@@ -1,0 +1,4354 @@
+﻿SET default_tablespace = univerts;
+
+CREATE TABLE email (
+    id bigint NOT NULL,
+    email_address character varying(50) NOT NULL,
+    subject character varying(256) NOT NULL,
+    email_text character varying(1024) NOT NULL,
+    send_date timestamp without time zone NOT NULL,
+    status_id bigint NOT NULL
+);
+
+COMMENT ON TABLE email IS 'Отправка писемь';
+COMMENT ON COLUMN email.id IS 'ID';
+COMMENT ON COLUMN email.email_address IS 'Адрес от кого';
+COMMENT ON COLUMN email.email_text IS 'Текст сообщения';
+COMMENT ON COLUMN email.send_date IS 'Дата отправления';
+COMMENT ON COLUMN email.status_id IS 'Статус';
+
+CREATE TABLE email_status (
+    id bigint NOT NULL,
+    name character varying(64) NOT NULL
+);
+
+COMMENT ON TABLE email_status IS 'Статусы e-mail сообщений';
+COMMENT ON COLUMN email_status.id IS 'ID';
+COMMENT ON COLUMN email_status.name IS 'Наименование';
+
+CREATE TABLE log (
+    id bigint NOT NULL,
+    log_type_id bigint NOT NULL,
+    log_date timestamp without time zone NOT NULL,
+    user_id bigint NOT NULL,
+    task_id bigint,
+    table_id bigint,
+    log text
+);
+
+COMMENT ON TABLE log IS 'Журнал действии пользователей';
+COMMENT ON COLUMN log.id IS 'ID';
+COMMENT ON COLUMN log.log_type_id IS 'Тип журнала';
+COMMENT ON COLUMN log.log_date IS 'Дата и время';
+COMMENT ON COLUMN log.user_id IS 'Пользователь';
+COMMENT ON COLUMN log.task_id IS 'Модуль';
+COMMENT ON COLUMN log.table_id IS 'Таблица';
+COMMENT ON COLUMN log.log IS 'Запись журнала';
+
+CREATE TABLE log_types (
+    id bigint NOT NULL,
+    name character varying(64) NOT NULL
+);
+
+COMMENT ON TABLE log_types IS 'Типы журнала';
+COMMENT ON COLUMN log_types.id IS 'ID';
+COMMENT ON COLUMN log_types.name IS 'Наименование';
+
+CREATE TABLE role_task_functions (
+    id bigint NOT NULL,
+    role_task_id bigint NOT NULL,
+    task_function_id bigint NOT NULL
+);
+
+COMMENT ON TABLE role_task_functions IS 'Дополнительные функции в задаче';
+
+CREATE TABLE role_tasks (
+    id bigint NOT NULL,
+    role_id bigint NOT NULL,
+    task_id bigint NOT NULL,
+    access_type boolean NOT NULL
+);
+
+COMMENT ON TABLE role_tasks IS 'Задачи ролей';
+COMMENT ON COLUMN role_tasks.access_type IS 'False - Только чтение, True - Полный доступ';
+
+CREATE TABLE roles (
+    id bigint NOT NULL,
+    role_name character varying(32) NOT NULL,
+    descr character varying(255)
+);
+
+COMMENT ON TABLE roles IS 'Роли';
+COMMENT ON COLUMN roles.id IS 'ID';
+COMMENT ON COLUMN roles.role_name IS 'Название роля';
+COMMENT ON COLUMN roles.descr IS 'Описание';
+
+CREATE TABLE settings (
+    id bigint NOT NULL,
+    name character varying(50) NOT NULL,
+    value character varying(100) NOT NULL,
+    descr character varying(256)
+);
+
+COMMENT ON TABLE settings IS 'Настройки системы';
+COMMENT ON COLUMN settings.id IS 'ID';
+COMMENT ON COLUMN settings.name IS 'Наименование';
+COMMENT ON COLUMN settings.value IS 'Значение';
+COMMENT ON COLUMN settings.descr IS 'Описание';
+
+CREATE TABLE tables (
+    id bigint NOT NULL,
+    name character varying(32) NOT NULL,
+    log_insert boolean NOT NULL,
+    log_update boolean NOT NULL,
+    log_delete boolean NOT NULL,
+    descr character varying(255) NOT NULL
+);
+
+COMMENT ON TABLE tables IS 'Таблицы';
+COMMENT ON COLUMN tables.name IS 'Название таблицы';
+COMMENT ON COLUMN tables.log_insert IS 'Записывать добавление (True - Да, False - Нет)';
+COMMENT ON COLUMN tables.log_update IS 'Записывать изменение (True - Да, False - Нет)';
+COMMENT ON COLUMN tables.log_delete IS 'Записывать удаление (True - Да, False - Нет)';
+COMMENT ON COLUMN tables.descr IS 'Описание';
+
+CREATE TABLE task_functions (
+    id bigint NOT NULL,
+    task_id bigint NOT NULL,
+    name character varying(50) NOT NULL,
+    descr character varying(100) NOT NULL
+);
+
+COMMENT ON TABLE task_functions IS 'Дополнительные функции в задаче';
+
+CREATE TABLE tasks (
+    id bigint NOT NULL,
+    name character varying(100) NOT NULL,
+    title character varying(255),
+    task_type boolean NOT NULL,
+    task_order numeric(4,0) NOT NULL,
+    class_path character varying(512),
+    parent_id bigint,
+    icon_name character varying(50),
+    descr character varying(1000),
+    visible boolean NOT NULL
+);
+
+COMMENT ON TABLE tasks IS 'Задачи и отчеты';
+COMMENT ON COLUMN tasks.name IS 'Наименование, будет использоваться для меню';
+COMMENT ON COLUMN tasks.title IS 'Заголовок окна, если это задача';
+COMMENT ON COLUMN tasks.task_type IS 'Тип задачи (False - Задача, True - Отчет)';
+COMMENT ON COLUMN tasks.task_order IS 'Порядок отображения в меню';
+COMMENT ON COLUMN tasks.class_path IS 'Путь к классу, NULL - если группа задач';
+COMMENT ON COLUMN tasks.parent_id IS 'Если NULL - корневая группа задач';
+COMMENT ON COLUMN tasks.descr IS 'Описание';
+
+CREATE TABLE user_roles (
+    id bigint NOT NULL,
+    user_id bigint NOT NULL,
+    role_id bigint NOT NULL
+);
+
+COMMENT ON TABLE user_roles IS 'Роли пользователей';
+COMMENT ON COLUMN user_roles.id IS 'ID';
+
+CREATE TABLE users (
+    id bigint NOT NULL,
+    user_type_id         integer,
+    first_name           character varying(64),
+    last_name            character varying(64),
+    middle_name          character varying(64),
+    first_name_en        character varying(64),
+    last_name_en         character varying(64),
+    middle_name_en       character varying(64),
+    birth_date           date,
+    sex_id               bigint,
+    marital_status_id    bigint,
+    nationality_id       bigint,
+    citizenship_id       bigint,
+    code                 character varying(12),
+    login character varying(20) NOT NULL,
+    passwd character(64) NOT NULL,
+    email                character varying(50),
+    phone_mobile         character varying(10),
+    phone_internal       character varying(128),
+    task_id		 bigint,
+    locked               boolean             not null,
+    lock_reason_id       bigint,
+    deleted              boolean             not null,
+    created              timestamp              not null
+);
+
+insert into email_status (id, name) values (1, 'KK=Дайын;RU=Подготовлено;EN=Ready;');
+insert into email_status (id, name) values (2, 'KK=Жөнелтілді;RU=Отправлено;EN=Sent;');
+
+insert into log_types (id, name) values (1, 'KK=Жүйеге кіру;RU=Вход в систему;EN=Login;');
+insert into log_types (id, name) values (2, 'KK=Жүйеден шығу;RU=Выход из системы;EN=Logout;');
+insert into log_types (id, name) values (3, 'KK=Ендіру;RU=Вставка;EN=Insert;');
+insert into log_types (id, name) values (4, 'KK=Өзгерту;RU=Изменение;EN=Update;');
+insert into log_types (id, name) values (5, 'KK=Жою;RU=Удаление;EN=Delete;');
+insert into log_types (id, name) values (6, 'KK=Құпия сөзді өзгерту;RU=Смена пароля;EN=Change password;');
+
+insert into role_tasks (id, role_id, task_id, access_type) values (1, 1, 1, true);
+insert into role_tasks (id, role_id, task_id, access_type) values (3, 1, 3, true);
+insert into role_tasks (id, role_id, task_id, access_type) values (4, 1, 4, true);
+insert into role_tasks (id, role_id, task_id, access_type) values (5, 1, 5, true);
+insert into role_tasks (id, role_id, task_id, access_type) values (6, 1, 6, true);
+insert into role_tasks (id, role_id, task_id, access_type) values (7, 1, 7, true);
+insert into role_tasks (id, role_id, task_id, access_type) values (8, 1, 8, true);
+insert into role_tasks (id, role_id, task_id, access_type) values (9, 1, 9, true);
+insert into role_tasks (id, role_id, task_id, access_type) values (2, 2, 2, true);
+
+insert into roles (id, role_name, descr) values (1, 'system', null);
+insert into roles (id, role_name, descr) values (2, 'alter_password', null);
+insert into roles (id, role_name, descr) values (3, 'administrator', null);
+
+insert into settings (id, name, value, descr) values (1, 'PK_GENERATOR', 'SEQUENCE', 'KK=Бастапқы кілтті жасау әдісі;RU=Способ генерации первичных ключей;EN=Primary key generation method;');
+insert into settings (id, name, value, descr) values (2, 'PK_PREFIX', 0, 'KK=ID өрісіне арналған алдыңғы қосымша;RU=Префикс для поля ID;EN=Prefix for ID field;');
+insert into settings (id, name, value, descr) values (4, 'TARGET_DB', 'POSTGRESQL', 'KK=Қолданылатын дерекқор;RU=Используемая БД;EN=Used DB;');
+insert into settings (id, name, value, descr) values (7, 'EMAIL_SMTP_HOST', 'smtp.gmail.com', 'KK=SMTP серверінің мекенжайы;RU=Адрес SMTP сервера;EN=Address of the SMTP server;');
+insert into settings (id, name, value, descr) values (6, 'EMAIL_SMTP_PROTOCOL', 'smtps', 'KK=SMTP протоколы;RU=SMTP протокол;EN=SMTP protocol;');
+insert into settings (id, name, value, descr) values (5, 'SCHEDULER_THREAD_POOL_SIZE', 100, 'KK=Тапсырмаларды жоспарлаушының ағындар пулының өлшемі;RU=Размер пула потоков планировщика задач;EN=Scheduler Thread Pool Size;');
+insert into settings (id, name, value, descr) values (8, 'EMAIL_SMTP_PORT', -1, 'KK=SMTP порты;RU=Порт SMTP;EN=SMTP port;');
+insert into settings (id, name, value, descr) values (12, 'EMAIL_POP3_PORT', -1, 'KK=POP3 порты;RU=Порт POP3;EN=POP3 port;');
+insert into settings (id, name, value, descr) values (3, 'LOGGING', 1, 'KK=Іс-әрекет журналын жүргізу;RU=Включить журналирование событий;EN=Enable logging of events;');
+insert into settings (id, name, value, descr) values (16, 'EMAIL_USE_IMAP', 1, 'KK=Хаттарды IMAP протоколы бойынша қабылдау;RU=Прием писемь по протоколу IMAP;EN=Receiving mails by IMAP protocol;');
+insert into settings (id, name, value, descr) values (15, 'EMAIL_IMAP_PORT', -1, 'KK=IMAP порты;RU=Порт IMAP;EN=IMAP port;');
+insert into settings (id, name, value, descr) values (14, 'EMAIL_IMAP_HOST', 'imap.gmail.com', 'KK=IMAP серверінің мекенжайы;RU=Адрес IMAP сервера;EN=Address of the IMAP server;');
+insert into settings (id, name, value, descr) values (13, 'EMAIL_IMAP_PROTOCOL', 'imaps', 'KK=IMAP протоколы;RU=IMAP протокол;EN=IMAP protocol;');
+insert into settings (id, name, value, descr) values (11, 'EMAIL_POP3_HOST', 'pop.gmail.com', 'KK=POP3 серверінің мекенжайы;RU=Адрес POP3 сервера;EN=Address of the POP3 server;');
+insert into settings (id, name, value, descr) values (10, 'EMAIL_POP3_PROTOCOL', 'pop3s', 'KK=POP3 протоколы;RU=POP3 протокол;EN=POP3 protocol;');
+insert into settings (id, name, value, descr) values (9, 'EMAIL_SMTP_USE_SSL', 0, 'KK=SSL арқылы жөнелту: 1 - Иә, 0 - Жоқ;RU=Отправить по SSL: 1 - Да, 0 - Нет;EN=Send by SSL: 1 - Yes, 0 - No;');
+
+insert into tables (id, name, log_insert, log_update, log_delete, descr) values (1, 'EMAIL_SERVER', true, true, true, 'KK=Пошта серверінің теңшемелері;RU=Настройки почтового сервера;EN=E-mail server settings;');
+insert into tables (id, name, log_insert, log_update, log_delete, descr) values (2, 'ROLE_TASK_FUNCTIONS', true, true, true, 'KK=Қосымша құқықтар;RU=Дополнительные права;EN=Additional privileges;');
+insert into tables (id, name, log_insert, log_update, log_delete, descr) values (3, 'ROLE_TASKS', true, true, true, 'KK=Рұқсат етілген модулдер;RU=Разрешенные модули;EN=Permitted modules;');
+insert into tables (id, name, log_insert, log_update, log_delete, descr) values (4, 'ROLES', true, true, true, 'KK=Рөлдер;RU=Роли;EN=Roles;');
+insert into tables (id, name, log_insert, log_update, log_delete, descr) values (5, 'SETTINGS', true, true, true, 'KK=Жүйенің теңшемелері;RU=Настройки системы;EN=System settings;');
+insert into tables (id, name, log_insert, log_update, log_delete, descr) values (6, 'USER_ROLES', true, true, true, 'KK=Қолданушының рөлдері;RU=Роли пользователя;EN=User roles;');
+insert into tables (id, name, log_insert, log_update, log_delete, descr) values (7, 'USERS', true, true, true, 'KK=Қолданушылар;RU=Пользователи;EN=Users;');
+
+insert into tasks (id, name, title, task_type, task_order, class_path, parent_id, icon_name, descr, visible) values (8, 'KK=Модульдер;RU=Модули;EN=Modules;', 'KK=Модульдер;RU=Модули;EN=Modules;', false, 301, 'com.r5.core.web.system.TasksView', 7, null, 'KK=Жүйенің модулдері;RU=Модули системы;EN=Modules of the system;', true);
+insert into tasks (id, name, title, task_type, task_order, class_path, parent_id, icon_name, descr, visible) values (3, 'KK=Басқару;RU=Администрирование;EN=Administration;', null, false, 200, null, null, null, 'KK=Жүйені басқаруға арналған модуль;RU=Модуль администрирования системы;EN=Module for administering the system;', true);
+insert into tasks (id, name, title, task_type, task_order, class_path, parent_id, icon_name, descr, visible) values (9, 'KK=Теңшемелер;RU=Настройки;EN=Settings;', 'KK=Теңшемелер;RU=Настройки;EN=Settings;', false, 302, 'com.r5.core.web.system.SettingsView', 7, null, 'KK=Жүйені теңшемелеуге арналған модуль;RU=Модуль для настройки системы;EN=Module for maintenance of the system;', true);
+insert into tasks (id, name, title, task_type, task_order, class_path, parent_id, icon_name, descr, visible) values (1, 'KK=Жалпы;RU=Общее;EN=Common;', null, false, 100, null, null, null, 'KK=Барлық қолданушыларға арналған ортақ міндеттер;RU=Общие задачи, предназначенные для всех пользователей;EN=Common tasks intended for all users;', true);
+insert into tasks (id, name, title, task_type, task_order, class_path, parent_id, icon_name, descr, visible) values (2, 'KK=Құпия сөзді өзгерту;RU=Смена пароля;EN=Change password;', 'KK=Құпия сөзді өзгерту;RU=Смена пароля;EN=Change password;', false, 101, 'com.r5.core.web.security.ChangePasswordView', 1, null, 'KK=Құпия сөзді өзгертуге арналған модуль;RU=Модуль смены пароля;EN=Module for changing a password;', true);
+insert into tasks (id, name, title, task_type, task_order, class_path, parent_id, icon_name, descr, visible) values (5, 'KK=Рөлдер;RU=Роли;EN=Roles;', 'KK=Рөлдер;RU=Роли;EN=Roles;', false, 202, 'com.r5.core.web.admin.RolesView', 3, null, 'KK=Рөлдерді басқаруға арналған модуль;RU=Модуль администрирования ролей;EN=Module for administering roles;', true);
+insert into tasks (id, name, title, task_type, task_order, class_path, parent_id, icon_name, descr, visible) values (6, 'KK=Іс-әрекет журналы;RU=Журнал событий;EN=Event logs;', 'KK=Іс-әрекет журналы;RU=Журнал событий;EN=Event logs;', false, 203, 'com.r5.core.web.admin.LogView', 3, null, 'KK=Іс-әрекет журналын көруге арналған модуль;RU=Модуль для просмотра журнала событий;EN=Module for view event logs;', true);
+insert into tasks (id, name, title, task_type, task_order, class_path, parent_id, icon_name, descr, visible) values (7, 'KK=Жүйе;RU=Система;EN=System;', null, false, 300, null, null, null, 'KK=Жүйені теңшемелеуге арналған модулдер;RU=Модули для настройки системы;EN=Modules for maintenance the system;', true);
+insert into tasks (id, name, title, task_type, task_order, class_path, parent_id, icon_name, descr, visible) values (4, 'KK=Қолданушылар;RU=Пользователи;EN=Users;', 'KK=Қолданушылар;RU=Пользователи;EN=Users;', false, 201, 'com.bass.taxcommittee.web.admin.TaxUsersView', 3, null, 'KK=Қолданушыларды басқаруға арналған модуль;RU=Модуль администрирования пользователей;EN=Module for administering users;', true);
+
+insert into user_roles (id, user_id, role_id) values (1, 1, 1);
+insert into user_roles (id, user_id, role_id) values (2, 1, 2);
+insert into user_roles (id, user_id, role_id) values (3, 2, 2);
+insert into user_roles (id, user_id, role_id) values (4, 2, 3);
+
+insert into users (id, login, passwd, locked, deleted, created) values (1, 'system', 'c68e903fbadfaef0679945bf5372b4130c73572f85c40731782f19ba2008cc3a', false, false, current_date);
+insert into users (id, login, passwd, locked, deleted, created) values (2, 'Administrator', 'd82494f05d6917ba02f7aaa29689ccb444bb73f20380876cb05d1f37537b7892', false, false, current_date);
+
+ALTER TABLE ONLY email
+    ADD CONSTRAINT pk_email PRIMARY KEY (id);
+
+ALTER TABLE ONLY email_status
+    ADD CONSTRAINT pk_email_status PRIMARY KEY (id);
+
+ALTER TABLE ONLY log
+    ADD CONSTRAINT pk_log PRIMARY KEY (id);
+
+ALTER TABLE ONLY log_types
+    ADD CONSTRAINT pk_log_types PRIMARY KEY (id);
+
+ALTER TABLE ONLY role_task_functions
+    ADD CONSTRAINT pk_role_task_functions PRIMARY KEY (id);
+
+ALTER TABLE ONLY role_tasks
+    ADD CONSTRAINT pk_role_tasks PRIMARY KEY (id);
+
+ALTER TABLE ONLY roles
+    ADD CONSTRAINT pk_roles PRIMARY KEY (id);
+
+ALTER TABLE ONLY settings
+    ADD CONSTRAINT pk_settings PRIMARY KEY (id);
+
+ALTER TABLE ONLY tables
+    ADD CONSTRAINT pk_tables PRIMARY KEY (id);
+
+ALTER TABLE ONLY task_functions
+    ADD CONSTRAINT pk_task_functions PRIMARY KEY (id);
+
+ALTER TABLE ONLY tasks
+    ADD CONSTRAINT pk_tasks PRIMARY KEY (id);
+
+ALTER TABLE ONLY user_roles
+    ADD CONSTRAINT pk_user_roles PRIMARY KEY (id);
+
+ALTER TABLE ONLY users
+    ADD CONSTRAINT pk_users PRIMARY KEY (id);
+
+CREATE INDEX idx_email_status ON email USING btree (status_id);
+
+CREATE INDEX idx_log_log_date ON log USING btree (log_date);
+CREATE INDEX idx_log_log_type ON log USING btree (log_type_id);
+CREATE INDEX idx_log_table ON log USING btree (table_id);
+CREATE INDEX idx_log_task ON log USING btree (task_id);
+CREATE INDEX idx_log_user ON log USING btree (user_id);
+
+CREATE UNIQUE INDEX idx_role_task_functions ON role_task_functions USING btree (role_task_id, task_function_id);
+CREATE UNIQUE INDEX idx_role_tasks ON role_tasks USING btree (role_id, task_id);
+CREATE UNIQUE INDEX idx_roles ON roles USING btree (role_name);
+CREATE UNIQUE INDEX idx_settings ON settings USING btree (name);
+CREATE UNIQUE INDEX idx_tables ON tables USING btree (name);
+CREATE INDEX idx_task_functions ON task_functions USING btree (task_id);
+CREATE INDEX idx_tasks_parent ON tasks USING btree (parent_id);
+CREATE UNIQUE INDEX idx_user_roles ON user_roles USING btree (user_id, role_id);
+
+CREATE UNIQUE INDEX idx_users_login ON users USING btree (login);
+CREATE INDEX idx_users_task ON users USING btree (task_id);
+
+ALTER TABLE ONLY email
+    ADD CONSTRAINT fk_email_email_status FOREIGN KEY (status_id) REFERENCES email_status(id) ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+ALTER TABLE ONLY log
+    ADD CONSTRAINT fk_log_log_type FOREIGN KEY (log_type_id) REFERENCES log_types(id) ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+ALTER TABLE ONLY log
+    ADD CONSTRAINT fk_log_table FOREIGN KEY (table_id) REFERENCES tables(id) ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+ALTER TABLE ONLY log
+    ADD CONSTRAINT fk_log_task FOREIGN KEY (task_id) REFERENCES tasks(id) ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+ALTER TABLE ONLY log
+    ADD CONSTRAINT fk_log_users FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+ALTER TABLE ONLY role_task_functions
+    ADD CONSTRAINT fk_role_task_func_role_task FOREIGN KEY (role_task_id) REFERENCES role_tasks(id) ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+ALTER TABLE ONLY role_task_functions
+    ADD CONSTRAINT fk_role_task_func_task_func FOREIGN KEY (task_function_id) REFERENCES task_functions(id) ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+ALTER TABLE ONLY role_tasks
+    ADD CONSTRAINT fk_role_tasks_roles FOREIGN KEY (role_id) REFERENCES roles(id) ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+ALTER TABLE ONLY role_tasks
+    ADD CONSTRAINT fk_role_tasks_tasks FOREIGN KEY (task_id) REFERENCES tasks(id) ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+ALTER TABLE ONLY task_functions
+    ADD CONSTRAINT fk_task_functions_tasks FOREIGN KEY (task_id) REFERENCES tasks(id) ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+ALTER TABLE ONLY tasks
+    ADD CONSTRAINT fk_tasks_parent_task FOREIGN KEY (parent_id) REFERENCES tasks(id) ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+ALTER TABLE ONLY user_roles
+    ADD CONSTRAINT fk_user_roles_role FOREIGN KEY (role_id) REFERENCES roles(id) ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+ALTER TABLE ONLY user_roles
+    ADD CONSTRAINT fk_user_roles_user FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+create sequence S_TASKS
+minvalue 0
+start with 21
+no cycle;
+
+create sequence S_EMAIL
+minvalue 0
+start with 1
+no cycle;
+
+create sequence S_TABLES
+minvalue 0
+start with 8
+no cycle;
+
+create sequence S_ROLES
+minvalue 0
+start with 11
+no cycle;
+
+create sequence S_USERS
+minvalue 0
+start with 2
+no cycle;
+
+create sequence S_USER_ROLES
+minvalue 0
+start with 3
+no cycle;
+
+create sequence S_LOG
+minvalue 0
+start with 1
+no cycle;
+
+create sequence S_ROLE_TASKS
+minvalue 0
+start with 21
+no cycle;
+
+create sequence S_TASK_FUNCTIONS
+minvalue 0
+start with 1
+no cycle;
+
+create sequence S_ROLE_TASK_FUNCTIONS
+minvalue 0
+start with 1
+no cycle;
+
+create table academic_calendar
+(
+   id                   bigint                 not null,
+   year_id              bigint                 not null,
+   faculty_id           bigint                 not null,
+   created              timestamp              not null,
+   status               numeric(1)             not null
+);
+
+create table academic_calendar_detail
+(
+   id                   bigint                 not null,
+   academic_calendar_id bigint                 not null,
+   item_id              bigint                 not null,
+   date1                date,
+   date2                date,
+   date3                date,
+   date4                date,
+   descr                character varying(128)
+);
+
+alter table academic_calendar_detail
+   add constraint pk_t_academic_calendar_detail primary key (id);
+
+create unique index idx_t_academic_calendar on academic_calendar (
+   year_id              asc,
+   faculty_id           asc
+);
+
+create unique index idx_t_academic_calendar_detail on academic_calendar_detail (
+   academic_calendar_id asc
+);
+
+alter table academic_calendar
+   add constraint pk_academic_calendar primary key (id);
+   
+create table academic_calendar_faculty
+(
+   id                   bigint                 not null,
+   faculty_name         character varying(20)            not null
+);
+
+alter table academic_calendar_faculty
+   add constraint pk_t_academic_calendar_faculty primary key (id);
+
+create table academic_calendar_item
+(
+   id                   bigint                 not null,
+   faculty_id           bigint                 not null,
+   semester_period_id   bigint,
+   item_name            character varying(521)           not null,
+   item_type            character varying(3)             not null,
+   deleted              boolean             not null
+);
+
+alter table  academic_calendar_item
+   add constraint pk_t_academic_calendar_item primary key (id);
+
+create index  idx_t_academic_calendar_item on  academic_calendar_item (
+   faculty_id           asc,
+   semester_period_id   asc,
+   item_name            asc
+);
+
+create unique index  idx_t_academic_calendar_item_typ on  academic_calendar_item (
+   item_type            asc
+);
+
+create table  academic_degree
+(
+   id                   bigint                 not null,
+   speciality_id        bigint                 not null,
+   degree_name          character varying(128)           not null,
+   study_period         numeric(1)             not null
+);
+
+alter table  academic_degree
+   add constraint pk_t_academic_degree primary key (id);
+
+create unique index  idx_t_academic_degree on  academic_degree (
+   speciality_id        asc
+);
+
+create table  academic_formula
+(
+   id                   bigint                 not null,
+   creditability_id     bigint                 not null,
+   formula              character varying(6)             not null,
+   lc_count             numeric(2)             not null,
+   lb_count             numeric(2)             not null,
+   pr_count             numeric(2)             not null
+);
+
+alter table  academic_formula
+   add constraint pk_t_academic_formula primary key (id);
+
+create unique index  idx_t_academic_formula on  academic_formula (
+   creditability_id     asc,
+   formula              asc
+);
+
+create table  academic_status
+(
+   id                   bigint                 not null,
+   status_name          character varying(16)            not null
+);
+
+alter table  academic_status
+   add constraint pk_t_academic_status primary key (id);
+
+create table  address_type
+(
+   id                   bigint                 not null,
+   type_name            character varying(64)            not null
+);
+
+alter table  address_type
+   add constraint pk_t_address_type primary key (id);
+
+create table  attestation
+(
+   id                   bigint                 not null,
+   schedule_detail_id   bigint                 not null,
+   attestation_type_id  bigint                 not null,
+   attestation_date     date                   not null,
+   begin_date           timestamp,
+   finish_date          timestamp,
+   locked               numeric(1)             not null,
+   locked_by            character varying(32)
+);
+
+alter table  attestation
+   add constraint pk_t_attestation primary key (id);
+
+create unique index  idx_t_attestation on  attestation (
+   schedule_detail_id   asc,
+   attestation_type_id  asc
+);
+
+create table  attestation_detail
+(
+   id                   bigint                 not null,
+   attestation_id       bigint                 not null,
+   student_id           bigint                 not null,
+   attendance_mark      numeric(1)             not null,
+   grade                numeric(6,2)           not null,
+   use_gpa              boolean             not null,
+   comments             character varying(512),
+   updated              timestamp,
+   updated_by           character varying(32)
+);
+
+alter table  attestation_detail
+   add constraint pk_t_attestation_detail primary key (id);
+
+create unique index  idx_t_attestation_detail on  attestation_detail (
+   attestation_id       asc,
+   student_id           asc
+);
+
+create table  attestation_type
+(
+   id                   bigint                 not null,
+   type_name            character varying(32)            not null
+);
+
+alter table  attestation_type
+   add constraint pk_t_attestation_type primary key (id);
+
+create table  award
+(
+   id                   bigint                 not null,
+   award_name           character varying(128)           not null
+);
+
+alter table  award
+   add constraint pk_t_award primary key (id);
+
+create table  contract_type
+(
+   id                   bigint                 not null,
+   type_name            character varying(128)           not null
+);
+
+alter table  contract_type
+   add constraint pk_t_contract_type primary key (id);
+
+create table  control_type
+(
+   id                   bigint                 not null,
+   type_name            character varying(128)           not null
+);
+
+alter table  control_type
+   add constraint pk_t_control_type primary key (id);
+
+create table  corpus
+(
+   id                   bigint                 not null,
+   corpus_name          character varying(32)            not null,
+   address              character varying(64)
+);
+
+alter table  corpus
+   add constraint pk_t_corpus primary key (id);
+
+create table  country
+(
+   id                   bigint                 not null,
+   country_name         character varying(128)           not null,
+   parent_id            bigint
+);
+
+alter table  country
+   add constraint pk_t_country primary key (id);
+
+create index  idx_t_country_parent on  country (
+   parent_id            asc
+);
+
+create table  creditability
+(
+   id                   bigint                 not null,
+   credit               numeric(2)             not null
+);
+
+alter table  creditability
+   add constraint pk_t_creditability primary key (id);
+
+create table  curriculum
+(
+   id                   bigint                 not null,
+   speciality_id        bigint                 not null,
+   entrance_year_id     bigint                 not null,
+   status_id            bigint                 not null,
+   created              timestamp              not null,
+   updated              timestamp,
+   deleted              boolean             not null
+);
+
+alter table  curriculum
+   add constraint pk_t_curriculum primary key (id);
+
+create unique index  idx_t_curriculum on  curriculum (
+   speciality_id        asc,
+   entrance_year_id     asc
+);
+
+create table  curriculum_add_program
+(
+   id                   bigint                 not null,
+   curriculum_id        bigint                 not null,
+   semester_id          bigint                 not null,
+   semester_data_id     bigint,
+   subject_id           bigint                 not null,
+   created              timestamp              not null,
+   updated              timestamp,
+   deleted              numeric(1)             not null
+);
+
+alter table  curriculum_add_program
+   add constraint pk_t_curriculum_add_program primary key (id);
+
+create index  idx_t_curriculum_add_program on  curriculum_add_program (
+   curriculum_id        asc,
+   subject_id           asc,
+   semester_id          asc
+);
+
+create table  curriculum_detail
+(
+   id                   bigint                 not null,
+   curriculum_id        bigint                 not null,
+   semester_id          bigint                 not null,
+   semester_data_id     bigint,
+   subject_id           bigint,
+   subject_cycle_id     bigint,
+   elective_subject_id  bigint,
+   elective_subject_cycle_id bigint,
+   elective_subject_credit numeric(1),
+   recommended_semester character varying(10),
+   consider_credit      numeric(1)             not null,
+   created              timestamp              not null,
+   updated              timestamp,
+   deleted              numeric(1)             not null
+);
+
+alter table  curriculum_detail
+   add constraint pk_t_curriculum_detail primary key (id);
+
+create index  idx_t_curriculum_detail on  curriculum_detail (
+   curriculum_id        asc,
+   semester_id          asc,
+   semester_data_id     asc,
+   subject_id           asc
+);
+
+create table  curriculum_schedule
+(
+   id                   bigint                 not null,
+   curriculum_id        bigint                 not null,
+   study_year_id        bigint                 not null,
+   month_id             bigint,
+   week_id              bigint                 not null,
+   symbol_id            bigint                 not null
+);
+
+alter table  curriculum_schedule
+   add constraint pk_t_curriculum_schedule primary key (id);
+
+create unique index  idx_t_curriculum_schedule on  curriculum_schedule (
+   curriculum_id        asc,
+   study_year_id        asc,
+   month_id             asc,
+   week_id              asc
+);
+
+create table  curriculum_schedule_symbol
+(
+   id                   bigint                 not null,
+   symbol               character varying(2)             not null,
+   descr                character varying(128)           not null
+);
+
+alter table  curriculum_schedule_symbol
+   add constraint pk_t_curriculum_schedule_symbol primary key (id);
+
+create table  curriculum_status
+(
+   id                   bigint                 not null,
+   status_name          character varying(32)            not null
+);
+
+alter table  curriculum_status
+   add constraint pk_t_curriculum_status primary key (id);
+
+create table  curriculum_summer
+(
+   id                   bigint                 not null,
+   semester_data_id     bigint                 not null,
+   status_id            bigint                 not null,
+   created              timestamp              not null,
+   updated              timestamp,
+   deleted              numeric(1)             not null
+);
+
+alter table  curriculum_summer
+   add constraint pk_t_curriculum_summer primary key (id);
+
+create unique index  idx_t_curriculum_summer on  curriculum_summer (
+   semester_data_id     asc
+);
+
+create table  curriculum_summer_detail
+(
+   id                   bigint                 not null,
+   curriculum_id        bigint                 not null,
+   subject_id           bigint                 not null,
+   subject_cycle_id     bigint,
+   created              timestamp              not null,
+   updated              timestamp,
+   deleted              numeric(1)             not null
+);
+
+alter table  curriculum_summer_detail
+   add constraint pk_t_curriculum_summer_detail primary key (id);
+
+create unique index  idx_t_curriculum_summer_detail on  curriculum_summer_detail (
+   curriculum_id        asc,
+   subject_id           asc
+);
+
+create table  data_type
+(
+   id                   bigint                 not null,
+   type_name            character varying(7)             not null
+);
+
+alter table  data_type
+   add constraint pk_t_data_type primary key (id);
+
+create table  day_hour
+(
+   id                   bigint                 not null,
+   from_hour            numeric(4,2)           not null,
+   to_hour              numeric(4,2)           not null,
+   time_period          char(11)               not null
+);
+
+alter table  day_hour
+   add constraint pk_t_day_hour primary key (id);
+
+create table  death_certificate
+(
+   id                   bigint                 not null,
+   issuer_name          character varying(256),
+   descr                character varying(256)
+);
+
+alter table  death_certificate
+   add constraint pk_t_death_certificate primary key (id);
+
+create table  degree
+(
+   id                   bigint                 not null,
+   degree_name          character varying(128)           not null
+);
+
+alter table  degree
+   add constraint pk_t_degree primary key (id);
+
+create table  department
+(
+   id                   bigint                 not null,
+   dept_name            character varying(256)           not null,
+   dept_short_name      character varying(16),
+   code                 char(4)                not null,
+   parent_id            bigint,
+   fc                   numeric(1)             not null,
+   deleted              numeric(1)             not null,
+   skd_id               bigint
+);
+
+alter table  department
+   add constraint pk_t_department primary key (id);
+
+create index  idx_t_dept_parent on  department (
+   parent_id            asc
+);
+
+create index  idx_t_dept_deleted on  department (
+   deleted              asc
+);
+
+create unique index  idx_t_dept_code on  department (
+   code                 asc
+);
+
+create table  disability_doc
+(
+   id                   bigint                 not null,
+   issuer_name          character varying(256)
+);
+
+alter table  disability_doc
+   add constraint pk_t_disability_doc primary key (id);
+
+create table  document_type
+(
+   id                   bigint                 not null,
+   type_name            character varying(128)           not null
+);
+
+alter table  document_type
+   add constraint pk_t_document_type primary key (id);
+
+create table  dorm
+(
+   id                   bigint                 not null,
+   dorm_name            character varying(32)            not null,
+   dorm_address         character varying(128),
+   room_count           numeric(2)             not null,
+   bed_count            numeric(3)             not null,
+   deleted              numeric(1)             not null
+);
+
+alter table  dorm
+   add constraint pk_t_dorm primary key (id);
+   
+create table  dorm_cost
+(
+   id                   bigint                 not null,
+   dorm_id              bigint                 not null,
+   bed_count            numeric(1)             not null,
+   gpa_min              numeric(2,1)           not null,
+   gpa_max              numeric(2,1)           not null,
+   study_year_id        bigint                 not null,
+   cost                 numeric(9,2)           not null
+);
+
+alter table  dorm_cost
+   add constraint pk_t_dorm_cost primary key (id);
+
+create unique index  idx_t_dorm_cost on  dorm_cost (
+   dorm_id              asc,
+   bed_count            asc,
+   gpa_min              asc,
+   gpa_max              asc,
+   study_year_id        asc
+);
+
+create table  dorm_room
+(
+   id                   bigint                 not null,
+   dorm_id              bigint                 not null,
+   room_no              character varying(64)            not null,
+   bed_count            numeric(1)             not null,
+   cost                 numeric(9,2)           not null,
+   deleted              numeric(1)             not null
+);
+
+alter table  dorm_room
+   add constraint pk_t_dorm_room primary key (id);
+
+create unique index  idx_t_dorm_room on  dorm_room (
+   dorm_id              asc,
+   room_no              asc,
+   deleted              asc
+);
+
+create table  dorm_rule_violation_type
+(
+   id                   bigint                 not null,
+   type_name            character varying(128)           not null
+);
+
+alter table  dorm_rule_violation_type
+   add constraint pk_dorm_rule_violation_type primary key (id);
+
+create table  dorm_student
+(
+   id                   bigint                 not null,
+   room_id              bigint                 not null,
+   student_id           bigint                 not null,
+   cost                 numeric(9,2)           not null,
+   check_in_date        timestamp              not null,
+   check_out_date       timestamp,
+   deleted              numeric(1)             not null,
+   created              timestamp              not null
+);
+
+alter table  dorm_student
+   add constraint pk_t_dorm_student primary key (id);
+
+create unique index  idx_t_dorm_student on  dorm_student (
+   room_id              asc,
+   student_id           asc,
+   check_in_date        asc
+);
+
+create table  dorm_student_violation
+(
+   id                   bigint                 not null,
+   dorm_student_id      bigint                 not null,
+   violation_type_id    bigint                 not null,
+   violation_date       timestamp              not null,
+   descr                character varying(512),
+   created              timestamp              not null
+);
+
+alter table  dorm_student_violation
+   add constraint pk_t_dorm_student_violation primary key (id);
+
+create index  idx_t_dorm_student_violation on  dorm_student_violation (
+   dorm_student_id      asc,
+   violation_type_id    asc,
+   violation_date       asc
+);
+
+create table  ects
+(
+   id                   bigint                 not null,
+   ects                 numeric(2)             not null
+);
+
+alter table  ects
+   add constraint pk_t_ects primary key (id);
+
+create table  education_doc
+(
+   id                   bigint                 not null,
+   education_type_id    bigint                 not null,
+   education_doc_type_id bigint                 not null,
+   school_type_id       bigint,
+   school_name          character varying(256),
+   school_country_id    bigint,
+   school_region_id     bigint,
+   school_address       character varying(256),
+   language_id          bigint,
+   school_certificate_type_id bigint,
+   high_graduated       numeric(1)             not null,
+   gold_mark            numeric(1)             not null,
+   gpa                  numeric(5,2)           default 0,
+   entry_year           numeric(4),
+   end_year             numeric(4),
+   faculty_name         character varying(64),
+   speciality_name      character varying(64)
+);
+
+alter table  education_doc
+   add constraint pk_t_education_doc primary key (id);
+
+create table  education_doc_type
+(
+   id                   bigint                 not null,
+   type_name            character varying(32)            not null
+);
+
+alter table  education_doc_type
+   add constraint pk_t_education_doc_type primary key (id);
+
+create table  education_type
+(
+   id                   bigint                 not null,
+   type_name            character varying(64)            not null
+);
+
+alter table  education_type
+   add constraint pk_t_education_type primary key (id);
+
+create table  elective_subject
+(
+   id                   bigint                 not null,
+   curriculum_id        bigint                 not null,
+   semester_id          bigint                 not null,
+   semester_data_id     bigint,
+   subject_id           bigint                 not null,
+   subject_cycle_id     bigint,
+   created              timestamp              not null,
+   updated              timestamp,
+   deleted              numeric(1)             not null
+);
+
+alter table  elective_subject
+   add constraint pk_t_elective_subject primary key (id);
+
+create table  elective_subject_label
+(
+   id                   bigint                 not null,
+   name_kz              character varying(128)           not null,
+   name_en              character varying(128)           not null,
+   name_ru              character varying(128)           not null
+);
+
+alter table elective_subject_label
+   add constraint pk_elective_subject_label primary key (id);
+
+create table  employee
+(
+   id                   bigint                 not null,
+   employee_status_id   bigint                 not null,
+   bachelor             numeric(1)             not null,
+   master               numeric(1)             not null
+);
+
+alter table  employee
+   add constraint pk_t_employee primary key (id);
+
+create table  employee_degree
+(
+   id                   bigint                 not null,
+   degree_id            bigint                 not null,
+   school_name          character varying(128)           not null,
+   dissertation_topic   character varying(128)           not null
+);
+
+alter table  employee_degree
+   add constraint pk_t_employee_degree primary key (id);
+
+create table  employee_dept
+(
+   id                   bigint                 not null,
+   employee_type_id     bigint                 not null,
+   employee_id          bigint                 not null,
+   dept_id              bigint,
+   post_id              bigint,
+   live_load            numeric(2)             not null default 0,
+   wage_rate            numeric(3,2)           not null,
+   rate_load            numeric(4,2)           not null,
+   hour_count           numeric(4,2)           not null,
+   hire_date            date                   not null,
+   dismiss_date         date,
+   adviser              numeric(1)             not null,
+   parent_id            bigint,
+   descr                character varying(2000)
+);
+
+alter table  employee_dept
+   add constraint pk_t_employee_dept primary key (id);
+
+create unique index  idx_t_employee_dept on  employee_dept (
+   employee_id          asc,
+   dept_id              asc,
+   post_id              asc
+);
+
+create table  employee_scientific
+(
+   id                   bigint                 not null,
+   employee_id          bigint                 not null,
+   scientific_type_id   integer                not null,
+   topic                character varying(1024)          not null
+);
+
+alter table  employee_scientific
+   add constraint pk_t_employee_scientific primary key (id);
+
+create table  employee_status
+(
+   id                   bigint                 not null,
+   status_name          character varying(64)            not null
+);
+
+alter table  employee_status
+   add constraint pk_t_employee_status primary key (id);
+
+create table  employee_type
+(
+   id                   bigint                 not null,
+   type_name            character varying(52)            not null
+);
+
+alter table  employee_type
+   add constraint pk_t_employee_type primary key (id);
+
+create table  employee_work_hour
+(
+   id                   bigint                 not null,
+   employee_id          bigint                 not null,
+   week_day_id          bigint                 not null,
+   day_hour_id          bigint                 not null,
+   work_hour_status_id  bigint                 not null
+);
+
+alter table  employee_work_hour
+   add constraint pk_t_emp_work_hour primary key (id);
+
+create unique index  idx_t_emp_work_hour on  employee_work_hour (
+   employee_id          asc,
+   week_day_id          asc,
+   day_hour_id          asc
+);
+
+create table  entrance_year
+(
+   id                   bigint                 not null,
+   entrance_year        char(9)                not null,
+   begin_year           numeric(4)             not null,
+   end_year             numeric(4)             not null
+);
+
+alter table  entrance_year
+   add constraint pk_t_entrance_year primary key (id);
+
+create unique index  idx_t_entrance_year_1 on  entrance_year (
+   entrance_year        asc
+);
+
+create unique index  idx_t_entrance_year_2 on  entrance_year (
+   begin_year           asc,
+   end_year             asc
+);
+
+create table  entrant_speciality
+(
+   id                   bigint                 not null,
+   student_id           bigint                 not null,
+   university_id        bigint                 not null,
+   speciality_id        bigint                 not null,
+   language_id          bigint                 not null
+);
+
+alter table  entrant_speciality
+   add constraint pk_t_entrant_speciality primary key (id);
+
+create unique index  idx_t_entrant_speciality on  entrant_speciality (
+   student_id           asc,
+   university_id        asc,
+   speciality_id        asc
+);
+
+create table  equipment
+(
+   id                   bigint                 not null,
+   equipment_name       character varying(64)            not null
+);
+
+alter table  equipment
+   add constraint pk_t_equipment primary key (id);
+
+create table  exam
+(
+   id                   bigint                 not null,
+   begin_date           timestamp,
+   finish_date          timestamp,
+   locked               numeric(1)             not null,
+   locked_by            character varying(32)
+);
+
+alter table  exam
+   add constraint pk_t_exam primary key (id);
+
+create table  exam_detail
+(
+   id                   bigint                 not null,
+   exam_id              bigint                 not null,
+   student_id           bigint                 not null,
+   attendance_mark      numeric(1)             not null,
+   grade                numeric(4,1)           not null,
+   alpha_grade          character varying(2)             not null,
+   digit_grade          numeric(3,2),
+   comments             character varying(512),
+   use_gpa              numeric(1)             not null,
+   updated              timestamp,
+   updated_by           character varying(32)
+);
+
+alter table  exam_detail
+   add constraint pk_t_exam_detail primary key (id);
+
+create unique index  idx_t_exam_detail on  exam_detail (
+   exam_id              asc,
+   student_id           asc
+);
+
+create table  exam_schedule
+(
+   id                   bigint                 not null,
+   semester_data_id     bigint                 not null,
+   subject_id           bigint                 not null,
+   examiner_id          bigint,
+   proctor_id           bigint,
+   room_id              bigint,
+   exam_date            date,
+   begin_time           character varying(5),
+   end_time             character varying(5),
+   created              timestamp              not null,
+   updated              timestamp,
+   deleted              numeric(1)             not null
+);
+
+alter table  exam_schedule
+   add constraint pk_t_exam_schedule primary key (id);
+
+create table  exam_schedule_detail
+(
+   id                   bigint                 not null,
+   exam_schedule_id     bigint                 not null,
+   student_id           bigint                 not null
+);
+
+alter table  exam_schedule_detail
+   add constraint pk_t_exam_schedule_detail primary key (id);
+
+create unique index  idx_t_exam_schedule_detail on  exam_schedule_detail (
+   exam_schedule_id     asc,
+   student_id           asc
+);
+
+create table  graduate_student_load
+(
+   id                   bigint                 not null,
+   employee_id          bigint                 not null,
+   level_id             bigint                 not null,
+   student_count        numeric(2)             not null
+);
+
+alter table  graduate_student_load
+   add constraint pk_t_graduate_student_load primary key (id);
+
+create unique index  idx_t_graduate_student_load on  graduate_student_load (
+   employee_id          asc,
+   level_id             asc
+);
+
+create table  graduation_project
+(
+   id                   bigint                 not null,
+   project_theme_kz     character varying(512)           not null,
+   project_theme_en     character varying(512)           not null,
+   project_theme_ru     character varying(512)           not null,
+   protocol_no          character varying(10),
+   protocol_date        date,
+   academic_degree_kz   character varying(128),
+   academic_degree_en   character varying(128),
+   academic_degree_ru   character varying(128)           not null,
+   educational_program  character varying(128),
+   qualification        character varying(64),
+   diploma_no           character varying(10)            not null,
+   diploma_date         date                   not null,
+   registration_no      character varying(10)            not null
+);
+
+alter table  graduation_project
+   add constraint pk_t_graduation_project primary key (id);
+
+create table  grant_doc
+(
+   id                   bigint                 not null,
+   grant_type_id        bigint                 not null,
+   ict                  character varying(18)
+);
+
+alter table  grant_doc
+   add constraint pk_t_grant_doc primary key (id);
+
+create table  grant_type
+(
+   id                   bigint                 not null,
+   type_name            character varying(64)            not null
+);
+
+alter table  grant_type
+   add constraint pk_t_grant_type primary key (id);
+
+create table  group_size_lab
+(
+   id                   bigint                 not null,
+   from_size            numeric(2)             not null,
+   to_size              numeric(2)             not null,
+   size                 character varying(5)             not null
+);
+
+alter table  group_size_lab
+   add constraint pk_t_group_size_lab primary key (id);
+
+create table  group_size_lecture
+(
+   id                   bigint                 not null,
+   from_size            numeric(3)             not null,
+   to_size              numeric(3)             not null,
+   size                 character varying(7)             not null
+);
+
+alter table  group_size_lecture
+   add constraint pk_t_group_size_lecture primary key (id);
+
+create table  group_size_prac
+(
+   id                   bigint                 not null,
+   from_size            numeric(2)             not null,
+   to_size              numeric(2)             not null,
+   size                 character varying(5)             not null
+);
+
+alter table  group_size_prac
+   add constraint pk_t_group_size_prac primary key (id);
+
+create table  guardian_council_decision
+(
+   id                   bigint                 not null,
+   issuer_name          character varying(256),
+   descr                character varying(256)
+);
+
+alter table  guardian_council_decision
+   add constraint pk_t_guardian_council_decision primary key (id);
+
+create table  language
+(
+   id                   bigint                 not null,
+   lang_name            character varying(32)            not null,
+   lang_short_name      char(6)                not null
+);
+
+alter table  language
+   add constraint pk_t_language primary key (id);
+
+create table  language_level
+(
+   id                   bigint                 not null,
+   level_name           character varying(32)            not null
+);
+
+alter table  language_level
+   add constraint pk_t_language_level primary key (id);
+
+create table  lesson
+(
+   id                   bigint                 not null,
+   schedule_detail_id   bigint                 not null,
+   lesson_date          date                   not null,
+   begin_date           timestamp,
+   finish_date          timestamp,
+   canceled             numeric(1)             not null,
+   cancel_reason        character varying(256)
+);
+
+alter table  lesson
+   add constraint pk_t_lesson primary key (id);
+
+create unique index  idx_t_lesson on  lesson (
+   schedule_detail_id   asc,
+   lesson_date          asc
+);
+
+create table  lesson_detail
+(
+   id                   bigint                 not null,
+   lesson_id            bigint                 not null,
+   student_id           bigint                 not null,
+   attendance_mark      numeric(1)             not null,
+   grade                numeric(6,2)           not null,
+   comments             character varying(512),
+   updated              timestamp,
+   updated_by           character varying(32)
+);
+
+alter table  lesson_detail
+   add constraint pk_t_lesson_detail primary key (id);
+
+create unique index  idx_t_lesson_detail on  lesson_detail (
+   lesson_id            asc,
+   student_id           asc
+);
+
+create table  lesson_type
+(
+   id                   bigint                 not null,
+   type_name            character varying(24)            not null,
+   type_short_name      character varying(8)             not null
+);
+
+alter table  lesson_type
+   add constraint pk_t_lesson_type primary key (id);
+
+create table  level
+(
+   id                   bigint                 not null,
+   level_name           character varying(24)            not null
+);
+
+alter table  level
+   add constraint pk_t_level primary key (id);
+
+create table  lock_reason
+(
+   id                   bigint                 not null,
+   reason               character varying(64)            not null,
+   lock_type            numeric(1)             not null
+);
+
+alter table  lock_reason
+   add constraint pk_t_lock_reason primary key (id);
+
+create table  marital_status
+(
+   id                   bigint                 not null,
+   status_name          character varying(64)            not null
+);
+
+alter table  marital_status
+   add constraint pk_t_marital_status primary key (id);
+
+create table  medical_checkup
+(
+   id                   bigint                 not null,
+   checkup_type_id      bigint                 not null,
+   issuer_name          character varying(256),
+   allow_dorm           numeric(1)             not null,
+   allow_study          numeric(1)             not null,
+   allow_work           numeric(1)             not null,
+   descr                character varying(512)
+);
+
+alter table  medical_checkup
+   add constraint p_pk_t_medical_che primary key (id);
+
+create table  medical_checkup_type
+(
+   id                   bigint                 not null,
+   type_name            character varying(32)            not null
+);
+
+alter table  medical_checkup_type
+   add constraint pk_t_medical_checkup_type primary key (id);
+
+create table  military_doc
+(
+   id                   bigint                 not null,
+   military_doc_type_id bigint                 not null,
+   military_status_id   bigint                 not null,
+   issuer_name          character varying(256)           not null
+);
+
+alter table  military_doc
+   add constraint pk_t_military_doc primary key (id);
+
+create table  military_doc_type
+(
+   id                   bigint                 not null,
+   type_name            character varying(64)            not null
+);
+
+alter table  military_doc_type
+   add constraint pk_t_military_doc_type primary key (id);
+
+create table  military_status
+(
+   id                   bigint                 not null,
+   status_name          character varying(64)            not null
+);
+
+alter table  military_status
+   add constraint pk_t_military_status primary key (id);
+
+create table  month
+(
+   id                   bigint                 not null,
+   month_name_ru        character varying(16)            not null,
+   month_name_en        character varying(16)            not null,
+   month_name_kz        character varying(18)            not null
+);
+
+alter table  month
+   add constraint pk_t_month primary key (id);
+
+create table  nationality
+(
+   id                   bigint                 not null,
+   nation_name          character varying(32)            not null
+);
+
+alter table  nationality
+   add constraint pk_t_nationality primary key (id);
+
+create table  news
+(
+   id                   bigint                 not null,
+   dept_id              bigint,
+   user_id              bigint                 not null,
+   topic                character varying(128)           not null,
+   news_body            text               not null,
+   link                 character varying(128),
+   global_news          numeric(1)             not null,
+   created              timestamp              not null,
+   updated              timestamp,
+   expire_date          timestamp,
+   deleted              numeric(1)             not null
+);
+
+alter table  news
+   add constraint pk_t_news primary key (id);
+
+create index  idx_t_news on  news (
+   dept_id              asc,
+   user_id              asc
+);
+
+create table  news_comment
+(
+   id                   bigint                 not null,
+   news_id              bigint                 not null,
+   user_id              bigint                 not null,
+   comment_body         text               not null,
+   created              timestamp              not null,
+   updated              timestamp,
+   deleted              numeric(1)             not null
+);
+
+alter table  news_comment
+   add constraint pk_t_news_comment primary key (id);
+
+create index  idx_t_news_comment on  news_comment (
+   news_id              asc,
+   user_id              asc
+);
+
+create table  news_file
+(
+   id                   bigint                 not null,
+   news_id              bigint                 not null,
+   file_name            character varying(128)           not null,
+   file_body            bytea               not null
+);
+
+alter table  news_file
+   add constraint pk_t_news_file primary key (id);
+
+create unique index  idx_t_news_file on  news_file (
+   news_id              asc,
+   file_name            asc
+);
+
+create table  order_doc
+(
+   id                   bigint                 not null,
+   order_type_id        bigint                 not null,
+   study_year_id        bigint,
+   descr                character varying(128)           not null,
+   hide_transcript      numeric(1)             not null
+);
+
+alter table  order_doc
+   add constraint pk_t_order_doc primary key (id);
+
+create table  order_type
+(
+   id                   bigint                 not null,
+   type_name            character varying(128)           not null
+);
+
+alter table  order_type
+   add constraint pk_t_order_type primary key (id);
+
+create table  organization
+(
+   id                   bigint                 not null,
+   organization_type_id bigint                 not null,
+   organization_name    character varying(256)           not null,
+   phone                character varying(12),
+   phone_mobile         character varying(12),
+   country_id           bigint,
+   region_id            bigint,
+   address              character varying(512)
+);
+
+alter table  organization
+   add constraint pk_t_organization primary key (id);
+
+create unique index  idx_t_organization on  organization (
+   organization_type_id asc,
+   organization_name    asc
+);
+
+create table  organization_type
+(
+   id                   bigint                 not null,
+   type_name            character varying(32)            not null
+);
+
+alter table  organization_type
+   add constraint pk_t_organization_type primary key (id);
+
+create table  other_document
+(
+   id                   bigint                 not null,
+   issuer_name          character varying(256),
+   descr                character varying(256)
+);
+
+alter table  other_document
+   add constraint pk_t_other_document primary key (id);
+
+create table  passport_type
+(
+   id                   bigint                 not null,
+   type_name            character varying(64)            not null
+);
+
+alter table  passport_type
+   add constraint pk_t_passport_type primary key (id);
+
+create table  payment_type
+(
+   id                   bigint                 not null,
+   type_name            character varying(32)            not null
+);
+
+alter table  payment_type
+   add constraint pk_t_payment_type primary key (id);
+
+create table  post
+(
+   id                   bigint                 not null,
+   post_name            character varying(128)           not null,
+   study_load           numeric(2)             not null default 0,
+   tp                   numeric(1)             not null,
+   priority             numeric(3)             not null
+);
+
+alter table  post
+   add constraint pk_t_post primary key (id);
+
+create table  preemptive_right
+(
+   id                   bigint                 not null,
+   issuer_name          character varying(256)           not null,
+   descr                character varying(1024)
+);
+
+alter table  preemptive_right
+   add constraint pk_t_preemptive_right primary key (id);
+
+create table  previous_experience
+(
+   id                   bigint                 not null,
+   employee_id          bigint                 not null,
+   organization_name    character varying(128)           not null,
+   post_name            character varying(128)           not null,
+   hire_date            date                   not null,
+   dismiss_date         date,
+   duty                 text               not null
+);
+
+alter table  previous_experience
+   add constraint pk_t_previous_experience primary key (id);
+
+create index  idx_t_prev_exp_emp on  previous_experience (
+   employee_id          asc
+);
+
+create table  property
+(
+   id                   bigint                 not null,
+   property_type_id     bigint                 not null,
+   data_type_id         bigint                 not null,
+   property_name        character varying(64)            not null
+);
+
+alter table  property
+   add constraint pk_t_property primary key (id);
+
+create unique index  idx_t_property on  property (
+   property_type_id     asc,
+   data_type_id         asc,
+   property_name        asc
+);
+
+create table  property_type
+(
+   id                   bigint                 not null,
+   type_name            character varying(40)            not null
+);
+
+alter table  property_type
+   add constraint pk_t_property_type primary key (id);
+
+create table  publication
+(
+   id                   bigint                 not null,
+   publication_type_id  bigint                 not null
+);
+
+alter table  publication
+   add constraint pk_t_publication primary key (id);
+
+create index  idx_t_emp_publication on  publication (
+   publication_type_id  asc
+);
+
+create table  publication_type
+(
+   id                   bigint                 not null,
+   type_name            character varying(128)           not null
+);
+
+alter table  publication_type
+   add constraint pk_t_publication_type primary key (id);
+
+create table  questioning
+(
+   id                   bigint                 not null,
+   user_id              bigint                 not null,
+   subject_id           bigint,
+   begin_date           timestamp              not null,
+   end_date             timestamp,
+   status               numeric(1)             not null
+);
+
+alter table  questioning
+   add constraint pk_t_questioning primary key (id);
+
+create table  questioning_detail
+(
+   id                   bigint                 not null,
+   questioning_id       bigint                 not null,
+   question_id          bigint                 not null,
+   answer_id            bigint,
+   answer_text          character varying(1024)
+);
+
+alter table  questioning_detail
+   add constraint pk_t_questioning_detail primary key (id);
+
+create unique index  idx_t_questioning_detail on  questioning_detail (
+   questioning_id       asc,
+   question_id          asc
+);
+
+create table  questionnaire
+(
+   id                   bigint                 not null,
+   questionnaire_type_id bigint                 not null,
+   questionnaire_name   character varying(128)           not null,
+   created              timestamp              not null,
+   updated              timestamp,
+   deleted              numeric(1)             not null
+);
+
+alter table  questionnaire
+   add constraint pk_t_questionnaire primary key (id);
+
+create unique index  idx_t_questionnaire on  questionnaire (
+   questionnaire_type_id asc,
+   questionnaire_name   asc
+);
+
+create table  questionnaire_answer
+(
+   id                   bigint                 not null,
+   question_id          bigint                 not null,
+   answer               character varying(32)            not null,
+   deleted              numeric(1)             not null
+);
+
+alter table  questionnaire_answer
+   add constraint pk_t_questionnaire_answer primary key (id);
+
+create unique index  idx_t_questionnaire_answer on  questionnaire_answer (
+   question_id          asc,
+   answer               asc
+);
+
+create table  questionnaire_question
+(
+   id                   bigint                 not null,
+   section_id           bigint                 not null,
+   question_no          numeric(2)             not null,
+   question             character varying(1024)          not null,
+   answer_text          numeric(1)             not null,
+   deleted              numeric(1)             not null
+);
+
+alter table  questionnaire_question
+   add constraint pk_t_questionnaire_question primary key (id);
+
+create unique index  idx_t_questionnaire_question on  questionnaire_question (
+   section_id           asc,
+   question_no          asc
+);
+
+create table  questionnaire_section
+(
+   id                   bigint                 not null,
+   questionnaire_id     bigint                 not null,
+   section_name         character varying(1024)          not null,
+   deleted              numeric(1)             not null
+);
+
+alter table  questionnaire_section
+   add constraint pk_t_questionnaire_section primary key (id);
+
+create table  questionnaire_type
+(
+   id                   bigint                 not null,
+   type_name            character varying(128)           not null
+);
+
+alter table  questionnaire_type
+   add constraint pk_t_questionnaire_type primary key (id);
+
+create table  rating_scale
+(
+   id                   bigint                 not null,
+   alpha_grade          character varying(2)             not null,
+   digit_grade          numeric(3,2)           not null,
+   mark_before_01092008 character varying(6)             not null,
+   mark_after_01092008  character varying(6)             not null,
+   total_from           numeric(2)             not null,
+   total_to             numeric(3)             not null,
+   descr                character varying(130)           not null
+);
+
+alter table  rating_scale
+   add constraint pk_t_rating_scale primary key (id);
+
+create table  registration_signature
+(
+   id                   bigint                 not null,
+   semester_data_id     bigint                 not null,
+   student_id           bigint                 not null,
+   sign_user_id         bigint                 not null,
+   signature_type_id    bigint                 not null,
+   sign_date            timestamp              not null
+);
+
+alter table  registration_signature
+   add constraint pk_t_registration_signature primary key (id);
+
+create unique index  idx_t_registration_signature on  registration_signature (
+   semester_data_id     asc,
+   student_id           asc,
+   sign_user_id         asc,
+   signature_type_id    asc
+);
+
+create table  registration_signature_type
+(
+   id                   bigint                 not null,
+   type_name            character varying(64)            not null
+);
+
+alter table  registration_signature_type
+   add constraint pk_t_registration_signature_type primary key (id);
+
+create table  relative_type
+(
+   id                   bigint                 not null,
+   type_name            character varying(32)            not null
+);
+
+alter table  relative_type
+   add constraint pk_t_relative_type primary key (id);
+
+create table  repatriate_doc
+(
+   id                   bigint                 not null,
+   issuer_name          character varying(256)
+);
+
+alter table  repatriate_doc
+   add constraint pk_t_repatriate_doc primary key (id);
+
+create table  request
+(
+   id                   bigint                 not null,
+   request_type_id      bigint                 not null,
+   employee_id          bigint                 not null,
+   request_date         timestamp              not null,
+   room_id              bigint                 not null,
+   request_status_id    bigint                 not null,
+   resp_empl_id         bigint,
+   descr                character varying(512)           not null
+);
+
+alter table  request
+   add constraint pk_t_request primary key (id);
+
+create table  request_file
+(
+   id                   bigint                 not null,
+   file_name            character varying(128)           not null,
+   file_body            bytea               not null
+);
+
+alter table  request_file
+   add constraint pk_t_request_file primary key (id);
+
+create table  request_report
+(
+   id                   bigint                 not null,
+   employee_id          bigint                 not null,
+   report_date          timestamp              not null,
+   computer_name        character varying(64),
+   comments             character varying(128)           not null
+);
+
+alter table  request_report
+   add constraint pk_t_request_report primary key (id);
+
+create table  request_status
+(
+   id                   bigint                 not null,
+   status_name          character varying(32)            not null
+);
+
+alter table  request_status
+   add constraint pk_t_request_status primary key (id);
+
+create table  request_type
+(
+   id                   bigint                 not null,
+   type_name            character varying(128)           not null
+);
+
+alter table  request_type
+   add constraint pk_t_request_type primary key (id);
+
+create table  room
+(
+   id                   bigint                 not null,
+   corpus_id            bigint                 not null,
+   room_no              character varying(64)            not null,
+   room_type_id         bigint                 not null,
+   capacity             numeric(3)             not null,
+   equipment            character varying(512),
+   resp_emp_id          bigint,
+   descr                character varying(256),
+   deleted              numeric(1)             not null,
+   created              timestamp              not null,
+   updated              timestamp
+);
+
+alter table  room
+   add constraint pk_t_room primary key (id);
+
+create unique index  idx_t_room on  room (
+   corpus_id            asc,
+   room_no              asc,
+   room_type_id         asc
+);
+
+create table  room_department
+(
+   id                   bigint                 not null,
+   room_id              bigint                 not null,
+   department_id        bigint                 not null
+);
+
+alter table  room_department
+   add constraint pk_t_room_department primary key (id);
+
+create unique index  idx_t_room_department on  room_department (
+   room_id              asc,
+   department_id        asc
+);
+
+create table  room_equipment
+(
+   id                   bigint                 not null,
+   room_id              bigint                 not null,
+   equipment_id         bigint                 not null
+);
+
+alter table  room_equipment
+   add constraint pk_t_room_equipment primary key (id);
+
+create unique index  idx_t_room_equipment on  room_equipment (
+   room_id              asc,
+   equipment_id         asc
+);
+
+create table  room_subject
+(
+   id                   bigint                 not null,
+   room_id              bigint                 not null,
+   subject_id           bigint                 not null
+);
+
+alter table  room_subject
+   add constraint pk_t_subject_room primary key (id);
+
+create unique index  idx_t_subject_room on  room_subject (
+   room_id              asc,
+   subject_id           asc
+);
+
+create table  room_type
+(
+   id                   bigint                 not null,
+   type_name            character varying(64)            not null
+);
+
+alter table  room_type
+   add constraint pk_t_room_type primary key (id);
+
+create table  room_work_hour
+(
+   id                   bigint                 not null,
+   room_id              bigint                 not null,
+   week_day_id          bigint                 not null,
+   day_hour_id          bigint                 not null,
+   work_hour_status_id  bigint                 not null
+);
+
+alter table  room_work_hour
+   add constraint pk_t_room_work_hour primary key (id);
+
+create unique index  idx_t_room_work_hour on  room_work_hour (
+   room_id              asc,
+   week_day_id          asc,
+   day_hour_id          asc
+);
+
+create table  schedule
+(
+   id                   bigint                 not null,
+   semester_data_id     bigint                 not null,
+   chair_id             bigint
+);
+
+alter table  schedule
+   add constraint pk_t_schedule primary key (id);
+
+create unique index  idx_t_schedule on  schedule (
+   semester_data_id     asc,
+   chair_id             asc
+);
+
+create table  schedule_detail
+(
+   id                   bigint                 not null,
+   schedule_id          bigint                 not null,
+   subject_id           bigint                 not null,
+   lesson_type_id       bigint                 not null,
+   lesson_name          character varying(10)            not null,
+   teacher_id           bigint                 not null,
+   week_day_id          bigint                 not null,
+   begin_time_id        bigint                 not null,
+   end_time_id          bigint                 not null,
+   room_id              bigint                 not null
+);
+
+alter table  schedule_detail
+   add constraint pk_t_schedule_detail primary key (id);
+
+create table  schedule_log
+(
+   id                   bigint                 not null,
+   log_record           text               not null
+);
+
+alter table  schedule_log
+   add constraint pk_t_schedule_log primary key (id);
+
+create table  schedule_property
+(
+   id                   bigint                 not null,
+   schedule_detail_id   bigint                 not null,
+   property_id          bigint                 not null,
+   property_value       character varying(128)           not null
+);
+
+alter table  schedule_property
+   add constraint pk_t_schedule_property primary key (id);
+
+create unique index  idx_t_schedule_property on  schedule_property (
+   schedule_detail_id   asc,
+   property_id          asc
+);
+
+create table  school_certificate_type
+(
+   id                   bigint                 not null,
+   type_name            character varying(32)            not null
+);
+
+alter table  school_certificate_type
+   add constraint pk_t_school_certificate_type primary key (id);
+
+create table  school_type
+(
+   id                   bigint                 not null,
+   type_name            character varying(34)            not null
+);
+
+alter table  school_type
+   add constraint pk_t_school_type primary key (id);
+
+create table  scientific_activity
+(
+   id                   bigint                 not null,
+   scientific_activity_type_id bigint                 not null,
+   begin_date           date,
+   end_date             date
+);
+
+alter table  scientific_activity
+   add constraint pk_t_scientific_activity primary key (id);
+
+create table  scientific_activity_type
+(
+   id                   bigint                 not null,
+   type_name            character varying(64)            not null
+);
+
+alter table  scientific_activity_type
+   add constraint pk_t_scientific_activity_type primary key (id);
+
+create table  scientific_management
+(
+   id                   bigint                 not null,
+   scientific_management_type_id bigint                 not null,
+   students_fio         text               not null,
+   students_count       numeric(2)             not null,
+   project_name         character varying(128),
+   result_              character varying(32),
+   achievement          character varying(32)
+);
+
+alter table  scientific_management
+   add constraint pk_scientific_management primary key (id);
+
+create table  scientific_management_file
+(
+   id                   bigint                 not null,
+   scientific_management_id bigint                 not null,
+   file_name            character varying(128)           not null,
+   file_bytes           bytea               not null
+);
+
+alter table  scientific_management_file
+   add constraint pk_t_sci_manag_file primary key (id);
+
+create table  scientific_management_type
+(
+   id                   bigint                 not null,
+   type_name            character varying(32)            not null
+);
+
+alter table  scientific_management_type
+   add constraint pk_t_scientific_management primary key (id);
+
+create table  scientific_type
+(
+   id                   bigint                 not null,
+   type_name            character varying(128)           not null
+);
+
+alter table  scientific_type
+   add constraint pk_t_scientific_type primary key (id);
+
+create table  semester
+(
+   id                   bigint                 not null,
+   study_year_id        bigint                 not null,
+   semester_period_id   bigint                 not null,
+   semester_name        char(17)               not null
+);
+
+alter table  semester
+   add constraint pk_t_semester primary key (id);
+
+create unique index  idx_t_semester on  semester (
+   study_year_id        asc,
+   semester_period_id   asc
+);
+
+create table  semester_data
+(
+   id                   bigint                 not null,
+   year_id              bigint                 not null,
+   semester_period_id   bigint                 not null,
+   begin_date           date                   not null,
+   end_date             date                   not null
+);
+
+alter table  semester_data
+   add constraint pk_t_semester_data primary key (id);
+
+create unique index  idx_t_semester_data on  semester_data (
+   year_id              asc,
+   semester_period_id   asc
+);
+
+create table  semester_period
+(
+   id                   bigint                 not null,
+   period_name          character varying(16)            not null
+);
+
+alter table  semester_period
+   add constraint pk_t_semester_period primary key (id);
+
+create table  semester_subject
+(
+   id                   bigint                 not null,
+   semester_data_id     bigint                 not null,
+   subject_id           bigint                 not null
+);
+
+alter table  semester_subject
+   add constraint pk_t_semester_subject primary key (id);
+
+create index  idx_t_semester_subject on  semester_subject (
+   semester_data_id     asc,
+   subject_id           asc
+);
+
+create table  sex
+(
+   id                   bigint                 not null,
+   sex_name             character varying(14)            not null
+);
+
+alter table  sex
+   add constraint pk_t_sex primary key (id);
+
+create table  social_category
+(
+   id                   bigint                 not null,
+   category_name        character varying(128)           not null
+);
+
+alter table  social_category
+   add constraint pk_t_social_category primary key (id);
+
+create table  speciality
+(
+   id                   bigint                 not null,
+   spec_name            character varying(256)           not null,
+   code                 character varying(10)            not null,
+   chair_id             bigint                 not null,
+   level_id             bigint                 not null,
+   deleted              numeric(1)             not null
+);
+
+alter table  speciality
+   add constraint pk_t_speciality primary key (id);
+
+create unique index  idx_t_speciality on  speciality (
+   spec_name            asc,
+   chair_id             asc,
+   level_id             asc
+);
+
+create index  idx_t_spec_deleted on  speciality (
+   deleted              asc
+);
+
+create table  student
+(
+   id                   bigint                 not null,
+   level_id             bigint                 not null,
+   category_id          bigint                 not null,
+   academic_status_id   bigint,
+   need_dorm            numeric(1)             not null,
+   entrance_year_id     bigint                 not null,
+   advisor_id           bigint,
+   plogin               character varying(32),
+   ppasswd              character varying(26)
+);
+
+alter table  student
+   add constraint pk_t_student primary key (id);
+
+create index  idx_t_student_level on  student (
+   level_id             asc
+);
+
+create table  student_category
+(
+   id                   bigint                 not null,
+   category_name        character varying(20)            not null
+);
+
+alter table  student_category
+   add constraint pk_t_student_category primary key (id);
+
+create table  student_contract
+(
+   id                   bigint                 not null,
+   contract_type_id     bigint                 not null,
+   payment_type_id      bigint                 not null,
+   organization_id      bigint
+);
+
+alter table  student_contract
+   add constraint pk_t_student_contract primary key (id);
+
+create table  student_education
+(
+   id                   bigint                 not null,
+   student_id           bigint                 not null,
+   faculty_id           bigint,
+   chair_id             bigint,
+   speciality_id        bigint,
+   study_year_id        bigint                 not null,
+   language_id          bigint                 not null,
+   education_type_id    bigint,
+   entry_date           timestamp,
+   end_date             date,
+   student_status_id    bigint,
+   child_id             bigint,
+   created              timestamp              not null,
+   updated              timestamp
+);
+
+alter table  student_education
+   add constraint pk_t_student_education primary key (id);
+
+create unique index  idx_t_student_education on  student_education (
+   student_id           asc,
+   faculty_id           asc,
+   chair_id             asc,
+   speciality_id        asc,
+   study_year_id        asc
+);
+
+create table  student_education_type
+(
+   id                   bigint                 not null,
+   type_name            character varying(24)            not null
+);
+
+alter table  student_education_type
+   add constraint pk_t_student_education_type primary key (id);
+
+create table  student_fin_debt
+(
+   id                   bigint                 not null,
+   student_id           bigint                 not null,
+   report_date          timestamp              not null,
+   debt_sum             numeric(12,2)          not null,
+   retake               numeric(1)             not null,
+   created              timestamp              not null,
+   deleted              numeric(1)             not null
+);
+
+alter table  student_fin_debt
+   add constraint pk_t_student_fin_debt primary key (id);
+
+create unique index  idx_t_student_fin_debt on  student_fin_debt (
+   student_id           asc,
+   report_date          asc,
+   retake               asc
+);
+
+create table  student_payment
+(
+   id                   bigint                 not null,
+   student_id           bigint                 not null,
+   payment_date         timestamp              not null,
+   payment_sum          numeric(12,2)          not null,
+   created              timestamp              not null
+);
+
+alter table  student_payment
+   add constraint pk_t_student_payment primary key (id);
+
+create index  idx_t_student_payment on  student_payment (
+   student_id           asc,
+   payment_date         asc
+);
+
+create table  student_relative
+(
+   id                   bigint                 not null,
+   student_id           bigint                 not null,
+   relative_type_id     bigint                 not null,
+   fio                  character varying(128),
+   country_id           bigint,
+   region_id            bigint,
+   city_id              bigint,
+   village_id           bigint,
+   street               character varying(128),
+   phone_home           character varying(10),
+   phone_mobile         character varying(10),
+   email                character varying(64),
+   work_place           character varying(150),
+   post_name            character varying(200),
+   phone_work           character varying(10)
+);
+
+alter table  student_relative
+   add constraint pk_t_student_relative primary key (id);
+
+create unique index  idx_t_student_relative on  student_relative (
+   student_id           asc,
+   relative_type_id     asc
+);
+
+create table  student_schedule
+(
+   id                   bigint                 not null,
+   student_id           bigint                 not null,
+   schedule_detail_id   bigint                 not null,
+   virtual_student      numeric(1)             not null,
+   deleted              numeric(1)             not null,
+   created              timestamp              not null
+);
+
+alter table  student_schedule
+   add constraint pk_t_student_schedule primary key (id);
+
+create index  idx_t_student_schedule on  student_schedule (
+   student_id           asc,
+   schedule_detail_id   asc,
+   deleted              asc
+);
+
+create table  student_status
+(
+   id                   bigint                 not null,
+   status_name          character varying(128)           not null
+);
+
+alter table  student_status
+   add constraint pk_t_student_status primary key (id);
+
+create table  student_subject
+(
+   id                   bigint                 not null,
+   semester_data_id     bigint                 not null,
+   student_id           bigint                 not null,
+   subject_id           bigint                 not null,
+   reg_date             timestamp              not null,
+   deleted              numeric(1)             not null
+);
+
+alter table  student_subject
+   add constraint pk_t_student_subject primary key (id);
+
+create index  idx_t_student_subject on  student_subject (
+   semester_data_id     asc,
+   student_id           asc,
+   subject_id           asc,
+   deleted              asc
+);
+
+create table  study_direct
+(
+   id                   bigint                 not null,
+   direct_name          character varying(128)           not null,
+   code                 char(3)                not null
+);
+
+alter table  study_direct
+   add constraint pk_t_study_direct primary key (id);
+
+create table  study_year
+(
+   id                   bigint                 not null,
+   study_year           numeric(2)             not null
+);
+
+alter table  study_year
+   add constraint pk_t_study_year primary key (id);
+
+create table  subject
+(
+   id                   bigint                 not null,
+   name_kz              character varying(512)           not null,
+   name_en              character varying(512)           not null,
+   name_ru              character varying(512)           not null,
+   code                 character varying(14)            not null,
+   study_direct_id      bigint,
+   descr                character varying(8000),
+   chair_id             bigint,
+   level_id             bigint                 not null,
+   subject_cycle_id     bigint                 not null,
+   mandatory            numeric(1)             not null,
+   creditability_id     bigint                 not null,
+   academic_formula_id  bigint                 not null,
+   ects_id              bigint,
+   lang_kz              numeric(1)             not null,
+   lang_en              numeric(1)             not null,
+   lang_ru              numeric(1)             not null,
+   group_lec_id         bigint,
+   group_prac_id        bigint,
+   group_lab_id         bigint,
+   control_type_id      bigint                 not null,
+   deleted              numeric(1)             not null
+);
+
+alter table  subject
+   add constraint pk_t_subject primary key (id);
+
+create index  idx_t_subject_deleted on  subject (
+   deleted              asc
+);
+
+create unique index  idx_t_subject_code on  subject (
+   code                 asc
+);
+
+create table  subject_cycle
+(
+   id                   bigint                 not null,
+   cycle_name           character varying(128)           not null,
+   cycle_short_name     character varying(6)             not null
+);
+
+alter table  subject_cycle
+   add constraint pk_t_subject_cycle primary key (id);
+
+create table  subject_requisite
+(
+   id                   bigint                 not null,
+   subject_id           bigint                 not null,
+   requisite_id         bigint                 not null,
+   pre_requisite        numeric(1)             not null
+);
+
+alter table  subject_requisite
+   add constraint pk_t_subject_requisite primary key (id);
+
+create unique index  idx_t_subject_requisite on  subject_requisite (
+   subject_id           asc,
+   requisite_id         asc
+);
+
+create table  teacher_load_assign
+(
+   id                   bigint                 not null,
+   created              timestamp              not null,
+   updated              timestamp,
+   deleted              numeric(1)             not null,
+   accepted             numeric(1)             not null
+);
+
+alter table  teacher_load_assign
+   add constraint pk_t_teacher_load_assign primary key (id);
+
+create table  teacher_load_assign_detail
+(
+   id                   bigint                 not null,
+   teacher_load_assign_id bigint                 not null,
+   teacher_id           bigint                 not null,
+   subject_id           bigint                 not null,
+   lc_credit            numeric(1)             not null,
+   lb_credit            numeric(1)             not null,
+   pr_credit            numeric(1)             not null,
+   semester_period_id   bigint                 not null,
+   student_count        numeric(3)             not null,
+   lc_count             numeric(2)             not null,
+   lb_count             numeric(2)             not null,
+   pr_count             numeric(2)             not null,
+   lc_hour              numeric(4,1)           not null,
+   lc_hour_total        numeric(4,1)           not null,
+   lb_hour              numeric(4,1)           not null,
+   lb_hour_total        numeric(4,1)           not null,
+   pr_hour              numeric(4,1)           not null,
+   pr_hour_total        numeric(4,1)           not null,
+   total_hour           numeric(4,1)           not null,
+   total_credit         numeric(4,1)           not null
+);
+
+alter table  teacher_load_assign_detail
+   add constraint pk_t_teacher_load_assign_detail primary key (id);
+
+create unique index  idx_t_teacher_load_assign_detail on  teacher_load_assign_detail (
+   teacher_load_assign_id asc,
+   teacher_id           asc,
+   subject_id           asc,
+   semester_period_id   asc
+);
+
+create table  teacher_load_calc
+(
+   id                   bigint                 not null,
+   year_id              bigint                 not null,
+   chair_id             bigint                 not null,
+   created              timestamp              not null,
+   updated              timestamp,
+   deleted              numeric(1)             not null,
+   accepted             numeric(1)             not null
+);
+
+alter table  teacher_load_calc
+   add constraint pk_t_teacher_load_calc primary key (id);
+
+create unique index  idx_t_teacher_load_calc on  teacher_load_calc (
+   year_id              asc,
+   chair_id             asc
+);
+
+create table  teacher_load_calc_detail
+(
+   id                   bigint                 not null,
+   teacher_load_calc_id bigint                 not null,
+   subject_id           bigint                 not null,
+   lc_credit            numeric(1)             not null,
+   lb_credit            numeric(1)             not null,
+   pr_credit            numeric(1)             not null,
+   semester_period_id   bigint                 not null,
+   student_count        numeric(3)             not null,
+   lc_count             numeric(2)             not null,
+   lb_count             numeric(2)             not null,
+   pr_count             numeric(2)             not null,
+   lc_hour              numeric(4,1)           not null,
+   lc_hour_total        numeric(5,1)           not null,
+   lb_hour              numeric(4,1)           not null,
+   lb_hour_total        numeric(5,1)           not null,
+   pr_hour              numeric(4,1)           not null,
+   pr_hour_total        numeric(5,1)           not null,
+   total_hour           numeric(5,1)           not null,
+   total_credit         numeric(5,1)           not null
+);
+
+alter table  teacher_load_calc_detail
+   add constraint pk_t_teacher_load_calc_detail primary key (id);
+
+create unique index  idx_t_teacher_load_calc_detail on  teacher_load_calc_detail (
+   teacher_load_calc_id asc,
+   subject_id           asc,
+   semester_period_id   asc
+);
+
+create table  teacher_room
+(
+   id                   bigint                 not null,
+   teacher_id           bigint                 not null,
+   room_id              bigint                 not null
+);
+
+alter table  teacher_room
+   add constraint pk_t_teacher_room primary key (id);
+
+create unique index  idx_t_teacher_room on  teacher_room (
+   teacher_id           asc,
+   room_id              asc
+);
+
+create table  teacher_subject
+(
+   id                   bigint                 not null,
+   employee_id          bigint                 not null,
+   subject_id           bigint                 not null,
+   group_lec_count      numeric(1)             not null,
+   group_lab_count      numeric(1)             not null,
+   group_prac_count     numeric(1)             not null,
+   group_lec_id         bigint,
+   group_prac_id        bigint,
+   group_lab_id         bigint,
+   fall                 numeric(1)             not null,
+   spring               numeric(1)             not null,
+   summer               numeric(1)             not null,
+   load_per_hours       numeric(1)             not null
+);
+
+alter table  teacher_subject
+   add constraint pk_t_teacher_subject primary key (id);
+
+create unique index  idx_t_teacher_subject on  teacher_subject (
+   employee_id          asc,
+   subject_id           asc,
+   load_per_hours       asc
+);
+
+create table  time
+(
+   id                   bigint                 not null,
+   time_value           numeric(4,2)           not null,
+   time_name            char(5)                not null
+);
+
+alter table  time
+   add constraint pk_t_time primary key (id);
+
+create table  tin
+(
+   id                   bigint                 not null,
+   issuer_name          character varying(256),
+   descr                character varying(256)
+);
+
+alter table  tin
+   add constraint pk_t_tin primary key (id);
+
+create table  university
+(
+   id                   bigint                 not null,
+   university_name      character varying(256)           not null,
+   use_default          numeric(1)             not null
+);
+
+alter table  university
+   add constraint pk_t_university primary key (id);
+
+create table  unt_certificate
+(
+   id                   bigint                 not null,
+   ict                  character varying(18),
+   rate                 numeric(3)
+);
+
+alter table  unt_certificate
+   add constraint c_rate check (rate is null or (rate <= 125));
+
+alter table  unt_certificate
+   add constraint pk_t_unt_certificate primary key (id);
+
+create table  unt_cert_subject
+(
+   id                   bigint                 not null,
+   unt_certificate_id   bigint                 not null,
+   unt_subject_id       bigint                 not null,
+   rate                 numeric(2)             not null
+);
+
+alter table  unt_cert_subject
+   add constraint pk_t_unt_cert_subject primary key (id);
+
+create unique index  idx_t_unt_cert_subject on  unt_cert_subject (
+   unt_certificate_id   asc,
+   unt_subject_id       asc
+);
+
+create table  unt_subject
+(
+   id                   bigint                 not null,
+   subject_name         character varying(32)            not null
+);
+
+alter table  unt_subject
+   add constraint pk_t_unt_subject primary key (id);
+
+create index  idx_t_user_deleted on  users (
+   deleted              asc
+);
+
+create index  idx_t_user_user_type on  users (
+   user_type_id         asc
+);
+
+create unique index  idx_t_user_login on  users (
+   login                asc
+);
+
+create table  user_address
+(
+   id                   bigint                 not null,
+   user_id              bigint                 not null,
+   address_type_id      bigint                 not null,
+   postal_code          character varying(6),
+   country_id           bigint,
+   region_id            bigint,
+   city_id              bigint,
+   village_id           bigint,
+   street               character varying(256),
+   phone_home           character varying(10)
+);
+
+alter table  user_address
+   add constraint pk_t_user_address primary key (id);
+
+create unique index  idx_t_user_address on  user_address (
+   user_id              asc,
+   address_type_id      asc
+);
+
+create table  user_award
+(
+   id                   bigint                 not null,
+   user_id              bigint                 not null,
+   award_id             bigint                 not null,
+   subject_name         character varying(128)
+);
+
+alter table  user_award
+   add constraint pk_t_user_award primary key (id);
+
+create unique index  idx_t_user_award on  user_award (
+   user_id              asc,
+   award_id             asc
+);
+
+create table  user_document
+(
+   id                   bigint                 not null,
+   user_id              bigint                 not null,
+   document_type_id     integer                not null,
+   document_no          character varying(128),
+   issue_date           date,
+   expire_date          date,
+   deleted              numeric(1)             not null
+);
+
+alter table  user_document
+   add constraint pk_t_user_document primary key (id);
+
+create index  idx_t_user_document on  user_document (
+   user_id              asc,
+   document_type_id     asc,
+   deleted              asc
+);
+
+create table  user_document_file
+(
+   id                   bigint                 not null,
+   user_doc_id          bigint                 not null,
+   file_name            character varying(128)           not null,
+   file_bytes           bytea               not null,
+   deleted              numeric(1)             not null
+);
+
+alter table  user_document_file
+   add constraint pk_t_user_document_file primary key (id);
+
+create index  idx_t_user_doc_file on  user_document_file (
+   user_doc_id          asc
+);
+
+create table  user_file
+(
+   id                   bigint                 not null,
+   user_id              bigint                 not null,
+   file_name            character varying(256)           not null,
+   folder               numeric(1)             not null,
+   parent_id            bigint,
+   created              timestamp              not null,
+   descr                character varying(1024)
+);
+
+alter table  user_file
+   add constraint pk_t_user_file primary key (id);
+
+create unique index  idx_t_user_file on  user_file (
+   user_id              asc,
+   file_name            asc
+);
+
+create table  user_language
+(
+   id                   bigint                 not null,
+   user_id              bigint                 not null,
+   language_id          bigint                 not null,
+   language_level_id    bigint                 not null
+);
+
+alter table  user_language
+   add constraint pk_t_user_language primary key (id);
+
+create unique index  idx_t_user_language on  user_language (
+   user_id              asc,
+   language_id          asc
+);
+
+create table  user_passport
+(
+   id                   bigint                 not null,
+   passport_type_id     bigint                 not null,
+   issuer_name          character varying(256),
+   iin                  character varying(12),
+   birth_country_id     bigint,
+   birth_region_id      bigint
+);
+
+alter table  user_passport
+   add constraint pk_t_user_passport primary key (id);
+
+create table  user_photo
+(
+   id                   bigint                 not null,
+   user_id              bigint                 not null,
+   file_name            character varying(128)           not null,
+   photo                bytea               not null
+);
+
+alter table  user_photo
+   add constraint pk_t_user_photo primary key (id);
+
+create unique index  idx_t_user_photo on  user_photo (
+   user_id              asc
+);
+
+create table  user_social_category
+(
+   id                   bigint                 not null,
+   user_id              bigint                 not null,
+   social_category_id   bigint                 not null
+);
+
+alter table  user_social_category
+   add constraint pk_t_student_social_category primary key (id);
+
+create unique index  idx_t_user_social_category on  user_social_category (
+   user_id              asc,
+   social_category_id   asc
+);
+
+create table  user_type
+(
+   id                   bigint                 not null,
+   type_name            character varying(32)            not null
+);
+
+alter table  user_type
+   add constraint pk_t_user_type primary key (id);
+
+create table  week
+(
+   id                   bigint                 not null,
+   week_name            character varying(15)            not null,
+   week_code            numeric(2)             not null
+);
+
+alter table  week
+   add constraint pk_t_week primary key (id);
+
+create table  week_day
+(
+   id                   bigint                 not null,
+   day_name_ru          character varying(22)            not null,
+   day_short_name_ru    char(4)                not null,
+   day_name_kz          character varying(16)            not null,
+   day_short_name_kz    char(4)                not null,
+   day_name_en          character varying(9)             not null,
+   day_short_name_en    char(3)                not null
+);
+
+alter table  week_day
+   add constraint pk_t_week_day primary key (id);
+
+create table  work_hour_status
+(
+   id                   bigint                 not null,
+   status_name          character varying(22)            not null
+);
+
+alter table  work_hour_status
+   add constraint pk_t_work_hour_status primary key (id);
+
+alter table  academic_calendar
+   add constraint fk_t_academic_calendar_faculty foreign key (faculty_id)
+      references  academic_calendar_faculty (id)
+      on delete restrict on update restrict;
+
+alter table  academic_calendar
+   add constraint fk_t_academic_calendar_year foreign key (year_id)
+      references  entrance_year (id)
+      on delete restrict on update restrict;
+
+alter table  academic_calendar_detail
+   add constraint ft_t_academic_calendar_deta_cale foreign key (academic_calendar_id)
+      references  academic_calendar (id)
+      on delete restrict on update restrict;
+
+alter table  academic_calendar_detail
+   add constraint ft_t_academic_calendar_deta_item foreign key (item_id)
+      references  academic_calendar_item (id)
+      on delete restrict on update restrict;
+
+alter table  academic_calendar_item
+   add constraint fk_t_academ_cal_facul_academ_cal_item foreign key (faculty_id)
+      references  academic_calendar_faculty (id)
+      on delete restrict on update restrict;
+
+alter table  academic_calendar_item
+   add constraint ft_t_acade_item_semes_per_semester foreign key (semester_period_id)
+      references  semester_period (id)
+      on delete restrict on update restrict;
+
+alter table  academic_degree
+   add constraint fk_t_academic_degree_speciality foreign key (speciality_id)
+      references  speciality (id)
+      on delete restrict on update restrict;
+
+alter table  academic_formula
+   add constraint fk_t_academ_formula_credit foreign key (creditability_id)
+      references  creditability (id)
+      on delete restrict on update restrict;
+
+alter table  attestation
+   add constraint fk_t_attestation_attestation_typ foreign key (attestation_type_id)
+      references  attestation_type (id)
+      on delete restrict on update restrict;
+
+alter table  attestation
+   add constraint fk_t_attestation_schedule_detail foreign key (schedule_detail_id)
+      references  schedule_detail (id)
+      on delete restrict on update restrict;
+
+alter table  attestation_detail
+   add constraint fk_t_attestation_detail_attestat foreign key (attestation_id)
+      references  attestation (id)
+      on delete restrict on update restrict;
+
+alter table  attestation_detail
+   add constraint fk_t_attestation_detail_student foreign key (student_id)
+      references  student_education (id)
+      on delete restrict on update restrict;
+
+alter table  country
+   add constraint fk_t_country_parent foreign key (parent_id)
+      references  country (id)
+      on delete restrict on update restrict;
+
+alter table  curriculum
+   add constraint fk_t_curriculum_curriculu_status foreign key (status_id)
+      references  curriculum_status (id)
+      on delete restrict on update restrict;
+
+alter table  curriculum
+   add constraint fk_t_curriculum_entrance_year foreign key (entrance_year_id)
+      references  entrance_year (id)
+      on delete restrict on update restrict;
+
+alter table  curriculum
+   add constraint fk_t_curriculum_speciality foreign key (speciality_id)
+      references  speciality (id)
+      on delete restrict on update restrict;
+
+alter table  curriculum_add_program
+   add constraint fk_t_curriculu_add_prog_semester foreign key (semester_id)
+      references  semester (id)
+      on delete restrict on update restrict;
+
+alter table  curriculum_add_program
+   add constraint fk_t_curricu_add_program_subject foreign key (subject_id)
+      references  subject (id)
+      on delete restrict on update restrict;
+
+alter table  curriculum_add_program
+   add constraint fk_t_curric_add_prg_curriculum foreign key (curriculum_id)
+      references  curriculum (id)
+      on delete restrict on update restrict;
+
+alter table  curriculum_add_program
+   add constraint fk_t_curric_add_prog_semestr_dat foreign key (semester_data_id)
+      references  semester_data (id)
+      on delete restrict on update restrict;
+
+alter table  curriculum_detail
+   add constraint fk_t_curriculum_detail_subje_cyc foreign key (subject_cycle_id)
+      references  subject_cycle (id)
+      on delete restrict on update restrict;
+
+alter table  curriculum_detail
+   add constraint fk_t_curriculum_det_semester_dat foreign key (semester_data_id)
+      references  semester_data (id)
+      on delete restrict on update restrict;
+
+alter table  curriculum_detail
+   add constraint fk_t_curric_detail_elect_subject foreign key (elective_subject_id)
+      references  elective_subject_label (id)
+      on delete restrict on update restrict;
+
+alter table  curriculum_detail
+   add constraint fk_t_curric_detail_semester foreign key (semester_id)
+      references  semester (id)
+      on delete restrict on update restrict;
+
+alter table  curriculum_detail
+   add constraint fk_t_curric_detail_subject foreign key (subject_id)
+      references  subject (id)
+      on delete restrict on update restrict;
+
+alter table  curriculum_detail
+   add constraint fk_t_curric_detail_subject_cycle foreign key (elective_subject_cycle_id)
+      references  subject_cycle (id)
+      on delete restrict on update restrict;
+
+alter table  curriculum_detail
+   add constraint fk_t_curric_detail_t_curriculum foreign key (curriculum_id)
+      references  curriculum (id)
+      on delete restrict on update restrict;
+
+alter table  curriculum_schedule
+   add constraint fk_t_curric_sched_curriculum foreign key (curriculum_id)
+      references  curriculum (id)
+      on delete restrict on update restrict;
+
+alter table  curriculum_schedule
+   add constraint fk_t_curric_sched_month foreign key (month_id)
+      references  month (id)
+      on delete restrict on update restrict;
+
+alter table  curriculum_schedule
+   add constraint fk_t_curric_sched_sched_symbol foreign key (symbol_id)
+      references  curriculum_schedule_symbol (id)
+      on delete restrict on update restrict;
+
+alter table  curriculum_schedule
+   add constraint fk_t_curric_sched_study_year foreign key (study_year_id)
+      references  study_year (id)
+      on delete restrict on update restrict;
+
+alter table  curriculum_schedule
+   add constraint fk_t_curric_sched_week foreign key (week_id)
+      references  week (id)
+      on delete restrict on update restrict;
+
+alter table  curriculum_summer
+   add constraint fk_t_curriculum_summer_semes_dat foreign key (semester_data_id)
+      references  semester_data (id)
+      on delete restrict on update restrict;
+
+alter table  curriculum_summer
+   add constraint fk_t_curriculum_summer_status foreign key (status_id)
+      references  curriculum_status (id)
+      on delete restrict on update restrict;
+
+alter table  curriculum_summer_detail
+   add constraint fk_t_curric_summer_detai_subject foreign key (subject_id)
+      references  subject (id)
+      on delete restrict on update restrict;
+
+alter table  curriculum_summer_detail
+   add constraint fk_t_curric_summ_det_curric_summ foreign key (curriculum_id)
+      references  curriculum_summer (id)
+      on delete restrict on update restrict;
+
+alter table  curriculum_summer_detail
+   add constraint fk_t_curric_summ_det_subje_cycle foreign key (subject_cycle_id)
+      references  subject_cycle (id)
+      on delete restrict on update restrict;
+
+alter table  death_certificate
+   add constraint fk_t_death_certificate_user_doc foreign key (id)
+      references  user_document (id)
+      on delete restrict on update restrict;
+
+alter table  department
+   add constraint fk_t_department_parent foreign key (parent_id)
+      references  department (id)
+      on delete restrict on update restrict;
+
+alter table  disability_doc
+   add constraint fk_t_disability_doc_user_doc foreign key (id)
+      references  user_document (id)
+      on delete restrict on update restrict;
+
+alter table  dorm_cost
+   add constraint fk_t_dorm_cost_dorm foreign key (dorm_id)
+      references  dorm (id)
+      on delete restrict on update restrict;
+
+alter table  dorm_cost
+   add constraint fk_t_dorm_cost_study_year foreign key (study_year_id)
+      references  study_year (id)
+      on delete restrict on update restrict;
+
+alter table  dorm_room
+   add constraint fk_t_dorm_room_dorm foreign key (dorm_id)
+      references  dorm (id)
+      on delete restrict on update restrict;
+
+alter table  dorm_student
+   add constraint fk_t_dorm_student_dorm_room foreign key (room_id)
+      references  dorm_room (id)
+      on delete restrict on update restrict;
+
+alter table  dorm_student
+   add constraint fk_t_dorm_student_student foreign key (student_id)
+      references  student_education (id)
+      on delete restrict on update restrict;
+
+alter table  dorm_student_violation
+   add constraint fk_t_dorm_student_violation_type foreign key (violation_type_id)
+      references  dorm_rule_violation_type (id)
+      on delete restrict on update restrict;
+
+alter table  dorm_student_violation
+   add constraint fk_t_dorm_student_violat_student foreign key (dorm_student_id)
+      references  dorm_student (id)
+      on delete restrict on update restrict;
+
+alter table  education_doc
+   add constraint fk_t_education_doc_education_type foreign key (education_type_id)
+      references  education_type (id)
+      on delete restrict on update restrict;
+
+alter table  education_doc
+   add constraint fk_t_edu_doc_country foreign key (school_country_id)
+      references  country (id)
+      on delete restrict on update restrict;
+
+alter table  education_doc
+   add constraint fk_t_edu_doc_edu_doc_type foreign key (education_doc_type_id)
+      references  education_doc_type (id)
+      on delete restrict on update restrict;
+
+alter table  education_doc
+   add constraint fk_t_edu_doc_language foreign key (language_id)
+      references  language (id)
+      on delete restrict on update restrict;
+
+alter table  education_doc
+   add constraint fk_t_edu_doc_region foreign key (school_region_id)
+      references  country (id)
+      on delete restrict on update restrict;
+
+alter table  education_doc
+   add constraint fk_t_edu_doc_school_type foreign key (school_type_id)
+      references  school_type (id)
+      on delete restrict on update restrict;
+
+alter table  education_doc
+   add constraint fk_t_edu_doc_sch_cert_typ foreign key (school_certificate_type_id)
+      references  school_certificate_type (id)
+      on delete restrict on update restrict;
+
+alter table  education_doc
+   add constraint fk_t_edu_doc_user_doc foreign key (id)
+      references  user_document (id)
+      on delete restrict on update restrict;
+
+alter table  elective_subject
+   add constraint fk_t_elective_subject_curriculum foreign key (curriculum_id)
+      references  curriculum (id)
+      on delete restrict on update restrict;
+
+alter table  elective_subject
+   add constraint fk_t_elective_subject_semester foreign key (semester_id)
+      references  semester (id)
+      on delete restrict on update restrict;
+
+alter table  elective_subject
+   add constraint fk_t_elective_subject_subject foreign key (subject_id)
+      references  subject (id)
+      on delete restrict on update restrict;
+
+alter table  elective_subject
+   add constraint fk_t_elective_subject_subjec_cyc foreign key (subject_cycle_id)
+      references  subject_cycle (id)
+      on delete restrict on update restrict;
+
+alter table  elective_subject
+   add constraint fk_t_elective_subje_semester_dat foreign key (semester_data_id)
+      references  semester_data (id)
+      on delete restrict on update restrict;
+
+alter table  employee
+   add constraint fk_t_employee_employee_status foreign key (employee_status_id)
+      references  employee_status (id)
+      on delete restrict on update restrict;
+
+alter table  employee
+   add constraint fk_t_employee_user foreign key (id)
+      references  users (id)
+      on delete restrict on update restrict;
+
+alter table  employee_degree
+   add constraint fk_t_employee_degree_degree foreign key (degree_id)
+      references  degree (id)
+      on delete restrict on update restrict;
+
+alter table  employee_degree
+   add constraint fk_t_employee_degree_doc foreign key (id)
+      references  user_document (id)
+      on delete restrict on update restrict;
+
+alter table  employee_dept
+   add constraint fk_t_employee_dept_dept foreign key (dept_id)
+      references  department (id)
+      on delete restrict on update restrict;
+
+alter table  employee_dept
+   add constraint fk_t_employee_dept_emp foreign key (employee_id)
+      references  employee (id)
+      on delete restrict on update restrict;
+
+alter table  employee_dept
+   add constraint fk_t_employee_dept_employee_type foreign key (employee_type_id)
+      references  employee_type (id)
+      on delete restrict on update restrict;
+
+alter table  employee_dept
+   add constraint fk_t_employee_dept_post foreign key (post_id)
+      references  post (id)
+      on delete restrict on update restrict;
+
+alter table  employee_dept
+   add constraint fk_t_emp_dept_parent foreign key (parent_id)
+      references  employee_dept (id)
+      on delete restrict on update restrict;
+
+alter table  employee_scientific
+   add constraint fk_t_employee_scientific_employee foreign key (employee_id)
+      references  employee (id)
+      on delete restrict on update restrict;
+
+alter table  employee_scientific
+   add constraint fk_t_emp_sci_sci_typ foreign key (scientific_type_id)
+      references  scientific_type (id)
+      on delete restrict on update restrict;
+
+alter table  employee_work_hour
+   add constraint fk_t_emp_work_hour_day_hour foreign key (day_hour_id)
+      references  day_hour (id)
+      on delete restrict on update restrict;
+
+alter table  employee_work_hour
+   add constraint fk_t_emp_work_hour_employee foreign key (employee_id)
+      references  employee (id)
+      on delete restrict on update restrict;
+
+alter table  employee_work_hour
+   add constraint fk_t_emp_work_hour_status foreign key (work_hour_status_id)
+      references  work_hour_status (id)
+      on delete restrict on update restrict;
+
+alter table  employee_work_hour
+   add constraint fk_t_emp_work_hour_week_day foreign key (week_day_id)
+      references  week_day (id)
+      on delete restrict on update restrict;
+
+alter table  entrant_speciality
+   add constraint fk_t_entrant_speciality_language foreign key (language_id)
+      references  language (id)
+      on delete restrict on update restrict;
+
+alter table  entrant_speciality
+   add constraint fk_t_entrant_speciality_speciality foreign key (speciality_id)
+      references  speciality (id)
+      on delete restrict on update restrict;
+
+alter table  entrant_speciality
+   add constraint fk_t_entrant_speciality_student foreign key (student_id)
+      references  student (id)
+      on delete restrict on update restrict;
+
+alter table  entrant_speciality
+   add constraint fk_t_entrant_speciality_university foreign key (university_id)
+      references  university (id)
+      on delete restrict on update restrict;
+
+alter table  exam
+   add constraint fk_t_exam_exam_schedule foreign key (id)
+      references  exam_schedule (id)
+      on delete restrict on update restrict;
+
+alter table  exam_detail
+   add constraint fk_t_exam_detail_exam foreign key (exam_id)
+      references  exam (id)
+      on delete restrict on update restrict;
+
+alter table  exam_detail
+   add constraint fk_t_exam_detail_student foreign key (student_id)
+      references  student_education (id)
+      on delete restrict on update restrict;
+
+alter table  exam_schedule
+   add constraint fk_t_exam_schedule_examiner foreign key (examiner_id)
+      references  employee (id)
+      on delete restrict on update restrict;
+
+alter table  exam_schedule
+   add constraint fk_t_exam_schedule_proctor foreign key (proctor_id)
+      references  employee (id)
+      on delete restrict on update restrict;
+
+alter table  exam_schedule
+   add constraint fk_t_exam_schedule_room foreign key (room_id)
+      references  room (id)
+      on delete restrict on update restrict;
+
+alter table  exam_schedule
+   add constraint fk_t_exam_schedule_semester_data foreign key (semester_data_id)
+      references  semester_data (id)
+      on delete restrict on update restrict;
+
+alter table  exam_schedule
+   add constraint fk_t_exam_schedule_subject foreign key (subject_id)
+      references  semester_subject (id)
+      on delete restrict on update restrict;
+
+alter table  exam_schedule_detail
+   add constraint fk_t_exam_sched_detail_exam_sched foreign key (exam_schedule_id)
+      references  exam_schedule (id)
+      on delete restrict on update restrict;
+
+alter table  exam_schedule_detail
+   add constraint fk_t_exam_sched_detail_student foreign key (student_id)
+      references  student_education (id)
+      on delete restrict on update restrict;
+
+alter table  graduate_student_load
+   add constraint fk_t_graduate_student_load_emplo foreign key (employee_id)
+      references  employee (id)
+      on delete restrict on update restrict;
+
+alter table  graduate_student_load
+   add constraint fk_t_graduate_student_load_level foreign key (level_id)
+      references  level (id)
+      on delete restrict on update restrict;
+
+alter table  graduation_project
+   add constraint fk_t_graduation_project_student foreign key (id)
+      references  student (id)
+      on delete restrict on update restrict;
+
+alter table  grant_doc
+   add constraint fk_t_grant_doc_grant_type foreign key (grant_type_id)
+      references  grant_type (id)
+      on delete restrict on update restrict;
+
+alter table  grant_doc
+   add constraint fk_t_grant_doc_user_document foreign key (id)
+      references  user_document (id)
+      on delete restrict on update restrict;
+
+alter table  guardian_council_decision
+   add constraint fk_t_guard_counci_decis_user_doc foreign key (id)
+      references  user_document (id)
+      on delete restrict on update restrict;
+
+alter table  lesson
+   add constraint fk_t_lesson_schedule_detail foreign key (schedule_detail_id)
+      references  schedule_detail (id)
+      on delete restrict on update restrict;
+
+alter table  lesson_detail
+   add constraint fk_t_lesson_detail_lesson foreign key (lesson_id)
+      references  lesson (id)
+      on delete restrict on update restrict;
+
+alter table  lesson_detail
+   add constraint fk_t_lesson_detail_student foreign key (student_id)
+      references  student_education (id)
+      on delete restrict on update restrict;
+
+alter table  medical_checkup
+   add constraint fk_t_medical_check_check_type foreign key (checkup_type_id)
+      references  medical_checkup_type (id)
+      on delete restrict on update restrict;
+
+alter table  medical_checkup
+   add constraint fk_t_medical_check_user_doc foreign key (id)
+      references  user_document (id)
+      on delete restrict on update restrict;
+
+alter table  military_doc
+   add constraint fk_t_military_doc_military_doc_type foreign key (military_doc_type_id)
+      references  military_doc_type (id)
+      on delete restrict on update restrict;
+
+alter table  military_doc
+   add constraint fk_t_milit_doc_milit_status foreign key (military_status_id)
+      references  military_status (id)
+      on delete restrict on update restrict;
+
+alter table  military_doc
+   add constraint fk_t_milit_doc_user_doc foreign key (id)
+      references  user_document (id)
+      on delete restrict on update restrict;
+
+alter table  news
+   add constraint fk_t_news_department foreign key (dept_id)
+      references  department (id)
+      on delete restrict on update restrict;
+
+alter table  news
+   add constraint fk_t_news_user foreign key (user_id)
+      references  employee (id)
+      on delete restrict on update restrict;
+
+alter table  news_comment
+   add constraint fk_t_news_comment_news foreign key (news_id)
+      references  news (id)
+      on delete restrict on update restrict;
+
+alter table  news_comment
+   add constraint fk_t_news_comment_user foreign key (user_id)
+      references  users (id)
+      on delete restrict on update restrict;
+
+alter table  news_file
+   add constraint fk_t_news_file_news foreign key (news_id)
+      references  news (id)
+      on delete restrict on update restrict;
+
+alter table  order_doc
+   add constraint fk_t_order_doc_order_type foreign key (order_type_id)
+      references  order_type (id)
+      on delete restrict on update restrict;
+
+alter table  order_doc
+   add constraint fk_t_order_doc_study_year foreign key (study_year_id)
+      references  study_year (id)
+      on delete restrict on update restrict;
+
+alter table  order_doc
+   add constraint fk_t_order_doc_user_document foreign key (id)
+      references  user_document (id)
+      on delete restrict on update restrict;
+
+alter table  organization
+   add constraint fk_t_organization_country foreign key (country_id)
+      references  country (id)
+      on delete restrict on update restrict;
+
+alter table  organization
+   add constraint fk_t_organization_organization_type foreign key (organization_type_id)
+      references  organization_type (id)
+      on delete restrict on update restrict;
+
+alter table  organization
+   add constraint fk_t_organization_region foreign key (region_id)
+      references  country (id)
+      on delete restrict on update restrict;
+
+alter table  other_document
+   add constraint fk_t_other_document_user_doc foreign key (id)
+      references  user_document (id)
+      on delete restrict on update restrict;
+
+alter table  preemptive_right
+   add constraint fk_t_preemptive_right_user_document foreign key (id)
+      references  user_document (id)
+      on delete restrict on update restrict;
+
+alter table  previous_experience
+   add constraint fk_t_prev_exp_employee foreign key (employee_id)
+      references  employee (id)
+      on delete restrict on update restrict;
+
+alter table  property
+   add constraint fk_t_property_data_type foreign key (data_type_id)
+      references  data_type (id)
+      on delete restrict on update restrict;
+
+alter table  property
+   add constraint fk_t_property_property_type foreign key (property_type_id)
+      references  property_type (id)
+      on delete restrict on update restrict;
+
+alter table  publication
+   add constraint fk_fk_t_emp_publ_publ_type foreign key (publication_type_id)
+      references  publication_type (id)
+      on delete restrict on update restrict;
+
+alter table  publication
+   add constraint fk_t_emp_publ_emp_sci foreign key (id)
+      references  employee_scientific (id)
+      on delete restrict on update restrict;
+
+alter table  questioning
+   add constraint fk_t_questioning_subject foreign key (subject_id)
+      references  subject (id)
+      on delete restrict on update restrict;
+
+alter table  questioning
+   add constraint fk_t_questioning_user foreign key (user_id)
+      references  users (id)
+      on delete restrict on update restrict;
+
+alter table  questioning_detail
+   add constraint fk_t_questioning_detail_answer foreign key (answer_id)
+      references  questionnaire_answer (id)
+      on delete restrict on update restrict;
+
+alter table  questioning_detail
+   add constraint fk_t_questioning_detail_question foreign key (question_id)
+      references  questionnaire_question (id)
+      on delete restrict on update restrict;
+
+alter table  questioning_detail
+   add constraint fk_t_questionin_detai_questionin foreign key (questioning_id)
+      references  questioning (id)
+      on delete restrict on update restrict;
+
+alter table  questionnaire
+   add constraint fk_t_questionnai_questionnai_typ foreign key (questionnaire_type_id)
+      references  questionnaire_type (id)
+      on delete restrict on update restrict;
+
+alter table  questionnaire_answer
+   add constraint fk_t_questionnaire_answer_questi foreign key (question_id)
+      references  questionnaire_question (id)
+      on delete restrict on update restrict;
+
+alter table  questionnaire_question
+   add constraint fk_t_questionna_question_section foreign key (section_id)
+      references  questionnaire_section (id)
+      on delete restrict on update restrict;
+
+alter table  questionnaire_section
+   add constraint fk_t_questionn_section_questionn foreign key (questionnaire_id)
+      references  questionnaire (id)
+      on delete restrict on update restrict;
+
+alter table  registration_signature
+   add constraint fk_t_registration_signa_semester foreign key (semester_data_id)
+      references  semester_data (id)
+      on delete restrict on update restrict;
+
+alter table  registration_signature
+   add constraint fk_t_registration_signa_signtype foreign key (signature_type_id)
+      references  registration_signature_type (id)
+      on delete restrict on update restrict;
+
+alter table  registration_signature
+   add constraint fk_t_registration_signa_signuser foreign key (sign_user_id)
+      references  users (id)
+      on delete restrict on update restrict;
+
+alter table  registration_signature
+   add constraint fk_t_registration_signa_student foreign key (student_id)
+      references  student_education (id)
+      on delete restrict on update restrict;
+
+alter table  repatriate_doc
+   add constraint fk_t_repatriate_doc_user_doc foreign key (id)
+      references  user_document (id)
+      on delete restrict on update restrict;
+
+alter table  request
+   add constraint fk_t_request_employee foreign key (employee_id)
+      references  employee (id)
+      on delete restrict on update restrict;
+
+alter table  request
+   add constraint fk_t_request_request_status foreign key (request_status_id)
+      references  request_status (id)
+      on delete restrict on update restrict;
+
+alter table  request
+   add constraint fk_t_request_request_type foreign key (request_type_id)
+      references  request_type (id)
+      on delete restrict on update restrict;
+
+alter table  request
+   add constraint fk_t_request_resp_employee foreign key (resp_empl_id)
+      references  employee (id)
+      on delete restrict on update restrict;
+
+alter table  request
+   add constraint fk_t_request_room foreign key (room_id)
+      references  room (id)
+      on delete restrict on update restrict;
+
+alter table  request_file
+   add constraint fk_t_request_request_file foreign key (id)
+      references  request (id)
+      on delete restrict on update restrict;
+
+alter table  request_report
+   add constraint fk_t_request_report_employee foreign key (employee_id)
+      references  employee (id)
+      on delete restrict on update restrict;
+
+alter table  request_report
+   add constraint fk_t_request_report_request foreign key (id)
+      references  request (id)
+      on delete restrict on update restrict;
+
+alter table  room
+   add constraint fk_t_room_corpus foreign key (corpus_id)
+      references  corpus (id)
+      on delete restrict on update restrict;
+
+alter table  room
+   add constraint fk_t_room_resp_employee foreign key (resp_emp_id)
+      references  employee (id)
+      on delete restrict on update restrict;
+
+alter table  room
+   add constraint fk_t_room_room_type foreign key (room_type_id)
+      references  room_type (id)
+      on delete restrict on update restrict;
+
+alter table  room_department
+   add constraint fk_t_room_dept_dept foreign key (department_id)
+      references  department (id)
+      on delete restrict on update restrict;
+
+alter table  room_department
+   add constraint fk_t_room_dept_room foreign key (room_id)
+      references  room (id)
+      on delete restrict on update restrict;
+
+alter table  room_equipment
+   add constraint fk_t_room_equipment_equipment foreign key (equipment_id)
+      references  equipment (id)
+      on delete restrict on update restrict;
+
+alter table  room_equipment
+   add constraint fk_t_room_equipment_room foreign key (room_id)
+      references  room (id)
+      on delete restrict on update restrict;
+
+alter table  room_subject
+   add constraint fk_t_room_subject_room foreign key (room_id)
+      references  room (id)
+      on delete restrict on update restrict;
+
+alter table  room_subject
+   add constraint fk_t_room_subject_subject foreign key (subject_id)
+      references  subject (id)
+      on delete restrict on update restrict;
+
+alter table  room_work_hour
+   add constraint fk_t_room_busy_day_t_room foreign key (room_id)
+      references  room (id)
+      on delete restrict on update restrict;
+
+alter table  room_work_hour
+   add constraint fk_t_room_work_hour_day_hour foreign key (day_hour_id)
+      references  day_hour (id)
+      on delete restrict on update restrict;
+
+alter table  room_work_hour
+   add constraint fk_t_room_work_hour_status foreign key (work_hour_status_id)
+      references  work_hour_status (id)
+      on delete restrict on update restrict;
+
+alter table  room_work_hour
+   add constraint fk_t_room_work_hour_week_day foreign key (week_day_id)
+      references  week_day (id)
+      on delete restrict on update restrict;
+
+alter table  schedule
+   add constraint fk_t_schedule_chair foreign key (chair_id)
+      references  department (id)
+      on delete restrict on update restrict;
+
+alter table  schedule
+   add constraint fk_t_schedule_semester_data foreign key (semester_data_id)
+      references  semester_data (id)
+      on delete restrict on update restrict;
+
+alter table  schedule_detail
+   add constraint fk_t_schedule_detail_begin_time foreign key (begin_time_id)
+      references  time (id)
+      on delete restrict on update restrict;
+
+alter table  schedule_detail
+   add constraint fk_t_schedule_detail_end_time foreign key (end_time_id)
+      references  time (id)
+      on delete restrict on update restrict;
+
+alter table  schedule_detail
+   add constraint fk_t_schedule_detail_lesson_type foreign key (lesson_type_id)
+      references  lesson_type (id)
+      on delete restrict on update restrict;
+
+alter table  schedule_detail
+   add constraint fk_t_schedule_detail_room foreign key (room_id)
+      references  room (id)
+      on delete restrict on update restrict;
+
+alter table  schedule_detail
+   add constraint fk_t_schedule_detail_schedule foreign key (schedule_id)
+      references  schedule (id)
+      on delete restrict on update restrict;
+
+alter table  schedule_detail
+   add constraint fk_t_schedule_detail_subject foreign key (subject_id)
+      references  semester_subject (id)
+      on delete restrict on update restrict;
+
+alter table  schedule_detail
+   add constraint fk_t_schedule_detail_teacher foreign key (teacher_id)
+      references  employee (id)
+      on delete restrict on update restrict;
+
+alter table  schedule_detail
+   add constraint fk_t_schedule_detail_week_day foreign key (week_day_id)
+      references  week_day (id)
+      on delete restrict on update restrict;
+
+alter table  schedule_log
+   add constraint fk_t_schedule_schedule_log foreign key (id)
+      references  schedule (id)
+      on delete restrict on update restrict;
+
+alter table  schedule_property
+   add constraint fk_t_schedule_property_property foreign key (property_id)
+      references  property (id)
+      on delete restrict on update restrict;
+
+alter table  schedule_property
+   add constraint fk_t_schedule_property_sched_det foreign key (schedule_detail_id)
+      references  schedule_detail (id)
+      on delete restrict on update restrict;
+
+alter table  scientific_activity
+   add constraint fk_t_sci_act_emp_sci foreign key (id)
+      references  employee_scientific (id)
+      on delete restrict on update restrict;
+
+alter table  scientific_activity
+   add constraint fk_t_sci_act_sci_act_typ foreign key (scientific_activity_type_id)
+      references  scientific_activity_type (id)
+      on delete restrict on update restrict;
+
+alter table  scientific_management
+   add constraint fk_t_sci_manag_emp_sci foreign key (id)
+      references  employee_scientific (id)
+      on delete restrict on update restrict;
+
+alter table  scientific_management
+   add constraint fk_t_sci_man_sci_man_typ foreign key (scientific_management_type_id)
+      references  scientific_management_type (id)
+      on delete restrict on update restrict;
+
+alter table  scientific_management_file
+   add constraint fk_t_sci_man_file_sci_man foreign key (scientific_management_id)
+      references  scientific_management (id)
+      on delete restrict on update restrict;
+
+alter table  semester
+   add constraint fk_semester_semester_period foreign key (semester_period_id)
+      references  semester_period (id)
+      on delete restrict on update restrict;
+
+alter table  semester
+   add constraint fk_t_semester_study_year foreign key (study_year_id)
+      references  study_year (id)
+      on delete restrict on update restrict;
+
+alter table  semester_data
+   add constraint fk_t_semester_data_entrance_year foreign key (year_id)
+      references  entrance_year (id)
+      on delete restrict on update restrict;
+
+alter table  semester_data
+   add constraint fk_t_semester_data_semest_period foreign key (semester_period_id)
+      references  semester_period (id)
+      on delete restrict on update restrict;
+
+alter table  semester_subject
+   add constraint fk_t_semester_subject_semester foreign key (semester_data_id)
+      references  semester_data (id)
+      on delete restrict on update restrict;
+
+alter table  semester_subject
+   add constraint fk_t_semester_subject_subject foreign key (subject_id)
+      references  subject (id)
+      on delete restrict on update restrict;
+
+alter table  speciality
+   add constraint fk_t_speciality_chair foreign key (chair_id)
+      references  department (id)
+      on delete restrict on update restrict;
+
+alter table  speciality
+   add constraint fk_t_speciality_level foreign key (level_id)
+      references  level (id)
+      on delete restrict on update restrict;
+
+alter table  student
+   add constraint fk_t_student_acad_stat foreign key (academic_status_id)
+      references  academic_status (id)
+      on delete restrict on update restrict;
+
+alter table  student
+   add constraint fk_t_student_advisor foreign key (advisor_id)
+      references  employee (id)
+      on delete restrict on update restrict;
+
+alter table  student
+   add constraint fk_t_student_category foreign key (category_id)
+      references  student_category (id)
+      on delete restrict on update restrict;
+
+alter table  student
+   add constraint fk_t_student_entrance_year foreign key (entrance_year_id)
+      references  entrance_year (id)
+      on delete restrict on update restrict;
+
+alter table  student
+   add constraint fk_t_student_level foreign key (level_id)
+      references  level (id)
+      on delete restrict on update restrict;
+
+alter table  student
+   add constraint fk_t_student_user foreign key (id)
+      references  users (id)
+      on delete restrict on update restrict;
+
+alter table  student_contract
+   add constraint fk_t_student_contract_contract_type foreign key (contract_type_id)
+      references  contract_type (id)
+      on delete restrict on update restrict;
+
+alter table  student_contract
+   add constraint fk_t_student_contract_organization foreign key (organization_id)
+      references  organization (id)
+      on delete restrict on update restrict;
+
+alter table  student_contract
+   add constraint fk_t_student_contract_payment_type foreign key (payment_type_id)
+      references  payment_type (id)
+      on delete restrict on update restrict;
+
+alter table  student_contract
+   add constraint fk_t_student_contract_user_doc foreign key (id)
+      references  user_document (id)
+      on delete restrict on update restrict;
+
+alter table  student_education
+   add constraint fk_t_student_chair foreign key (chair_id)
+      references  department (id)
+      on delete restrict on update restrict;
+
+alter table  student_education
+   add constraint fk_t_student_education_child foreign key (child_id)
+      references  student_education (id)
+      on delete restrict on update restrict;
+
+alter table  student_education
+   add constraint fk_t_student_education_education_type foreign key (education_type_id)
+      references  student_education_type (id)
+      on delete restrict on update restrict;
+
+alter table  student_education
+   add constraint fk_t_student_education_student foreign key (student_id)
+      references  student (id)
+      on delete restrict on update restrict;
+
+alter table  student_education
+   add constraint fk_t_student_education_study_yea foreign key (study_year_id)
+      references  study_year (id)
+      on delete restrict on update restrict;
+
+alter table  student_education
+   add constraint fk_t_student_faculty foreign key (faculty_id)
+      references  department (id)
+      on delete restrict on update restrict;
+
+alter table  student_education
+   add constraint fk_t_student_special foreign key (speciality_id)
+      references  speciality (id)
+      on delete restrict on update restrict;
+
+alter table  student_education
+   add constraint fk_t_student_status foreign key (student_status_id)
+      references  student_status (id)
+      on delete restrict on update restrict;
+
+alter table  student_education
+   add constraint fk_t_stud_edu_language foreign key (language_id)
+      references  language (id)
+      on delete restrict on update restrict;
+
+alter table  student_fin_debt
+   add constraint fk_t_student_fin_debt_student foreign key (student_id)
+      references  student (id)
+      on delete restrict on update restrict;
+
+alter table  student_payment
+   add constraint fk_t_student_payment_student foreign key (student_id)
+      references  student (id)
+      on delete restrict on update restrict;
+
+alter table  student_relative
+   add constraint fk_t_student_relative_city foreign key (city_id)
+      references  country (id)
+      on delete restrict on update restrict;
+
+alter table  student_relative
+   add constraint fk_t_student_relative_country foreign key (country_id)
+      references  country (id)
+      on delete restrict on update restrict;
+
+alter table  student_relative
+   add constraint fk_t_student_relative_region foreign key (region_id)
+      references  country (id)
+      on delete restrict on update restrict;
+
+alter table  student_relative
+   add constraint fk_t_student_relative_relative_type foreign key (relative_type_id)
+      references  relative_type (id)
+      on delete restrict on update restrict;
+
+alter table  student_relative
+   add constraint fk_t_student_relative_student foreign key (student_id)
+      references  student (id)
+      on delete restrict on update restrict;
+
+alter table  student_relative
+   add constraint fk_t_student_relative_village foreign key (village_id)
+      references  country (id)
+      on delete restrict on update restrict;
+
+alter table  student_schedule
+   add constraint fk_t_student_schedule_schedule foreign key (schedule_detail_id)
+      references  schedule_detail (id)
+      on delete restrict on update restrict;
+
+alter table  student_schedule
+   add constraint fk_t_student_schedule_student foreign key (student_id)
+      references  student_education (id)
+      on delete restrict on update restrict;
+
+alter table  student_subject
+   add constraint fk_t_student_subject_semest_data foreign key (semester_data_id)
+      references  semester_data (id)
+      on delete restrict on update restrict;
+
+alter table  student_subject
+   add constraint fk_t_student_subject_student foreign key (student_id)
+      references  student_education (id)
+      on delete restrict on update restrict;
+
+alter table  student_subject
+   add constraint fk_t_student_subject_subject foreign key (subject_id)
+      references  semester_subject (id)
+      on delete restrict on update restrict;
+
+alter table  subject
+   add constraint fk_t_subject_acad_formula foreign key (academic_formula_id)
+      references  academic_formula (id)
+      on delete restrict on update restrict;
+
+alter table  subject
+   add constraint fk_t_subject_chair foreign key (chair_id)
+      references  department (id)
+      on delete restrict on update restrict;
+
+alter table  subject
+   add constraint fk_t_subject_control_type foreign key (control_type_id)
+      references  control_type (id)
+      on delete restrict on update restrict;
+
+alter table  subject
+   add constraint fk_t_subject_creditability foreign key (creditability_id)
+      references  creditability (id)
+      on delete restrict on update restrict;
+
+alter table  subject
+   add constraint fk_t_subject_ects foreign key (ects_id)
+      references  ects (id)
+      on delete restrict on update restrict;
+
+alter table  subject
+   add constraint fk_t_subject_gr_laborat foreign key (group_lab_id)
+      references  group_size_lab (id)
+      on delete restrict on update restrict;
+
+alter table  subject
+   add constraint fk_t_subject_gr_lecture foreign key (group_lec_id)
+      references  group_size_lecture (id)
+      on delete restrict on update restrict;
+
+alter table  subject
+   add constraint fk_t_subject_gr_practic foreign key (group_prac_id)
+      references  group_size_prac (id)
+      on delete restrict on update restrict;
+
+alter table  subject
+   add constraint fk_t_subject_level foreign key (level_id)
+      references  level (id)
+      on delete restrict on update restrict;
+
+alter table  subject
+   add constraint fk_t_subject_study_direct foreign key (study_direct_id)
+      references  study_direct (id)
+      on delete restrict on update restrict;
+
+alter table  subject
+   add constraint fk_t_subject_subject_cycle foreign key (subject_cycle_id)
+      references  subject_cycle (id)
+      on delete restrict on update restrict;
+
+alter table  subject_requisite
+   add constraint fk_t_subject_requisite_requisite foreign key (requisite_id)
+      references  subject (id)
+      on delete restrict on update restrict;
+
+alter table  subject_requisite
+   add constraint fk_t_subject_requisite_subject foreign key (subject_id)
+      references  subject (id)
+      on delete restrict on update restrict;
+
+alter table  teacher_load_assign
+   add constraint fk_t_teach_load_calc_assign foreign key (id)
+      references  teacher_load_calc (id)
+      on delete restrict on update restrict;
+
+alter table  teacher_load_assign_detail
+   add constraint fk_t_teacher_load_assig_det_subj foreign key (subject_id)
+      references  subject (id)
+      on delete restrict on update restrict;
+
+alter table  teacher_load_assign_detail
+   add constraint fk_t_teach_load_assign_det_tla foreign key (teacher_load_assign_id)
+      references  teacher_load_assign (id)
+      on delete restrict on update restrict;
+
+alter table  teacher_load_assign_detail
+   add constraint fk_t_teach_loa_assign_det_semest foreign key (semester_period_id)
+      references  semester_period (id)
+      on delete restrict on update restrict;
+
+alter table  teacher_load_assign_detail
+   add constraint fk_t_teach_loa_assign_det_teache foreign key (teacher_id)
+      references  employee (id)
+      on delete restrict on update restrict;
+
+alter table  teacher_load_calc
+   add constraint fk_t_teacher_load_calc_chair foreign key (chair_id)
+      references  department (id)
+      on delete restrict on update restrict;
+
+alter table  teacher_load_calc
+   add constraint fk_t_teache_load_calc_study_year foreign key (year_id)
+      references  entrance_year (id)
+      on delete restrict on update restrict;
+
+alter table  teacher_load_calc_detail
+   add constraint fk_t_teacher_lcd_subject foreign key (subject_id)
+      references  subject (id)
+      on delete restrict on update restrict;
+
+alter table  teacher_load_calc_detail
+   add constraint fk_t_teacher_lcd_teach_load_calc foreign key (teacher_load_calc_id)
+      references  teacher_load_calc (id)
+      on delete restrict on update restrict;
+
+alter table  teacher_load_calc_detail
+   add constraint fk_t_teach_load_calc_det_semeste foreign key (semester_period_id)
+      references  semester_period (id)
+      on delete restrict on update restrict;
+
+alter table  teacher_room
+   add constraint fk_t_teacher_room_room foreign key (room_id)
+      references  room (id)
+      on delete restrict on update restrict;
+
+alter table  teacher_room
+   add constraint fk_t_teacher_room_teacher foreign key (teacher_id)
+      references  employee (id)
+      on delete restrict on update restrict;
+
+alter table  teacher_subject
+   add constraint fk_t_teacher_subject_laboratory foreign key (group_lab_id)
+      references  group_size_lab (id)
+      on delete restrict on update restrict;
+
+alter table  teacher_subject
+   add constraint fk_t_teacher_subject_lecture foreign key (group_lec_id)
+      references  group_size_lecture (id)
+      on delete restrict on update restrict;
+
+alter table  teacher_subject
+   add constraint fk_t_teacher_subject_practice foreign key (group_prac_id)
+      references  group_size_prac (id)
+      on delete restrict on update restrict;
+
+alter table  teacher_subject
+   add constraint fk_t_teacher_subject_subject foreign key (subject_id)
+      references  subject (id)
+      on delete restrict on update restrict;
+
+alter table  teacher_subject
+   add constraint fk_t_teacher_subject_teacher foreign key (employee_id)
+      references  employee (id)
+      on delete restrict on update restrict;
+
+alter table  tin
+   add constraint fk_t_tin_user_doc foreign key (id)
+      references  user_document (id)
+      on delete restrict on update restrict;
+
+alter table  unt_certificate
+   add constraint fk_t_unt_cert_user_doc foreign key (id)
+      references  user_document (id)
+      on delete restrict on update restrict;
+
+alter table  unt_cert_subject
+   add constraint fk_t_unt_cert_subj_cert foreign key (unt_certificate_id)
+      references  unt_certificate (id)
+      on delete restrict on update restrict;
+
+alter table  unt_cert_subject
+   add constraint fk_t_unt_cert_subj_subj foreign key (unt_subject_id)
+      references  unt_subject (id)
+      on delete restrict on update restrict;
+
+alter table  users
+   add constraint fk_t_user_citizenship foreign key (citizenship_id)
+      references  country (id)
+      on delete restrict on update restrict;
+
+alter table  users
+   add constraint fk_t_user_lock_reason foreign key (lock_reason_id)
+      references  lock_reason (id)
+      on delete restrict on update restrict;
+
+alter table  users
+   add constraint fk_t_user_marital_status foreign key (marital_status_id)
+      references  marital_status (id)
+      on delete restrict on update restrict;
+
+alter table  users
+   add constraint fk_t_user_nationality foreign key (nationality_id)
+      references  nationality (id)
+      on delete restrict on update restrict;
+
+alter table  users
+   add constraint fk_t_user_sex foreign key (sex_id)
+      references  sex (id)
+      on delete restrict on update restrict;
+
+alter table  users
+   add constraint fk_t_user_user_type foreign key (user_type_id)
+      references  user_type (id)
+      on delete restrict on update restrict;
+
+alter table  user_address
+   add constraint fk_t_user_address_address_type foreign key (address_type_id)
+      references  address_type (id)
+      on delete restrict on update restrict;
+
+alter table  user_address
+   add constraint fk_t_user_address_city foreign key (city_id)
+      references  country (id)
+      on delete restrict on update restrict;
+
+alter table  user_address
+   add constraint fk_t_user_address_country foreign key (country_id)
+      references  country (id)
+      on delete restrict on update restrict;
+
+alter table  user_address
+   add constraint fk_t_user_address_region foreign key (region_id)
+      references  country (id)
+      on delete restrict on update restrict;
+
+alter table  user_address
+   add constraint fk_t_user_address_user foreign key (user_id)
+      references  users (id)
+      on delete restrict on update restrict;
+
+alter table  user_address
+   add constraint fk_t_user_address_village foreign key (village_id)
+      references  country (id)
+      on delete restrict on update restrict;
+
+alter table  user_award
+   add constraint fk_t_user_award_award foreign key (award_id)
+      references  award (id)
+      on delete restrict on update restrict;
+
+alter table  user_award
+   add constraint fk_t_user_award_user foreign key (user_id)
+      references  users (id)
+      on delete restrict on update restrict;
+
+alter table  user_document
+   add constraint fk_t_user_document_user foreign key (user_id)
+      references  users (id)
+      on delete restrict on update restrict;
+
+alter table  user_document
+   add constraint fk_t_user_doc_doc_type foreign key (document_type_id)
+      references  document_type (id)
+      on delete restrict on update restrict;
+
+alter table  user_document_file
+   add constraint fk_t_user_doc_file_user_doc foreign key (user_doc_id)
+      references  user_document (id)
+      on delete restrict on update restrict;
+
+alter table  user_file
+   add constraint fk_t_user_file_user foreign key (user_id)
+      references  users (id)
+      on delete restrict on update restrict;
+
+alter table  user_file
+   add constraint fk_t_user_file_user_file foreign key (parent_id)
+      references  user_file (id)
+      on delete restrict on update restrict;
+
+alter table  user_language
+   add constraint fk_t_user_language_language foreign key (language_id)
+      references  language (id)
+      on delete restrict on update restrict;
+
+alter table  user_language
+   add constraint fk_t_user_language_lang_level foreign key (language_level_id)
+      references  language_level (id)
+      on delete restrict on update restrict;
+
+alter table  user_language
+   add constraint fk_t_user_language_user foreign key (user_id)
+      references  users (id)
+      on delete restrict on update restrict;
+
+alter table  user_passport
+   add constraint fk_t_user_passport_country foreign key (birth_country_id)
+      references  country (id)
+      on delete restrict on update restrict;
+
+alter table  user_passport
+   add constraint fk_t_user_passport_passport_type foreign key (passport_type_id)
+      references  passport_type (id)
+      on delete restrict on update restrict;
+
+alter table  user_passport
+   add constraint fk_t_user_passport_region foreign key (birth_region_id)
+      references  country (id)
+      on delete restrict on update restrict;
+
+alter table  user_passport
+   add constraint fk_t_user_passp_user_doc foreign key (id)
+      references  user_document (id)
+      on delete restrict on update restrict;
+
+alter table  user_photo
+   add constraint fk_t_user_photo_user foreign key (user_id)
+      references  users (id)
+      on delete restrict on update restrict;
+
+alter table  user_social_category
+   add constraint fk_t_user_soc_categ_soc_categ foreign key (social_category_id)
+      references  social_category (id)
+      on delete restrict on update restrict;
+
+alter table  user_social_category
+   add constraint fk_t_user_soc_categ_user foreign key (user_id)
+      references  users (id)
+      on delete restrict on update restrict;
