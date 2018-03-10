@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+		     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		     xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+		     version="2.0">
+	<persistence-unit name="UNIVER-PU" transaction-type="RESOURCE_LOCAL">
+		<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+		<!--<mapping-file>META-INF/custom-orm.xml</mapping-file>-->
+  		<class>org.r3a.common.entity.ID</class>
+  		<class>org.r3a.common.entity.AbstractEntity</class>
+  		<class>org.r3a.common.entity.beans.AbstractSetting</class>
+  		<class>org.r3a.common.entity.beans.AbstractEmail</class>
+  		<class>org.r3a.common.entity.beans.AbstractLog</class>
+  		<class>org.r3a.common.entity.beans.AbstractRoleTaskFunction</class>
+  		<class>org.r3a.common.entity.beans.AbstractRoleTask</class>
+  		<class>org.r3a.common.entity.beans.AbstractRole</class>
+  		<class>org.r3a.common.entity.beans.AbstractSequence</class>
+  		<class>org.r3a.common.entity.beans.AbstractSetting</class>
+  		<class>org.r3a.common.entity.beans.AbstractTable</class>
+  		<class>org.r3a.common.entity.beans.AbstractTaskFunction</class>
+  		<class>org.r3a.common.entity.beans.AbstractTask</class>
+  		<class>org.r3a.common.entity.beans.AbstractUserRole</class>
+  		<class>org.r3a.common.entity.beans.AbstractUser</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.EMAIL</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.EMAIL_STATUS</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.LOG</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.LOG_TYPES</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.ROLE_TASK_FUNCTIONS</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.ROLE_TASKS</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.ROLES</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.SEQUENCES</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.SETTINGS</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.TABLES</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.TASK_FUNCTIONS</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.TASKS</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.USER_ROLES</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.USERS</class>
+	    <exclude-unlisted-classes>true</exclude-unlisted-classes>
+	    <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
+	    <properties>
+	    	<property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
+		    <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/univerdb"/>
+		    <property name="javax.persistence.jdbc.user" value="univer"/>
+		    <property name="javax.persistence.jdbc.password" value="univer"/>
+		    <property name="eclipselink.connection-pool.default.initial" value="1"/>
+		    <property name="eclipselink.connection-pool.default.min" value="2"/>
+		    <property name="eclipselink.connection-pool.default.max" value="8"/>
+		    <property name="eclipselink.connection-pool.default.wait" value="60000"/>
+		    <property name="eclipselink.target-database" value="PostgreSQL"/>
+		    <property name="eclipselink.ddl-generation" value="none"/>
+		    <!-- <property name="eclipselink.ddl-generation.output-mode" value="database"/> -->
+		    <!-- <property name="eclipselink.jdbc.cache-statements" value="true"/> -->
+		    <!-- <property name="eclipselink.jdbc.cache-statements.size" value="100"/> -->
+		    <property name="eclipselink.logging.level.sql" value="FINE"/>
+		    <property name="eclipselink.logging.parameters" value="true"/>
+		    <property name="show-sql" value="false"/>
+		    <!--<property name="jdbc.property.database.schema" value="UNIVER"/>-->
+	    </properties>
+	</persistence-unit>
+</persistence>

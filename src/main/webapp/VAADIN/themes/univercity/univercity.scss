@@ -1,0 +1,449 @@
+// If you edit this file you need to compile the theme. See README.md for details.
+
+// Global variable overrides. Must be declared before importing Valo.
+
+// Defines the plaintext font size, weight and family. Font size affects general component sizing.
+//$v-font-size: 16px;
+//$v-font-weight: 300;
+//$v-font-family: "Open Sans", sans-serif;
+
+// Defines the border used by all components.
+//$v-border: 1px solid (v-shade 0.7);
+//$v-border-radius: 4px;
+
+// Affects the color of some component elements, e.g Button, Panel title, etc
+//$v-background-color: hsl(210, 0%, 98%);
+// Affects the color of content areas, e.g  Panel and Window content, TextField input etc
+//$v-app-background-color: $v-background-color;
+
+// Affects the visual appearance of all components
+//$v-gradient: v-linear 8%;
+//$v-bevel-depth: 30%;
+//$v-shadow-opacity: 5%;
+
+// Defines colors for indicating status (focus, success, failure)
+//$v-focus-color: valo-focus-color(); // Calculates a suitable color automatically
+//$v-friendly-color: #2c9720;
+//$v-error-indicator-color: #ed473b;
+
+// For more information, see: https://vaadin.com/book/-/page/themes.valo.html
+// Example variants can be copy/pasted from https://vaadin.com/wiki/-/wiki/Main/Valo+Examples
+
+@import "../valo/valo.scss";
+
+@mixin univercity {
+  @include valo;
+
+  [class*="margin-left"] > tbody > [class*="row"] > [class*="captioncell"] {
+    padding-left: 10px;
+  }
+
+  [class*="margin-bottom"] > tbody > [class*="lastrow"] > td {
+    padding-bottom: 10px;
+  }
+
+  [class*="margin-top"] > tbody > [class*="firstrow"] > td {
+    padding-top: 10px;
+  }
+
+  [class*="margin-right"] > tbody > [class*="row"] > [class*="contentcell"] {
+    padding-right: 10px;
+  }
+
+  .bold-text {
+    font-weight: bold;
+  }
+
+  .v-ui {
+    /*font-size: 100%;
+    font-family: Arial,Helvetica,sans-serif;*/
+  }
+
+  .v-button {
+    height: 30px;
+  }
+
+  .v-button-icon-only {
+    width: 30px;
+  }
+
+  .v-button-icon-24 {
+    height: 24px;
+    width: 24px;
+  }
+
+  .v-button-link:focus::after {
+    border-color: transparent;
+    box-shadow: none;
+  }
+
+  .v-button-page-control-first {
+    padding: 0;
+    margin-left: 5px;
+  }
+
+  .v-button-page-control-previous {
+    padding: 0;
+    margin-left: 5px;
+    margin-right: 5px;
+  }
+
+  .v-button-page-control-next {
+    padding: 0;
+    margin-left: 5px;
+    margin-right: 5px;
+  }
+
+  .v-button-page-control-last {
+    padding: 0;
+  }
+
+  .v-button-add {
+    width: 120px;
+  }
+
+  .v-button-edit {
+    width: 120px;
+  }
+
+  .v-button-delete {
+    width: 120px;
+  }
+
+  .v-button-preview {
+    width: 120px;
+  }
+
+  .v-button-refresh {
+    width: 120px;
+  }
+
+  .v-button-print {
+    width: 120px;
+  }
+
+  .v-button-filter {
+    width: 120px;
+  }
+
+  .v-button-help {
+    width: 120px;
+  }
+
+  .v-button-common-toolbar {
+    width: 120px;
+  }
+
+  .v-button-close {
+  }
+
+  .v-button-save {
+  }
+
+  .v-button-cancel {
+  }
+
+  .v-button-search {
+  }
+
+  .v-button-clear {
+  }
+
+  .v-button-generate {
+  }
+
+  .v-button-dialog-yes {
+  }
+
+  .v-button-dialog-no {
+  }
+
+  .v-button-multiline {
+    vertical-align: middle;
+  }
+
+  .v-button-multiline::before {
+    content: none;
+  }
+
+  .v-button-multiline .v-button-caption {
+    font-size: 10px;
+    font-weight: 400;
+    line-height: 1;
+  }
+
+  .v-button-bold {
+    font-weight: 600;
+  }
+
+  .v-button-back {
+    color: blue;
+  }
+
+  .v-table-header-wrap, .v-table-footer-wrap {
+    font-size: 12px;
+  }
+
+  .v-table-cell-content .v-table-cell-break-word {
+    word-wrap: break-all;
+  }
+
+  .v-textfield {
+    height: 24px;
+    font-weight: 600;
+    border-radius: 0;
+    border: 1px solid gray;
+  }
+
+  .v-textfield-error {
+    border-color: gray !important;
+  }
+
+  .v-textfield-number-field {
+    text-align: right;
+  }
+
+  .v-textfield-text-grid-cell {
+    height: 14px;
+    width: 95%;
+  }
+
+  .v-textfield-number-grid-cell {
+    height: 14px;
+    width: 95%;
+    text-align: right;
+  }
+
+  .v-textarea-text-grid-cell {
+    height: 30px;
+    width: 95%;
+    border-radius: 0;
+  }
+
+  .v-textarea-no-border-radius {
+    border-radius: 0;
+  }
+
+  .v-filterselect {
+    height: 24px;
+  }
+
+  .v-filterselect [class*="input"] {
+    border: 1px solid gray;
+    border-radius: 0;
+    font-weight: 600;
+  }
+
+  .v-filterselect [class$="button"] {
+    border-left: 1px solid gray;
+    color: inherit;
+  }
+
+  .v-filterselect-error .v-filterselect-input {
+    border-color: gray !important;
+  }
+
+  .v-filterselect-error .v-filterselect-button {
+    color: inherit;
+  }
+
+  .v-filterselect-item-red {
+    color: red;
+  }
+
+  .v-filterselect-red .v-filterselect-input {
+    color: red;
+  }
+
+  .v-datefield [class*="textfield"] {
+    font-weight: 600;
+    border: 1px solid gray;
+    border-radius: 0;
+  }
+
+  .v-datefield [class*="button"] {
+    color: inherit;
+    border-color: gray;
+  }
+
+  .v-datefield-error .v-datefield-textfield {
+    border-color: gray !important;
+  }
+
+  .v-datefield-error .v-datefield-button {
+    border-color: gray;
+    color: inherit;
+  }
+
+  .v-select select {
+    border: 1px solid gray;
+    border-radius: 0;
+  }
+
+  .v-formlayout-captioncell .v-caption {
+    font-weight: 300;
+  }
+
+  .v-label-filter-caption {
+    vertical-align: middle;
+  }
+
+  .v-label-select-widget-title {
+    font-weight: bold;
+    padding-left: 27px;
+  }
+
+  .v-label-vertical-text {
+    -moz-transform: rotate(270deg);
+    -ms-transform: rotate(270deg);
+    -webkit-transform: rotate(270deg);
+    -o-transform: rotate(270deg);
+    transform: rotate(270deg);
+  }
+
+  .v-label-bold {
+    font-weight: bold;
+  }
+
+  .v-label-error {
+    font-size: 14px;
+    color: red;
+  }
+
+  .v-label-required-indicator {
+    margin-right: 10px;
+  }
+
+  .v-label-bold-16 {
+    font-weight: bold;
+    font-size: 16px;
+  }
+
+  .v-label-text-center {
+    text-align: center;
+  }
+
+  .v-grid-header th {
+    font-size: 12px;
+    font-weight: bold;
+  }
+
+  .v-grid-header-center {
+  }
+
+  .v-grid-header-center .v-grid-column-header-content {
+    text-align: center;
+  }
+
+  .v-grid-boolean-column {
+    text-align: center;
+  }
+
+  .v-grid-number-column {
+    text-align: right;
+  }
+
+  .v-tabsheet-form-widget-view {
+  }
+
+  .v-tabsheet-form-widget-view .v-tabsheet-tabcontainer::before {
+    border-top: none;
+  }
+
+  .v-tabsheet-form-widget-view .v-tabsheet-tabcontainer {
+    padding-bottom: 5px;
+  }
+
+  .v-tabsheet-form-widget-view .v-tabsheet-content {
+    text-align: center;
+  }
+
+  .v-panel-widget-panel {
+    border: none;
+  }
+
+  .v-panel-form-panel {
+    background: #f1f1f1;
+  }
+
+  .v-upload-file-list-widget {
+  }
+
+  .v-upload-file-list-widget .v-button {
+    /* padding: 0; */
+    @extend .v-button-icon-only;
+    height: 24px;
+    width: 24px;
+    background: transparent none repeat scroll 0 0;
+  }
+
+  .v-upload-file-list-widget .v-button .v-button-wrap {
+    /* background-image: url("/img/button/upload.png"); */
+  }
+
+  .v-caption-file-list-widget {
+    position: absolute;
+    margin: 8% 12%;
+  }
+
+  .v-slot-file-list-widget {
+  }
+
+  .v-slot-file-list-widget .v-has-caption {
+    position: relative;
+  }
+
+  .v-verticallayout-file-list-widget {
+  }
+
+  .v-verticallayout-file-list-widget .v-spacing {
+    height: 3px;
+  }
+
+  .v-verticallayout-bordered {
+    border: 1px solid;
+  }
+
+  .v-horizontallayout-file-list-widget {
+  }
+
+  .v-horizontallayout-file-list-widget .v-spacing {
+    width: 3px;
+  }
+
+  .v-horizontallayout-page-control {
+    margin-top: 1.8%;
+  }
+
+  .v-horizontallayout-form-panel {
+    border: 1px solid #d5d5d5;
+    background: #f1f1f1 none repeat scroll 0 0;
+  }
+
+  .v-gridlayout-form-panel {
+    border: 1px solid #d5d5d5;
+    background: #f1f1f1 none repeat scroll 0 0;
+  }
+
+  .v-progressbar-dialog.v-progressbar-indeterminate {
+    border-width: 5px;
+    height: 50px !important;
+    width: 50px !important;
+  }
+
+  .v-select-optiongroup-horizontal {
+    white-space: nowrap;
+  }
+
+  .v-select-optiongroup-horizontal .v-select-option {
+    display: inline-block;
+  }
+
+  .v-select-optiongroup-horizontal .v-checkbox.v-disabled > label, .v-checkbox.v-disabled > .v-icon {
+    opacity: 1;
+  }
+
+  .v-select-optiongroup-horizontal .v-select-option.v-radiobutton {
+    padding-right: 10px;
+  }
+}

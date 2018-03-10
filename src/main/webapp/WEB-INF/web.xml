@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" version="3.1">
+    <display-name>Univercity</display-name>
+    <description>Univercity application</description>
+    
+<!--    <context-param>
+        <param-name>UIProvider</param-name>
+        <param-value>com.ex.my.MyUIProvider</param-value>
+        <description>If need custom UIProvider, by default Vaadin uses DefaultUIProvider for create an instance of UI class</description>
+    </context-param>-->
+    
+    <context-param>
+        <param-name>disable-xsrf-protection</param-name>
+        <param-value>false</param-value>
+        <!--<description>If true, then disables protection of cross-site request forgery (XSRF) attack. Disabling this parameter may be usefull for testing application by JMeter</description>-->
+    </context-param>
+
+    <listener>
+        <listener-class>org.apache.shiro.web.env.EnvironmentLoaderListener</listener-class>
+    </listener>
+    <filter>
+        <filter-name>ShiroFilter</filter-name>
+        <filter-class>org.apache.shiro.web.servlet.ShiroFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>ShiroFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+        <dispatcher>INCLUDE</dispatcher>
+        <dispatcher>ERROR</dispatcher>
+    </filter-mapping>
+
+    <session-config>
+        <session-timeout>30</session-timeout>
+    </session-config>
+</web-app>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO" name="univercity" packages="kz.halyqsoft.univercity">
+    <Properties>
+        <Property name="log.pattern">%d{yyyy-MM-dd HH:mm:ss,SSS} - %m%n</Property>
+        <Property name="log.filename">/opt/tomcat/logs</Property>
+    </Properties>
+
+    <Appenders>
+        <Console name="ConsoleAppender" target="SYSTEM_OUT">
+            <PatternLayout pattern="${log.pattern}"/>
+        </Console>
+
+        <RollingFile name="FileAppender" fileName="${log.filename}/univercity-log.log" filePattern="${log.filename}/univercity-log-%i.log">
+            <PatternLayout>
+                <Pattern>${log.pattern}</Pattern>
+            </PatternLayout>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="1MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="3"/>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <Logger name="kz.halyqsoft.univercity.UnivercityUI" level="INFO" additivity="false">
+            <!--<AppenderRef ref="ConsoleAppender"/>-->
+            <AppenderRef ref="FileAppender"/>
+        </Logger>
+
+        <Root level="INFO">
+            <!--<AppenderRef ref="ConsoleAppender"/>-->
+            <AppenderRef ref="FileAppender"/>
+        </Root>
+    </Loggers>
+</Configuration>

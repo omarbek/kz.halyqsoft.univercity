@@ -19,6 +19,29 @@
           <element id="library" level="project" name="Maven: com.vaadin.external.slf4j:vaadin-slf4j-jdk14:1.6.1" />
           <element id="library" level="project" name="Maven: com.vaadin:vaadin-client-compiled:8.3.1" />
           <element id="library" level="project" name="Maven: com.vaadin:vaadin-themes:8.3.1" />
+          <element id="library" level="project" name="Maven: org.apache.logging.log4j:log4j-api:2.10.0" />
+          <element id="library" level="project" name="Maven: org.apache.logging.log4j:log4j-core:2.10.0" />
+          <element id="library" level="project" name="Maven: org.apache.logging.log4j:log4j-slf4j-impl:2.10.0" />
+          <element id="library" level="project" name="Maven: org.slf4j:slf4j-api:1.8.0-alpha2" />
+          <element id="library" level="project" name="Maven: org.apache.shiro:shiro-core:1.3.2" />
+          <element id="library" level="project" name="Maven: commons-beanutils:commons-beanutils:1.8.3" />
+          <element id="library" level="project" name="Maven: org.apache.shiro:shiro-web:1.3.2" />
+          <element id="library" level="project" name="Maven: org.apache.shiro:shiro-ehcache:1.3.2" />
+          <element id="library" level="project" name="Maven: net.sf.ehcache:ehcache-core:2.5.3" />
+          <element id="library" level="project" name="Maven: commons-logging:commons-logging:1.2" />
+          <element id="library" level="project" name="Maven: org.ehcache:ehcache:3.4.0" />
+          <element id="library" level="project" name="Maven: org.r3a:vaadin:1.0" />
+          <element id="library" level="project" name="Maven: javax.portlet:portlet-api:3.0.0" />
+          <element id="library" level="project" name="Maven: javax.enterprise:cdi-api:1.2" />
+          <element id="library" level="project" name="Maven: javax.el:javax.el-api:3.0.0" />
+          <element id="library" level="project" name="Maven: javax.interceptor:javax.interceptor-api:1.2" />
+          <element id="library" level="project" name="Maven: javax.inject:javax.inject:1" />
+          <element id="library" level="project" name="Maven: org.r3a:common:1.0" />
+          <element id="library" level="project" name="Maven: org.r3a:dblink:1.0" />
+          <element id="library" level="project" name="Maven: org.r3a:entity:1.0" />
+          <element id="library" level="project" name="Maven: org.r3a:utility:1.0" />
+          <element id="library" level="project" name="Maven: com.unboundid:unboundid-ldapsdk:4.0.4" />
+          <element id="library" level="project" name="Maven: org.r3a:resources:1.0" />
         </element>
       </element>
       <element id="directory" name="META-INF">
