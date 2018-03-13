@@ -78,9 +78,9 @@
     <orderEntry type="library" name="Maven: org.r3a:common:1.0" level="project" />
     <orderEntry type="library" name="Maven: org.r3a:dblink:1.0" level="project" />
     <orderEntry type="library" name="Maven: org.r3a:entity:1.0" level="project" />
-    <orderEntry type="library" name="Maven: org.r3a:utility:1.0" level="project" />
-    <orderEntry type="library" name="Maven: com.unboundid:unboundid-ldapsdk:4.0.4" level="project" />
     <orderEntry type="library" name="Maven: org.r3a:resources:1.0" level="project" />
     <orderEntry type="library" name="Maven: org.r3a:vaadin-add-on:1.0" level="project" />
+    <orderEntry type="library" name="Maven: org.r3a:utility:1.0" level="project" />
+    <orderEntry type="library" name="Maven: com.unboundid:unboundid-ldapsdk:4.0.4" level="project" />
   </component>
 </module>

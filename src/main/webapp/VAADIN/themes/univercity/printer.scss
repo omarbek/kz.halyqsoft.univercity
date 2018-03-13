@@ -1,0 +1,63 @@
+@CHARSET "UTF-8";
+
+@media print {
+	button {
+		display: none;
+	}
+	
+	.v-button {
+		display: none;
+		& * {
+	        display: none;
+	    }
+	}
+	
+	.v-nativebutton {
+		display: none;
+		& * {
+	        display: none;
+	    }
+	}
+	
+	.wpthemeFooter {
+		display: none;
+		& * {
+	        display: none;
+	    }
+	}
+	
+	.wpthemeHeader {
+		display: none;
+		& * {
+	        display: none;
+	    }
+	}
+	
+	.wpthemeBanner {
+		display: none;
+		& * {
+	        display: none;
+	    }
+	}
+	
+	.wpthemeSecondaryBanner {
+		display: none;
+		& * {
+	        display: none;
+	    }
+	}
+	
+	.wpthemeCrumbTrail {
+		display: none;
+		& * {
+	        display: none;
+	    }
+	}
+	
+	.wpToolbarActionBar {
+		display: none;
+		& * {
+	        display: none;
+	    }
+	}
+}

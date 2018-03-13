@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact name="kz.halyqsoft.univercity:GWT">
+    <output-path>src/main/webapp/VAADIN/widgetsets</output-path>
+    <root id="root">
+      <element id="gwt-compiler-output" facet="kz.halyqsoft.univercity/gwt/GWT" />
+    </root>
+  </artifact>
+</component>

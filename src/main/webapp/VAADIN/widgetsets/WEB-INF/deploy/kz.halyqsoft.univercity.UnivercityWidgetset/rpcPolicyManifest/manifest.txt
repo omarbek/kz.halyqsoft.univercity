@@ -1,0 +1,2 @@
+# Module kz.halyqsoft.univercity.UnivercityWidgetset
+# RPC service class, partial path of RPC policy file

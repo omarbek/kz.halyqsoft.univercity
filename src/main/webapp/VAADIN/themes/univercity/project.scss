@@ -1,0 +1,475 @@
+/* 
+    author Rakymzhan A. Kenzhegul
+    created 03.12.2014 17:00:28
+*/
+
+.wpthemeInner {
+	width: 100%;
+}
+
+.wpthemeCrumbTrail {
+    margin: 6px 20% 20px;
+}
+
+.wptheme1Col .wpthemeCol {
+	margin: 0 5% auto;
+	width: 90%;
+}
+
+.v-label-day-time {
+	font-size: 100%;
+    font-weight: normal;
+}
+
+.v-label-total-caption-13 {
+	font: 600 13px/1.55 Arial,Helvetica,sans-serif;
+}
+
+.v-label-total-text-13 {
+	font: italic bold 13px/1.55 Arial,Helvetica,sans-serif;
+}
+
+.v-label-total-caption-11 {
+	font: 600 11px/1.55 Arial,Helvetica,sans-serif;
+}
+
+.v-label-total-text-11 {
+	font: italic bold 11px/1.55 Arial,Helvetica,sans-serif;
+}
+
+.v-label-schedule-cell {
+	font-size: 10px;
+	font-weight: normal;
+}
+
+.v-label-margin-left-30 {
+	margin-left: 30px;
+}
+
+.v-caption-day-time-legend {
+	font-size: 100% !important;
+    font-weight: normal !important;
+    padding-left: 50px !important;
+}
+
+.v-horizontallayout-day-time-legend {
+	padding-top: 8px;
+}
+
+.v-horizontallayout-subject-filter-panel {
+	padding-right: 120px;
+}
+
+.v-horizontallayout-academ-calendar-item {
+	padding: 8px;
+	background-color: #ededed;
+}
+
+.v-verticallayout-schedule-cell {
+	padding: 7px 5px 7px 5px;
+	height: 100%;
+}
+
+.v-verticallayout-schedule-cell-full {
+	background: #c0faff;
+}
+
+.v-grid-curriculum-schedule {
+}
+
+.v-grid-curriculum-schedule .v-grid-column-header-content {
+	text-align: center;
+}
+
+.v-grid-curriculum-schedule .v-textfield-text-grid-cell {
+	width: 40% !important;
+}
+
+.v-grid-lesson-detail .v-grid-body .v-grid-cell {
+	height: 51px;
+	line-height: 50px;
+}
+
+.v-grid-row-error {
+    color: #ff8080;
+}
+
+.v-button-add-elective {
+}
+
+.v-button-calculate {
+}
+
+.v-button-assign {
+}
+
+.v-button-delete {
+	text-align: right !important;	
+}
+
+.v-button-selected {
+	background: #87cb9d !important;
+	color: white !important;
+}
+
+.v-button-selected-page-button {
+  	color: #ffffff !important;
+	background: darkred !important;
+}
+
+.v-button-search {
+  	color: #ffffff !important;
+  	background: green !important;
+}
+
+.v-button-toolbar-100 {
+  	width: 110px;
+  	font-weight: bold !important;
+}
+ 	
+.v-button-toolbar-100-to-main {
+  	margin-right: 5px;
+  	color: blue !important;
+}
+
+.v-button-btn {
+ 	border-radius: 4px;
+    border-style: solid;
+    border-width: 1px;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+  	
+.v-button-btn-success {
+	background: #5bb75b;
+    background-image: linear-gradient(to bottom, #62c462, #51a351);
+    background-repeat: repeat-x;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+    color: #ffffff;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+  	
+.v-button-btn-primary {
+	background: #006dcc;
+    background-image: linear-gradient(to bottom, #08c, #04c);
+    background-repeat: repeat-x;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+    color: #ffffff;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+
+.v-nativebutton-schedule {
+	margin-left: 5px !important;
+	height: 25px;
+	width: 25px;
+}
+
+.v-nativebutton-schedule .v-icon {
+	margin-left: -4px;
+}
+
+.v-nativebutton-schedule-property {
+	height: 25px;
+	width: 25px;
+}
+
+.v-nativebutton-schedule-property .v-icon {
+	margin-left: -4px;
+}
+
+.v-nativebutton-margin-bottom-10 {
+	margin-bottom: 10px;
+}
+
+.v-nativebutton-margin-bottom--3 {
+	margin-bottom: -3px;
+}
+
+.v-nativebutton-text-red {
+	color: #d80f48;
+}
+
+.v-nativebutton-text-bold {
+	font-weight: bold !important;
+}
+
+.v-table-row-exam-schedule-row {
+	background: #c0faff !important;
+	color: red !important;
+    font-weight: bold;
+}
+
+.v-table-row-exam-schedule-row.v-selected {
+	background: #fab2b2 !important;
+	color: black !important;
+}
+
+.v-table-schedule {
+}
+
+.v-table-schedule .v-table-header-cell {
+	text-align: center;
+	font-weight: bold;
+}
+
+.commentsGrid td{
+    height:100px !important;
+ }
+ 
+.v-label-visitCell {
+	border: 1px solid black;
+	border-style: solid;
+	width: 30px;
+}
+
+.v-label-visitCellFooter {
+	border: 1px solid black;
+	border-style: solid;
+	width: 120px;
+}
+
+.v-label-missing {
+	background-color: red;
+}
+
+.v-label-late {
+	background-color: yellow;
+}
+
+.v-label-schedule-cell-full {
+	background: #c0faff;
+	height: 100%;
+}
+
+.v-caption-title {
+	font-size: 120% !important;
+    font-weight: bold !important;
+    text-align: center;
+}
+
+.v-caption-header-center {
+	text-align: center;
+}
+
+.v-caption-lesson-detail {
+	text-align: left;
+}
+
+.v-panel-existing-records {
+}
+  	
+.v-panel-existing-records .v-panel-caption {
+	font-size: 160% !important;
+	font-weight: 600 !important;
+}
+
+.v-panel-schedule-edit-panel {
+}
+
+.v-panel-schedule-edit-panel .v-panel-caption {
+	text-align: center;
+}
+
+.v-panel-news-panel {
+}
+
+.v-panel-news-panel .v-panel-caption {
+	background-image: none !important;
+	color: #8181F7 !important;
+	background-color: #ffffff !important; 
+}
+
+.v-formlayout-alert {
+	border-radius: 4px;
+	padding-left: 14px;
+	margin-bottom: 7px;
+}
+
+.v-formlayout-alert-success {
+	background-color: #dff0d8;
+    border-color: #d6e9c6;
+    color: #468847;
+}
+
+.v-formlayout-alert-success .v-caption {
+	background-color: #dff0d8;
+    border-color: #d6e9c6;
+    color: #468847;
+}
+
+.v-formlayout-alert-warning {
+}
+
+.v-gridlayout-print {
+	font-size: 140%;
+}
+	
+.v-gridlayout-print.v-gridlayout-slot {
+	line-height: 2;
+}
+
+.v-gridlayout-schedule {
+}
+	
+.v-gridlayout-schedule .v-gridlayout-slot {
+	height: auto !important;
+}
+
+.schedule-table {
+	width: 100%;
+	height: 100%;
+	border-collapse: collapse;
+}
+
+.schedule-td {
+	width: 16%;
+	text-align: center;
+}
+
+.schedule-bordered-td {
+	border: 1px solid;
+	height: 10%;
+}
+
+#ic-print-header-table {
+	/* width: 190mm; */
+	text-align: center;
+	table-layout: fixed;
+	color: #999999;
+}
+
+#ic-print-header-table td {
+	vertical-align: middle;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 10pt;
+}
+
+#ic-print-header-table th {
+	font-size: 18pt;
+	font-weight: bold;
+	font-style: italic;
+}
+
+#ic-print-description-table {
+	/* width: 190mm; */
+	border-collapse: collapse;
+	border-spacing: 0px;
+	color: black;
+}
+
+#ic-print-description-table th {
+	vertical-align: top;
+	/* padding: 1mm; */
+	width: 35mm;
+	/* text-align: left; */
+}
+
+#ic-print-description-table td {
+	vertical-align: top;
+	/* padding: 1mm 5mm 1mm 2mm; */
+	width: 60mm;
+	/* text-align: left; */
+}
+
+#ic-print-data-table {
+	width: 100%;
+}
+
+.v-table-ic-print-data-table {
+	font-size: 11px;
+}
+
+.v-table-ic-print-data-table .v-table-header-wrap {
+	font-weight: bold;
+	text-align: center;
+	background-image: none !important;
+	border-left: 1px solid black !important;
+	border-top: 1px solid black !important;
+	border-right: 1px solid black !important;
+	border-bottom: none !important;
+}
+
+.v-table-ic-print-data-table .v-table-footer-wrap {
+	font-weight: bold;
+	text-align: center;
+	background-image: none !important;
+	border-left: 1px solid black !important;
+	border-top: none !important;
+	border-right: 1px solid black !important;
+	border-bottom: 1px solid black !important;
+}
+
+.v-table-ic-print-data-table .v-table-footer td {
+	border-left: 1px solid black !important;
+}
+
+.v-table-ic-print-data-table .v-table-footer td:first-child {
+	border-left-color: transparent !important;
+}
+
+.v-table-ic-print-data-table .v-table-header td:first-child {
+	border-left-color: transparent !important;
+}
+
+.v-table-ic-print-data-table .v-table-row-odd {
+	background-color: white !important;
+}
+
+.v-table-ic-print-data-table .v-table-row-odd td {
+	border-top: 1px solid black !important;
+	border-left: 1px solid black;
+}
+
+.v-table-ic-print-data-table .v-table-caption-container {
+	border-left: 1px solid black !important;
+}
+
+.v-table-ic-print-data-table .v-table-body {
+	border: 1px solid black !important;
+}
+
+.v-table-ic-print-data-table .v-table-row td {
+	border-left: 1px solid black;
+}
+
+#ic-print-sign-table {
+	width: 100%;
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
+#ic-print-sign-table td {
+	line-height: 2.5;
+	width: 50%;
+}
+
+#ic-print-sign-table .text-right {
+	text-align: right;
+}
+
+.v-label-ic-print-title {
+	color: #999999;
+	font-weight: bold;
+	font-size: 11pt;
+	margin-top: 7px;
+}
+
+.v-label-news-date {
+	color: #5858FA !important;
+	padding-right: 5px !important;
+	padding-left: 9px !important;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.v-label-news-author {
+	color: #5858FA !important;
+	font-weight: bold !important;
+	padding-right: 5px !important;
+}
+
+.v-label-news-body {
+	padding-left: 12px;
+	padding-right: 12px;
+	padding-top: 9px;
+	padding-bottom: 9px;
+}
