@@ -8,7 +8,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 
 /**
- * Author Rakymzhan A. Kenzhegul
+ * @author Omarbek
  * Created Feb 24, 2016 2:52:35 PM
  */
 @Entity

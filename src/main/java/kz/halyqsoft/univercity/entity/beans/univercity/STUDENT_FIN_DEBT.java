@@ -15,7 +15,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 /**
- * @author Rakymzhan A. Kenzhegul
+ * @@author Omarbek
  * @created Apr 3, 2017 3:03:25 PM
  */
 @Entity

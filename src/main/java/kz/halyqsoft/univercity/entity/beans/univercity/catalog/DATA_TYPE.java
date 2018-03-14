@@ -3,7 +3,7 @@ package kz.halyqsoft.univercity.entity.beans.univercity.catalog;
 import javax.persistence.Entity;
 
 /**
- * Author Rakymzhan A. Kenzhegul
+ * @author Omarbek
  * Created Jan 25, 2017 12:09:26 PM
  */
 @Entity

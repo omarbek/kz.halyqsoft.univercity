@@ -3,7 +3,7 @@ package kz.halyqsoft.univercity.entity.beans.univercity.catalog;
 import org.r3a.common.entity.AbstractEntity;
 
 /**
- * Author Rakymzhan A. Kenzhegul
+ * @author Omarbek
  * Created Dec 26, 2016 1:53:22 PM
  */
 public class PPS extends AbstractEntity {

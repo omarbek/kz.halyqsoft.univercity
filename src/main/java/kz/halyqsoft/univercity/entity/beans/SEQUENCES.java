@@ -5,7 +5,7 @@ import org.r3a.common.entity.beans.AbstractSequence;
 import javax.persistence.Entity;
 
 /**
- * Author Rakymzhan A. Kenzhegul
+ * @author Omarbek
  * Created 12.03.2014 14:49:06
  */
 @Entity

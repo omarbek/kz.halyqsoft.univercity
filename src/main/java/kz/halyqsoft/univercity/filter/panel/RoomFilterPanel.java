@@ -7,7 +7,7 @@ import kz.halyqsoft.univercity.filter.FRoomFilter;
 import org.r3a.common.vaadin.widget.filter2.panel.AbstractFilterPanel;
 
 /**
- * @author Rakymzhan A. Kenzhegul
+ * @@author Omarbek
  * @created Apr 10, 2017 3:19:50 PM
  */
 @SuppressWarnings("serial")

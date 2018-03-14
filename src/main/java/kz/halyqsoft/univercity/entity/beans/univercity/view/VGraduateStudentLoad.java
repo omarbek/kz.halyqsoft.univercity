@@ -5,7 +5,7 @@ import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
 
 /**
- * @author Rakymzhan A. Kenzhegul
+ * @@author Omarbek
  * @created Mar 27, 2017 9:31:17 AM
  */
 public class VGraduateStudentLoad extends AbstractEntity {

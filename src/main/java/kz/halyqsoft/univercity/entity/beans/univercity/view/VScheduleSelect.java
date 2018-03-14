@@ -5,7 +5,7 @@ import org.r3a.common.entity.AbstractEntity;
 import java.util.Locale;
 
 /**
- * @author Rakymzhan A. Kenzhegul
+ * @@author Omarbek
  * @created Feb 21, 2017 5:47:44 PM
  */
 public final class VScheduleSelect extends AbstractEntity {

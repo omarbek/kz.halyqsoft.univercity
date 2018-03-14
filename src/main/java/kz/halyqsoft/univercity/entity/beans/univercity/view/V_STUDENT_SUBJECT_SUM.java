@@ -10,7 +10,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 
 /**
- * @author Rakymzhan A. Kenzhegul
+ * @@author Omarbek
  * @created Jun 29, 2016 12:13:43 PM
  */
 @Entity

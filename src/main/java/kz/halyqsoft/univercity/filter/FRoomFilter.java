@@ -5,7 +5,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ROOM_TYPE;
 import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 
 /**
- * @author Rakymzhan A. Kenzhegul
+ * @@author Omarbek
  * @created Apr 10, 2017 3:10:38 PM
  */
 public final class FRoomFilter extends AbstractFilterBean {

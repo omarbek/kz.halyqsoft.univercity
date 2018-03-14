@@ -28,7 +28,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 /**
- * @author Rakymzhan A. Kenzhegul
+ * @@author Omarbek
  * @created Nov 9, 2015 10:48:13 AM
  */
 @SuppressWarnings("serial")

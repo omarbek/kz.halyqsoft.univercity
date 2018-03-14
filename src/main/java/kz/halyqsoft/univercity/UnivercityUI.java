@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Author: Rakymzhan A. Kenzhegul
+ * @author Omarbek
  * Created: 09.03.2018 22:49
  */
 @Theme("univercity")

@@ -19,7 +19,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
 /**
- * Author Rakymzhan A. Kenzhegul
+ * @author Omarbek
  * Created Nov 4, 2015 11:07:15 AM
  */
 @Entity

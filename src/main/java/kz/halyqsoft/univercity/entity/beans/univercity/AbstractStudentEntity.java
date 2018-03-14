@@ -3,7 +3,7 @@ package kz.halyqsoft.univercity.entity.beans.univercity;
 import javax.persistence.MappedSuperclass;
 
 /**
- * @author Rakymzhan A. Kenzhegul
+ * @@author Omarbek
  * @created Dec 28, 2016 3:46:19 PM
  */
 @SuppressWarnings("serial")

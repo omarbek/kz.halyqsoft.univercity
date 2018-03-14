@@ -14,7 +14,7 @@ import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 
 /**
- * @author Rakymzhan A. Kenzhegul
+ * @@author Omarbek
  * @created Feb 25, 2016 5:22:43 PM
  */
 @Entity

@@ -11,7 +11,7 @@ import org.r3a.common.entity.beans.AbstractUserRole;
 import org.r3a.common.vaadin.security.AbstractDatabaseRealm;
 
 /**
- * Author Rakymzhan A. Kenzhegul
+ * @author Omarbek
  * Created 19.05.2014 19:00:49
  */
 public final class DatabaseRealm extends AbstractDatabaseRealm {

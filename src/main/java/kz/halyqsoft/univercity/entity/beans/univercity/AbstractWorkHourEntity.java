@@ -14,7 +14,7 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
 
 /**
- * @author Rakymzhan A. Kenzhegul
+ * @@author Omarbek
  * @created Jan 2, 2016 3:30:54 PM
  */
 @SuppressWarnings("serial")

@@ -6,7 +6,7 @@ import org.r3a.common.vaadin.servlet.AbstractCommonServlet;
 import javax.servlet.annotation.WebServlet;
 
 /**
- * Author: Rakymzhan A. Kenzhegul
+ * @author Omarbek
  * Created: 09.03.2018 22:52
  */
 @WebServlet(urlPatterns = "/*", name = "UnivercityServlet", asyncSupported = true)

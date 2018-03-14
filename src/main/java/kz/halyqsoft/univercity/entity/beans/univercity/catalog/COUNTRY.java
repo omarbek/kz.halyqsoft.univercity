@@ -15,7 +15,7 @@ import javax.persistence.Transient;
 import java.util.List;
 
 /**
- * Author Rakymzhan A. Kenzhegul
+ * @author Omarbek
  * Created Nov 3, 2015 9:48:09 AM
  */
 @Entity

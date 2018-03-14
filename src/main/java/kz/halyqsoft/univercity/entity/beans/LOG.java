@@ -12,7 +12,7 @@ import javax.persistence.ManyToOne;
 import java.time.format.DateTimeFormatter;
 
 /**
- * Author Rakymzhan A. Kenzhegul
+ * @author Omarbek
  * Created 03.08.2011 15:07:40
  */
 @Entity

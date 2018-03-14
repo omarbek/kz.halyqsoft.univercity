@@ -9,7 +9,7 @@ import java.util.Date;
 import javax.persistence.*;
 
 /**
- * Author Rakymzhan A. Kenzhegul
+ * @author Omarbek
  * Created Sep 14, 2016 10:24:53 AM
  */
 @Entity

@@ -23,7 +23,7 @@ import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 /**
- * @author Rakymzhan A. Kenzhegul
+ * @@author Omarbek
  * @created Nov 13, 2015 9:36:23 AM
  */
 @SuppressWarnings("serial")

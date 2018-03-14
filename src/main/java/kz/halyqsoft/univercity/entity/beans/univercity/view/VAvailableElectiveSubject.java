@@ -3,7 +3,7 @@ package kz.halyqsoft.univercity.entity.beans.univercity.view;
 import org.r3a.common.entity.AbstractEntity;
 
 /**
- * @author Rakymzhan A. Kenzhegul
+ * @@author Omarbek
  * @created Feb 22, 2017 10:11:54 AM
  */
 public final class VAvailableElectiveSubject extends AbstractEntity {

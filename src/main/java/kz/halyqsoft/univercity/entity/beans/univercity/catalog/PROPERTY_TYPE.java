@@ -8,7 +8,7 @@ import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 
 /**
- * Author Rakymzhan A. Kenzhegul
+ * @author Omarbek
  * Created Jan 25, 2017 12:25:24 PM
  */
 @Entity

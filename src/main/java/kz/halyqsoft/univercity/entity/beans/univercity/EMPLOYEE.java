@@ -10,7 +10,7 @@ import javax.persistence.*;
 import java.util.Set;
 
 /**
- * @author Rakymzhan A. Kenzhegul
+ * @@author Omarbek
  * @created Dec 21, 2015 9:17:14 AM
  */
 @Entity

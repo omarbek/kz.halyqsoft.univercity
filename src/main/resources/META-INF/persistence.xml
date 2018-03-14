@@ -35,6 +35,10 @@
   		<class>kz.halyqsoft.univercity.entity.beans.TASKS</class>
   		<class>kz.halyqsoft.univercity.entity.beans.USER_ROLES</class>
   		<class>kz.halyqsoft.univercity.entity.beans.USERS</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.NATIONALITY</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.LEVEL</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDENT_CATEGORY</class>
 	    <exclude-unlisted-classes>true</exclude-unlisted-classes>
 	    <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
 	    <properties>

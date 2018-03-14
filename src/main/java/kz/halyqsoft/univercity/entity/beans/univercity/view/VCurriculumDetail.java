@@ -5,7 +5,7 @@ import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
 
 /**
- * @author Rakymzhan A. Kenzhegul
+ * @@author Omarbek
  * @created Apr 20, 2017 3:41:10 PM
  */
 public class VCurriculumDetail extends AbstractEntity {

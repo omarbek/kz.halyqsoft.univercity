@@ -3,7 +3,7 @@ package kz.halyqsoft.univercity.entity.beans.univercity.view;
 import org.r3a.common.entity.AbstractEntity;
 
 /**
- * @author Rakymzhan A. Kenzhegul
+ * @@author Omarbek
  * @created Feb 21, 2017 4:44:54 PM
  */
 public final class VAttestationDetail extends AbstractEntity {

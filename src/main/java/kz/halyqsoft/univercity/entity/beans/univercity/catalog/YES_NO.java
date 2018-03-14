@@ -3,7 +3,7 @@ package kz.halyqsoft.univercity.entity.beans.univercity.catalog;
 import org.r3a.common.entity.AbstractEntity;
 
 /**
- * @author Rakymzhan A. Kenzhegul
+ * @@author Omarbek
  * @created Dec 26, 2016 1:51:09 PM
  */
 public class YES_NO extends AbstractEntity {
