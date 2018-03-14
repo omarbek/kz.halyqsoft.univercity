@@ -78,7 +78,7 @@
   .#{$primary-stylename}-hsplitter div,
   .#{$primary-stylename}-vsplitter div {
     &:before {
-      box-sizing: border-box;
+      @include box-sizing(border-box);
       content: "";
       position: absolute;
       top: 0;

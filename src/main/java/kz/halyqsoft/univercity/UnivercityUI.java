@@ -22,6 +22,8 @@ import org.r3a.common.entity.beans.AbstractUser;
 import org.r3a.common.entity.beans.AbstractUserRole;
 import org.r3a.common.resources.Resource;
 import org.r3a.common.vaadin.AbstractSecureWebUI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +35,8 @@ import java.util.Locale;
  */
 @Theme("univercity")
 public class UnivercityUI extends AbstractSecureWebUI {
+
+    private static final Logger LOG = LoggerFactory.getLogger(UnivercityUI.class);
 
     @Override
     public void attach() {

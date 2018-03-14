@@ -14,8 +14,8 @@
 	</prerequisites>
 
 	<properties>
-		<vaadin.version>8.3.1</vaadin.version>
-		<vaadin.plugin.version>8.3.1</vaadin.plugin.version>
+		<vaadin.version>7.7.9</vaadin.version>
+		<vaadin.plugin.version>7.7.9</vaadin.plugin.version>
 		<jetty.plugin.version>9.3.9.v20160517</jetty.plugin.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
@@ -129,6 +129,11 @@
 			<artifactId>vaadin</artifactId>
 			<version>1.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.r3a</groupId>
+			<artifactId>vaadin-add-on</artifactId>
+			<version>1.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -147,6 +152,20 @@
 				<groupId>com.vaadin</groupId>
 				<artifactId>vaadin-maven-plugin</artifactId>
 				<version>${vaadin.plugin.version}</version>
+				<configuration>
+					<strict>true</strict>
+					<force>true</force>
+					<!-- Enable during development to speed compiling. -->
+					<!-- <draftCompile>true</draftCompile>
+                    <style>DETAILED</style> -->
+					<!--<userAgents>ie8</userAgents>-->
+					<!-- <userAgents>gecko1_8</userAgents> -->
+					<!-- End development options -->
+					<webappDirectory>src/main/webapp/VAADIN/widgetsets</webappDirectory>
+					<modules>
+						<module>kz.halyqsoft.univercity.UnivercityWidgetset</module>
+					</modules>
+				</configuration>
 				<executions>
 					<execution>
 						<goals>

@@ -3,7 +3,7 @@
  */
 @mixin valo-widget-style {
   // Baseline expectations for all Vaadin widgets
-  box-sizing: border-box;
+  @include box-sizing(border-box);
   display: inline-block;
   vertical-align: top;
 

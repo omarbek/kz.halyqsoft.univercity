@@ -18,10 +18,6 @@
       position: absolute;
       pointer-events: none;
     }
-
-    .v-icon.FontAwesome {
-        margin-left: 0px;
-      }
   }
 
   .#{$primary-stylename}-error {
@@ -32,61 +28,6 @@
     .#{$primary-stylename}-button {
       color: $v-error-indicator-color;
       border-color: $v-error-indicator-color;
-    }
-  }
-
-  .#{$primary-stylename}-error-info {
-    .#{$primary-stylename}-input {
-      @include valo-textfield-error-level-info-style;
-    }
-
-    .#{$primary-stylename}-button {
-      color: $v-error-indicator-level-info-color;
-      border-color: $v-error-indicator-level-info-color;
-    }
-  }
-
-  .#{$primary-stylename}-error-warning {
-    .#{$primary-stylename}-input {
-      @include valo-textfield-error-level-warning-style;
-    }
-
-    .#{$primary-stylename}-button {
-      color: $v-error-indicator-level-warning-color;
-      border-color: $v-error-indicator-level-warning-color;
-    }
-  }
-
-  .#{$primary-stylename}-error-error {
-    .#{$primary-stylename}-input {
-      @include valo-textfield-error-level-error-style;
-    }
-
-    .#{$primary-stylename}-button {
-      color: $v-error-indicator-level-error-color;
-      border-color: $v-error-indicator-level-error-color;
-    }
-  }
-
-  .#{$primary-stylename}-error-critical {
-    .#{$primary-stylename}-input {
-      @include valo-textfield-error-level-critical-style;
-    }
-
-    .#{$primary-stylename}-button {
-      color: $v-error-indicator-level-critical-color;
-      border-color: $v-error-indicator-level-critical-color;
-    }
-  }
-
-  .#{$primary-stylename}-error-system {
-    .#{$primary-stylename}-input {
-      @include valo-textfield-error-level-system-style;
-    }
-
-    .#{$primary-stylename}-button {
-      color: $v-error-indicator-level-system-color;
-      border-color: $v-error-indicator-level-system-color;
     }
   }
 
@@ -220,12 +161,6 @@
     width: $unit-size;
     line-height: 1;
     padding-top: .12em;
-
-    $padding-width: ceil($unit-size/6);
-    @if $border-radius {
-      $padding-width: $padding-width + ceil($border-radius/3);
-    }
-    margin-left: $padding-width;
   }
 
   &[class*="prompt"] > [class*="input"] {
@@ -265,7 +200,7 @@
 
 /**
  * Outputs the styles for a combobox variant input element.
- *
+ * 
  * @param {size} $unit-size ($v-unit-size) - The sizing of the input (affects the padding only, width and height are 100%)
  * @param {size | list} $padding (null) - The padding of the input. Computed from other parameters by default.
  * @param {color} $font-color (null) - The font color of the input. Computed from the $background-color by default.
@@ -299,7 +234,7 @@
 
     $states: normal focus disabled
 ) {
-  box-sizing: border-box;
+  @include box-sizing(border-box);
   @include valo-textfield-style($unit-size: $unit-size,
                                 $padding: $padding,
                                 $font-color: $font-color,
@@ -321,7 +256,7 @@
 
 /**
  * Outputs the styles for a combobox variant button element.
- *
+ * 
  * @param {size} $unit-size ($v-unit-size) - The sizing of the button, which corresponds its width.
  * @param {list} $bevel ($v-textfield-bevel) - Box-shadow value according to $v-bevel documentation
  * @param {color} $background-color ($v-textfield-background-color) - The background color of the input, which affects the font color of the button
@@ -348,6 +283,9 @@
     }
     color: mix($background-color, valo-font-color($background-color));
 
+    .v-ie8 & {
+      background-color: $background-color;
+    }
   }
 
   @if $v-border-radius > 0 {
@@ -420,7 +358,7 @@
 
   [class$="suggestmenu"] {
     @include valo-selection-overlay-style($animate-in: false, $animate-out: false);
-    box-sizing: content-box;
+    @include box-sizing(content-box);
     position: relative;
     z-index: 1;
     display: block;

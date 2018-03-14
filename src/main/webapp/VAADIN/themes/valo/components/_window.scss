@@ -47,7 +47,7 @@ $v-window-modality-curtain-background-color: #222 !default;
 /**
  *
  *
- * @param {string} $primary-stylename (v-window) -
+ * @param {string} $primary-stylename (v-window) - 
  *
  * @group window
  */
@@ -161,7 +161,7 @@ $v-window-modality-curtain-background-color: #222 !default;
     z-index: 3;
     top: 0;
     right: 0;
-    box-sizing: border-box;
+    @include box-sizing(border-box);
     width: $v-unit-size - round($v-unit-size/9);
     height: $v-unit-size - 1px;
     background-color: $v-window-background-color;
@@ -187,31 +187,6 @@ $v-window-modality-curtain-background-color: #222 !default;
     &:active {
       color: inherit;
     }
-  }
-  
-  .#{$primary-stylename}-closebox:focus::after {
-    content: "";
-    position: absolute;
-    top: round($v-unit-size/6);
-    right: round($v-unit-size/6);
-    bottom: round($v-unit-size/6);
-    left: round($v-unit-size/18);
-    border-radius: $v-window-border-radius;
-    
-    @include valo-focus-style;
-  }
-  
-  .#{$primary-stylename}-maximizebox:focus::after,
-  .#{$primary-stylename}-restorebox:focus::after {
-    content: "";
-    position: absolute;
-    top: round($v-unit-size/6);
-    right: round($v-unit-size/18);
-    bottom: round($v-unit-size/6);
-    left: round($v-unit-size/6);
-    border-radius: $v-window-border-radius;
-    
-    @include valo-focus-style;
   }
 
   .#{$primary-stylename}-closebox {
@@ -247,10 +222,6 @@ $v-window-modality-curtain-background-color: #222 !default;
       width: $v-unit-size;
       padding-right: 0;
       border-bottom-left-radius: $v-window-border-radius;
-      
-      &:focus::after {
-        left: round($v-unit-size/6);
-      }
     }
   }
 
@@ -270,7 +241,7 @@ $v-window-modality-curtain-background-color: #222 !default;
   }
 
   .#{$primary-stylename}-contents {
-    box-sizing: border-box;
+    @include box-sizing(border-box);
     border-radius: $v-border-radius;
     margin-top: 0 !important;
 
@@ -320,6 +291,16 @@ $v-window-modality-curtain-background-color: #222 !default;
     width: round($v-unit-size/2);
     height: round($v-unit-size/2);
     cursor: nwse-resize;
+
+    .v-ie8 & {
+      background: #000;
+      filter: alpha(opacity=0.1);
+    }
+
+    .v-ie8 &,
+    .v-ie9 & {
+      cursor: se-resize;
+    }
   }
 
 
@@ -377,7 +358,7 @@ $v-window-modality-curtain-background-color: #222 !default;
   .v-margin-left.v-margin-right.v-margin-top {
     .#{$primary-stylename}-top-toolbar {
       &.v-layout {
-        box-sizing: content-box;
+        @include box-sizing(content-box);
         margin: round($v-unit-size/-3) round($v-unit-size/-3) 0;
       }
 
@@ -395,7 +376,7 @@ $v-window-modality-curtain-background-color: #222 !default;
   .v-margin-left.v-margin-right.v-margin-bottom {
     .#{$primary-stylename}-bottom-toolbar {
       &.v-layout {
-        box-sizing: content-box;
+        @include box-sizing(content-box);
         margin: 0 round($v-unit-size/-3) round($v-unit-size/-3);
       }
     }

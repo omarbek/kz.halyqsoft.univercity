@@ -10,7 +10,7 @@
     [class*="caption-container"],
     [class*="footer-container"],
     [class*="cell-wrapper"] {
-      box-sizing: content-box;
+      @include box-sizing(content-box);
       padding-left: 0;
       padding-right: 0;
     }

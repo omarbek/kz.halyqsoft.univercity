@@ -8,7 +8,7 @@ $v-textfield-background-color: if(is-dark-color($v-app-background-color), darken
  * The background color for read-only text fields.
  * @group textfield
  */
-$v-textfield-background-color--readonly: darkest-color($v-app-background-color, darken($v-textfield-background-color, 2%)) !default;
+$v-textfield-background-color--readonly: darkest-color($v-app-background-color, darken($v-textfield-background-color, 2%));
 
 /**
  * The bevel style for text fields. See the documentation for $v-bevel.
@@ -70,25 +70,6 @@ $v-textfield-disabled-opacity: $v-disabled-opacity !default;
     @include valo-textfield-error-style;
   }
 
-  .#{$primary-stylename}-error-info {
-    @include valo-textfield-error-level-info-style;
-  }
-
-  .#{$primary-stylename}-error-warning {
-    @include valo-textfield-error-level-warning-style;
-  }
-
-  .#{$primary-stylename}-error-error {
-    @include valo-textfield-error-level-error-style;
-  }
-
-  .#{$primary-stylename}-error-critical {
-    @include valo-textfield-error-level-critical-style;
-  }
-
-  .#{$primary-stylename}-error-system {
-    @include valo-textfield-error-level-system-style;
-  }
 
   @if $include-additional-styles {
     .#{$primary-stylename}-borderless {
@@ -119,12 +100,12 @@ $v-textfield-disabled-opacity: $v-disabled-opacity !default;
       font-size: $v-font-size--huge;
     }
 
-    @include valo-textfield-inline-icon($primary-stylename: $primary-stylename, $stylenames: inline-icon);
-    @include valo-textfield-inline-icon($primary-stylename: $primary-stylename, $stylenames: inline-icon tiny, $unit-size: $v-unit-size--tiny, $font-size: $v-font-size--tiny);
-    @include valo-textfield-inline-icon($primary-stylename: $primary-stylename, $stylenames: inline-icon compact, $unit-size: $v-unit-size--small);
-    @include valo-textfield-inline-icon($primary-stylename: $primary-stylename, $stylenames: inline-icon small, $unit-size: $v-unit-size--small, $font-size: $v-font-size--small);
-    @include valo-textfield-inline-icon($primary-stylename: $primary-stylename, $stylenames: inline-icon large, $unit-size: $v-unit-size--large, $font-size: $v-font-size--large);
-    @include valo-textfield-inline-icon($primary-stylename: $primary-stylename, $stylenames: inline-icon huge, $unit-size: $v-unit-size--huge, $font-size: $v-font-size--huge);
+    @include valo-textfield-inline-icon($stylenames: inline-icon);
+    @include valo-textfield-inline-icon($stylenames: inline-icon tiny, $unit-size: $v-unit-size--tiny, $font-size: $v-font-size--tiny);
+    @include valo-textfield-inline-icon($stylenames: inline-icon compact, $unit-size: $v-unit-size--small);
+    @include valo-textfield-inline-icon($stylenames: inline-icon small, $unit-size: $v-unit-size--small, $font-size: $v-font-size--small);
+    @include valo-textfield-inline-icon($stylenames: inline-icon large, $unit-size: $v-unit-size--large, $font-size: $v-font-size--large);
+    @include valo-textfield-inline-icon($stylenames: inline-icon huge, $unit-size: $v-unit-size--huge, $font-size: $v-font-size--huge);
 
     .#{$primary-stylename}-align-right {
       text-align: right;
@@ -185,6 +166,13 @@ $v-textfield-disabled-opacity: $v-disabled-opacity !default;
     height: $unit-size;
     border-radius: $border-radius;
 
+    .v-ie8 &,
+    .v-ie9 & {
+      line-height: $unit-size;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+
     @if type-of($padding) == number or type-of($padding) == list {
       padding: $padding;
     } @else {
@@ -239,9 +227,9 @@ $v-textfield-disabled-opacity: $v-disabled-opacity !default;
 
 /**
  * Outputs the styles for a text field input prompt.
- *
+ * 
  * @param {color} $background-color ($v-textfield-background-color) - The background color of the text field
- *
+ * 
  * @group textfield
  */
 @mixin valo-textfield-prompt-style ($background-color: $v-textfield-background-color) {
@@ -262,12 +250,12 @@ $v-textfield-disabled-opacity: $v-disabled-opacity !default;
 
 /**
  * Outputs the styles for a text field focus state.
- *
+ * 
  * @param {list} $bevel ($v-textfield-bevel) - Box-shadow value according to $v-bevel documentation
  * @param {list} $shadow ($v-textfield-shadow) - Box-shadow value according to $v-shadow documentation
  * @param {color} $background-color ($v-textfield-background-color) - The background color of the text field
  * @param {list} $gradient (null) - Valo specific gradient value. See the documentation for $v-gradient.
- *
+ * 
  * @group textfield
  */
 @mixin valo-textfield-focus-style ($bevel: $v-textfield-bevel, $shadow: $v-textfield-shadow, $background-color: $v-textfield-background-color, $gradient: null) {
@@ -290,7 +278,7 @@ $v-textfield-disabled-opacity: $v-disabled-opacity !default;
 
 /**
  * Outputs the styles for a read-only text field.
- *
+ * 
  * @group textfield
  */
 @mixin valo-textfield-readonly-style {
@@ -306,9 +294,9 @@ $v-textfield-disabled-opacity: $v-disabled-opacity !default;
 
 /**
  * Outputs the styles for a borderless style text field.
- *
+ * 
  * @param {color} $background-color (transparent) - The background color of the text field
- *
+ * 
  * @group textfield
  */
 @mixin valo-textfield-borderless-style ($background-color: transparent) {
@@ -335,72 +323,27 @@ $v-textfield-disabled-opacity: $v-disabled-opacity !default;
 
 /**
  * Outputs the styles for a text field error state.
- *
+ * 
  * @group textfield
  */
-@mixin valo-textfield-error-style($indicator-color: $v-error-indicator-color) {
-  border-color: $indicator-color !important;
-  $bg: scale-color($indicator-color, $lightness: 98%);
+@mixin valo-textfield-error-style {
+  border-color: $v-error-indicator-color !important;
+  $bg: scale-color($v-error-indicator-color, $lightness: 98%);
   background: $bg;
   color: valo-font-color($bg);
 }
 
-/**
- * Outputs the styles for a text field error state with error level 'info'.
- *
- * @group textfield
- */
-@mixin valo-textfield-error-level-info-style {
-  @include valo-textfield-error-style($v-error-indicator-level-info-color);
-}
 
 /**
- * Outputs the styles for a text field error state with error level 'warning'.
- *
- * @group textfield
- */
-@mixin valo-textfield-error-level-warning-style {
-  @include valo-textfield-error-style($v-error-indicator-level-warning-color);
-}
-
-/**
- * Outputs the styles for a text field error state with error level 'error'.
- *
- * @group textfield
- */
-@mixin valo-textfield-error-level-error-style {
-  @include valo-textfield-error-style($v-error-indicator-level-error-color);
-}
-
-/**
- * Outputs the styles for a text field error state with error level 'critical'.
- *
- * @group textfield
- */
-@mixin valo-textfield-error-level-critical-style {
-  @include valo-textfield-error-style($v-error-indicator-level-critical-color);
-}
-
-/**
- * Outputs the styles for a text field error state with error level 'system'.
- *
- * @group textfield
- */
-@mixin valo-textfield-error-level-system-style {
-  @include valo-textfield-error-style($v-error-indicator-level-system-color);
-}
-
-
-/**
- * Outputs the selectors and styles for an inline-icon style for a text field. Included indipendently (i.e. not enclosed with a parent text field selector).
- *
+ * Outputs the selectors and styles for an inline-icon style for a text field. Included indipendently (i.e. not enclosed with a parent text field selector). 
+ * 
  * @param {string} $primary-stylename (v-textfield) - The primary style name for the selectors
  * @param {string | list} $stylenames (inline-icon) - The additional style names which will define the inline-icon style
  * @param {string} $input-selector (null) - Additional selector for a nested input element which should be targeted
  * @param {size} $unit-size ($v-unit-size) - The unit size which the resulting style will support
  * @param {size} $font-size ($v-font-size) - The font size which the resulting style will support (needed for font icons)
  * @param {size} $image-icon-size (16px) - The image icon height which the resulting style will support (needed to center the icon vertically inside the text field)
- *
+ * 
  * @group text field
  */
 @mixin valo-textfield-inline-icon($primary-stylename: v-textfield, $stylenames: inline-icon, $input-selector: null, $unit-size: $v-unit-size, $font-size: $v-font-size, $image-icon-size: 16px) {

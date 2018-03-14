@@ -34,8 +34,6 @@
 @import "textfield";
 @import "textarea";
 @import "tree";
-@import "treegrid";
-@import "tree8";
 @import "treetable";
 @import "twincolselect";
 @import "upload";
@@ -145,14 +143,6 @@
 
   @if v-is-included(tree) {
     @include valo-tree;
-  }
-
-  @if v-is-included(tree8) {
-    @include valo-tree8;
-  }
-
-  @if v-is-included(treegrid) {
-    @include valo-treegrid;
   }
 
   @if v-is-included(table) or v-is-included(treetable) {
