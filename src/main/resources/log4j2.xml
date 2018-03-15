@@ -23,12 +23,12 @@
 
     <Loggers>
         <Logger name="kz.halyqsoft.univercity.UnivercityUI" level="INFO" additivity="false">
-            <!--<AppenderRef ref="ConsoleAppender"/>-->
+            <AppenderRef ref="ConsoleAppender"/>
             <AppenderRef ref="FileAppender"/>
         </Logger>
 
         <Root level="INFO">
-            <!--<AppenderRef ref="ConsoleAppender"/>-->
+            <AppenderRef ref="ConsoleAppender"/>
             <AppenderRef ref="FileAppender"/>
         </Root>
     </Loggers>

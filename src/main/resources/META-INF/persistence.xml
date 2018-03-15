@@ -39,6 +39,33 @@
   		<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR</class>
   		<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.LEVEL</class>
   		<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDENT_CATEGORY</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEPARTMENT</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.POST</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEX</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.MARITAL_STATUS</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.COUNTRY</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.AWARD</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.CONTRACT_TYPE</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEGREE</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.RATING_SCALE</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.LANGUAGE_LEVEL</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.LANGUAGE</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.EQUIPMENT</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.MEDICAL_CHECKUP_TYPE</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.MILITARY_STATUS</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.ORDER_TYPE</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.CORPUS</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.SCHOOL_TYPE</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.SOCIAL_CATEGORY</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDENT_STATUS</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.UNIVERSITY</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEPARTMENT</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.ACADEMIC_DEGREE</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.ORGANIZATION_TYPE</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.ORGANIZATION</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_PERIOD</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_DATA</class>
+  		<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.SPECIALITY</class>
 	    <exclude-unlisted-classes>true</exclude-unlisted-classes>
 	    <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
 	    <properties>

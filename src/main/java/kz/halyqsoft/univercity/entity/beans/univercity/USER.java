@@ -31,7 +31,6 @@ import javax.persistence.TemporalType;
  * @@author Omarbek
  * @created Nov 9, 2015 10:48:13 AM
  */
-@SuppressWarnings("serial")
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "USER_TYPE_ID", discriminatorType = DiscriminatorType.INTEGER)

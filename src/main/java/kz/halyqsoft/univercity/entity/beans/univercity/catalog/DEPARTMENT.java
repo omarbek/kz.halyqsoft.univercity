@@ -25,146 +25,135 @@ import javax.persistence.Transient;
 @Entity
 public class DEPARTMENT extends AbstractEntity implements CommonTree<DEPARTMENT> {
 
-	private static final long serialVersionUID = -290698274912292023L;
+    private static final long serialVersionUID = -290698274912292023L;
 
-	@FieldInfo(type = EFieldType.TEXT, max = 128, order = 1)
-	@Column(name = "DEPT_NAME", nullable = false)
-	private String deptName;
-	
-	@FieldInfo(type = EFieldType.TEXT, max = 5, order = 2, required = false)
-	@Column(name = "DEPT_SHORT_NAME", nullable = false)
-	private String deptShortName;
-	
-	@FieldInfo(type = EFieldType.TEXT, max = 4, order = 3, required = false, readOnlyFixed = true)
-	@Column(name = "CODE", nullable = false)
-	private String code;
-	
-	@FieldInfo(type = EFieldType.FK_DIALOG, order = 4, required = false, readOnlyFixed = true)
+    @FieldInfo(type = EFieldType.TEXT, max = 128, order = 1)
+    @Column(name = "DEPT_NAME", nullable = false)
+    private String deptName;
+
+    @FieldInfo(type = EFieldType.TEXT, max = 5, order = 2, required = false)
+    @Column(name = "DEPT_SHORT_NAME", nullable = false)
+    private String deptShortName;
+
+    @FieldInfo(type = EFieldType.TEXT, max = 4, order = 3, required = false, readOnlyFixed = true)
+    @Column(name = "CODE", nullable = false)
+    private String code;
+
+    @FieldInfo(type = EFieldType.FK_DIALOG, order = 4, required = false, readOnlyFixed = true)
     @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "PARENT_ID", referencedColumnName = "ID")})
+            @JoinColumn(name = "PARENT_ID", referencedColumnName = "ID")})
     private DEPARTMENT parent;
-	
-	@FieldInfo(type = EFieldType.BOOLEAN, order = 5, required = false, inEdit = false, inGrid = false, inView = false)
-	@Column(name = "FC", nullable = false)
+
+    @FieldInfo(type = EFieldType.BOOLEAN, order = 5, required = false, inEdit = false, inGrid = false, inView = false)
+    @Column(name = "FC", nullable = false)
     private boolean fc;
-	
-	@FieldInfo(type = EFieldType.BOOLEAN, order = 6, required = false, inEdit = false, inGrid = false, inView = false)
-	@Column(name = "DELETED", nullable = false)
+
+    @FieldInfo(type = EFieldType.BOOLEAN, order = 6, required = false, inEdit = false, inGrid = false, inView = false)
+    @Column(name = "DELETED", nullable = false)
     private boolean deleted;
-	
-	@Column(name = "SKD_ID")
-	private BigInteger skdId;
-	
-	@Column(name = "OLD_ID")
-	private String oldId;
-	
-	@OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
+
+    @Column(name = "SKD_ID")
+    private BigInteger skdId;
+
+    @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
     private List<DEPARTMENT> children = new ArrayList<>();
-	
-	@Transient
+
+    @Transient
     private boolean selected;
-	
-	public DEPARTMENT() {
-	}
-	
-	public String getDeptName() {
-		return deptName;
-	}
 
-	public void setDeptName(String deptName) {
-		this.deptName = deptName;
-	}
+    public DEPARTMENT() {
+    }
 
-	public String getDeptShortName() {
-		return deptShortName;
-	}
+    public String getDeptName() {
+        return deptName;
+    }
 
-	public void setDeptShortName(String deptShortName) {
-		this.deptShortName = deptShortName;
-	}
-	
-	public boolean isFc() {
-		return fc;
-	}
+    public void setDeptName(String deptName) {
+        this.deptName = deptName;
+    }
 
-	public void setFc(boolean fc) {
-		this.fc = fc;
-	}
+    public String getDeptShortName() {
+        return deptShortName;
+    }
 
-	public boolean isDeleted() {
-		return deleted;
-	}
+    public void setDeptShortName(String deptShortName) {
+        this.deptShortName = deptShortName;
+    }
 
-	public void setDeleted(boolean deleted) {
-		this.deleted = deleted;
-	}
+    public boolean isFc() {
+        return fc;
+    }
 
-	@Override
-	public DEPARTMENT getParent() {
-		return parent;
-	}
+    public void setFc(boolean fc) {
+        this.fc = fc;
+    }
 
-	@Override
-	public void setParent(DEPARTMENT parent) {
-		this.parent = parent;
-	}
-	
-	public String getCode() {
-		return code;
-	}
+    public boolean isDeleted() {
+        return deleted;
+    }
 
-	public void setCode(String code) {
-		this.code = code;
-	}
-	
-	public BigInteger getSkdId() {
-		return skdId;
-	}
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
 
-	public void setSkdId(BigInteger skdId) {
-		this.skdId = skdId;
-	}
+    @Override
+    public DEPARTMENT getParent() {
+        return parent;
+    }
 
-	public String getOldId() {
-		return oldId;
-	}
+    @Override
+    public void setParent(DEPARTMENT parent) {
+        this.parent = parent;
+    }
 
-	public void setOldId(String oldId) {
-		this.oldId = oldId;
-	}
+    public String getCode() {
+        return code;
+    }
 
-	@Override
-	public boolean isSelected() {
-		return selected;
-	}
+    public void setCode(String code) {
+        this.code = code;
+    }
 
-	@Override
-	public void setSelected(boolean selected) {
-		this.selected = selected;
-	}
+    public BigInteger getSkdId() {
+        return skdId;
+    }
 
-	@Override
-	public String getIconPath() {
-		return null;
-	}
+    public void setSkdId(BigInteger skdId) {
+        this.skdId = skdId;
+    }
 
-	@Override
-	public boolean hasParent() {
-		return (parent != null);
-	}
+    @Override
+    public boolean isSelected() {
+        return selected;
+    }
 
-	@Override
-	public List<DEPARTMENT> getChildren() {
+    @Override
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
+    @Override
+    public String getIconPath() {
+        return null;
+    }
+
+    @Override
+    public boolean hasParent() {
+        return (parent != null);
+    }
+
+    @Override
+    public List<DEPARTMENT> getChildren() {
         return children;
-	}
-	
-	public void setChildren(List<DEPARTMENT> children) {
-		this.children = children;
-	}
+    }
 
-	@Override
-	public String toString() {
-		return deptName;
-	}
+    public void setChildren(List<DEPARTMENT> children) {
+        this.children = children;
+    }
+
+    @Override
+    public String toString() {
+        return deptName;
+    }
 }

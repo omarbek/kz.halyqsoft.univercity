@@ -90,7 +90,7 @@ public class CatalogEntity implements CommonTree<CatalogEntity> {
 
     @Override
     public String toString() {
-//        return getUILocaleUtil().getEntityLabel(entityClass);
+//        return getUILocaleUtil().getEntityLabel(entityClass);//TODO
         return entityClass.toString();
     }
 
