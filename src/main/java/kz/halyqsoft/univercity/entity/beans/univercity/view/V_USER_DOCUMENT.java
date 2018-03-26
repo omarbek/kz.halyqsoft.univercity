@@ -3,7 +3,7 @@ package kz.halyqsoft.univercity.entity.beans.univercity.view;
 import java.util.Date;
 
 /**
- * @author Dmitry Dobrin.
+ * @author Omarbek
  * @created 26.04.2017.
  */
 public class V_USER_DOCUMENT {

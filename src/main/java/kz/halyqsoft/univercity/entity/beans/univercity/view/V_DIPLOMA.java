@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * @author Dmitry Dobrin.
+ * @author Omarbek
  * @created 28.04.2017.
  */
 public class V_DIPLOMA extends V_EXAM_RESULT {

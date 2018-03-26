@@ -9,7 +9,7 @@ import javax.persistence.FetchType;
 import javax.persistence.Lob;
 
 /**
- * @@author Omarbek
+ * @author Omarbek
  * @created Apr 19, 2017 9:56:20 AM
  */
 @Entity

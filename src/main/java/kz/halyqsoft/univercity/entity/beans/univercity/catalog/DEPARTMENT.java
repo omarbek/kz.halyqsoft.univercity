@@ -53,9 +53,6 @@ public class DEPARTMENT extends AbstractEntity implements CommonTree<DEPARTMENT>
     @Column(name = "DELETED", nullable = false)
     private boolean deleted;
 
-    @Column(name = "SKD_ID")
-    private BigInteger skdId;
-
     @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
     private List<DEPARTMENT> children = new ArrayList<>();
 
@@ -113,14 +110,6 @@ public class DEPARTMENT extends AbstractEntity implements CommonTree<DEPARTMENT>
 
     public void setCode(String code) {
         this.code = code;
-    }
-
-    public BigInteger getSkdId() {
-        return skdId;
-    }
-
-    public void setSkdId(BigInteger skdId) {
-        this.skdId = skdId;
     }
 
     @Override

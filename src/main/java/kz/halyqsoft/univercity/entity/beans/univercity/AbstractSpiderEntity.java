@@ -7,7 +7,7 @@ import java.util.Date;
 import javax.persistence.MappedSuperclass;
 
 /**
- * @@author Omarbek
+ * @author Omarbek
  * @created Dec 28, 2016 11:00:56 AM
  */
 @SuppressWarnings("serial")

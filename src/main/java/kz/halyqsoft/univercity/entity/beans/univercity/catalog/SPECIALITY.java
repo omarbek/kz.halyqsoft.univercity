@@ -43,9 +43,6 @@ public class SPECIALITY extends AbstractEntity {
 	@Column(name = "DELETED", nullable = false)
     private boolean deleted;
 	
-	@Column(name = "OLD_ID")
-	private String oldId;
-
 	public SPECIALITY() {
 	}
 
@@ -89,14 +86,6 @@ public class SPECIALITY extends AbstractEntity {
 		this.deleted = deleted;
 	}
 	
-	public String getOldId() {
-		return oldId;
-	}
-
-	public void setOldId(String oldId) {
-		this.oldId = oldId;
-	}
-
 	@Override
 	public String toString() {
 		return specName + " - " + code;

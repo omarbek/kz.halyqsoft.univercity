@@ -9,7 +9,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDY_YEAR;
 import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 
 /**
- * @@author Omarbek
+ * @author Omarbek
  * @created Mar 27, 2017 4:54:32 PM
  */
 public final class FStudentFilter extends AbstractFilterBean {

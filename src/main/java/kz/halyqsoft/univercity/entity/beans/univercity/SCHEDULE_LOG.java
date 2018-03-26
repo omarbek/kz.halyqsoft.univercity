@@ -7,7 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.Lob;
 
 /**
- * @@author Omarbek
+ * @author Omarbek
  * @created Apr 11, 2017 10:50:13 AM
  */
 @Entity

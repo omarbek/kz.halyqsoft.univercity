@@ -9,7 +9,7 @@ import java.util.Date;
 import javax.persistence.*;
 
 /**
- * @@author Omarbek
+ * @author Omarbek
  * @created Apr 3, 2017 5:03:41 PM
  */
 @Entity

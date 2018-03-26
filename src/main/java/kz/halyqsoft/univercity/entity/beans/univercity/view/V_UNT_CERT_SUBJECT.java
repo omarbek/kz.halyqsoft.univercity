@@ -13,7 +13,7 @@ import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 
 /**
- * @@author Omarbek
+ * @author Omarbek
  * @created Nov 23, 2015 10:57:21 AM
  */
 @Entity

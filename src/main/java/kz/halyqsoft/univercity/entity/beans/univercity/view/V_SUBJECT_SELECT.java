@@ -16,7 +16,7 @@ import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 
 /**
- * @@author Omarbek
+ * @author Omarbek
  * @created Oct 8, 2016 4:13:55 PM
  */
 @Entity

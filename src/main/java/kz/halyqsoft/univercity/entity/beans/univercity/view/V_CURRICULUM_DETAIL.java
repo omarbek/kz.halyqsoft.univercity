@@ -18,7 +18,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
 /**
- * @@author Omarbek
+ * @author Omarbek
  * @created Feb 22, 2016 9:38:48 AM
  */
 @Entity

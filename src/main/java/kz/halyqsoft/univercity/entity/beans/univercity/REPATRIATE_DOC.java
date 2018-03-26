@@ -8,7 +8,7 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
 /**
- * @@author Omarbek
+ * @author Omarbek
  * @created Nov 13, 2015 4:47:52 PM
  */
 @Entity

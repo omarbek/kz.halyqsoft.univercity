@@ -3,7 +3,7 @@ package kz.halyqsoft.univercity.entity.beans.univercity.view;
 import org.r3a.common.entity.AbstractEntity;
 
 /**
- * @@author Omarbek
+ * @author Omarbek
  * @created Mar 30, 2017 5:01:44 PM
  */
 public class VIndividualCurriculumPrint extends AbstractEntity {

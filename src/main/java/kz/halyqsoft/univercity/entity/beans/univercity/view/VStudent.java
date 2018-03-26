@@ -5,7 +5,7 @@ import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
 
 /**
- * @@author Omarbek
+ * @author Omarbek
  * @created Mar 28, 2017 11:55:40 AM
  */
 public final class VStudent extends AbstractEntity {

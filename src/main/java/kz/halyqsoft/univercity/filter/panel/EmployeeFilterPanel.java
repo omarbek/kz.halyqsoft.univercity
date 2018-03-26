@@ -7,7 +7,7 @@ import kz.halyqsoft.univercity.filter.FEmployeeFilter;
 import org.r3a.common.vaadin.widget.filter2.panel.AbstractFilterPanel;
 
 /**
- * @@author Omarbek
+ * @author Omarbek
  * @created Apr 10, 2017 5:25:59 PM
  */
 @SuppressWarnings("serial")

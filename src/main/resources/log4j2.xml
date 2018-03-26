@@ -2,7 +2,7 @@
 <Configuration status="INFO" name="univercity" packages="kz.halyqsoft.univercity">
     <Properties>
         <Property name="log.pattern">%d{yyyy-MM-dd HH:mm:ss,SSS} - %m%n</Property>
-        <Property name="log.filename">/opt/tomcat/logs</Property>
+        <Property name="log.filename">D:\apache-tomcat-9.0.4\logs</Property>
     </Properties>
 
     <Appenders>

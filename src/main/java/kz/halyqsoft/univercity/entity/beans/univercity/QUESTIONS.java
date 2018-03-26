@@ -16,7 +16,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
 /**
- * @author Kairat A. Gatiyatov
+ * @author Omarbek
  * @created 06 ���. 2016 �. 15:11:29
  */
 

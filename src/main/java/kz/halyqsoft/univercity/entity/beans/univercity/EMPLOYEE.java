@@ -10,7 +10,7 @@ import javax.persistence.*;
 import java.util.Set;
 
 /**
- * @@author Omarbek
+ * @author Omarbek
  * @created Dec 21, 2015 9:17:14 AM
  */
 @Entity

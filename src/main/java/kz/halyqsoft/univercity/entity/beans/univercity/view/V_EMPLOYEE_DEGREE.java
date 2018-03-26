@@ -21,7 +21,7 @@ import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 /**
- * @@author Omarbek
+ * @author Omarbek
  * @created Dec 29, 2015 10:54:43 AM
  */
 @Entity

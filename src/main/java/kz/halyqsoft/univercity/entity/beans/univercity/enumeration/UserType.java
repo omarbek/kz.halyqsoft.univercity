@@ -1,7 +1,7 @@
 package kz.halyqsoft.univercity.entity.beans.univercity.enumeration;
 
 /**
- * @author Dmitry Dobrin.
+ * @author Omarbek
  * @created 11.05.2017.
  */
 public enum UserType {

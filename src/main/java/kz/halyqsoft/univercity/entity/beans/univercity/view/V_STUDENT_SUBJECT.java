@@ -6,7 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 
 /**
- * @@author Omarbek
+ * @author Omarbek
  * @created Nov 2, 2016 10:27:00 AM
  */
 @Entity

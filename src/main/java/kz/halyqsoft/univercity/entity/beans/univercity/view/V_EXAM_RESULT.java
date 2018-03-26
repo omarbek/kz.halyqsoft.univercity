@@ -7,7 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * @author Dmitry Dobrin.
+ * @author Omarbek
  * @created 27.04.2017.
  */
 public class V_EXAM_RESULT extends AbstractEntity {

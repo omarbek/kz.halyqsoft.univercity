@@ -5,7 +5,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.catalog.POST;
 import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 
 /**
- * @@author Omarbek
+ * @author Omarbek
  * @created Apr 10, 2017 5:18:24 PM
  */
 public final class FEmployeeFilter extends AbstractFilterBean {

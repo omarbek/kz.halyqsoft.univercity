@@ -7,7 +7,7 @@ import kz.halyqsoft.univercity.filter.FStudentFilter;
 import org.r3a.common.vaadin.widget.filter2.panel.AbstractFilterPanel;
 
 /**
- * @@author Omarbek
+ * @author Omarbek
  * @created Mar 28, 2017 9:40:44 AM
  */
 @SuppressWarnings("serial")

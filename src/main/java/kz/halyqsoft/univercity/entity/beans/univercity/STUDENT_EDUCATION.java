@@ -17,7 +17,7 @@ import java.util.Set;
 import javax.persistence.*;
 
 /**
- * @@author Omarbek
+ * @author Omarbek
  * @created Dec 21, 2015 10:58:55 AM
  */
 @Entity

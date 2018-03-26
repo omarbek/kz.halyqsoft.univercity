@@ -94,7 +94,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         content = new HorizontalLayout();
         content.setSpacing(true);
         content.setSizeFull();
-        
+
 		/*�������� ������*/
         dataFM.setButtonsVisible(false);
         dataFM.getFieldModel("academicStatus").setInEdit(false);
@@ -450,7 +450,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
             }
         }
         /*********************/
-	
+
 		/*���������� ���*/
         sb = new StringBuilder();
         sb.append(getUILocaleUtil().getCaption("title.error"));
@@ -498,7 +498,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
             }
         }
         /*******************/
-		
+
 		/*����� �����������*/
         sb = new StringBuilder();
         sb.append(getUILocaleUtil().getCaption("title.error"));
@@ -554,7 +554,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         regionRegFM.getListeners().add(new RegionChangeListener(cityReg, cityRegFM));
         cityRegFM.getListeners().add(new CityChangeListener(villageReg, villageRegFM));
         /******************************************************************************/
-		
+
 		/*����� ����������*/
         sb = new StringBuilder();
         sb.append(getUILocaleUtil().getCaption("title.error"));
@@ -612,7 +612,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         regionFactFM.getListeners().add(new RegionChangeListener(cityFact, cityFactFM));
         cityFactFM.getListeners().add(new CityChangeListener(villageFact, villageFactFM));
         /**********************************************************************************/
-		
+
 		/*������ ����*/
         sb = new StringBuilder();
         sb.append(getUILocaleUtil().getCaption("title.error"));
@@ -639,17 +639,17 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
 //		QueryModel countryFatherQM = countryFatherFM.getQueryModel();
 //		countryFatherQM.getFrom().getBaseItem().setSchema("KBTU");
 //		countryFatherQM.addWhereNull("parent");
-//		
+//
 //		FKFieldModel regionFatherFM = (FKFieldModel)fatherFM.getFieldModel("region");
 //		QueryModel regionFatherQM = regionFatherFM.getQueryModel();
 //		regionFatherQM.getFrom().getBaseItem().setSchema("KBTU");
 //		regionFatherQM.addWhere("parent", ECriteria.EQUAL, ID.valueOf(-1));
-//		
+//
 //		FKFieldModel cityFatherFM = (FKFieldModel)fatherFM.getFieldModel("city");
 //		QueryModel cityFatherQM = cityFatherFM.getQueryModel();
 //		cityFatherQM.getFrom().getBaseItem().setSchema("KBTU");
 //		cityFatherQM.addWhere("parent", ECriteria.EQUAL, ID.valueOf(-1));
-//		
+//
 //		FKFieldModel villageFatherFM = (FKFieldModel)fatherFM.getFieldModel("village");
 //		QueryModel villageFatherQM = villageFatherFM.getQueryModel();
 //		villageFatherQM.getFrom().getBaseItem().setSchema("KBTU");
@@ -682,7 +682,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         regionFatherFM.getListeners().add(new RegionChangeListener(cityFather, cityFatherFM));
         cityFatherFM.getListeners().add(new CityChangeListener(villageFather, villageFatherFM));
         /*****************************************************************************************/
-		
+
 		/*������ ������*/
         sb = new StringBuilder();
         sb.append(getUILocaleUtil().getCaption("title.error"));
@@ -700,17 +700,17 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
 //		QueryModel countryMotherQM = countryMotherFM.getQueryModel();
 //		countryMotherQM.getFrom().getBaseItem().setSchema("KBTU");
 //		countryMotherQM.addWhereNull("parent");
-//		
+//
 //		FKFieldModel regionMotherFM = (FKFieldModel)motherFM.getFieldModel("region");
 //		QueryModel regionMotherQM = regionMotherFM.getQueryModel();
 //		regionMotherQM.getFrom().getBaseItem().setSchema("KBTU");
 //		regionMotherQM.addWhere("parent", ECriteria.EQUAL, ID.valueOf(-1));
-//		
+//
 //		FKFieldModel cityMotherFM = (FKFieldModel)motherFM.getFieldModel("city");
 //		QueryModel cityMotherQM = cityMotherFM.getQueryModel();
 //		cityMotherQM.getFrom().getBaseItem().setSchema("KBTU");
 //		cityMotherQM.addWhere("parent", ECriteria.EQUAL, ID.valueOf(-1));
-//		
+//
 //		FKFieldModel villageMotherFM = (FKFieldModel)motherFM.getFieldModel("village");
 //		QueryModel villageMotherQM = villageMotherFM.getQueryModel();
 //		villageMotherQM.getFrom().getBaseItem().setSchema("KBTU");
@@ -741,7 +741,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         regionMotherFM.getListeners().add(new RegionChangeListener(cityMother, cityMotherFM));
         cityMotherFM.getListeners().add(new CityChangeListener(villageMother, villageMotherFM));
         /****************************************************************************************/
-		
+
 		/*������ �� ���������*/
         sb = new StringBuilder();
         sb.append(getUILocaleUtil().getCaption("title.error"));
@@ -785,7 +785,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
             }
         }
         /*********************/
-		
+
 		/*�������� ����������� (���� �� 1 ���������� ��� ����������)*/
         sb = new StringBuilder();
         sb.append(getUILocaleUtil().getCaption("title.error"));
@@ -1012,7 +1012,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 formExit.click();
             }
         });
-				
+
 		/*������ ��������� ����� �������*/
         //two variables are overridden
         caption = "buttonMain";
@@ -1569,7 +1569,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 form52.removeStyleName("activedCh");
                 form53.removeStyleName("activedCh");
                 form54.removeStyleName("activedCh");
-     			
+
      			/*������ �� ���*/
                 ID untCertificateId = ID.valueOf(-1);
                 if (!untCertificateFM.isCreateNew()) {
@@ -1885,7 +1885,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 }
                 awardsQM.addWhere("user", ECriteria.EQUAL, studentId2);
                 /*********/
-				
+
 				/*���������� ���������*/
                 socialCategoriesTW = new TableWidget(V_USER_SOCIAL_CATEGORY.class);
                 socialCategoriesTW.addEntityListener(ApplicantsForm.this);
@@ -1979,7 +1979,6 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                             FormModel repatriateDocFM, FormModel preemptiveRightFM, FormModel educationFM, FormModel untCertificateFM, FormModel grantDocFM,
                             FormModel addressFactFM, FormModel addressRegFM, FormModel motherFM, FormModel fatherFM, FormModel dataContractFM) {
 
-        //original if-else statements are below, if everything works - delete them, Kairat - burn in hell!
         switch (flag) {
             case 1:
                 if (dataFM.isModified() && dataFW.save())
@@ -2011,7 +2010,6 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 break;
             case 4:
             case 8:
-                //I don't have any thoughts about why this condition matters in original code, so Kairat - burn in hell!
                 break;
             case 5:
                 if (untCertificateFM.isModified() && certificateFW.save())
@@ -2838,24 +2836,16 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
 
                         try {
                             Integer count = (Integer) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItems(qm);
-                            count++;
                             String code = CommonUtils.getCode(count);
 
-                            StringBuilder codeSB = new StringBuilder();
-                            codeSB.append(faculty.getCode());
-                            codeSB.append(code);
-                            if (level.getId().equals(ID.valueOf(1))) {
-                                codeSB.append("SB");
-                            } else if (level.getId().equals(ID.valueOf(2))) {
-                                codeSB.append("SM");
+                            code = faculty.getCode() + code;
+                            if (level.getId().equals(ID.valueOf(2))) {
+                                code = "MD" + code;
                             } else {
-                                codeSB.append("SD");
+                                code = "BD" + code;
                             }
-                            codeSB.append(code);
-
-                            codeSB.append(year.toString().substring(2));
-                            codeSB.append(code);
-                            s.setCode(codeSB.toString());//TODO check
+                            code = year.toString().substring(2) + code;
+                            s.setCode(code);
                             SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(s);
                             dataFW.refresh();
                         } catch (Exception ex) {

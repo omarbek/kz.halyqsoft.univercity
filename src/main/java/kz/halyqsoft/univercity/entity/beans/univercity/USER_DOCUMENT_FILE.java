@@ -15,7 +15,7 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 
 /**
- * @@author Omarbek
+ * @author Omarbek
  * @created Nov 13, 2015 9:53:15 AM
  */
 @Entity

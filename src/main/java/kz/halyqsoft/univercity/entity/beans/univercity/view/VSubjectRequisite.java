@@ -5,7 +5,7 @@ import org.r3a.common.entity.AbstractEntity;
 import java.util.Locale;
 
 /**
- * @@author Omarbek
+ * @author Omarbek
  * @created Feb 27, 2017 11:33:54 AM
  */
 @SuppressWarnings("unused")

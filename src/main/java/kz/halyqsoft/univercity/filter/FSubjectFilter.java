@@ -7,7 +7,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT_CYCLE;
 import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 
 /**
- * @@author Omarbek
+ * @author Omarbek
  * @created Apr 6, 2017 10:09:22 AM
  */
 public final class FSubjectFilter extends AbstractFilterBean {

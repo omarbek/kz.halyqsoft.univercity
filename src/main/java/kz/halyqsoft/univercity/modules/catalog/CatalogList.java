@@ -15,11 +15,14 @@ import java.util.TreeSet;
  */
 class CatalogList {
 
-    private static Set<Entity> list = new TreeSet<>(new CatalogEntityComparator());
-    private static int id = 0;
+    private static Set<Entity> list;
+    private static int id;
 
     static List<Entity> getCatalogList() {
+        id = 0;
+        list = new TreeSet<>(new CatalogEntityComparator());
 
+        addCatalogEntityToList(NATIONALITY.class);
         addCatalogEntityToList(AWARD.class);
         addCatalogEntityToList(CONTRACT_TYPE.class);
         addCatalogEntityToList(DEGREE.class);
@@ -30,7 +33,6 @@ class CatalogList {
         addCatalogEntityToList(EQUIPMENT.class);
         addCatalogEntityToList(MEDICAL_CHECKUP_TYPE.class);
         addCatalogEntityToList(MILITARY_STATUS.class);
-        addCatalogEntityToList(NATIONALITY.class);
         addCatalogEntityToList(ORDER_TYPE.class);
         addCatalogEntityToList(POST.class);
         addCatalogEntityToList(CORPUS.class);

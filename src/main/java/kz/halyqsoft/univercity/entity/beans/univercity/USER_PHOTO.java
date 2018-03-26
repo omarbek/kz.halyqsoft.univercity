@@ -12,7 +12,7 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 
 /**
- * @@author Omarbek
+ * @author Omarbek
  * @created Nov 12, 2015 3:03:56 PM
  */
 @Entity

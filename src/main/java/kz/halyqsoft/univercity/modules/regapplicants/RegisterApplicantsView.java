@@ -1,10 +1,10 @@
 package kz.halyqsoft.univercity.modules.regapplicants;
 
-import kz.halyqsoft.univercity.utils.ErrorUtils;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.LEVEL;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDENT_CATEGORY;
+import kz.halyqsoft.univercity.utils.ErrorUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.ID;

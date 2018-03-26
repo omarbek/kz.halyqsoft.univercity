@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * @@author Omarbek
+ * @author Omarbek
  * @created Apr 26, 2016 12:20:23 PM
  */
 @Entity

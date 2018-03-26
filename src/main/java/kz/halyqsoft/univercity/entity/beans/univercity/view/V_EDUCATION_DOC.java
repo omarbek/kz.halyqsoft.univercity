@@ -1,7 +1,7 @@
 package kz.halyqsoft.univercity.entity.beans.univercity.view;
 
 /**
- * @author Dmitry Dobrin.
+ * @author Omarbek
  * @created 26.04.2017.
  */
 public class V_EDUCATION_DOC extends V_USER_DOCUMENT {

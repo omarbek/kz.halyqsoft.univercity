@@ -16,7 +16,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 /**
- * @author Kairat A. Gatiyatov
+ * @author Omarbek
  * @created 22 ���. 2016 �. 15:11:29
  */
 
