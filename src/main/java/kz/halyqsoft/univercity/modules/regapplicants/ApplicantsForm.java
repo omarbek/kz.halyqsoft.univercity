@@ -37,8 +37,6 @@ import org.r3a.common.vaadin.widget.form.FormModel;
 import org.r3a.common.vaadin.widget.form.GridFormWidget;
 import org.r3a.common.vaadin.widget.form.field.filelist.FileListFieldModel;
 import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
-import org.r3a.common.vaadin.widget.photo.PhotoWidgetEvent;
-import org.r3a.common.vaadin.widget.photo.PhotoWidgetListener;
 import org.r3a.common.vaadin.widget.table.TableWidget;
 import org.r3a.common.vaadin.widget.table.model.DBTableModel;
 
@@ -50,7 +48,7 @@ import java.util.Calendar;
  * @author Omarbek
  * @created 21.05.2016 11:25:18
  */
-public final class ApplicantsForm extends AbstractFormWidgetView implements PhotoWidgetListener {
+public final class ApplicantsForm extends AbstractFormWidgetView {
 
     private AbstractFormWidget dataFW;
     private HorizontalSplitPanel mainForm;
@@ -1483,6 +1481,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                     try {
                         userId1 = dataFM.getEntity().getId();
                     } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
                 educationQM.addWhereAnd(educationUDFI, "user", ECriteria.EQUAL, userId1);
@@ -1993,12 +1992,12 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM,
                         educationFM, untCertificateFM, grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
 // 				int count = specTW.getEntityCount();
-                if (saveData == false) Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
-                else if (savePass == false) Message.showInfo(getUILocaleUtil().getMessage("info.save.passport"));
-                else if (saveEduc == false) Message.showInfo(getUILocaleUtil().getMessage("info.save.educ"));
-                else if (saveUNT == false) Message.showInfo(getUILocaleUtil().getMessage("info.save.unt"));
+                if (!saveData) Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
+                else if (!savePass) Message.showInfo(getUILocaleUtil().getMessage("info.save.passport"));
+                else if (!saveEduc) Message.showInfo(getUILocaleUtil().getMessage("info.save.educ"));
+                else if (!saveUNT) Message.showInfo(getUILocaleUtil().getMessage("info.save.unt"));
                 else {
-                    String codeApp = new String();
+                    String codeApp;
                     form0.setEnabled(false);
                     form1.setEnabled(false);
                     form2.setEnabled(false);
@@ -2243,9 +2242,9 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         return formModel;
     }
 
-    private boolean preSaveSpeciality(Object source, Entity e, boolean isNew, int buttonId) {
+    private boolean preSaveSpeciality(Entity e, boolean isNew) {
         V_ENTRANT_SPECIALITY ves = (V_ENTRANT_SPECIALITY) e;
-        ENTRANT_SPECIALITY es = null;
+        ENTRANT_SPECIALITY es;
         FormModel fm = dataFW.getWidgetModel();
         if (isNew) {
             List<Entity> list = specTW.getAllEntities();
@@ -2295,7 +2294,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
 
                         DEPARTMENT faculty = es.getSpeciality().getDepartment().getParent();
 
-                        QueryModel<V_KBTU_ENTRANTS> qm = new QueryModel<V_KBTU_ENTRANTS>(V_KBTU_ENTRANTS.class);
+                        QueryModel<V_KBTU_ENTRANTS> qm = new QueryModel<>(V_KBTU_ENTRANTS.class);
                         qm.addSelect("id", EAggregate.COUNT);
                         qm.addWhere("level", ECriteria.EQUAL, level.getId());
                         qm.addWhereAnd("createdYear", ECriteria.EQUAL, year);
@@ -2343,7 +2342,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         return false;
     }
 
-    private boolean preSaveData(Object source, Entity e, boolean isNew, int buttonId) {
+    private boolean preSaveData(Entity e, boolean isNew) {
         STUDENT s = (STUDENT) e;
 
         if (isNew) {
@@ -2371,7 +2370,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         return false;
     }
 
-    private boolean preSaveContract(Object source, Entity e, boolean isNew, int buttonId) {
+    private boolean preSaveContract(Entity e, boolean isNew) {
         if (dataFW.getWidgetModel().isCreateNew()) {
             Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
             return false;
@@ -2424,7 +2423,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         return false;
     }
 
-    private boolean preSavePassport(Object source, Entity e, boolean isNew, int buttonId) {
+    private boolean preSavePassport(Entity e, boolean isNew) {
         if (dataFW.getWidgetModel().isCreateNew()) {
             Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
             return false;
@@ -2478,7 +2477,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         return false;
     }
 
-    private boolean preSaveEducationDoc(Object source, Entity e, boolean isNew, int buttonId) {
+    private boolean preSaveEducationDoc(Entity e, boolean isNew) {
         EDUCATION_DOC ed = (EDUCATION_DOC) e;
         FormModel fm = dataFW.getWidgetModel();
         if (isNew) {
@@ -2533,7 +2532,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         return false;
     }
 
-    private boolean preSaveDoc(Object source, Entity e, boolean isNew, int buttonId) {
+    private boolean preSaveDoc(Entity e, boolean isNew) {
         if (dataFW.getWidgetModel().isCreateNew()) {
             Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
             return false;
@@ -2586,7 +2585,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         return false;
     }
 
-    private boolean preSaveMilitary(Object source, Entity e, boolean isNew, int buttonId) {
+    private boolean preSaveMilitary(Entity e, boolean isNew) {
         if (dataFW.getWidgetModel().isCreateNew()) {
             Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
             return false;
@@ -2639,7 +2638,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         return false;
     }
 
-    private boolean preSaveDisability(Object source, Entity e, boolean isNew, int buttonId) {
+    private boolean preSaveDisability(Entity e, boolean isNew) {
         if (dataFW.getWidgetModel().isCreateNew()) {
             Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
             return false;
@@ -2692,7 +2691,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         return false;
     }
 
-    private boolean preSaveRepatriate(Object source, Entity e, boolean isNew, int buttonId) {
+    private boolean preSaveRepatriate(Entity e, boolean isNew) {
         if (dataFW.getWidgetModel().isCreateNew()) {
             Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
             return false;
@@ -2745,7 +2744,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         return false;
     }
 
-    private boolean preSaveLanguage(Object source, Entity e, boolean isNew, int buttonId) {
+    private boolean preSaveLanguage(Entity e, boolean isNew) {
         V_USER_LANGUAGE vul = (V_USER_LANGUAGE) e;
         if (isNew) {
             try {
@@ -2780,7 +2779,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         return false;
     }
 
-    private boolean preSavePreemptiveRight(Object source, Entity e, boolean isNew, int buttonId) {
+    private boolean preSavePreemptiveRight(Entity e, boolean isNew) {
         if (dataFW.getWidgetModel().isCreateNew()) {
             Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
             return false;
@@ -2833,7 +2832,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         return false;
     }
 
-    private boolean preSaveGrant(Object source, Entity e, boolean isNew, int buttonId) {
+    private boolean preSaveGrant(Entity e, boolean isNew) {
         if (dataFW.getWidgetModel().isCreateNew()) {
             Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
             return false;
@@ -2887,7 +2886,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         return false;
     }
 
-    private boolean preSaveMedicalCheckup(Object source, Entity e, boolean isNew, int buttonId) {
+    private boolean preSaveMedicalCheckup(Entity e, boolean isNew) {
         V_MEDICAL_CHECKUP vmc = (V_MEDICAL_CHECKUP) e;
         MEDICAL_CHECKUP mc = null;
         FormModel fm = dataFW.getWidgetModel();
@@ -2959,7 +2958,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         return false;
     }
 
-    private boolean preSaveUNTCertificate(Object source, Entity e, boolean isNew, int buttonId) {
+    private boolean preSaveUNTCertificate(Entity e, boolean isNew) {
         if (dataFW.getWidgetModel().isCreateNew()) {
             Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
             return false;
@@ -3014,9 +3013,9 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         return false;
     }
 
-    private boolean preSaveUNTRates(Object source, Entity e, boolean isNew, int buttonId) {
+    private boolean preSaveUNTRates(Entity e, boolean isNew) {
         V_UNT_CERT_SUBJECT vucs = (V_UNT_CERT_SUBJECT) e;
-        UNT_CERT_SUBJECT ucs = null;
+        UNT_CERT_SUBJECT ucs;
         FormModel fm = certificateFW.getWidgetModel();
         if (isNew) {
             ucs = new UNT_CERT_SUBJECT();
@@ -3059,7 +3058,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         return false;
     }
 
-    private boolean preSaveAddressReg(Object source, Entity e, boolean isNew, int buttonId) {
+    private boolean preSaveAddressReg(Entity e, boolean isNew) {
         if (dataFW.getWidgetModel().isCreateNew()) {
             Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
             return false;
@@ -3087,7 +3086,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         return false;
     }
 
-    private boolean preSaveAddressFact(Object source, Entity e, boolean isNew, int buttonId) {
+    private boolean preSaveAddressFact(Entity e, boolean isNew) {
         if (dataFW.getWidgetModel().isCreateNew()) {
             Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
             return false;
@@ -3115,7 +3114,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         return false;
     }
 
-    private boolean preSaveFather(Object source, Entity e, boolean isNew, int buttonId) {
+    private boolean preSaveFather(Entity e, boolean isNew) {
         if (dataFW.getWidgetModel().isCreateNew()) {
             Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
             return false;
@@ -3143,7 +3142,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         return false;
     }
 
-    private boolean preSaveMother(Object source, Entity e, boolean isNew, int buttonId) {
+    private boolean preSaveMother(Entity e, boolean isNew) {
         if (dataFW.getWidgetModel().isCreateNew()) {
             Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
             return false;
@@ -3172,9 +3171,9 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         return false;
     }
 
-    private boolean preSaveAwards(Object source, Entity e, boolean isNew, int buttonId) {
+    private boolean preSaveAwards(Entity e, boolean isNew) {
         V_USER_AWARD vua = (V_USER_AWARD) e;
-        USER_AWARD ua = null;
+        USER_AWARD ua;
         FormModel fm = dataFW.getWidgetModel();
         if (isNew) {
             ua = new USER_AWARD();
@@ -3206,9 +3205,9 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         return false;
     }
 
-    private boolean preSaveSocialCategories(Object source, Entity e, boolean isNew, int buttonId) {
+    private boolean preSaveSocialCategories(Entity e, boolean isNew) {
         V_USER_SOCIAL_CATEGORY vusc = (V_USER_SOCIAL_CATEGORY) e;
-        USER_SOCIAL_CATEGORY usc = null;
+        USER_SOCIAL_CATEGORY usc;
         FormModel fm = dataFW.getWidgetModel();
         if (isNew) {
             usc = new USER_SOCIAL_CATEGORY();
@@ -3315,7 +3314,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
             }
 
 			/*int count = specTW.getEntityCount();
-			if (count < 4) {
+            if (count < 4) {
 				Message.showInfo(getUILocaleUtil().getMessage("need.to.select.4.universities"));
 				return false;
 			}*/
@@ -3329,7 +3328,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
             }
 
 			/*int count = specTW.getEntityCount();
-			if (count < 4) {
+            if (count < 4) {
 				Message.showInfo(getUILocaleUtil().getMessage("need.to.select.4.universities"));
 				return false;
 			}*/
@@ -3377,7 +3376,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
             }
 
 			/*int count = specTW.getEntityCount();
-			if (count < 4) {
+            if (count < 4) {
 				Message.showInfo(getUILocaleUtil().getMessage("need.to.select.4.universities"));
 				return false;
 			}*/
@@ -3404,7 +3403,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
 
     @Override
     public boolean onEdit(Object source, Entity e, int buttonId) {
-        QueryModel<USER_DOCUMENT_FILE> udfQM = new QueryModel<USER_DOCUMENT_FILE>(USER_DOCUMENT_FILE.class);
+        QueryModel<USER_DOCUMENT_FILE> udfQM = new QueryModel<>(USER_DOCUMENT_FILE.class);
         udfQM.addSelect("id");
         udfQM.addSelect("fileName");
         udfQM.addWhere("deleted", Boolean.FALSE);
@@ -3508,7 +3507,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
 
     @Override
     public boolean onPreview(Object source, Entity e, int buttonId) {
-        QueryModel<USER_DOCUMENT_FILE> udfQM = new QueryModel<USER_DOCUMENT_FILE>(USER_DOCUMENT_FILE.class);
+        QueryModel<USER_DOCUMENT_FILE> udfQM = new QueryModel<>(USER_DOCUMENT_FILE.class);
         udfQM.addSelect("id");
         udfQM.addSelect("fileName");
         udfQM.addWhere("deleted", Boolean.FALSE);
@@ -3607,47 +3606,47 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
     @Override
     public boolean preSave(Object source, Entity e, boolean isNew, int buttonId) throws Exception {
         if (source.equals(dataFW)) {
-            return preSaveData(source, e, isNew, buttonId);
+            return preSaveData(e, isNew);
         } else if (source.equals(documentsTW)) {
-            return preSaveEducationDoc(source, e, isNew, buttonId);
+            return preSaveEducationDoc(e, isNew);
         } else if (source.equals(educDocFW)) {
-            return preSaveDoc(source, e, isNew, buttonId);
+            return preSaveDoc(e, isNew);
         } else if (source.equals(passportFW)) {
-            return preSavePassport(source, e, isNew, buttonId);
+            return preSavePassport(e, isNew);
         } else if (source.equals(specTW)) {
-            return preSaveSpeciality(source, e, isNew, buttonId);
+            return preSaveSpeciality(e, isNew);
         } else if (source.equals(languagesTW)) {
-            return preSaveLanguage(source, e, isNew, buttonId);
+            return preSaveLanguage(e, isNew);
         } else if (source.equals(medicalCheckupTW)) {
-            return preSaveMedicalCheckup(source, e, isNew, buttonId);
+            return preSaveMedicalCheckup(e, isNew);
         } else if (source.equals(awardsTW)) {
-            return preSaveAwards(source, e, isNew, buttonId);
+            return preSaveAwards(e, isNew);
         } else if (source.equals(socialCategoriesTW)) {
-            return preSaveSocialCategories(source, e, isNew, buttonId);
+            return preSaveSocialCategories(e, isNew);
         } else if (source.equals(militaryFW)) {
-            return preSaveMilitary(source, e, isNew, buttonId);
+            return preSaveMilitary(e, isNew);
         } else if (source.equals(disabilityFW)) {
-            return preSaveDisability(source, e, isNew, buttonId);
+            return preSaveDisability(e, isNew);
         } else if (source.equals(repatriateFW)) {
-            return preSaveRepatriate(source, e, isNew, buttonId);
+            return preSaveRepatriate(e, isNew);
         } else if (source.equals(grantFW)) {
-            return preSaveGrant(source, e, isNew, buttonId);
+            return preSaveGrant(e, isNew);
         } else if (source.equals(preemptiveRightFW)) {
-            return preSavePreemptiveRight(source, e, isNew, buttonId);
+            return preSavePreemptiveRight(e, isNew);
         } else if (source.equals(certificateFW)) {
-            return preSaveUNTCertificate(source, e, isNew, buttonId);
+            return preSaveUNTCertificate(e, isNew);
         } else if (source.equals(untRatesTW)) {
-            return preSaveUNTRates(source, e, isNew, buttonId);
+            return preSaveUNTRates(e, isNew);
         } else if (source.equals(addressRegFW)) {
-            return preSaveAddressReg(source, e, isNew, buttonId);
+            return preSaveAddressReg(e, isNew);
         } else if (source.equals(addressFactFW)) {
-            return preSaveAddressFact(source, e, isNew, buttonId);
+            return preSaveAddressFact(e, isNew);
         } else if (source.equals(fatherFW)) {
-            return preSaveFather(source, e, isNew, buttonId);
+            return preSaveFather(e, isNew);
         } else if (source.equals(motherFW)) {
-            return preSaveMother(source, e, isNew, buttonId);
+            return preSaveMother(e, isNew);
         } else if (source.equals(dataContractFW)) {
-            return preSaveContract(source, e, isNew, buttonId);
+            return preSaveContract(e, isNew);
         }
         return super.preSave(source, e, isNew, buttonId);
     }
@@ -3669,7 +3668,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
 
             return false;
         } else if (source.equals(languagesTW)) {
-            List<USER_LANGUAGE> delList = new ArrayList<USER_LANGUAGE>();
+            List<USER_LANGUAGE> delList = new ArrayList<>();
             for (Entity e : entities) {
                 try {
                     delList.add(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(USER_LANGUAGE.class, e.getId()));
@@ -3688,7 +3687,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
 
             return false;
         } else if (source.equals(medicalCheckupTW)) {
-            List<MEDICAL_CHECKUP> delList = new ArrayList<MEDICAL_CHECKUP>();
+            List<MEDICAL_CHECKUP> delList = new ArrayList<>();
             for (Entity e : entities) {
                 try {
                     MEDICAL_CHECKUP mc = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(MEDICAL_CHECKUP.class, e.getId());
@@ -3709,7 +3708,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
 
             return false;
         } else if (source.equals(untRatesTW)) {
-            List<UNT_CERT_SUBJECT> delList = new ArrayList<UNT_CERT_SUBJECT>();
+            List<UNT_CERT_SUBJECT> delList = new ArrayList<>();
             for (Entity e : entities) {
                 try {
                     delList.add(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(UNT_CERT_SUBJECT.class, e.getId()));
@@ -3728,7 +3727,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
 
             return false;
         } else if (source.equals(specTW)) {
-            List<ENTRANT_SPECIALITY> delList = new ArrayList<ENTRANT_SPECIALITY>();
+            List<ENTRANT_SPECIALITY> delList = new ArrayList<>();
             for (Entity e : entities) {
                 try {
                     delList.add(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(ENTRANT_SPECIALITY.class, e.getId()));
@@ -3747,7 +3746,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
 
             return false;
         } else if (source.equals(awardsTW)) {
-            List<USER_AWARD> delList = new ArrayList<USER_AWARD>();
+            List<USER_AWARD> delList = new ArrayList<>();
             for (Entity e : entities) {
                 try {
                     delList.add(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(USER_AWARD.class, e.getId()));
@@ -3766,7 +3765,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
 
             return false;
         } else if (source.equals(socialCategoriesTW)) {
-            List<USER_SOCIAL_CATEGORY> delList = new ArrayList<USER_SOCIAL_CATEGORY>();
+            List<USER_SOCIAL_CATEGORY> delList = new ArrayList<>();
             for (Entity e : entities) {
                 try {
                     delList.add(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(USER_SOCIAL_CATEGORY.class, e.getId()));
@@ -3816,18 +3815,6 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
     }
 
     @Override
-    public void handlePhotoWidgetEvent(PhotoWidgetEvent photoWidgetEvent) {
-    }
-
-    public STUDENT getStudent() {
-        return student;
-    }
-
-    public void setStudent(STUDENT student) {
-        this.student = student;
-    }
-
-    @Override
     protected AbstractCommonView getParentView() {
         return null;//TODO
 //        return new ApplicantsList();
@@ -3841,5 +3828,13 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
     @Override
     protected String getViewTitle(Locale locale) {
         return getUILocaleUtil().getCaption("regapplicant");
+    }
+
+    public STUDENT getStudent() {
+        return student;
+    }
+
+    public void setStudent(STUDENT student) {
+        this.student = student;
     }
 }
