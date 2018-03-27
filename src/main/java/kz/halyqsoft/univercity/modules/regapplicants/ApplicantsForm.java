@@ -8,7 +8,6 @@ import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Table.Align;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.*;
@@ -44,6 +43,8 @@ import javax.persistence.NoResultException;
 import java.util.*;
 import java.util.Calendar;
 
+import static com.vaadin.ui.Table.Align;
+
 /**
  * @author Omarbek
  * @created 21.05.2016 11:25:18
@@ -51,18 +52,25 @@ import java.util.Calendar;
 public final class ApplicantsForm extends AbstractFormWidgetView {
 
     private AbstractFormWidget dataFW;
-    private HorizontalSplitPanel mainForm;
+    private HorizontalSplitPanel registrationHSP;
     private HorizontalLayout content;
     private VerticalLayout buttonForm;
     private TableWidget specTW, documentsTW, languagesTW, medicalCheckupTW, awardsTW, socialCategoriesTW, untRatesTW;
     private GridFormWidget passportFW, militaryFW, disabilityFW, repatriateFW, grantFW, preemptiveRightFW;
     private GridFormWidget certificateFW, addressRegFW, addressFactFW, fatherFW, motherFW, dataContractFW, educDocFW;
     private int flag;
-    private Button form0, form01, form02, form1, form2, form3, form4, form5, form6, form7;
-    private Button form11, form12, form13, form14, form21, form22, form23, form41, form42;
-    private Button form51, form52, form53, form54, formExit;
-    private Button next1, next2, next3, next4, next5, next6, next7, next8, next9, next10;
-    private Button next11, next12, next13, next14, next15, next16, next17, next18;
+
+    private Button mainDataButton, factAddressButton, regAddressButton, specButton;
+    private Button idDocButton, militaryButton, disabilityButton, repatriateButton;
+    private Button eduDocButton, educationDocsButton, preemRightButton;
+    private Button medButton;
+    private Button untButton, grantDocButton;
+    private Button motherButton, fatherButton;
+    private Button contractButton, moreButton;
+    private Button finishButton;
+
+    private Button nextSpecButton, nextIdDocButton, nextMilitaryButton, nextDisabilityButton, nextRepatriateButton, nextEduDocButton, nextEduDocsButton, nextPreemRightButton, nextMedButton, nextUntButton;
+    private Button nextGrantDocButton, nextMotherButton, nextFatherButton, nextFactAddressButton, nextRegAddressButton, nextMoreButton, next17, nextFinishButton;
     private boolean saveData, savePass, saveEduc, saveUNT;
     private VerticalLayout messForm;
     private FromItem educationUDFI;
@@ -74,9 +82,9 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
 
         super();
         setBackButtonVisible(false);
-        mainForm = new HorizontalSplitPanel();
-        mainForm.setSplitPosition(20);
-        mainForm.setSizeFull();
+        registrationHSP = new HorizontalSplitPanel();
+        registrationHSP.setSplitPosition(20);
+        registrationHSP.setSizeFull();
 
         buttonForm = new VerticalLayout();
         buttonForm.setSpacing(true);
@@ -195,14 +203,14 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
 		/*�������� ����������� (���� �� 1 ���������� ��� ����������)*/
         final FormModel educationFM = createEducationDoc(udfQM);
 
-        createNextButtons();
-
         final Button form = createFormButtons(dataFM, preemptiveRightFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, grantDocFM, untCertificateFM, addressRegFM, addressFactFM, fatherFM, motherFM, dataContractFM, educationFM);
+
+        setNextButtons();
 
         addFormButtons();
 
-//        form.click();
-        getContent().addComponent(mainForm);
+        form.click();
+        getContent().addComponent(registrationHSP);
     }
 
     private FormModel createPreemptiveRight(QueryModel<USER_DOCUMENT_FILE> udfQM) throws Exception {
@@ -915,171 +923,26 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         return educationFM;
     }
 
-    private void createNextButtons() {
-        /****************************************************************************************/
-        //two variables for time locality
-        String caption = "next", styleName = "nextStyle";
-        next1 = createNextButton(caption, styleName);
-        next1.addClickListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(ClickEvent event) {
-                form02.click();
-            }
-        });
-
-        next2 = createNextButton(caption, styleName);
-        next2.addClickListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(ClickEvent event) {
-                form1.click();
-            }
-        });
-
-        next3 = createNextButton(caption, styleName);
-        next3.addClickListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(ClickEvent event) {
-                form12.click();
-            }
-        });
-
-        next4 = createNextButton(caption, styleName);
-        next4.addClickListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(ClickEvent event) {
-                form13.click();
-            }
-        });
-
-        next5 = createNextButton(caption, styleName);
-        next5.addClickListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(ClickEvent event) {
-                form14.click();
-            }
-        });
-
-        next6 = createNextButton(caption, styleName);
-        next6.addClickListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(ClickEvent event) {
-                form2.click();
-            }
-        });
-
-        next7 = createNextButton(caption, styleName);
-        next7.addClickListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(ClickEvent event) {
-                form22.click();
-            }
-        });
-
-        next8 = createNextButton(caption, styleName);
-        next8.addClickListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(ClickEvent event) {
-                form23.click();
-            }
-        });
-
-        next9 = createNextButton(caption, styleName);
-        next9.addClickListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(ClickEvent event) {
-                form3.click();
-            }
-        });
-
-        next10 = createNextButton(caption, styleName);
-        next10.addClickListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(ClickEvent event) {
-                form4.click();
-            }
-        });
-
-        next11 = createNextButton(caption, styleName);
-        next11.addClickListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(ClickEvent event) {
-                form42.click();
-            }
-        });
-
-        next12 = createNextButton(caption, styleName);
-        next12.addClickListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(ClickEvent event) {
-                form5.click();
-            }
-        });
-
-        next13 = createNextButton(caption, styleName);
-        next13.addClickListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(ClickEvent event) {
-                form52.click();
-            }
-        });
-
-        next14 = createNextButton(caption, styleName);
-        next14.addClickListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(ClickEvent event) {
-                form53.click();
-            }
-        });
-
-        next15 = createNextButton(caption, styleName);
-        next15.addClickListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(ClickEvent event) {
-                form54.click();
-            }
-        });
-
-        next16 = createNextButton(caption, styleName);
-        next16.addClickListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(ClickEvent event) {
-                form7.click();
-            }
-        });
-
-        next17 = createNextButton(caption, styleName);
-        next17.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(ClickEvent event) {
-                form7.click();
-            }
-        });
-
+    private void setNextButtons() {
+        String caption = "next";
+        nextSpecButton = createNextButton(specButton, caption);
+        nextIdDocButton = createNextButton(idDocButton, caption);
+        nextMilitaryButton = createNextButton(militaryButton, caption);
+        nextDisabilityButton = createNextButton(disabilityButton, caption);
+        nextRepatriateButton = createNextButton(repatriateButton, caption);
+        nextEduDocButton = createNextButton(eduDocButton, caption);
+        nextEduDocsButton = createNextButton(educationDocsButton, caption);
+        nextPreemRightButton = createNextButton(preemRightButton, caption);
+        nextMedButton = createNextButton(medButton, caption);
+        nextUntButton = createNextButton(untButton, caption);
+        nextGrantDocButton = createNextButton(grantDocButton, caption);
+        nextMotherButton = createNextButton(motherButton, caption);
+        nextFatherButton = createNextButton(fatherButton, caption);
+        nextFactAddressButton = createNextButton(factAddressButton, caption);
+        nextRegAddressButton = createNextButton(regAddressButton, caption);
+        nextMoreButton = createNextButton(moreButton, caption);
         caption = "exit";
-        next18 = createNextButton(caption, styleName);
-        next18.addClickListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(ClickEvent event) {
-                formExit.click();
-            }
-        });
+        nextFinishButton = createNextButton(finishButton, caption);
     }
 
     private Button createFormButtons(FormModel dataFM, FormModel preemptiveRightFM, FormModel userPassportFM, FormModel militaryDocFM, FormModel disabilityDocFM, FormModel repatriateDocFM, FormModel grantDocFM, FormModel untCertificateFM, FormModel addressRegFM, FormModel addressFactFM, FormModel fatherFM, FormModel motherFM, FormModel dataContractFM, FormModel educationFM) {
@@ -1090,8 +953,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         form.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
-                form0.addStyleName("actived");
-                form01.addStyleName("activedCh");
+                mainDataButton.addStyleName("actived");
                 flag = 1;
                 saveData = false;
                 saveEduc = false;
@@ -1113,64 +975,51 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 }
                 entrantSpecialityQM.addWhere("student", ECriteria.EQUAL, studentId1);
 
-                mainForm.removeComponent(content);
+                registrationHSP.removeComponent(content);
                 content = new HorizontalLayout();
                 content.addComponent(dataFW);
-                content.addComponent(next1);
-                content.setComponentAlignment(next1, Alignment.MIDDLE_CENTER);
-                mainForm.addComponent(content);
+                content.addComponent(nextSpecButton);
+                content.setComponentAlignment(nextSpecButton, Alignment.MIDDLE_CENTER);
+                registrationHSP.addComponent(content);
             }
         });
 
-        form0 = createFormButton("regapplicant.main.data", caption);
-        form0.addClickListener(new Button.ClickListener() {
+        mainDataButton = createFormButton("regapplicant.main.data", caption);
+        mainDataButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM, educationFM, untCertificateFM,
                         grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
                 flag = 1;
-                form0.addStyleName("actived");
-                form1.removeStyleName("actived");
-                form2.removeStyleName("actived");
-                form3.removeStyleName("actived");
-                form4.removeStyleName("actived");
-                form5.removeStyleName("actived");
-                form6.removeStyleName("actived");
-                form7.removeStyleName("actived");
-                form01.addStyleName("activedCh");
-                form02.removeStyleName("activedCh");
-                form11.removeStyleName("activedCh");
-                form12.removeStyleName("activedCh");
-                form13.removeStyleName("activedCh");
-                form14.removeStyleName("activedCh");
-                form21.removeStyleName("activedCh");
-                form22.removeStyleName("activedCh");
-                form23.removeStyleName("activedCh");
-                form41.removeStyleName("activedCh");
-                form42.removeStyleName("activedCh");
-                form51.removeStyleName("activedCh");
-                form52.removeStyleName("activedCh");
-                form53.removeStyleName("activedCh");
-                form54.removeStyleName("activedCh");
-                mainForm.removeComponent(content);
+                mainDataButton.addStyleName("actived");
+                idDocButton.removeStyleName("actived");
+                eduDocButton.removeStyleName("actived");
+                medButton.removeStyleName("actived");
+                untButton.removeStyleName("actived");
+                motherButton.removeStyleName("actived");
+                contractButton.removeStyleName("actived");
+                moreButton.removeStyleName("actived");
+                specButton.removeStyleName("activedCh");
+                militaryButton.removeStyleName("activedCh");
+                disabilityButton.removeStyleName("activedCh");
+                repatriateButton.removeStyleName("activedCh");
+                educationDocsButton.removeStyleName("activedCh");
+                preemRightButton.removeStyleName("activedCh");
+                grantDocButton.removeStyleName("activedCh");
+                fatherButton.removeStyleName("activedCh");
+                factAddressButton.removeStyleName("activedCh");
+                regAddressButton.removeStyleName("activedCh");
+                registrationHSP.removeComponent(content);
                 content = new HorizontalLayout();
                 content.addComponent(dataFW);
-                content.addComponent(next1);
-                content.setComponentAlignment(next1, Alignment.MIDDLE_CENTER);
-                mainForm.addComponent(content);
+                content.addComponent(nextSpecButton);
+                content.setComponentAlignment(nextSpecButton, Alignment.MIDDLE_CENTER);
+                registrationHSP.addComponent(content);
             }
         });
 
-        form01 = createFormButton("data.app", styleName);
-        form01.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(ClickEvent event) {
-                form0.click();
-            }
-        });
-
-        form02 = createFormButton("speciality", styleName);
-        form02.addClickListener(new Button.ClickListener() {
+        specButton = createFormButton("speciality", styleName);
+        specButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
                 specTW = new TableWidget(V_ENTRANT_SPECIALITY.class);
@@ -1183,10 +1032,11 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 if (!dataFM.isCreateNew()) {
                     try {
                         studentId1 = dataFM.getEntity().getId();
-                        if (dataFW.save() == true) {
+                        if (dataFW.save()) {
                             saveData = true;
                         }
                     } catch (Exception ex) {
+                        ex.printStackTrace();//TODO catch
                     }
                 }
                 entrantSpecialityQM.addWhere("student", ECriteria.EQUAL, studentId1);
@@ -1195,269 +1045,218 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                         grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
 
                 flag = 12;
-                form0.addStyleName("actived");
-                form1.removeStyleName("actived");
-                form2.removeStyleName("actived");
-                form3.removeStyleName("actived");
-                form4.removeStyleName("actived");
-                form5.removeStyleName("actived");
-                form6.removeStyleName("actived");
-                form7.removeStyleName("actived");
-                form01.removeStyleName("activedCh");
-                form02.addStyleName("activedCh");
-                form11.removeStyleName("activedCh");
-                form12.removeStyleName("activedCh");
-                form13.removeStyleName("activedCh");
-                form14.removeStyleName("activedCh");
-                form21.removeStyleName("activedCh");
-                form22.removeStyleName("activedCh");
-                form23.removeStyleName("activedCh");
-                form41.removeStyleName("activedCh");
-                form42.removeStyleName("activedCh");
-                form51.removeStyleName("activedCh");
-                form52.removeStyleName("activedCh");
-                form53.removeStyleName("activedCh");
-                form54.removeStyleName("activedCh");
-                mainForm.removeComponent(content);
+                mainDataButton.addStyleName("actived");
+                idDocButton.removeStyleName("actived");
+                eduDocButton.removeStyleName("actived");
+                medButton.removeStyleName("actived");
+                untButton.removeStyleName("actived");
+                motherButton.removeStyleName("actived");
+                contractButton.removeStyleName("actived");
+                moreButton.removeStyleName("actived");
+                specButton.addStyleName("activedCh");
+                militaryButton.removeStyleName("activedCh");
+                disabilityButton.removeStyleName("activedCh");
+                repatriateButton.removeStyleName("activedCh");
+                educationDocsButton.removeStyleName("activedCh");
+                preemRightButton.removeStyleName("activedCh");
+                grantDocButton.removeStyleName("activedCh");
+                fatherButton.removeStyleName("activedCh");
+                factAddressButton.removeStyleName("activedCh");
+                regAddressButton.removeStyleName("activedCh");
+                registrationHSP.removeComponent(content);
                 content = new HorizontalLayout();
                 content.addComponent(specTW);
-                content.addComponent(next2);
-                content.setComponentAlignment(next2, Alignment.MIDDLE_CENTER);
-                mainForm.addComponent(content);
+                content.addComponent(nextIdDocButton);
+                content.setComponentAlignment(nextIdDocButton, Alignment.MIDDLE_CENTER);
+                registrationHSP.addComponent(content);
             }
         });
 
-        form1 = createFormButton("documents", caption);
-        form1.addClickListener(new Button.ClickListener() {
+        idDocButton = createFormButton("identity.document", caption);
+        idDocButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM, educationFM, untCertificateFM,
                         grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
                 flag = 2;
-                form0.removeStyleName("actived");
-                form1.addStyleName("actived");
-                form2.removeStyleName("actived");
-                form3.removeStyleName("actived");
-                form4.removeStyleName("actived");
-                form5.removeStyleName("actived");
-                form6.removeStyleName("actived");
-                form7.removeStyleName("actived");
-                form01.removeStyleName("activedCh");
-                form02.removeStyleName("activedCh");
-                form11.addStyleName("activedCh");
-                form12.removeStyleName("activedCh");
-                form13.removeStyleName("activedCh");
-                form14.removeStyleName("activedCh");
-                form21.removeStyleName("activedCh");
-                form22.removeStyleName("activedCh");
-                form23.removeStyleName("activedCh");
-                form41.removeStyleName("activedCh");
-                form42.removeStyleName("activedCh");
-                form51.removeStyleName("activedCh");
-                form52.removeStyleName("activedCh");
-                form53.removeStyleName("activedCh");
-                form54.removeStyleName("activedCh");
+                mainDataButton.removeStyleName("actived");
+                idDocButton.addStyleName("actived");
+                eduDocButton.removeStyleName("actived");
+                medButton.removeStyleName("actived");
+                untButton.removeStyleName("actived");
+                motherButton.removeStyleName("actived");
+                contractButton.removeStyleName("actived");
+                moreButton.removeStyleName("actived");
+                specButton.removeStyleName("activedCh");
+                militaryButton.removeStyleName("activedCh");
+                disabilityButton.removeStyleName("activedCh");
+                repatriateButton.removeStyleName("activedCh");
+                educationDocsButton.removeStyleName("activedCh");
+                preemRightButton.removeStyleName("activedCh");
+                grantDocButton.removeStyleName("activedCh");
+                fatherButton.removeStyleName("activedCh");
+                factAddressButton.removeStyleName("activedCh");
+                regAddressButton.removeStyleName("activedCh");
                 content.removeAllComponents();
                 content.addComponent(passportFW);
-                content.addComponent(next3);
-                content.setComponentAlignment(next3, Alignment.MIDDLE_CENTER);
+                content.addComponent(nextMilitaryButton);
+                content.setComponentAlignment(nextMilitaryButton, Alignment.MIDDLE_CENTER);
             }
         });
 
-        form11 = createFormButton("identity.document", styleName);
-        form11.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(ClickEvent event) {
-                form1.click();
-            }
-        });
-
-        form12 = createFormButton("military.document", styleName);
-        form12.addClickListener(new Button.ClickListener() {
+        militaryButton = createFormButton("military.document", styleName);
+        militaryButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM, educationFM, untCertificateFM,
                         grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
                 flag = 22;
-                form0.removeStyleName("actived");
-                form1.addStyleName("actived");
-                form2.removeStyleName("actived");
-                form3.removeStyleName("actived");
-                form4.removeStyleName("actived");
-                form5.removeStyleName("actived");
-                form6.removeStyleName("actived");
-                form7.removeStyleName("actived");
-                form01.removeStyleName("activedCh");
-                form02.removeStyleName("activedCh");
-                form11.removeStyleName("activedCh");
-                form12.addStyleName("activedCh");
-                form13.removeStyleName("activedCh");
-                form14.removeStyleName("activedCh");
-                form21.removeStyleName("activedCh");
-                form22.removeStyleName("activedCh");
-                form23.removeStyleName("activedCh");
-                form41.removeStyleName("activedCh");
-                form42.removeStyleName("activedCh");
-                form51.removeStyleName("activedCh");
-                form52.removeStyleName("activedCh");
-                form53.removeStyleName("activedCh");
-                form54.removeStyleName("activedCh");
+                mainDataButton.removeStyleName("actived");
+                idDocButton.addStyleName("actived");
+                eduDocButton.removeStyleName("actived");
+                medButton.removeStyleName("actived");
+                untButton.removeStyleName("actived");
+                motherButton.removeStyleName("actived");
+                contractButton.removeStyleName("actived");
+                moreButton.removeStyleName("actived");
+                specButton.removeStyleName("activedCh");
+                militaryButton.addStyleName("activedCh");
+                disabilityButton.removeStyleName("activedCh");
+                repatriateButton.removeStyleName("activedCh");
+                educationDocsButton.removeStyleName("activedCh");
+                preemRightButton.removeStyleName("activedCh");
+                grantDocButton.removeStyleName("activedCh");
+                fatherButton.removeStyleName("activedCh");
+                factAddressButton.removeStyleName("activedCh");
+                regAddressButton.removeStyleName("activedCh");
                 content.removeAllComponents();
                 content.addComponent(militaryFW);
-                content.addComponent(next4);
-                content.setComponentAlignment(next4, Alignment.MIDDLE_CENTER);
+                content.addComponent(nextDisabilityButton);
+                content.setComponentAlignment(nextDisabilityButton, Alignment.MIDDLE_CENTER);
             }
         });
 
-        form13 = createFormButton("disability.document", styleName);
-        form13.addClickListener(new Button.ClickListener() {
+        disabilityButton = createFormButton("disability.document", styleName);
+        disabilityButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM, educationFM, untCertificateFM,
                         grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
                 flag = 23;
-                form0.removeStyleName("actived");
-                form1.addStyleName("actived");
-                form2.removeStyleName("actived");
-                form3.removeStyleName("actived");
-                form4.removeStyleName("actived");
-                form5.removeStyleName("actived");
-                form6.removeStyleName("actived");
-                form7.removeStyleName("actived");
-                form01.removeStyleName("activedCh");
-                form02.removeStyleName("activedCh");
-                form11.removeStyleName("activedCh");
-                form12.removeStyleName("activedCh");
-                form13.addStyleName("activedCh");
-                form14.removeStyleName("activedCh");
-                form21.removeStyleName("activedCh");
-                form22.removeStyleName("activedCh");
-                form23.removeStyleName("activedCh");
-                form41.removeStyleName("activedCh");
-                form42.removeStyleName("activedCh");
-                form51.removeStyleName("activedCh");
-                form52.removeStyleName("activedCh");
-                form53.removeStyleName("activedCh");
-                form54.removeStyleName("activedCh");
+                mainDataButton.removeStyleName("actived");
+                idDocButton.addStyleName("actived");
+                eduDocButton.removeStyleName("actived");
+                medButton.removeStyleName("actived");
+                untButton.removeStyleName("actived");
+                motherButton.removeStyleName("actived");
+                contractButton.removeStyleName("actived");
+                moreButton.removeStyleName("actived");
+                specButton.removeStyleName("activedCh");
+                militaryButton.removeStyleName("activedCh");
+                disabilityButton.addStyleName("activedCh");
+                repatriateButton.removeStyleName("activedCh");
+                educationDocsButton.removeStyleName("activedCh");
+                preemRightButton.removeStyleName("activedCh");
+                grantDocButton.removeStyleName("activedCh");
+                fatherButton.removeStyleName("activedCh");
+                factAddressButton.removeStyleName("activedCh");
+                regAddressButton.removeStyleName("activedCh");
                 content.removeAllComponents();
                 content.addComponent(disabilityFW);
-                content.addComponent(next5);
-                content.setComponentAlignment(next5, Alignment.MIDDLE_CENTER);
+                content.addComponent(nextRepatriateButton);
+                content.setComponentAlignment(nextRepatriateButton, Alignment.MIDDLE_CENTER);
             }
         });
 
-        form14 = createFormButton("repatriate.document", styleName);
-        form14.addClickListener(new Button.ClickListener() {
+        repatriateButton = createFormButton("repatriate.document", styleName);
+        repatriateButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM, educationFM, untCertificateFM,
                         grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
                 flag = 24;
-                form0.removeStyleName("actived");
-                form1.addStyleName("actived");
-                form2.removeStyleName("actived");
-                form3.removeStyleName("actived");
-                form4.removeStyleName("actived");
-                form5.removeStyleName("actived");
-                form6.removeStyleName("actived");
-                form7.removeStyleName("actived");
-                form01.removeStyleName("activedCh");
-                form02.removeStyleName("activedCh");
-                form11.removeStyleName("activedCh");
-                form12.removeStyleName("activedCh");
-                form13.removeStyleName("activedCh");
-                form14.addStyleName("activedCh");
-                form21.removeStyleName("activedCh");
-                form22.removeStyleName("activedCh");
-                form23.removeStyleName("activedCh");
-                form41.removeStyleName("activedCh");
-                form42.removeStyleName("activedCh");
-                form51.removeStyleName("activedCh");
-                form52.removeStyleName("activedCh");
-                form53.removeStyleName("activedCh");
-                form54.removeStyleName("activedCh");
+                mainDataButton.removeStyleName("actived");
+                idDocButton.addStyleName("actived");
+                eduDocButton.removeStyleName("actived");
+                medButton.removeStyleName("actived");
+                untButton.removeStyleName("actived");
+                motherButton.removeStyleName("actived");
+                contractButton.removeStyleName("actived");
+                moreButton.removeStyleName("actived");
+                specButton.removeStyleName("activedCh");
+                militaryButton.removeStyleName("activedCh");
+                disabilityButton.removeStyleName("activedCh");
+                repatriateButton.addStyleName("activedCh");
+                educationDocsButton.removeStyleName("activedCh");
+                preemRightButton.removeStyleName("activedCh");
+                grantDocButton.removeStyleName("activedCh");
+                fatherButton.removeStyleName("activedCh");
+                factAddressButton.removeStyleName("activedCh");
+                regAddressButton.removeStyleName("activedCh");
                 content.removeAllComponents();
                 content.addComponent(repatriateFW);
-                content.addComponent(next6);
-                content.setComponentAlignment(next6, Alignment.MIDDLE_CENTER);
+                content.addComponent(nextEduDocButton);
+                content.setComponentAlignment(nextEduDocButton, Alignment.MIDDLE_CENTER);
             }
         });
 
-        form2 = createFormButton("education", caption);
-        form2.addClickListener(new Button.ClickListener() {
+        eduDocButton = createFormButton("education.document", caption);
+        eduDocButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM, educationFM, untCertificateFM,
                         grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
                 flag = 3;
-                form0.removeStyleName("actived");
-                form1.removeStyleName("actived");
-                form2.addStyleName("actived");
-                form3.removeStyleName("actived");
-                form4.removeStyleName("actived");
-                form5.removeStyleName("actived");
-                form6.removeStyleName("actived");
-                form7.removeStyleName("actived");
-                form01.removeStyleName("activedCh");
-                form02.removeStyleName("activedCh");
-                form11.removeStyleName("activedCh");
-                form12.removeStyleName("activedCh");
-                form13.removeStyleName("activedCh");
-                form14.removeStyleName("activedCh");
-                form21.addStyleName("activedCh");
-                form22.removeStyleName("activedCh");
-                form23.removeStyleName("activedCh");
-                form41.removeStyleName("activedCh");
-                form42.removeStyleName("activedCh");
-                form51.removeStyleName("activedCh");
-                form52.removeStyleName("activedCh");
-                form53.removeStyleName("activedCh");
-                form54.removeStyleName("activedCh");
+                mainDataButton.removeStyleName("actived");
+                idDocButton.removeStyleName("actived");
+                eduDocButton.addStyleName("actived");
+                medButton.removeStyleName("actived");
+                untButton.removeStyleName("actived");
+                motherButton.removeStyleName("actived");
+                contractButton.removeStyleName("actived");
+                moreButton.removeStyleName("actived");
+                specButton.removeStyleName("activedCh");
+                militaryButton.removeStyleName("activedCh");
+                disabilityButton.removeStyleName("activedCh");
+                repatriateButton.removeStyleName("activedCh");
+                educationDocsButton.removeStyleName("activedCh");
+                preemRightButton.removeStyleName("activedCh");
+                grantDocButton.removeStyleName("activedCh");
+                fatherButton.removeStyleName("activedCh");
+                factAddressButton.removeStyleName("activedCh");
+                regAddressButton.removeStyleName("activedCh");
                 content.removeAllComponents();
                 content.addComponent(educDocFW);
-                content.addComponent(next7);
-                content.setComponentAlignment(next7, Alignment.MIDDLE_CENTER);
+                content.addComponent(nextEduDocsButton);
+                content.setComponentAlignment(nextEduDocsButton, Alignment.MIDDLE_CENTER);
             }
         });
 
-        form21 = createFormButton("education.document", styleName);
-        form21.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(ClickEvent event) {
-                form2.click();
-            }
-        });
-
-        form22 = createFormButton("education.documents", styleName);
-        form22.addClickListener(new Button.ClickListener() {
+        educationDocsButton = createFormButton("education.documents", styleName);
+        educationDocsButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM, educationFM, untCertificateFM,
                         grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
                 flag = 32;
-                form0.removeStyleName("actived");
-                form1.removeStyleName("actived");
-                form2.addStyleName("actived");
-                form3.removeStyleName("actived");
-                form4.removeStyleName("actived");
-                form5.removeStyleName("actived");
-                form6.removeStyleName("actived");
-                form7.removeStyleName("actived");
-                form01.removeStyleName("activedCh");
-                form02.removeStyleName("activedCh");
-                form11.removeStyleName("activedCh");
-                form12.removeStyleName("activedCh");
-                form13.removeStyleName("activedCh");
-                form14.removeStyleName("activedCh");
-                form21.removeStyleName("activedCh");
-                form22.addStyleName("activedCh");
-                form23.removeStyleName("activedCh");
-                form41.removeStyleName("activedCh");
-                form42.removeStyleName("activedCh");
-                form51.removeStyleName("activedCh");
-                form52.removeStyleName("activedCh");
-                form53.removeStyleName("activedCh");
-                form54.removeStyleName("activedCh");
+                mainDataButton.removeStyleName("actived");
+                idDocButton.removeStyleName("actived");
+                eduDocButton.addStyleName("actived");
+                medButton.removeStyleName("actived");
+                untButton.removeStyleName("actived");
+                motherButton.removeStyleName("actived");
+                contractButton.removeStyleName("actived");
+                moreButton.removeStyleName("actived");
+                specButton.removeStyleName("activedCh");
+                militaryButton.removeStyleName("activedCh");
+                disabilityButton.removeStyleName("activedCh");
+                repatriateButton.removeStyleName("activedCh");
+                educationDocsButton.addStyleName("activedCh");
+                preemRightButton.removeStyleName("activedCh");
+                grantDocButton.removeStyleName("activedCh");
+                fatherButton.removeStyleName("activedCh");
+                factAddressButton.removeStyleName("activedCh");
+                regAddressButton.removeStyleName("activedCh");
                 /*��������� �� �����������*/
                 documentsTW = new TableWidget(EDUCATION_DOC.class);
                 documentsTW.addEntityListener(ApplicantsForm.this);
@@ -1489,41 +1288,36 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
 
                 content.removeAllComponents();
                 content.addComponent(documentsTW);
-                content.addComponent(next8);
-                content.setComponentAlignment(next8, Alignment.MIDDLE_CENTER);
+                content.addComponent(nextPreemRightButton);
+                content.setComponentAlignment(nextPreemRightButton, Alignment.MIDDLE_CENTER);
             }
         });
 
-        form23 = createFormButton("preemptive.right", styleName);
-        form23.addClickListener(new Button.ClickListener() {
+        preemRightButton = createFormButton("preemptive.right", styleName);
+        preemRightButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM, educationFM, untCertificateFM,
                         grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
                 flag = 33;
-                form0.removeStyleName("actived");
-                form1.removeStyleName("actived");
-                form2.addStyleName("actived");
-                form3.removeStyleName("actived");
-                form4.removeStyleName("actived");
-                form5.removeStyleName("actived");
-                form6.removeStyleName("actived");
-                form7.removeStyleName("actived");
-                form01.removeStyleName("activedCh");
-                form02.removeStyleName("activedCh");
-                form11.removeStyleName("activedCh");
-                form12.removeStyleName("activedCh");
-                form13.removeStyleName("activedCh");
-                form14.removeStyleName("activedCh");
-                form21.removeStyleName("activedCh");
-                form22.removeStyleName("activedCh");
-                form23.addStyleName("activedCh");
-                form41.removeStyleName("activedCh");
-                form42.removeStyleName("activedCh");
-                form51.removeStyleName("activedCh");
-                form52.removeStyleName("activedCh");
-                form53.removeStyleName("activedCh");
-                form54.removeStyleName("activedCh");
+                mainDataButton.removeStyleName("actived");
+                idDocButton.removeStyleName("actived");
+                eduDocButton.addStyleName("actived");
+                medButton.removeStyleName("actived");
+                untButton.removeStyleName("actived");
+                motherButton.removeStyleName("actived");
+                contractButton.removeStyleName("actived");
+                moreButton.removeStyleName("actived");
+                specButton.removeStyleName("activedCh");
+                militaryButton.removeStyleName("activedCh");
+                disabilityButton.removeStyleName("activedCh");
+                repatriateButton.removeStyleName("activedCh");
+                educationDocsButton.removeStyleName("activedCh");
+                preemRightButton.addStyleName("activedCh");
+                grantDocButton.removeStyleName("activedCh");
+                fatherButton.removeStyleName("activedCh");
+                factAddressButton.removeStyleName("activedCh");
+                regAddressButton.removeStyleName("activedCh");
                 /*������ ������*/
                 ID userId1 = ID.valueOf(-1);
                 if (!dataFM.isCreateNew()) {
@@ -1545,41 +1339,36 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
 
                 content.removeAllComponents();
                 content.addComponent(preemLang);
-                content.addComponent(next9);
-                content.setComponentAlignment(next9, Alignment.MIDDLE_CENTER);
+                content.addComponent(nextMedButton);
+                content.setComponentAlignment(nextMedButton, Alignment.MIDDLE_CENTER);
             }
         });
 
-        form3 = createFormButton("medical.checkup", caption);
-        form3.addClickListener(new Button.ClickListener() {
+        medButton = createFormButton("medical.checkup", caption);
+        medButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM, educationFM, untCertificateFM,
                         grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
                 flag = 4;
-                form0.removeStyleName("actived");
-                form1.removeStyleName("actived");
-                form2.removeStyleName("actived");
-                form3.addStyleName("actived");
-                form4.removeStyleName("actived");
-                form5.removeStyleName("actived");
-                form6.removeStyleName("actived");
-                form7.removeStyleName("actived");
-                form01.removeStyleName("activedCh");
-                form02.removeStyleName("activedCh");
-                form11.removeStyleName("activedCh");
-                form12.removeStyleName("activedCh");
-                form13.removeStyleName("activedCh");
-                form14.removeStyleName("activedCh");
-                form21.removeStyleName("activedCh");
-                form22.removeStyleName("activedCh");
-                form23.removeStyleName("activedCh");
-                form41.removeStyleName("activedCh");
-                form42.removeStyleName("activedCh");
-                form51.removeStyleName("activedCh");
-                form52.removeStyleName("activedCh");
-                form53.removeStyleName("activedCh");
-                form54.removeStyleName("activedCh");
+                mainDataButton.removeStyleName("actived");
+                idDocButton.removeStyleName("actived");
+                eduDocButton.removeStyleName("actived");
+                medButton.addStyleName("actived");
+                untButton.removeStyleName("actived");
+                motherButton.removeStyleName("actived");
+                contractButton.removeStyleName("actived");
+                moreButton.removeStyleName("actived");
+                specButton.removeStyleName("activedCh");
+                militaryButton.removeStyleName("activedCh");
+                disabilityButton.removeStyleName("activedCh");
+                repatriateButton.removeStyleName("activedCh");
+                educationDocsButton.removeStyleName("activedCh");
+                preemRightButton.removeStyleName("activedCh");
+                grantDocButton.removeStyleName("activedCh");
+                fatherButton.removeStyleName("activedCh");
+                factAddressButton.removeStyleName("activedCh");
+                regAddressButton.removeStyleName("activedCh");
                 /*����������� �������*/
                 medicalCheckupTW = new TableWidget(V_MEDICAL_CHECKUP.class);
                 medicalCheckupTW.addEntityListener(ApplicantsForm.this);
@@ -1593,6 +1382,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                     try {
                         userId2 = dataFW.getWidgetModel().getEntity().getId();
                     } catch (Exception e) {
+                        e.printStackTrace();//TODO catch
                     }
                 }
                 medicalCheckupQM.addWhereAnd("user", ECriteria.EQUAL, userId2);
@@ -1600,45 +1390,39 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 FormModel medicalCheckupFM = medicalCheckupTM.getFormModel();
                 medicalCheckupFM.getFieldModel("allowWork").setInEdit(false);
                 medicalCheckupFM.getFieldModel("allowWork").setInView(false);
-                /*********************/
 
                 content.removeAllComponents();
                 content.addComponent(medicalCheckupTW);
-                content.addComponent(next10);
-                content.setComponentAlignment(next10, Alignment.MIDDLE_CENTER);
+                content.addComponent(nextUntButton);
+                content.setComponentAlignment(nextUntButton, Alignment.MIDDLE_CENTER);
             }
         });
 
-        form4 = createFormButton("unt", caption);
-        form4.addClickListener(new Button.ClickListener() {
+        untButton = createFormButton("unt", caption);
+        untButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM, educationFM, untCertificateFM,
                         grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
                 flag = 5;
-                form0.removeStyleName("actived");
-                form1.removeStyleName("actived");
-                form2.removeStyleName("actived");
-                form3.removeStyleName("actived");
-                form4.addStyleName("actived");
-                form5.removeStyleName("actived");
-                form6.removeStyleName("actived");
-                form7.removeStyleName("actived");
-                form01.removeStyleName("activedCh");
-                form02.removeStyleName("activedCh");
-                form11.removeStyleName("activedCh");
-                form12.removeStyleName("activedCh");
-                form13.removeStyleName("activedCh");
-                form14.removeStyleName("activedCh");
-                form21.removeStyleName("activedCh");
-                form22.removeStyleName("activedCh");
-                form23.removeStyleName("activedCh");
-                form41.addStyleName("activedCh");
-                form42.removeStyleName("activedCh");
-                form51.removeStyleName("activedCh");
-                form52.removeStyleName("activedCh");
-                form53.removeStyleName("activedCh");
-                form54.removeStyleName("activedCh");
+                mainDataButton.removeStyleName("actived");
+                idDocButton.removeStyleName("actived");
+                eduDocButton.removeStyleName("actived");
+                medButton.removeStyleName("actived");
+                untButton.addStyleName("actived");
+                motherButton.removeStyleName("actived");
+                contractButton.removeStyleName("actived");
+                moreButton.removeStyleName("actived");
+                specButton.removeStyleName("activedCh");
+                militaryButton.removeStyleName("activedCh");
+                disabilityButton.removeStyleName("activedCh");
+                repatriateButton.removeStyleName("activedCh");
+                educationDocsButton.removeStyleName("activedCh");
+                preemRightButton.removeStyleName("activedCh");
+                grantDocButton.removeStyleName("activedCh");
+                fatherButton.removeStyleName("activedCh");
+                factAddressButton.removeStyleName("activedCh");
+                regAddressButton.removeStyleName("activedCh");
 
      			/*������ �� ���*/
                 ID untCertificateId = ID.valueOf(-1);
@@ -1667,242 +1451,196 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
 
                 content.removeAllComponents();
                 content.addComponent(dataUNT);
-                content.addComponent(next11);
-                content.setComponentAlignment(next11, Alignment.MIDDLE_CENTER);
+                content.addComponent(nextGrantDocButton);
+                content.setComponentAlignment(nextGrantDocButton, Alignment.MIDDLE_CENTER);
             }
         });
 
-        form41 = createFormButton("unt.certificate", styleName);
-        form41.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(ClickEvent event) {
-                form4.click();
-            }
-        });
-
-        form42 = createFormButton("grant.document", styleName);
-        form42.addClickListener(new Button.ClickListener() {
+        grantDocButton = createFormButton("grant.document", styleName);
+        grantDocButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM, educationFM, untCertificateFM,
                         grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
                 flag = 52;
-                form0.removeStyleName("actived");
-                form1.removeStyleName("actived");
-                form2.removeStyleName("actived");
-                form3.removeStyleName("actived");
-                form4.addStyleName("actived");
-                form5.removeStyleName("actived");
-                form6.removeStyleName("actived");
-                form7.removeStyleName("actived");
-                form01.removeStyleName("activedCh");
-                form02.removeStyleName("activedCh");
-                form11.removeStyleName("activedCh");
-                form12.removeStyleName("activedCh");
-                form13.removeStyleName("activedCh");
-                form14.removeStyleName("activedCh");
-                form21.removeStyleName("activedCh");
-                form22.removeStyleName("activedCh");
-                form23.removeStyleName("activedCh");
-                form41.removeStyleName("activedCh");
-                form42.addStyleName("activedCh");
-                form51.removeStyleName("activedCh");
-                form52.removeStyleName("activedCh");
-                form53.removeStyleName("activedCh");
-                form54.removeStyleName("activedCh");
+                mainDataButton.removeStyleName("actived");
+                idDocButton.removeStyleName("actived");
+                eduDocButton.removeStyleName("actived");
+                medButton.removeStyleName("actived");
+                untButton.addStyleName("actived");
+                motherButton.removeStyleName("actived");
+                contractButton.removeStyleName("actived");
+                moreButton.removeStyleName("actived");
+                specButton.removeStyleName("activedCh");
+                militaryButton.removeStyleName("activedCh");
+                disabilityButton.removeStyleName("activedCh");
+                repatriateButton.removeStyleName("activedCh");
+                educationDocsButton.removeStyleName("activedCh");
+                preemRightButton.removeStyleName("activedCh");
+                grantDocButton.addStyleName("activedCh");
+                fatherButton.removeStyleName("activedCh");
+                factAddressButton.removeStyleName("activedCh");
+                regAddressButton.removeStyleName("activedCh");
                 content.removeAllComponents();
                 content.addComponent(grantFW);
-                content.addComponent(next12);
-                content.setComponentAlignment(next12, Alignment.MIDDLE_CENTER);
+                content.addComponent(nextMotherButton);
+                content.setComponentAlignment(nextMotherButton, Alignment.MIDDLE_CENTER);
             }
         });
 
-        form5 = createFormButton("parents.data", caption);
-        form5.addClickListener(new Button.ClickListener() {
+        motherButton = createFormButton("parents.data.mother", caption);
+        motherButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM, educationFM, untCertificateFM,
                         grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
                 flag = 6;
-                form0.removeStyleName("actived");
-                form1.removeStyleName("actived");
-                form2.removeStyleName("actived");
-                form3.removeStyleName("actived");
-                form4.removeStyleName("actived");
-                form5.addStyleName("actived");
-                form6.removeStyleName("actived");
-                form7.removeStyleName("actived");
-                form01.removeStyleName("activedCh");
-                form02.removeStyleName("activedCh");
-                form11.removeStyleName("activedCh");
-                form12.removeStyleName("activedCh");
-                form13.removeStyleName("activedCh");
-                form14.removeStyleName("activedCh");
-                form21.removeStyleName("activedCh");
-                form22.removeStyleName("activedCh");
-                form23.removeStyleName("activedCh");
-                form41.removeStyleName("activedCh");
-                form42.removeStyleName("activedCh");
-                form51.addStyleName("activedCh");
-                form52.removeStyleName("activedCh");
-                form53.removeStyleName("activedCh");
-                form54.removeStyleName("activedCh");
+                mainDataButton.removeStyleName("actived");
+                idDocButton.removeStyleName("actived");
+                eduDocButton.removeStyleName("actived");
+                medButton.removeStyleName("actived");
+                untButton.removeStyleName("actived");
+                motherButton.addStyleName("actived");
+                contractButton.removeStyleName("actived");
+                moreButton.removeStyleName("actived");
+                specButton.removeStyleName("activedCh");
+                militaryButton.removeStyleName("activedCh");
+                disabilityButton.removeStyleName("activedCh");
+                repatriateButton.removeStyleName("activedCh");
+                educationDocsButton.removeStyleName("activedCh");
+                preemRightButton.removeStyleName("activedCh");
+                grantDocButton.removeStyleName("activedCh");
+                fatherButton.removeStyleName("activedCh");
+                factAddressButton.removeStyleName("activedCh");
+                regAddressButton.removeStyleName("activedCh");
                 content.removeAllComponents();
                 content.addComponent(motherFW);
-                content.addComponent(next13);
-                content.setComponentAlignment(next13, Alignment.MIDDLE_CENTER);
+                content.addComponent(nextFatherButton);
+                content.setComponentAlignment(nextFatherButton, Alignment.MIDDLE_CENTER);
             }
         });
 
-        form51 = createFormButton("parents.data.mother", styleName);
-        form51.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(ClickEvent event) {
-                form5.click();
-            }
-        });
-
-        form52 = createFormButton("parents.data.father", styleName);
-        form52.addClickListener(new Button.ClickListener() {
+        fatherButton = createFormButton("parents.data.father", styleName);
+        fatherButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM, educationFM, untCertificateFM,
                         grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
                 flag = 62;
-                form0.removeStyleName("actived");
-                form1.removeStyleName("actived");
-                form2.removeStyleName("actived");
-                form3.removeStyleName("actived");
-                form4.removeStyleName("actived");
-                form5.addStyleName("actived");
-                form6.removeStyleName("actived");
-                form7.removeStyleName("actived");
-                form01.removeStyleName("activedCh");
-                form02.removeStyleName("activedCh");
-                form11.removeStyleName("activedCh");
-                form12.removeStyleName("activedCh");
-                form13.removeStyleName("activedCh");
-                form14.removeStyleName("activedCh");
-                form21.removeStyleName("activedCh");
-                form22.removeStyleName("activedCh");
-                form23.removeStyleName("activedCh");
-                form41.removeStyleName("activedCh");
-                form42.removeStyleName("activedCh");
-                form51.removeStyleName("activedCh");
-                form52.addStyleName("activedCh");
-                form53.removeStyleName("activedCh");
-                form54.removeStyleName("activedCh");
+                mainDataButton.removeStyleName("actived");
+                idDocButton.removeStyleName("actived");
+                eduDocButton.removeStyleName("actived");
+                medButton.removeStyleName("actived");
+                untButton.removeStyleName("actived");
+                motherButton.addStyleName("actived");
+                contractButton.removeStyleName("actived");
+                moreButton.removeStyleName("actived");
+                specButton.removeStyleName("activedCh");
+                militaryButton.removeStyleName("activedCh");
+                disabilityButton.removeStyleName("activedCh");
+                repatriateButton.removeStyleName("activedCh");
+                educationDocsButton.removeStyleName("activedCh");
+                preemRightButton.removeStyleName("activedCh");
+                grantDocButton.removeStyleName("activedCh");
+                fatherButton.addStyleName("activedCh");
+                factAddressButton.removeStyleName("activedCh");
+                regAddressButton.removeStyleName("activedCh");
                 content.removeAllComponents();
                 content.addComponent(fatherFW);
-                content.addComponent(next14);
-                content.setComponentAlignment(next14, Alignment.MIDDLE_CENTER);
+                content.addComponent(nextFactAddressButton);
+                content.setComponentAlignment(nextFactAddressButton, Alignment.MIDDLE_CENTER);
             }
         });
 
-        form53 = createFormButton("address.residential", styleName);
-        form53.addClickListener(new Button.ClickListener() {
+        factAddressButton = createFormButton("address.residential", styleName);
+        factAddressButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM, educationFM, untCertificateFM,
                         grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
                 flag = 63;
-                form0.removeStyleName("actived");
-                form1.removeStyleName("actived");
-                form2.removeStyleName("actived");
-                form3.removeStyleName("actived");
-                form4.removeStyleName("actived");
-                form5.addStyleName("actived");
-                form6.removeStyleName("actived");
-                form7.removeStyleName("actived");
-                form01.removeStyleName("activedCh");
-                form02.removeStyleName("activedCh");
-                form11.removeStyleName("activedCh");
-                form12.removeStyleName("activedCh");
-                form13.removeStyleName("activedCh");
-                form14.removeStyleName("activedCh");
-                form21.removeStyleName("activedCh");
-                form22.removeStyleName("activedCh");
-                form23.removeStyleName("activedCh");
-                form41.removeStyleName("activedCh");
-                form42.removeStyleName("activedCh");
-                form51.removeStyleName("activedCh");
-                form52.removeStyleName("activedCh");
-                form53.addStyleName("activedCh");
-                form54.removeStyleName("activedCh");
+                mainDataButton.removeStyleName("actived");
+                idDocButton.removeStyleName("actived");
+                eduDocButton.removeStyleName("actived");
+                medButton.removeStyleName("actived");
+                untButton.removeStyleName("actived");
+                motherButton.addStyleName("actived");
+                contractButton.removeStyleName("actived");
+                moreButton.removeStyleName("actived");
+                specButton.removeStyleName("activedCh");
+                militaryButton.removeStyleName("activedCh");
+                disabilityButton.removeStyleName("activedCh");
+                repatriateButton.removeStyleName("activedCh");
+                educationDocsButton.removeStyleName("activedCh");
+                preemRightButton.removeStyleName("activedCh");
+                grantDocButton.removeStyleName("activedCh");
+                fatherButton.removeStyleName("activedCh");
+                factAddressButton.addStyleName("activedCh");
+                regAddressButton.removeStyleName("activedCh");
                 content.removeAllComponents();
                 content.addComponent(addressFactFW);
-                content.addComponent(next15);
-                content.setComponentAlignment(next15, Alignment.MIDDLE_CENTER);
+                content.addComponent(nextRegAddressButton);
+                content.setComponentAlignment(nextRegAddressButton, Alignment.MIDDLE_CENTER);
             }
         });
 
-        form54 = createFormButton("address.registration", styleName);
-        form54.addClickListener(new Button.ClickListener() {
+        regAddressButton = createFormButton("address.registration", styleName);
+        regAddressButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM, educationFM, untCertificateFM,
                         grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
                 flag = 64;
-                form0.removeStyleName("actived");
-                form1.removeStyleName("actived");
-                form2.removeStyleName("actived");
-                form3.removeStyleName("actived");
-                form4.removeStyleName("actived");
-                form5.addStyleName("actived");
-                form6.removeStyleName("actived");
-                form7.removeStyleName("actived");
-                form01.removeStyleName("activedCh");
-                form02.removeStyleName("activedCh");
-                form11.removeStyleName("activedCh");
-                form12.removeStyleName("activedCh");
-                form13.removeStyleName("activedCh");
-                form14.removeStyleName("activedCh");
-                form21.removeStyleName("activedCh");
-                form22.removeStyleName("activedCh");
-                form23.removeStyleName("activedCh");
-                form41.removeStyleName("activedCh");
-                form42.removeStyleName("activedCh");
-                form51.removeStyleName("activedCh");
-                form52.removeStyleName("activedCh");
-                form53.removeStyleName("activedCh");
-                form54.addStyleName("activedCh");
+                mainDataButton.removeStyleName("actived");
+                idDocButton.removeStyleName("actived");
+                eduDocButton.removeStyleName("actived");
+                medButton.removeStyleName("actived");
+                untButton.removeStyleName("actived");
+                motherButton.addStyleName("actived");
+                contractButton.removeStyleName("actived");
+                moreButton.removeStyleName("actived");
+                specButton.removeStyleName("activedCh");
+                militaryButton.removeStyleName("activedCh");
+                disabilityButton.removeStyleName("activedCh");
+                repatriateButton.removeStyleName("activedCh");
+                educationDocsButton.removeStyleName("activedCh");
+                preemRightButton.removeStyleName("activedCh");
+                grantDocButton.removeStyleName("activedCh");
+                fatherButton.removeStyleName("activedCh");
+                factAddressButton.removeStyleName("activedCh");
+                regAddressButton.addStyleName("activedCh");
                 content.removeAllComponents();
                 content.addComponent(addressRegFW);
-                content.addComponent(next16);
-                content.setComponentAlignment(next16, Alignment.MIDDLE_CENTER);
+                content.addComponent(nextMoreButton);
+                content.setComponentAlignment(nextMoreButton, Alignment.MIDDLE_CENTER);
             }
         });
 
-        form6 = createFormButton("contract.data", caption);
-        form6.addClickListener(new Button.ClickListener() {
+        contractButton = createFormButton("contract.data", caption);
+        contractButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM, educationFM, untCertificateFM,
                         grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
                 flag = 7;
-                form0.removeStyleName("actived");
-                form1.removeStyleName("actived");
-                form2.removeStyleName("actived");
-                form3.removeStyleName("actived");
-                form4.removeStyleName("actived");
-                form5.removeStyleName("actived");
-                form6.addStyleName("actived");
-                form7.removeStyleName("actived");
-                form01.removeStyleName("activedCh");
-                form02.removeStyleName("activedCh");
-                form11.removeStyleName("activedCh");
-                form12.removeStyleName("activedCh");
-                form13.removeStyleName("activedCh");
-                form14.removeStyleName("activedCh");
-                form21.removeStyleName("activedCh");
-                form22.removeStyleName("activedCh");
-                form23.removeStyleName("activedCh");
-                form41.removeStyleName("activedCh");
-                form42.removeStyleName("activedCh");
-                form51.removeStyleName("activedCh");
-                form52.removeStyleName("activedCh");
-                form53.removeStyleName("activedCh");
-                form54.removeStyleName("activedCh");
+                mainDataButton.removeStyleName("actived");
+                idDocButton.removeStyleName("actived");
+                eduDocButton.removeStyleName("actived");
+                medButton.removeStyleName("actived");
+                untButton.removeStyleName("actived");
+                motherButton.removeStyleName("actived");
+                contractButton.addStyleName("actived");
+                moreButton.removeStyleName("actived");
+                specButton.removeStyleName("activedCh");
+                militaryButton.removeStyleName("activedCh");
+                disabilityButton.removeStyleName("activedCh");
+                repatriateButton.removeStyleName("activedCh");
+                educationDocsButton.removeStyleName("activedCh");
+                preemRightButton.removeStyleName("activedCh");
+                grantDocButton.removeStyleName("activedCh");
+                fatherButton.removeStyleName("activedCh");
+                factAddressButton.removeStyleName("activedCh");
+                regAddressButton.removeStyleName("activedCh");
                 content.removeAllComponents();
                 content.addComponent(dataContractFW);
                 content.addComponent(next17);
@@ -1910,36 +1648,31 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             }
         });
 
-        form7 = createFormButton("inform.more", caption);
-        form7.addClickListener(new Button.ClickListener() {
+        moreButton = createFormButton("inform.more", caption);
+        moreButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM, educationFM, untCertificateFM,
                         grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
                 flag = 8;
-                form0.removeStyleName("actived");
-                form1.removeStyleName("actived");
-                form2.removeStyleName("actived");
-                form3.removeStyleName("actived");
-                form4.removeStyleName("actived");
-                form5.removeStyleName("actived");
-                form6.removeStyleName("actived");
-                form7.addStyleName("actived");
-                form01.removeStyleName("activedCh");
-                form02.removeStyleName("activedCh");
-                form11.removeStyleName("activedCh");
-                form12.removeStyleName("activedCh");
-                form13.removeStyleName("activedCh");
-                form14.removeStyleName("activedCh");
-                form21.removeStyleName("activedCh");
-                form22.removeStyleName("activedCh");
-                form23.removeStyleName("activedCh");
-                form41.removeStyleName("activedCh");
-                form42.removeStyleName("activedCh");
-                form51.removeStyleName("activedCh");
-                form52.removeStyleName("activedCh");
-                form53.removeStyleName("activedCh");
-                form54.removeStyleName("activedCh");
+                mainDataButton.removeStyleName("actived");
+                idDocButton.removeStyleName("actived");
+                eduDocButton.removeStyleName("actived");
+                medButton.removeStyleName("actived");
+                untButton.removeStyleName("actived");
+                motherButton.removeStyleName("actived");
+                contractButton.removeStyleName("actived");
+                moreButton.addStyleName("actived");
+                specButton.removeStyleName("activedCh");
+                militaryButton.removeStyleName("activedCh");
+                disabilityButton.removeStyleName("activedCh");
+                repatriateButton.removeStyleName("activedCh");
+                educationDocsButton.removeStyleName("activedCh");
+                preemRightButton.removeStyleName("activedCh");
+                grantDocButton.removeStyleName("activedCh");
+                fatherButton.removeStyleName("activedCh");
+                factAddressButton.removeStyleName("activedCh");
+                regAddressButton.removeStyleName("activedCh");
                  /*�������*/
                 awardsTW = new TableWidget(V_USER_AWARD.class);
                 awardsTW.addEntityListener(ApplicantsForm.this);
@@ -1978,15 +1711,15 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
 
                 content.removeAllComponents();
                 content.addComponent(dopData);
-                content.addComponent(next18);
-                content.setComponentAlignment(next18, Alignment.MIDDLE_CENTER);
+                content.addComponent(nextFinishButton);
+                content.setComponentAlignment(nextFinishButton, Alignment.MIDDLE_CENTER);
             }
         });
 
-        formExit = new Button();
-        formExit.setCaption(getUILocaleUtil().getCaption("exit"));
-        formExit.setWidth("230px");
-        formExit.addClickListener(new Button.ClickListener() {
+        finishButton = new Button();
+        finishButton.setCaption(getUILocaleUtil().getCaption("exit"));
+        finishButton.setWidth("230px");
+        finishButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM,
@@ -1998,30 +1731,25 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 else if (!saveUNT) Message.showInfo(getUILocaleUtil().getMessage("info.save.unt"));
                 else {
                     String codeApp;
-                    form0.setEnabled(false);
-                    form1.setEnabled(false);
-                    form2.setEnabled(false);
-                    form3.setEnabled(false);
-                    form4.setEnabled(false);
-                    form5.setEnabled(false);
-                    form6.setEnabled(false);
-                    form7.setEnabled(false);
-                    form01.setEnabled(false);
-                    form02.setEnabled(false);
-                    form11.setEnabled(false);
-                    form12.setEnabled(false);
-                    form13.setEnabled(false);
-                    form14.setEnabled(false);
-                    form21.setEnabled(false);
-                    form22.setEnabled(false);
-                    form23.setEnabled(false);
-                    form41.setEnabled(false);
-                    form42.setEnabled(false);
-                    form51.setEnabled(false);
-                    form52.setEnabled(false);
-                    form53.setEnabled(false);
-                    form54.setEnabled(false);
-                    formExit.setEnabled(false);
+                    mainDataButton.setEnabled(false);
+                    idDocButton.setEnabled(false);
+                    eduDocButton.setEnabled(false);
+                    medButton.setEnabled(false);
+                    untButton.setEnabled(false);
+                    motherButton.setEnabled(false);
+                    contractButton.setEnabled(false);
+                    moreButton.setEnabled(false);
+                    specButton.setEnabled(false);
+                    militaryButton.setEnabled(false);
+                    disabilityButton.setEnabled(false);
+                    repatriateButton.setEnabled(false);
+                    educationDocsButton.setEnabled(false);
+                    preemRightButton.setEnabled(false);
+                    grantDocButton.setEnabled(false);
+                    fatherButton.setEnabled(false);
+                    factAddressButton.setEnabled(false);
+                    regAddressButton.setEnabled(false);
+                    finishButton.setEnabled(false);
                     codeApp = (String) dataFM.getFieldModel("code").getValue();
                     Label mess = new Label("<br><br><br><center><strong>�� ������� ������ ����������� �� ������� ����!!!</strong><br>"
                             + "\n<i>��������� ���� ���������� ��� �����������:</i><br>" + codeApp + "</center>");
@@ -2029,12 +1757,12 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                     messForm = new VerticalLayout();
                     messForm.addComponent(mess);
 
-                    mainForm.removeAllComponents();
+                    registrationHSP.removeAllComponents();
                     content.removeAllComponents();
                     content.addComponent(messForm);
                     content.setComponentAlignment(messForm, Alignment.BOTTOM_CENTER);
-                    mainForm.addComponent(buttonForm);
-                    mainForm.addComponent(content);
+                    registrationHSP.addComponent(buttonForm);
+                    registrationHSP.addComponent(content);
                 }
             }
         });
@@ -2177,38 +1905,41 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
     }
 
     private void addFormButtons() {
-        buttonForm.addComponent(form0);
-        buttonForm.addComponent(form01);
-        buttonForm.addComponent(form02);
-        buttonForm.addComponent(form1);
-        buttonForm.addComponent(form11);
-        buttonForm.addComponent(form12);
-        buttonForm.addComponent(form13);
-        buttonForm.addComponent(form14);
-        buttonForm.addComponent(form2);
-        buttonForm.addComponent(form21);
-        buttonForm.addComponent(form22);
-        buttonForm.addComponent(form23);
-        buttonForm.addComponent(form3);
-        buttonForm.addComponent(form4);
-        buttonForm.addComponent(form41);
-        buttonForm.addComponent(form42);
-        buttonForm.addComponent(form5);
-        buttonForm.addComponent(form51);
-        buttonForm.addComponent(form52);
-        buttonForm.addComponent(form53);
-        buttonForm.addComponent(form54);
-//		buttonForm.addComponent(form6);
-        buttonForm.addComponent(form7);
-        buttonForm.addComponent(formExit);
+        buttonForm.addComponent(mainDataButton);
+        buttonForm.addComponent(factAddressButton);
+        buttonForm.addComponent(regAddressButton);
+        buttonForm.addComponent(specButton);
+        buttonForm.addComponent(idDocButton);
+        buttonForm.addComponent(militaryButton);
+        buttonForm.addComponent(disabilityButton);
+        buttonForm.addComponent(repatriateButton);
+        buttonForm.addComponent(eduDocButton);
+        buttonForm.addComponent(educationDocsButton);
+        buttonForm.addComponent(preemRightButton);
+        buttonForm.addComponent(medButton);
+        buttonForm.addComponent(untButton);
+        buttonForm.addComponent(grantDocButton);
+        buttonForm.addComponent(motherButton);
+        buttonForm.addComponent(fatherButton);
+        buttonForm.addComponent(contractButton);//TODO comment if doesnt' work
+        buttonForm.addComponent(moreButton);
+        buttonForm.addComponent(finishButton);
         buttonForm.setSpacing(false);
-        mainForm.addComponent(buttonForm);
+        registrationHSP.addComponent(buttonForm);
     }
 
-    private Button createNextButton(String caption, String styleName) {
+    private Button createNextButton(Button clickButton, String caption) {
+        String styleName = "nextStyle";
         Button temp = new Button();
         temp.setCaption(getUILocaleUtil().getCaption(caption));
         temp.setStyleName(styleName);
+        temp.addClickListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(ClickEvent event) {
+                clickButton.click();
+            }
+        });
         return temp;
     }
 
@@ -3389,8 +3120,8 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
                 return false;
             }
-			/*int count = specTW.getEntityCount();
-			if (count < 4) {
+            /*int count = specTW.getEntityCount();
+            if (count < 4) {
 				Message.showInfo(getUILocaleUtil().getMessage("need.to.select.4.universities"));
 				return false;
 			}*/
