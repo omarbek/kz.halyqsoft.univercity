@@ -1,7 +1,5 @@
 package kz.halyqsoft.univercity.modules.regapplicants;
 
-import com.vaadin.data.Property;
-import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.data.validator.IntegerRangeValidator;
@@ -14,6 +12,7 @@ import com.vaadin.ui.Table.Align;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.*;
+import kz.halyqsoft.univercity.modules.regapplicants.changelisteners.*;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.facade.CommonIDFacadeBean;
@@ -61,9 +60,11 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
     private GridFormWidget passportFW, militaryFW, disabilityFW, repatriateFW, grantFW, preemptiveRightFW;
     private GridFormWidget certificateFW, addressRegFW, addressFactFW, fatherFW, motherFW, dataContractFW, educDocFW;
     private int flag;
-    private Button form0, form1, form2, form3, form4, form5, form6, form7, form01, form02;
-    private Button form11, form12, form13, form14, form21, form22, form23, form41, form42, form51, form52, form53, form54, formExit;
-    private Button next1, next2, next3, next4, next5, next6, next7, next8, next9, next10, next11, next12, next13, next14, next15, next16, next17, next18;
+    private Button form0, form01, form02, form1, form2, form3, form4, form5, form6, form7;
+    private Button form11, form12, form13, form14, form21, form22, form23, form41, form42;
+    private Button form51, form52, form53, form54, formExit;
+    private Button next1, next2, next3, next4, next5, next6, next7, next8, next9, next10;
+    private Button next11, next12, next13, next14, next15, next16, next17, next18;
     private boolean saveData, savePass, saveEduc, saveUNT;
     private VerticalLayout messForm;
     private FromItem educationUDFI;
@@ -71,15 +72,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
 //    private List<T_STUDENT> delStudentList = new ArrayList<T_STUDENT>();
     private STUDENT student;
 
-    public STUDENT getStudent() {
-        return student;
-    }
-
-    public void setStudent(STUDENT student) {
-        this.student = student;
-    }
-
-    public ApplicantsForm(final FormModel dataFM) throws Exception {
+    ApplicantsForm(final FormModel dataFM) throws Exception {
 
         super();
         setBackButtonVisible(false);
@@ -165,6 +158,56 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         udfQM.addSelect("fileName");
         udfQM.addWhere("userDocument", ECriteria.EQUAL, null);
         udfQM.addWhereAnd("deleted", Boolean.FALSE);
+
+        final FormModel preemptiveRightFM = createPreemptiveRight(udfQM);
+
+		/*��������, �������������� ��������*/
+        final FormModel userPassportFM = createIdentityDoc(udfQM);
+
+		/*�������� ����*/
+        final FormModel militaryDocFM = createMilitaryDoc(udfQM);
+
+		/*���������� ��� �� ������������*/
+        final FormModel disabilityDocFM = createDisability(udfQM);
+
+		/*�������� ��������*/
+        final FormModel repatriateDocFM = createRepatriate(udfQM);
+
+		/*�������� � ������*/
+        final FormModel grantDocFM = createGrant(udfQM);
+
+		/*���������� ���*/
+        final FormModel untCertificateFM = createUnt(udfQM);
+
+		/*����� �����������*/
+        final FormModel addressRegFM = createAddressReg();
+
+		/*����� ����������*/
+        final FormModel addressFactFM = createAddressRes();
+
+		/*������ ����*/
+        final FormModel fatherFM = createFatherData();
+
+		/*������ ������*/
+        final FormModel motherFM = createMotherData();
+
+		/*������ �� ���������*/
+        final FormModel dataContractFM = createContractData(udfQM);
+
+		/*�������� ����������� (���� �� 1 ���������� ��� ����������)*/
+        final FormModel educationFM = createEducationDoc(udfQM);
+
+        createNextButtons();
+
+        final Button form = createFormButtons(dataFM, preemptiveRightFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, grantDocFM, untCertificateFM, addressRegFM, addressFactFM, fatherFM, motherFM, dataContractFM, educationFM);
+
+        addFormButtons();
+
+//        form.click();
+        getContent().addComponent(mainForm);
+    }
+
+    private FormModel createPreemptiveRight(QueryModel<USER_DOCUMENT_FILE> udfQM) throws Exception {
         StringBuilder sb = new StringBuilder();
         sb.append(getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
@@ -207,9 +250,11 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 preemptiveRightFM.createNew();
             }
         }
-        /***********************************/
+        /***********************************/return preemptiveRightFM;
+    }
 
-		/*��������, �������������� ��������*/
+    private FormModel createIdentityDoc(QueryModel<USER_DOCUMENT_FILE> udfQM) throws Exception {
+        StringBuilder sb;
         sb = new StringBuilder();
         sb.append(getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
@@ -271,9 +316,11 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
             }
         }
         birthCountryFieldModel.getListeners().add(new BirthCountryChangeListener(birthRegionFieldModel, birthRegion));
-        /***********************************/
+        /***********************************/return userPassportFM;
+    }
 
-		/*�������� ����*/
+    private FormModel createMilitaryDoc(QueryModel<USER_DOCUMENT_FILE> udfQM) throws Exception {
+        StringBuilder sb;
         sb = new StringBuilder();
         sb.append(getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
@@ -316,9 +363,11 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 militaryDocFM.createNew();
             }
         }
-        /***********************************************************************************/
+        /***********************************************************************************/return militaryDocFM;
+    }
 
-		/*���������� ��� �� ������������*/
+    private FormModel createDisability(QueryModel<USER_DOCUMENT_FILE> udfQM) throws Exception {
+        StringBuilder sb;
         sb = new StringBuilder();
         sb.append(getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
@@ -361,9 +410,11 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 disabilityDocFM.createNew();
             }
         }
-        /*****************************************************************/
+        /*****************************************************************/return disabilityDocFM;
+    }
 
-		/*�������� ��������*/
+    private FormModel createRepatriate(QueryModel<USER_DOCUMENT_FILE> udfQM) throws Exception {
+        StringBuilder sb;
         sb = new StringBuilder();
         sb.append(getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
@@ -405,9 +456,11 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 repatriateDocFM.createNew();
             }
         }
-        /******************************************************************/
+        /******************************************************************/return repatriateDocFM;
+    }
 
-		/*�������� � ������*/
+    private FormModel createGrant(QueryModel<USER_DOCUMENT_FILE> udfQM) throws Exception {
+        StringBuilder sb;
         sb = new StringBuilder();
         sb.append(getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
@@ -449,9 +502,11 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 grantDocFM.createNew();
             }
         }
-        /*********************/
+        /*********************/return grantDocFM;
+    }
 
-		/*���������� ���*/
+    private FormModel createUnt(QueryModel<USER_DOCUMENT_FILE> udfQM) throws Exception {
+        StringBuilder sb;
         sb = new StringBuilder();
         sb.append(getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
@@ -497,9 +552,11 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 untCertificateFM.createNew();
             }
         }
-        /*******************/
+        /*******************/return untCertificateFM;
+    }
 
-		/*����� �����������*/
+    private FormModel createAddressReg() throws Exception {
+        StringBuilder sb;
         sb = new StringBuilder();
         sb.append(getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
@@ -553,9 +610,11 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         countryRegFM.getListeners().add(new CountryChangeListener(regionReg, regionRegFM));
         regionRegFM.getListeners().add(new RegionChangeListener(cityReg, cityRegFM));
         cityRegFM.getListeners().add(new CityChangeListener(villageReg, villageRegFM));
-        /******************************************************************************/
+        /******************************************************************************/return addressRegFM;
+    }
 
-		/*����� ����������*/
+    private FormModel createAddressRes() throws Exception {
+        StringBuilder sb;
         sb = new StringBuilder();
         sb.append(getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
@@ -611,9 +670,11 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         countryFactFM.getListeners().add(new CountryChangeListener(regionFact, regionFactFM));
         regionFactFM.getListeners().add(new RegionChangeListener(cityFact, cityFactFM));
         cityFactFM.getListeners().add(new CityChangeListener(villageFact, villageFactFM));
-        /**********************************************************************************/
+        /**********************************************************************************/return addressFactFM;
+    }
 
-		/*������ ����*/
+    private FormModel createFatherData() throws Exception {
+        StringBuilder sb;
         sb = new StringBuilder();
         sb.append(getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
@@ -681,9 +742,11 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         countryFatherFM.getListeners().add(new CountryChangeListener(regionFather, regionFatherFM));
         regionFatherFM.getListeners().add(new RegionChangeListener(cityFather, cityFatherFM));
         cityFatherFM.getListeners().add(new CityChangeListener(villageFather, villageFatherFM));
-        /*****************************************************************************************/
+        /*****************************************************************************************/return fatherFM;
+    }
 
-		/*������ ������*/
+    private FormModel createMotherData() throws Exception {
+        StringBuilder sb;
         sb = new StringBuilder();
         sb.append(getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
@@ -740,9 +803,11 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         countryMotherFM.getListeners().add(new CountryChangeListener(regionMother, regionMotherFM));
         regionMotherFM.getListeners().add(new RegionChangeListener(cityMother, cityMotherFM));
         cityMotherFM.getListeners().add(new CityChangeListener(villageMother, villageMotherFM));
-        /****************************************************************************************/
+        /****************************************************************************************/return motherFM;
+    }
 
-		/*������ �� ���������*/
+    private FormModel createContractData(QueryModel<USER_DOCUMENT_FILE> udfQM) throws Exception {
+        StringBuilder sb;
         sb = new StringBuilder();
         sb.append(getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
@@ -784,9 +849,11 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 dataContractFM.createNew();
             }
         }
-        /*********************/
+        /*********************/return dataContractFM;
+    }
 
-		/*�������� ����������� (���� �� 1 ���������� ��� ����������)*/
+    private FormModel createEducationDoc(QueryModel<USER_DOCUMENT_FILE> udfQM) throws Exception {
+        StringBuilder sb;
         sb = new StringBuilder();
         sb.append(getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
@@ -819,7 +886,6 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
 
         FileListFieldModel educationFLFM = (FileListFieldModel) educationFM.getFieldModel("fileList");
         educationFLFM.permitMimeType(FileListFieldModel.JPEG);
-
         educationFLFM.getFileList().clear();
         educationFLFM.getDeleteList().clear();
         if (dataFW.getWidgetModel().isCreateNew()) {
@@ -848,6 +914,10 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 educationFM.createNew();
             }
         }
+        return educationFM;
+    }
+
+    private void createNextButtons() {
         /****************************************************************************************/
         //two variables for time locality
         String caption = "next", styleName = "nextStyle";
@@ -1012,11 +1082,11 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 formExit.click();
             }
         });
+    }
 
-		/*������ ��������� ����� �������*/
-        //two variables are overridden
-        caption = "buttonMain";
-        styleName = "buttonChild";
+    private Button createFormButtons(FormModel dataFM, FormModel preemptiveRightFM, FormModel userPassportFM, FormModel militaryDocFM, FormModel disabilityDocFM, FormModel repatriateDocFM, FormModel grantDocFM, FormModel untCertificateFM, FormModel addressRegFM, FormModel addressFactFM, FormModel fatherFM, FormModel motherFM, FormModel dataContractFM, FormModel educationFM) {
+        String caption = "buttonMain";
+        String styleName = "buttonChild";
 
         final Button form = createFormButton("regapplicant.main.data", caption);
         form.addClickListener(new Button.ClickListener() {
@@ -1040,6 +1110,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                     try {
                         studentId1 = dataFM.getEntity().getId();
                     } catch (Exception ex) {
+                        ex.printStackTrace();//TODO catch
                     }
                 }
                 entrantSpecialityQM.addWhere("student", ECriteria.EQUAL, studentId1);
@@ -1389,7 +1460,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 form52.removeStyleName("activedCh");
                 form53.removeStyleName("activedCh");
                 form54.removeStyleName("activedCh");
-				/*��������� �� �����������*/
+                /*��������� �� �����������*/
                 documentsTW = new TableWidget(EDUCATION_DOC.class);
                 documentsTW.addEntityListener(ApplicantsForm.this);
                 documentsTW.setWidth("667px");
@@ -1454,7 +1525,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 form52.removeStyleName("activedCh");
                 form53.removeStyleName("activedCh");
                 form54.removeStyleName("activedCh");
-				/*������ ������*/
+                /*������ ������*/
                 ID userId1 = ID.valueOf(-1);
                 if (!dataFM.isCreateNew()) {
                     try {
@@ -1510,7 +1581,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 form52.removeStyleName("activedCh");
                 form53.removeStyleName("activedCh");
                 form54.removeStyleName("activedCh");
-				/*����������� �������*/
+                /*����������� �������*/
                 medicalCheckupTW = new TableWidget(V_MEDICAL_CHECKUP.class);
                 medicalCheckupTW.addEntityListener(ApplicantsForm.this);
                 medicalCheckupTW.setWidth("667px");
@@ -1870,7 +1941,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 form52.removeStyleName("activedCh");
                 form53.removeStyleName("activedCh");
                 form54.removeStyleName("activedCh");
-         		/*�������*/
+                 /*�������*/
                 awardsTW = new TableWidget(V_USER_AWARD.class);
                 awardsTW.addEntityListener(ApplicantsForm.this);
                 awardsTW.setWidth("667px");
@@ -1968,16 +2039,12 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 }
             }
         });
-
-        addFormButtons();
-
-        form.click();
-        getContent().addComponent(mainForm);
+        return form;
     }
 
-    protected void flagSave(int flag, FormModel dataFM, FormModel userPassportFM, FormModel militaryDocFM, FormModel disabilityDocFM,
-                            FormModel repatriateDocFM, FormModel preemptiveRightFM, FormModel educationFM, FormModel untCertificateFM, FormModel grantDocFM,
-                            FormModel addressFactFM, FormModel addressRegFM, FormModel motherFM, FormModel fatherFM, FormModel dataContractFM) {
+    private void flagSave(int flag, FormModel dataFM, FormModel userPassportFM, FormModel militaryDocFM, FormModel disabilityDocFM,
+                          FormModel repatriateDocFM, FormModel preemptiveRightFM, FormModel educationFM, FormModel untCertificateFM, FormModel grantDocFM,
+                          FormModel addressFactFM, FormModel addressRegFM, FormModel motherFM, FormModel fatherFM, FormModel dataContractFM) {
 
         switch (flag) {
             case 1:
@@ -2042,8 +2109,6 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
             default:
                 break;
         }
-
-
 //		if (flag == 1) {
 //			if (dataFM.isModified()) {
 //				if (dataFW.save() == true) {
@@ -2112,28 +2177,6 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
 //		}
     }
 
-    @Override
-    protected AbstractCommonView getParentView() {
-        return null;//TODO
-//        return new ApplicantsList();
-    }
-
-    @Override
-    public String getViewName() {
-        return "applicantsForm";
-    }
-
-    @Override
-    protected String getViewTitle(Locale locale) {
-        return getUILocaleUtil().getCaption("regapplicant");
-    }
-
-    @Override
-    public void initView(boolean readOnly) throws Exception {
-        super.initView(readOnly);
-        readOnly = dataFW.getWidgetModel().isReadOnly();
-    }
-
     private void addFormButtons() {
         buttonForm.addComponent(form0);
         buttonForm.addComponent(form01);
@@ -2162,7 +2205,6 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         buttonForm.setSpacing(false);
         mainForm.addComponent(buttonForm);
     }
-
 
     private Button createNextButton(String caption, String styleName) {
         Button temp = new Button();
@@ -2199,581 +2241,6 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         formModel.getFieldModel("phoneHome").getValidators()
                 .add(new RegexpValidator("^([0-9]{6})|([0-9]{7})|([0-9]{8})|([0-9]{9})|([0-9]{10})$", "������� (���.) ������ ��������� �� 6 �� 10 ����"));
         return formModel;
-    }
-
-    @Override
-    public boolean preCreate(Object source, int buttonId) {
-        if (source.equals(documentsTW)) {
-            if (dataFW.getWidgetModel().isCreateNew()) {
-                Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
-                return false;
-            }
-			
-			/*int count = specTW.getEntityCount();
-			if (count < 4) {
-				Message.showInfo(getUILocaleUtil().getMessage("need.to.select.4.universities"));
-				return false;
-			}*/
-
-            FormModel educationFM = ((DBTableModel) documentsTW.getWidgetModel()).getFormModel();
-            FKFieldModel schoolCountryFieldModel = (FKFieldModel) educationFM.getFieldModel("schoolCountry");
-            QueryModel schoolCountryQM = schoolCountryFieldModel.getQueryModel();
-            schoolCountryQM.addWhereNull("parent");
-            schoolCountryQM.addOrder("countryName");
-
-            FKFieldModel schoolRegionFieldModel = (FKFieldModel) educationFM.getFieldModel("schoolRegion");
-            QueryModel schoolRegionQM = schoolRegionFieldModel.getQueryModel();
-            schoolRegionQM.addWhere("parent", ECriteria.EQUAL, ID.valueOf(-1));
-
-            schoolCountryFieldModel.getListeners().add(new SchoolCountryChangeListener(schoolRegionFieldModel, null));
-
-
-            educationFM.getFieldModel("language").setRequired(true);
-            educationFM.getFieldModel("schoolCertificateType").setRequired(true);
-            educationFM.getFieldModel("schoolRegion").setRequired(true);
-            educationFM.getFieldModel("schoolAddress").setRequired(true);
-            educationFM.getFieldModel("entryYear").getValidators().add(new IntegerRangeValidator("�� ��������� ������� ����", 0, 2016));
-            educationFM.getFieldModel("endYear").getValidators().add(new IntegerRangeValidator("�� ��������� ������� ����", 0, 2016));
-
-            FileListFieldModel educationFLFM = (FileListFieldModel) educationFM.getFieldModel("fileList");
-            educationFLFM.permitMimeType(FileListFieldModel.JPEG);
-
-            educationFLFM.getFileList().clear();
-            educationFLFM.getDeleteList().clear();
-
-            return true;
-        } else if (source.equals(languagesTW)) {
-            if (dataFW.getWidgetModel().isCreateNew()) {
-                Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
-                return false;
-            }
-			
-			/*int count = specTW.getEntityCount();
-			if (count < 4) {
-				Message.showInfo(getUILocaleUtil().getMessage("need.to.select.4.universities"));
-				return false;
-			}*/
-
-            FormModel languageFM = ((DBTableModel) languagesTW.getWidgetModel()).getFormModel();
-            return true;
-        } else if (source.equals(untRatesTW)) {
-            try {
-                certificateFW.post();
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                LOG.error("Failed to post: ", e);
-            }
-
-            if (certificateFW.getWidgetModel().isCreateNew()) {
-                Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
-                return false;
-            }
-			
-			/*int count = specTW.getEntityCount();
-			if (count < 4) {
-				Message.showInfo(getUILocaleUtil().getMessage("need.to.select.4.universities"));
-				return false;
-			}*/
-
-            FormModel untRatesFM = ((DBTableModel) untRatesTW.getWidgetModel()).getFormModel();
-            return true;
-        } else if (source.equals(medicalCheckupTW)) {
-            if (dataFW.getWidgetModel().isCreateNew()) {
-                Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
-                return false;
-            }
-			
-			/*int count = specTW.getEntityCount();
-			if (count < 4) {
-				Message.showInfo(getUILocaleUtil().getMessage("need.to.select.4.universities"));
-				return false;
-			}*/
-
-            FormModel medicalCheckupFM = ((DBTableModel) medicalCheckupTW.getWidgetModel()).getFormModel();
-
-            FileListFieldModel medicalCheckupFLFM = (FileListFieldModel) medicalCheckupFM.getFieldModel("fileList");
-            medicalCheckupFLFM.permitMimeType(FileListFieldModel.JPEG);
-
-            medicalCheckupFLFM.getFileList().clear();
-            medicalCheckupFLFM.getDeleteList().clear();
-
-            return true;
-        } else if (source.equals(specTW)) {
-            saveData = true;
-            if (dataFW.getWidgetModel().isCreateNew() || dataFW.getWidgetModel().isModified()) {
-                boolean success = dataFW.save();
-                if (!success) {
-                    return false;
-                }
-            }
-
-            int count = specTW.getEntityCount();
-            if (count == 4) {
-                Message.showInfo(getUILocaleUtil().getMessage("more.records.not.required"));
-                return false;
-            }
-
-            FormModel entrantSpecialityFM = ((DBTableModel) specTW.getWidgetModel()).getFormModel();
-            FKFieldModel specialityFKFM = (FKFieldModel) entrantSpecialityFM.getFieldModel("speciality");
-            specialityFKFM.setDialogWidth(600);
-            specialityFKFM.setDialogHeight(600);
-            QueryModel specialityQM = specialityFKFM.getQueryModel();
-            specialityQM.addWhere("deleted", Boolean.FALSE);
-            try {
-                specialityQM.addWhere("level", ECriteria.EQUAL, ((STUDENT) dataFW.getWidgetModel().getEntity()).getLevel().getId());
-            } catch (Exception ex) {
-            }
-
-            return true;
-        } else if (source.equals(awardsTW)) {
-            if (dataFW.getWidgetModel().isCreateNew()) {
-                Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
-                return false;
-            }
-			
-			/*int count = specTW.getEntityCount();
-			if (count < 4) {
-				Message.showInfo(getUILocaleUtil().getMessage("need.to.select.4.universities"));
-				return false;
-			}*/
-
-            FormModel awardsFM = ((DBTableModel) awardsTW.getWidgetModel()).getFormModel();
-
-            return true;
-        } else if (source.equals(socialCategoriesTW)) {
-            if (dataFW.getWidgetModel().isCreateNew()) {
-                Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
-                return false;
-            }
-			/*int count = specTW.getEntityCount();
-			if (count < 4) {
-				Message.showInfo(getUILocaleUtil().getMessage("need.to.select.4.universities"));
-				return false;
-			}*/
-            FormModel socialCategoryFM = ((DBTableModel) socialCategoriesTW.getWidgetModel()).getFormModel();
-            return true;
-        }
-
-        return super.preCreate(source, buttonId);
-    }
-
-    @Override
-    public void onCreate(Object source, Entity e, int buttonId) {
-    }
-
-    @Override
-    public boolean onEdit(Object source, Entity e, int buttonId) {
-        QueryModel<USER_DOCUMENT_FILE> udfQM = new QueryModel<USER_DOCUMENT_FILE>(USER_DOCUMENT_FILE.class);
-        udfQM.addSelect("id");
-        udfQM.addSelect("fileName");
-        udfQM.addWhere("deleted", Boolean.FALSE);
-
-        if (source.equals(documentsTW)) {
-            FormModel educationFM = ((DBTableModel) documentsTW.getWidgetModel()).getFormModel();
-            FKFieldModel schoolCountryFieldModel = (FKFieldModel) educationFM.getFieldModel("schoolCountry");
-            QueryModel schoolCountryQM = schoolCountryFieldModel.getQueryModel();
-            schoolCountryQM.addWhereNull("parent");
-            schoolCountryQM.addOrder("countryName");
-
-            FKFieldModel schoolRegionFieldModel = (FKFieldModel) educationFM.getFieldModel("schoolRegion");
-            QueryModel schoolRegionQM = schoolRegionFieldModel.getQueryModel();
-            schoolRegionQM.addWhere("parent", ECriteria.EQUAL, ID.valueOf(-1));
-
-            schoolCountryFieldModel.getListeners().add(new SchoolCountryChangeListener(schoolRegionFieldModel, null));
-
-
-            FileListFieldModel educationFLFM = (FileListFieldModel) educationFM.getFieldModel("fileList");
-            educationFLFM.permitMimeType(FileListFieldModel.JPEG);
-
-            educationFLFM.getFileList().clear();
-            educationFLFM.getDeleteList().clear();
-
-            udfQM.addWhereAnd("userDocument", ECriteria.EQUAL, e.getId());
-
-            try {
-                List udfList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(udfQM);
-                if (!udfList.isEmpty()) {
-//                    for (Object o : udfList) {
-//                        Object[] oo = (Object[]) o;
-//                        FileBean fe = new FileBean( USER_DOCUMENT_FILE.class);
-//                        fe.setId(ID.valueOf((Long) oo[0]));
-//                        fe.setFileName((String) oo[1]);
-//                        fe.setNewFile(false);
-//                        educationFLFM.getFileList().add(fe);
-//                    }
-                }
-            } catch (Exception ex) {
-                LOG.error("Unable to load education document copies: ", ex);
-            }
-
-            return true;
-        } else if (source.equals(medicalCheckupTW)) {
-            FormModel medicalCheckupFM = ((DBTableModel) medicalCheckupTW.getWidgetModel()).getFormModel();
-
-            FileListFieldModel medicalCheckupFLFM = (FileListFieldModel) medicalCheckupFM.getFieldModel("fileList");
-            medicalCheckupFLFM.permitMimeType(FileListFieldModel.JPEG);
-
-            medicalCheckupFLFM.getFileList().clear();
-            medicalCheckupFLFM.getDeleteList().clear();
-
-            udfQM.addWhereAnd("userDocument", ECriteria.EQUAL, e.getId());
-
-            try {
-                List udfList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(udfQM);
-                if (!udfList.isEmpty()) {
-//                    for (Object o : udfList) {
-//                        Object[] oo = (Object[]) o;
-//                        FileBean fe = new FileBean( USER_DOCUMENT_FILE.class);
-//                        fe.setId(ID.valueOf((Long) oo[0]));
-//                        fe.setFileName((String) oo[1]);
-//                        fe.setNewFile(false);
-//                        medicalCheckupFLFM.getFileList().add(fe);
-//                    }
-                }
-            } catch (Exception ex) {
-                LOG.error("Unable to load education document copies: ", ex);
-            }
-
-            return true;
-        } else if (source.equals(languagesTW)) {
-            FormModel languageFM = ((DBTableModel) languagesTW.getWidgetModel()).getFormModel();
-
-            return true;
-        } else if (source.equals(untRatesTW)) {
-            FormModel untRatesFM = ((DBTableModel) untRatesTW.getWidgetModel()).getFormModel();
-
-            return true;
-        } else if (source.equals(specTW)) {
-            FormModel entrantSpecialityFM = ((DBTableModel) specTW.getWidgetModel()).getFormModel();
-            FKFieldModel specialityFKFM = (FKFieldModel) entrantSpecialityFM.getFieldModel("speciality");
-            specialityFKFM.setDialogWidth(600);
-            specialityFKFM.setDialogHeight(600);
-            QueryModel specialityQM = specialityFKFM.getQueryModel();
-            specialityQM.addWhere("deleted", Boolean.FALSE);
-
-            return true;
-        } else if (source.equals(awardsTW)) {
-            FormModel awardsFM = ((DBTableModel) awardsTW.getWidgetModel()).getFormModel();
-
-            return true;
-        } else if (source.equals(socialCategoriesTW)) {
-            FormModel socialCategoryFM = ((DBTableModel) socialCategoriesTW.getWidgetModel()).getFormModel();
-
-            return true;
-        }
-
-        return super.onEdit(source, e, buttonId);
-    }
-
-    @Override
-    public boolean onPreview(Object source, Entity e, int buttonId) {
-        QueryModel<USER_DOCUMENT_FILE> udfQM = new QueryModel<USER_DOCUMENT_FILE>(USER_DOCUMENT_FILE.class);
-        udfQM.addSelect("id");
-        udfQM.addSelect("fileName");
-        udfQM.addWhere("deleted", Boolean.FALSE);
-
-        if (source.equals(documentsTW)) {
-            FormModel educationFM = ((DBTableModel) documentsTW.getWidgetModel()).getFormModel();
-            FKFieldModel schoolCountryFieldModel = (FKFieldModel) educationFM.getFieldModel("schoolCountry");
-            QueryModel schoolCountryQM = schoolCountryFieldModel.getQueryModel();
-            schoolCountryQM.addWhereNull("parent");
-            schoolCountryQM.addOrder("countryName");
-
-            FKFieldModel schoolRegionFieldModel = (FKFieldModel) educationFM.getFieldModel("schoolRegion");
-            QueryModel schoolRegionQM = schoolRegionFieldModel.getQueryModel();
-            schoolRegionQM.addWhere("parent", ECriteria.EQUAL, ID.valueOf(-1));
-
-            schoolCountryFieldModel.getListeners().add(new SchoolCountryChangeListener(schoolRegionFieldModel, null));
-
-
-            FileListFieldModel educationFLFM = (FileListFieldModel) educationFM.getFieldModel("fileList");
-            educationFLFM.permitMimeType(FileListFieldModel.JPEG);
-
-            educationFLFM.getFileList().clear();
-            educationFLFM.getDeleteList().clear();
-
-            udfQM.addWhereAnd("userDocument", ECriteria.EQUAL, e.getId());
-
-            try {
-                List udfList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(udfQM);
-                if (!udfList.isEmpty()) {
-//                    for (Object o : udfList) {
-//                        Object[] oo = (Object[]) o;
-//                        FileBean fe = new FileBean( USER_DOCUMENT_FILE.class);
-//                        fe.setId(ID.valueOf((Long) oo[0]));
-//                        fe.setFileName((String) oo[1]);
-//                        fe.setNewFile(false);
-//                        educationFLFM.getFileList().add(fe);
-//                    }
-                }
-            } catch (Exception ex) {
-                LOG.error("Unable to load education document copies: ", ex);
-            }
-
-            return true;
-        } else if (source.equals(medicalCheckupTW)) {
-            FormModel medicalCheckupFM = ((DBTableModel) medicalCheckupTW.getWidgetModel()).getFormModel();
-
-            FileListFieldModel medicalCheckupFLFM = (FileListFieldModel) medicalCheckupFM.getFieldModel("fileList");
-            medicalCheckupFLFM.permitMimeType(FileListFieldModel.JPEG);
-
-            medicalCheckupFLFM.getFileList().clear();
-            medicalCheckupFLFM.getDeleteList().clear();
-
-            udfQM.addWhereAnd("userDocument", ECriteria.EQUAL, e.getId());
-
-            try {
-                List udfList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(udfQM);
-                if (!udfList.isEmpty()) {
-//                    for (Object o : udfList) {
-//                        Object[] oo = (Object[]) o;
-//                        FileBean fe = new FileBean( USER_DOCUMENT_FILE.class);
-//                        fe.setId(ID.valueOf((Long) oo[0]));
-//                        fe.setFileName((String) oo[1]);
-//                        fe.setNewFile(false);
-//                        medicalCheckupFLFM.getFileList().add(fe);
-//                    }
-                }
-            } catch (Exception ex) {
-                LOG.error("Unable to load education document copies: ", ex);
-            }
-            return true;
-        } else if (source.equals(languagesTW)) {
-            FormModel languageFM = ((DBTableModel) languagesTW.getWidgetModel()).getFormModel();
-            return true;
-        } else if (source.equals(untRatesTW)) {
-            FormModel untRatesFM = ((DBTableModel) untRatesTW.getWidgetModel()).getFormModel();
-            return true;
-        } else if (source.equals(specTW)) {
-            FormModel entrantSpecialityFM = ((DBTableModel) specTW.getWidgetModel()).getFormModel();
-            FKFieldModel specialityFKFM = (FKFieldModel) entrantSpecialityFM.getFieldModel("speciality");
-            specialityFKFM.setDialogWidth(600);
-            specialityFKFM.setDialogHeight(600);
-            QueryModel specialityQM = specialityFKFM.getQueryModel();
-            specialityQM.addWhere("deleted", Boolean.FALSE);
-            return true;
-        } else if (source.equals(awardsTW)) {
-            FormModel awardsFM = ((DBTableModel) awardsTW.getWidgetModel()).getFormModel();
-            return true;
-        } else if (source.equals(socialCategoriesTW)) {
-            FormModel socialCategoryFM = ((DBTableModel) socialCategoriesTW.getWidgetModel()).getFormModel();
-            return true;
-        }
-
-        return super.onPreview(source, e, buttonId);
-    }
-
-    @Override
-    public void beforeRefresh(Object source, int buttonId) {
-    }
-
-    @Override
-    public void onFilter(Object source, QueryModel qm, int buttonId) {
-    }
-
-    @Override
-    public void onAccept(Object source, List<Entity> entities, int buttonId) {
-    }
-
-    @Override
-    public boolean preSave(Object source, Entity e, boolean isNew, int buttonId) throws Exception {
-        if (source.equals(dataFW)) {
-            return preSaveData(source, e, isNew, buttonId);
-        } else if (source.equals(documentsTW)) {
-            return preSaveEducationDoc(source, e, isNew, buttonId);
-        } else if (source.equals(educDocFW)) {
-            return preSaveDoc(source, e, isNew, buttonId);
-        } else if (source.equals(passportFW)) {
-            return preSavePassport(source, e, isNew, buttonId);
-        } else if (source.equals(specTW)) {
-            return preSaveSpeciality(source, e, isNew, buttonId);
-        } else if (source.equals(languagesTW)) {
-            return preSaveLanguage(source, e, isNew, buttonId);
-        } else if (source.equals(medicalCheckupTW)) {
-            return preSaveMedicalCheckup(source, e, isNew, buttonId);
-        } else if (source.equals(awardsTW)) {
-            return preSaveAwards(source, e, isNew, buttonId);
-        } else if (source.equals(socialCategoriesTW)) {
-            return preSaveSocialCategories(source, e, isNew, buttonId);
-        } else if (source.equals(militaryFW)) {
-            return preSaveMilitary(source, e, isNew, buttonId);
-        } else if (source.equals(disabilityFW)) {
-            return preSaveDisability(source, e, isNew, buttonId);
-        } else if (source.equals(repatriateFW)) {
-            return preSaveRepatriate(source, e, isNew, buttonId);
-        } else if (source.equals(grantFW)) {
-            return preSaveGrant(source, e, isNew, buttonId);
-        } else if (source.equals(preemptiveRightFW)) {
-            return preSavePreemptiveRight(source, e, isNew, buttonId);
-        } else if (source.equals(certificateFW)) {
-            return preSaveUNTCertificate(source, e, isNew, buttonId);
-        } else if (source.equals(untRatesTW)) {
-            return preSaveUNTRates(source, e, isNew, buttonId);
-        } else if (source.equals(addressRegFW)) {
-            return preSaveAddressReg(source, e, isNew, buttonId);
-        } else if (source.equals(addressFactFW)) {
-            return preSaveAddressFact(source, e, isNew, buttonId);
-        } else if (source.equals(fatherFW)) {
-            return preSaveFather(source, e, isNew, buttonId);
-        } else if (source.equals(motherFW)) {
-            return preSaveMother(source, e, isNew, buttonId);
-        } else if (source.equals(dataContractFW)) {
-            return preSaveContract(source, e, isNew, buttonId);
-        }
-        return super.preSave(source, e, isNew, buttonId);
-    }
-
-    @Override
-    public boolean preDelete(Object source, List<Entity> entities, int buttonId) {
-        if (source.equals(documentsTW)) {
-            for (Entity e : entities) {
-                ((EDUCATION_DOC) e).setDeleted(true);
-            }
-
-            try {
-                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(entities);
-                documentsTW.refresh();
-            } catch (Exception ex) {
-                LOG.error("Unable to delete education docs: ", ex);
-                Message.showError(getUILocaleUtil().getMessage("error.cannotdelentity"));
-            }
-
-            return false;
-        } else if (source.equals(languagesTW)) {
-            List<USER_LANGUAGE> delList = new ArrayList<USER_LANGUAGE>();
-            for (Entity e : entities) {
-                try {
-                    delList.add(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(USER_LANGUAGE.class, e.getId()));
-                } catch (Exception ex) {
-                    LOG.error("Unable to delete user languages: ", ex);
-                }
-            }
-
-            try {
-                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(delList);
-                languagesTW.refresh();
-            } catch (Exception ex) {
-                LOG.error("Unable to delete user languages: ", ex);
-                Message.showError(getUILocaleUtil().getMessage("error.cannotdelentity"));
-            }
-
-            return false;
-        } else if (source.equals(medicalCheckupTW)) {
-            List<MEDICAL_CHECKUP> delList = new ArrayList<MEDICAL_CHECKUP>();
-            for (Entity e : entities) {
-                try {
-                    MEDICAL_CHECKUP mc = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(MEDICAL_CHECKUP.class, e.getId());
-                    mc.setDeleted(true);
-                    delList.add(mc);
-                } catch (Exception ex) {
-                    LOG.error("Unable to delete medical checkup: ", ex);
-                }
-            }
-
-            try {
-                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(delList);
-                medicalCheckupTW.refresh();
-            } catch (Exception ex) {
-                LOG.error("Unable to delete medical checkup: ", ex);
-                Message.showError(getUILocaleUtil().getMessage("error.cannotdelentity"));
-            }
-
-            return false;
-        } else if (source.equals(untRatesTW)) {
-            List<UNT_CERT_SUBJECT> delList = new ArrayList<UNT_CERT_SUBJECT>();
-            for (Entity e : entities) {
-                try {
-                    delList.add(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(UNT_CERT_SUBJECT.class, e.getId()));
-                } catch (Exception ex) {
-                    LOG.error("Unable to delete user UNT rates: ", ex);
-                }
-            }
-
-            try {
-                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(delList);
-                untRatesTW.refresh();
-            } catch (Exception ex) {
-                LOG.error("Unable to delete user UNT rates: ", ex);
-                Message.showError(getUILocaleUtil().getMessage("error.cannotdelentity"));
-            }
-
-            return false;
-        } else if (source.equals(specTW)) {
-            List<ENTRANT_SPECIALITY> delList = new ArrayList<ENTRANT_SPECIALITY>();
-            for (Entity e : entities) {
-                try {
-                    delList.add(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(ENTRANT_SPECIALITY.class, e.getId()));
-                } catch (Exception ex) {
-                    LOG.error("Unable to delete entrant specialities: ", ex);
-                }
-            }
-
-            try {
-                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(delList);
-                specTW.refresh();
-            } catch (Exception ex) {
-                LOG.error("Unable to delete entrant specialities: ", ex);
-                Message.showError(getUILocaleUtil().getMessage("error.cannotdelentity"));
-            }
-
-            return false;
-        } else if (source.equals(awardsTW)) {
-            List<USER_AWARD> delList = new ArrayList<USER_AWARD>();
-            for (Entity e : entities) {
-                try {
-                    delList.add(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(USER_AWARD.class, e.getId()));
-                } catch (Exception ex) {
-                    LOG.error("Unable to delete user awards: ", ex);
-                }
-            }
-
-            try {
-                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(delList);
-                awardsTW.refresh();
-            } catch (Exception ex) {
-                LOG.error("Unable to delete user awards: ", ex);
-                Message.showError(getUILocaleUtil().getMessage("error.cannotdelentity"));
-            }
-
-            return false;
-        } else if (source.equals(socialCategoriesTW)) {
-            List<USER_SOCIAL_CATEGORY> delList = new ArrayList<USER_SOCIAL_CATEGORY>();
-            for (Entity e : entities) {
-                try {
-                    delList.add(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(USER_SOCIAL_CATEGORY.class, e.getId()));
-                } catch (Exception ex) {
-                    LOG.error("Unable to delete user social categories: ", ex);
-                }
-            }
-
-            try {
-                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(delList);
-                socialCategoriesTW.refresh();
-            } catch (Exception ex) {
-                LOG.error("Unable to delete user social categories: ", ex);
-                Message.showError(getUILocaleUtil().getMessage("error.cannotdelentity"));
-            }
-
-            return false;
-        }
-
-        return super.preDelete(source, entities, buttonId);
-    }
-
-    @Override
-    public void onDelete(Object source, List<Entity> entities, int buttonId) {
-    }
-
-    @Override
-    public void handlePhotoWidgetEvent(PhotoWidgetEvent ev) {
-
-    }
-
-    @Override
-    public void handleEntityEvent(EntityEvent ev) {
-        if (!ev.getSource().equals(dataFW)) {
-            super.handleEntityEvent(ev);
-        }
     }
 
     private boolean preSaveSpeciality(Object source, Entity e, boolean isNew, int buttonId) {
@@ -3774,6 +3241,562 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
     }
 
     @Override
+    public void initView(boolean readOnly) throws Exception {
+        super.initView(readOnly);
+        readOnly = dataFW.getWidgetModel().isReadOnly();
+    }
+
+    @Override
+    public boolean preCreate(Object source, int buttonId) {
+        if (source.equals(documentsTW)) {
+            if (dataFW.getWidgetModel().isCreateNew()) {
+                Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
+                return false;
+            }
+
+			/*int count = specTW.getEntityCount();
+            if (count < 4) {
+				Message.showInfo(getUILocaleUtil().getMessage("need.to.select.4.universities"));
+				return false;
+			}*/
+
+            FormModel educationFM = ((DBTableModel) documentsTW.getWidgetModel()).getFormModel();
+            FKFieldModel schoolCountryFieldModel = (FKFieldModel) educationFM.getFieldModel("schoolCountry");
+            QueryModel schoolCountryQM = schoolCountryFieldModel.getQueryModel();
+            schoolCountryQM.addWhereNull("parent");
+            schoolCountryQM.addOrder("countryName");
+
+            FKFieldModel schoolRegionFieldModel = (FKFieldModel) educationFM.getFieldModel("schoolRegion");
+            QueryModel schoolRegionQM = schoolRegionFieldModel.getQueryModel();
+            schoolRegionQM.addWhere("parent", ECriteria.EQUAL, ID.valueOf(-1));
+
+            schoolCountryFieldModel.getListeners().add(new SchoolCountryChangeListener(schoolRegionFieldModel, null));
+
+
+            educationFM.getFieldModel("language").setRequired(true);
+            educationFM.getFieldModel("schoolCertificateType").setRequired(true);
+            educationFM.getFieldModel("schoolRegion").setRequired(true);
+            educationFM.getFieldModel("schoolAddress").setRequired(true);
+            educationFM.getFieldModel("entryYear").getValidators().add(new IntegerRangeValidator("�� ��������� ������� ����", 0, 2016));
+            educationFM.getFieldModel("endYear").getValidators().add(new IntegerRangeValidator("�� ��������� ������� ����", 0, 2016));
+
+            FileListFieldModel educationFLFM = (FileListFieldModel) educationFM.getFieldModel("fileList");
+            educationFLFM.permitMimeType(FileListFieldModel.JPEG);
+
+            educationFLFM.getFileList().clear();
+            educationFLFM.getDeleteList().clear();
+
+            return true;
+        } else if (source.equals(languagesTW)) {
+            if (dataFW.getWidgetModel().isCreateNew()) {
+                Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
+                return false;
+            }
+
+			/*int count = specTW.getEntityCount();
+            if (count < 4) {
+				Message.showInfo(getUILocaleUtil().getMessage("need.to.select.4.universities"));
+				return false;
+			}*/
+
+            FormModel languageFM = ((DBTableModel) languagesTW.getWidgetModel()).getFormModel();
+            return true;
+        } else if (source.equals(untRatesTW)) {
+            try {
+                certificateFW.post();
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                LOG.error("Failed to post: ", e);
+            }
+
+            if (certificateFW.getWidgetModel().isCreateNew()) {
+                Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
+                return false;
+            }
+
+			/*int count = specTW.getEntityCount();
+			if (count < 4) {
+				Message.showInfo(getUILocaleUtil().getMessage("need.to.select.4.universities"));
+				return false;
+			}*/
+
+            FormModel untRatesFM = ((DBTableModel) untRatesTW.getWidgetModel()).getFormModel();
+            return true;
+        } else if (source.equals(medicalCheckupTW)) {
+            if (dataFW.getWidgetModel().isCreateNew()) {
+                Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
+                return false;
+            }
+
+			/*int count = specTW.getEntityCount();
+			if (count < 4) {
+				Message.showInfo(getUILocaleUtil().getMessage("need.to.select.4.universities"));
+				return false;
+			}*/
+
+            FormModel medicalCheckupFM = ((DBTableModel) medicalCheckupTW.getWidgetModel()).getFormModel();
+
+            FileListFieldModel medicalCheckupFLFM = (FileListFieldModel) medicalCheckupFM.getFieldModel("fileList");
+            medicalCheckupFLFM.permitMimeType(FileListFieldModel.JPEG);
+
+            medicalCheckupFLFM.getFileList().clear();
+            medicalCheckupFLFM.getDeleteList().clear();
+
+            return true;
+        } else if (source.equals(specTW)) {
+            saveData = true;
+            if (dataFW.getWidgetModel().isCreateNew() || dataFW.getWidgetModel().isModified()) {
+                boolean success = dataFW.save();
+                if (!success) {
+                    return false;
+                }
+            }
+
+            int count = specTW.getEntityCount();
+            if (count == 4) {
+                Message.showInfo(getUILocaleUtil().getMessage("more.records.not.required"));
+                return false;
+            }
+
+            FormModel entrantSpecialityFM = ((DBTableModel) specTW.getWidgetModel()).getFormModel();
+            FKFieldModel specialityFKFM = (FKFieldModel) entrantSpecialityFM.getFieldModel("speciality");
+            specialityFKFM.setDialogWidth(600);
+            specialityFKFM.setDialogHeight(600);
+            QueryModel specialityQM = specialityFKFM.getQueryModel();
+            specialityQM.addWhere("deleted", Boolean.FALSE);
+            try {
+                specialityQM.addWhere("level", ECriteria.EQUAL, ((STUDENT) dataFW.getWidgetModel().getEntity()).getLevel().getId());
+            } catch (Exception ex) {
+            }
+
+            return true;
+        } else if (source.equals(awardsTW)) {
+            if (dataFW.getWidgetModel().isCreateNew()) {
+                Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
+                return false;
+            }
+
+			/*int count = specTW.getEntityCount();
+			if (count < 4) {
+				Message.showInfo(getUILocaleUtil().getMessage("need.to.select.4.universities"));
+				return false;
+			}*/
+
+            FormModel awardsFM = ((DBTableModel) awardsTW.getWidgetModel()).getFormModel();
+
+            return true;
+        } else if (source.equals(socialCategoriesTW)) {
+            if (dataFW.getWidgetModel().isCreateNew()) {
+                Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
+                return false;
+            }
+			/*int count = specTW.getEntityCount();
+			if (count < 4) {
+				Message.showInfo(getUILocaleUtil().getMessage("need.to.select.4.universities"));
+				return false;
+			}*/
+            FormModel socialCategoryFM = ((DBTableModel) socialCategoriesTW.getWidgetModel()).getFormModel();
+            return true;
+        }
+
+        return super.preCreate(source, buttonId);
+    }
+
+    @Override
+    public boolean onEdit(Object source, Entity e, int buttonId) {
+        QueryModel<USER_DOCUMENT_FILE> udfQM = new QueryModel<USER_DOCUMENT_FILE>(USER_DOCUMENT_FILE.class);
+        udfQM.addSelect("id");
+        udfQM.addSelect("fileName");
+        udfQM.addWhere("deleted", Boolean.FALSE);
+
+        if (source.equals(documentsTW)) {
+            FormModel educationFM = ((DBTableModel) documentsTW.getWidgetModel()).getFormModel();
+            FKFieldModel schoolCountryFieldModel = (FKFieldModel) educationFM.getFieldModel("schoolCountry");
+            QueryModel schoolCountryQM = schoolCountryFieldModel.getQueryModel();
+            schoolCountryQM.addWhereNull("parent");
+            schoolCountryQM.addOrder("countryName");
+
+            FKFieldModel schoolRegionFieldModel = (FKFieldModel) educationFM.getFieldModel("schoolRegion");
+            QueryModel schoolRegionQM = schoolRegionFieldModel.getQueryModel();
+            schoolRegionQM.addWhere("parent", ECriteria.EQUAL, ID.valueOf(-1));
+
+            schoolCountryFieldModel.getListeners().add(new SchoolCountryChangeListener(schoolRegionFieldModel, null));
+
+
+            FileListFieldModel educationFLFM = (FileListFieldModel) educationFM.getFieldModel("fileList");
+            educationFLFM.permitMimeType(FileListFieldModel.JPEG);
+
+            educationFLFM.getFileList().clear();
+            educationFLFM.getDeleteList().clear();
+
+            udfQM.addWhereAnd("userDocument", ECriteria.EQUAL, e.getId());
+
+            try {
+                List udfList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(udfQM);
+                if (!udfList.isEmpty()) {
+//                    for (Object o : udfList) {
+//                        Object[] oo = (Object[]) o;
+//                        FileBean fe = new FileBean( USER_DOCUMENT_FILE.class);
+//                        fe.setId(ID.valueOf((Long) oo[0]));
+//                        fe.setFileName((String) oo[1]);
+//                        fe.setNewFile(false);
+//                        educationFLFM.getFileList().add(fe);
+//                    }
+                }
+            } catch (Exception ex) {
+                LOG.error("Unable to load education document copies: ", ex);
+            }
+
+            return true;
+        } else if (source.equals(medicalCheckupTW)) {
+            FormModel medicalCheckupFM = ((DBTableModel) medicalCheckupTW.getWidgetModel()).getFormModel();
+
+            FileListFieldModel medicalCheckupFLFM = (FileListFieldModel) medicalCheckupFM.getFieldModel("fileList");
+            medicalCheckupFLFM.permitMimeType(FileListFieldModel.JPEG);
+
+            medicalCheckupFLFM.getFileList().clear();
+            medicalCheckupFLFM.getDeleteList().clear();
+
+            udfQM.addWhereAnd("userDocument", ECriteria.EQUAL, e.getId());
+
+            try {
+                List udfList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(udfQM);
+                if (!udfList.isEmpty()) {
+//                    for (Object o : udfList) {
+//                        Object[] oo = (Object[]) o;
+//                        FileBean fe = new FileBean( USER_DOCUMENT_FILE.class);
+//                        fe.setId(ID.valueOf((Long) oo[0]));
+//                        fe.setFileName((String) oo[1]);
+//                        fe.setNewFile(false);
+//                        medicalCheckupFLFM.getFileList().add(fe);
+//                    }
+                }
+            } catch (Exception ex) {
+                LOG.error("Unable to load education document copies: ", ex);
+            }
+
+            return true;
+        } else if (source.equals(languagesTW)) {
+            FormModel languageFM = ((DBTableModel) languagesTW.getWidgetModel()).getFormModel();
+
+            return true;
+        } else if (source.equals(untRatesTW)) {
+            FormModel untRatesFM = ((DBTableModel) untRatesTW.getWidgetModel()).getFormModel();
+
+            return true;
+        } else if (source.equals(specTW)) {
+            FormModel entrantSpecialityFM = ((DBTableModel) specTW.getWidgetModel()).getFormModel();
+            FKFieldModel specialityFKFM = (FKFieldModel) entrantSpecialityFM.getFieldModel("speciality");
+            specialityFKFM.setDialogWidth(600);
+            specialityFKFM.setDialogHeight(600);
+            QueryModel specialityQM = specialityFKFM.getQueryModel();
+            specialityQM.addWhere("deleted", Boolean.FALSE);
+
+            return true;
+        } else if (source.equals(awardsTW)) {
+            FormModel awardsFM = ((DBTableModel) awardsTW.getWidgetModel()).getFormModel();
+
+            return true;
+        } else if (source.equals(socialCategoriesTW)) {
+            FormModel socialCategoryFM = ((DBTableModel) socialCategoriesTW.getWidgetModel()).getFormModel();
+
+            return true;
+        }
+
+        return super.onEdit(source, e, buttonId);
+    }
+
+    @Override
+    public boolean onPreview(Object source, Entity e, int buttonId) {
+        QueryModel<USER_DOCUMENT_FILE> udfQM = new QueryModel<USER_DOCUMENT_FILE>(USER_DOCUMENT_FILE.class);
+        udfQM.addSelect("id");
+        udfQM.addSelect("fileName");
+        udfQM.addWhere("deleted", Boolean.FALSE);
+
+        if (source.equals(documentsTW)) {
+            FormModel educationFM = ((DBTableModel) documentsTW.getWidgetModel()).getFormModel();
+            FKFieldModel schoolCountryFieldModel = (FKFieldModel) educationFM.getFieldModel("schoolCountry");
+            QueryModel schoolCountryQM = schoolCountryFieldModel.getQueryModel();
+            schoolCountryQM.addWhereNull("parent");
+            schoolCountryQM.addOrder("countryName");
+
+            FKFieldModel schoolRegionFieldModel = (FKFieldModel) educationFM.getFieldModel("schoolRegion");
+            QueryModel schoolRegionQM = schoolRegionFieldModel.getQueryModel();
+            schoolRegionQM.addWhere("parent", ECriteria.EQUAL, ID.valueOf(-1));
+
+            schoolCountryFieldModel.getListeners().add(new SchoolCountryChangeListener(schoolRegionFieldModel, null));
+
+
+            FileListFieldModel educationFLFM = (FileListFieldModel) educationFM.getFieldModel("fileList");
+            educationFLFM.permitMimeType(FileListFieldModel.JPEG);
+
+            educationFLFM.getFileList().clear();
+            educationFLFM.getDeleteList().clear();
+
+            udfQM.addWhereAnd("userDocument", ECriteria.EQUAL, e.getId());
+
+            try {
+                List udfList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(udfQM);
+                if (!udfList.isEmpty()) {
+//                    for (Object o : udfList) {
+//                        Object[] oo = (Object[]) o;
+//                        FileBean fe = new FileBean( USER_DOCUMENT_FILE.class);
+//                        fe.setId(ID.valueOf((Long) oo[0]));
+//                        fe.setFileName((String) oo[1]);
+//                        fe.setNewFile(false);
+//                        educationFLFM.getFileList().add(fe);
+//                    }
+                }
+            } catch (Exception ex) {
+                LOG.error("Unable to load education document copies: ", ex);
+            }
+
+            return true;
+        } else if (source.equals(medicalCheckupTW)) {
+            FormModel medicalCheckupFM = ((DBTableModel) medicalCheckupTW.getWidgetModel()).getFormModel();
+
+            FileListFieldModel medicalCheckupFLFM = (FileListFieldModel) medicalCheckupFM.getFieldModel("fileList");
+            medicalCheckupFLFM.permitMimeType(FileListFieldModel.JPEG);
+
+            medicalCheckupFLFM.getFileList().clear();
+            medicalCheckupFLFM.getDeleteList().clear();
+
+            udfQM.addWhereAnd("userDocument", ECriteria.EQUAL, e.getId());
+
+            try {
+                List udfList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(udfQM);
+                if (!udfList.isEmpty()) {
+//                    for (Object o : udfList) {
+//                        Object[] oo = (Object[]) o;
+//                        FileBean fe = new FileBean( USER_DOCUMENT_FILE.class);
+//                        fe.setId(ID.valueOf((Long) oo[0]));
+//                        fe.setFileName((String) oo[1]);
+//                        fe.setNewFile(false);
+//                        medicalCheckupFLFM.getFileList().add(fe);
+//                    }
+                }
+            } catch (Exception ex) {
+                LOG.error("Unable to load education document copies: ", ex);
+            }
+            return true;
+        } else if (source.equals(languagesTW)) {
+            FormModel languageFM = ((DBTableModel) languagesTW.getWidgetModel()).getFormModel();
+            return true;
+        } else if (source.equals(untRatesTW)) {
+            FormModel untRatesFM = ((DBTableModel) untRatesTW.getWidgetModel()).getFormModel();
+            return true;
+        } else if (source.equals(specTW)) {
+            FormModel entrantSpecialityFM = ((DBTableModel) specTW.getWidgetModel()).getFormModel();
+            FKFieldModel specialityFKFM = (FKFieldModel) entrantSpecialityFM.getFieldModel("speciality");
+            specialityFKFM.setDialogWidth(600);
+            specialityFKFM.setDialogHeight(600);
+            QueryModel specialityQM = specialityFKFM.getQueryModel();
+            specialityQM.addWhere("deleted", Boolean.FALSE);
+            return true;
+        } else if (source.equals(awardsTW)) {
+            FormModel awardsFM = ((DBTableModel) awardsTW.getWidgetModel()).getFormModel();
+            return true;
+        } else if (source.equals(socialCategoriesTW)) {
+            FormModel socialCategoryFM = ((DBTableModel) socialCategoriesTW.getWidgetModel()).getFormModel();
+            return true;
+        }
+
+        return super.onPreview(source, e, buttonId);
+    }
+
+    @Override
+    public boolean preSave(Object source, Entity e, boolean isNew, int buttonId) throws Exception {
+        if (source.equals(dataFW)) {
+            return preSaveData(source, e, isNew, buttonId);
+        } else if (source.equals(documentsTW)) {
+            return preSaveEducationDoc(source, e, isNew, buttonId);
+        } else if (source.equals(educDocFW)) {
+            return preSaveDoc(source, e, isNew, buttonId);
+        } else if (source.equals(passportFW)) {
+            return preSavePassport(source, e, isNew, buttonId);
+        } else if (source.equals(specTW)) {
+            return preSaveSpeciality(source, e, isNew, buttonId);
+        } else if (source.equals(languagesTW)) {
+            return preSaveLanguage(source, e, isNew, buttonId);
+        } else if (source.equals(medicalCheckupTW)) {
+            return preSaveMedicalCheckup(source, e, isNew, buttonId);
+        } else if (source.equals(awardsTW)) {
+            return preSaveAwards(source, e, isNew, buttonId);
+        } else if (source.equals(socialCategoriesTW)) {
+            return preSaveSocialCategories(source, e, isNew, buttonId);
+        } else if (source.equals(militaryFW)) {
+            return preSaveMilitary(source, e, isNew, buttonId);
+        } else if (source.equals(disabilityFW)) {
+            return preSaveDisability(source, e, isNew, buttonId);
+        } else if (source.equals(repatriateFW)) {
+            return preSaveRepatriate(source, e, isNew, buttonId);
+        } else if (source.equals(grantFW)) {
+            return preSaveGrant(source, e, isNew, buttonId);
+        } else if (source.equals(preemptiveRightFW)) {
+            return preSavePreemptiveRight(source, e, isNew, buttonId);
+        } else if (source.equals(certificateFW)) {
+            return preSaveUNTCertificate(source, e, isNew, buttonId);
+        } else if (source.equals(untRatesTW)) {
+            return preSaveUNTRates(source, e, isNew, buttonId);
+        } else if (source.equals(addressRegFW)) {
+            return preSaveAddressReg(source, e, isNew, buttonId);
+        } else if (source.equals(addressFactFW)) {
+            return preSaveAddressFact(source, e, isNew, buttonId);
+        } else if (source.equals(fatherFW)) {
+            return preSaveFather(source, e, isNew, buttonId);
+        } else if (source.equals(motherFW)) {
+            return preSaveMother(source, e, isNew, buttonId);
+        } else if (source.equals(dataContractFW)) {
+            return preSaveContract(source, e, isNew, buttonId);
+        }
+        return super.preSave(source, e, isNew, buttonId);
+    }
+
+    @Override
+    public boolean preDelete(Object source, List<Entity> entities, int buttonId) {
+        if (source.equals(documentsTW)) {
+            for (Entity e : entities) {
+                ((EDUCATION_DOC) e).setDeleted(true);
+            }
+
+            try {
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(entities);
+                documentsTW.refresh();
+            } catch (Exception ex) {
+                LOG.error("Unable to delete education docs: ", ex);
+                Message.showError(getUILocaleUtil().getMessage("error.cannotdelentity"));
+            }
+
+            return false;
+        } else if (source.equals(languagesTW)) {
+            List<USER_LANGUAGE> delList = new ArrayList<USER_LANGUAGE>();
+            for (Entity e : entities) {
+                try {
+                    delList.add(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(USER_LANGUAGE.class, e.getId()));
+                } catch (Exception ex) {
+                    LOG.error("Unable to delete user languages: ", ex);
+                }
+            }
+
+            try {
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(delList);
+                languagesTW.refresh();
+            } catch (Exception ex) {
+                LOG.error("Unable to delete user languages: ", ex);
+                Message.showError(getUILocaleUtil().getMessage("error.cannotdelentity"));
+            }
+
+            return false;
+        } else if (source.equals(medicalCheckupTW)) {
+            List<MEDICAL_CHECKUP> delList = new ArrayList<MEDICAL_CHECKUP>();
+            for (Entity e : entities) {
+                try {
+                    MEDICAL_CHECKUP mc = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(MEDICAL_CHECKUP.class, e.getId());
+                    mc.setDeleted(true);
+                    delList.add(mc);
+                } catch (Exception ex) {
+                    LOG.error("Unable to delete medical checkup: ", ex);
+                }
+            }
+
+            try {
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(delList);
+                medicalCheckupTW.refresh();
+            } catch (Exception ex) {
+                LOG.error("Unable to delete medical checkup: ", ex);
+                Message.showError(getUILocaleUtil().getMessage("error.cannotdelentity"));
+            }
+
+            return false;
+        } else if (source.equals(untRatesTW)) {
+            List<UNT_CERT_SUBJECT> delList = new ArrayList<UNT_CERT_SUBJECT>();
+            for (Entity e : entities) {
+                try {
+                    delList.add(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(UNT_CERT_SUBJECT.class, e.getId()));
+                } catch (Exception ex) {
+                    LOG.error("Unable to delete user UNT rates: ", ex);
+                }
+            }
+
+            try {
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(delList);
+                untRatesTW.refresh();
+            } catch (Exception ex) {
+                LOG.error("Unable to delete user UNT rates: ", ex);
+                Message.showError(getUILocaleUtil().getMessage("error.cannotdelentity"));
+            }
+
+            return false;
+        } else if (source.equals(specTW)) {
+            List<ENTRANT_SPECIALITY> delList = new ArrayList<ENTRANT_SPECIALITY>();
+            for (Entity e : entities) {
+                try {
+                    delList.add(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(ENTRANT_SPECIALITY.class, e.getId()));
+                } catch (Exception ex) {
+                    LOG.error("Unable to delete entrant specialities: ", ex);
+                }
+            }
+
+            try {
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(delList);
+                specTW.refresh();
+            } catch (Exception ex) {
+                LOG.error("Unable to delete entrant specialities: ", ex);
+                Message.showError(getUILocaleUtil().getMessage("error.cannotdelentity"));
+            }
+
+            return false;
+        } else if (source.equals(awardsTW)) {
+            List<USER_AWARD> delList = new ArrayList<USER_AWARD>();
+            for (Entity e : entities) {
+                try {
+                    delList.add(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(USER_AWARD.class, e.getId()));
+                } catch (Exception ex) {
+                    LOG.error("Unable to delete user awards: ", ex);
+                }
+            }
+
+            try {
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(delList);
+                awardsTW.refresh();
+            } catch (Exception ex) {
+                LOG.error("Unable to delete user awards: ", ex);
+                Message.showError(getUILocaleUtil().getMessage("error.cannotdelentity"));
+            }
+
+            return false;
+        } else if (source.equals(socialCategoriesTW)) {
+            List<USER_SOCIAL_CATEGORY> delList = new ArrayList<USER_SOCIAL_CATEGORY>();
+            for (Entity e : entities) {
+                try {
+                    delList.add(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(USER_SOCIAL_CATEGORY.class, e.getId()));
+                } catch (Exception ex) {
+                    LOG.error("Unable to delete user social categories: ", ex);
+                }
+            }
+
+            try {
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(delList);
+                socialCategoriesTW.refresh();
+            } catch (Exception ex) {
+                LOG.error("Unable to delete user social categories: ", ex);
+                Message.showError(getUILocaleUtil().getMessage("error.cannotdelentity"));
+            }
+
+            return false;
+        }
+
+        return super.preDelete(source, entities, buttonId);
+    }
+
+    @Override
+    public void handleEntityEvent(EntityEvent ev) {
+        if (!ev.getSource().equals(dataFW)) {
+            super.handleEntityEvent(ev);
+        }
+    }
+
+    @Override
     public void deferredCreate(Object source, Entity e) {
         STUDENT student = (STUDENT) e;
         if (source.equals(dataFW)) {
@@ -3793,145 +3816,30 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
     }
 
     @Override
-    public void deferredDelete(Object source, List<Entity> entities) {
+    public void handlePhotoWidgetEvent(PhotoWidgetEvent photoWidgetEvent) {
+    }
+
+    public STUDENT getStudent() {
+        return student;
+    }
+
+    public void setStudent(STUDENT student) {
+        this.student = student;
     }
 
     @Override
-    public void onException(Object source, Throwable ex) {
+    protected AbstractCommonView getParentView() {
+        return null;//TODO
+//        return new ApplicantsList();
     }
 
-    private class BirthCountryChangeListener implements Property.ValueChangeListener {
-
-        private final FKFieldModel birthRegionFieldModel;
-        private final COUNTRY birthRegion;
-
-        public BirthCountryChangeListener(FKFieldModel birthRegionFieldModel, COUNTRY birthRegion) {
-            this.birthRegionFieldModel = birthRegionFieldModel;
-            this.birthRegion = birthRegion;
-        }
-
-        @Override
-        public void valueChange(ValueChangeEvent ev) {
-            Object value = ev.getProperty().getValue();
-            QueryModel qm = birthRegionFieldModel.getQueryModel();
-            if (value != null) {
-                qm.addWhere("parent", ECriteria.EQUAL, ((COUNTRY) value).getId());
-            } else {
-                qm.addWhere("parent", ECriteria.EQUAL, ID.valueOf(-1));
-            }
-            try {
-                birthRegionFieldModel.refresh(birthRegion);
-            } catch (Exception e) {
-                e.printStackTrace();//TODO catch
-            }
-        }
+    @Override
+    public String getViewName() {
+        return "applicantsForm";
     }
 
-    private class SchoolCountryChangeListener implements Property.ValueChangeListener {
-
-        private final FKFieldModel schoolRegionFieldModel;
-        private final COUNTRY schoolRegion;
-
-        public SchoolCountryChangeListener(FKFieldModel schoolRegionFieldModel, COUNTRY schoolRegion) {
-            this.schoolRegionFieldModel = schoolRegionFieldModel;
-            this.schoolRegion = schoolRegion;
-        }
-
-        @Override
-        public void valueChange(ValueChangeEvent ev) {
-            Object value = ev.getProperty().getValue();
-            QueryModel qm = schoolRegionFieldModel.getQueryModel();
-            if (value != null) {
-                qm.addWhere("parent", ECriteria.EQUAL, ((COUNTRY) value).getId());
-            } else {
-                qm.addWhere("parent", ECriteria.EQUAL, ID.valueOf(-1));
-            }
-            try {
-                schoolRegionFieldModel.refresh(schoolRegion);
-            } catch (Exception e) {
-                e.printStackTrace();//TODO catch
-            }
-        }
-    }
-
-    private class CountryChangeListener implements Property.ValueChangeListener {
-
-        private final COUNTRY region;
-        private final FKFieldModel regionFM;
-
-        public CountryChangeListener(COUNTRY region, FKFieldModel regionFM) {
-            this.region = region;
-            this.regionFM = regionFM;
-        }
-
-        @Override
-        public void valueChange(ValueChangeEvent ev) {
-            Object value = ev.getProperty().getValue();
-            QueryModel qm = regionFM.getQueryModel();
-            if (value != null) {
-                qm.addWhere("parent", ECriteria.EQUAL, ((COUNTRY) value).getId());
-            } else {
-                qm.addWhere("parent", ECriteria.EQUAL, ID.valueOf(-1));
-            }
-            try {
-                regionFM.refresh(region);
-            } catch (Exception e) {
-                e.printStackTrace();//TODO catch
-            }
-        }
-    }
-
-    private class RegionChangeListener implements Property.ValueChangeListener {
-
-        private final COUNTRY city;
-        private final FKFieldModel cityFM;
-
-        public RegionChangeListener(COUNTRY city, FKFieldModel cityFM) {
-            this.city = city;
-            this.cityFM = cityFM;
-        }
-
-        @Override
-        public void valueChange(ValueChangeEvent ev) {
-            Object value = ev.getProperty().getValue();
-            QueryModel qm = cityFM.getQueryModel();
-            if (value != null) {
-                qm.addWhere("parent", ECriteria.EQUAL, ((COUNTRY) value).getId());
-            } else {
-                qm.addWhere("parent", ECriteria.EQUAL, ID.valueOf(-1));
-            }
-            try {
-                cityFM.refresh(city);
-            } catch (Exception e) {
-                e.printStackTrace();//TODO catch
-            }
-        }
-    }
-
-    private class CityChangeListener implements Property.ValueChangeListener {
-
-        private final COUNTRY village;
-        private final FKFieldModel villageFM;
-
-        public CityChangeListener(COUNTRY village, FKFieldModel villageFM) {
-            this.village = village;
-            this.villageFM = villageFM;
-        }
-
-        @Override
-        public void valueChange(ValueChangeEvent ev) {
-            Object value = ev.getProperty().getValue();
-            QueryModel qm = villageFM.getQueryModel();
-            if (value != null) {
-                qm.addWhere("parent", ECriteria.EQUAL, ((COUNTRY) value).getId());
-            } else {
-                qm.addWhere("parent", ECriteria.EQUAL, ID.valueOf(-1));
-            }
-            try {
-                villageFM.refresh(village);
-            } catch (Exception e) {
-                e.printStackTrace();//TODO catch
-            }
-        }
+    @Override
+    protected String getViewTitle(Locale locale) {
+        return getUILocaleUtil().getCaption("regapplicant");
     }
 }

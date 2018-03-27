@@ -9,6 +9,7 @@
         <!--<mapping-file>META-INF/custom-orm.xml</mapping-file>-->
         <class>org.r3a.common.entity.ID</class>
         <class>org.r3a.common.entity.AbstractEntity</class>
+
         <class>org.r3a.common.entity.beans.AbstractSetting</class>
         <class>org.r3a.common.entity.beans.AbstractEmail</class>
         <class>org.r3a.common.entity.beans.AbstractLog</class>
@@ -22,6 +23,7 @@
         <class>org.r3a.common.entity.beans.AbstractTask</class>
         <class>org.r3a.common.entity.beans.AbstractUserRole</class>
         <class>org.r3a.common.entity.beans.AbstractUser</class>
+
         <class>kz.halyqsoft.univercity.entity.beans.EMAIL</class>
         <class>kz.halyqsoft.univercity.entity.beans.EMAIL_STATUS</class>
         <class>kz.halyqsoft.univercity.entity.beans.LOG</class>
@@ -36,40 +38,253 @@
         <class>kz.halyqsoft.univercity.entity.beans.TASKS</class>
         <class>kz.halyqsoft.univercity.entity.beans.USER_ROLES</class>
         <class>kz.halyqsoft.univercity.entity.beans.USERS</class>
-        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.NATIONALITY</class>
-        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR</class>
-        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.LEVEL</class>
-        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDENT_CATEGORY</class>
-        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEPARTMENT</class>
-        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.POST</class>
-        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEX</class>
-        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.MARITAL_STATUS</class>
-        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.COUNTRY</class>
+
+        <!--<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.AbstractCategoryEntity</class>-->
+        <!--<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.AbstractStatusEntity</class>-->
+        <!--<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.AbstractTypeEntity</class>-->
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.ACADEMIC_CALENDAR_FACULTY</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.ACADEMIC_CALENDAR_ITEM</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.ACADEMIC_DEGREE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.ACADEMIC_FORMULA</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.ACADEMIC_STATUS</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.ADDRESS_TYPE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.ATTESTATION_TYPE</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.AWARD</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.CONTRACT_TYPE</class>
-        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEGREE</class>
-        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.RATING_SCALE</class>
-        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.LANGUAGE_LEVEL</class>
-        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.LANGUAGE</class>
-        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.EQUIPMENT</class>
-        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.MEDICAL_CHECKUP_TYPE</class>
-        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.MILITARY_STATUS</class>
-        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.ORDER_TYPE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.CONTROL_TYPE</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.CORPUS</class>
-        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.SCHOOL_TYPE</class>
-        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.SOCIAL_CATEGORY</class>
-        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDENT_STATUS</class>
-        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.UNIVERSITY</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.COUNTRY</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.CREDITABILITY</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.CURRICULUM_SCHEDULE_SYMBOL</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.CURRICULUM_STATUS</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.DATA_TYPE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.DAY_HOUR</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEGREE</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEPARTMENT</class>
-        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.ACADEMIC_DEGREE</class>
-        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.ORGANIZATION_TYPE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.DOCUMENT_TYPE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.DORM</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.DORM_COST</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.DORM_ROOM</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.DORM_RULE_VIOLATION_TYPE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.ECTS</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.EDUCATION_DOC_TYPE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.EDUCATION_TYPE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.ELECTIVE_SUBJECT_LABEL</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.EMPLOYEE_STATUS</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.EMPLOYEE_TYPE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.EQUIPMENT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.GRANT_TYPE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.GROUP_SIZE_LAB</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.GROUP_SIZE_LECTURE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.GROUP_SIZE_PRAC</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.LANGUAGE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.LANGUAGE_LEVEL</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.LESSON_TYPE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.LEVEL</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.LOCK_REASON</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.MARITAL_STATUS</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.MEDICAL_CHECKUP_TYPE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.MILITARY_DOC_TYPE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.MILITARY_STATUS</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.MONTH</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.NATIONALITY</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.ORDER_TYPE</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.ORGANIZATION</class>
-        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_PERIOD</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.ORGANIZATION_TYPE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.PASSPORT_TYPE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.PAYMENT_TYPE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.POST</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.PROPERTY</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.PROPERTY_TYPE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.PUBLICATION_TYPE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.QUESTIONNAIRE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.QUESTIONNAIRE_ANSWER</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.QUESTIONNAIRE_QUESTION</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.QUESTIONNAIRE_SECTION</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.QUESTIONNAIRE_TYPE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.RATING_SCALE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.REGISTRATION_SIGNATURE_TYPE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.RELATIVE_TYPE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.REQUEST_STATUS</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.REQUEST_TYPE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.ROOM</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.ROOM_TYPE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.SCHOOL_CERTIFICATE_TYPE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.SCHOOL_TYPE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.SCIENTIFIC_ACTIVITY_TYPE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.SCIENTIFIC_MANAGEMENT_TYPE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.SCIENTIFIC_TYPE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_DATA</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_PERIOD</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEX</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.SOCIAL_CATEGORY</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.SPECIALITY</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDENT_CATEGORY</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDENT_EDUCATION_TYPE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDENT_STATUS</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDY_DIRECT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDY_YEAR</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT_CYCLE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT_REQUISITE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.TIME</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.UNIVERSITY</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.UNT_SUBJECT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.USER_TYPE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.WEEK</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.WEEK_DAY</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.WORK_HOUR_STATUS</class>
+
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_SPECIALITY</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_ORGANIZATION</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_USER_LANGUAGE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_MEDICAL_CHECKUP</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_UNT_CERT_SUBJECT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_ENTRANT_SPECIALITY</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_USER_AWARD</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_USER_SOCIAL_CATEGORY</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_TEACHER_SUBJECT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_EMPLOYEE_DEGREE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_PUBLICATION</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_SCIENTIFIC_ACTIVITY</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_SCIENTIFIC_MANAGEMENT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_EMPLOYEE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.VT_EMPLOYEE_DEPT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_ROOM</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_ROOM_EQUIPMENT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_ROOM_SUBJECT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_ROOM_DEPARTMENT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_KBTU_ENTRANTS</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_CURRICULUM_DETAIL</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_ACADEMIC_DEGREE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_ELECTIVE_SUBJECT_LABEL</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_CURRICULUM_ADD_PROGRAM</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_STUDENT_SUBJECT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_TEACHER_LOAD_CALC_DETAIL</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_STUDENT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_TEACHER_LOAD_ASSIGN_DETAIL</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_LESSON_DETAIL</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_TEST_RESULT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_TEST_R</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_STUDENT_SCHEDULE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_ELECTIVE_SUBJECT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_TRANSCRIPT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_STUDENT_SUBJECT_SUM</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_EXAM_SCHEDULE_SUM</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_ORDER_DOC</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_EXAM_DETAIL</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_LESSON_DETAIL_FULL</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_SEMESTER_DATA</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_ADVISOR</class>
-        <!--<class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_ENTRANT_SPECIALITY</class>-->
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_SUBJECT_SELECT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_SEMESTER_SUBJECT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_STUDENT_SELECT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_TEACHER_ROOM</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_TEACHER_SUBJECT_SELECT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_EXAM_SCHEDULE_SELECT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_EXAM_TRANSCRIPT</class>
+
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.AbstractSpiderEntity</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.AbstractStudentEntity</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.AbstractWorkHourEntity</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.USER_PHOTO</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.USER_DOCUMENT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.USER_DOCUMENT_FILE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.USER_PASSPORT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.MILITARY_DOC</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.EDUCATION_DOC</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.MEDICAL_CHECKUP</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.DISABILITY_DOC</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.REPATRIATE_DOC</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.UNT_CERTIFICATE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.GRANT_DOC</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_CONTRACT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.ORDER_DOC</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.PREEMPTIVE_RIGHT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.UNT_CERT_SUBJECT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.USER_ADDRESS</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.STUDENT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_RELATIVE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_EDUCATION</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.ENTRANT_SPECIALITY</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.USER_AWARD</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.USER_SOCIAL_CATEGORY</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.USER_LANGUAGE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE_DEGREE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE_DEPT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE_SCIENTIFIC</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.PUBLICATION</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.SCIENTIFIC_ACTIVITY</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.SCIENTIFIC_MANAGEMENT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.SCIENTIFIC_MANAGEMENT_FILE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.PREVIOUS_EXPERIENCE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE_WORK_HOUR</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.TEACHER_SUBJECT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.ROOM_SUBJECT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.ROOM_EQUIPMENT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.ROOM_WORK_HOUR</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.ROOM_DEPARTMENT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM_DETAIL</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM_ADD_PROGRAM</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM_SCHEDULE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_SUBJECT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.TEACHER_LOAD_CALC</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.TEACHER_LOAD_CALC_DETAIL</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.TEACHER_LOAD_ASSIGN</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.TEACHER_LOAD_ASSIGN_DETAIL</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.SCHEDULE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.SCHEDULE_DETAIL</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.SCHEDULE_LOG</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.TESTING_SUBJECT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.THEME</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.QUESTIONS</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_TEST</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_ANSWER</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.ANSWER</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_SCHEDULE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.LESSON</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.LESSON_DETAIL</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.ELECTIVE_SUBJECT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.EXAM_SCHEDULE_DETAIL</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.EXAM_SCHEDULE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.EXAM</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.EXAM_DETAIL</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.AUTHORIZED_SIGN_TRANSCRIPT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.DEATH_CERTIFICATE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.GUARDIAN_COUNCIL_DECISION</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.OTHER_DOCUMENT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.TIN</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.SEMESTER_SUBJECT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.ATTESTATION</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.ATTESTATION_DETAIL</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.ACADEMIC_CALENDAR</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.ACADEMIC_CALENDAR_DETAIL</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.TEACHER_ROOM</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.SCHEDULE_PROPERTY</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.GRADUATE_STUDENT_LOAD</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.QUESTIONING</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.QUESTIONING_DETAIL</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.USER_FILE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.NEWS</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.NEWS_FILE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.NEWS_COMMENT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_FIN_DEBT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_PAYMENT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.REGISTRATION_SIGNATURE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.DORM_STUDENT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.DORM_STUDENT_VIOLATION</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.REQUEST</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.REQUEST_FILE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.REQUEST_REPORT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM_SUMMER</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM_SUMMER_DETAIL</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.GRADUATION_PROJECT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.USER</class>
+
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
         <properties>
