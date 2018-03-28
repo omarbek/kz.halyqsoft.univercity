@@ -51,32 +51,40 @@ import static com.vaadin.ui.Table.Align;
  */
 public final class ApplicantsForm extends AbstractFormWidgetView {
 
-    private AbstractFormWidget dataFW;
+    private AbstractFormWidget dataAFW;
     private HorizontalSplitPanel registrationHSP;
-    private HorizontalLayout content;
-    private VerticalLayout buttonForm;
-    private TableWidget specTW, documentsTW, languagesTW, medicalCheckupTW, awardsTW, socialCategoriesTW, untRatesTW;
-    private GridFormWidget passportFW, militaryFW, disabilityFW, repatriateFW, grantFW, preemptiveRightFW;
-    private GridFormWidget certificateFW, addressRegFW, addressFactFW, fatherFW, motherFW, dataContractFW, educDocFW;
-    private int flag;
+    private HorizontalLayout contentHL;
+    private VerticalLayout buttonsVL;
+    private VerticalLayout messForm;
+    private FromItem educationUDFI;
+    private FileListFieldModel militaryFLFM;
+
+    private TableWidget specTW, documentsTW, languagesTW, medicalCheckupTW;
+    private TableWidget awardsTW, socialCategoriesTW, untRatesTW;
+    private GridFormWidget passportGFW, militaryGFW, disabilityGFW, repatriateGFW, grantGFW;
+    private GridFormWidget preemptiveRightGFW, certificateGFW, addressRegGFW;
+    private GridFormWidget addressFactGFW, fatherGFW, motherGFW, dataContractGFW, educDocGFW;
 
     private Button mainDataButton, factAddressButton, regAddressButton, specButton;
     private Button idDocButton, militaryButton, disabilityButton, repatriateButton;
-    private Button eduDocButton, educationDocsButton, preemRightButton;
+    private Button eduDocButton, eduDocsButton, preemRightButton;
     private Button medButton;
     private Button untButton, grantDocButton;
     private Button motherButton, fatherButton;
     private Button contractButton, moreButton;
     private Button finishButton;
+    private Button nextFactAddressButton, nextRegAddressButton, nextSpecButton;
+    private Button nextIdDocButton, nextMilitaryButton, nextDisabilityButton;
+    private Button nextRepatriateButton, nextEduDocButton, nextEduDocsButton;
+    private Button nextPreemRightButton, nextMedButton;
+    private Button nextUntButton, nextGrantDocButton, nextMotherButton, nextFatherButton;
+    private Button nextContractButton, nextMoreButton, nextFinishButton;
 
-    private Button nextSpecButton, nextIdDocButton, nextMilitaryButton, nextDisabilityButton, nextRepatriateButton, nextEduDocButton, nextEduDocsButton, nextPreemRightButton, nextMedButton, nextUntButton;
-    private Button nextGrantDocButton, nextMotherButton, nextFatherButton, nextFactAddressButton, nextRegAddressButton, nextMoreButton, next17, nextFinishButton;
     private boolean saveData, savePass, saveEduc, saveUNT;
-    private VerticalLayout messForm;
-    private FromItem educationUDFI;
-    //    private List<T_STUDENT> newStudentList = new ArrayList<T_STUDENT>();
-//    private List<T_STUDENT> delStudentList = new ArrayList<T_STUDENT>();
+    //    private List<STUDENT> newStudentList = new ArrayList<>();
+//    private List<STUDENT> delStudentList = new ArrayList<>();
     private STUDENT student;
+    private Flag flag;
 
     ApplicantsForm(final FormModel dataFM) throws Exception {
 
@@ -86,24 +94,24 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         registrationHSP.setSplitPosition(20);
         registrationHSP.setSizeFull();
 
-        buttonForm = new VerticalLayout();
-        buttonForm.setSpacing(true);
-        buttonForm.setSizeFull();
+        buttonsVL = new VerticalLayout();
+        buttonsVL.setSpacing(true);
+        buttonsVL.setSizeFull();
 
-        content = new HorizontalLayout();
-        content.setSpacing(true);
-        content.setSizeFull();
+        contentHL = new HorizontalLayout();
+        contentHL.setSpacing(true);
+        contentHL.setSizeFull();
 
 		/*�������� ������*/
         dataFM.setButtonsVisible(false);
         dataFM.getFieldModel("academicStatus").setInEdit(false);
         dataFM.getFieldModel("academicStatus").setInView(false);
-        dataFW = new GridFormWidget(dataFM);
-        dataFW.addEntityListener(this);
-        dataFM.getGridColumnCount();
+        dataAFW = new GridFormWidget(dataFM);
+        dataAFW.addEntityListener(this);
+//        dataFM.getGridColumnCount();
         dataFM.getFieldModel("email").getValidators().add(new EmailValidator("����� �� ���������� E-mail"));
 //		dataFM.getFieldModel("phoneMobile").getValidators().add(new RegexpValidator("^\\d{10}$", "������� (���.) ������ ��������� 10 ����"));
-        dataFW.setCaption(getUILocaleUtil().getCaption("regapplicant.main.data"));
+        dataAFW.setCaption(getUILocaleUtil().getCaption("regapplicant.main.data"));
         dataFM.getFieldModel("email").setRequired(true);
         dataFM.getFieldModel("email").setReadOnly(false);
         dataFM.getFieldModel("phoneMobile").setRequired(true);
@@ -112,18 +120,18 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         advisorFM.setSelectType(ESelectType.CUSTOM_GRID);
         advisorFM.setDialogHeight(400);
         advisorFM.setDialogWidth(600);
-        QueryModel advisorQM = advisorFM.getQueryModel();
+//        QueryModel advisorQM = advisorFM.getQueryModel();
 
         try {
             TextField fioTF = new TextField();
             fioTF.setImmediate(true);
             fioTF.setWidth(400, Unit.PIXELS);
 
-            QueryModel<DEPARTMENT> chairQM = new QueryModel<DEPARTMENT>(DEPARTMENT.class);
+            QueryModel<DEPARTMENT> chairQM = new QueryModel<>(DEPARTMENT.class);
             chairQM.addWhereNotNull("parent");
             chairQM.addWhereAnd("deleted", Boolean.FALSE);
             chairQM.addOrder("deptName");
-            BeanItemContainer<DEPARTMENT> chairBIC = new BeanItemContainer<DEPARTMENT>(DEPARTMENT.class, SessionFacadeFactory
+            BeanItemContainer<DEPARTMENT> chairBIC = new BeanItemContainer<>(DEPARTMENT.class, SessionFacadeFactory
                     .getSessionFacade(CommonEntityFacadeBean.class).lookup(chairQM));
             ComboBox chairCB = new ComboBox();
             chairCB.setContainerDataSource(chairBIC);
@@ -134,9 +142,9 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             chairCB.setPageLength(0);
             chairCB.setWidth(400, Unit.PIXELS);
 
-            QueryModel<POST> postQM = new QueryModel<POST>(POST.class);
+            QueryModel<POST> postQM = new QueryModel<>(POST.class);
             postQM.addOrder("postName");
-            BeanItemContainer<POST> postBIC = new BeanItemContainer<POST>(POST.class, SessionFacadeFactory
+            BeanItemContainer<POST> postBIC = new BeanItemContainer<>(POST.class, SessionFacadeFactory
                     .getSessionFacade(CommonEntityFacadeBean.class).lookup(postQM));
             ComboBox postCB = new ComboBox();
             postCB.setContainerDataSource(postBIC);
@@ -159,7 +167,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         }
 
 		/*���������������� �����*/
-        QueryModel<USER_DOCUMENT_FILE> udfQM = new QueryModel<USER_DOCUMENT_FILE>(USER_DOCUMENT_FILE.class);
+        QueryModel<USER_DOCUMENT_FILE> udfQM = new QueryModel<>(USER_DOCUMENT_FILE.class);
         udfQM.addSelect("id");
         udfQM.addSelect("fileName");
         udfQM.addWhere("userDocument", ECriteria.EQUAL, null);
@@ -218,9 +226,9 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         sb.append(getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
         sb.append(getUILocaleUtil().getCaption("preemptive.right"));
-        preemptiveRightFW = new GridFormWidget(PREEMPTIVE_RIGHT.class);
-        preemptiveRightFW.addEntityListener(this);
-        final FormModel preemptiveRightFM = preemptiveRightFW.getWidgetModel();
+        preemptiveRightGFW = new GridFormWidget(PREEMPTIVE_RIGHT.class);
+        preemptiveRightGFW.addEntityListener(this);
+        final FormModel preemptiveRightFM = preemptiveRightGFW.getWidgetModel();
         preemptiveRightFM.setTitleResource("preemptive.right");
         preemptiveRightFM.setErrorMessageTitle(sb.toString());
         preemptiveRightFM.setButtonsVisible(false);
@@ -228,35 +236,25 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         FileListFieldModel preemptiveRightFLFM = (FileListFieldModel) preemptiveRightFM.getFieldModel("fileList");
         preemptiveRightFLFM.permitMimeType(FileListFieldModel.JPEG);
 
-        if (dataFW.getWidgetModel().isCreateNew()) {
+        if (dataAFW.getWidgetModel().isCreateNew()) {
             preemptiveRightFM.createNew();
         } else {
-            QueryModel<PREEMPTIVE_RIGHT> preemptiveRightQM = new QueryModel<PREEMPTIVE_RIGHT>(PREEMPTIVE_RIGHT.class);
+            QueryModel<PREEMPTIVE_RIGHT> preemptiveRightQM = new QueryModel<>(PREEMPTIVE_RIGHT.class);
             FromItem fi = preemptiveRightQM.addJoin(EJoin.INNER_JOIN, "id", USER_DOCUMENT.class, "id");
-            preemptiveRightQM.addWhere(fi, "user", ECriteria.EQUAL, dataFW.getWidgetModel().getEntity().getId());
+            preemptiveRightQM.addWhere(fi, "user", ECriteria.EQUAL, dataAFW.getWidgetModel().getEntity().getId());
             preemptiveRightQM.addWhereAnd(fi, "deleted", Boolean.FALSE);
             try {
                 PREEMPTIVE_RIGHT preemptiveRight = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(preemptiveRightQM);
                 if (preemptiveRight != null) {
                     preemptiveRightFM.loadEntity(preemptiveRight.getId());
                     udfQM.addWhere("userDocument", ECriteria.EQUAL, preemptiveRight.getId());
-                    List udfList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(udfQM);
-                    if (!udfList.isEmpty()) {
-//                        for (Object o : udfList) {
-//                            Object[] oo = (Object[]) o;
-//                            FileBean fe = new FileBean( USER_DOCUMENT_FILE.class);
-//                            fe.setId(ID.valueOf((Long) oo[0]));
-//                            fe.setFileName((String) oo[1]);
-//                            fe.setNewFile(false);
-//                            preemptiveRightFLFM.getFileList().add(fe);
-//                        }
-                    }
+                    addFiles(udfQM, preemptiveRightFLFM);
                 }
             } catch (NoResultException ex) {
                 preemptiveRightFM.createNew();
             }
         }
-        /***********************************/return preemptiveRightFM;
+        return preemptiveRightFM;
     }
 
     private FormModel createIdentityDoc(QueryModel<USER_DOCUMENT_FILE> udfQM) throws Exception {
@@ -265,10 +263,10 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         sb.append(getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
         sb.append(getUILocaleUtil().getCaption("identity.document"));
-        passportFW = new GridFormWidget(USER_PASSPORT.class);
-        passportFW.addEntityListener(this);
-        passportFW.focus();
-        final FormModel userPassportFM = passportFW.getWidgetModel();
+        passportGFW = new GridFormWidget(USER_PASSPORT.class);
+        passportGFW.addEntityListener(this);
+        passportGFW.focus();
+        final FormModel userPassportFM = passportGFW.getWidgetModel();
         userPassportFM.setTitleResource("identity.document");
         userPassportFM.setErrorMessageTitle(sb.toString());
         userPassportFM.setButtonsVisible(false);
@@ -291,12 +289,12 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         FileListFieldModel passportFLFM = (FileListFieldModel) userPassportFM.getFieldModel("fileList");
         passportFLFM.permitMimeType(FileListFieldModel.JPEG);
 
-        if (dataFW.getWidgetModel().isCreateNew()) {
+        if (dataAFW.getWidgetModel().isCreateNew()) {
             userPassportFM.createNew();
         } else {
-            QueryModel<USER_PASSPORT> userPassportQM = new QueryModel<USER_PASSPORT>(USER_PASSPORT.class);
+            QueryModel<USER_PASSPORT> userPassportQM = new QueryModel<>(USER_PASSPORT.class);
             FromItem fi = userPassportQM.addJoin(EJoin.INNER_JOIN, "id", USER_DOCUMENT.class, "id");
-            userPassportQM.addWhere(fi, "user", ECriteria.EQUAL, dataFW.getWidgetModel().getEntity().getId());
+            userPassportQM.addWhere(fi, "user", ECriteria.EQUAL, dataAFW.getWidgetModel().getEntity().getId());
             userPassportQM.addWhereAnd(fi, "deleted", Boolean.FALSE);
             try {
                 USER_PASSPORT userPassport = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(userPassportQM);
@@ -306,15 +304,15 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                     udfQM.addWhere("userDocument", ECriteria.EQUAL, userPassport.getId());
                     List udfList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(udfQM);
                     if (!udfList.isEmpty()) {
-//                        for (Object o : udfList) {
-//                            Object[] oo = (Object[]) o;
-//                            FileBean fe = new FileBean(USER_DOCUMENT_FILE.class);
-//                            fe.setId(ID.valueOf((Long) oo[0]));
-//                            fe.setFileName((String) oo[1]);
-//                            LOG.error("It somehow works! " + fe.toString());
-//                            fe.setNewFile(false);
-//                            passportFLFM.getFileList().add(fe);
-//                        }
+                        for (Object o : udfList) {
+                            Object[] oo = (Object[]) o;
+                            FileBean fe = new FileBean(USER_DOCUMENT_FILE.class);
+                            fe.setId(ID.valueOf((Long) oo[0]));
+                            fe.setFileName((String) oo[1]);
+                            LOG.error("It somehow works! " + fe.toString());
+                            fe.setNewFile(false);
+                            passportFLFM.getFileList().add(fe);
+                        }
                     }
                 }
             } catch (NoResultException ex) {
@@ -322,7 +320,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             }
         }
         birthCountryFieldModel.getListeners().add(new BirthCountryChangeListener(birthRegionFieldModel, birthRegion));
-        /***********************************/return userPassportFM;
+        return userPassportFM;
     }
 
     private FormModel createMilitaryDoc(QueryModel<USER_DOCUMENT_FILE> udfQM) throws Exception {
@@ -331,45 +329,35 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         sb.append(getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
         sb.append(getUILocaleUtil().getCaption("military.document"));
-        militaryFW = new GridFormWidget(MILITARY_DOC.class);
-        militaryFW.addEntityListener(this);
-        militaryFW.addStyleName("toTop");
-        final FormModel militaryDocFM = militaryFW.getWidgetModel();
+        militaryGFW = new GridFormWidget(MILITARY_DOC.class);
+        militaryGFW.addEntityListener(this);
+        militaryGFW.addStyleName("toTop");
+        final FormModel militaryDocFM = militaryGFW.getWidgetModel();
         militaryDocFM.setTitleResource("military.document");
         militaryDocFM.setErrorMessageTitle(sb.toString());
         militaryDocFM.setButtonsVisible(false);
         ((FKFieldModel) militaryDocFM.getFieldModel("militaryDocType")).addStyle("toTop");
 
-        FileListFieldModel militaryFLFM = (FileListFieldModel) militaryDocFM.getFieldModel("fileList");
+        militaryFLFM = (FileListFieldModel) militaryDocFM.getFieldModel("fileList");
         militaryFLFM.permitMimeType(FileListFieldModel.JPEG);
 
-        if (dataFW.getWidgetModel().isCreateNew()) {
+        if (dataAFW.getWidgetModel().isCreateNew()) {
             militaryDocFM.createNew();
         } else {
-            QueryModel<MILITARY_DOC> militaryDocQM = new QueryModel<MILITARY_DOC>(MILITARY_DOC.class);
+            QueryModel<MILITARY_DOC> militaryDocQM = new QueryModel<>(MILITARY_DOC.class);
             FromItem fi = militaryDocQM.addJoin(EJoin.INNER_JOIN, "id", USER_DOCUMENT.class, "id");
-            militaryDocQM.addWhere(fi, "user", ECriteria.EQUAL, dataFW.getWidgetModel().getEntity().getId());
+            militaryDocQM.addWhere(fi, "user", ECriteria.EQUAL, dataAFW.getWidgetModel().getEntity().getId());
             militaryDocQM.addWhereAnd(fi, "deleted", Boolean.FALSE);
             try {
                 MILITARY_DOC militaryDoc = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(militaryDocQM);
                 militaryDocFM.loadEntity(militaryDoc.getId());
                 udfQM.addWhere("userDocument", ECriteria.EQUAL, militaryDoc.getId());
-                List udfList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(udfQM);
-                if (!udfList.isEmpty()) {
-//                    for (Object o : udfList) {
-//                        Object[] oo = (Object[]) o;
-//                        FileBean fe = new FileBean(USER_DOCUMENT_FILE.class);
-//                        fe.setId(ID.valueOf((Long) oo[0]));
-//                        fe.setFileName((String) oo[1]);
-//                        fe.setNewFile(false);
-//                        militaryFLFM.getFileList().add(fe);
-//                    }
-                }
+                addFiles(udfQM, militaryFLFM);
             } catch (NoResultException ex) {
                 militaryDocFM.createNew();
             }
         }
-        /***********************************************************************************/return militaryDocFM;
+        return militaryDocFM;
     }
 
     private FormModel createDisability(QueryModel<USER_DOCUMENT_FILE> udfQM) throws Exception {
@@ -378,10 +366,10 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         sb.append(getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
         sb.append(getUILocaleUtil().getCaption("disability.document"));
-        disabilityFW = new GridFormWidget(DISABILITY_DOC.class);
-        disabilityFW.addEntityListener(this);
-        disabilityFW.addStyleName("toTop");
-        final FormModel disabilityDocFM = disabilityFW.getWidgetModel();
+        disabilityGFW = new GridFormWidget(DISABILITY_DOC.class);
+        disabilityGFW.addEntityListener(this);
+        disabilityGFW.addStyleName("toTop");
+        final FormModel disabilityDocFM = disabilityGFW.getWidgetModel();
         disabilityDocFM.setTitleResource("disability.document");
         disabilityDocFM.setErrorMessageTitle(sb.toString());
         disabilityDocFM.setButtonsVisible(false);
@@ -390,28 +378,18 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         FileListFieldModel disabilityFLFM = (FileListFieldModel) disabilityDocFM.getFieldModel("fileList");
         disabilityFLFM.permitMimeType(FileListFieldModel.JPEG);
 
-        if (dataFW.getWidgetModel().isCreateNew()) {
+        if (dataAFW.getWidgetModel().isCreateNew()) {
             disabilityDocFM.createNew();
         } else {
             QueryModel<DISABILITY_DOC> disabilityDocQM = new QueryModel<DISABILITY_DOC>(DISABILITY_DOC.class);
             FromItem fi = disabilityDocQM.addJoin(EJoin.INNER_JOIN, "id", USER_DOCUMENT.class, "id");
-            disabilityDocQM.addWhere(fi, "user", ECriteria.EQUAL, dataFW.getWidgetModel().getEntity().getId());
+            disabilityDocQM.addWhere(fi, "user", ECriteria.EQUAL, dataAFW.getWidgetModel().getEntity().getId());
             disabilityDocQM.addWhereAnd(fi, "deleted", Boolean.FALSE);
             try {
                 DISABILITY_DOC disabilityDoc = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(disabilityDocQM);
                 disabilityDocFM.loadEntity(disabilityDoc.getId());
                 udfQM.addWhere("userDocument", ECriteria.EQUAL, disabilityDoc.getId());
-                List udfList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(udfQM);
-                if (!udfList.isEmpty()) {
-//                    for (Object o : udfList) {
-//                        Object[] oo = (Object[]) o;
-//                        FileBean fe = new FileBean( USER_DOCUMENT_FILE.class);
-//                        fe.setId(ID.valueOf((Long) oo[0]));
-//                        fe.setFileName((String) oo[1]);
-//                        fe.setNewFile(false);
-//                        disabilityFLFM.getFileList().add(fe);
-//                    }
-                }
+                addFiles(udfQM, disabilityFLFM);
             } catch (NoResultException ex) {
                 disabilityDocFM.createNew();
             }
@@ -425,10 +403,10 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         sb.append(getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
         sb.append(getUILocaleUtil().getCaption("repatriate.document"));
-        repatriateFW = new GridFormWidget(REPATRIATE_DOC.class);
-        repatriateFW.addEntityListener(this);
-        repatriateFW.addStyleName("toTop");
-        final FormModel repatriateDocFM = repatriateFW.getWidgetModel();
+        repatriateGFW = new GridFormWidget(REPATRIATE_DOC.class);
+        repatriateGFW.addEntityListener(this);
+        repatriateGFW.addStyleName("toTop");
+        final FormModel repatriateDocFM = repatriateGFW.getWidgetModel();
         repatriateDocFM.setTitleResource("repatriate.document");
         repatriateDocFM.setErrorMessageTitle(sb.toString());
         repatriateDocFM.setButtonsVisible(false);
@@ -436,28 +414,18 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         FileListFieldModel repatriateFLFM = (FileListFieldModel) repatriateDocFM.getFieldModel("fileList");
         repatriateFLFM.permitMimeType(FileListFieldModel.JPEG);
 
-        if (dataFW.getWidgetModel().isCreateNew()) {
+        if (dataAFW.getWidgetModel().isCreateNew()) {
             repatriateDocFM.createNew();
         } else {
             QueryModel<REPATRIATE_DOC> repatriateDocQM = new QueryModel<REPATRIATE_DOC>(REPATRIATE_DOC.class);
             FromItem fi = repatriateDocQM.addJoin(EJoin.INNER_JOIN, "id", USER_DOCUMENT.class, "id");
-            repatriateDocQM.addWhere(fi, "user", ECriteria.EQUAL, dataFW.getWidgetModel().getEntity().getId());
+            repatriateDocQM.addWhere(fi, "user", ECriteria.EQUAL, dataAFW.getWidgetModel().getEntity().getId());
             repatriateDocQM.addWhereAnd(fi, "deleted", Boolean.FALSE);
             try {
                 REPATRIATE_DOC repatriateDoc = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(repatriateDocQM);
                 repatriateDocFM.loadEntity(repatriateDoc.getId());
                 udfQM.addWhere("userDocument", ECriteria.EQUAL, repatriateDoc.getId());
-                List udfList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(udfQM);
-                if (!udfList.isEmpty()) {
-//                    for (Object o : udfList) {
-//                        Object[] oo = (Object[]) o;
-//                        FileBean fe = new FileBean(USER_DOCUMENT_FILE.class);
-//                        fe.setId(ID.valueOf((Long) oo[0]));
-//                        fe.setFileName((String) oo[1]);
-//                        fe.setNewFile(false);
-//                        repatriateFLFM.getFileList().add(fe);
-//                    }
-                }
+                addFiles(udfQM, repatriateFLFM);
             } catch (NoResultException ex) {
                 repatriateDocFM.createNew();
             }
@@ -471,9 +439,9 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         sb.append(getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
         sb.append(getUILocaleUtil().getCaption("grant.document"));
-        grantFW = new GridFormWidget(GRANT_DOC.class);
-        grantFW.addEntityListener(this);
-        final FormModel grantDocFM = grantFW.getWidgetModel();
+        grantGFW = new GridFormWidget(GRANT_DOC.class);
+        grantGFW.addEntityListener(this);
+        final FormModel grantDocFM = grantGFW.getWidgetModel();
         grantDocFM.setTitleResource("grant.document");
         grantDocFM.setErrorMessageTitle(sb.toString());
         grantDocFM.setButtonsVisible(false);
@@ -482,28 +450,18 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         FileListFieldModel grantDocFLFM = (FileListFieldModel) grantDocFM.getFieldModel("fileList");
         grantDocFLFM.permitMimeType(FileListFieldModel.JPEG);
 
-        if (dataFW.getWidgetModel().isCreateNew()) {
+        if (dataAFW.getWidgetModel().isCreateNew()) {
             grantDocFM.createNew();
         } else {
             QueryModel<GRANT_DOC> grantDocQM = new QueryModel<GRANT_DOC>(GRANT_DOC.class);
             FromItem fi = grantDocQM.addJoin(EJoin.INNER_JOIN, "id", USER_DOCUMENT.class, "id");
-            grantDocQM.addWhere(fi, "user", ECriteria.EQUAL, dataFW.getWidgetModel().getEntity().getId());
+            grantDocQM.addWhere(fi, "user", ECriteria.EQUAL, dataAFW.getWidgetModel().getEntity().getId());
             grantDocQM.addWhereAnd(fi, "deleted", Boolean.FALSE);
             try {
                 GRANT_DOC grantDoc = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(grantDocQM);
                 grantDocFM.loadEntity(grantDoc.getId());
                 udfQM.addWhere("userDocument", ECriteria.EQUAL, grantDoc.getId());
-                List udfList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(udfQM);
-                if (!udfList.isEmpty()) {
-//                    for (Object o : udfList) {
-//                        Object[] oo = (Object[]) o;
-//                        FileBean fe = new FileBean(USER_DOCUMENT_FILE.class);
-//                        fe.setId(ID.valueOf((Long) oo[0]));
-//                        fe.setFileName((String) oo[1]);
-//                        fe.setNewFile(false);
-//                        grantDocFLFM.getFileList().add(fe);
-//                    }
-                }
+                addFiles(udfQM, grantDocFLFM);
             } catch (NoResultException ex) {
                 grantDocFM.createNew();
             }
@@ -517,9 +475,9 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         sb.append(getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
         sb.append(getUILocaleUtil().getCaption("unt"));
-        certificateFW = new GridFormWidget(UNT_CERTIFICATE.class);
-        certificateFW.addEntityListener(this);
-        final FormModel untCertificateFM = certificateFW.getWidgetModel();
+        certificateGFW = new GridFormWidget(UNT_CERTIFICATE.class);
+        certificateGFW.addEntityListener(this);
+        final FormModel untCertificateFM = certificateGFW.getWidgetModel();
         untCertificateFM.setTitleResource("unt.certificate");
         untCertificateFM.setErrorMessageTitle(sb.toString());
         untCertificateFM.setButtonsVisible(false);
@@ -529,30 +487,20 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         FileListFieldModel untCertificateFLFM = (FileListFieldModel) untCertificateFM.getFieldModel("fileList");
         untCertificateFLFM.permitMimeType(FileListFieldModel.JPEG);
 
-        if (dataFW.getWidgetModel().isCreateNew()) {
+        if (dataAFW.getWidgetModel().isCreateNew()) {
             UNT_CERTIFICATE cert = (UNT_CERTIFICATE) untCertificateFM.createNew();
             cert.setRate(0);
         } else {
             QueryModel<UNT_CERTIFICATE> untCertificateQM = new QueryModel<UNT_CERTIFICATE>(UNT_CERTIFICATE.class);
             FromItem fi = untCertificateQM.addJoin(EJoin.INNER_JOIN, "id", USER_DOCUMENT.class, "id");
-            untCertificateQM.addWhere(fi, "user", ECriteria.EQUAL, dataFW.getWidgetModel().getEntity().getId());
+            untCertificateQM.addWhere(fi, "user", ECriteria.EQUAL, dataAFW.getWidgetModel().getEntity().getId());
             untCertificateQM.addWhereAnd(fi, "deleted", Boolean.FALSE);
             try {
                 UNT_CERTIFICATE untCertificate = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(untCertificateQM);
                 if (untCertificate != null) {
                     untCertificateFM.loadEntity(untCertificate.getId());
                     udfQM.addWhere("userDocument", ECriteria.EQUAL, untCertificate.getId());
-                    List udfList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(udfQM);
-                    if (!udfList.isEmpty()) {
-//                        for (Object o : udfList) {
-//                            Object[] oo = (Object[]) o;
-//                            FileBean fe = new FileBean( USER_DOCUMENT_FILE.class);
-//                            fe.setId(ID.valueOf((Long) oo[0]));
-//                            fe.setFileName((String) oo[1]);
-//                            fe.setNewFile(false);
-//                            untCertificateFLFM.getFileList().add(fe);
-//                        }
-                    }
+                    addFiles(udfQM, untCertificateFLFM);
                 }
             } catch (NoResultException ex) {
                 untCertificateFM.createNew();
@@ -567,9 +515,9 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         sb.append(getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
         sb.append(getUILocaleUtil().getCaption("address.registration"));
-        addressRegFW = new GridFormWidget(USER_ADDRESS.class);
-        addressRegFW.addEntityListener(this);
-        final FormModel addressRegFM = addressRegFW.getWidgetModel();
+        addressRegGFW = new GridFormWidget(USER_ADDRESS.class);
+        addressRegGFW.addEntityListener(this);
+        final FormModel addressRegFM = addressRegGFW.getWidgetModel();
         addressRegFM.setTitleResource("address.registration");
         addressRegFM.setErrorMessageTitle(sb.toString());
         addressRegFM.setButtonsVisible(false);
@@ -593,11 +541,11 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         villageRegQM.addWhere("parent", ECriteria.EQUAL, ID.valueOf(-1));
 
         COUNTRY regionReg = null, cityReg = null, villageReg = null;
-        if (dataFW.getWidgetModel().isCreateNew()) {
+        if (dataAFW.getWidgetModel().isCreateNew()) {
             addressRegFM.createNew();
         } else {
             QueryModel<USER_ADDRESS> addressRegQM = new QueryModel<USER_ADDRESS>(USER_ADDRESS.class);
-            addressRegQM.addWhere("user", ECriteria.EQUAL, dataFW.getWidgetModel().getEntity().getId());
+            addressRegQM.addWhere("user", ECriteria.EQUAL, dataAFW.getWidgetModel().getEntity().getId());
             addressRegQM.addWhereAnd("addressType", ECriteria.EQUAL, ID.valueOf(1));
             try {
                 USER_ADDRESS addressReg = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(addressRegQM);
@@ -625,9 +573,9 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         sb.append(getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
         sb.append(getUILocaleUtil().getCaption("address.residential"));
-        addressFactFW = new GridFormWidget(USER_ADDRESS.class);
-        addressFactFW.addEntityListener(this);
-        final FormModel addressFactFM = addressFactFW.getWidgetModel();
+        addressFactGFW = new GridFormWidget(USER_ADDRESS.class);
+        addressFactGFW.addEntityListener(this);
+        final FormModel addressFactFM = addressFactGFW.getWidgetModel();
         addressFactFM.setTitleResource("address.residential");
         addressFactFM.setErrorMessageTitle(sb.toString());
         addressFactFM.setButtonsVisible(false);
@@ -653,11 +601,11 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         COUNTRY regionFact = null;
         COUNTRY cityFact = null;
         COUNTRY villageFact = null;
-        if (dataFW.getWidgetModel().isCreateNew()) {
+        if (dataAFW.getWidgetModel().isCreateNew()) {
             addressFactFM.createNew();
         } else {
             QueryModel<USER_ADDRESS> addressFactQM = new QueryModel<USER_ADDRESS>(USER_ADDRESS.class);
-            addressFactQM.addWhere("user", ECriteria.EQUAL, dataFW.getWidgetModel().getEntity().getId());
+            addressFactQM.addWhere("user", ECriteria.EQUAL, dataAFW.getWidgetModel().getEntity().getId());
             addressFactQM.addWhereAnd("addressType", ECriteria.EQUAL, ID.valueOf(2));
             try {
                 USER_ADDRESS addressFact = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(addressFactQM);
@@ -684,11 +632,12 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         sb = new StringBuilder();
         sb.append(getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
-        sb.append(getUILocaleUtil().getCaption("parents.data.father"));
-        fatherFW = new GridFormWidget(STUDENT_RELATIVE.class);
-        fatherFW.addEntityListener(this);
-        final FormModel fatherFM = createFormModel(fatherFW, sb);
-//		final FormModel fatherFM = fatherFW.getWidgetModel();
+        String caption = "parents.data.father";
+        sb.append(getUILocaleUtil().getCaption(caption));
+        fatherGFW = new GridFormWidget(STUDENT_RELATIVE.class);
+        fatherGFW.addEntityListener(this);
+        final FormModel fatherFM = createFormModel(fatherGFW, sb, caption);
+//		final FormModel fatherFM = fatherGFW.getWidgetModel();
 //		fatherFM.setTitleResource("parents.data.father");
 //		fatherFM.setErrorMessageTitle(sb.toString());
 //		fatherFM.setButtonsVisible(false);
@@ -725,11 +674,11 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         COUNTRY regionFather = null;
         COUNTRY cityFather = null;
         COUNTRY villageFather = null;
-        if (dataFW.getWidgetModel().isCreateNew()) {
+        if (dataAFW.getWidgetModel().isCreateNew()) {
             fatherFM.createNew();
         } else {
             QueryModel<STUDENT_RELATIVE> fatherQM = new QueryModel<STUDENT_RELATIVE>(STUDENT_RELATIVE.class);
-            fatherQM.addWhere("student", ECriteria.EQUAL, dataFW.getWidgetModel().getEntity().getId());
+            fatherQM.addWhere("student", ECriteria.EQUAL, dataAFW.getWidgetModel().getEntity().getId());
             fatherQM.addWhereAnd("relativeType", ECriteria.EQUAL, ID.valueOf(1));
             try {
                 STUDENT_RELATIVE father = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(fatherQM);
@@ -756,10 +705,11 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         sb = new StringBuilder();
         sb.append(getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
-        sb.append(getUILocaleUtil().getCaption("parents.data.mother"));
-        motherFW = new GridFormWidget(STUDENT_RELATIVE.class);
-        motherFW.addEntityListener(this);
-        final FormModel motherFM = createFormModel(motherFW, sb);
+        String caption = "parents.data.mother";
+        sb.append(getUILocaleUtil().getCaption(caption));
+        motherGFW = new GridFormWidget(STUDENT_RELATIVE.class);
+        motherGFW.addEntityListener(this);
+        final FormModel motherFM = createFormModel(motherGFW, sb, caption);
         FKFieldModel countryMotherFM = createFKFieldModel("country", motherFM);
         FKFieldModel regionMotherFM = createFKFieldModel("region", motherFM);
         FKFieldModel cityMotherFM = createFKFieldModel("city", motherFM);
@@ -786,11 +736,11 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
 //		villageMotherQM.addWhere("parent", ECriteria.EQUAL, ID.valueOf(-1));
 
         COUNTRY regionMother = null, cityMother = null, villageMother = null;
-        if (dataFW.getWidgetModel().isCreateNew()) {
+        if (dataAFW.getWidgetModel().isCreateNew()) {
             motherFM.createNew();
         } else {
-            QueryModel<STUDENT_RELATIVE> motherQM = new QueryModel<STUDENT_RELATIVE>(STUDENT_RELATIVE.class);
-            motherQM.addWhere("student", ECriteria.EQUAL, dataFW.getWidgetModel().getEntity().getId());
+            QueryModel<STUDENT_RELATIVE> motherQM = new QueryModel<>(STUDENT_RELATIVE.class);
+            motherQM.addWhere("student", ECriteria.EQUAL, dataAFW.getWidgetModel().getEntity().getId());
             motherQM.addWhereAnd("relativeType", ECriteria.EQUAL, ID.valueOf(2));
             try {
                 STUDENT_RELATIVE mother = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(motherQM);
@@ -818,9 +768,9 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         sb.append(getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
         sb.append(getUILocaleUtil().getCaption("contract.data"));
-        dataContractFW = new GridFormWidget(STUDENT_CONTRACT.class);
-        dataContractFW.addEntityListener(this);
-        final FormModel dataContractFM = dataContractFW.getWidgetModel();
+        dataContractGFW = new GridFormWidget(STUDENT_CONTRACT.class);
+        dataContractGFW.addEntityListener(this);
+        final FormModel dataContractFM = dataContractGFW.getWidgetModel();
         dataContractFM.setButtonsVisible(false);
         dataContractFM.setTitleResource("contract.data");
         dataContractFM.getFieldModel("expireDate").setInEdit(false);
@@ -829,28 +779,18 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         FileListFieldModel contractFLFM = (FileListFieldModel) dataContractFM.getFieldModel("fileList");
         contractFLFM.permitMimeType(FileListFieldModel.JPEG);
 
-        if (dataFW.getWidgetModel().isCreateNew()) {
+        if (dataAFW.getWidgetModel().isCreateNew()) {
             dataContractFM.createNew();
         } else {
             QueryModel<STUDENT_CONTRACT> dataContractQM = new QueryModel<STUDENT_CONTRACT>(STUDENT_CONTRACT.class);
             FromItem sc = dataContractQM.addJoin(EJoin.INNER_JOIN, "id", USER_DOCUMENT.class, "id");
-            dataContractQM.addWhere(sc, "user", ECriteria.EQUAL, dataFW.getWidgetModel().getEntity().getId());
+            dataContractQM.addWhere(sc, "user", ECriteria.EQUAL, dataAFW.getWidgetModel().getEntity().getId());
             dataContractQM.addWhereAnd(sc, "deleted", Boolean.FALSE);
             try {
                 STUDENT_CONTRACT dataContractDoc = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(dataContractQM);
                 dataContractFM.loadEntity(dataContractDoc.getId());
                 udfQM.addWhere("userDocument", ECriteria.EQUAL, dataContractDoc.getId());
-                List udfList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(udfQM);
-                if (!udfList.isEmpty()) {
-//                    for (Object o : udfList) {
-//                        Object[] oo = (Object[]) o;
-//                        FileBean fe = new FileBean(USER_DOCUMENT_FILE.class);
-//                        fe.setId(ID.valueOf((Long) oo[0]));
-//                        fe.setFileName((String) oo[1]);
-//                        fe.setNewFile(false);
-//                        militaryFLFM.getFileList().add(fe);
-//                    }
-                }
+                addFiles(udfQM, militaryFLFM);
             } catch (NoResultException ex) {
                 dataContractFM.createNew();
             }
@@ -864,9 +804,9 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         sb.append(getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
         sb.append(getUILocaleUtil().getCaption("education.document"));
-        educDocFW = new GridFormWidget(EDUCATION_DOC.class);
-        educDocFW.addEntityListener(this);
-        final FormModel educationFM = educDocFW.getWidgetModel();
+        educDocGFW = new GridFormWidget(EDUCATION_DOC.class);
+        educDocGFW.addEntityListener(this);
+        final FormModel educationFM = educDocGFW.getWidgetModel();
         educationFM.setButtonsVisible(false);
         educationFM.setTitleResource("education.document");
         FKFieldModel schoolCountryFieldModel = (FKFieldModel) educationFM.getFieldModel("schoolCountry");
@@ -894,28 +834,18 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         educationFLFM.permitMimeType(FileListFieldModel.JPEG);
         educationFLFM.getFileList().clear();
         educationFLFM.getDeleteList().clear();
-        if (dataFW.getWidgetModel().isCreateNew()) {
+        if (dataAFW.getWidgetModel().isCreateNew()) {
             educationFM.createNew();
         } else {
             QueryModel<EDUCATION_DOC> educationQM = new QueryModel<EDUCATION_DOC>(EDUCATION_DOC.class);
             FromItem sc = educationQM.addJoin(EJoin.INNER_JOIN, "id", USER_DOCUMENT.class, "id");
-            educationQM.addWhere(sc, "user", ECriteria.EQUAL, dataFW.getWidgetModel().getEntity().getId());
+            educationQM.addWhere(sc, "user", ECriteria.EQUAL, dataAFW.getWidgetModel().getEntity().getId());
             educationQM.addWhereAnd(sc, "deleted", Boolean.FALSE);
             try {
                 EDUCATION_DOC educDoc = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(educationQM);
                 educationFM.loadEntity(educDoc.getId());
                 udfQM.addWhere("userDocument", ECriteria.EQUAL, educDoc.getId());
-                List udfList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(udfQM);
-                if (!udfList.isEmpty()) {
-//                    for (Object o : udfList) {
-//                        Object[] oo = (Object[]) o;
-//                        FileBean fe = new FileBean( USER_DOCUMENT_FILE.class);
-//                        fe.setId(ID.valueOf((Long) oo[0]));
-//                        fe.setFileName((String) oo[1]);
-//                        fe.setNewFile(false);
-//                        educationFLFM.getFileList().add(fe);
-//                    }
-                }
+                addFiles(udfQM, educationFLFM);
             } catch (NoResultException ex) {
                 educationFM.createNew();
             }
@@ -925,27 +855,32 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
 
     private void setNextButtons() {
         String caption = "next";
+        nextFactAddressButton = createNextButton(factAddressButton, caption);
+        nextRegAddressButton = createNextButton(regAddressButton, caption);
         nextSpecButton = createNextButton(specButton, caption);
         nextIdDocButton = createNextButton(idDocButton, caption);
         nextMilitaryButton = createNextButton(militaryButton, caption);
         nextDisabilityButton = createNextButton(disabilityButton, caption);
         nextRepatriateButton = createNextButton(repatriateButton, caption);
         nextEduDocButton = createNextButton(eduDocButton, caption);
-        nextEduDocsButton = createNextButton(educationDocsButton, caption);
+        nextEduDocsButton = createNextButton(eduDocsButton, caption);
         nextPreemRightButton = createNextButton(preemRightButton, caption);
         nextMedButton = createNextButton(medButton, caption);
         nextUntButton = createNextButton(untButton, caption);
         nextGrantDocButton = createNextButton(grantDocButton, caption);
         nextMotherButton = createNextButton(motherButton, caption);
         nextFatherButton = createNextButton(fatherButton, caption);
-        nextFactAddressButton = createNextButton(factAddressButton, caption);
-        nextRegAddressButton = createNextButton(regAddressButton, caption);
+        nextContractButton = createNextButton(contractButton, caption);
         nextMoreButton = createNextButton(moreButton, caption);
         caption = "exit";
         nextFinishButton = createNextButton(finishButton, caption);
     }
 
-    private Button createFormButtons(FormModel dataFM, FormModel preemptiveRightFM, FormModel userPassportFM, FormModel militaryDocFM, FormModel disabilityDocFM, FormModel repatriateDocFM, FormModel grantDocFM, FormModel untCertificateFM, FormModel addressRegFM, FormModel addressFactFM, FormModel fatherFM, FormModel motherFM, FormModel dataContractFM, FormModel educationFM) {
+    private Button createFormButtons(FormModel dataFM, FormModel preemptiveRightFM, FormModel userPassportFM,
+                                     FormModel militaryDocFM, FormModel disabilityDocFM, FormModel repatriateDocFM,
+                                     FormModel grantDocFM, FormModel untCertificateFM, FormModel addressRegFM,
+                                     FormModel addressFactFM, FormModel fatherFM, FormModel motherFM,
+                                     FormModel dataContractFM, FormModel educationFM) {
         String caption = "buttonMain";
         String styleName = "buttonChild";
 
@@ -954,7 +889,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             @Override
             public void buttonClick(ClickEvent event) {
                 mainDataButton.addStyleName("actived");
-                flag = 1;
+                flag = Flag.MAIN_DATA;
                 saveData = false;
                 saveEduc = false;
                 savePass = false;
@@ -975,12 +910,12 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 }
                 entrantSpecialityQM.addWhere("student", ECriteria.EQUAL, studentId1);
 
-                registrationHSP.removeComponent(content);
-                content = new HorizontalLayout();
-                content.addComponent(dataFW);
-                content.addComponent(nextSpecButton);
-                content.setComponentAlignment(nextSpecButton, Alignment.MIDDLE_CENTER);
-                registrationHSP.addComponent(content);
+                registrationHSP.removeComponent(contentHL);
+                contentHL = new HorizontalLayout();
+                contentHL.addComponent(dataAFW);
+                contentHL.addComponent(nextFactAddressButton);
+                contentHL.setComponentAlignment(nextFactAddressButton, Alignment.MIDDLE_CENTER);
+                registrationHSP.addComponent(contentHL);
             }
         });
 
@@ -990,7 +925,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM, educationFM, untCertificateFM,
                         grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
-                flag = 1;
+                flag = Flag.MAIN_DATA;
                 mainDataButton.addStyleName("actived");
                 idDocButton.removeStyleName("actived");
                 eduDocButton.removeStyleName("actived");
@@ -1003,18 +938,82 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 militaryButton.removeStyleName("activedCh");
                 disabilityButton.removeStyleName("activedCh");
                 repatriateButton.removeStyleName("activedCh");
-                educationDocsButton.removeStyleName("activedCh");
+                eduDocsButton.removeStyleName("activedCh");
                 preemRightButton.removeStyleName("activedCh");
                 grantDocButton.removeStyleName("activedCh");
                 fatherButton.removeStyleName("activedCh");
                 factAddressButton.removeStyleName("activedCh");
                 regAddressButton.removeStyleName("activedCh");
-                registrationHSP.removeComponent(content);
-                content = new HorizontalLayout();
-                content.addComponent(dataFW);
-                content.addComponent(nextSpecButton);
-                content.setComponentAlignment(nextSpecButton, Alignment.MIDDLE_CENTER);
-                registrationHSP.addComponent(content);
+                registrationHSP.removeComponent(contentHL);
+                contentHL = new HorizontalLayout();
+                contentHL.addComponent(dataAFW);
+                contentHL.addComponent(nextFactAddressButton);
+                contentHL.setComponentAlignment(nextFactAddressButton, Alignment.MIDDLE_CENTER);
+                registrationHSP.addComponent(contentHL);
+            }
+        });
+
+        factAddressButton = createFormButton("address.residential", styleName);
+        factAddressButton.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(ClickEvent event) {
+                flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM, educationFM, untCertificateFM,
+                        grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
+                flag = Flag.FACT_ADDRESS;
+                mainDataButton.removeStyleName("actived");
+                idDocButton.removeStyleName("actived");
+                eduDocButton.removeStyleName("actived");
+                medButton.removeStyleName("actived");
+                untButton.removeStyleName("actived");
+                motherButton.addStyleName("actived");
+                contractButton.removeStyleName("actived");
+                moreButton.removeStyleName("actived");
+                specButton.removeStyleName("activedCh");
+                militaryButton.removeStyleName("activedCh");
+                disabilityButton.removeStyleName("activedCh");
+                repatriateButton.removeStyleName("activedCh");
+                eduDocsButton.removeStyleName("activedCh");
+                preemRightButton.removeStyleName("activedCh");
+                grantDocButton.removeStyleName("activedCh");
+                fatherButton.removeStyleName("activedCh");
+                factAddressButton.addStyleName("activedCh");
+                regAddressButton.removeStyleName("activedCh");
+                contentHL.removeAllComponents();
+                contentHL.addComponent(addressFactGFW);
+                contentHL.addComponent(nextRegAddressButton);
+                contentHL.setComponentAlignment(nextRegAddressButton, Alignment.MIDDLE_CENTER);
+            }
+        });
+
+        regAddressButton = createFormButton("address.registration", styleName);
+        regAddressButton.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(ClickEvent event) {
+                flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM, educationFM, untCertificateFM,
+                        grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
+                flag = Flag.REG_ADDRESS;
+                mainDataButton.removeStyleName("actived");
+                idDocButton.removeStyleName("actived");
+                eduDocButton.removeStyleName("actived");
+                medButton.removeStyleName("actived");
+                untButton.removeStyleName("actived");
+                motherButton.addStyleName("actived");
+                contractButton.removeStyleName("actived");
+                moreButton.removeStyleName("actived");
+                specButton.removeStyleName("activedCh");
+                militaryButton.removeStyleName("activedCh");
+                disabilityButton.removeStyleName("activedCh");
+                repatriateButton.removeStyleName("activedCh");
+                eduDocsButton.removeStyleName("activedCh");
+                preemRightButton.removeStyleName("activedCh");
+                grantDocButton.removeStyleName("activedCh");
+                fatherButton.removeStyleName("activedCh");
+                factAddressButton.removeStyleName("activedCh");
+                regAddressButton.addStyleName("activedCh");
+                contentHL.removeAllComponents();
+                contentHL.addComponent(addressRegGFW);
+                contentHL.addComponent(nextSpecButton);
+                contentHL.setComponentAlignment(nextSpecButton, Alignment.MIDDLE_CENTER);
             }
         });
 
@@ -1032,7 +1031,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 if (!dataFM.isCreateNew()) {
                     try {
                         studentId1 = dataFM.getEntity().getId();
-                        if (dataFW.save()) {
+                        if (dataAFW.save()) {
                             saveData = true;
                         }
                     } catch (Exception ex) {
@@ -1044,7 +1043,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM, educationFM, untCertificateFM,
                         grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
 
-                flag = 12;
+                flag = Flag.DEFAULT_FLAG;
                 mainDataButton.addStyleName("actived");
                 idDocButton.removeStyleName("actived");
                 eduDocButton.removeStyleName("actived");
@@ -1057,18 +1056,18 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 militaryButton.removeStyleName("activedCh");
                 disabilityButton.removeStyleName("activedCh");
                 repatriateButton.removeStyleName("activedCh");
-                educationDocsButton.removeStyleName("activedCh");
+                eduDocsButton.removeStyleName("activedCh");
                 preemRightButton.removeStyleName("activedCh");
                 grantDocButton.removeStyleName("activedCh");
                 fatherButton.removeStyleName("activedCh");
                 factAddressButton.removeStyleName("activedCh");
                 regAddressButton.removeStyleName("activedCh");
-                registrationHSP.removeComponent(content);
-                content = new HorizontalLayout();
-                content.addComponent(specTW);
-                content.addComponent(nextIdDocButton);
-                content.setComponentAlignment(nextIdDocButton, Alignment.MIDDLE_CENTER);
-                registrationHSP.addComponent(content);
+                registrationHSP.removeComponent(contentHL);
+                contentHL = new HorizontalLayout();
+                contentHL.addComponent(specTW);
+                contentHL.addComponent(nextIdDocButton);
+                contentHL.setComponentAlignment(nextIdDocButton, Alignment.MIDDLE_CENTER);
+                registrationHSP.addComponent(contentHL);
             }
         });
 
@@ -1078,7 +1077,8 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM, educationFM, untCertificateFM,
                         grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
-                flag = 2;
+
+                flag = Flag.ID_DOC;
                 mainDataButton.removeStyleName("actived");
                 idDocButton.addStyleName("actived");
                 eduDocButton.removeStyleName("actived");
@@ -1091,16 +1091,16 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 militaryButton.removeStyleName("activedCh");
                 disabilityButton.removeStyleName("activedCh");
                 repatriateButton.removeStyleName("activedCh");
-                educationDocsButton.removeStyleName("activedCh");
+                eduDocsButton.removeStyleName("activedCh");
                 preemRightButton.removeStyleName("activedCh");
                 grantDocButton.removeStyleName("activedCh");
                 fatherButton.removeStyleName("activedCh");
                 factAddressButton.removeStyleName("activedCh");
                 regAddressButton.removeStyleName("activedCh");
-                content.removeAllComponents();
-                content.addComponent(passportFW);
-                content.addComponent(nextMilitaryButton);
-                content.setComponentAlignment(nextMilitaryButton, Alignment.MIDDLE_CENTER);
+                contentHL.removeAllComponents();
+                contentHL.addComponent(passportGFW);
+                contentHL.addComponent(nextMilitaryButton);
+                contentHL.setComponentAlignment(nextMilitaryButton, Alignment.MIDDLE_CENTER);
             }
         });
 
@@ -1110,7 +1110,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM, educationFM, untCertificateFM,
                         grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
-                flag = 22;
+                flag = Flag.MILITARY;
                 mainDataButton.removeStyleName("actived");
                 idDocButton.addStyleName("actived");
                 eduDocButton.removeStyleName("actived");
@@ -1123,16 +1123,16 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 militaryButton.addStyleName("activedCh");
                 disabilityButton.removeStyleName("activedCh");
                 repatriateButton.removeStyleName("activedCh");
-                educationDocsButton.removeStyleName("activedCh");
+                eduDocsButton.removeStyleName("activedCh");
                 preemRightButton.removeStyleName("activedCh");
                 grantDocButton.removeStyleName("activedCh");
                 fatherButton.removeStyleName("activedCh");
                 factAddressButton.removeStyleName("activedCh");
                 regAddressButton.removeStyleName("activedCh");
-                content.removeAllComponents();
-                content.addComponent(militaryFW);
-                content.addComponent(nextDisabilityButton);
-                content.setComponentAlignment(nextDisabilityButton, Alignment.MIDDLE_CENTER);
+                contentHL.removeAllComponents();
+                contentHL.addComponent(militaryGFW);
+                contentHL.addComponent(nextDisabilityButton);
+                contentHL.setComponentAlignment(nextDisabilityButton, Alignment.MIDDLE_CENTER);
             }
         });
 
@@ -1142,7 +1142,8 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM, educationFM, untCertificateFM,
                         grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
-                flag = 23;
+
+                flag = Flag.DISABILITY;
                 mainDataButton.removeStyleName("actived");
                 idDocButton.addStyleName("actived");
                 eduDocButton.removeStyleName("actived");
@@ -1155,16 +1156,16 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 militaryButton.removeStyleName("activedCh");
                 disabilityButton.addStyleName("activedCh");
                 repatriateButton.removeStyleName("activedCh");
-                educationDocsButton.removeStyleName("activedCh");
+                eduDocsButton.removeStyleName("activedCh");
                 preemRightButton.removeStyleName("activedCh");
                 grantDocButton.removeStyleName("activedCh");
                 fatherButton.removeStyleName("activedCh");
                 factAddressButton.removeStyleName("activedCh");
                 regAddressButton.removeStyleName("activedCh");
-                content.removeAllComponents();
-                content.addComponent(disabilityFW);
-                content.addComponent(nextRepatriateButton);
-                content.setComponentAlignment(nextRepatriateButton, Alignment.MIDDLE_CENTER);
+                contentHL.removeAllComponents();
+                contentHL.addComponent(disabilityGFW);
+                contentHL.addComponent(nextRepatriateButton);
+                contentHL.setComponentAlignment(nextRepatriateButton, Alignment.MIDDLE_CENTER);
             }
         });
 
@@ -1174,7 +1175,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM, educationFM, untCertificateFM,
                         grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
-                flag = 24;
+                flag = Flag.REPATRIATE;
                 mainDataButton.removeStyleName("actived");
                 idDocButton.addStyleName("actived");
                 eduDocButton.removeStyleName("actived");
@@ -1187,16 +1188,16 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 militaryButton.removeStyleName("activedCh");
                 disabilityButton.removeStyleName("activedCh");
                 repatriateButton.addStyleName("activedCh");
-                educationDocsButton.removeStyleName("activedCh");
+                eduDocsButton.removeStyleName("activedCh");
                 preemRightButton.removeStyleName("activedCh");
                 grantDocButton.removeStyleName("activedCh");
                 fatherButton.removeStyleName("activedCh");
                 factAddressButton.removeStyleName("activedCh");
                 regAddressButton.removeStyleName("activedCh");
-                content.removeAllComponents();
-                content.addComponent(repatriateFW);
-                content.addComponent(nextEduDocButton);
-                content.setComponentAlignment(nextEduDocButton, Alignment.MIDDLE_CENTER);
+                contentHL.removeAllComponents();
+                contentHL.addComponent(repatriateGFW);
+                contentHL.addComponent(nextEduDocButton);
+                contentHL.setComponentAlignment(nextEduDocButton, Alignment.MIDDLE_CENTER);
             }
         });
 
@@ -1206,7 +1207,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM, educationFM, untCertificateFM,
                         grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
-                flag = 3;
+                flag = Flag.EDU_DOC;
                 mainDataButton.removeStyleName("actived");
                 idDocButton.removeStyleName("actived");
                 eduDocButton.addStyleName("actived");
@@ -1219,26 +1220,26 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 militaryButton.removeStyleName("activedCh");
                 disabilityButton.removeStyleName("activedCh");
                 repatriateButton.removeStyleName("activedCh");
-                educationDocsButton.removeStyleName("activedCh");
+                eduDocsButton.removeStyleName("activedCh");
                 preemRightButton.removeStyleName("activedCh");
                 grantDocButton.removeStyleName("activedCh");
                 fatherButton.removeStyleName("activedCh");
                 factAddressButton.removeStyleName("activedCh");
                 regAddressButton.removeStyleName("activedCh");
-                content.removeAllComponents();
-                content.addComponent(educDocFW);
-                content.addComponent(nextEduDocsButton);
-                content.setComponentAlignment(nextEduDocsButton, Alignment.MIDDLE_CENTER);
+                contentHL.removeAllComponents();
+                contentHL.addComponent(educDocGFW);
+                contentHL.addComponent(nextEduDocsButton);
+                contentHL.setComponentAlignment(nextEduDocsButton, Alignment.MIDDLE_CENTER);
             }
         });
 
-        educationDocsButton = createFormButton("education.documents", styleName);
-        educationDocsButton.addClickListener(new Button.ClickListener() {
+        eduDocsButton = createFormButton("education.documents", styleName);
+        eduDocsButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM, educationFM, untCertificateFM,
                         grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
-                flag = 32;
+                flag = Flag.EDU_DOCS;
                 mainDataButton.removeStyleName("actived");
                 idDocButton.removeStyleName("actived");
                 eduDocButton.addStyleName("actived");
@@ -1251,13 +1252,12 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 militaryButton.removeStyleName("activedCh");
                 disabilityButton.removeStyleName("activedCh");
                 repatriateButton.removeStyleName("activedCh");
-                educationDocsButton.addStyleName("activedCh");
+                eduDocsButton.addStyleName("activedCh");
                 preemRightButton.removeStyleName("activedCh");
                 grantDocButton.removeStyleName("activedCh");
                 fatherButton.removeStyleName("activedCh");
                 factAddressButton.removeStyleName("activedCh");
                 regAddressButton.removeStyleName("activedCh");
-                /*��������� �� �����������*/
                 documentsTW = new TableWidget(EDUCATION_DOC.class);
                 documentsTW.addEntityListener(ApplicantsForm.this);
                 documentsTW.setWidth("667px");
@@ -1286,10 +1286,10 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 educationQM.addWhereAnd(educationUDFI, "user", ECriteria.EQUAL, userId1);
                 /**************************/
 
-                content.removeAllComponents();
-                content.addComponent(documentsTW);
-                content.addComponent(nextPreemRightButton);
-                content.setComponentAlignment(nextPreemRightButton, Alignment.MIDDLE_CENTER);
+                contentHL.removeAllComponents();
+                contentHL.addComponent(documentsTW);
+                contentHL.addComponent(nextPreemRightButton);
+                contentHL.setComponentAlignment(nextPreemRightButton, Alignment.MIDDLE_CENTER);
             }
         });
 
@@ -1299,7 +1299,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM, educationFM, untCertificateFM,
                         grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
-                flag = 33;
+                flag = Flag.PREEM_RIGHT;
                 mainDataButton.removeStyleName("actived");
                 idDocButton.removeStyleName("actived");
                 eduDocButton.addStyleName("actived");
@@ -1312,7 +1312,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 militaryButton.removeStyleName("activedCh");
                 disabilityButton.removeStyleName("activedCh");
                 repatriateButton.removeStyleName("activedCh");
-                educationDocsButton.removeStyleName("activedCh");
+                eduDocsButton.removeStyleName("activedCh");
                 preemRightButton.addStyleName("activedCh");
                 grantDocButton.removeStyleName("activedCh");
                 fatherButton.removeStyleName("activedCh");
@@ -1334,13 +1334,13 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 languageQM.addWhere("user", ECriteria.EQUAL, userId1);
                 /***********************************/
                 VerticalLayout preemLang = new VerticalLayout();
-                preemLang.addComponent(preemptiveRightFW);
+                preemLang.addComponent(preemptiveRightGFW);
                 preemLang.addComponent(languagesTW);
 
-                content.removeAllComponents();
-                content.addComponent(preemLang);
-                content.addComponent(nextMedButton);
-                content.setComponentAlignment(nextMedButton, Alignment.MIDDLE_CENTER);
+                contentHL.removeAllComponents();
+                contentHL.addComponent(preemLang);
+                contentHL.addComponent(nextMedButton);
+                contentHL.setComponentAlignment(nextMedButton, Alignment.MIDDLE_CENTER);
             }
         });
 
@@ -1350,7 +1350,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM, educationFM, untCertificateFM,
                         grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
-                flag = 4;
+                flag = Flag.MED;
                 mainDataButton.removeStyleName("actived");
                 idDocButton.removeStyleName("actived");
                 eduDocButton.removeStyleName("actived");
@@ -1363,7 +1363,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 militaryButton.removeStyleName("activedCh");
                 disabilityButton.removeStyleName("activedCh");
                 repatriateButton.removeStyleName("activedCh");
-                educationDocsButton.removeStyleName("activedCh");
+                eduDocsButton.removeStyleName("activedCh");
                 preemRightButton.removeStyleName("activedCh");
                 grantDocButton.removeStyleName("activedCh");
                 fatherButton.removeStyleName("activedCh");
@@ -1378,9 +1378,9 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 QueryModel medicalCheckupQM = medicalCheckupTM.getQueryModel();
                 medicalCheckupQM.addWhere("deleted", Boolean.FALSE);
                 ID userId2 = ID.valueOf(-1);
-                if (!dataFW.getWidgetModel().isCreateNew()) {
+                if (!dataAFW.getWidgetModel().isCreateNew()) {
                     try {
-                        userId2 = dataFW.getWidgetModel().getEntity().getId();
+                        userId2 = dataAFW.getWidgetModel().getEntity().getId();
                     } catch (Exception e) {
                         e.printStackTrace();//TODO catch
                     }
@@ -1391,10 +1391,10 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 medicalCheckupFM.getFieldModel("allowWork").setInEdit(false);
                 medicalCheckupFM.getFieldModel("allowWork").setInView(false);
 
-                content.removeAllComponents();
-                content.addComponent(medicalCheckupTW);
-                content.addComponent(nextUntButton);
-                content.setComponentAlignment(nextUntButton, Alignment.MIDDLE_CENTER);
+                contentHL.removeAllComponents();
+                contentHL.addComponent(medicalCheckupTW);
+                contentHL.addComponent(nextUntButton);
+                contentHL.setComponentAlignment(nextUntButton, Alignment.MIDDLE_CENTER);
             }
         });
 
@@ -1404,7 +1404,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM, educationFM, untCertificateFM,
                         grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
-                flag = 5;
+                flag = Flag.UNT;
                 mainDataButton.removeStyleName("actived");
                 idDocButton.removeStyleName("actived");
                 eduDocButton.removeStyleName("actived");
@@ -1417,7 +1417,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 militaryButton.removeStyleName("activedCh");
                 disabilityButton.removeStyleName("activedCh");
                 repatriateButton.removeStyleName("activedCh");
-                educationDocsButton.removeStyleName("activedCh");
+                eduDocsButton.removeStyleName("activedCh");
                 preemRightButton.removeStyleName("activedCh");
                 grantDocButton.removeStyleName("activedCh");
                 fatherButton.removeStyleName("activedCh");
@@ -1446,13 +1446,13 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 /***************/
 
                 VerticalLayout dataUNT = new VerticalLayout();
-                dataUNT.addComponent(certificateFW);
+                dataUNT.addComponent(certificateGFW);
                 dataUNT.addComponent(untRatesTW);
 
-                content.removeAllComponents();
-                content.addComponent(dataUNT);
-                content.addComponent(nextGrantDocButton);
-                content.setComponentAlignment(nextGrantDocButton, Alignment.MIDDLE_CENTER);
+                contentHL.removeAllComponents();
+                contentHL.addComponent(dataUNT);
+                contentHL.addComponent(nextGrantDocButton);
+                contentHL.setComponentAlignment(nextGrantDocButton, Alignment.MIDDLE_CENTER);
             }
         });
 
@@ -1462,7 +1462,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM, educationFM, untCertificateFM,
                         grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
-                flag = 52;
+                flag = Flag.GRANT_DOC;
                 mainDataButton.removeStyleName("actived");
                 idDocButton.removeStyleName("actived");
                 eduDocButton.removeStyleName("actived");
@@ -1475,16 +1475,16 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 militaryButton.removeStyleName("activedCh");
                 disabilityButton.removeStyleName("activedCh");
                 repatriateButton.removeStyleName("activedCh");
-                educationDocsButton.removeStyleName("activedCh");
+                eduDocsButton.removeStyleName("activedCh");
                 preemRightButton.removeStyleName("activedCh");
                 grantDocButton.addStyleName("activedCh");
                 fatherButton.removeStyleName("activedCh");
                 factAddressButton.removeStyleName("activedCh");
                 regAddressButton.removeStyleName("activedCh");
-                content.removeAllComponents();
-                content.addComponent(grantFW);
-                content.addComponent(nextMotherButton);
-                content.setComponentAlignment(nextMotherButton, Alignment.MIDDLE_CENTER);
+                contentHL.removeAllComponents();
+                contentHL.addComponent(grantGFW);
+                contentHL.addComponent(nextMotherButton);
+                contentHL.setComponentAlignment(nextMotherButton, Alignment.MIDDLE_CENTER);
             }
         });
 
@@ -1494,7 +1494,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM, educationFM, untCertificateFM,
                         grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
-                flag = 6;
+                flag = Flag.MOTHER;
                 mainDataButton.removeStyleName("actived");
                 idDocButton.removeStyleName("actived");
                 eduDocButton.removeStyleName("actived");
@@ -1507,16 +1507,16 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 militaryButton.removeStyleName("activedCh");
                 disabilityButton.removeStyleName("activedCh");
                 repatriateButton.removeStyleName("activedCh");
-                educationDocsButton.removeStyleName("activedCh");
+                eduDocsButton.removeStyleName("activedCh");
                 preemRightButton.removeStyleName("activedCh");
                 grantDocButton.removeStyleName("activedCh");
                 fatherButton.removeStyleName("activedCh");
                 factAddressButton.removeStyleName("activedCh");
                 regAddressButton.removeStyleName("activedCh");
-                content.removeAllComponents();
-                content.addComponent(motherFW);
-                content.addComponent(nextFatherButton);
-                content.setComponentAlignment(nextFatherButton, Alignment.MIDDLE_CENTER);
+                contentHL.removeAllComponents();
+                contentHL.addComponent(motherGFW);
+                contentHL.addComponent(nextFatherButton);
+                contentHL.setComponentAlignment(nextFatherButton, Alignment.MIDDLE_CENTER);
             }
         });
 
@@ -1526,7 +1526,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM, educationFM, untCertificateFM,
                         grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
-                flag = 62;
+                flag = Flag.FATHER;
                 mainDataButton.removeStyleName("actived");
                 idDocButton.removeStyleName("actived");
                 eduDocButton.removeStyleName("actived");
@@ -1539,80 +1539,16 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 militaryButton.removeStyleName("activedCh");
                 disabilityButton.removeStyleName("activedCh");
                 repatriateButton.removeStyleName("activedCh");
-                educationDocsButton.removeStyleName("activedCh");
+                eduDocsButton.removeStyleName("activedCh");
                 preemRightButton.removeStyleName("activedCh");
                 grantDocButton.removeStyleName("activedCh");
                 fatherButton.addStyleName("activedCh");
                 factAddressButton.removeStyleName("activedCh");
                 regAddressButton.removeStyleName("activedCh");
-                content.removeAllComponents();
-                content.addComponent(fatherFW);
-                content.addComponent(nextFactAddressButton);
-                content.setComponentAlignment(nextFactAddressButton, Alignment.MIDDLE_CENTER);
-            }
-        });
-
-        factAddressButton = createFormButton("address.residential", styleName);
-        factAddressButton.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(ClickEvent event) {
-                flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM, educationFM, untCertificateFM,
-                        grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
-                flag = 63;
-                mainDataButton.removeStyleName("actived");
-                idDocButton.removeStyleName("actived");
-                eduDocButton.removeStyleName("actived");
-                medButton.removeStyleName("actived");
-                untButton.removeStyleName("actived");
-                motherButton.addStyleName("actived");
-                contractButton.removeStyleName("actived");
-                moreButton.removeStyleName("actived");
-                specButton.removeStyleName("activedCh");
-                militaryButton.removeStyleName("activedCh");
-                disabilityButton.removeStyleName("activedCh");
-                repatriateButton.removeStyleName("activedCh");
-                educationDocsButton.removeStyleName("activedCh");
-                preemRightButton.removeStyleName("activedCh");
-                grantDocButton.removeStyleName("activedCh");
-                fatherButton.removeStyleName("activedCh");
-                factAddressButton.addStyleName("activedCh");
-                regAddressButton.removeStyleName("activedCh");
-                content.removeAllComponents();
-                content.addComponent(addressFactFW);
-                content.addComponent(nextRegAddressButton);
-                content.setComponentAlignment(nextRegAddressButton, Alignment.MIDDLE_CENTER);
-            }
-        });
-
-        regAddressButton = createFormButton("address.registration", styleName);
-        regAddressButton.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(ClickEvent event) {
-                flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM, educationFM, untCertificateFM,
-                        grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
-                flag = 64;
-                mainDataButton.removeStyleName("actived");
-                idDocButton.removeStyleName("actived");
-                eduDocButton.removeStyleName("actived");
-                medButton.removeStyleName("actived");
-                untButton.removeStyleName("actived");
-                motherButton.addStyleName("actived");
-                contractButton.removeStyleName("actived");
-                moreButton.removeStyleName("actived");
-                specButton.removeStyleName("activedCh");
-                militaryButton.removeStyleName("activedCh");
-                disabilityButton.removeStyleName("activedCh");
-                repatriateButton.removeStyleName("activedCh");
-                educationDocsButton.removeStyleName("activedCh");
-                preemRightButton.removeStyleName("activedCh");
-                grantDocButton.removeStyleName("activedCh");
-                fatherButton.removeStyleName("activedCh");
-                factAddressButton.removeStyleName("activedCh");
-                regAddressButton.addStyleName("activedCh");
-                content.removeAllComponents();
-                content.addComponent(addressRegFW);
-                content.addComponent(nextMoreButton);
-                content.setComponentAlignment(nextMoreButton, Alignment.MIDDLE_CENTER);
+                contentHL.removeAllComponents();
+                contentHL.addComponent(fatherGFW);
+                contentHL.addComponent(nextContractButton);
+                contentHL.setComponentAlignment(nextContractButton, Alignment.MIDDLE_CENTER);
             }
         });
 
@@ -1622,7 +1558,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM, educationFM, untCertificateFM,
                         grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
-                flag = 7;
+                flag = Flag.CONTRACT;
                 mainDataButton.removeStyleName("actived");
                 idDocButton.removeStyleName("actived");
                 eduDocButton.removeStyleName("actived");
@@ -1635,16 +1571,16 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 militaryButton.removeStyleName("activedCh");
                 disabilityButton.removeStyleName("activedCh");
                 repatriateButton.removeStyleName("activedCh");
-                educationDocsButton.removeStyleName("activedCh");
+                eduDocsButton.removeStyleName("activedCh");
                 preemRightButton.removeStyleName("activedCh");
                 grantDocButton.removeStyleName("activedCh");
                 fatherButton.removeStyleName("activedCh");
                 factAddressButton.removeStyleName("activedCh");
                 regAddressButton.removeStyleName("activedCh");
-                content.removeAllComponents();
-                content.addComponent(dataContractFW);
-                content.addComponent(next17);
-                content.setComponentAlignment(next17, Alignment.MIDDLE_CENTER);
+                contentHL.removeAllComponents();
+                contentHL.addComponent(dataContractGFW);
+                contentHL.addComponent(nextMoreButton);
+                contentHL.setComponentAlignment(nextMoreButton, Alignment.MIDDLE_CENTER);
             }
         });
 
@@ -1654,7 +1590,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM, educationFM, untCertificateFM,
                         grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
-                flag = 8;
+                flag = Flag.DEFAULT_FLAG;
                 mainDataButton.removeStyleName("actived");
                 idDocButton.removeStyleName("actived");
                 eduDocButton.removeStyleName("actived");
@@ -1667,7 +1603,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 militaryButton.removeStyleName("activedCh");
                 disabilityButton.removeStyleName("activedCh");
                 repatriateButton.removeStyleName("activedCh");
-                educationDocsButton.removeStyleName("activedCh");
+                eduDocsButton.removeStyleName("activedCh");
                 preemRightButton.removeStyleName("activedCh");
                 grantDocButton.removeStyleName("activedCh");
                 fatherButton.removeStyleName("activedCh");
@@ -1680,9 +1616,9 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 DBTableModel awardsTM = (DBTableModel) awardsTW.getWidgetModel();
                 QueryModel awardsQM = awardsTM.getQueryModel();
                 ID studentId2 = ID.valueOf(-1);
-                if (!dataFW.getWidgetModel().isCreateNew()) {
+                if (!dataAFW.getWidgetModel().isCreateNew()) {
                     try {
-                        studentId2 = dataFW.getWidgetModel().getEntity().getId();
+                        studentId2 = dataAFW.getWidgetModel().getEntity().getId();
                     } catch (Exception e) {
                     }
                 }
@@ -1696,9 +1632,9 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 DBTableModel socialCategoriesTM = (DBTableModel) socialCategoriesTW.getWidgetModel();
                 QueryModel socialCategoriesQM = socialCategoriesTM.getQueryModel();
                 ID userId = ID.valueOf(-1);
-                if (!dataFW.getWidgetModel().isCreateNew()) {
+                if (!dataAFW.getWidgetModel().isCreateNew()) {
                     try {
-                        userId = dataFW.getWidgetModel().getEntity().getId();
+                        userId = dataAFW.getWidgetModel().getEntity().getId();
                     } catch (Exception e) {
                     }
                 }
@@ -1709,10 +1645,10 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 dopData.addComponent(socialCategoriesTW);
                 dopData.addComponent(awardsTW);
 
-                content.removeAllComponents();
-                content.addComponent(dopData);
-                content.addComponent(nextFinishButton);
-                content.setComponentAlignment(nextFinishButton, Alignment.MIDDLE_CENTER);
+                contentHL.removeAllComponents();
+                contentHL.addComponent(dopData);
+                contentHL.addComponent(nextFinishButton);
+                contentHL.setComponentAlignment(nextFinishButton, Alignment.MIDDLE_CENTER);
             }
         });
 
@@ -1743,7 +1679,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                     militaryButton.setEnabled(false);
                     disabilityButton.setEnabled(false);
                     repatriateButton.setEnabled(false);
-                    educationDocsButton.setEnabled(false);
+                    eduDocsButton.setEnabled(false);
                     preemRightButton.setEnabled(false);
                     grantDocButton.setEnabled(false);
                     fatherButton.setEnabled(false);
@@ -1758,174 +1694,107 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                     messForm.addComponent(mess);
 
                     registrationHSP.removeAllComponents();
-                    content.removeAllComponents();
-                    content.addComponent(messForm);
-                    content.setComponentAlignment(messForm, Alignment.BOTTOM_CENTER);
-                    registrationHSP.addComponent(buttonForm);
-                    registrationHSP.addComponent(content);
+                    contentHL.removeAllComponents();
+                    contentHL.addComponent(messForm);
+                    contentHL.setComponentAlignment(messForm, Alignment.BOTTOM_CENTER);
+                    registrationHSP.addComponent(buttonsVL);
+                    registrationHSP.addComponent(contentHL);
                 }
             }
         });
         return form;
     }
 
-    private void flagSave(int flag, FormModel dataFM, FormModel userPassportFM, FormModel militaryDocFM, FormModel disabilityDocFM,
-                          FormModel repatriateDocFM, FormModel preemptiveRightFM, FormModel educationFM, FormModel untCertificateFM, FormModel grantDocFM,
-                          FormModel addressFactFM, FormModel addressRegFM, FormModel motherFM, FormModel fatherFM, FormModel dataContractFM) {
+    private void flagSave(Flag flag, FormModel dataFM, FormModel userPassportFM, FormModel militaryDocFM,
+                          FormModel disabilityDocFM, FormModel repatriateDocFM, FormModel preemptiveRightFM,
+                          FormModel educationFM, FormModel untCertificateFM, FormModel grantDocFM,
+                          FormModel addressFactFM, FormModel addressRegFM, FormModel motherFM,
+                          FormModel fatherFM, FormModel dataContractFM) {
 
         switch (flag) {
-            case 1:
-                if (dataFM.isModified() && dataFW.save())
+            case MAIN_DATA:
+                if (dataFM.isModified() && dataAFW.save())
                     saveData = true;
                 break;
-            case 2:
-                if (userPassportFM.isModified() && passportFW.save())
+            case ID_DOC:
+                if (userPassportFM.isModified() && passportGFW.save())
                     savePass = true;
                 break;
-            case 22:
+            case MILITARY:
                 if (militaryDocFM.isModified())
-                    militaryFW.save();
+                    militaryGFW.save();
                 break;
-            case 23:
+            case DISABILITY:
                 if (disabilityDocFM.isModified())
-                    disabilityFW.save();
+                    disabilityGFW.save();
                 break;
-            case 24:
+            case REPATRIATE:
                 if (repatriateDocFM.isModified())
-                    repatriateFW.save();
+                    repatriateGFW.save();
                 break;
-            case 3:
-                if (educationFM.isModified() && educDocFW.save())
+            case EDU_DOC:
+                if (educationFM.isModified() && educDocGFW.save())
                     saveEduc = true;
                 break;
-            case 33:
+            case PREEM_RIGHT:
                 if (preemptiveRightFM.isModified())
-                    preemptiveRightFW.save();
+                    preemptiveRightGFW.save();
                 break;
-            case 4:
-            case 8:
-                break;
-            case 5:
-                if (untCertificateFM.isModified() && certificateFW.save())
+            case UNT:
+                if (untCertificateFM.isModified() && certificateGFW.save())
                     saveUNT = true;
                 break;
-            case 52:
+            case GRANT_DOC:
                 if (grantDocFM.isModified())
-                    grantFW.save();
+                    grantGFW.save();
                 break;
-            case 6:
+            case MOTHER:
                 if (motherFM.isModified())
-                    motherFW.save();
+                    motherGFW.save();
                 break;
-            case 62:
+            case FATHER:
                 if (fatherFM.isModified())
-                    fatherFW.save();
+                    fatherGFW.save();
                 break;
-            case 63:
+            case FACT_ADDRESS:
                 if (addressFactFM.isModified())
-                    addressFactFW.save();
+                    addressFactGFW.save();
                 break;
-            case 64:
+            case REG_ADDRESS:
                 if (addressRegFM.isModified())
-                    addressRegFW.save();
+                    addressRegGFW.save();
                 break;
-            case 7:
+            case CONTRACT:
                 if (dataContractFM.isModified())
-                    dataContractFW.save();
+                    dataContractGFW.save();
                 break;
             default:
                 break;
         }
-//		if (flag == 1) {
-//			if (dataFM.isModified()) {
-//				if (dataFW.save() == true) {
-//					saveData = true;
-//				}
-//			}
-//		} else if (flag == 2) {
-//			if (userPassportFM.isModified()) {
-//				if (passportFW.save() == true) {
-//					savePass = true;
-//				}
-//			}
-//		} else if (flag == 22) {
-//			if (militaryDocFM.isModified()) {
-//				militaryFW.save();
-//			}
-//		} else if (flag == 23) {
-//			if (disabilityDocFM.isModified()) {
-//				disabilityFW.save();
-//			}
-//		} else if (flag == 24) {
-//			if (repatriateDocFM.isModified()) {
-//				repatriateFW.save();
-//			}
-//		} else if (flag == 3) {
-//			if (educationFM.isModified()) {
-//				if (educDocFW.save() == true) {
-//					saveEduc = true;
-//				}
-//			}
-//		} else if (flag == 33) {
-//			if (preemptiveRightFM.isModified()) {
-//				preemptiveRightFW.save();
-//			}
-//		} else if ((flag == 4) || (flag == 8)) {
-//		} else if (flag == 5) {
-//			if (untCertificateFM.isModified()) {
-//				if (certificateFW.save() == true) {
-//					saveUNT = true;
-//				}
-//			}
-//		} else if (flag == 52) {
-//			if (grantDocFM.isModified()) {
-//				grantFW.save();
-//			}
-//		} else if (flag == 6) {
-//			if (motherFM.isModified()) {
-//				motherFW.save();
-//			}
-//		} else if (flag == 62) {
-//			if (fatherFM.isModified()) {
-//				fatherFW.save();
-//			}
-//		} else if (flag == 63) {
-//			if (addressFactFM.isModified()) {
-//				addressFactFW.save();
-//			}
-//		} else if (flag == 64) {
-//			if (addressRegFM.isModified()) {
-//				addressRegFW.save();
-//			}
-//		} else if (flag == 7) {
-//			if (dataContractFM.isModified()) {
-//				dataContractFW.save();
-//			}
-//		}
     }
 
     private void addFormButtons() {
-        buttonForm.addComponent(mainDataButton);
-        buttonForm.addComponent(factAddressButton);
-        buttonForm.addComponent(regAddressButton);
-        buttonForm.addComponent(specButton);
-        buttonForm.addComponent(idDocButton);
-        buttonForm.addComponent(militaryButton);
-        buttonForm.addComponent(disabilityButton);
-        buttonForm.addComponent(repatriateButton);
-        buttonForm.addComponent(eduDocButton);
-        buttonForm.addComponent(educationDocsButton);
-        buttonForm.addComponent(preemRightButton);
-        buttonForm.addComponent(medButton);
-        buttonForm.addComponent(untButton);
-        buttonForm.addComponent(grantDocButton);
-        buttonForm.addComponent(motherButton);
-        buttonForm.addComponent(fatherButton);
-        buttonForm.addComponent(contractButton);//TODO comment if doesnt' work
-        buttonForm.addComponent(moreButton);
-        buttonForm.addComponent(finishButton);
-        buttonForm.setSpacing(false);
-        registrationHSP.addComponent(buttonForm);
+        buttonsVL.addComponent(mainDataButton);
+        buttonsVL.addComponent(factAddressButton);
+        buttonsVL.addComponent(regAddressButton);
+        buttonsVL.addComponent(specButton);
+        buttonsVL.addComponent(idDocButton);
+        buttonsVL.addComponent(militaryButton);
+        buttonsVL.addComponent(disabilityButton);
+        buttonsVL.addComponent(repatriateButton);
+        buttonsVL.addComponent(eduDocButton);
+        buttonsVL.addComponent(eduDocsButton);
+        buttonsVL.addComponent(preemRightButton);
+        buttonsVL.addComponent(medButton);
+        buttonsVL.addComponent(untButton);
+        buttonsVL.addComponent(grantDocButton);
+        buttonsVL.addComponent(motherButton);
+        buttonsVL.addComponent(fatherButton);
+        buttonsVL.addComponent(contractButton);//TODO comment, if doesnt' work
+        buttonsVL.addComponent(moreButton);
+        buttonsVL.addComponent(finishButton);
+        buttonsVL.setSpacing(false);
+        registrationHSP.addComponent(buttonsVL);
     }
 
     private Button createNextButton(Button clickButton, String caption) {
@@ -1961,9 +1830,9 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         return fkFM;
     }
 
-    private FormModel createFormModel(GridFormWidget widget, StringBuilder sb) {
+    private FormModel createFormModel(GridFormWidget widget, StringBuilder sb, String caption) {
         FormModel formModel = widget.getWidgetModel();
-        formModel.setTitleResource("parents.data.father");
+        formModel.setTitleResource(caption);
         formModel.setErrorMessageTitle(sb.toString());
         formModel.setButtonsVisible(false);
         formModel.getFieldModel("email").getValidators().add(new EmailValidator("�� ����� ������������ E-mail"));
@@ -1976,7 +1845,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
     private boolean preSaveSpeciality(Entity e, boolean isNew) {
         V_ENTRANT_SPECIALITY ves = (V_ENTRANT_SPECIALITY) e;
         ENTRANT_SPECIALITY es;
-        FormModel fm = dataFW.getWidgetModel();
+        FormModel fm = dataAFW.getWidgetModel();
         if (isNew) {
             List<Entity> list = specTW.getAllEntities();
             if (list.size() == 3) {
@@ -2044,7 +1913,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                             code = year.toString().substring(2) + code;
                             s.setCode(code);
                             SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(s);
-                            dataFW.refresh();
+                            dataAFW.refresh();
                         } catch (Exception ex) {
                             LOG.error("Unable to generate code for entrant: ", ex);
                             Message.showError(ex.getMessage());
@@ -2083,7 +1952,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 s.setCode("000000000000");
                 s.setCategory(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(STUDENT_CATEGORY.class, ID.valueOf(1)));
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(s);
-                dataFW.getWidgetModel().loadEntity(s.getId());
+                dataAFW.getWidgetModel().loadEntity(s.getId());
                 showSavedNotification();
             } catch (Exception ex) {
                 LOG.error("Unable to save new applicant: ", ex);
@@ -2102,12 +1971,12 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
     }
 
     private boolean preSaveContract(Entity e, boolean isNew) {
-        if (dataFW.getWidgetModel().isCreateNew()) {
+        if (dataAFW.getWidgetModel().isCreateNew()) {
             Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
             return false;
         }
         STUDENT_CONTRACT md = (STUDENT_CONTRACT) e;
-        FormModel fm = dataFW.getWidgetModel();
+        FormModel fm = dataAFW.getWidgetModel();
         if (isNew) {
             try {
                 md.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_T_USER_DOCUMENT"));
@@ -2126,7 +1995,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             }
         }
 
-        FileListFieldModel flfm = (FileListFieldModel) dataContractFW.getWidgetModel().getFieldModel("fileList");
+        FileListFieldModel flfm = (FileListFieldModel) dataContractGFW.getWidgetModel().getFieldModel("fileList");
         for (FileBean fe : flfm.getFileList()) {
             if (fe.isNewFile()) {
                 USER_DOCUMENT_FILE udf = new USER_DOCUMENT_FILE();
@@ -2155,13 +2024,13 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
     }
 
     private boolean preSavePassport(Entity e, boolean isNew) {
-        if (dataFW.getWidgetModel().isCreateNew()) {
+        if (dataAFW.getWidgetModel().isCreateNew()) {
             Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
             return false;
         }
 
         USER_PASSPORT p = (USER_PASSPORT) e;
-        FormModel fm = dataFW.getWidgetModel();
+        FormModel fm = dataAFW.getWidgetModel();
         if (isNew) {
             try {
                 p.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_T_USER_DOCUMENT"));
@@ -2180,7 +2049,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             }
         }
 
-        FileListFieldModel flfm = (FileListFieldModel) passportFW.getWidgetModel().getFieldModel("fileList");
+        FileListFieldModel flfm = (FileListFieldModel) passportGFW.getWidgetModel().getFieldModel("fileList");
         for (FileBean fe : flfm.getFileList()) {
             if (fe.isNewFile()) {
                 USER_DOCUMENT_FILE udf = new USER_DOCUMENT_FILE();
@@ -2210,7 +2079,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
 
     private boolean preSaveEducationDoc(Entity e, boolean isNew) {
         EDUCATION_DOC ed = (EDUCATION_DOC) e;
-        FormModel fm = dataFW.getWidgetModel();
+        FormModel fm = dataAFW.getWidgetModel();
         if (isNew) {
             try {
                 ed.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_T_USER_DOCUMENT"));
@@ -2218,7 +2087,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(ed);
 
                 QueryModel educationQM = ((DBSelectModel) documentsTW.getWidgetModel()).getQueryModel();
-                educationQM.addWhere(educationUDFI, "user", ECriteria.EQUAL, dataFW.getWidgetModel().getEntity().getId());
+                educationQM.addWhere(educationUDFI, "user", ECriteria.EQUAL, dataAFW.getWidgetModel().getEntity().getId());
 
                 documentsTW.refresh();
                 showSavedNotification();
@@ -2250,6 +2119,12 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             }
         }
 
+        deleteFiles(flfm);
+
+        return false;
+    }
+
+    private void deleteFiles(FileListFieldModel flfm) {
         for (FileBean fe : flfm.getDeleteList()) {
             try {
                 USER_DOCUMENT_FILE udf = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(USER_DOCUMENT_FILE.class, fe.getId());
@@ -2259,17 +2134,15 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 LOG.error("Unable to delete repatriate doc copy: ", ex);
             }
         }
-
-        return false;
     }
 
     private boolean preSaveDoc(Entity e, boolean isNew) {
-        if (dataFW.getWidgetModel().isCreateNew()) {
+        if (dataAFW.getWidgetModel().isCreateNew()) {
             Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
             return false;
         }
         EDUCATION_DOC md = (EDUCATION_DOC) e;
-        FormModel fm = dataFW.getWidgetModel();
+        FormModel fm = dataAFW.getWidgetModel();
         if (isNew) {
             try {
                 md.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_T_USER_DOCUMENT"));
@@ -2288,7 +2161,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             }
         }
 
-        FileListFieldModel flfm = (FileListFieldModel) educDocFW.getWidgetModel().getFieldModel("fileList");
+        FileListFieldModel flfm = (FileListFieldModel) educDocGFW.getWidgetModel().getFieldModel("fileList");
         for (FileBean fe : flfm.getFileList()) {
             if (fe.isNewFile()) {
                 USER_DOCUMENT_FILE udf = new USER_DOCUMENT_FILE();
@@ -2317,12 +2190,12 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
     }
 
     private boolean preSaveMilitary(Entity e, boolean isNew) {
-        if (dataFW.getWidgetModel().isCreateNew()) {
+        if (dataAFW.getWidgetModel().isCreateNew()) {
             Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
             return false;
         }
         MILITARY_DOC md = (MILITARY_DOC) e;
-        FormModel fm = dataFW.getWidgetModel();
+        FormModel fm = dataAFW.getWidgetModel();
         if (isNew) {
             try {
                 md.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_T_USER_DOCUMENT"));
@@ -2341,7 +2214,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             }
         }
 
-        FileListFieldModel flfm = (FileListFieldModel) militaryFW.getWidgetModel().getFieldModel("fileList");
+        FileListFieldModel flfm = (FileListFieldModel) militaryGFW.getWidgetModel().getFieldModel("fileList");
         for (FileBean fe : flfm.getFileList()) {
             if (fe.isNewFile()) {
                 USER_DOCUMENT_FILE udf = new USER_DOCUMENT_FILE();
@@ -2370,12 +2243,12 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
     }
 
     private boolean preSaveDisability(Entity e, boolean isNew) {
-        if (dataFW.getWidgetModel().isCreateNew()) {
+        if (dataAFW.getWidgetModel().isCreateNew()) {
             Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
             return false;
         }
         DISABILITY_DOC dd = (DISABILITY_DOC) e;
-        FormModel fm = dataFW.getWidgetModel();
+        FormModel fm = dataAFW.getWidgetModel();
         if (isNew) {
             try {
                 dd.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_T_USER_DOCUMENT"));
@@ -2394,7 +2267,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             }
         }
 
-        FileListFieldModel flfm = (FileListFieldModel) disabilityFW.getWidgetModel().getFieldModel("fileList");
+        FileListFieldModel flfm = (FileListFieldModel) disabilityGFW.getWidgetModel().getFieldModel("fileList");
         for (FileBean fe : flfm.getFileList()) {
             if (fe.isNewFile()) {
                 USER_DOCUMENT_FILE udf = new USER_DOCUMENT_FILE();
@@ -2423,12 +2296,12 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
     }
 
     private boolean preSaveRepatriate(Entity e, boolean isNew) {
-        if (dataFW.getWidgetModel().isCreateNew()) {
+        if (dataAFW.getWidgetModel().isCreateNew()) {
             Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
             return false;
         }
         REPATRIATE_DOC rd = (REPATRIATE_DOC) e;
-        FormModel fm = dataFW.getWidgetModel();
+        FormModel fm = dataAFW.getWidgetModel();
         if (isNew) {
             try {
                 rd.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_T_USER_DOCUMENT"));
@@ -2447,7 +2320,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             }
         }
 
-        FileListFieldModel flfm = (FileListFieldModel) repatriateFW.getWidgetModel().getFieldModel("fileList");
+        FileListFieldModel flfm = (FileListFieldModel) repatriateGFW.getWidgetModel().getFieldModel("fileList");
         for (FileBean fe : flfm.getFileList()) {
             if (fe.isNewFile()) {
                 USER_DOCUMENT_FILE udf = new USER_DOCUMENT_FILE();
@@ -2462,15 +2335,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             }
         }
 
-        for (FileBean fe : flfm.getDeleteList()) {
-            try {
-                USER_DOCUMENT_FILE udf = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(USER_DOCUMENT_FILE.class, fe.getId());
-                udf.setDeleted(true);
-                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(udf);
-            } catch (Exception ex) {
-                LOG.error("Unable to delete repatriate doc copy: ", ex);
-            }
-        }
+        deleteFiles(flfm);
 
         return false;
     }
@@ -2479,7 +2344,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         V_USER_LANGUAGE vul = (V_USER_LANGUAGE) e;
         if (isNew) {
             try {
-                STUDENT s = (STUDENT) dataFW.getWidgetModel().getEntity();
+                STUDENT s = (STUDENT) dataAFW.getWidgetModel().getEntity();
                 USER_LANGUAGE ul = new USER_LANGUAGE();
                 ul.setUser(s);
                 ul.setLanguage(vul.getLanguage());
@@ -2511,12 +2376,12 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
     }
 
     private boolean preSavePreemptiveRight(Entity e, boolean isNew) {
-        if (dataFW.getWidgetModel().isCreateNew()) {
+        if (dataAFW.getWidgetModel().isCreateNew()) {
             Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
             return false;
         }
         PREEMPTIVE_RIGHT pr = (PREEMPTIVE_RIGHT) e;
-        FormModel fm = dataFW.getWidgetModel();
+        FormModel fm = dataAFW.getWidgetModel();
         if (isNew) {
             try {
                 pr.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_T_USER_DOCUMENT"));
@@ -2535,7 +2400,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             }
         }
 
-        FileListFieldModel flfm = (FileListFieldModel) preemptiveRightFW.getWidgetModel().getFieldModel("fileList");
+        FileListFieldModel flfm = (FileListFieldModel) preemptiveRightGFW.getWidgetModel().getFieldModel("fileList");
         for (FileBean fe : flfm.getFileList()) {
             if (fe.isNewFile()) {
                 USER_DOCUMENT_FILE udf = new USER_DOCUMENT_FILE();
@@ -2564,12 +2429,12 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
     }
 
     private boolean preSaveGrant(Entity e, boolean isNew) {
-        if (dataFW.getWidgetModel().isCreateNew()) {
+        if (dataAFW.getWidgetModel().isCreateNew()) {
             Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
             return false;
         }
         GRANT_DOC gd = (GRANT_DOC) e;
-        FormModel fm = dataFW.getWidgetModel();
+        FormModel fm = dataAFW.getWidgetModel();
 
         if (isNew) {
             try {
@@ -2589,7 +2454,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             }
         }
 
-        FileListFieldModel flfm = (FileListFieldModel) grantFW.getWidgetModel().getFieldModel("fileList");
+        FileListFieldModel flfm = (FileListFieldModel) grantGFW.getWidgetModel().getFieldModel("fileList");
         for (FileBean fe : flfm.getFileList()) {
             if (fe.isNewFile()) {
                 USER_DOCUMENT_FILE udf = new USER_DOCUMENT_FILE();
@@ -2620,7 +2485,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
     private boolean preSaveMedicalCheckup(Entity e, boolean isNew) {
         V_MEDICAL_CHECKUP vmc = (V_MEDICAL_CHECKUP) e;
         MEDICAL_CHECKUP mc = null;
-        FormModel fm = dataFW.getWidgetModel();
+        FormModel fm = dataAFW.getWidgetModel();
         if (isNew) {
             mc = new MEDICAL_CHECKUP();
             try {
@@ -2690,12 +2555,12 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
     }
 
     private boolean preSaveUNTCertificate(Entity e, boolean isNew) {
-        if (dataFW.getWidgetModel().isCreateNew()) {
+        if (dataAFW.getWidgetModel().isCreateNew()) {
             Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
             return false;
         }
         UNT_CERTIFICATE uc = (UNT_CERTIFICATE) e;
-        FormModel fm = dataFW.getWidgetModel();
+        FormModel fm = dataAFW.getWidgetModel();
 
         if (isNew) {
             try {
@@ -2703,7 +2568,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 uc.setUser((STUDENT) fm.getEntity());
                 //Starting rate = 0
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(uc);
-                certificateFW.getWidgetModel().loadEntity(uc.getId());
+                certificateGFW.getWidgetModel().loadEntity(uc.getId());
                 showSavedNotification();
             } catch (Exception ex) {
                 LOG.error("Unable to create a UNT certificate: ", ex);
@@ -2717,7 +2582,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             }
         }
 
-        FileListFieldModel flfm = (FileListFieldModel) certificateFW.getWidgetModel().getFieldModel("fileList");
+        FileListFieldModel flfm = (FileListFieldModel) certificateGFW.getWidgetModel().getFieldModel("fileList");
         for (FileBean fe : flfm.getFileList()) {
             if (fe.isNewFile()) {
                 USER_DOCUMENT_FILE udf = new USER_DOCUMENT_FILE();
@@ -2747,7 +2612,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
     private boolean preSaveUNTRates(Entity e, boolean isNew) {
         V_UNT_CERT_SUBJECT vucs = (V_UNT_CERT_SUBJECT) e;
         UNT_CERT_SUBJECT ucs;
-        FormModel fm = certificateFW.getWidgetModel();
+        FormModel fm = certificateGFW.getWidgetModel();
         if (isNew) {
             ucs = new UNT_CERT_SUBJECT();
             try {
@@ -2763,7 +2628,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 untRatesQM.addWhere("untCertificate", ECriteria.EQUAL, fm.getEntity().getId());
 
                 untRatesTW.refresh();
-                certificateFW.refresh();
+                certificateGFW.refresh();
                 showSavedNotification();
 
             } catch (Exception ex) {
@@ -2780,7 +2645,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(untCertificate);
                 saveUNT = true;
                 untRatesTW.refresh();
-                certificateFW.refresh();
+                certificateGFW.refresh();
                 showSavedNotification();
             } catch (Exception ex) {
                 LOG.error("Unable to merge a UNT rate: ", ex);
@@ -2790,12 +2655,12 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
     }
 
     private boolean preSaveAddressReg(Entity e, boolean isNew) {
-        if (dataFW.getWidgetModel().isCreateNew()) {
+        if (dataAFW.getWidgetModel().isCreateNew()) {
             Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
             return false;
         }
         USER_ADDRESS ua = (USER_ADDRESS) e;
-        FormModel fm = dataFW.getWidgetModel();
+        FormModel fm = dataAFW.getWidgetModel();
 
         if (isNew) {
             try {
@@ -2818,12 +2683,12 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
     }
 
     private boolean preSaveAddressFact(Entity e, boolean isNew) {
-        if (dataFW.getWidgetModel().isCreateNew()) {
+        if (dataAFW.getWidgetModel().isCreateNew()) {
             Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
             return false;
         }
         USER_ADDRESS ua = (USER_ADDRESS) e;
-        FormModel fm = dataFW.getWidgetModel();
+        FormModel fm = dataAFW.getWidgetModel();
 
         if (isNew) {
             try {
@@ -2846,12 +2711,12 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
     }
 
     private boolean preSaveFather(Entity e, boolean isNew) {
-        if (dataFW.getWidgetModel().isCreateNew()) {
+        if (dataAFW.getWidgetModel().isCreateNew()) {
             Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
             return false;
         }
         STUDENT_RELATIVE sr = (STUDENT_RELATIVE) e;
-        FormModel fm = dataFW.getWidgetModel();
+        FormModel fm = dataAFW.getWidgetModel();
 
         if (isNew) {
             try {
@@ -2874,13 +2739,13 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
     }
 
     private boolean preSaveMother(Entity e, boolean isNew) {
-        if (dataFW.getWidgetModel().isCreateNew()) {
+        if (dataAFW.getWidgetModel().isCreateNew()) {
             Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
             return false;
         }
 
         STUDENT_RELATIVE sr = (STUDENT_RELATIVE) e;
-        FormModel fm = dataFW.getWidgetModel();
+        FormModel fm = dataAFW.getWidgetModel();
 
         if (isNew) {
             try {
@@ -2905,7 +2770,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
     private boolean preSaveAwards(Entity e, boolean isNew) {
         V_USER_AWARD vua = (V_USER_AWARD) e;
         USER_AWARD ua;
-        FormModel fm = dataFW.getWidgetModel();
+        FormModel fm = dataAFW.getWidgetModel();
         if (isNew) {
             ua = new USER_AWARD();
             try {
@@ -2939,7 +2804,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
     private boolean preSaveSocialCategories(Entity e, boolean isNew) {
         V_USER_SOCIAL_CATEGORY vusc = (V_USER_SOCIAL_CATEGORY) e;
         USER_SOCIAL_CATEGORY usc;
-        FormModel fm = dataFW.getWidgetModel();
+        FormModel fm = dataAFW.getWidgetModel();
         if (isNew) {
             usc = new USER_SOCIAL_CATEGORY();
             try {
@@ -2970,16 +2835,106 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         return false;
     }
 
+    private boolean check(Object source, Entity e) {
+        QueryModel<USER_DOCUMENT_FILE> udfQM = new QueryModel<>(USER_DOCUMENT_FILE.class);
+        udfQM.addSelect("id");
+        udfQM.addSelect("fileName");
+        udfQM.addWhere("deleted", Boolean.FALSE);
+
+        if (source.equals(documentsTW)) {
+            FormModel educationFM = ((DBTableModel) documentsTW.getWidgetModel()).getFormModel();
+            FKFieldModel schoolCountryFieldModel = (FKFieldModel) educationFM.getFieldModel("schoolCountry");
+            QueryModel schoolCountryQM = schoolCountryFieldModel.getQueryModel();
+            schoolCountryQM.addWhereNull("parent");
+            schoolCountryQM.addOrder("countryName");
+
+            FKFieldModel schoolRegionFieldModel = (FKFieldModel) educationFM.getFieldModel("schoolRegion");
+            QueryModel schoolRegionQM = schoolRegionFieldModel.getQueryModel();
+            schoolRegionQM.addWhere("parent", ECriteria.EQUAL, ID.valueOf(-1));
+
+            schoolCountryFieldModel.getListeners().add(new SchoolCountryChangeListener(schoolRegionFieldModel, null));
+
+            FileListFieldModel educationFLFM = (FileListFieldModel) educationFM.getFieldModel("fileList");
+            educationFLFM.permitMimeType(FileListFieldModel.JPEG);
+
+            educationFLFM.getFileList().clear();
+            educationFLFM.getDeleteList().clear();
+
+            udfQM.addWhereAnd("userDocument", ECriteria.EQUAL, e.getId());
+
+            try {
+                addFiles(udfQM, educationFLFM);
+            } catch (Exception ex) {
+                LOG.error("Unable to load education document copies: ", ex);
+            }
+
+            return true;
+        } else if (source.equals(medicalCheckupTW)) {
+            FormModel medicalCheckupFM = ((DBTableModel) medicalCheckupTW.getWidgetModel()).getFormModel();
+
+            FileListFieldModel medicalCheckupFLFM = (FileListFieldModel) medicalCheckupFM.getFieldModel("fileList");
+            medicalCheckupFLFM.permitMimeType(FileListFieldModel.JPEG);
+
+            medicalCheckupFLFM.getFileList().clear();
+            medicalCheckupFLFM.getDeleteList().clear();
+
+            udfQM.addWhereAnd("userDocument", ECriteria.EQUAL, e.getId());
+
+            addFiles(udfQM, medicalCheckupFLFM);
+
+            return true;
+        } else if (source.equals(languagesTW)) {
+            FormModel languageFM = ((DBTableModel) languagesTW.getWidgetModel()).getFormModel();
+            return true;
+        } else if (source.equals(untRatesTW)) {
+            FormModel untRatesFM = ((DBTableModel) untRatesTW.getWidgetModel()).getFormModel();
+            return true;
+        } else if (source.equals(specTW)) {
+            FormModel entrantSpecialityFM = ((DBTableModel) specTW.getWidgetModel()).getFormModel();
+            FKFieldModel specialityFKFM = (FKFieldModel) entrantSpecialityFM.getFieldModel("speciality");
+            specialityFKFM.setDialogWidth(600);
+            specialityFKFM.setDialogHeight(600);
+            QueryModel specialityQM = specialityFKFM.getQueryModel();
+            specialityQM.addWhere("deleted", Boolean.FALSE);
+            return true;
+        } else if (source.equals(awardsTW)) {
+            FormModel awardsFM = ((DBTableModel) awardsTW.getWidgetModel()).getFormModel();
+            return true;
+        } else if (source.equals(socialCategoriesTW)) {
+            FormModel socialCategoryFM = ((DBTableModel) socialCategoriesTW.getWidgetModel()).getFormModel();
+            return true;
+        }
+        return false;
+    }
+
+    private void addFiles(QueryModel<USER_DOCUMENT_FILE> udfQM, FileListFieldModel medicalCheckupFLFM) {
+        try {
+            List udfList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(udfQM);
+            if (!udfList.isEmpty()) {
+                for (Object o : udfList) {
+                    Object[] oo = (Object[]) o;
+                    FileBean fe = new FileBean(USER_DOCUMENT_FILE.class);
+                    fe.setId(ID.valueOf((Long) oo[0]));
+                    fe.setFileName((String) oo[1]);
+                    fe.setNewFile(false);
+                    medicalCheckupFLFM.getFileList().add(fe);
+                }
+            }
+        } catch (Exception ex) {
+            LOG.error("Unable to load education document copies: ", ex);
+        }
+    }
+
     @Override
     public void initView(boolean readOnly) throws Exception {
         super.initView(readOnly);
-        readOnly = dataFW.getWidgetModel().isReadOnly();
+        readOnly = dataAFW.getWidgetModel().isReadOnly();
     }
 
     @Override
     public boolean preCreate(Object source, int buttonId) {
         if (source.equals(documentsTW)) {
-            if (dataFW.getWidgetModel().isCreateNew()) {
+            if (dataAFW.getWidgetModel().isCreateNew()) {
                 Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
                 return false;
             }
@@ -3018,7 +2973,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
 
             return true;
         } else if (source.equals(languagesTW)) {
-            if (dataFW.getWidgetModel().isCreateNew()) {
+            if (dataAFW.getWidgetModel().isCreateNew()) {
                 Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
                 return false;
             }
@@ -3033,13 +2988,13 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             return true;
         } else if (source.equals(untRatesTW)) {
             try {
-                certificateFW.post();
+                certificateGFW.post();
             } catch (Exception e) {
                 // TODO Auto-generated catch block
                 LOG.error("Failed to post: ", e);
             }
 
-            if (certificateFW.getWidgetModel().isCreateNew()) {
+            if (certificateGFW.getWidgetModel().isCreateNew()) {
                 Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
                 return false;
             }
@@ -3053,7 +3008,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             FormModel untRatesFM = ((DBTableModel) untRatesTW.getWidgetModel()).getFormModel();
             return true;
         } else if (source.equals(medicalCheckupTW)) {
-            if (dataFW.getWidgetModel().isCreateNew()) {
+            if (dataAFW.getWidgetModel().isCreateNew()) {
                 Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
                 return false;
             }
@@ -3075,8 +3030,8 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             return true;
         } else if (source.equals(specTW)) {
             saveData = true;
-            if (dataFW.getWidgetModel().isCreateNew() || dataFW.getWidgetModel().isModified()) {
-                boolean success = dataFW.save();
+            if (dataAFW.getWidgetModel().isCreateNew() || dataAFW.getWidgetModel().isModified()) {
+                boolean success = dataAFW.save();
                 if (!success) {
                     return false;
                 }
@@ -3095,13 +3050,13 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             QueryModel specialityQM = specialityFKFM.getQueryModel();
             specialityQM.addWhere("deleted", Boolean.FALSE);
             try {
-                specialityQM.addWhere("level", ECriteria.EQUAL, ((STUDENT) dataFW.getWidgetModel().getEntity()).getLevel().getId());
+                specialityQM.addWhere("level", ECriteria.EQUAL, ((STUDENT) dataAFW.getWidgetModel().getEntity()).getLevel().getId());
             } catch (Exception ex) {
             }
 
             return true;
         } else if (source.equals(awardsTW)) {
-            if (dataFW.getWidgetModel().isCreateNew()) {
+            if (dataAFW.getWidgetModel().isCreateNew()) {
                 Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
                 return false;
             }
@@ -3116,7 +3071,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
 
             return true;
         } else if (source.equals(socialCategoriesTW)) {
-            if (dataFW.getWidgetModel().isCreateNew()) {
+            if (dataAFW.getWidgetModel().isCreateNew()) {
                 Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
                 return false;
             }
@@ -3134,215 +3089,23 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
 
     @Override
     public boolean onEdit(Object source, Entity e, int buttonId) {
-        QueryModel<USER_DOCUMENT_FILE> udfQM = new QueryModel<>(USER_DOCUMENT_FILE.class);
-        udfQM.addSelect("id");
-        udfQM.addSelect("fileName");
-        udfQM.addWhere("deleted", Boolean.FALSE);
-
-        if (source.equals(documentsTW)) {
-            FormModel educationFM = ((DBTableModel) documentsTW.getWidgetModel()).getFormModel();
-            FKFieldModel schoolCountryFieldModel = (FKFieldModel) educationFM.getFieldModel("schoolCountry");
-            QueryModel schoolCountryQM = schoolCountryFieldModel.getQueryModel();
-            schoolCountryQM.addWhereNull("parent");
-            schoolCountryQM.addOrder("countryName");
-
-            FKFieldModel schoolRegionFieldModel = (FKFieldModel) educationFM.getFieldModel("schoolRegion");
-            QueryModel schoolRegionQM = schoolRegionFieldModel.getQueryModel();
-            schoolRegionQM.addWhere("parent", ECriteria.EQUAL, ID.valueOf(-1));
-
-            schoolCountryFieldModel.getListeners().add(new SchoolCountryChangeListener(schoolRegionFieldModel, null));
-
-
-            FileListFieldModel educationFLFM = (FileListFieldModel) educationFM.getFieldModel("fileList");
-            educationFLFM.permitMimeType(FileListFieldModel.JPEG);
-
-            educationFLFM.getFileList().clear();
-            educationFLFM.getDeleteList().clear();
-
-            udfQM.addWhereAnd("userDocument", ECriteria.EQUAL, e.getId());
-
-            try {
-                List udfList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(udfQM);
-                if (!udfList.isEmpty()) {
-//                    for (Object o : udfList) {
-//                        Object[] oo = (Object[]) o;
-//                        FileBean fe = new FileBean( USER_DOCUMENT_FILE.class);
-//                        fe.setId(ID.valueOf((Long) oo[0]));
-//                        fe.setFileName((String) oo[1]);
-//                        fe.setNewFile(false);
-//                        educationFLFM.getFileList().add(fe);
-//                    }
-                }
-            } catch (Exception ex) {
-                LOG.error("Unable to load education document copies: ", ex);
-            }
-
-            return true;
-        } else if (source.equals(medicalCheckupTW)) {
-            FormModel medicalCheckupFM = ((DBTableModel) medicalCheckupTW.getWidgetModel()).getFormModel();
-
-            FileListFieldModel medicalCheckupFLFM = (FileListFieldModel) medicalCheckupFM.getFieldModel("fileList");
-            medicalCheckupFLFM.permitMimeType(FileListFieldModel.JPEG);
-
-            medicalCheckupFLFM.getFileList().clear();
-            medicalCheckupFLFM.getDeleteList().clear();
-
-            udfQM.addWhereAnd("userDocument", ECriteria.EQUAL, e.getId());
-
-            try {
-                List udfList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(udfQM);
-                if (!udfList.isEmpty()) {
-//                    for (Object o : udfList) {
-//                        Object[] oo = (Object[]) o;
-//                        FileBean fe = new FileBean( USER_DOCUMENT_FILE.class);
-//                        fe.setId(ID.valueOf((Long) oo[0]));
-//                        fe.setFileName((String) oo[1]);
-//                        fe.setNewFile(false);
-//                        medicalCheckupFLFM.getFileList().add(fe);
-//                    }
-                }
-            } catch (Exception ex) {
-                LOG.error("Unable to load education document copies: ", ex);
-            }
-
-            return true;
-        } else if (source.equals(languagesTW)) {
-            FormModel languageFM = ((DBTableModel) languagesTW.getWidgetModel()).getFormModel();
-
-            return true;
-        } else if (source.equals(untRatesTW)) {
-            FormModel untRatesFM = ((DBTableModel) untRatesTW.getWidgetModel()).getFormModel();
-
-            return true;
-        } else if (source.equals(specTW)) {
-            FormModel entrantSpecialityFM = ((DBTableModel) specTW.getWidgetModel()).getFormModel();
-            FKFieldModel specialityFKFM = (FKFieldModel) entrantSpecialityFM.getFieldModel("speciality");
-            specialityFKFM.setDialogWidth(600);
-            specialityFKFM.setDialogHeight(600);
-            QueryModel specialityQM = specialityFKFM.getQueryModel();
-            specialityQM.addWhere("deleted", Boolean.FALSE);
-
-            return true;
-        } else if (source.equals(awardsTW)) {
-            FormModel awardsFM = ((DBTableModel) awardsTW.getWidgetModel()).getFormModel();
-
-            return true;
-        } else if (source.equals(socialCategoriesTW)) {
-            FormModel socialCategoryFM = ((DBTableModel) socialCategoriesTW.getWidgetModel()).getFormModel();
-
-            return true;
-        }
-
-        return super.onEdit(source, e, buttonId);
+        return check(source, e) || super.onEdit(source, e, buttonId);
     }
 
     @Override
     public boolean onPreview(Object source, Entity e, int buttonId) {
-        QueryModel<USER_DOCUMENT_FILE> udfQM = new QueryModel<>(USER_DOCUMENT_FILE.class);
-        udfQM.addSelect("id");
-        udfQM.addSelect("fileName");
-        udfQM.addWhere("deleted", Boolean.FALSE);
-
-        if (source.equals(documentsTW)) {
-            FormModel educationFM = ((DBTableModel) documentsTW.getWidgetModel()).getFormModel();
-            FKFieldModel schoolCountryFieldModel = (FKFieldModel) educationFM.getFieldModel("schoolCountry");
-            QueryModel schoolCountryQM = schoolCountryFieldModel.getQueryModel();
-            schoolCountryQM.addWhereNull("parent");
-            schoolCountryQM.addOrder("countryName");
-
-            FKFieldModel schoolRegionFieldModel = (FKFieldModel) educationFM.getFieldModel("schoolRegion");
-            QueryModel schoolRegionQM = schoolRegionFieldModel.getQueryModel();
-            schoolRegionQM.addWhere("parent", ECriteria.EQUAL, ID.valueOf(-1));
-
-            schoolCountryFieldModel.getListeners().add(new SchoolCountryChangeListener(schoolRegionFieldModel, null));
-
-
-            FileListFieldModel educationFLFM = (FileListFieldModel) educationFM.getFieldModel("fileList");
-            educationFLFM.permitMimeType(FileListFieldModel.JPEG);
-
-            educationFLFM.getFileList().clear();
-            educationFLFM.getDeleteList().clear();
-
-            udfQM.addWhereAnd("userDocument", ECriteria.EQUAL, e.getId());
-
-            try {
-                List udfList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(udfQM);
-                if (!udfList.isEmpty()) {
-//                    for (Object o : udfList) {
-//                        Object[] oo = (Object[]) o;
-//                        FileBean fe = new FileBean( USER_DOCUMENT_FILE.class);
-//                        fe.setId(ID.valueOf((Long) oo[0]));
-//                        fe.setFileName((String) oo[1]);
-//                        fe.setNewFile(false);
-//                        educationFLFM.getFileList().add(fe);
-//                    }
-                }
-            } catch (Exception ex) {
-                LOG.error("Unable to load education document copies: ", ex);
-            }
-
-            return true;
-        } else if (source.equals(medicalCheckupTW)) {
-            FormModel medicalCheckupFM = ((DBTableModel) medicalCheckupTW.getWidgetModel()).getFormModel();
-
-            FileListFieldModel medicalCheckupFLFM = (FileListFieldModel) medicalCheckupFM.getFieldModel("fileList");
-            medicalCheckupFLFM.permitMimeType(FileListFieldModel.JPEG);
-
-            medicalCheckupFLFM.getFileList().clear();
-            medicalCheckupFLFM.getDeleteList().clear();
-
-            udfQM.addWhereAnd("userDocument", ECriteria.EQUAL, e.getId());
-
-            try {
-                List udfList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(udfQM);
-                if (!udfList.isEmpty()) {
-//                    for (Object o : udfList) {
-//                        Object[] oo = (Object[]) o;
-//                        FileBean fe = new FileBean( USER_DOCUMENT_FILE.class);
-//                        fe.setId(ID.valueOf((Long) oo[0]));
-//                        fe.setFileName((String) oo[1]);
-//                        fe.setNewFile(false);
-//                        medicalCheckupFLFM.getFileList().add(fe);
-//                    }
-                }
-            } catch (Exception ex) {
-                LOG.error("Unable to load education document copies: ", ex);
-            }
-            return true;
-        } else if (source.equals(languagesTW)) {
-            FormModel languageFM = ((DBTableModel) languagesTW.getWidgetModel()).getFormModel();
-            return true;
-        } else if (source.equals(untRatesTW)) {
-            FormModel untRatesFM = ((DBTableModel) untRatesTW.getWidgetModel()).getFormModel();
-            return true;
-        } else if (source.equals(specTW)) {
-            FormModel entrantSpecialityFM = ((DBTableModel) specTW.getWidgetModel()).getFormModel();
-            FKFieldModel specialityFKFM = (FKFieldModel) entrantSpecialityFM.getFieldModel("speciality");
-            specialityFKFM.setDialogWidth(600);
-            specialityFKFM.setDialogHeight(600);
-            QueryModel specialityQM = specialityFKFM.getQueryModel();
-            specialityQM.addWhere("deleted", Boolean.FALSE);
-            return true;
-        } else if (source.equals(awardsTW)) {
-            FormModel awardsFM = ((DBTableModel) awardsTW.getWidgetModel()).getFormModel();
-            return true;
-        } else if (source.equals(socialCategoriesTW)) {
-            FormModel socialCategoryFM = ((DBTableModel) socialCategoriesTW.getWidgetModel()).getFormModel();
-            return true;
-        }
-
-        return super.onPreview(source, e, buttonId);
+        return check(source, e) || super.onPreview(source, e, buttonId);
     }
 
     @Override
     public boolean preSave(Object source, Entity e, boolean isNew, int buttonId) throws Exception {
-        if (source.equals(dataFW)) {
+        if (source.equals(dataAFW)) {
             return preSaveData(e, isNew);
         } else if (source.equals(documentsTW)) {
             return preSaveEducationDoc(e, isNew);
-        } else if (source.equals(educDocFW)) {
+        } else if (source.equals(educDocGFW)) {
             return preSaveDoc(e, isNew);
-        } else if (source.equals(passportFW)) {
+        } else if (source.equals(passportGFW)) {
             return preSavePassport(e, isNew);
         } else if (source.equals(specTW)) {
             return preSaveSpeciality(e, isNew);
@@ -3354,29 +3117,29 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             return preSaveAwards(e, isNew);
         } else if (source.equals(socialCategoriesTW)) {
             return preSaveSocialCategories(e, isNew);
-        } else if (source.equals(militaryFW)) {
+        } else if (source.equals(militaryGFW)) {
             return preSaveMilitary(e, isNew);
-        } else if (source.equals(disabilityFW)) {
+        } else if (source.equals(disabilityGFW)) {
             return preSaveDisability(e, isNew);
-        } else if (source.equals(repatriateFW)) {
+        } else if (source.equals(repatriateGFW)) {
             return preSaveRepatriate(e, isNew);
-        } else if (source.equals(grantFW)) {
+        } else if (source.equals(grantGFW)) {
             return preSaveGrant(e, isNew);
-        } else if (source.equals(preemptiveRightFW)) {
+        } else if (source.equals(preemptiveRightGFW)) {
             return preSavePreemptiveRight(e, isNew);
-        } else if (source.equals(certificateFW)) {
+        } else if (source.equals(certificateGFW)) {
             return preSaveUNTCertificate(e, isNew);
         } else if (source.equals(untRatesTW)) {
             return preSaveUNTRates(e, isNew);
-        } else if (source.equals(addressRegFW)) {
+        } else if (source.equals(addressRegGFW)) {
             return preSaveAddressReg(e, isNew);
-        } else if (source.equals(addressFactFW)) {
+        } else if (source.equals(addressFactGFW)) {
             return preSaveAddressFact(e, isNew);
-        } else if (source.equals(fatherFW)) {
+        } else if (source.equals(fatherGFW)) {
             return preSaveFather(e, isNew);
-        } else if (source.equals(motherFW)) {
+        } else if (source.equals(motherGFW)) {
             return preSaveMother(e, isNew);
-        } else if (source.equals(dataContractFW)) {
+        } else if (source.equals(dataContractGFW)) {
             return preSaveContract(e, isNew);
         }
         return super.preSave(source, e, isNew, buttonId);
@@ -3521,7 +3284,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
 
     @Override
     public void handleEntityEvent(EntityEvent ev) {
-        if (!ev.getSource().equals(dataFW)) {
+        if (!ev.getSource().equals(dataAFW)) {
             super.handleEntityEvent(ev);
         }
     }
@@ -3529,7 +3292,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
     @Override
     public void deferredCreate(Object source, Entity e) {
         STUDENT student = (STUDENT) e;
-        if (source.equals(dataFW)) {
+        if (source.equals(dataAFW)) {
             student.setCreated(new Date());
             try {
                 student.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_T_USER"));
@@ -3547,8 +3310,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
 
     @Override
     protected AbstractCommonView getParentView() {
-        return null;//TODO
-//        return new ApplicantsList();
+        return null;
     }
 
     @Override
