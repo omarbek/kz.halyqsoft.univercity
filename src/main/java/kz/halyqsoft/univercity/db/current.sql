@@ -90,3 +90,6 @@ CREATE VIEW V_USER_AWARD AS
     usr_award.AWARD_ID,
     award.AWARD_NAME
   FROM USER_AWARD usr_award INNER JOIN AWARD award ON usr_award.AWARD_ID = award.ID;
+
+INSERT INTO user_type VALUES (1, 'Сотрудник');
+INSERT INTO user_type VALUES (2, 'Студент');
