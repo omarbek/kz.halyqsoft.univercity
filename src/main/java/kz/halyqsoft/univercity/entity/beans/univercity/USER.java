@@ -101,7 +101,7 @@ public abstract class USER extends AbstractEntity {
 	@Column(name = "EMAIL")
 	private String email;
 	
-	@FieldInfo(type = EFieldType.MASK, fieldMask = "(###)-###-####", max = 10, order = 16, required = false, inGrid = false)
+	@FieldInfo(type = EFieldType.TEXT, fieldMask = "(###)-###-####", max = 10, order = 16, required = false, inGrid = false)
 	@Column(name = "PHONE_MOBILE")
 	private String phoneMobile;
 	

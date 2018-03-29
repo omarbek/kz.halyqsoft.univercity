@@ -1948,7 +1948,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         if (isNew) {
             s.setCreated(new Date());
             try {
-                s.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_T_USER"));
+                s.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USERS"));
                 s.setCode("000000000000");
                 s.setCategory(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(STUDENT_CATEGORY.class, ID.valueOf(1)));
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(s);
