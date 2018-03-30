@@ -1,5 +1,7 @@
 package kz.halyqsoft.univercity.modules.regapplicants;
 
+import com.vaadin.ui.Button;
+import com.vaadin.ui.VerticalLayout;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.LEVEL;
@@ -25,12 +27,34 @@ import java.util.Calendar;
  */
 public class RegisterApplicantsView extends AbstractTaskView implements EntityListener {
 
+    static Button regButton;
+    private VerticalLayout registerVL;
+    private boolean removeAll = false;
+
     public RegisterApplicantsView(AbstractTask task) throws Exception {
         super(task);
     }
 
     @Override
     public void initView(boolean b) throws Exception {
+        registerVL = new VerticalLayout();
+        regButton = new Button();
+        regButton.setCaption(getUILocaleUtil().getCaption("sign.up"));
+        regButton.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                createApplicants();
+                removeAll = true;
+            }
+        });
+        registerVL.addComponent(regButton);
+        getContent().addComponent(registerVL);
+    }
+
+    private void createApplicants() {
+        if (removeAll) {
+            registerVL.removeAllComponents();
+        }
         FormModel studentFM = new FormModel(STUDENT.class, true);
         studentFM.setReadOnly(false);
         studentFM.setTitleVisible(false);
@@ -58,7 +82,7 @@ public class RegisterApplicantsView extends AbstractTaskView implements EntityLi
         try {
             studentFM.createNew();
 
-            java.util.Calendar c = java.util.Calendar.getInstance();
+            Calendar c = Calendar.getInstance();
             QueryModel<ENTRANCE_YEAR> qmEntranceYear = new QueryModel<>(ENTRANCE_YEAR.class);
             qmEntranceYear.addWhere("beginYear", ECriteria.EQUAL, c.get(Calendar.YEAR));
             ENTRANCE_YEAR ey = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(qmEntranceYear);
@@ -66,7 +90,8 @@ public class RegisterApplicantsView extends AbstractTaskView implements EntityLi
             ((STUDENT) studentFM.getEntity()).setEntranceYear(ey);
             ((STUDENT) studentFM.getEntity()).setLevel(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(LEVEL.class, ID.valueOf(1)));
             ((STUDENT) studentFM.getEntity()).setCategory(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(STUDENT_CATEGORY.class, ID.valueOf(1)));
-            getContent().addComponent(new ApplicantsForm(studentFM));
+
+            registerVL.addComponent(new ApplicantsForm(studentFM, ey));
         } catch (Exception ex) {
             ErrorUtils.LOG.error("Unable to create new Applicant: ", ex);
             Message.showError("Unable to create new Applicant");

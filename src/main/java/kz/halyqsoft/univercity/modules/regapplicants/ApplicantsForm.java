@@ -40,6 +40,7 @@ import org.r3a.common.vaadin.widget.table.TableWidget;
 import org.r3a.common.vaadin.widget.table.model.DBTableModel;
 
 import javax.persistence.NoResultException;
+import java.math.BigInteger;
 import java.util.*;
 import java.util.Calendar;
 
@@ -65,6 +66,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
     private GridFormWidget preemptiveRightGFW, certificateGFW, addressRegGFW;
     private GridFormWidget addressFactGFW, fatherGFW, motherGFW, dataContractGFW, educDocGFW;
 
+    private Button form;
     private Button mainDataButton, factAddressButton, regAddressButton, specButton;
     private Button idDocButton, militaryButton, disabilityButton, repatriateButton;
     private Button eduDocButton, eduDocsButton, preemRightButton;
@@ -85,10 +87,14 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
 //    private List<STUDENT> delStudentList = new ArrayList<>();
     private STUDENT student;
     private Flag flag;
+    private ENTRANCE_YEAR entranceYear;
 
-    ApplicantsForm(final FormModel dataFM) throws Exception {
+    private static final int NUMBER_OF_SUBJECT_IN_UNT = 6;
+
+    ApplicantsForm(final FormModel dataFM, ENTRANCE_YEAR entranceYear) throws Exception {
 
         super();
+        this.entranceYear = entranceYear;
         setBackButtonVisible(false);
         registrationHSP = new HorizontalSplitPanel();
         registrationHSP.setSplitPosition(20);
@@ -211,14 +217,15 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
 		/*�������� ����������� (���� �� 1 ���������� ��� ����������)*/
         final FormModel educationFM = createEducationDoc(udfQM);
 
-        final Button form = createFormButtons(dataFM, preemptiveRightFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, grantDocFM, untCertificateFM, addressRegFM, addressFactFM, fatherFM, motherFM, dataContractFM, educationFM);
+        createFormButtons(dataFM, preemptiveRightFM, userPassportFM, militaryDocFM,
+                disabilityDocFM, repatriateDocFM, grantDocFM, untCertificateFM, addressRegFM,
+                addressFactFM, fatherFM, motherFM, dataContractFM, educationFM);
 
         setNextButtons();
 
         addFormButtons();
 
         form.click();
-        getContent().addComponent(registrationHSP);
     }
 
     private FormModel createPreemptiveRight(QueryModel<USER_DOCUMENT_FILE> udfQM) throws Exception {
@@ -876,18 +883,19 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         nextFinishButton = createNextButton(finishButton, caption);
     }
 
-    private Button createFormButtons(FormModel dataFM, FormModel preemptiveRightFM, FormModel userPassportFM,
-                                     FormModel militaryDocFM, FormModel disabilityDocFM, FormModel repatriateDocFM,
-                                     FormModel grantDocFM, FormModel untCertificateFM, FormModel addressRegFM,
-                                     FormModel addressFactFM, FormModel fatherFM, FormModel motherFM,
-                                     FormModel dataContractFM, FormModel educationFM) {
+    private void createFormButtons(FormModel dataFM, FormModel preemptiveRightFM, FormModel userPassportFM,
+                                   FormModel militaryDocFM, FormModel disabilityDocFM, FormModel repatriateDocFM,
+                                   FormModel grantDocFM, FormModel untCertificateFM, FormModel addressRegFM,
+                                   FormModel addressFactFM, FormModel fatherFM, FormModel motherFM,
+                                   FormModel dataContractFM, FormModel educationFM) {
         String caption = "buttonMain";
         String styleName = "buttonChild";
 
-        final Button form = createFormButton("regapplicant.main.data", caption);
+        form = createFormButton("regapplicant.main.data", caption);
         form.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
+                getContent().removeAllComponents();
                 mainDataButton.addStyleName("actived");
                 flag = Flag.MAIN_DATA;
                 saveData = false;
@@ -916,6 +924,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 contentHL.addComponent(nextFactAddressButton);
                 contentHL.setComponentAlignment(nextFactAddressButton, Alignment.MIDDLE_CENTER);
                 registrationHSP.addComponent(contentHL);
+                getContent().addComponent(registrationHSP);
             }
         });
 
@@ -1445,8 +1454,22 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 untRatesQM.addWhere("untCertificate", ECriteria.EQUAL, untCertificateId);
                 /***************/
 
+                Button saveButton = createSaveButton();
+                saveButton.addClickListener(new Button.ClickListener() {
+                    @Override
+                    public void buttonClick(ClickEvent clickEvent) {
+                        if (untCertificateFM.isModified()) {
+                            certificateGFW.save();
+                        } else {
+                            Message.showError("fill main data");
+                        }
+                    }
+                });
+
                 VerticalLayout dataUNT = new VerticalLayout();
                 dataUNT.addComponent(certificateGFW);
+                dataUNT.addComponent(saveButton);
+                dataUNT.setComponentAlignment(saveButton, Alignment.MIDDLE_CENTER);
                 dataUNT.addComponent(untRatesTW);
 
                 contentHL.removeAllComponents();
@@ -1666,7 +1689,6 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 else if (!saveEduc) Message.showInfo(getUILocaleUtil().getMessage("info.save.educ"));
                 else if (!saveUNT) Message.showInfo(getUILocaleUtil().getMessage("info.save.unt"));
                 else {
-                    String codeApp;
                     mainDataButton.setEnabled(false);
                     idDocButton.setEnabled(false);
                     eduDocButton.setEnabled(false);
@@ -1686,12 +1708,19 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                     factAddressButton.setEnabled(false);
                     regAddressButton.setEnabled(false);
                     finishButton.setEnabled(false);
-                    codeApp = (String) dataFM.getFieldModel("code").getValue();
-                    Label mess = new Label("<br><br><br><center><strong>�� ������� ������ ����������� �� ������� ����!!!</strong><br>"
-                            + "\n<i>��������� ���� ���������� ��� �����������:</i><br>" + codeApp + "</center>");
+                    Label mess = new Label("<br><br><br><center><strong>Вы успешно прошли регистрацию!!!</strong><br>");
                     mess.setContentMode(ContentMode.HTML);
                     messForm = new VerticalLayout();
                     messForm.addComponent(mess);
+
+                    Button againButton = new Button("again");//TODO
+                    againButton.addClickListener(new Button.ClickListener() {
+                        @Override
+                        public void buttonClick(ClickEvent clickEvent) {
+                            RegisterApplicantsView.regButton.click();
+                        }
+                    });
+                    messForm.addComponent(againButton);
 
                     registrationHSP.removeAllComponents();
                     contentHL.removeAllComponents();
@@ -1702,7 +1731,6 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 }
             }
         });
-        return form;
     }
 
     private void flagSave(Flag flag, FormModel dataFM, FormModel userPassportFM, FormModel militaryDocFM,
@@ -1741,8 +1769,9 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                     preemptiveRightGFW.save();
                 break;
             case UNT:
-                if (untCertificateFM.isModified() && certificateGFW.save())
+                if (untRatesTW.getEntityCount() > 1) {
                     saveUNT = true;
+                }
                 break;
             case GRANT_DOC:
                 if (grantDocFM.isModified())
@@ -1948,10 +1977,13 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         if (isNew) {
             s.setCreated(new Date());
             try {
-                s.setLogin(s.getFirstNameEN() + "_" + s.getLastNameEN());
                 s.setPasswd("12345678");
                 s.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USERS"));
-                s.setCode("000000000000");
+                Integer beginYear = entranceYear.getBeginYear();
+                String year = beginYear.toString().substring(2, 4);
+                String code = getCode(year);
+                s.setLogin(code);
+                s.setCode(code);
                 s.setCategory(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(STUDENT_CATEGORY.class, ID.valueOf(1)));
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(s);
                 dataAFW.getWidgetModel().loadEntity(s.getId());
@@ -1970,6 +2002,29 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             }
         }
         return false;
+    }
+
+    private String getCode(String beginYear) {
+        String code = null;
+        try {
+            Integer usersCode = SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USERS_CODE").getId().intValue();
+            if (usersCode < 10) {
+                code = beginYear + "000" + usersCode;
+            } else if (usersCode < 100) {
+                code = beginYear + "00" + usersCode;
+            } else if (usersCode < 1000) {
+                code = beginYear + "0" + usersCode;
+            } else if (usersCode < 10000) {
+                code = beginYear + usersCode;
+            } else {
+                SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USERS_CODE").
+                        setId(BigInteger.valueOf(0));//TODO check
+                code = getCode(beginYear);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();//TODO catch
+        }
+        return code;
     }
 
     private boolean preSaveContract(Entity e, boolean isNew) {
@@ -2754,7 +2809,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 sr.setStudent((STUDENT) fm.getEntity());
                 sr.setRelativeType(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(RELATIVE_TYPE.class, ID.valueOf(2)));
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(sr);
-                Message.showInfo(getUILocaleUtil().getMessage("info.record.saved"));
+                showSavedNotification();
             } catch (Exception ex) {
                 LOG.error("Unable to create a mothers data: ", ex);
             }

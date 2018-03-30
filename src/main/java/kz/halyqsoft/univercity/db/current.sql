@@ -292,3 +292,8 @@ create sequence s_unt_cert_subject
 minvalue 0
 start with 1
 no cycle;
+
+create sequence s_users_code
+minvalue 0
+start with 1
+no cycle;
