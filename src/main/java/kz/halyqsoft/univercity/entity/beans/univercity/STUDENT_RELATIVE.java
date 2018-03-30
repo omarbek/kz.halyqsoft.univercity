@@ -65,11 +65,11 @@ public class STUDENT_RELATIVE extends AbstractEntity {
 	@Column(name = "STREET")
 	private String street;
 	
-	@FieldInfo(type = EFieldType.MASK, fieldMask = "(###)-###-####", order = 9, required = false)
+	@FieldInfo(type = EFieldType.TEXT, fieldMask = "(###)-###-####", order = 9, required = false)
 	@Column(name = "PHONE_HOME")
 	private String phoneHome;
 	
-	@FieldInfo(type = EFieldType.MASK, fieldMask = "(###)-###-####", order = 10, required = false)
+	@FieldInfo(type = EFieldType.TEXT, fieldMask = "(###)-###-####", order = 10, required = false)
 	@Column(name = "PHONE_MOBILE")
 	private String phoneMobile;
 	
@@ -85,7 +85,7 @@ public class STUDENT_RELATIVE extends AbstractEntity {
 	@Column(name = "POST_NAME")
 	private String postName;
 	
-	@FieldInfo(type = EFieldType.MASK, fieldMask = "(###)-###-####", order = 14, required = false)
+	@FieldInfo(type = EFieldType.TEXT, fieldMask = "(###)-###-####", order = 14, required = false)
 	@Column(name = "PHONE_WORK")
 	private String phoneWork;
 

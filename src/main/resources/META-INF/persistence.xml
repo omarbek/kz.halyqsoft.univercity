@@ -283,7 +283,6 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM_SUMMER</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM_SUMMER_DETAIL</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.GRADUATION_PROJECT</class>
-        <class>kz.halyqsoft.univercity.entity.beans.univercity.USER</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>

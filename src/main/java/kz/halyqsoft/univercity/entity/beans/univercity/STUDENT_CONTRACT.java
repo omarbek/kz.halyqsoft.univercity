@@ -41,9 +41,6 @@ public class STUDENT_CONTRACT extends USER_DOCUMENT {
         @JoinColumn(name = "ORGANIZATION_ID", referencedColumnName = "ID")})
     private ORGANIZATION organization;
 	
-	@Column(name = "OLD_ID")
-	private String oldId;
-
 	public STUDENT_CONTRACT() {
 	}
 
@@ -71,11 +68,4 @@ public class STUDENT_CONTRACT extends USER_DOCUMENT {
 		this.organization = organization;
 	}
 
-	public String getOldId() {
-		return oldId;
-	}
-
-	public void setOldId(String oldId) {
-		this.oldId = oldId;
-	}
 }

@@ -1,16 +1,12 @@
 package kz.halyqsoft.univercity.entity.beans.univercity.view;
 
-import kz.halyqsoft.univercity.entity.beans.univercity.USER;
+import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.AWARD;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 /**
  * @author Omarbek
@@ -18,49 +14,49 @@ import javax.persistence.ManyToOne;
  */
 @Entity
 public class V_USER_AWARD extends AbstractEntity {
-	
-	private static final long serialVersionUID = -4690588002827723871L;
 
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 1, inGrid = false, inEdit = false, inView = false)
+    private static final long serialVersionUID = -4690588002827723871L;
+
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 1, inGrid = false, inEdit = false, inView = false)
     @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "USER_ID", referencedColumnName = "ID")})
-    private USER user;
-	
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 2, inGrid = false)
+            @JoinColumn(name = "USER_ID", referencedColumnName = "ID")})
+    private USERS user;
+
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 2, inGrid = false)
     @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "AWARD_ID", referencedColumnName = "ID")})
+            @JoinColumn(name = "AWARD_ID", referencedColumnName = "ID")})
     private AWARD award;
-	
-	@FieldInfo(type = EFieldType.TEXT, max = 128, order = 3, inEdit = false, inView = false)
-	@Column(name = "AWARD_NAME", nullable = false)
-	private String awardName;
 
-	public V_USER_AWARD() {
-	}
+    @FieldInfo(type = EFieldType.TEXT, max = 128, order = 3, inEdit = false, inView = false)
+    @Column(name = "AWARD_NAME", nullable = false)
+    private String awardName;
 
-	public USER getUser() {
-		return user;
-	}
+    public V_USER_AWARD() {
+    }
 
-	public void setUser(USER user) {
-		this.user = user;
-	}
+    public USERS getUser() {
+        return user;
+    }
 
-	public AWARD getAward() {
-		return award;
-	}
+    public void setUser(USERS user) {
+        this.user = user;
+    }
 
-	public void setAward(AWARD award) {
-		this.award = award;
-	}
+    public AWARD getAward() {
+        return award;
+    }
 
-	public String getAwardName() {
-		return awardName;
-	}
+    public void setAward(AWARD award) {
+        this.award = award;
+    }
 
-	public void setAwardName(String awardName) {
-		this.awardName = awardName;
-	}
+    public String getAwardName() {
+        return awardName;
+    }
+
+    public void setAwardName(String awardName) {
+        this.awardName = awardName;
+    }
 }

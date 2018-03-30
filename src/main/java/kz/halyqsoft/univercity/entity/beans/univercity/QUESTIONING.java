@@ -1,17 +1,11 @@
 package kz.halyqsoft.univercity.entity.beans.univercity;
 
+import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT;
 import org.r3a.common.entity.AbstractEntity;
 
+import javax.persistence.*;
 import java.util.Date;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.ManyToOne;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 /**
  * @author Omarbek
@@ -20,69 +14,69 @@ import javax.persistence.TemporalType;
 @Entity
 public class QUESTIONING extends AbstractEntity {
 
-	private static final long serialVersionUID = -575139584100869072L;
+    private static final long serialVersionUID = -575139584100869072L;
 
-	@ManyToOne
+    @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "USER_ID", referencedColumnName = "ID")})
-    private USER user;
-	
-	@ManyToOne
+            @JoinColumn(name = "USER_ID", referencedColumnName = "ID")})
+    private USERS user;
+
+    @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
+            @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
     private SUBJECT subject;
-	
-	@Column(name = "BEGIN_DATE", nullable = false)
+
+    @Column(name = "BEGIN_DATE", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date beginDate;
-	
-	@Column(name = "END_DATE")
+
+    @Column(name = "END_DATE")
     @Temporal(TemporalType.TIMESTAMP)
     private Date endDate;
-	
-	@Column(name = "STATUS", nullable = false)
+
+    @Column(name = "STATUS", nullable = false)
     private boolean status;
-	
-	public QUESTIONING() {
-	}
 
-	public USER getUser() {
-		return user;
-	}
+    public QUESTIONING() {
+    }
 
-	public void setUser(USER user) {
-		this.user = user;
-	}
+    public USERS getUser() {
+        return user;
+    }
 
-	public SUBJECT getSubject() {
-		return subject;
-	}
+    public void setUser(USERS user) {
+        this.user = user;
+    }
 
-	public void setSubject(SUBJECT subject) {
-		this.subject = subject;
-	}
+    public SUBJECT getSubject() {
+        return subject;
+    }
 
-	public Date getBeginDate() {
-		return beginDate;
-	}
+    public void setSubject(SUBJECT subject) {
+        this.subject = subject;
+    }
 
-	public void setBeginDate(Date beginDate) {
-		this.beginDate = beginDate;
-	}
+    public Date getBeginDate() {
+        return beginDate;
+    }
 
-	public Date getEndDate() {
-		return endDate;
-	}
+    public void setBeginDate(Date beginDate) {
+        this.beginDate = beginDate;
+    }
 
-	public void setEndDate(Date endDate) {
-		this.endDate = endDate;
-	}
+    public Date getEndDate() {
+        return endDate;
+    }
 
-	public boolean isStatus() {
-		return status;
-	}
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
 
-	public void setStatus(boolean status) {
-		this.status = status;
-	}
+    public boolean isStatus() {
+        return status;
+    }
+
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
 }

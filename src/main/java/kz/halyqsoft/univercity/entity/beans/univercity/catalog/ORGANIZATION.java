@@ -29,11 +29,11 @@ public class ORGANIZATION extends AbstractEntity {
 	@Column(name = "ORGANIZATION_NAME", nullable = false)
 	private String organizationName;
 	
-	@FieldInfo(type = EFieldType.MASK, fieldMask = "(###)-###-####", order = 3, required = false)
+	@FieldInfo(type = EFieldType.TEXT, fieldMask = "(###)-###-####", order = 3, required = false)
 	@Column(name = "PHONE", nullable = false)
 	private String phone;
 	
-	@FieldInfo(type = EFieldType.MASK, fieldMask = "(###)-###-####", order = 4, required = false)
+	@FieldInfo(type = EFieldType.TEXT, fieldMask = "(###)-###-####", order = 4, required = false)
 	@Column(name = "PHONE_MOBILE", nullable = false)
 	private String phoneMobile;
 	

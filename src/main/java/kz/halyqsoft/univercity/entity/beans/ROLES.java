@@ -8,7 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 
 /**
- * Author Rahimjan A. Kenjegul
+ * Author Omarbek
  * Created 25.10.2008 17:22:10
  */
 @Entity

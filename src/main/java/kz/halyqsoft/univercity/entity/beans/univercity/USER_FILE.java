@@ -1,12 +1,9 @@
 package kz.halyqsoft.univercity.entity.beans.univercity;
 
+import kz.halyqsoft.univercity.entity.beans.USERS;
 import org.r3a.common.entity.AbstractEntity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 /**
  * @author Omarbek
@@ -17,65 +14,65 @@ public class USER_FILE extends AbstractEntity {
 
     private static final long serialVersionUID = -1871311136603846819L;
 
-	@ManyToOne
+    @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "USER_ID", referencedColumnName = "ID")})
-    private USER user;
-	
-	@Column(name = "FILE_NAME", nullable = false)
-	private String fileName;
-	
-	@Column(name = "FOLDER", nullable = false)
+            @JoinColumn(name = "USER_ID", referencedColumnName = "ID")})
+    private USERS user;
+
+    @Column(name = "FILE_NAME", nullable = false)
+    private String fileName;
+
+    @Column(name = "FOLDER", nullable = false)
     private boolean folder;
-	
-	@ManyToOne
+
+    @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "PARENT_ID", referencedColumnName = "ID")})
+            @JoinColumn(name = "PARENT_ID", referencedColumnName = "ID")})
     private USER_FILE parent;
-	
-	@Column(name = "DESCR")
-	private String descr;
-	
-	public USER_FILE() {
-	}
 
-	public USER getUser() {
-		return user;
-	}
+    @Column(name = "DESCR")
+    private String descr;
 
-	public void setUser(USER user) {
-		this.user = user;
-	}
+    public USER_FILE() {
+    }
 
-	public String getFileName() {
-		return fileName;
-	}
+    public USERS getUser() {
+        return user;
+    }
 
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
+    public void setUser(USERS user) {
+        this.user = user;
+    }
 
-	public boolean isFolder() {
-		return folder;
-	}
+    public String getFileName() {
+        return fileName;
+    }
 
-	public void setFolder(boolean folder) {
-		this.folder = folder;
-	}
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
 
-	public USER_FILE getParent() {
-		return parent;
-	}
+    public boolean isFolder() {
+        return folder;
+    }
 
-	public void setParent(USER_FILE parent) {
-		this.parent = parent;
-	}
+    public void setFolder(boolean folder) {
+        this.folder = folder;
+    }
 
-	public String getDescr() {
-		return descr;
-	}
+    public USER_FILE getParent() {
+        return parent;
+    }
 
-	public void setDescr(String descr) {
-		this.descr = descr;
-	}
+    public void setParent(USER_FILE parent) {
+        this.parent = parent;
+    }
+
+    public String getDescr() {
+        return descr;
+    }
+
+    public void setDescr(String descr) {
+        this.descr = descr;
+    }
 }

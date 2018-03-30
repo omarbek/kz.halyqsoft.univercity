@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Author Rahimjan A. Kenjegul
+ * Author Omarbek
  * Created 12.11.2008 22:13:59
  */
 @Entity

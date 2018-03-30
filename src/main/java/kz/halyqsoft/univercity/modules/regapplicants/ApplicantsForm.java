@@ -197,7 +197,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         final FormModel addressRegFM = createAddressReg();
 
 		/*����� ����������*/
-        final FormModel addressFactFM = createAddressRes();
+        final FormModel addressFactFM = createAddressFact();
 
 		/*������ ����*/
         final FormModel fatherFM = createFatherData();
@@ -567,7 +567,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         /******************************************************************************/return addressRegFM;
     }
 
-    private FormModel createAddressRes() throws Exception {
+    private FormModel createAddressFact() throws Exception {
         StringBuilder sb;
         sb = new StringBuilder();
         sb.append(getUILocaleUtil().getCaption("title.error"));
@@ -1948,6 +1948,8 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         if (isNew) {
             s.setCreated(new Date());
             try {
+                s.setLogin(s.getFirstNameEN() + "_" + s.getLastNameEN());
+                s.setPasswd("12345678");
                 s.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USERS"));
                 s.setCode("000000000000");
                 s.setCategory(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(STUDENT_CATEGORY.class, ID.valueOf(1)));
@@ -1959,7 +1961,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 Message.showError("�������� ������ �� ���������"); //("Unable to save new applicant");								
             }
         } else {
-            s.setUpdated(new Date());
+//            s.setUpdated(new Date());
             try {
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(s);
                 showSavedNotification();
@@ -1979,7 +1981,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         FormModel fm = dataAFW.getWidgetModel();
         if (isNew) {
             try {
-                md.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_T_USER_DOCUMENT"));
+                md.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USER_DOCUMENT"));
                 md.setUser((STUDENT) fm.getEntity());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(md);
                 showSavedNotification();
@@ -2033,7 +2035,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         FormModel fm = dataAFW.getWidgetModel();
         if (isNew) {
             try {
-                p.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_T_USER_DOCUMENT"));
+                p.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USER_DOCUMENT"));
                 p.setUser((STUDENT) fm.getEntity());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(p);
                 showSavedNotification();
@@ -2082,7 +2084,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         FormModel fm = dataAFW.getWidgetModel();
         if (isNew) {
             try {
-                ed.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_T_USER_DOCUMENT"));
+                ed.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USER_DOCUMENT"));
                 ed.setUser((STUDENT) fm.getEntity());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(ed);
 
@@ -2145,7 +2147,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         FormModel fm = dataAFW.getWidgetModel();
         if (isNew) {
             try {
-                md.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_T_USER_DOCUMENT"));
+                md.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USER_DOCUMENT"));
                 md.setUser((STUDENT) fm.getEntity());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(md);
                 showSavedNotification();
@@ -2198,7 +2200,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         FormModel fm = dataAFW.getWidgetModel();
         if (isNew) {
             try {
-                md.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_T_USER_DOCUMENT"));
+                md.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USER_DOCUMENT"));
                 md.setUser((STUDENT) fm.getEntity());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(md);
                 showSavedNotification();
@@ -2251,7 +2253,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         FormModel fm = dataAFW.getWidgetModel();
         if (isNew) {
             try {
-                dd.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_T_USER_DOCUMENT"));
+                dd.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USER_DOCUMENT"));
                 dd.setUser((STUDENT) fm.getEntity());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(dd);
                 showSavedNotification();
@@ -2304,7 +2306,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         FormModel fm = dataAFW.getWidgetModel();
         if (isNew) {
             try {
-                rd.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_T_USER_DOCUMENT"));
+                rd.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USER_DOCUMENT"));
                 rd.setUser((STUDENT) fm.getEntity());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(rd);
                 showSavedNotification();
@@ -2384,7 +2386,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         FormModel fm = dataAFW.getWidgetModel();
         if (isNew) {
             try {
-                pr.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_T_USER_DOCUMENT"));
+                pr.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USER_DOCUMENT"));
                 pr.setUser((STUDENT) fm.getEntity());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(pr);
                 showSavedNotification();
@@ -2438,7 +2440,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
 
         if (isNew) {
             try {
-                gd.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_T_USER_DOCUMENT"));
+                gd.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USER_DOCUMENT"));
                 gd.setUser((STUDENT) fm.getEntity());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(gd);
                 showSavedNotification();
@@ -2490,7 +2492,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             mc = new MEDICAL_CHECKUP();
             try {
                 STUDENT s = (STUDENT) fm.getEntity();
-                mc.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_T_USER_DOCUMENT"));
+                mc.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USER_DOCUMENT"));
                 mc.setUser(s);
                 mc.setDocumentNo(vmc.getDocumentNo());
                 mc.setIssueDate(vmc.getIssueDate());
@@ -2564,7 +2566,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
 
         if (isNew) {
             try {
-                uc.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_T_USER_DOCUMENT"));
+                uc.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USER_DOCUMENT"));
                 uc.setUser((STUDENT) fm.getEntity());
                 //Starting rate = 0
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(uc);
@@ -3295,7 +3297,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         if (source.equals(dataAFW)) {
             student.setCreated(new Date());
             try {
-                student.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_T_USER"));
+                student.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USER"));
                 student.setCategory(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(STUDENT_CATEGORY.class, ID.valueOf(1)));
             } catch (Exception ex) {
                 LOG.error("Unable to create a social category: ", ex);

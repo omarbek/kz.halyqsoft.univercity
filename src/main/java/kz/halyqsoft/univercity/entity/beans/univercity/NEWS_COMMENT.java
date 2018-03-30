@@ -1,17 +1,10 @@
 package kz.halyqsoft.univercity.entity.beans.univercity;
 
+import kz.halyqsoft.univercity.entity.beans.USERS;
 import org.r3a.common.entity.AbstractEntity;
 
+import javax.persistence.*;
 import java.util.Date;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 /**
  * @author Omarbek
@@ -20,81 +13,81 @@ import javax.persistence.TemporalType;
 @Entity
 public class NEWS_COMMENT extends AbstractEntity {
 
-	private static final long serialVersionUID = -754266641645349366L;
+    private static final long serialVersionUID = -754266641645349366L;
 
-	@ManyToOne
+    @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "NEWS_ID", referencedColumnName = "ID")})
+            @JoinColumn(name = "NEWS_ID", referencedColumnName = "ID")})
     private NEWS news;
-	
-	@ManyToOne
+
+    @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "USER_ID", referencedColumnName = "ID", nullable = false)})
-    private USER user;
-	
-	@Column(name = "COMMENT_BODY", nullable = false)
+            @JoinColumn(name = "USER_ID", referencedColumnName = "ID", nullable = false)})
+    private USERS user;
+
+    @Column(name = "COMMENT_BODY", nullable = false)
     @Lob
     private String commentBody;
-	
-	@Column(name = "CREATED", nullable = false)
+
+    @Column(name = "CREATED", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date created;
-	
-	@Column(name = "UPDATED")
+
+    @Column(name = "UPDATED")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updated;
-	
-	@Column(name = "DELETED", nullable = false)
+
+    @Column(name = "DELETED", nullable = false)
     private boolean deleted;
-	
-	public NEWS_COMMENT() {
-	}
 
-	public NEWS getNews() {
-		return news;
-	}
+    public NEWS_COMMENT() {
+    }
 
-	public void setNews(NEWS news) {
-		this.news = news;
-	}
+    public NEWS getNews() {
+        return news;
+    }
 
-	public USER getUser() {
-		return user;
-	}
+    public void setNews(NEWS news) {
+        this.news = news;
+    }
 
-	public void setUser(USER user) {
-		this.user = user;
-	}
+    public USERS getUser() {
+        return user;
+    }
 
-	public String getCommentBody() {
-		return commentBody;
-	}
+    public void setUser(USERS user) {
+        this.user = user;
+    }
 
-	public void setCommentBody(String commentBody) {
-		this.commentBody = commentBody;
-	}
+    public String getCommentBody() {
+        return commentBody;
+    }
 
-	public Date getCreated() {
-		return created;
-	}
+    public void setCommentBody(String commentBody) {
+        this.commentBody = commentBody;
+    }
 
-	public void setCreated(Date created) {
-		this.created = created;
-	}
+    public Date getCreated() {
+        return created;
+    }
 
-	public Date getUpdated() {
-		return updated;
-	}
+    public void setCreated(Date created) {
+        this.created = created;
+    }
 
-	public void setUpdated(Date updated) {
-		this.updated = updated;
-	}
+    public Date getUpdated() {
+        return updated;
+    }
 
-	public boolean isDeleted() {
-		return deleted;
-	}
+    public void setUpdated(Date updated) {
+        this.updated = updated;
+    }
 
-	public void setDeleted(boolean deleted) {
-		this.deleted = deleted;
-	}
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
 }

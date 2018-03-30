@@ -1,5 +1,6 @@
 package kz.halyqsoft.univercity.entity.beans.univercity;
 
+import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SOCIAL_CATEGORY;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
@@ -17,36 +18,36 @@ import javax.persistence.ManyToOne;
 @Entity
 public class USER_SOCIAL_CATEGORY extends AbstractEntity {
 
-	private static final long serialVersionUID = 3662923439027833950L;
+    private static final long serialVersionUID = 3662923439027833950L;
 
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 1, inGrid = false, inEdit = false, inView = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 1, inGrid = false, inEdit = false, inView = false)
     @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "USER_ID", referencedColumnName = "ID")})
-    private USER user;
-	
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 2)
+            @JoinColumn(name = "USER_ID", referencedColumnName = "ID")})
+    private USERS user;
+
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 2)
     @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "SOCIAL_CATEGORY_ID", referencedColumnName = "ID")})
+            @JoinColumn(name = "SOCIAL_CATEGORY_ID", referencedColumnName = "ID")})
     private SOCIAL_CATEGORY socialCategory;
-	
-	public USER_SOCIAL_CATEGORY() {
-	}
 
-	public USER getUser() {
-		return user;
-	}
+    public USER_SOCIAL_CATEGORY() {
+    }
 
-	public void setUser(USER user) {
-		this.user = user;
-	}
+    public USERS getUser() {
+        return user;
+    }
 
-	public SOCIAL_CATEGORY getSocialCategory() {
-		return socialCategory;
-	}
+    public void setUser(USERS user) {
+        this.user = user;
+    }
 
-	public void setSocialCategory(SOCIAL_CATEGORY socialCategory) {
-		this.socialCategory = socialCategory;
-	}
+    public SOCIAL_CATEGORY getSocialCategory() {
+        return socialCategory;
+    }
+
+    public void setSocialCategory(SOCIAL_CATEGORY socialCategory) {
+        this.socialCategory = socialCategory;
+    }
 }

@@ -1,5 +1,6 @@
 package kz.halyqsoft.univercity.entity.beans.univercity;
 
+import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.EMPLOYEE_STATUS;
 import kz.halyqsoft.univercity.entity.beans.univercity.enumeration.UserType;
 import org.r3a.common.entity.EFieldType;
@@ -19,7 +20,7 @@ import java.util.Set;
 		@NamedQuery(name = "T_EMPLOYEE.getEmployeeByLogin",
 				query = "SELECT e FROM EMPLOYEE e WHERE e.login = :login")
 })
-public class EMPLOYEE extends USER {
+public class EMPLOYEE extends USERS {
 
 	private static final long serialVersionUID = -4068099239028431993L;
 

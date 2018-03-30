@@ -1,15 +1,9 @@
 package kz.halyqsoft.univercity.entity.beans.univercity;
 
+import kz.halyqsoft.univercity.entity.beans.USERS;
 import org.r3a.common.entity.AbstractEntity;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 /**
  * @author Omarbek
@@ -18,50 +12,50 @@ import javax.persistence.ManyToOne;
 @Entity
 public class USER_PHOTO extends AbstractEntity {
 
-	private static final long serialVersionUID = 8637714526263016051L;
+    private static final long serialVersionUID = 8637714526263016051L;
 
     @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "USER_ID", referencedColumnName = "ID")})
-    private USER user;
-	
-	@Column(name = "FILE_NAME", nullable = false)
-	private String fileName;
-	
-	@Column(name = "PHOTO")
+            @JoinColumn(name = "USER_ID", referencedColumnName = "ID")})
+    private USERS user;
+
+    @Column(name = "FILE_NAME", nullable = false)
+    private String fileName;
+
+    @Column(name = "PHOTO")
     @Lob
     @Basic(fetch = FetchType.EAGER)
     private byte[] photo;
 
-	public USER_PHOTO() {
-	}
+    public USER_PHOTO() {
+    }
 
-	public USER getUser() {
-		return user;
-	}
+    public USERS getUser() {
+        return user;
+    }
 
-	public void setUser(USER user) {
-		this.user = user;
-	}
+    public void setUser(USERS user) {
+        this.user = user;
+    }
 
-	public String getFileName() {
-		return fileName;
-	}
+    public String getFileName() {
+        return fileName;
+    }
 
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
 
-	public byte[] getPhoto() {
-		return photo;
-	}
+    public byte[] getPhoto() {
+        return photo;
+    }
 
-	public void setPhoto(byte[] photo) {
-		this.photo = photo;
-	}
+    public void setPhoto(byte[] photo) {
+        this.photo = photo;
+    }
 
-	@Override
-	public String toString() {
-		return fileName;
-	}
+    @Override
+    public String toString() {
+        return fileName;
+    }
 }

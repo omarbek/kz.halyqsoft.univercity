@@ -1,12 +1,12 @@
 package kz.halyqsoft.univercity.entity.beans.univercity;
 
+import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.REGISTRATION_SIGNATURE_TYPE;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_DATA;
 import org.r3a.common.entity.AbstractEntity;
 
-import java.util.Date;
-
 import javax.persistence.*;
+import java.util.Date;
 
 /**
  * @author Omarbek
@@ -14,78 +14,78 @@ import javax.persistence.*;
  */
 @Entity
 @NamedQueries({
-		@NamedQuery(name = "T_REGISTRATION_SIGNATURE.find",
-				query = "SELECT rs FROM REGISTRATION_SIGNATURE rs WHERE rs.semesterData = :semesterData AND " +
-						"rs.studentEducation = :studentEducation AND rs.signUser = :signUser")
+        @NamedQuery(name = "T_REGISTRATION_SIGNATURE.find",
+                query = "SELECT rs FROM REGISTRATION_SIGNATURE rs WHERE rs.semesterData = :semesterData AND " +
+                        "rs.studentEducation = :studentEducation AND rs.signUser = :signUser")
 })
 public class REGISTRATION_SIGNATURE extends AbstractEntity {
 
-	private static final long serialVersionUID = 2602578096241627014L;
+    private static final long serialVersionUID = 2602578096241627014L;
 
-	@ManyToOne
+    @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "SEMESTER_DATA_ID", referencedColumnName = "ID", nullable = false)})
+            @JoinColumn(name = "SEMESTER_DATA_ID", referencedColumnName = "ID", nullable = false)})
     private SEMESTER_DATA semesterData;
-	
-	@ManyToOne
+
+    @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "STUDENT_ID", referencedColumnName = "ID", nullable = false)})
+            @JoinColumn(name = "STUDENT_ID", referencedColumnName = "ID", nullable = false)})
     private STUDENT_EDUCATION studentEducation;
-	
-	@ManyToOne
+
+    @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "SIGN_USER_ID", referencedColumnName = "ID", nullable = false)})
-    private USER signUser;
-	
-	@ManyToOne
+            @JoinColumn(name = "SIGN_USER_ID", referencedColumnName = "ID", nullable = false)})
+    private USERS signUser;
+
+    @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "SIGNATURE_TYPE_ID", referencedColumnName = "ID", nullable = false)})
+            @JoinColumn(name = "SIGNATURE_TYPE_ID", referencedColumnName = "ID", nullable = false)})
     private REGISTRATION_SIGNATURE_TYPE signatureType;
-	
-	@Column(name = "SIGN_DATE", nullable = false)
+
+    @Column(name = "SIGN_DATE", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date signDate;
-	
-	public REGISTRATION_SIGNATURE() {
-	}
 
-	public SEMESTER_DATA getSemesterData() {
-		return semesterData;
-	}
+    public REGISTRATION_SIGNATURE() {
+    }
 
-	public void setSemesterData(SEMESTER_DATA semesterData) {
-		this.semesterData = semesterData;
-	}
+    public SEMESTER_DATA getSemesterData() {
+        return semesterData;
+    }
 
-	public STUDENT_EDUCATION getStudentEducation() {
-		return studentEducation;
-	}
+    public void setSemesterData(SEMESTER_DATA semesterData) {
+        this.semesterData = semesterData;
+    }
 
-	public void setStudentEducation(STUDENT_EDUCATION student) {
-		this.studentEducation = student;
-	}
+    public STUDENT_EDUCATION getStudentEducation() {
+        return studentEducation;
+    }
 
-	public USER getSignUser() {
-		return signUser;
-	}
+    public void setStudentEducation(STUDENT_EDUCATION student) {
+        this.studentEducation = student;
+    }
 
-	public void setSignUser(USER signUser) {
-		this.signUser = signUser;
-	}
+    public USERS getSignUser() {
+        return signUser;
+    }
 
-	public REGISTRATION_SIGNATURE_TYPE getSignatureType() {
-		return signatureType;
-	}
+    public void setSignUser(USERS signUser) {
+        this.signUser = signUser;
+    }
 
-	public void setSignatureType(REGISTRATION_SIGNATURE_TYPE signatureType) {
-		this.signatureType = signatureType;
-	}
+    public REGISTRATION_SIGNATURE_TYPE getSignatureType() {
+        return signatureType;
+    }
 
-	public Date getSignDate() {
-		return signDate;
-	}
+    public void setSignatureType(REGISTRATION_SIGNATURE_TYPE signatureType) {
+        this.signatureType = signatureType;
+    }
 
-	public void setSignDate(Date signDate) {
-		this.signDate = signDate;
-	}
+    public Date getSignDate() {
+        return signDate;
+    }
+
+    public void setSignDate(Date signDate) {
+        this.signDate = signDate;
+    }
 }

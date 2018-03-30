@@ -1,5 +1,6 @@
 package kz.halyqsoft.univercity.entity.beans.univercity;
 
+import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ACADEMIC_STATUS;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.LEVEL;
@@ -10,7 +11,6 @@ import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
 
 import javax.persistence.*;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,138 +21,138 @@ import java.util.Set;
 @Entity
 @DiscriminatorValue(value = UserType.STUDENT_INDEX)
 @NamedQueries({
-		@NamedQuery(name = "T_STUDENT.getStudentByLogin",
-				query = "SELECT s FROM STUDENT s WHERE s.login = :login")
+        @NamedQuery(name = "T_STUDENT.getStudentByLogin",
+                query = "SELECT s FROM STUDENT s WHERE s.login = :login")
 })
-public class STUDENT extends USER {
+public class STUDENT extends USERS {
 
-	private static final long serialVersionUID = -7293682451972401050L;
+    private static final long serialVersionUID = -7293682451972401050L;
 
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 30, inGrid = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 30, inGrid = false)
     @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "LEVEL_ID", referencedColumnName = "ID")})
+            @JoinColumn(name = "LEVEL_ID", referencedColumnName = "ID")})
     private LEVEL level;
-	
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 31, inGrid = false)
+
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 31, inGrid = false)
     @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "CATEGORY_ID", referencedColumnName = "ID")})
+            @JoinColumn(name = "CATEGORY_ID", referencedColumnName = "ID")})
     private STUDENT_CATEGORY category;
-	
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 32, inGrid = false, required = false)
+
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 32, inGrid = false, required = false)
     @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "ACADEMIC_STATUS_ID", referencedColumnName = "ID")})
+            @JoinColumn(name = "ACADEMIC_STATUS_ID", referencedColumnName = "ID")})
     private ACADEMIC_STATUS academicStatus;
-	
-	@FieldInfo(type = EFieldType.BOOLEAN, order = 33, required = false, inGrid = false)
-	@Column(name = "NEED_DORM", nullable = false)
+
+    @FieldInfo(type = EFieldType.BOOLEAN, order = 33, required = false, inGrid = false)
+    @Column(name = "NEED_DORM", nullable = false)
     private boolean needDorm;
-	
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 34, inGrid = false, readOnlyFixed = true)
+
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 34, inGrid = false, readOnlyFixed = true)
     @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "ENTRANCE_YEAR_ID", referencedColumnName = "ID")})
+            @JoinColumn(name = "ENTRANCE_YEAR_ID", referencedColumnName = "ID")})
     private ENTRANCE_YEAR entranceYear;
-	
-	@FieldInfo(type = EFieldType.FK_DIALOG, order = 35, inGrid = false, required = false)
+
+    @FieldInfo(type = EFieldType.FK_DIALOG, order = 35, inGrid = false, required = false)
     @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "ADVISOR_ID", referencedColumnName = "ID")})
+            @JoinColumn(name = "ADVISOR_ID", referencedColumnName = "ID")})
     private V_ADVISOR advisor;
-	
-	@Column(name = "PLOGIN")
-	private String parentLogin;
-	
-	@Column(name = "PPASSWD")
-	private String parentPasswd;
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "student")
-	private Set<STUDENT_EDUCATION> studentEducations;
+    @Column(name = "PLOGIN")
+    private String parentLogin;
 
-	public STUDENT() {
-		studentEducations = new HashSet<>();
-	}
+    @Column(name = "PPASSWD")
+    private String parentPasswd;
 
-	public LEVEL getLevel() {
-		return level;
-	}
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "student")
+    private Set<STUDENT_EDUCATION> studentEducations;
 
-	public void setLevel(LEVEL level) {
-		this.level = level;
-	}
+    public STUDENT() {
+        studentEducations = new HashSet<>();
+    }
 
-	public STUDENT_CATEGORY getCategory() {
-		return category;
-	}
+    public LEVEL getLevel() {
+        return level;
+    }
 
-	public void setCategory(STUDENT_CATEGORY category) {
-		this.category = category;
-	}
+    public void setLevel(LEVEL level) {
+        this.level = level;
+    }
 
-	public ACADEMIC_STATUS getAcademicStatus() {
-		return academicStatus;
-	}
+    public STUDENT_CATEGORY getCategory() {
+        return category;
+    }
 
-	public void setAcademicStatus(ACADEMIC_STATUS academicStatus) {
-		this.academicStatus = academicStatus;
-	}
+    public void setCategory(STUDENT_CATEGORY category) {
+        this.category = category;
+    }
 
-	public boolean isNeedDorm() {
-		return needDorm;
-	}
+    public ACADEMIC_STATUS getAcademicStatus() {
+        return academicStatus;
+    }
 
-	public void setNeedDorm(boolean needDorm) {
-		this.needDorm = needDorm;
-	}
+    public void setAcademicStatus(ACADEMIC_STATUS academicStatus) {
+        this.academicStatus = academicStatus;
+    }
 
-	public ENTRANCE_YEAR getEntranceYear() {
-		return entranceYear;
-	}
+    public boolean isNeedDorm() {
+        return needDorm;
+    }
 
-	public void setEntranceYear(ENTRANCE_YEAR entranceYear) {
-		this.entranceYear = entranceYear;
-	}
+    public void setNeedDorm(boolean needDorm) {
+        this.needDorm = needDorm;
+    }
 
-	public V_ADVISOR getAdvisor() {
-		return advisor;
-	}
+    public ENTRANCE_YEAR getEntranceYear() {
+        return entranceYear;
+    }
 
-	public void setAdvisor(V_ADVISOR advisor) {
-		this.advisor = advisor;
-	}
+    public void setEntranceYear(ENTRANCE_YEAR entranceYear) {
+        this.entranceYear = entranceYear;
+    }
 
-	public String getParentLogin() {
-		return parentLogin;
-	}
+    public V_ADVISOR getAdvisor() {
+        return advisor;
+    }
 
-	public void setParentLogin(String parentLogin) {
-		this.parentLogin = parentLogin;
-	}
+    public void setAdvisor(V_ADVISOR advisor) {
+        this.advisor = advisor;
+    }
 
-	public String getParentPasswd() {
-		return parentPasswd;
-	}
+    public String getParentLogin() {
+        return parentLogin;
+    }
 
-	public void setParentPasswd(String parentPasswd) {
-		this.parentPasswd = parentPasswd;
-	}
+    public void setParentLogin(String parentLogin) {
+        this.parentLogin = parentLogin;
+    }
 
-	public Set<STUDENT_EDUCATION> getStudentEducations() {
-		return studentEducations;
-	}
+    public String getParentPasswd() {
+        return parentPasswd;
+    }
 
-	public void setStudentEducations(Set<STUDENT_EDUCATION> studentEducations) {
-		this.studentEducations = studentEducations;
-	}
+    public void setParentPasswd(String parentPasswd) {
+        this.parentPasswd = parentPasswd;
+    }
 
-	public STUDENT_EDUCATION getLastEducation() {
-		for (STUDENT_EDUCATION education : studentEducations) {
-			if (education.getChild() == null) {
-				return education;
-			}
-		}
-		return null;
-	}
+    public Set<STUDENT_EDUCATION> getStudentEducations() {
+        return studentEducations;
+    }
+
+    public void setStudentEducations(Set<STUDENT_EDUCATION> studentEducations) {
+        this.studentEducations = studentEducations;
+    }
+
+    public STUDENT_EDUCATION getLastEducation() {
+        for (STUDENT_EDUCATION education : studentEducations) {
+            if (education.getChild() == null) {
+                return education;
+            }
+        }
+        return null;
+    }
 }
