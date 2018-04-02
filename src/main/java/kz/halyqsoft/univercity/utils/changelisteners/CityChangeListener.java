@@ -1,4 +1,4 @@
-package kz.halyqsoft.univercity.modules.regapplicants.changelisteners;
+package kz.halyqsoft.univercity.utils.changelisteners;
 
 import com.vaadin.data.Property;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.COUNTRY;
@@ -11,26 +11,27 @@ import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
  * @author Omarbek
  * @created on 27.03.2018
  */
-public class BirthCountryChangeListener implements Property.ValueChangeListener {
-    private final FKFieldModel birthRegionFieldModel;
-    private final COUNTRY birthRegion;
+public class CityChangeListener implements Property.ValueChangeListener {
 
-    public BirthCountryChangeListener(FKFieldModel birthRegionFieldModel, COUNTRY birthRegion) {
-        this.birthRegionFieldModel = birthRegionFieldModel;
-        this.birthRegion = birthRegion;
+    private final COUNTRY village;
+    private final FKFieldModel villageFM;
+
+    public CityChangeListener(COUNTRY village, FKFieldModel villageFM) {
+        this.village = village;
+        this.villageFM = villageFM;
     }
 
     @Override
     public void valueChange(Property.ValueChangeEvent ev) {
         Object value = ev.getProperty().getValue();
-        QueryModel qm = birthRegionFieldModel.getQueryModel();
+        QueryModel qm = villageFM.getQueryModel();
         if (value != null) {
             qm.addWhere("parent", ECriteria.EQUAL, ((COUNTRY) value).getId());
         } else {
             qm.addWhere("parent", ECriteria.EQUAL, ID.valueOf(-1));
         }
         try {
-            birthRegionFieldModel.refresh(birthRegion);
+            villageFM.refresh(village);
         } catch (Exception e) {
             e.printStackTrace();//TODO catch
         }

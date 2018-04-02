@@ -71,6 +71,13 @@ public class STUDENT extends USERS {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "student")
     private Set<STUDENT_EDUCATION> studentEducations;
 
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "student")
+    private Set<ENTRANT_SPECIALITY> entrantSpecialities;
+
+    @OneToOne
+    @PrimaryKeyJoinColumn(name = "ID", referencedColumnName = "ID")
+    private GRADUATION_PROJECT graduationProject;
+
     public STUDENT() {
         studentEducations = new HashSet<>();
     }
@@ -154,5 +161,21 @@ public class STUDENT extends USERS {
             }
         }
         return null;
+    }
+
+    public Set<ENTRANT_SPECIALITY> getEntrantSpecialities() {
+        return entrantSpecialities;
+    }
+
+    public void setEntrantSpecialities(Set<ENTRANT_SPECIALITY> entrantSpecialities) {
+        this.entrantSpecialities = entrantSpecialities;
+    }
+
+    public GRADUATION_PROJECT getGraduationProject() {
+        return graduationProject;
+    }
+
+    public void setGraduationProject(GRADUATION_PROJECT graduationProject) {
+        this.graduationProject = graduationProject;
     }
 }

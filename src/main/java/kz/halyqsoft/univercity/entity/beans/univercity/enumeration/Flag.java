@@ -1,4 +1,4 @@
-package kz.halyqsoft.univercity.modules.regapplicants;
+package kz.halyqsoft.univercity.entity.beans.univercity.enumeration;
 
 /**
  * @author Omarbek

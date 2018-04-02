@@ -1,4 +1,4 @@
-package kz.halyqsoft.univercity.modules.regapplicants.changelisteners;
+package kz.halyqsoft.univercity.utils.changelisteners;
 
 import com.vaadin.data.Property;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.COUNTRY;

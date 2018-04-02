@@ -116,13 +116,13 @@
 			<groupId>org.eclipse.persistence</groupId>
 			<artifactId>eclipselink</artifactId>
 			<version>2.7.1</version>
-			<!--<scope>provided</scope>&lt;!&ndash;real&ndash;&gt;-->
+			<scope>provided</scope><!--real-->
 		</dependency>
 		<dependency>
 			<groupId>postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<version>9.1-901-1.jdbc4</version>
-			<!--<scope>provided</scope>&lt;!&ndash;real&ndash;&gt;-->
+			<scope>provided</scope><!--real-->
 		</dependency>
 		<dependency>
 			<groupId>org.r3a</groupId>
@@ -134,6 +134,12 @@
 			<artifactId>vaadin-add-on</artifactId>
 			<version>1.0</version>
 		</dependency>
+		<dependency>
+			<groupId>com.itextpdf</groupId>
+			<artifactId>itextpdf</artifactId>
+			<version>5.5.11</version>
+		</dependency>
+		<!--last-->
 	</dependencies>
 
 	<build>
