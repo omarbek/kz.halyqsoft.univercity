@@ -1,6 +1,8 @@
 package kz.halyqsoft.univercity.modules.regapplicants;
 
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
@@ -19,6 +21,7 @@ import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.form.FormModel;
 import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 
+import java.io.IOException;
 import java.util.Calendar;
 
 /**
@@ -48,6 +51,31 @@ public class RegisterApplicantsView extends AbstractTaskView implements EntityLi
             }
         });
         registerVL.addComponent(regButton);
+//        TextField firstTF = new TextField("Number of iteration:");
+//        TextField secondTF = new TextField("Parameter: ");
+//        TextField thirdTF = new TextField("The Star:");
+//        Button submitButton = new Button("calculate");
+//        submitButton.addClickListener(new Button.ClickListener() {
+//            @Override
+//            public void buttonClick(Button.ClickEvent clickEvent) {
+//                try {
+//                    AllLabs.calculate(Double.parseDouble(secondTF.getValue()), Integer.parseInt(thirdTF.getValue()),
+//                            Integer.parseInt(firstTF.getValue()));
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+//
+//        registerVL.addComponent(firstTF);
+//        registerVL.setComponentAlignment(firstTF, Alignment.MIDDLE_CENTER);
+//        registerVL.addComponent(secondTF);
+//        registerVL.setComponentAlignment(secondTF, Alignment.MIDDLE_CENTER);
+//        registerVL.addComponent(thirdTF);
+//        registerVL.setComponentAlignment(thirdTF, Alignment.MIDDLE_CENTER);
+//        registerVL.addComponent(submitButton);
+//        registerVL.setComponentAlignment(submitButton, Alignment.MIDDLE_CENTER);
+
         getContent().addComponent(registerVL);
     }
 
