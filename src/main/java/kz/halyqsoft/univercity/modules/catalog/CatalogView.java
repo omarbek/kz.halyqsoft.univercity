@@ -1,9 +1,9 @@
 package kz.halyqsoft.univercity.modules.catalog;
 
-import com.vaadin.data.Property;
 import com.vaadin.ui.HorizontalSplitPanel;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.utils.CommonUtils;
+import kz.halyqsoft.univercity.utils.changelisteners.CountryChangeListener;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
@@ -12,6 +12,8 @@ import org.r3a.common.entity.beans.AbstractTask;
 import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.event.EntityListener;
 import org.r3a.common.entity.query.QueryModel;
+import org.r3a.common.entity.query.from.EJoin;
+import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.select.EAggregate;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.entity.tree.CommonTree;
@@ -140,6 +142,12 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                         tm.getColumnModel("endYear").setFormat(NumberUtils.INTEGER_FORMAT);
                     } */ else if (entityClass.equals(CORPUS.class)) {
                         classASW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
+                    } else if (entityClass.equals(LOCK_REASON.class)) {
+                        qm.addWhere("reason", null, null, true);//for filter
+                    } else if (entityClass.equals(SPECIALITY.class)) {
+                        FormModel fm = ((DBSelectModel) classASW.getWidgetModel()).getFormModel();
+                        QueryModel specQM = ((FKFieldModel) fm.getFieldModel("department")).getQueryModel();
+                        specQM.addWhereNotNull("parent");
                     }
                 }
                 mainHSP.addComponent(classASW);
@@ -238,30 +246,4 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
         return true;
     }
 
-    private class CountryChangeListener implements Property.ValueChangeListener {
-
-        private final COUNTRY region;
-        private final FKFieldModel regionFM;
-
-        CountryChangeListener(COUNTRY region, FKFieldModel regionFM) {
-            this.region = region;
-            this.regionFM = regionFM;
-        }
-
-        @Override
-        public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
-            Object value = valueChangeEvent.getProperty().getValue();
-            QueryModel qm = regionFM.getQueryModel();
-            if (value != null) {
-                qm.addWhere("parent", ECriteria.EQUAL, ((COUNTRY) value).getId());
-            } else {
-                qm.addWhere("parent", ECriteria.EQUAL, ID.valueOf(-1));
-            }
-            try {
-                regionFM.refresh(region);
-            } catch (Exception ex) {
-                LOG.error("Unable to regions: ", ex);
-            }
-        }
-    }
 }

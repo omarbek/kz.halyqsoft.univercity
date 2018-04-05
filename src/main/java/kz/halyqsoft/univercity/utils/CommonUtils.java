@@ -1,6 +1,7 @@
 package kz.halyqsoft.univercity.utils;
 
 import org.r3a.common.entity.ID;
+import org.r3a.common.vaadin.AbstractSecureWebUI;
 
 import java.util.Random;
 
@@ -9,6 +10,11 @@ import java.util.Random;
  * @created on 15.03.2018
  */
 public class CommonUtils {
+
+    public static String getCurrentUserLogin(){
+        return AbstractSecureWebUI.getInstance().getUsername();
+    }
+
     public static String getCode(Integer count) {
         String code = String.valueOf(count);
         if (count < 10) {
@@ -21,7 +27,7 @@ public class CommonUtils {
         return code;
     }
 
-    public static String getCodeBuilder(Integer count) {
+    private static String getCodeBuilder(Integer count) {
         String code = String.valueOf(count);
         StringBuilder codeSB = new StringBuilder();
         if (count < 10) {

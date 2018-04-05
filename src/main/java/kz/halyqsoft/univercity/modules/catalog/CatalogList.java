@@ -33,7 +33,7 @@ class CatalogList {
         addCatalogEntityToList(EQUIPMENT.class);
         addCatalogEntityToList(MEDICAL_CHECKUP_TYPE.class);
         addCatalogEntityToList(MILITARY_STATUS.class);
-        addCatalogEntityToList(ORDER_TYPE.class);
+        addCatalogEntityToList(ORDER_TYPE.class);//TODO remove
         addCatalogEntityToList(POST.class);
         addCatalogEntityToList(CORPUS.class);
         addCatalogEntityToList(SCHOOL_TYPE.class);
@@ -45,6 +45,7 @@ class CatalogList {
         addCatalogEntityToList(DEPARTMENT.class);
         addCatalogEntityToList(MARITAL_STATUS.class);
         addCatalogEntityToList(STUDENT_CATEGORY.class);
+        addCatalogEntityToList(LOCK_REASON.class);
 
         addCatalogEntityToList(SPECIALITY.class);
         addCatalogEntityToList(ACADEMIC_DEGREE.class);

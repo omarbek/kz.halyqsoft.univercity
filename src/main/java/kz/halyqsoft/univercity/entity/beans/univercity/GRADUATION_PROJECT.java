@@ -6,13 +6,7 @@ import org.r3a.common.entity.FieldInfo;
 
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.ManyToOne;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 
 /**
  * @author Omarbek
@@ -22,78 +16,64 @@ import javax.persistence.TemporalType;
 public class GRADUATION_PROJECT extends AbstractEntity {
 
 	private static final long serialVersionUID = -8295572563460334192L;
-	
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 1, inGrid = false, inEdit = false, inView = false)
-    @ManyToOne
-    @JoinColumns({
-        @JoinColumn(name = "STUDENT_ID", referencedColumnName = "ID")})
-    private STUDENT student;
-	
+
+	@OneToOne
+	@PrimaryKeyJoinColumn(name = "ID", referencedColumnName = "ID")
+	private STUDENT student;
+
+	@FieldInfo(type = EFieldType.TEXT, order = 1, inEdit = true, inView = true, inGrid = true)
+	@Column(name = "PROJECT_THEME_KZ", nullable = false, length = 512)
+	private String projectThemeKz;
+
 	@FieldInfo(type = EFieldType.TEXT, order = 2, inEdit = true, inView = true, inGrid = true)
-	@Column(name = "NAME_DIPLOMA")
-	private String nameDiplomaRu;
-	
+	@Column(name = "PROJECT_THEME_EN", nullable = false, length = 512)
+	private String projectThemeEn;
+
 	@FieldInfo(type = EFieldType.TEXT, order = 3, inEdit = true, inView = true, inGrid = true)
-	@Column(name = "NAME_DIPLOMA_KZ")
-	private String nameDiplomaKz;
-	
-	@FieldInfo(type = EFieldType.TEXT, order = 4, inEdit = true, inView = true, inGrid = true)
-	@Column(name = "NAME_DIPLOMA__EN")
-	private String nameDiplomaEn;
-	
-	@FieldInfo(type = EFieldType.TEXT, order = 5, inEdit = true, inView = true, inGrid = true)
-	@Column(name = "DIPLOMA_NUMBER")
-	private String diplomaNumber;
-	
-	@FieldInfo(type = EFieldType.DATE, order = 6, inEdit = true, inView = true, inGrid = true)
-	@Column(name = "DIPLOMA_DATE")
-    @Temporal(TemporalType.DATE)
-    private Date diplomaDate;
-	
-	@FieldInfo(type = EFieldType.TEXT, order = 7, inEdit = true, inView = true, inGrid = true)
-	@Column(name = "ACADEMIC_DEGREE_KZ")
-	private String academicDegreeRu;
-	
-	@FieldInfo(type = EFieldType.TEXT, order = 8, inEdit = true, inView = true, inGrid = true)
-	@Column(name = "ACADEMIC_DEGREE_EN")
-	private String academicDegreeKz;
-	
-	@FieldInfo(type = EFieldType.TEXT, order = 9, inEdit = true, inView = true, inGrid = true)
-	@Column(name = "ACADEMIC_DEGREE_RU")
-	private String academicDegreeEn;
-	
-	@FieldInfo(type = EFieldType.TEXT, order = 10, inEdit = true, inView = true, inGrid = true)
-	@Column(name = "EDUCATIONAL_PROGRAM")
-	private String educationalProgram;
-	
-	@FieldInfo(type = EFieldType.TEXT, order = 11, inEdit = true, inView = true, inGrid = true)
-	@Column(name = "QUALIFICATION")
-	private String qualification;
-	
-	@FieldInfo(type = EFieldType.TEXT, order = 12, inEdit = true, inView = true, inGrid = true)
-	@Column(name = "PROTOCOL_NUMBER")
-	private String protocolNumber;
-	
-	@FieldInfo(type = EFieldType.DATE, order = 13, inEdit = true, inView = true, inGrid = true)
+	@Column(name = "PROJECT_THEME_RU", nullable = false, length = 512)
+	private String projectThemeRu;
+
+	@FieldInfo(type = EFieldType.TEXT, order = 4, inEdit = true, inView = true, inGrid = true, required = false)
+	@Column(name = "PROTOCOL_NO", length = 10)
+	private String protocolNo;
+
+	@FieldInfo(type = EFieldType.DATE, order = 5, inEdit = true, inView = true, inGrid = true, required = false)
 	@Column(name = "PROTOCOL_DATE")
-    @Temporal(TemporalType.DATE)
-    private Date protocolDate;
-	
-	@FieldInfo(type = EFieldType.TEXT, order = 14, inEdit = true, inView = true, inGrid = true)
-	@Column(name = "REG_NUMBER")
-	private String regNumber;
-	
-	@FieldInfo(type = EFieldType.TEXT, order = 15, inEdit = true, inView = true, inGrid = true)
-	@Column(name = "FIRST_NAME_EN")
-	private String firstNameEn;
-	
-	@FieldInfo(type = EFieldType.TEXT, order = 16, inEdit = true, inView = true, inGrid = true)
-	@Column(name = "SECOND_NAME_EN")
-	private String secondNameEn;
-	
-	@FieldInfo(type = EFieldType.TEXT, order = 17, required = false, inEdit = true, inView = true, inGrid = true)
-	@Column(name = "MIDDLE_NAME_EN")
-	private String middleNameEn;
+	@Temporal(TemporalType.DATE)
+	private Date protocolDate;
+
+	@FieldInfo(type = EFieldType.TEXT, order = 6, inEdit = true, inView = true, inGrid = true, required = false)
+	@Column(name = "ACADEMIC_DEGREE_KZ", length = 128)
+	private String academicDegreeKz;
+
+	@FieldInfo(type = EFieldType.TEXT, order = 7, inEdit = true, inView = true, inGrid = true, required = false)
+	@Column(name = "ACADEMIC_DEGREE_EN", length = 128)
+	private String academicDegreeEn;
+
+	@FieldInfo(type = EFieldType.TEXT, order = 8, inEdit = true, inView = true, inGrid = true)
+	@Column(name = "ACADEMIC_DEGREE_RU", nullable = false, length = 128)
+	private String academicDegreeRu;
+
+	@FieldInfo(type = EFieldType.TEXT, order = 9, inEdit = true, inView = true, inGrid = true, required = false)
+	@Column(name = "EDUCATIONAL_PROGRAM", length = 128)
+	private String educationalProgram;
+
+	@FieldInfo(type = EFieldType.TEXT, order = 10, inEdit = true, inView = true, inGrid = true, required = false)
+	@Column(name = "QUALIFICATION", length = 64)
+	private String qualification;
+
+	@FieldInfo(type = EFieldType.TEXT, order = 11, inEdit = true, inView = true, inGrid = true)
+	@Column(name = "DIPLOMA_NO", nullable = false, length = 10)
+	private String diplomaNo;
+
+	@FieldInfo(type = EFieldType.DATE, order = 12, inEdit = true, inView = true, inGrid = true)
+	@Column(name = "DIPLOMA_DATE", nullable = false)
+	@Temporal(TemporalType.DATE)
+	private Date diplomaDate;
+
+	@FieldInfo(type = EFieldType.TEXT, order = 13, inEdit = true, inView = true, inGrid = true)
+	@Column(name = "REGISTRATION_NO", nullable = false, length = 10)
+	private String registrationNo;
 
 	public STUDENT getStudent() {
 		return student;
@@ -103,52 +83,44 @@ public class GRADUATION_PROJECT extends AbstractEntity {
 		this.student = student;
 	}
 
-	public String getNameDiplomaRu() {
-		return nameDiplomaRu;
+	public String getProjectThemeKz() {
+		return projectThemeKz;
 	}
 
-	public void setNameDiplomaRu(String nameDiplomaRu) {
-		this.nameDiplomaRu = nameDiplomaRu;
+	public void setProjectThemeKz(String projectThemeKz) {
+		this.projectThemeKz = projectThemeKz;
 	}
 
-	public String getNameDiplomaKz() {
-		return nameDiplomaKz;
+	public String getProjectThemeEn() {
+		return projectThemeEn;
 	}
 
-	public void setNameDiplomaKz(String nameDiplomaKz) {
-		this.nameDiplomaKz = nameDiplomaKz;
+	public void setProjectThemeEn(String projectThemeEn) {
+		this.projectThemeEn = projectThemeEn;
 	}
 
-	public String getNameDiplomaEn() {
-		return nameDiplomaEn;
+	public String getProjectThemeRu() {
+		return projectThemeRu;
 	}
 
-	public void setNameDiplomaEn(String nameDiplomaEn) {
-		this.nameDiplomaEn = nameDiplomaEn;
+	public void setProjectThemeRu(String projectThemeRu) {
+		this.projectThemeRu = projectThemeRu;
 	}
 
-	public String getDiplomaNumber() {
-		return diplomaNumber;
+	public String getProtocolNo() {
+		return protocolNo;
 	}
 
-	public void setDiplomaNumber(String diplomaNumber) {
-		this.diplomaNumber = diplomaNumber;
+	public void setProtocolNo(String protocolNo) {
+		this.protocolNo = protocolNo;
 	}
 
-	public Date getDiplomaDate() {
-		return diplomaDate;
+	public Date getProtocolDate() {
+		return protocolDate;
 	}
 
-	public void setDiplomaDate(Date diplomaDate) {
-		this.diplomaDate = diplomaDate;
-	}
-
-	public String getAcademicDegreeRu() {
-		return academicDegreeRu;
-	}
-
-	public void setAcademicDegreeRu(String academicDegreeRu) {
-		this.academicDegreeRu = academicDegreeRu;
+	public void setProtocolDate(Date protocolDate) {
+		this.protocolDate = protocolDate;
 	}
 
 	public String getAcademicDegreeKz() {
@@ -167,6 +139,14 @@ public class GRADUATION_PROJECT extends AbstractEntity {
 		this.academicDegreeEn = academicDegreeEn;
 	}
 
+	public String getAcademicDegreeRu() {
+		return academicDegreeRu;
+	}
+
+	public void setAcademicDegreeRu(String academicDegreeRu) {
+		this.academicDegreeRu = academicDegreeRu;
+	}
+
 	public String getEducationalProgram() {
 		return educationalProgram;
 	}
@@ -183,56 +163,27 @@ public class GRADUATION_PROJECT extends AbstractEntity {
 		this.qualification = qualification;
 	}
 
-	public String getProtocolNumber() {
-		return protocolNumber;
+	public String getDiplomaNo() {
+		return diplomaNo;
 	}
 
-	public void setProtocolNumber(String protocolNumber) {
-		this.protocolNumber = protocolNumber;
+	public void setDiplomaNo(String diplomaNo) {
+		this.diplomaNo = diplomaNo;
 	}
 
-	public Date getProtocolDate() {
-		return protocolDate;
+	public Date getDiplomaDate() {
+		return diplomaDate;
 	}
 
-	public void setProtocolDate(Date protocolDate) {
-		this.protocolDate = protocolDate;
+	public void setDiplomaDate(Date diplomaDate) {
+		this.diplomaDate = diplomaDate;
 	}
 
-	public String getRegNumber() {
-		return regNumber;
+	public String getRegistrationNo() {
+		return registrationNo;
 	}
 
-	public void setRegNumber(String regNumber) {
-		this.regNumber = regNumber;
+	public void setRegistrationNo(String registrationNo) {
+		this.registrationNo = registrationNo;
 	}
-
-	public String getFirstNameEn() {
-		return firstNameEn;
-	}
-
-	public void setFirstNameEn(String firstNameEn) {
-		this.firstNameEn = firstNameEn;
-	}
-
-	public String getSecondNameEn() {
-		return secondNameEn;
-	}
-
-	public void setSecondNameEn(String secondNameEn) {
-		this.secondNameEn = secondNameEn;
-	}
-
-	public String getMiddleNameEn() {
-		return middleNameEn;
-	}
-
-	public void setMiddleNameEn(String middleNameEn) {
-		this.middleNameEn = middleNameEn;
-	}
-
-	public static long getSerialversionuid() {
-		return serialVersionUID;
-	}
-	
 }

@@ -58,46 +58,12 @@ public class SocialCategoriesTab extends VerticalLayout {
     private class SocialCategoriesEntityListener implements EntityListener {
 
         @Override
-        public void handleEntityEvent(EntityEvent entityEvent) {
-        }
-
-        @Override
         public boolean preCreate(Object o, int i) {
             if (studentEditHelper.isStudentNew()) {
                 Message.showInfo(studentEditHelper.getUiLocaleUtil().getMessage("info.save.base.data.first"));
-                return true;
+                return false;
             }
-            return false;
-        }
-
-        @Override
-        public void onCreate(Object o, Entity entity, int i) {
-        }
-
-        @Override
-        public boolean onEdit(Object o, Entity entity, int i) {
-            return false;
-        }
-
-        @Override
-        public boolean onPreview(Object o, Entity entity, int i) {
-            return false;
-        }
-
-        @Override
-        public void beforeRefresh(Object o, int i) {
-        }
-
-        @Override
-        public void onRefresh(Object o, List<Entity> list) {
-        }
-
-        @Override
-        public void onFilter(Object o, QueryModel queryModel, int i) {
-        }
-
-        @Override
-        public void onAccept(Object o, List<Entity> list, int i) {
+            return true;
         }
 
         @Override
@@ -169,6 +135,40 @@ public class SocialCategoriesTab extends VerticalLayout {
 
         @Override
         public void onException(Object o, Throwable throwable) {
+        }
+
+        @Override
+        public void handleEntityEvent(EntityEvent entityEvent) {
+        }
+
+        @Override
+        public void onCreate(Object o, Entity entity, int i) {
+        }
+
+        @Override
+        public boolean onEdit(Object o, Entity entity, int i) {
+            return false;
+        }
+
+        @Override
+        public boolean onPreview(Object o, Entity entity, int i) {
+            return false;
+        }
+
+        @Override
+        public void beforeRefresh(Object o, int i) {
+        }
+
+        @Override
+        public void onRefresh(Object o, List<Entity> list) {
+        }
+
+        @Override
+        public void onFilter(Object o, QueryModel queryModel, int i) {
+        }
+
+        @Override
+        public void onAccept(Object o, List<Entity> list, int i) {
         }
     }
 }

@@ -16,6 +16,7 @@ import com.vaadin.ui.Upload.StartedEvent;
 import com.vaadin.ui.Upload.SucceededEvent;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
+import kz.halyqsoft.univercity.entity.beans.univercity.enumeration.OperType;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_ORDER_DOC;
 import kz.halyqsoft.univercity.filter.FStudentFilter;
 import kz.halyqsoft.univercity.utils.ErrorUtils;
@@ -51,89 +52,38 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
 
     private final FormModel parentBaseDataFM;
-    private final FStudentFilter parentFilter;
-    private STUDENT_EDUCATION studentEducation;
-    private Label facultyLabel;
-    private Label specialityLabel;
-    private Label studyYearLabel;
-    private Label languageLabel;
-    private Label educationTypeLabel;
-    private Label entryDateLabel;
-    private Label endDateLabel;
-    private Label statusLabel;
     private TableWidget ordersTW;
     private Table orderFilesTable;
-    private VerticalLayout rightVL;
-    private EOperType operType;
-    private ComboBox facultyWidget;
-    private ComboBox specialityWidget;
-    private ComboBox studyYearWidget;
-    private ComboBox languageWidget;
-    private ComboBox educationTypeWidget;
-    private DateField entryDateWidget;
-    private DateField endDateWidget;
-    private ComboBox statusWidget;
-    private ComboBox orderTypeWidget;
-    private ComboBox orderStudyYearWidget;
-    private TextField orderNoWidget;
-    private DateField orderDateWidget;
-    private CheckBox hideTranscriptWidget;
-    private TextArea orderDescrWidget;
-    private ListSelect orderFilesWidget;
+    private DateField endDateField, orderDateField;
+    private TextField orderNoTF;
+    private CheckBox hideTranscriptChB;
+    private TextArea orderDescrTA;
+    private ListSelect orderFilesLS;
     private File file;
     private Upload upload;
-    private HorizontalLayout toolbarLeftHL;
 
-    public EducationDetailPanel(FormModel parentBaseDataFM, FStudentFilter parentFilter, STUDENT_EDUCATION studentEducation) {
+    private HorizontalLayout toolbarLeftHL;
+    private VerticalLayout rightVL;
+    private VerticalLayout mainVL;
+
+    private ComboBox facultyCB, specCB, studyYearCB, languageCB, educationTypeCB;
+    private ComboBox statusCB, orderTypeCB, orderStudyCB;
+
+    private Label facultyLabel, specialityLabel, studyYearLabel, languageLabel;
+    private Label educationTypeLabel, entryDateLabel, endDateLabel, statusLabel;
+
+    private OperType operType;
+    private StudentEdit studentEdit;
+    private final FStudentFilter parentFilter;
+    private STUDENT_EDUCATION studentEducation;
+
+    EducationDetailPanel(FormModel parentBaseDataFM, FStudentFilter parentFilter,
+                         STUDENT_EDUCATION studentEducation, VerticalLayout mainVL, StudentEdit studentEdit) {
         this.parentBaseDataFM = parentBaseDataFM;
         this.parentFilter = parentFilter;
         this.studentEducation = studentEducation;
-    }
-
-    @Override
-    public String getViewName() {
-        return "educationInfo";
-    }
-
-    @Override
-    protected String getViewTitle(Locale locale) {
-        return getUILocaleUtil().getCaption("student.education.info");
-    }
-
-    @Override
-    protected AbstractCommonView getParentView() {
-        AbstractCommonView parentView = null;
-        try {
-            parentView = new StudentEdit(parentBaseDataFM, parentFilter);
-        } catch (Exception e) {
-            e.printStackTrace();//TODO catch
-        }
-        return parentView;
-    }
-
-    @Override
-    protected String getTopTitle() {
-        STUDENT student = studentEducation.getStudent();
-        StringBuilder sb = new StringBuilder();
-        sb.append(student.getLastName());
-        sb.append(' ');
-        sb.append(student.getFirstName());
-        if (student.getMiddleName() != null) {
-            sb.append(' ');
-            sb.append(student.getMiddleName());
-        }
-
-        return sb.toString();
-    }
-
-    @Override
-    protected boolean isTabbedView() {
-        return false;
-    }
-
-    @Override
-    public void initView(boolean readOnly) throws Exception {
-        super.initView(readOnly);
+        this.mainVL = mainVL;
+        this.studentEdit = studentEdit;
 
         GridLayout mainGL = new GridLayout();
         mainGL.setSizeFull();
@@ -208,7 +158,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
         leftVL.setComponentAlignment(educationFL, Alignment.TOP_LEFT);
 
 		/* 1.2. Toolbar */
-        if (!studentEducation.getStatus().getId().equals(ID.valueOf(2)) && !studentEducation.getStatus().getId().equals(ID.valueOf(3))) {
+        if (!studentEducation.getStatus().getId().equals(ID.valueOf(2))) {
             toolbarLeftHL = new HorizontalLayout();
             toolbarLeftHL.setSpacing(true);
 
@@ -330,8 +280,49 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
         refreshOrderFiles(ID.valueOf(-1));
     }
 
+    @Override
+    public String getViewName() {
+        return "educationInfo";
+    }
+
+    @Override
+    protected String getViewTitle(Locale locale) {
+        return getUILocaleUtil().getCaption("student.education.info");
+    }
+
+    @Override
+    protected AbstractCommonView getParentView() {
+        mainVL.removeComponent(this);
+        mainVL.addComponent(studentEdit);
+        return null;
+    }
+
+    @Override
+    protected String getTopTitle() {
+        STUDENT student = studentEducation.getStudent();
+        StringBuilder sb = new StringBuilder();
+        sb.append(student.getLastName());
+        sb.append(' ');
+        sb.append(student.getFirstName());
+        if (student.getMiddleName() != null) {
+            sb.append(' ');
+            sb.append(student.getMiddleName());
+        }
+
+        return sb.toString();
+    }
+
+    @Override
+    protected boolean isTabbedView() {
+        return false;
+    }
+
+    @Override
+    public void initView(boolean readOnly) throws Exception {
+    }
+
     private void transfer() {
-        operType = EOperType.TRANSFER;
+        operType = OperType.TRANSFER;
         rightVL.removeAllComponents();
         rightVL.setCaption(getUILocaleUtil().getCaption("transfer"));
 
@@ -361,7 +352,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
     }
 
     private void academicLeave() {
-        operType = EOperType.ACADEMIC_LEAVE;
+        operType = OperType.ACADEMIC_LEAVE;
         rightVL.removeAllComponents();
         rightVL.setCaption(getUILocaleUtil().getCaption("academic.leave"));
 
@@ -391,10 +382,11 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
     }
 
     private void restore() {
-        if (!studentEducation.getStatus().getId().equals(ID.valueOf(6))) {
+        if (!(studentEducation.getStatus().getId().equals(ID.valueOf(3)) ||
+                studentEducation.getStatus().getId().equals(ID.valueOf(5)))) {
             Message.showInfo(getUILocaleUtil().getMessage("unable.to.restore"));
         } else {
-            operType = EOperType.RESTORE;
+            operType = OperType.RESTORE;
             rightVL.removeAllComponents();
             rightVL.setCaption(getUILocaleUtil().getCaption("restore"));
 
@@ -425,7 +417,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
     }
 
     private void alumnus() {
-        operType = EOperType.ALUMNUS;
+        operType = OperType.ALUMNUS;
         rightVL.removeAllComponents();
         rightVL.setCaption(getUILocaleUtil().getCaption("alumnus"));
 
@@ -455,7 +447,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
     }
 
     private void deduct() {
-        operType = EOperType.DEDUCT;
+        operType = OperType.DEDUCT;
         rightVL.removeAllComponents();
         rightVL.setCaption(getUILocaleUtil().getCaption("deduct"));
 
@@ -485,7 +477,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
     }
 
     private void otherOrder() {
-        operType = EOperType.OTHER;
+        operType = OperType.OTHER;
         rightVL.removeAllComponents();
         rightVL.setCaption(getUILocaleUtil().getCaption("new.order"));
 
@@ -495,7 +487,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
     }
 
     private void editOrder(V_ORDER_DOC vod) {
-        operType = EOperType.EDIT_ORDER;
+        operType = OperType.EDIT_ORDER;
         rightVL.removeAllComponents();
         rightVL.setCaption(getUILocaleUtil().getCaption("edit.order"));
 
@@ -557,17 +549,17 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
         try {
             List<DEPARTMENT> facultyList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(facultyQM);
             BeanItemContainer<DEPARTMENT> facultyBIC = new BeanItemContainer<DEPARTMENT>(DEPARTMENT.class, facultyList);
-            facultyWidget = new ComboBox();
-            facultyWidget.setNewItemsAllowed(false);
-            facultyWidget.setFilteringMode(FilteringMode.STARTSWITH);
-            facultyWidget.setTextInputAllowed(true);
-            facultyWidget.setImmediate(true);
-            facultyWidget.setWidth(350, Unit.PIXELS);
-            facultyWidget.setContainerDataSource(facultyBIC);
-            facultyWidget.setValue(studentEducation.getFaculty());
-            facultyWidget.setEnabled(operType.equals(EOperType.TRANSFER));
-            facultyWidget.addValueChangeListener(new FacultyChangeListener());
-            facultyHL.addComponent(facultyWidget);
+            facultyCB = new ComboBox();
+            facultyCB.setNewItemsAllowed(false);
+            facultyCB.setFilteringMode(FilteringMode.STARTSWITH);
+            facultyCB.setTextInputAllowed(true);
+            facultyCB.setImmediate(true);
+            facultyCB.setWidth(350, Unit.PIXELS);
+            facultyCB.setContainerDataSource(facultyBIC);
+            facultyCB.setValue(studentEducation.getFaculty());
+            facultyCB.setEnabled(operType.equals(OperType.TRANSFER));
+            facultyCB.addValueChangeListener(new FacultyChangeListener());
+            facultyHL.addComponent(facultyCB);
         } catch (Exception ex) {
             ErrorUtils.LOG.error("Unable to load faculty list: ", ex);
             Message.showError(ex.toString());
@@ -583,15 +575,15 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
         specialityLabel.setValue(getUILocaleUtil().getEntityFieldLabel(STUDENT_EDUCATION.class, "speciality"));
         specialityHL.addComponent(specialityLabel);
         specialityHL.addComponent(createRequiredIndicator());
-        specialityWidget = new ComboBox();
-        specialityWidget.setNewItemsAllowed(false);
-        specialityWidget.setFilteringMode(FilteringMode.CONTAINS);
-        specialityWidget.setTextInputAllowed(true);
-        specialityWidget.setWidth(350, Unit.PIXELS);
+        specCB = new ComboBox();
+        specCB.setNewItemsAllowed(false);
+        specCB.setFilteringMode(FilteringMode.CONTAINS);
+        specCB.setTextInputAllowed(true);
+        specCB.setWidth(350, Unit.PIXELS);
         refreshSpecialities(studentEducation.getFaculty().getId());
-        specialityWidget.setValue(studentEducation.getSpeciality());
-        specialityWidget.setEnabled(operType.equals(EOperType.TRANSFER));
-        specialityHL.addComponent(specialityWidget);
+        specCB.setValue(studentEducation.getSpeciality());
+        specCB.setEnabled(operType.equals(OperType.TRANSFER));
+        specialityHL.addComponent(specCB);
 
         return specialityHL;
     }
@@ -605,7 +597,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
         try {
             List<SPECIALITY> specialityList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(specialityQM);
             BeanItemContainer<SPECIALITY> specialityBIC = new BeanItemContainer<SPECIALITY>(SPECIALITY.class, specialityList);
-            specialityWidget.setContainerDataSource(specialityBIC);
+            specCB.setContainerDataSource(specialityBIC);
         } catch (Exception ex) {
             ErrorUtils.LOG.error("Unable to load speciality list: ", ex);
             Message.showError(ex.toString());
@@ -626,15 +618,15 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
         try {
             List<STUDY_YEAR> studyYearList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(studyYearQM);
             BeanItemContainer<STUDY_YEAR> studyYearBIC = new BeanItemContainer<STUDY_YEAR>(STUDY_YEAR.class, studyYearList);
-            studyYearWidget = new ComboBox();
-            studyYearWidget.setNewItemsAllowed(false);
-            studyYearWidget.setFilteringMode(FilteringMode.OFF);
-            studyYearWidget.setTextInputAllowed(false);
-            studyYearWidget.setWidth(50, Unit.PIXELS);
-            studyYearWidget.setContainerDataSource(studyYearBIC);
-            studyYearWidget.setValue(studentEducation.getStudyYear());
-            studyYearWidget.setEnabled(operType.equals(EOperType.TRANSFER));
-            hl.addComponent(studyYearWidget);
+            studyYearCB = new ComboBox();
+            studyYearCB.setNewItemsAllowed(false);
+            studyYearCB.setFilteringMode(FilteringMode.OFF);
+            studyYearCB.setTextInputAllowed(false);
+            studyYearCB.setWidth(50, Unit.PIXELS);
+            studyYearCB.setContainerDataSource(studyYearBIC);
+            studyYearCB.setValue(studentEducation.getStudyYear());
+            studyYearCB.setEnabled(operType.equals(OperType.TRANSFER));
+            hl.addComponent(studyYearCB);
 
             Label languageLabel = new Label();
             languageLabel.setWidthUndefined();
@@ -646,15 +638,15 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
             languageQM.addOrder("langName");
             List<LANGUAGE> languageList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(languageQM);
             BeanItemContainer<LANGUAGE> languageBIC = new BeanItemContainer<LANGUAGE>(LANGUAGE.class, languageList);
-            languageWidget = new ComboBox();
-            languageWidget.setNewItemsAllowed(false);
-            languageWidget.setFilteringMode(FilteringMode.OFF);
-            languageWidget.setTextInputAllowed(false);
-            languageWidget.setWidth(110, Unit.PIXELS);
-            languageWidget.setContainerDataSource(languageBIC);
-            languageWidget.setValue(studentEducation.getLanguage());
-            languageWidget.setEnabled(operType.equals(EOperType.TRANSFER));
-            hl.addComponent(languageWidget);
+            languageCB = new ComboBox();
+            languageCB.setNewItemsAllowed(false);
+            languageCB.setFilteringMode(FilteringMode.OFF);
+            languageCB.setTextInputAllowed(false);
+            languageCB.setWidth(110, Unit.PIXELS);
+            languageCB.setContainerDataSource(languageBIC);
+            languageCB.setValue(studentEducation.getLanguage());
+            languageCB.setEnabled(operType.equals(OperType.TRANSFER));
+            hl.addComponent(languageCB);
 
             Label educationTypeLabel = new Label();
             educationTypeLabel.setWidthUndefined();
@@ -666,15 +658,15 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
             educationTypeQM.addOrder("typeName");
             List<STUDENT_EDUCATION_TYPE> educationTypeList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(educationTypeQM);
             BeanItemContainer<STUDENT_EDUCATION_TYPE> educationTypeBIC = new BeanItemContainer<STUDENT_EDUCATION_TYPE>(STUDENT_EDUCATION_TYPE.class, educationTypeList);
-            educationTypeWidget = new ComboBox();
-            educationTypeWidget.setNewItemsAllowed(false);
-            educationTypeWidget.setFilteringMode(FilteringMode.OFF);
-            educationTypeWidget.setTextInputAllowed(false);
-            educationTypeWidget.setWidth(110, Unit.PIXELS);
-            educationTypeWidget.setContainerDataSource(educationTypeBIC);
-            educationTypeWidget.setValue(studentEducation.getEducationType());
-            educationTypeWidget.setEnabled(operType.equals(EOperType.TRANSFER));
-            hl.addComponent(educationTypeWidget);
+            educationTypeCB = new ComboBox();
+            educationTypeCB.setNewItemsAllowed(false);
+            educationTypeCB.setFilteringMode(FilteringMode.OFF);
+            educationTypeCB.setTextInputAllowed(false);
+            educationTypeCB.setWidth(110, Unit.PIXELS);
+            educationTypeCB.setContainerDataSource(educationTypeBIC);
+            educationTypeCB.setValue(studentEducation.getEducationType());
+            educationTypeCB.setEnabled(operType.equals(OperType.TRANSFER));
+            hl.addComponent(educationTypeCB);
         } catch (Exception ex) {
             ErrorUtils.LOG.error("Unable to load records: ", ex);
             Message.showError(ex.toString());
@@ -691,27 +683,27 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
         entryDateLabel.setValue(getUILocaleUtil().getEntityFieldLabel(STUDENT_EDUCATION.class, "entryDate"));
         hl.addComponent(entryDateLabel);
         hl.addComponent(createRequiredIndicator());
-        entryDateWidget = new DateField();
-        entryDateWidget.setWidth(80, Unit.PIXELS);
-        entryDateWidget.setEnabled(false);
-        entryDateWidget.setData(studentEducation.getEntryDate());
-        hl.addComponent(entryDateWidget);
+        DateField entryDateField = new DateField();
+        entryDateField.setWidth(100, Unit.PIXELS);
+        entryDateField.setEnabled(false);
+        entryDateField.setValue(studentEducation.getEntryDate());
+        hl.addComponent(entryDateField);
 
         Label endDateLabel = new Label();
         endDateLabel.setWidthUndefined();
         endDateLabel.addStyleName("margin-left-30");
         endDateLabel.setValue(getUILocaleUtil().getEntityFieldLabel(STUDENT_EDUCATION.class, "endDate"));
         hl.addComponent(endDateLabel);
-        hl.addComponent(createRequiredIndicator());
-        endDateWidget = new DateField();
-        endDateWidget.setWidth(80, Unit.PIXELS);
-        endDateWidget.setEnabled(operType.equals(EOperType.ALUMNUS) || operType.equals(EOperType.DEDUCT));
-        if (operType.equals(EOperType.ALUMNUS) || operType.equals(EOperType.DEDUCT)) {
-            endDateWidget.setData(new Date());
+//        hl.addComponent(createRequiredIndicator());
+        endDateField = new DateField();
+        endDateField.setWidth(100, Unit.PIXELS);
+        endDateField.setEnabled(operType.equals(OperType.ALUMNUS) || operType.equals(OperType.DEDUCT));
+        if (operType.equals(OperType.ALUMNUS) || operType.equals(OperType.DEDUCT)) {
+            endDateField.setValue(new Date());
         } else {
-            endDateWidget.setData(studentEducation.getEndDate());
+            endDateField.setValue(studentEducation.getEndDate());
         }
-        hl.addComponent(endDateWidget);
+        hl.addComponent(endDateField);
 
         return hl;
     }
@@ -731,15 +723,15 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
         try {
             List<STUDENT_STATUS> statusList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(statusQM);
             BeanItemContainer<STUDENT_STATUS> statusBIC = new BeanItemContainer<STUDENT_STATUS>(STUDENT_STATUS.class, statusList);
-            statusWidget = new ComboBox();
-            statusWidget.setNewItemsAllowed(false);
-            statusWidget.setFilteringMode(FilteringMode.OFF);
-            statusWidget.setTextInputAllowed(false);
-            statusWidget.setWidth(130, Unit.PIXELS);
-            statusWidget.setContainerDataSource(statusBIC);
-            statusWidget.setValue(studentEducation.getStatus());
-            statusWidget.setEnabled(false);
-            hl.addComponent(statusWidget);
+            statusCB = new ComboBox();
+            statusCB.setNewItemsAllowed(false);
+            statusCB.setFilteringMode(FilteringMode.OFF);
+            statusCB.setTextInputAllowed(false);
+            statusCB.setWidth(130, Unit.PIXELS);
+            statusCB.setContainerDataSource(statusBIC);
+            statusCB.setValue(studentEducation.getStatus());
+            statusCB.setEnabled(false);
+            hl.addComponent(statusCB);
         } catch (Exception ex) {
             ErrorUtils.LOG.error("Unable to load student status list: ", ex);
             Message.showError(ex.toString());
@@ -752,7 +744,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
         VerticalLayout vl = new VerticalLayout();
         vl.setSizeFull();
         vl.setSpacing(true);
-        if (!operType.equals(EOperType.OTHER) && !operType.equals(EOperType.EDIT_ORDER)) {
+        if (!operType.equals(OperType.OTHER) && !operType.equals(OperType.EDIT_ORDER)) {
             vl.setCaption(getUILocaleUtil().getCaption("new.order"));
         }
 
@@ -763,9 +755,9 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
         orderTypeLabel.setValue(getUILocaleUtil().getEntityFieldLabel(ORDER_DOC.class, "orderType"));
         hl1.addComponent(orderTypeLabel);
         hl1.addComponent(createRequiredIndicator());
-        QueryModel<ORDER_TYPE> orderTypeQM = new QueryModel<ORDER_TYPE>(ORDER_TYPE.class);
-        if (operType.equals(EOperType.OTHER)) {
-            List<ID> idList = new ArrayList<ID>();
+        QueryModel<ORDER_TYPE> orderTypeQM = new QueryModel<>(ORDER_TYPE.class);
+        if (operType.equals(OperType.OTHER)) {
+            List<ID> idList = new ArrayList<>();
             idList.add(ID.valueOf(1));
             idList.add(ID.valueOf(2));
             orderTypeQM.addWhereIn("id", idList);
@@ -773,37 +765,37 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
         orderTypeQM.addOrder("typeName");
         try {
             List<ORDER_TYPE> orderTypeList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(orderTypeQM);
-            BeanItemContainer<ORDER_TYPE> orderTypeBIC = new BeanItemContainer<ORDER_TYPE>(ORDER_TYPE.class, orderTypeList);
-            orderTypeWidget = new ComboBox();
-            orderTypeWidget.setNewItemsAllowed(false);
-            orderTypeWidget.setFilteringMode(FilteringMode.OFF);
-            orderTypeWidget.setTextInputAllowed(false);
-            orderTypeWidget.setWidth(180, Unit.PIXELS);
-            orderTypeWidget.setContainerDataSource(orderTypeBIC);
-            if (!operType.equals(EOperType.OTHER) && !operType.equals(EOperType.EDIT_ORDER)) {
+            BeanItemContainer<ORDER_TYPE> orderTypeBIC = new BeanItemContainer<>(ORDER_TYPE.class, orderTypeList);
+            orderTypeCB = new ComboBox();
+            orderTypeCB.setNewItemsAllowed(false);
+            orderTypeCB.setFilteringMode(FilteringMode.OFF);
+            orderTypeCB.setTextInputAllowed(false);
+            orderTypeCB.setWidth(180, Unit.PIXELS);
+            orderTypeCB.setContainerDataSource(orderTypeBIC);
+            if (!operType.equals(OperType.OTHER) && !operType.equals(OperType.EDIT_ORDER)) {
                 ORDER_TYPE orderType = null;
                 for (ORDER_TYPE ot : orderTypeList) {
-                    if (operType.equals(EOperType.TRANSFER)) {
+                    if (operType.equals(OperType.TRANSFER)) {
                         if (ot.getId().equals(ID.valueOf(3))) {
                             orderType = ot;
                             break;
                         }
-                    } else if (operType.equals(EOperType.ACADEMIC_LEAVE)) {
+                    } else if (operType.equals(OperType.ACADEMIC_LEAVE)) {
                         if (ot.getId().equals(ID.valueOf(4))) {
                             orderType = ot;
                             break;
                         }
-                    } else if (operType.equals(EOperType.RESTORE)) {
+                    } else if (operType.equals(OperType.RESTORE)) {
                         if (ot.getId().equals(ID.valueOf(5))) {
                             orderType = ot;
                             break;
                         }
-                    } else if (operType.equals(EOperType.ALUMNUS)) {
+                    } else if (operType.equals(OperType.ALUMNUS)) {
                         if (ot.getId().equals(ID.valueOf(7))) {
                             orderType = ot;
                             break;
                         }
-                    } else if (operType.equals(EOperType.DEDUCT)) {
+                    } else if (operType.equals(OperType.DEDUCT)) {
                         if (ot.getId().equals(ID.valueOf(8))) {
                             orderType = ot;
                             break;
@@ -812,14 +804,14 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
                 }
 
                 if (orderType != null) {
-                    orderTypeWidget.setValue(orderType);
+                    orderTypeCB.setValue(orderType);
                 }
-                orderTypeWidget.setEnabled(false);
-            } else if (operType.equals(EOperType.EDIT_ORDER)) {
+                orderTypeCB.setEnabled(false);
+            } else if (operType.equals(OperType.EDIT_ORDER)) {
                 vod = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(V_ORDER_DOC.class, vod.getId());
-                orderTypeWidget.setValue(vod.getOrderType());
+                orderTypeCB.setValue(vod.getOrderType());
             }
-            hl1.addComponent(orderTypeWidget);
+            hl1.addComponent(orderTypeCB);
 
             Label studyYearLabel = new Label();
             studyYearLabel.setWidthUndefined();
@@ -831,15 +823,15 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
             studyYearQM.addOrder("studyYear");
             List<STUDY_YEAR> studyYearList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(studyYearQM);
             BeanItemContainer<STUDY_YEAR> studyYearBIC = new BeanItemContainer<STUDY_YEAR>(STUDY_YEAR.class, studyYearList);
-            orderStudyYearWidget = new ComboBox();
-            orderStudyYearWidget.setNewItemsAllowed(false);
-            orderStudyYearWidget.setFilteringMode(FilteringMode.OFF);
-            orderStudyYearWidget.setTextInputAllowed(false);
-            orderStudyYearWidget.setWidth(50, Unit.PIXELS);
-            orderStudyYearWidget.setContainerDataSource(studyYearBIC);
-            orderStudyYearWidget.setValue(studentEducation.getStudyYear());
-            orderStudyYearWidget.setEnabled(false);
-            hl1.addComponent(orderStudyYearWidget);
+            orderStudyCB = new ComboBox();
+            orderStudyCB.setNewItemsAllowed(false);
+            orderStudyCB.setFilteringMode(FilteringMode.OFF);
+            orderStudyCB.setTextInputAllowed(false);
+            orderStudyCB.setWidth(50, Unit.PIXELS);
+            orderStudyCB.setContainerDataSource(studyYearBIC);
+            orderStudyCB.setValue(studentEducation.getStudyYear());
+            orderStudyCB.setEnabled(false);
+            hl1.addComponent(orderStudyCB);
 
             vl.addComponent(hl1);
             vl.setComponentAlignment(hl1, Alignment.TOP_RIGHT);
@@ -851,12 +843,12 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
             orderNoLabel.setValue(getUILocaleUtil().getCaption("order.no"));
             hl2.addComponent(orderNoLabel);
             hl2.addComponent(createRequiredIndicator());
-            orderNoWidget = new TextField();
-            orderNoWidget.setWidth(120, Unit.PIXELS);
-            if (operType.equals(EOperType.EDIT_ORDER)) {
-                orderNoWidget.setValue(vod.getDocumentNo());
+            orderNoTF = new TextField();
+            orderNoTF.setWidth(120, Unit.PIXELS);
+            if (operType.equals(OperType.EDIT_ORDER)) {
+                orderNoTF.setValue(vod.getDocumentNo());
             }
-            hl2.addComponent(orderNoWidget);
+            hl2.addComponent(orderNoTF);
 
             Label orderDateLabel = new Label();
             orderDateLabel.setWidthUndefined();
@@ -864,25 +856,25 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
             orderDateLabel.setValue(getUILocaleUtil().getCaption("order.date"));
             hl2.addComponent(orderDateLabel);
             hl2.addComponent(createRequiredIndicator());
-            orderDateWidget = new DateField();
-            orderDateWidget.setWidth(80, Unit.PIXELS);
-            if (operType.equals(EOperType.EDIT_ORDER)) {
-                orderDateWidget.setData(vod.getIssueDate());
+            orderDateField = new DateField();
+            orderDateField.setWidth(100, Unit.PIXELS);
+            if (operType.equals(OperType.EDIT_ORDER)) {
+                orderDateField.setValue(vod.getIssueDate());
             }
-            hl2.addComponent(orderDateWidget);
+            hl2.addComponent(orderDateField);
 
             Label hideTranscriptLabel = new Label();
             hideTranscriptLabel.setWidthUndefined();
             hideTranscriptLabel.addStyleName("margin-left-30");
             hideTranscriptLabel.setValue(getUILocaleUtil().getEntityFieldLabel(ORDER_DOC.class, "hideTranscript"));
             hl2.addComponent(hideTranscriptLabel);
-            hideTranscriptWidget = new CheckBox();
-            if (operType.equals(EOperType.EDIT_ORDER)) {
-                hideTranscriptWidget.setValue(vod.isHideTranscript());
+            hideTranscriptChB = new CheckBox();
+            if (operType.equals(OperType.EDIT_ORDER)) {
+                hideTranscriptChB.setValue(vod.isHideTranscript());
             } else {
-                hideTranscriptWidget.setValue(Boolean.FALSE);
+                hideTranscriptChB.setValue(Boolean.FALSE);
             }
-            hl2.addComponent(hideTranscriptWidget);
+            hl2.addComponent(hideTranscriptChB);
 
             vl.addComponent(hl2);
             vl.setComponentAlignment(hl2, Alignment.TOP_RIGHT);
@@ -894,14 +886,14 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
             orderDescrLabel.setValue(getUILocaleUtil().getEntityFieldLabel(ORDER_DOC.class, "descr"));
             hl3.addComponent(orderDescrLabel);
             hl3.addComponent(createRequiredIndicator());
-            orderDescrWidget = new TextArea();
-            orderDescrWidget.setWordwrap(true);
-            orderDescrWidget.setHeight(45, Unit.PIXELS);
-            orderDescrWidget.setWidth(350, Unit.PIXELS);
-            if (operType.equals(EOperType.EDIT_ORDER)) {
-                orderDescrWidget.setValue(vod.getDescr());
+            orderDescrTA = new TextArea();
+            orderDescrTA.setWordwrap(true);
+            orderDescrTA.setHeight(45, Unit.PIXELS);
+            orderDescrTA.setWidth(350, Unit.PIXELS);
+            if (operType.equals(OperType.EDIT_ORDER)) {
+                orderDescrTA.setValue(vod.getDescr());
             }
-            hl3.addComponent(orderDescrWidget);
+            hl3.addComponent(orderDescrTA);
 
             vl.addComponent(hl3);
             vl.setComponentAlignment(hl3, Alignment.TOP_RIGHT);
@@ -912,12 +904,12 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
             orderFilesLabel.setWidthUndefined();
             orderFilesLabel.setValue(getUILocaleUtil().getEntityLabel(USER_DOCUMENT_FILE.class));
             hl4.addComponent(orderFilesLabel);
-            orderFilesWidget = new ListSelect();
-            orderFilesWidget.setRows(4);
-            orderFilesWidget.setWidth(350, Unit.PIXELS);
-            orderFilesWidget.setNullSelectionAllowed(false);
+            orderFilesLS = new ListSelect();
+            orderFilesLS.setRows(4);
+            orderFilesLS.setWidth(350, Unit.PIXELS);
+            orderFilesLS.setNullSelectionAllowed(false);
             List<FileBean> fbList = new ArrayList<FileBean>();
-            if (operType.equals(EOperType.EDIT_ORDER)) {
+            if (operType.equals(OperType.EDIT_ORDER)) {
                 QueryModel<USER_DOCUMENT_FILE> udfQM = new QueryModel<USER_DOCUMENT_FILE>(USER_DOCUMENT_FILE.class);
                 udfQM.addWhere("userDocument", ECriteria.EQUAL, vod.getId());
                 udfQM.addWhereAnd("deleted", Boolean.FALSE);
@@ -931,8 +923,8 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
                 }
             }
             BeanItemContainer<FileBean> orderFilesBIC = new BeanItemContainer<FileBean>(FileBean.class, fbList);
-            orderFilesWidget.setContainerDataSource(orderFilesBIC);
-            hl4.addComponent(orderFilesWidget);
+            orderFilesLS.setContainerDataSource(orderFilesBIC);
+            hl4.addComponent(orderFilesLS);
             FileReceiver fr = new FileReceiver();
             upload = new Upload();
             upload.setButtonCaption(getUILocaleUtil().getCaption("upload"));
@@ -986,17 +978,17 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
     }
 
     private void save() {
-        if (operType.equals(EOperType.TRANSFER)) {
+        if (operType.equals(OperType.TRANSFER)) {
             doTransfer();
-        } else if (operType.equals(EOperType.ACADEMIC_LEAVE)) {
+        } else if (operType.equals(OperType.ACADEMIC_LEAVE)) {
             doAcademicLeave();
-        } else if (operType.equals(EOperType.RESTORE)) {
+        } else if (operType.equals(OperType.RESTORE)) {
             doRestore();
-        } else if (operType.equals(EOperType.ALUMNUS)) {
+        } else if (operType.equals(OperType.ALUMNUS)) {
             doAlumnus();
-        } else if (operType.equals(EOperType.DEDUCT)) {
+        } else if (operType.equals(OperType.DEDUCT)) {
             doDeduct();
-        } else if (operType.equals(EOperType.OTHER) || operType.equals(EOperType.EDIT_ORDER)) {
+        } else if (operType.equals(OperType.OTHER) || operType.equals(OperType.EDIT_ORDER)) {
             saveOrder();
         }
     }
@@ -1006,30 +998,30 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
             checkStudentEducationInfo();
             checkOrder();
             STUDENT_STATUS ss = null;
-            if (!studyYearWidget.getValue().equals(studentEducation.getStudyYear())) {
+            if (!studyYearCB.getValue().equals(studentEducation.getStudyYear())) {
                 ss = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(STUDENT_STATUS.class, ID.valueOf(6));
-            } else if (!facultyWidget.getValue().equals(studentEducation.getFaculty()) || !specialityWidget.getValue().equals(studentEducation.getSpeciality())) {
+            } else if (!facultyCB.getValue().equals(studentEducation.getFaculty()) || !specCB.getValue().equals(studentEducation.getSpeciality())) {
                 ss = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(STUDENT_STATUS.class, ID.valueOf(4));
-            } else if (!educationTypeWidget.getValue().equals(studentEducation.getEducationType())) {
+            } else if (!educationTypeCB.getValue().equals(studentEducation.getEducationType())) {
                 ss = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(STUDENT_STATUS.class, ID.valueOf(7));
-            } else if (!languageWidget.getValue().equals(studentEducation.getLanguage())) {
+            } else if (!languageCB.getValue().equals(studentEducation.getLanguage())) {
                 ss = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(STUDENT_STATUS.class, ID.valueOf(8));
             }
 
             if (ss == null) {
                 Message.showInfo(getUILocaleUtil().getMessage("unable.to.transfer"));
             } else {
-                SPECIALITY speciality = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(SPECIALITY.class, ((SPECIALITY) specialityWidget.getValue()).getId());
+                SPECIALITY speciality = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(SPECIALITY.class, ((SPECIALITY) specCB.getValue()).getId());
                 STUDENT_EDUCATION newSE = new STUDENT_EDUCATION();
                 newSE.setStudent(studentEducation.getStudent());
-                newSE.setFaculty((DEPARTMENT) facultyWidget.getValue());
+                newSE.setFaculty((DEPARTMENT) facultyCB.getValue());
                 newSE.setChair(speciality.getDepartment());
                 newSE.setSpeciality(speciality);
-                newSE.setStudyYear((STUDY_YEAR) studyYearWidget.getValue());
-                newSE.setLanguage((LANGUAGE) languageWidget.getValue());
-                newSE.setEducationType((STUDENT_EDUCATION_TYPE) educationTypeWidget.getValue());
+                newSE.setStudyYear((STUDY_YEAR) studyYearCB.getValue());
+                newSE.setLanguage((LANGUAGE) languageCB.getValue());
+                newSE.setEducationType((STUDENT_EDUCATION_TYPE) educationTypeCB.getValue());
                 newSE.setEntryDate(studentEducation.getEntryDate());
-                newSE.setEndDate((Date) endDateWidget.getData());
+                newSE.setEndDate(endDateField.getValue());
                 newSE.setStatus(studentEducation.getStatus());
                 newSE.setCreated(new Date());
 
@@ -1040,21 +1032,23 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
                 studentEducation.setUpdated(new Date());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(studentEducation);
 
-                if (newSE.getStudyYear().getStudyYear() > studentEducation.getStudyYear().getStudyYear()) {
+                if (newSE.getStudyYear().getStudyYear() > studentEducation.getStudyYear().getStudyYear()) {//TODO check
                     int i = newSE.getStudyYear().getStudyYear() - 1;
                     ENTRANCE_YEAR ey = newSE.getStudent().getEntranceYear();
-                    QueryModel<ENTRANCE_YEAR> syQM = new QueryModel<ENTRANCE_YEAR>(ENTRANCE_YEAR.class);
+                    QueryModel<ENTRANCE_YEAR> syQM = new QueryModel<>(ENTRANCE_YEAR.class);
                     syQM.addWhere("beginYear", ECriteria.EQUAL, ey.getBeginYear() + i);
                     syQM.addWhereAnd("endYear", ECriteria.EQUAL, ey.getEndYear() + i);
                     try {
-                        ENTRANCE_YEAR sy = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(syQM);
-                        QueryModel<STUDENT_SUBJECT> ssQM = new QueryModel<STUDENT_SUBJECT>(STUDENT_SUBJECT.class);
+                        ENTRANCE_YEAR sy = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                                lookupSingle(syQM);
+                        QueryModel<STUDENT_SUBJECT> ssQM = new QueryModel<>(STUDENT_SUBJECT.class);
                         FromItem ssFI = ssQM.addJoin(EJoin.INNER_JOIN, "semesterData", SEMESTER_DATA.class, "id");
                         ssQM.addWhere("studentEducation", ECriteria.EQUAL, studentEducation.getId());
                         ssQM.addWhereAnd(ssFI, "year", ECriteria.EQUAL, sy.getId());
-                        List<STUDENT_SUBJECT> ssList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(ssQM);
+                        List<STUDENT_SUBJECT> ssList = SessionFacadeFactory.getSessionFacade(
+                                CommonEntityFacadeBean.class).lookup(ssQM);
 
-                        List<STUDENT_SUBJECT> mergeList = new ArrayList<STUDENT_SUBJECT>();
+                        List<STUDENT_SUBJECT> mergeList = new ArrayList<>();
                         for (STUDENT_SUBJECT ss1 : ssList) {
                             ss1.setStudentEducation(newSE);
                             mergeList.add(ss1);
@@ -1144,7 +1138,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
             STUDENT_STATUS ss = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(STUDENT_STATUS.class, ID.valueOf(2));
 
             createNewOrder();
-            studentEducation.setEndDate((Date) endDateWidget.getData());
+            studentEducation.setEndDate(endDateField.getValue());
             studentEducation.setStatus(ss);
             studentEducation.setUpdated(new Date());
             SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(studentEducation);
@@ -1172,7 +1166,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
             STUDENT_STATUS ss = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(STUDENT_STATUS.class, ID.valueOf(3));
 
             createNewOrder();
-            studentEducation.setEndDate((Date) endDateWidget.getData());
+            studentEducation.setEndDate(endDateField.getValue());
             studentEducation.setStatus(ss);
             studentEducation.setUpdated(new Date());
             SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(studentEducation);
@@ -1194,24 +1188,24 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
     }
 
     private void saveOrder() {
-        if (operType.equals(EOperType.OTHER) || operType.equals(EOperType.EDIT_ORDER)) {
+        if (operType.equals(OperType.OTHER) || operType.equals(OperType.EDIT_ORDER)) {
             try {
                 checkOrder();
-                if (operType.equals(EOperType.OTHER)) {
+                if (operType.equals(OperType.OTHER)) {
                     createNewOrder();
                 } else {
                     ORDER_DOC od = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(ORDER_DOC.class, ordersTW.getSelectedEntity().getId());
-                    od.setOrderType((ORDER_TYPE) orderTypeWidget.getValue());
-                    od.setStudyYear((STUDY_YEAR) orderStudyYearWidget.getValue());
-                    od.setDescr(orderDescrWidget.getValue());
-                    od.setHideTranscript(hideTranscriptWidget.getValue());
+                    od.setOrderType((ORDER_TYPE) orderTypeCB.getValue());
+                    od.setStudyYear((STUDY_YEAR) orderStudyCB.getValue());
+                    od.setDescr(orderDescrTA.getValue());
+                    od.setHideTranscript(hideTranscriptChB.getValue());
                     od.setUser(studentEducation.getStudent());
-                    od.setDocumentNo(orderNoWidget.getValue());
-                    od.setIssueDate((Date) orderDateWidget.getData());
+                    od.setDocumentNo(orderNoTF.getValue());
+                    od.setIssueDate(orderDateField.getValue());
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(od);
 
                     List<USER_DOCUMENT_FILE> udfList = new ArrayList<USER_DOCUMENT_FILE>();
-                    Collection coll = orderFilesWidget.getContainerDataSource().getItemIds();
+                    Collection coll = orderFilesLS.getContainerDataSource().getItemIds();
                     for (Object o : coll) {
                         FileBean fb = (FileBean) o;
                         if (fb.isNewFile()) {
@@ -1244,17 +1238,17 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
     private void createNewOrder() throws Exception {
         ORDER_DOC newOrder = new ORDER_DOC();
         newOrder.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID(USER_DOCUMENT.class));
-        newOrder.setOrderType((ORDER_TYPE) orderTypeWidget.getValue());
-        newOrder.setStudyYear((STUDY_YEAR) orderStudyYearWidget.getValue());
-        newOrder.setDescr(orderDescrWidget.getValue());
-        newOrder.setHideTranscript(hideTranscriptWidget.getValue());
+        newOrder.setOrderType((ORDER_TYPE) orderTypeCB.getValue());
+        newOrder.setStudyYear((STUDY_YEAR) orderStudyCB.getValue());
+        newOrder.setDescr(orderDescrTA.getValue());
+        newOrder.setHideTranscript(hideTranscriptChB.getValue());
         newOrder.setUser(studentEducation.getStudent());
-        newOrder.setDocumentNo(orderNoWidget.getValue());
-        newOrder.setIssueDate((Date) orderDateWidget.getData());
+        newOrder.setDocumentNo(orderNoTF.getValue());
+        newOrder.setIssueDate(orderDateField.getValue());
         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(newOrder);
 
         List<USER_DOCUMENT_FILE> udfList = new ArrayList<USER_DOCUMENT_FILE>();
-        Collection coll = orderFilesWidget.getContainerDataSource().getItemIds();
+        Collection coll = orderFilesLS.getContainerDataSource().getItemIds();
         for (Object o : coll) {
             FileBean fb = (FileBean) o;
             if (fb.isNewFile()) {
@@ -1272,11 +1266,10 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
     }
 
     private void checkOrder() throws Exception {
-        boolean ok = true;
-        ok = (orderTypeWidget.getValue() != null && orderStudyYearWidget.getValue() != null &&
-                (orderNoWidget.getValue() != null && !orderNoWidget.getValue().trim().isEmpty()) &&
-                orderDateWidget.getData() != null && (orderDescrWidget.getValue() != null &&
-                !orderDescrWidget.getValue().trim().isEmpty()));
+        boolean ok = (orderTypeCB.getValue() != null && orderStudyCB.getValue() != null &&
+                (orderNoTF.getValue() != null && !orderNoTF.getValue().trim().isEmpty()) &&
+                (orderDescrTA.getValue() != null &&
+                        !orderDescrTA.getValue().trim().isEmpty()));
 
         if (!ok) {
             throw new Exception(getUILocaleUtil().getMessage("error.emptyvalue"));
@@ -1284,13 +1277,12 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
     }
 
     private void checkStudentEducationInfo() throws Exception {
-        boolean ok = true;
-        ok = (facultyWidget.getValue() != null && specialityWidget.getValue() != null
-                && studyYearWidget.getValue() != null && languageWidget.getValue() != null
-                && educationTypeWidget.getValue() != null);
+        boolean ok = (facultyCB.getValue() != null && specCB.getValue() != null
+                && studyYearCB.getValue() != null && languageCB.getValue() != null
+                && educationTypeCB.getValue() != null);
         if (ok) {
-            if (operType.equals(EOperType.ALUMNUS) || operType.equals(EOperType.DEDUCT)) {
-                ok = (endDateWidget.getData() != null);
+            if (operType.equals(OperType.ALUMNUS) || operType.equals(OperType.DEDUCT)) {
+                ok = (endDateField.getValue() != null);
             }
         }
 
@@ -1300,19 +1292,19 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
     }
 
     private void cancel() {
-        if (operType.equals(EOperType.TRANSFER)) {
+        if (operType.equals(OperType.TRANSFER)) {
             transfer();
-        } else if (operType.equals(EOperType.ACADEMIC_LEAVE)) {
+        } else if (operType.equals(OperType.ACADEMIC_LEAVE)) {
             academicLeave();
-        } else if (operType.equals(EOperType.RESTORE)) {
+        } else if (operType.equals(OperType.RESTORE)) {
             restore();
-        } else if (operType.equals(EOperType.ALUMNUS)) {
+        } else if (operType.equals(OperType.ALUMNUS)) {
             alumnus();
-        } else if (operType.equals(EOperType.DEDUCT)) {
+        } else if (operType.equals(OperType.DEDUCT)) {
             deduct();
-        } else if (operType.equals(EOperType.OTHER)) {
+        } else if (operType.equals(OperType.OTHER)) {
             otherOrder();
-        } else if (operType.equals(EOperType.EDIT_ORDER)) {
+        } else if (operType.equals(OperType.EDIT_ORDER)) {
             editOrder((V_ORDER_DOC) ordersTW.getSelectedEntity());
         }
     }
@@ -1350,10 +1342,6 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
         }
     }
 
-    private enum EOperType {
-        TRANSFER, ACADEMIC_LEAVE, RESTORE, ALUMNUS, DEDUCT, OTHER, EDIT_ORDER
-    }
-
     private class FacultyChangeListener implements ValueChangeListener {
 
         @Override
@@ -1388,7 +1376,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
                 fb.setFileBytes(bytes);
                 fb.setNewFile(true);
 
-                orderFilesWidget.getContainerDataSource().addItem(fb);
+                orderFilesLS.getContainerDataSource().addItem(fb);
             } catch (Exception ex) {
                 ErrorUtils.LOG.error("FileListWidget: Unable to read temp file: ", ex);
             } finally {

@@ -26,8 +26,8 @@ public class SPECIALITY extends AbstractEntity {
 	@FieldInfo(type = EFieldType.TEXT, max = 10, order = 2, columnWidth = 80)
 	@Column(name = "CODE", nullable = false)
 	private String code;
-	
-	@FieldInfo(type = EFieldType.FK_DIALOG, order = 3)
+
+	@FieldInfo(type = EFieldType.FK_COMBO, order = 3)
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "CHAIR_ID", referencedColumnName = "ID")})

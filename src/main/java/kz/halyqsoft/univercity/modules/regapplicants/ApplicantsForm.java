@@ -12,8 +12,9 @@ import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.enumeration.Flag;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.*;
-import kz.halyqsoft.univercity.utils.changelisteners.*;
+import kz.halyqsoft.univercity.utils.AddressUtils;
 import kz.halyqsoft.univercity.utils.CommonUtils;
+import kz.halyqsoft.univercity.utils.changelisteners.*;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.facade.CommonIDFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -37,11 +38,16 @@ import org.r3a.common.vaadin.widget.form.FormModel;
 import org.r3a.common.vaadin.widget.form.GridFormWidget;
 import org.r3a.common.vaadin.widget.form.field.filelist.FileListFieldModel;
 import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
+import org.r3a.common.vaadin.widget.photo.PhotoWidget;
+import org.r3a.common.vaadin.widget.photo.PhotoWidgetEvent;
+import org.r3a.common.vaadin.widget.photo.PhotoWidgetListener;
 import org.r3a.common.vaadin.widget.table.TableWidget;
 import org.r3a.common.vaadin.widget.table.model.DBTableModel;
 
 import javax.persistence.NoResultException;
 import java.math.BigInteger;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Calendar;
 
@@ -51,7 +57,7 @@ import static com.vaadin.ui.Table.Align;
  * @author Omarbek
  * @created 21.05.2016 11:25:18
  */
-public final class ApplicantsForm extends AbstractFormWidgetView {
+public final class ApplicantsForm extends AbstractFormWidgetView implements PhotoWidgetListener {
 
     private AbstractFormWidget dataAFW;
     private HorizontalSplitPanel registrationHSP;
@@ -83,19 +89,24 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
     private Button nextUntButton, nextGrantDocButton, nextMotherButton, nextFatherButton;
     private Button nextContractButton, nextMoreButton, nextFinishButton;
 
-    private boolean saveData, savePass, saveEduc, saveUNT;
-    //    private List<STUDENT> newStudentList = new ArrayList<>();
-//    private List<STUDENT> delStudentList = new ArrayList<>();
+    private String userPhotoFilename;
+    private byte[] userPhotoBytes;
+    private boolean userPhotoChanged;
+
+    private boolean saveData, saveSpec, savePass, saveEduc, saveUNT;
     private STUDENT student;
     private Flag flag;
-    private ENTRANCE_YEAR entranceYear;
+    private Integer beginYear;
+    private int currentYear;
 
-    private static final int NUMBER_OF_SUBJECT_IN_UNT = 6;
+    private static final int FATHER = 1;
+    private static final int MOTHER = 2;
 
     ApplicantsForm(final FormModel dataFM, ENTRANCE_YEAR entranceYear) throws Exception {
 
         super();
-        this.entranceYear = entranceYear;
+        beginYear = entranceYear.getBeginYear();
+        currentYear = Calendar.getInstance().get(Calendar.YEAR);
         setBackButtonVisible(false);
         registrationHSP = new HorizontalSplitPanel();
         registrationHSP.setSplitPosition(20);
@@ -109,15 +120,12 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         contentHL.setSpacing(true);
         contentHL.setSizeFull();
 
-		/*�������� ������*/
         dataFM.setButtonsVisible(false);
         dataFM.getFieldModel("academicStatus").setInEdit(false);
         dataFM.getFieldModel("academicStatus").setInView(false);
         dataAFW = new GridFormWidget(dataFM);
         dataAFW.addEntityListener(this);
-//        dataFM.getGridColumnCount();
-        dataFM.getFieldModel("email").getValidators().add(new EmailValidator("����� �� ���������� E-mail"));
-//		dataFM.getFieldModel("phoneMobile").getValidators().add(new RegexpValidator("^\\d{10}$", "������� (���.) ������ ��������� 10 ����"));
+        dataFM.getFieldModel("email").getValidators().add(new EmailValidator("Введён некорректный E-mail"));
         dataAFW.setCaption(getUILocaleUtil().getCaption("regapplicant.main.data"));
         dataFM.getFieldModel("email").setRequired(true);
         dataFM.getFieldModel("email").setReadOnly(false);
@@ -127,7 +135,6 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         advisorFM.setSelectType(ESelectType.CUSTOM_GRID);
         advisorFM.setDialogHeight(400);
         advisorFM.setDialogWidth(600);
-//        QueryModel advisorQM = advisorFM.getQueryModel();
 
         try {
             TextField fioTF = new TextField();
@@ -173,7 +180,6 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             Message.showError(ex.toString());
         }
 
-		/*���������������� �����*/
         QueryModel<USER_DOCUMENT_FILE> udfQM = new QueryModel<>(USER_DOCUMENT_FILE.class);
         udfQM.addSelect("id");
         udfQM.addSelect("fileName");
@@ -182,40 +188,28 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
 
         final FormModel preemptiveRightFM = createPreemptiveRight(udfQM);
 
-		/*��������, �������������� ��������*/
         final FormModel userPassportFM = createIdentityDoc(udfQM);
 
-		/*�������� ����*/
         final FormModel militaryDocFM = createMilitaryDoc(udfQM);
 
-		/*���������� ��� �� ������������*/
         final FormModel disabilityDocFM = createDisability(udfQM);
 
-		/*�������� ��������*/
         final FormModel repatriateDocFM = createRepatriate(udfQM);
 
-		/*�������� � ������*/
         final FormModel grantDocFM = createGrant(udfQM);
 
-		/*���������� ���*/
         final FormModel untCertificateFM = createUnt(udfQM);
 
-		/*����� �����������*/
         final FormModel addressRegFM = createAddressReg();
 
-		/*����� ����������*/
         final FormModel addressFactFM = createAddressFact();
 
-		/*������ ����*/
-        final FormModel fatherFM = createFatherData();
+        final FormModel fatherFM = createFatherData("parents.data.father", FATHER);
 
-		/*������ ������*/
-        final FormModel motherFM = createMotherData();
+        final FormModel motherFM = createFatherData("parents.data.mother", MOTHER);
 
-		/*������ �� ���������*/
         final FormModel dataContractFM = createContractData(udfQM);
 
-		/*�������� ����������� (���� �� 1 ���������� ��� ����������)*/
         final FormModel educationFM = createEducationDoc(udfQM);
 
         createFormButtons(dataFM, preemptiveRightFM, userPassportFM, militaryDocFM,
@@ -230,15 +224,13 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
     }
 
     private FormModel createPreemptiveRight(QueryModel<USER_DOCUMENT_FILE> udfQM) throws Exception {
-        StringBuilder sb = new StringBuilder();
-        sb.append(getUILocaleUtil().getCaption("title.error"));
-        sb.append(": ");
-        sb.append(getUILocaleUtil().getCaption("preemptive.right"));
+        String sb = getUILocaleUtil().getCaption("title.error") + ": "
+                + getUILocaleUtil().getCaption("preemptive.right");
         preemptiveRightGFW = new GridFormWidget(PREEMPTIVE_RIGHT.class);
         preemptiveRightGFW.addEntityListener(this);
         final FormModel preemptiveRightFM = preemptiveRightGFW.getWidgetModel();
         preemptiveRightFM.setTitleResource("preemptive.right");
-        preemptiveRightFM.setErrorMessageTitle(sb.toString());
+        preemptiveRightFM.setErrorMessageTitle(sb);
         preemptiveRightFM.setButtonsVisible(false);
 
         FileListFieldModel preemptiveRightFLFM = (FileListFieldModel) preemptiveRightFM.getFieldModel("fileList");
@@ -279,7 +271,6 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         userPassportFM.setErrorMessageTitle(sb.toString());
         userPassportFM.setButtonsVisible(false);
         userPassportFM.getFieldModel("expireDate").setRequired(true);
-//		((FKFieldModel)userPassportFM.getFieldModel("documentIssuer")).getQueryModel().getFrom().getBaseItem().setSchema("KBTU");
 
         COUNTRY birthRegion = null;
 
@@ -292,7 +283,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         QueryModel birthRegionQM = birthRegionFieldModel.getQueryModel();
         birthRegionQM.addWhere("parent", ECriteria.EQUAL, ID.valueOf(-1));
 
-        userPassportFM.getFieldModel("iin").getValidators().add(new RegexpValidator("^\\d{12}$", "��� ������ ���������� 12 ����"));
+        userPassportFM.getFieldModel("iin").getValidators().add(new RegexpValidator("^\\d{12}$", "ИИН должен состоять из 12 цифр"));
 
         FileListFieldModel passportFLFM = (FileListFieldModel) userPassportFM.getFieldModel("fileList");
         passportFLFM.permitMimeType(FileListFieldModel.JPEG);
@@ -344,7 +335,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         militaryDocFM.setTitleResource("military.document");
         militaryDocFM.setErrorMessageTitle(sb.toString());
         militaryDocFM.setButtonsVisible(false);
-        ((FKFieldModel) militaryDocFM.getFieldModel("militaryDocType")).addStyle("toTop");
+        militaryDocFM.getFieldModel("militaryDocType").addStyle("toTop");
 
         militaryFLFM = (FileListFieldModel) militaryDocFM.getFieldModel("fileList");
         militaryFLFM.permitMimeType(FileListFieldModel.JPEG);
@@ -389,7 +380,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         if (dataAFW.getWidgetModel().isCreateNew()) {
             disabilityDocFM.createNew();
         } else {
-            QueryModel<DISABILITY_DOC> disabilityDocQM = new QueryModel<DISABILITY_DOC>(DISABILITY_DOC.class);
+            QueryModel<DISABILITY_DOC> disabilityDocQM = new QueryModel<>(DISABILITY_DOC.class);
             FromItem fi = disabilityDocQM.addJoin(EJoin.INNER_JOIN, "id", USER_DOCUMENT.class, "id");
             disabilityDocQM.addWhere(fi, "user", ECriteria.EQUAL, dataAFW.getWidgetModel().getEntity().getId());
             disabilityDocQM.addWhereAnd(fi, "deleted", Boolean.FALSE);
@@ -402,7 +393,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 disabilityDocFM.createNew();
             }
         }
-        /*****************************************************************/return disabilityDocFM;
+        return disabilityDocFM;
     }
 
     private FormModel createRepatriate(QueryModel<USER_DOCUMENT_FILE> udfQM) throws Exception {
@@ -425,7 +416,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         if (dataAFW.getWidgetModel().isCreateNew()) {
             repatriateDocFM.createNew();
         } else {
-            QueryModel<REPATRIATE_DOC> repatriateDocQM = new QueryModel<REPATRIATE_DOC>(REPATRIATE_DOC.class);
+            QueryModel<REPATRIATE_DOC> repatriateDocQM = new QueryModel<>(REPATRIATE_DOC.class);
             FromItem fi = repatriateDocQM.addJoin(EJoin.INNER_JOIN, "id", USER_DOCUMENT.class, "id");
             repatriateDocQM.addWhere(fi, "user", ECriteria.EQUAL, dataAFW.getWidgetModel().getEntity().getId());
             repatriateDocQM.addWhereAnd(fi, "deleted", Boolean.FALSE);
@@ -438,7 +429,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 repatriateDocFM.createNew();
             }
         }
-        /******************************************************************/return repatriateDocFM;
+        return repatriateDocFM;
     }
 
     private FormModel createGrant(QueryModel<USER_DOCUMENT_FILE> udfQM) throws Exception {
@@ -453,7 +444,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         grantDocFM.setTitleResource("grant.document");
         grantDocFM.setErrorMessageTitle(sb.toString());
         grantDocFM.setButtonsVisible(false);
-        grantDocFM.getFieldModel("ict").getValidators().add(new RegexpValidator("^\\d{9}$", "��� ������ ���������� 9 ����"));
+        grantDocFM.getFieldModel("ict").getValidators().add(new RegexpValidator("^\\d{9}$", "ИКТ должен состоять из 9 цифр"));
 
         FileListFieldModel grantDocFLFM = (FileListFieldModel) grantDocFM.getFieldModel("fileList");
         grantDocFLFM.permitMimeType(FileListFieldModel.JPEG);
@@ -461,7 +452,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         if (dataAFW.getWidgetModel().isCreateNew()) {
             grantDocFM.createNew();
         } else {
-            QueryModel<GRANT_DOC> grantDocQM = new QueryModel<GRANT_DOC>(GRANT_DOC.class);
+            QueryModel<GRANT_DOC> grantDocQM = new QueryModel<>(GRANT_DOC.class);
             FromItem fi = grantDocQM.addJoin(EJoin.INNER_JOIN, "id", USER_DOCUMENT.class, "id");
             grantDocQM.addWhere(fi, "user", ECriteria.EQUAL, dataAFW.getWidgetModel().getEntity().getId());
             grantDocQM.addWhereAnd(fi, "deleted", Boolean.FALSE);
@@ -474,7 +465,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 grantDocFM.createNew();
             }
         }
-        /*********************/return grantDocFM;
+        return grantDocFM;
     }
 
     private FormModel createUnt(QueryModel<USER_DOCUMENT_FILE> udfQM) throws Exception {
@@ -489,8 +480,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         untCertificateFM.setTitleResource("unt.certificate");
         untCertificateFM.setErrorMessageTitle(sb.toString());
         untCertificateFM.setButtonsVisible(false);
-        untCertificateFM.getFieldModel("ict").getValidators().add(new RegexpValidator("^\\d{9}$", "��� ������ ���������� 9 ����"));
-        untCertificateFM.getFieldModel("rate").getValidators().add(new IntegerRangeValidator("������������ ����� ���� = 125", 0, 125));
+        untCertificateFM.getFieldModel("ict").getValidators().add(new RegexpValidator("^\\d{9}$", "ИКТ должен состоять из 9 цифр"));
         untCertificateFM.getFieldModel("rate").setInEdit(true);
         FileListFieldModel untCertificateFLFM = (FileListFieldModel) untCertificateFM.getFieldModel("fileList");
         untCertificateFLFM.permitMimeType(FileListFieldModel.JPEG);
@@ -499,7 +489,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             UNT_CERTIFICATE cert = (UNT_CERTIFICATE) untCertificateFM.createNew();
             cert.setRate(0);
         } else {
-            QueryModel<UNT_CERTIFICATE> untCertificateQM = new QueryModel<UNT_CERTIFICATE>(UNT_CERTIFICATE.class);
+            QueryModel<UNT_CERTIFICATE> untCertificateQM = new QueryModel<>(UNT_CERTIFICATE.class);
             FromItem fi = untCertificateQM.addJoin(EJoin.INNER_JOIN, "id", USER_DOCUMENT.class, "id");
             untCertificateQM.addWhere(fi, "user", ECriteria.EQUAL, dataAFW.getWidgetModel().getEntity().getId());
             untCertificateQM.addWhereAnd(fi, "deleted", Boolean.FALSE);
@@ -514,7 +504,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 untCertificateFM.createNew();
             }
         }
-        /*******************/return untCertificateFM;
+        return untCertificateFM;
     }
 
     private FormModel createAddressReg() throws Exception {
@@ -529,8 +519,6 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         addressRegFM.setTitleResource("address.registration");
         addressRegFM.setErrorMessageTitle(sb.toString());
         addressRegFM.setButtonsVisible(false);
-        addressRegFM.getFieldModel("phoneHome").getValidators()
-                .add(new RegexpValidator("^([0-9]{6})|([0-9]{7})|([0-9]{8})|([0-9]{9})|([0-9]{10})$", "������� (���.) ������ ��������� �� 6 �� 10 ����"));
 
         FKFieldModel countryRegFM = (FKFieldModel) addressRegFM.getFieldModel("country");
         QueryModel countryRegQM = countryRegFM.getQueryModel();
@@ -552,7 +540,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         if (dataAFW.getWidgetModel().isCreateNew()) {
             addressRegFM.createNew();
         } else {
-            QueryModel<USER_ADDRESS> addressRegQM = new QueryModel<USER_ADDRESS>(USER_ADDRESS.class);
+            QueryModel<USER_ADDRESS> addressRegQM = new QueryModel<>(USER_ADDRESS.class);
             addressRegQM.addWhere("user", ECriteria.EQUAL, dataAFW.getWidgetModel().getEntity().getId());
             addressRegQM.addWhereAnd("addressType", ECriteria.EQUAL, ID.valueOf(1));
             try {
@@ -572,7 +560,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         countryRegFM.getListeners().add(new CountryChangeListener(regionReg, regionRegFM));
         regionRegFM.getListeners().add(new RegionChangeListener(cityReg, cityRegFM));
         cityRegFM.getListeners().add(new CityChangeListener(villageReg, villageRegFM));
-        /******************************************************************************/return addressRegFM;
+        return addressRegFM;
     }
 
     private FormModel createAddressFact() throws Exception {
@@ -587,8 +575,6 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         addressFactFM.setTitleResource("address.residential");
         addressFactFM.setErrorMessageTitle(sb.toString());
         addressFactFM.setButtonsVisible(false);
-        addressFactFM.getFieldModel("phoneHome").getValidators()
-                .add(new RegexpValidator("^([0-9]{6})|([0-9]{7})|([0-9]{8})|([0-9]{9})|([0-9]{10})$", "������� (���.) ������ ��������� �� 6 �� 10 ����"));
 
         FKFieldModel countryFactFM = (FKFieldModel) addressFactFM.getFieldModel("country");
         QueryModel countryFactQM = countryFactFM.getQueryModel();
@@ -632,142 +618,48 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         countryFactFM.getListeners().add(new CountryChangeListener(regionFact, regionFactFM));
         regionFactFM.getListeners().add(new RegionChangeListener(cityFact, cityFactFM));
         cityFactFM.getListeners().add(new CityChangeListener(villageFact, villageFactFM));
-        /**********************************************************************************/return addressFactFM;
+        return addressFactFM;
     }
 
-    private FormModel createFatherData() throws Exception {
-        StringBuilder sb;
-        sb = new StringBuilder();
-        sb.append(getUILocaleUtil().getCaption("title.error"));
-        sb.append(": ");
-        String caption = "parents.data.father";
-        sb.append(getUILocaleUtil().getCaption(caption));
-        fatherGFW = new GridFormWidget(STUDENT_RELATIVE.class);
-        fatherGFW.addEntityListener(this);
-        final FormModel fatherFM = createFormModel(fatherGFW, sb, caption);
-//		final FormModel fatherFM = fatherGFW.getWidgetModel();
-//		fatherFM.setTitleResource("parents.data.father");
-//		fatherFM.setErrorMessageTitle(sb.toString());
-//		fatherFM.setButtonsVisible(false);
-//		fatherFM.getFieldModel("email").getValidators().add(new EmailValidator("�� ����� ������������ E-mail"));
-//		fatherFM.getFieldModel("phoneMobile").getValidators().add(new RegexpValidator("^\\d{10}$", "������� (���.) ������ ��������� 10 ����"));
-//		fatherFM.getFieldModel("phoneHome").getValidators()
-//			.add(new RegexpValidator("^([0-9]{6})|([0-9]{7})|([0-9]{8})|([0-9]{9})|([0-9]{10})$", "������� (���.) ������ ��������� �� 6 �� 10 ����"));
-
-        FKFieldModel countryFatherFM = createFKFieldModel("country", fatherFM);
-        FKFieldModel regionFatherFM = createFKFieldModel("region", fatherFM);
-        FKFieldModel cityFatherFM = createFKFieldModel("city", fatherFM);
-        FKFieldModel villageFatherFM = createFKFieldModel("village", fatherFM);
-
-//		FKFieldModel countryFatherFM = (FKFieldModel)fatherFM.getFieldModel("country");
-//		QueryModel countryFatherQM = countryFatherFM.getQueryModel();
-//		countryFatherQM.getFrom().getBaseItem().setSchema("KBTU");
-//		countryFatherQM.addWhereNull("parent");
-//
-//		FKFieldModel regionFatherFM = (FKFieldModel)fatherFM.getFieldModel("region");
-//		QueryModel regionFatherQM = regionFatherFM.getQueryModel();
-//		regionFatherQM.getFrom().getBaseItem().setSchema("KBTU");
-//		regionFatherQM.addWhere("parent", ECriteria.EQUAL, ID.valueOf(-1));
-//
-//		FKFieldModel cityFatherFM = (FKFieldModel)fatherFM.getFieldModel("city");
-//		QueryModel cityFatherQM = cityFatherFM.getQueryModel();
-//		cityFatherQM.getFrom().getBaseItem().setSchema("KBTU");
-//		cityFatherQM.addWhere("parent", ECriteria.EQUAL, ID.valueOf(-1));
-//
-//		FKFieldModel villageFatherFM = (FKFieldModel)fatherFM.getFieldModel("village");
-//		QueryModel villageFatherQM = villageFatherFM.getQueryModel();
-//		villageFatherQM.getFrom().getBaseItem().setSchema("KBTU");
-//		villageFatherQM.addWhere("parent", ECriteria.EQUAL, ID.valueOf(-1));
-
-        COUNTRY regionFather = null;
-        COUNTRY cityFather = null;
-        COUNTRY villageFather = null;
-        if (dataAFW.getWidgetModel().isCreateNew()) {
-            fatherFM.createNew();
+    private FormModel createFatherData(String caption, int parent_number) throws Exception {
+        StringBuilder parentSB = new StringBuilder();
+        parentSB.append(getUILocaleUtil().getCaption("title.error"));
+        parentSB.append(": ");
+        parentSB.append(getUILocaleUtil().getCaption(caption));
+        FormModel parentFM;
+        if (parent_number == FATHER) {
+            fatherGFW = new GridFormWidget(STUDENT_RELATIVE.class);
+            fatherGFW.addEntityListener(this);
+            parentFM = createFormModel(fatherGFW, parentSB, caption);
         } else {
-            QueryModel<STUDENT_RELATIVE> fatherQM = new QueryModel<STUDENT_RELATIVE>(STUDENT_RELATIVE.class);
-            fatherQM.addWhere("student", ECriteria.EQUAL, dataAFW.getWidgetModel().getEntity().getId());
-            fatherQM.addWhereAnd("relativeType", ECriteria.EQUAL, ID.valueOf(1));
-            try {
-                STUDENT_RELATIVE father = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(fatherQM);
-                if (father != null) {
-                    fatherFM.loadEntity(father.getId());
-                    father = (STUDENT_RELATIVE) fatherFM.getEntity();
-                    regionFather = father.getRegion();
-                    cityFather = father.getCity();
-                    villageFather = father.getVillage();
-                }
-            } catch (NoResultException ex) {
-                fatherFM.createNew();
-            }
+            motherGFW = new GridFormWidget(STUDENT_RELATIVE.class);
+            motherGFW.addEntityListener(this);
+            parentFM = createFormModel(motherGFW, parentSB, caption);
         }
 
-        countryFatherFM.getListeners().add(new CountryChangeListener(regionFather, regionFatherFM));
-        regionFatherFM.getListeners().add(new RegionChangeListener(cityFather, cityFatherFM));
-        cityFatherFM.getListeners().add(new CityChangeListener(villageFather, villageFatherFM));
-        /*****************************************************************************************/return fatherFM;
-    }
+        FKFieldModel countryFM = createFKFieldModel("country", parentFM);
+        FKFieldModel regionFM = createFKFieldModel("region", parentFM);
+        FKFieldModel cityFM = createFKFieldModel("city", parentFM);
+        FKFieldModel villageFM = createFKFieldModel("village", parentFM);
 
-    private FormModel createMotherData() throws Exception {
-        StringBuilder sb;
-        sb = new StringBuilder();
-        sb.append(getUILocaleUtil().getCaption("title.error"));
-        sb.append(": ");
-        String caption = "parents.data.mother";
-        sb.append(getUILocaleUtil().getCaption(caption));
-        motherGFW = new GridFormWidget(STUDENT_RELATIVE.class);
-        motherGFW.addEntityListener(this);
-        final FormModel motherFM = createFormModel(motherGFW, sb, caption);
-        FKFieldModel countryMotherFM = createFKFieldModel("country", motherFM);
-        FKFieldModel regionMotherFM = createFKFieldModel("region", motherFM);
-        FKFieldModel cityMotherFM = createFKFieldModel("city", motherFM);
-        FKFieldModel villageMotherFM = createFKFieldModel("village", motherFM);
-
-//		FKFieldModel countryMotherFM = (FKFieldModel)motherFM.getFieldModel("country");
-//		QueryModel countryMotherQM = countryMotherFM.getQueryModel();
-//		countryMotherQM.getFrom().getBaseItem().setSchema("KBTU");
-//		countryMotherQM.addWhereNull("parent");
-//
-//		FKFieldModel regionMotherFM = (FKFieldModel)motherFM.getFieldModel("region");
-//		QueryModel regionMotherQM = regionMotherFM.getQueryModel();
-//		regionMotherQM.getFrom().getBaseItem().setSchema("KBTU");
-//		regionMotherQM.addWhere("parent", ECriteria.EQUAL, ID.valueOf(-1));
-//
-//		FKFieldModel cityMotherFM = (FKFieldModel)motherFM.getFieldModel("city");
-//		QueryModel cityMotherQM = cityMotherFM.getQueryModel();
-//		cityMotherQM.getFrom().getBaseItem().setSchema("KBTU");
-//		cityMotherQM.addWhere("parent", ECriteria.EQUAL, ID.valueOf(-1));
-//
-//		FKFieldModel villageMotherFM = (FKFieldModel)motherFM.getFieldModel("village");
-//		QueryModel villageMotherQM = villageMotherFM.getQueryModel();
-//		villageMotherQM.getFrom().getBaseItem().setSchema("KBTU");
-//		villageMotherQM.addWhere("parent", ECriteria.EQUAL, ID.valueOf(-1));
-
-        COUNTRY regionMother = null, cityMother = null, villageMother = null;
+        COUNTRY region = null;
+        COUNTRY city = null;
+        COUNTRY village = null;
         if (dataAFW.getWidgetModel().isCreateNew()) {
-            motherFM.createNew();
+            parentFM.createNew();
         } else {
-            QueryModel<STUDENT_RELATIVE> motherQM = new QueryModel<>(STUDENT_RELATIVE.class);
-            motherQM.addWhere("student", ECriteria.EQUAL, dataAFW.getWidgetModel().getEntity().getId());
-            motherQM.addWhereAnd("relativeType", ECriteria.EQUAL, ID.valueOf(2));
-            try {
-                STUDENT_RELATIVE mother = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(motherQM);
-                if (mother != null) {
-                    motherFM.loadEntity(mother.getId());
-                    mother = (STUDENT_RELATIVE) motherFM.getEntity();
-                    regionMother = mother.getRegion();
-                    cityMother = mother.getCity();
-                    villageMother = mother.getVillage();
-                }
-            } catch (NoResultException ex) {
-                motherFM.createNew();
-            }
+            ID studentId = dataAFW.getWidgetModel().getEntity().getId();
+
+            AddressUtils addressUtils = new AddressUtils(parent_number, parentFM, false, studentId);
+            region = addressUtils.getRegion();
+            city = addressUtils.getCity();
+            village = addressUtils.getVillage();
         }
 
-        countryMotherFM.getListeners().add(new CountryChangeListener(regionMother, regionMotherFM));
-        regionMotherFM.getListeners().add(new RegionChangeListener(cityMother, cityMotherFM));
-        cityMotherFM.getListeners().add(new CityChangeListener(villageMother, villageMotherFM));
-        /****************************************************************************************/return motherFM;
+        countryFM.getListeners().add(new CountryChangeListener(region, regionFM));
+        regionFM.getListeners().add(new RegionChangeListener(city, cityFM));
+        cityFM.getListeners().add(new CityChangeListener(village, villageFM));
+        return parentFM;
     }
 
     private FormModel createContractData(QueryModel<USER_DOCUMENT_FILE> udfQM) throws Exception {
@@ -782,7 +674,6 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         dataContractFM.setButtonsVisible(false);
         dataContractFM.setTitleResource("contract.data");
         dataContractFM.getFieldModel("expireDate").setInEdit(false);
-        dataContractFM.getFieldModel("contractType").getOrder();
 
         FileListFieldModel contractFLFM = (FileListFieldModel) dataContractFM.getFieldModel("fileList");
         contractFLFM.permitMimeType(FileListFieldModel.JPEG);
@@ -790,7 +681,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         if (dataAFW.getWidgetModel().isCreateNew()) {
             dataContractFM.createNew();
         } else {
-            QueryModel<STUDENT_CONTRACT> dataContractQM = new QueryModel<STUDENT_CONTRACT>(STUDENT_CONTRACT.class);
+            QueryModel<STUDENT_CONTRACT> dataContractQM = new QueryModel<>(STUDENT_CONTRACT.class);
             FromItem sc = dataContractQM.addJoin(EJoin.INNER_JOIN, "id", USER_DOCUMENT.class, "id");
             dataContractQM.addWhere(sc, "user", ECriteria.EQUAL, dataAFW.getWidgetModel().getEntity().getId());
             dataContractQM.addWhereAnd(sc, "deleted", Boolean.FALSE);
@@ -803,7 +694,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 dataContractFM.createNew();
             }
         }
-        /*********************/return dataContractFM;
+        return dataContractFM;
     }
 
     private FormModel createEducationDoc(QueryModel<USER_DOCUMENT_FILE> udfQM) throws Exception {
@@ -827,9 +718,8 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         educationFM.getFieldModel("schoolRegion").setRequired(false);
 
         educationFM.getFieldModel("schoolAddress").setRequired(true);
-//		educationFM.getFieldModel("entryYear").setRequired(false);
-        educationFM.getFieldModel("entryYear").getValidators().add(new IntegerRangeValidator("�� ��������� ������� ����", 0, 2016));
-        educationFM.getFieldModel("endYear").getValidators().add(new IntegerRangeValidator("�� ��������� ������� ����", 0, 2016));
+        educationFM.getFieldModel("entryYear").getValidators().add(new IntegerRangeValidator("Значение года не может быть больше текущего года", 0, currentYear));
+        educationFM.getFieldModel("endYear").getValidators().add(new IntegerRangeValidator("Значение года не может быть больше текущего года", 0, currentYear));
 
         FKFieldModel schoolRegionFieldModel = (FKFieldModel) educationFM.getFieldModel("schoolRegion");
         QueryModel schoolRegionQM = schoolRegionFieldModel.getQueryModel();
@@ -900,6 +790,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 mainDataButton.addStyleName("actived");
                 flag = Flag.MAIN_DATA;
                 saveData = false;
+                saveSpec = false;
                 saveEduc = false;
                 savePass = false;
                 saveUNT = false;
@@ -922,11 +813,15 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 registrationHSP.removeComponent(contentHL);
                 contentHL = new HorizontalLayout();
                 contentHL.addComponent(dataAFW);
-                contentHL.addComponent(nextFactAddressButton);
-                contentHL.setComponentAlignment(nextFactAddressButton, Alignment.MIDDLE_CENTER);
+
+                VerticalLayout photoAndButtonVL = getPhotoVL();
+                contentHL.addComponent(photoAndButtonVL);
+
                 registrationHSP.addComponent(contentHL);
                 getContent().addComponent(registrationHSP);
             }
+
+
         });
 
         mainDataButton = createFormButton("regapplicant.main.data", caption);
@@ -957,8 +852,10 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 registrationHSP.removeComponent(contentHL);
                 contentHL = new HorizontalLayout();
                 contentHL.addComponent(dataAFW);
-                contentHL.addComponent(nextFactAddressButton);
-                contentHL.setComponentAlignment(nextFactAddressButton, Alignment.MIDDLE_CENTER);
+
+                VerticalLayout photoAndButtonVL = getPhotoVL();
+                contentHL.addComponent(photoAndButtonVL);
+
                 registrationHSP.addComponent(contentHL);
             }
         });
@@ -1053,7 +950,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM, educationFM, untCertificateFM,
                         grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
 
-                flag = Flag.DEFAULT_FLAG;
+                flag = Flag.SPECIALITY;
                 mainDataButton.addStyleName("actived");
                 idDocButton.removeStyleName("actived");
                 eduDocButton.removeStyleName("actived");
@@ -1294,7 +1191,6 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                     }
                 }
                 educationQM.addWhereAnd(educationUDFI, "user", ECriteria.EQUAL, userId1);
-                /**************************/
 
                 contentHL.removeAllComponents();
                 contentHL.addComponent(documentsTW);
@@ -1328,12 +1224,12 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 fatherButton.removeStyleName("activedCh");
                 factAddressButton.removeStyleName("activedCh");
                 regAddressButton.removeStyleName("activedCh");
-                /*������ ������*/
                 ID userId1 = ID.valueOf(-1);
                 if (!dataFM.isCreateNew()) {
                     try {
                         userId1 = dataFM.getEntity().getId();
                     } catch (Exception e) {
+                        e.printStackTrace();//TODO catch
                     }
                 }
                 languagesTW = new TableWidget(V_USER_LANGUAGE.class);
@@ -1342,7 +1238,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 DBTableModel languageTM = (DBTableModel) languagesTW.getWidgetModel();
                 QueryModel languageQM = languageTM.getQueryModel();
                 languageQM.addWhere("user", ECriteria.EQUAL, userId1);
-                /***********************************/
+
                 VerticalLayout preemLang = new VerticalLayout();
                 preemLang.addComponent(preemptiveRightGFW);
                 preemLang.addComponent(languagesTW);
@@ -1379,7 +1275,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 fatherButton.removeStyleName("activedCh");
                 factAddressButton.removeStyleName("activedCh");
                 regAddressButton.removeStyleName("activedCh");
-                /*����������� �������*/
+
                 medicalCheckupTW = new TableWidget(V_MEDICAL_CHECKUP.class);
                 medicalCheckupTW.addEntityListener(ApplicantsForm.this);
                 medicalCheckupTW.setWidth("667px");
@@ -1434,7 +1330,6 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 factAddressButton.removeStyleName("activedCh");
                 regAddressButton.removeStyleName("activedCh");
 
-     			/*������ �� ���*/
                 ID untCertificateId = ID.valueOf(-1);
                 if (!untCertificateFM.isCreateNew()) {
                     UNT_CERTIFICATE untCertificate = null;
@@ -1453,7 +1348,6 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 DBTableModel untRatesTM = (DBTableModel) untRatesTW.getWidgetModel();
                 QueryModel untRatesQM = untRatesTM.getQueryModel();
                 untRatesQM.addWhere("untCertificate", ECriteria.EQUAL, untCertificateId);
-                /***************/
 
                 Button saveButton = createSaveButton();
                 saveButton.addClickListener(new Button.ClickListener() {
@@ -1633,7 +1527,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 fatherButton.removeStyleName("activedCh");
                 factAddressButton.removeStyleName("activedCh");
                 regAddressButton.removeStyleName("activedCh");
-                 /*�������*/
+
                 awardsTW = new TableWidget(V_USER_AWARD.class);
                 awardsTW.addEntityListener(ApplicantsForm.this);
                 awardsTW.setWidth("667px");
@@ -1644,12 +1538,11 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                     try {
                         studentId2 = dataAFW.getWidgetModel().getEntity().getId();
                     } catch (Exception e) {
+                        e.printStackTrace();//TODO catch
                     }
                 }
                 awardsQM.addWhere("user", ECriteria.EQUAL, studentId2);
-                /*********/
 
-				/*���������� ���������*/
                 socialCategoriesTW = new TableWidget(V_USER_SOCIAL_CATEGORY.class);
                 socialCategoriesTW.addEntityListener(ApplicantsForm.this);
                 socialCategoriesTW.setWidth("667px");
@@ -1663,7 +1556,6 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                     }
                 }
                 socialCategoriesQM.addWhere("user", ECriteria.EQUAL, userId);
-                /**********************/
 
                 VerticalLayout dopData = new VerticalLayout();
                 dopData.addComponent(socialCategoriesTW);
@@ -1684,12 +1576,17 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM, userPassportFM, militaryDocFM, disabilityDocFM, repatriateDocFM, preemptiveRightFM,
                         educationFM, untCertificateFM, grantDocFM, addressFactFM, addressRegFM, motherFM, fatherFM, dataContractFM);
-// 				int count = specTW.getEntityCount();
-                if (!saveData) Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
-                else if (!savePass) Message.showInfo(getUILocaleUtil().getMessage("info.save.passport"));
-                else if (!saveEduc) Message.showInfo(getUILocaleUtil().getMessage("info.save.educ"));
-                else if (!saveUNT) Message.showInfo(getUILocaleUtil().getMessage("info.save.unt"));
-                else {
+                if (!saveData) {
+                    Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
+                } else if (!saveSpec) {
+                    Message.showInfo(getUILocaleUtil().getMessage("info.save.speciality"));
+                } else if (!savePass) {
+                    Message.showInfo(getUILocaleUtil().getMessage("info.save.passport"));
+                } else if (!saveEduc) {
+                    Message.showInfo(getUILocaleUtil().getMessage("info.save.educ"));
+                } else if (!saveUNT) {
+                    Message.showInfo(getUILocaleUtil().getMessage("info.save.unt"));
+                } else {
                     mainDataButton.setEnabled(false);
                     idDocButton.setEnabled(false);
                     eduDocButton.setEnabled(false);
@@ -1709,12 +1606,38 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                     factAddressButton.setEnabled(false);
                     regAddressButton.setEnabled(false);
                     finishButton.setEnabled(false);
+
+                    STUDENT_EDUCATION studentEducation = new STUDENT_EDUCATION();
+                    try {
+                        STUDENT student = (STUDENT) dataFM.getEntity();
+                        studentEducation.setStudent(student);
+                        SPECIALITY speciality = (student).getEntrantSpecialities().iterator().next().getSpeciality();
+                        studentEducation.setFaculty(speciality.getDepartment().getParent());
+                        studentEducation.setChair(speciality.getDepartment());
+                        studentEducation.setSpeciality(speciality);
+                        studentEducation.setStudyYear(SessionFacadeFactory.getSessionFacade(
+                                CommonEntityFacadeBean.class).lookup(STUDY_YEAR.class, ID.valueOf(1)));
+                        studentEducation.setLanguage(SessionFacadeFactory.getSessionFacade(
+                                CommonEntityFacadeBean.class).lookup(LANGUAGE.class, ID.valueOf(1)));
+                        studentEducation.setEducationType(SessionFacadeFactory.getSessionFacade(
+                                CommonEntityFacadeBean.class).lookup(STUDENT_EDUCATION_TYPE.class, ID.valueOf(1)));
+                        DateFormat uriDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                        studentEducation.setEntryDate(uriDateFormat.parse(beginYear + "-09-01"));
+                        studentEducation.setStatus(SessionFacadeFactory.getSessionFacade(
+                                CommonEntityFacadeBean.class).lookup(STUDENT_STATUS.class, ID.valueOf(1)));
+                        studentEducation.setCreated(new Date());
+
+                        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(studentEducation);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
                     Label mess = new Label("<br><br><br><center><strong>Вы успешно прошли регистрацию!!!</strong><br>");
                     mess.setContentMode(ContentMode.HTML);
                     messForm = new VerticalLayout();
                     messForm.addComponent(mess);
 
-                    Button againButton = new Button("again");//TODO
+                    Button againButton = new Button(getUILocaleUtil().getCaption("back.to.new.applicant.registration"));
                     againButton.addClickListener(new Button.ClickListener() {
                         @Override
                         public void buttonClick(ClickEvent clickEvent) {
@@ -1734,6 +1657,22 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         });
     }
 
+    private VerticalLayout getPhotoVL() {
+        VerticalLayout photoAndButtonVL = new VerticalLayout();
+
+        PhotoWidget userPW = new PhotoWidget(userPhotoBytes);
+        userPW.setPhotoHeight(290, Unit.PIXELS);
+        userPW.setPhotoWidth(230, Unit.PIXELS);
+        userPW.setSaveButtonVisible(false);
+        userPW.addListener(ApplicantsForm.this);
+        photoAndButtonVL.addComponent(userPW);
+        photoAndButtonVL.setComponentAlignment(userPW, Alignment.TOP_CENTER);
+
+        photoAndButtonVL.addComponent(nextFactAddressButton);
+        photoAndButtonVL.setComponentAlignment(nextFactAddressButton, Alignment.MIDDLE_CENTER);
+        return photoAndButtonVL;
+    }
+
     private void flagSave(Flag flag, FormModel dataFM, FormModel userPassportFM, FormModel militaryDocFM,
                           FormModel disabilityDocFM, FormModel repatriateDocFM, FormModel preemptiveRightFM,
                           FormModel educationFM, FormModel untCertificateFM, FormModel grantDocFM,
@@ -1744,6 +1683,11 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             case MAIN_DATA:
                 if (dataFM.isModified() && dataAFW.save())
                     saveData = true;
+                break;
+            case SPECIALITY:
+                if (specTW.getEntityCount() > 0) {
+                    saveSpec = true;
+                }
                 break;
             case ID_DOC:
                 if (userPassportFM.isModified() && passportGFW.save())
@@ -1820,7 +1764,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         buttonsVL.addComponent(grantDocButton);
         buttonsVL.addComponent(motherButton);
         buttonsVL.addComponent(fatherButton);
-        buttonsVL.addComponent(contractButton);//TODO comment, if doesnt' work
+        buttonsVL.addComponent(contractButton);
         buttonsVL.addComponent(moreButton);
         buttonsVL.addComponent(finishButton);
         buttonsVL.setSpacing(false);
@@ -1865,10 +1809,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         formModel.setTitleResource(caption);
         formModel.setErrorMessageTitle(sb.toString());
         formModel.setButtonsVisible(false);
-        formModel.getFieldModel("email").getValidators().add(new EmailValidator("�� ����� ������������ E-mail"));
-        formModel.getFieldModel("phoneMobile").getValidators().add(new RegexpValidator("^\\d{10}$", "������� (���.) ������ ��������� 10 ����"));
-        formModel.getFieldModel("phoneHome").getValidators()
-                .add(new RegexpValidator("^([0-9]{6})|([0-9]{7})|([0-9]{8})|([0-9]{9})|([0-9]{10})$", "������� (���.) ������ ��������� �� 6 �� 10 ����"));
+        formModel.getFieldModel("email").getValidators().add(new EmailValidator("Введён некорректный E-mail"));
         return formModel;
     }
 
@@ -1877,28 +1818,6 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
         ENTRANT_SPECIALITY es;
         FormModel fm = dataAFW.getWidgetModel();
         if (isNew) {
-            List<Entity> list = specTW.getAllEntities();
-            if (list.size() == 3) {
-                boolean kbtu = false;
-                for (Entity e1 : list) {
-                    try {
-                        ENTRANT_SPECIALITY ves1 = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(ENTRANT_SPECIALITY.class, e1.getId());
-                        kbtu = ves1.getUniversity().getId().equals(ID.valueOf(421));
-                        if (kbtu) {
-                            break;
-                        }
-                    } catch (Exception ex) {
-                        LOG.error("Unable to check university id: ", ex);
-                    }
-                }
-
-                if (!kbtu) {
-                    if (!ves.getUniversity().getId().equals(ID.valueOf(421))) {
-                        Message.showError(getUILocaleUtil().getMessage("1.of.4.universities.must.be.kbtu"));
-                        return false;
-                    }
-                }
-            }
 
             es = new ENTRANT_SPECIALITY();
             try {
@@ -1980,7 +1899,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             try {
                 s.setPasswd("12345678");
                 s.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USERS"));
-                Integer beginYear = entranceYear.getBeginYear();
+
                 String year = beginYear.toString().substring(2, 4);
                 String code = getCode(year);
                 s.setLogin(code);
@@ -1988,13 +1907,23 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 s.setCategory(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(STUDENT_CATEGORY.class, ID.valueOf(1)));
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(s);
                 dataAFW.getWidgetModel().loadEntity(s.getId());
+
+                if (userPhotoChanged) {
+                    USER_PHOTO userPhoto = new USER_PHOTO();
+                    userPhoto.setUser(s);
+                    userPhoto.setFileName(userPhotoFilename);
+                    userPhoto.setPhoto(userPhotoBytes);
+                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(userPhoto);
+                }
+
                 showSavedNotification();
             } catch (Exception ex) {
                 LOG.error("Unable to save new applicant: ", ex);
-                Message.showError("�������� ������ �� ���������"); //("Unable to save new applicant");								
+                Message.showError("Ошибка сохранения основных данных");
             }
         } else {
-//            s.setUpdated(new Date());
+            s.setUpdated(new Date());
+            s.setUpdatedBy(CommonUtils.getCurrentUserLogin());
             try {
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(s);
                 showSavedNotification();
@@ -2624,7 +2553,6 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             try {
                 uc.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USER_DOCUMENT"));
                 uc.setUser((STUDENT) fm.getEntity());
-                //Starting rate = 0
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(uc);
                 certificateGFW.getWidgetModel().loadEntity(uc.getId());
                 showSavedNotification();
@@ -2942,10 +2870,8 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
 
             return true;
         } else if (source.equals(languagesTW)) {
-            FormModel languageFM = ((DBTableModel) languagesTW.getWidgetModel()).getFormModel();
             return true;
         } else if (source.equals(untRatesTW)) {
-            FormModel untRatesFM = ((DBTableModel) untRatesTW.getWidgetModel()).getFormModel();
             return true;
         } else if (source.equals(specTW)) {
             FormModel entrantSpecialityFM = ((DBTableModel) specTW.getWidgetModel()).getFormModel();
@@ -2956,10 +2882,8 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             specialityQM.addWhere("deleted", Boolean.FALSE);
             return true;
         } else if (source.equals(awardsTW)) {
-            FormModel awardsFM = ((DBTableModel) awardsTW.getWidgetModel()).getFormModel();
             return true;
         } else if (source.equals(socialCategoriesTW)) {
-            FormModel socialCategoryFM = ((DBTableModel) socialCategoriesTW.getWidgetModel()).getFormModel();
             return true;
         }
         return false;
@@ -2985,8 +2909,6 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
 
     @Override
     public void initView(boolean readOnly) throws Exception {
-        super.initView(readOnly);
-        readOnly = dataAFW.getWidgetModel().isReadOnly();
     }
 
     @Override
@@ -2996,12 +2918,6 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
                 return false;
             }
-
-			/*int count = specTW.getEntityCount();
-            if (count < 4) {
-				Message.showInfo(getUILocaleUtil().getMessage("need.to.select.4.universities"));
-				return false;
-			}*/
 
             FormModel educationFM = ((DBTableModel) documentsTW.getWidgetModel()).getFormModel();
             FKFieldModel schoolCountryFieldModel = (FKFieldModel) educationFM.getFieldModel("schoolCountry");
@@ -3020,8 +2936,8 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             educationFM.getFieldModel("schoolCertificateType").setRequired(true);
             educationFM.getFieldModel("schoolRegion").setRequired(true);
             educationFM.getFieldModel("schoolAddress").setRequired(true);
-            educationFM.getFieldModel("entryYear").getValidators().add(new IntegerRangeValidator("�� ��������� ������� ����", 0, 2016));
-            educationFM.getFieldModel("endYear").getValidators().add(new IntegerRangeValidator("�� ��������� ������� ����", 0, 2016));
+            educationFM.getFieldModel("entryYear").getValidators().add(new IntegerRangeValidator("Значение года не может быть больше текущего года", 0, currentYear));
+            educationFM.getFieldModel("endYear").getValidators().add(new IntegerRangeValidator("Значение года не может быть больше текущего года", 0, currentYear));
 
             FileListFieldModel educationFLFM = (FileListFieldModel) educationFM.getFieldModel("fileList");
             educationFLFM.permitMimeType(FileListFieldModel.JPEG);
@@ -3036,20 +2952,12 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 return false;
             }
 
-			/*int count = specTW.getEntityCount();
-            if (count < 4) {
-				Message.showInfo(getUILocaleUtil().getMessage("need.to.select.4.universities"));
-				return false;
-			}*/
-
-            FormModel languageFM = ((DBTableModel) languagesTW.getWidgetModel()).getFormModel();
             return true;
         } else if (source.equals(untRatesTW)) {
             try {
                 certificateGFW.post();
             } catch (Exception e) {
-                // TODO Auto-generated catch block
-                LOG.error("Failed to post: ", e);
+                LOG.error("Failed to post: ", e);// TODO catch
             }
 
             if (certificateGFW.getWidgetModel().isCreateNew()) {
@@ -3057,25 +2965,12 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 return false;
             }
 
-			/*int count = specTW.getEntityCount();
-            if (count < 4) {
-				Message.showInfo(getUILocaleUtil().getMessage("need.to.select.4.universities"));
-				return false;
-			}*/
-
-            FormModel untRatesFM = ((DBTableModel) untRatesTW.getWidgetModel()).getFormModel();
             return true;
         } else if (source.equals(medicalCheckupTW)) {
             if (dataAFW.getWidgetModel().isCreateNew()) {
                 Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
                 return false;
             }
-
-			/*int count = specTW.getEntityCount();
-            if (count < 4) {
-				Message.showInfo(getUILocaleUtil().getMessage("need.to.select.4.universities"));
-				return false;
-			}*/
 
             FormModel medicalCheckupFM = ((DBTableModel) medicalCheckupTW.getWidgetModel()).getFormModel();
 
@@ -3110,6 +3005,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
             try {
                 specialityQM.addWhere("level", ECriteria.EQUAL, ((STUDENT) dataAFW.getWidgetModel().getEntity()).getLevel().getId());
             } catch (Exception ex) {
+                ex.printStackTrace();//TODO catch
             }
 
             return true;
@@ -3119,26 +3015,12 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
                 return false;
             }
 
-			/*int count = specTW.getEntityCount();
-            if (count < 4) {
-				Message.showInfo(getUILocaleUtil().getMessage("need.to.select.4.universities"));
-				return false;
-			}*/
-
-            FormModel awardsFM = ((DBTableModel) awardsTW.getWidgetModel()).getFormModel();
-
             return true;
         } else if (source.equals(socialCategoriesTW)) {
             if (dataAFW.getWidgetModel().isCreateNew()) {
                 Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
                 return false;
             }
-            /*int count = specTW.getEntityCount();
-            if (count < 4) {
-				Message.showInfo(getUILocaleUtil().getMessage("need.to.select.4.universities"));
-				return false;
-			}*/
-            FormModel socialCategoryFM = ((DBTableModel) socialCategoriesTW.getWidgetModel()).getFormModel();
             return true;
         }
 
@@ -3388,4 +3270,14 @@ public final class ApplicantsForm extends AbstractFormWidgetView {
     public void setStudent(STUDENT student) {
         this.student = student;
     }
+
+    @Override
+    public void handlePhotoWidgetEvent(PhotoWidgetEvent photoWidgetEvent) {
+        if (photoWidgetEvent.getEvent() == PhotoWidgetEvent.CHANGED) {
+            userPhotoBytes = photoWidgetEvent.getBytes();
+            userPhotoFilename = photoWidgetEvent.getFilename();
+            userPhotoChanged = true;
+        }
+    }
+
 }

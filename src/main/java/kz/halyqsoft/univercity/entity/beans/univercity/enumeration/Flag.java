@@ -21,5 +21,7 @@ public enum Flag {
     GRANT_DOC,
     MOTHER,
     FATHER,
-    CONTRACT;
+    CONTRACT,
+    SPECIALITY
+    ;
 }

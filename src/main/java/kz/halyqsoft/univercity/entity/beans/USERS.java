@@ -124,6 +124,15 @@ public class USERS extends AbstractUser implements CommonTree<USERS> {
     @Column(name = "USER_TYPE_ID", insertable = false, updatable = false)
     private int typeIndex;
 
+    @FieldInfo(type = EFieldType.DATETIME, order = 25, required = false, readOnlyFixed = true, inGrid = false,
+            inEdit = false, inView = false)
+    @Column(name = "UPDATED")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updated;
+
+    @Column(name = "UPDATED_BY")
+    private String updatedBy;
+
     public USERS() {
     }
 
@@ -378,5 +387,21 @@ public class USERS extends AbstractUser implements CommonTree<USERS> {
     @Override
     public void setLogin(String login) {
         this.login = login;
+    }
+
+    public Date getUpdated() {
+        return updated;
+    }
+
+    public void setUpdated(Date updated) {
+        this.updated = updated;
+    }
+
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
     }
 }

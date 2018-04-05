@@ -120,10 +120,6 @@ public class AddressesTab extends VerticalLayout {
         cityRegQM.addWhere("parent", ECriteria.EQUAL, ID.valueOf(-1));
         cityRegQM.addOrder("countryName");
 
-        FKFieldModel districtRegFM = (FKFieldModel) addressRegFM.getFieldModel("district");
-        QueryModel districtRegQM = districtRegFM.getQueryModel();
-        districtRegQM.addWhere("id", ECriteria.EQUAL, ID.valueOf(-1));
-
         FKFieldModel villageRegFM = (FKFieldModel) addressRegFM.getFieldModel("village");
         QueryModel villageRegQM = villageRegFM.getQueryModel();
         villageRegQM.addWhere("parent", ECriteria.EQUAL, ID.valueOf(-1));
@@ -191,10 +187,6 @@ public class AddressesTab extends VerticalLayout {
         QueryModel cityFactQM = cityFactFM.getQueryModel();
         cityFactQM.addWhere("parent", ECriteria.EQUAL, ID.valueOf(-1));
         cityFactQM.addOrder("countryName");
-
-        FKFieldModel districtFactFM = (FKFieldModel) addressFactFM.getFieldModel("district");
-        QueryModel districtFactQM = districtFactFM.getQueryModel();
-        districtFactQM.addWhere("id", ECriteria.EQUAL, ID.valueOf(-1));
 
         FKFieldModel villageFactFM = (FKFieldModel) addressFactFM.getFieldModel("village");
         QueryModel villageFactQM = villageFactFM.getQueryModel();

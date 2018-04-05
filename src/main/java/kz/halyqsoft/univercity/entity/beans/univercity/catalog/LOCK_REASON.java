@@ -4,8 +4,7 @@ import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
+import javax.persistence.*;
 
 /**
  * @author Omarbek
@@ -19,10 +18,13 @@ public class LOCK_REASON extends AbstractEntity {
 	@FieldInfo(type = EFieldType.TEXT, max = 32, order = 1)
 	@Column(name = "REASON", nullable = false)
 	private String reason;
-	
-	@Column(name = "LOCK_TYPE", nullable = false)
-	private Integer lockType;
-	
+
+	@FieldInfo(type = EFieldType.FK_COMBO, order = 2)
+	@ManyToOne
+	@JoinColumns({
+			@JoinColumn(name = "USER_TYPE_ID", referencedColumnName = "ID")})
+	private USER_TYPE userType;
+
 	public LOCK_REASON() {
 	}
 
@@ -34,12 +36,12 @@ public class LOCK_REASON extends AbstractEntity {
 		this.reason = reason;
 	}
 
-	public Integer getLockType() {
-		return lockType;
+	public USER_TYPE getUserType() {
+		return userType;
 	}
 
-	public void setLockType(Integer lockType) {
-		this.lockType = lockType;
+	public void setUserType(USER_TYPE userType) {
+		this.userType = userType;
 	}
 
 	@Override
