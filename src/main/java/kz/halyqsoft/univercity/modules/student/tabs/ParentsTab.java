@@ -222,7 +222,7 @@ public class ParentsTab extends VerticalLayout {
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(studentRelative);
                     studentEditHelper.showSavedNotification();
                 } catch (Exception ex) {
-                    ErrorUtils.LOG.error("Unable to create a fathers data: ", ex);
+                    ErrorUtils.LOG.error("Unable to createCertificate a fathers data: ", ex);
                 }
             } else {
                 try {

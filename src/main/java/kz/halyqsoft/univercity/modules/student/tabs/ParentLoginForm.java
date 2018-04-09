@@ -12,8 +12,6 @@ import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.utility.PasswordGenerator;
-import org.r3a.common.vaadin.AbstractWebUI;
-import org.r3a.common.vaadin.locale.UILocaleUtil;
 import org.r3a.common.vaadin.widget.dialog.Message;
 
 import java.util.List;
@@ -31,10 +29,10 @@ public class ParentLoginForm extends FormLayout {
 
     public ParentLoginForm(STUDENT student) {
         this.student = student;
-        setCaption(getUILocaleUtil().getCaption("student.parent.login"));
+        setCaption(ErrorUtils.getUILocaleUtil().getCaption("student.parent.login"));
 
         loginTF = new TextField();
-        loginTF.setCaption(getUILocaleUtil().getCaption("username"));
+        loginTF.setCaption(ErrorUtils.getUILocaleUtil().getCaption("username"));
         loginTF.setImmediate(true);
         loginTF.setEnabled(false);
         loginTF.setNullSettingAllowed(true);
@@ -43,7 +41,7 @@ public class ParentLoginForm extends FormLayout {
         loginTF.setValue(student.getParentLogin());
 
         passwdTF = new TextField();
-        passwdTF.setCaption(getUILocaleUtil().getCaption("password"));
+        passwdTF.setCaption(ErrorUtils.getUILocaleUtil().getCaption("password"));
         passwdTF.setImmediate(true);
         passwdTF.setNullSettingAllowed(true);
         passwdTF.setNullRepresentation("");
@@ -54,7 +52,7 @@ public class ParentLoginForm extends FormLayout {
         addComponent(passwdTF);
 
         Button generate = new Button();
-        generate.setCaption(getUILocaleUtil().getCaption("generate.login.and.passwd"));
+        generate.setCaption(ErrorUtils.getUILocaleUtil().getCaption("generate.login.and.passwd"));
         generate.addClickListener(new ClickListener() {
 
             @Override
@@ -104,9 +102,5 @@ public class ParentLoginForm extends FormLayout {
     public void cancel() {
         loginTF.setValue(student.getParentLogin());
         passwdTF.setValue(student.getParentPasswd());
-    }
-
-    private static UILocaleUtil getUILocaleUtil() {
-        return AbstractWebUI.getInstance().getUILocaleUtil();
     }
 }

@@ -285,7 +285,7 @@ public class AddressesTab extends VerticalLayout {
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(userAddress);
                     studentEditHelper.showSavedNotification();
                 } catch (Exception ex) {
-                    ErrorUtils.LOG.error("Unable to create a registration address: ", ex);
+                    ErrorUtils.LOG.error("Unable to createCertificate a registration address: ", ex);
                 }
             } else {
                 try {
@@ -376,7 +376,7 @@ public class AddressesTab extends VerticalLayout {
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(userAddress);
                     studentEditHelper.showSavedNotification();
                 } catch (Exception ex) {
-                    ErrorUtils.LOG.error("Unable to create a residential address: ", ex);
+                    ErrorUtils.LOG.error("Unable to createCertificate a residential address: ", ex);
                 }
             } else {
                 try {

@@ -392,7 +392,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
             try {
                 sb.append(baseDataFW.getWidgetModel().getEntity().toString());
             } catch (Exception ex) {
-                LOG.error("Unable to create view title: ", ex);
+                LOG.error("Unable to createCertificate view title: ", ex);
             }
 
             return sb.toString();
@@ -1265,7 +1265,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 baseDataFW.refresh();
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to create a entrant: ", ex);
+                LOG.error("Unable to createCertificate a entrant: ", ex);
             }
         } else {
 			s.setUpdated(new Date());
@@ -1355,7 +1355,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(p);
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to create a passport: ", ex);
+                LOG.error("Unable to createCertificate a passport: ", ex);
             }
         } else {
             try {
@@ -1408,7 +1408,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(md);
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to create a military doc: ", ex);
+                LOG.error("Unable to createCertificate a military doc: ", ex);
             }
         } else {
             try {
@@ -1461,7 +1461,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(dd);
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to create a disability doc: ", ex);
+                LOG.error("Unable to createCertificate a disability doc: ", ex);
             }
         } else {
             try {
@@ -1514,7 +1514,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(rd);
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to create a repatriate doc: ", ex);
+                LOG.error("Unable to createCertificate a repatriate doc: ", ex);
             }
         } else {
             try {
@@ -1568,7 +1568,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 educationTW.refresh();
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to create a education doc: ", ex);
+                LOG.error("Unable to createCertificate a education doc: ", ex);
             }
         } else {
             try {
@@ -1625,7 +1625,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 languageTW.refresh();
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to create a language: ", ex);
+                LOG.error("Unable to createCertificate a language: ", ex);
             }
         } else {
             try {
@@ -1657,7 +1657,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(pr);
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to create a preemptive right: ", ex);
+                LOG.error("Unable to createCertificate a preemptive right: ", ex);
             }
         } else {
             try {
@@ -1710,7 +1710,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(gd);
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to create a grant doc: ", ex);
+                LOG.error("Unable to createCertificate a grant doc: ", ex);
             }
         } else {
             try {
@@ -1774,7 +1774,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 medicalCheckupTW.refresh();
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to create a medical checkup: ", ex);
+                LOG.error("Unable to createCertificate a medical checkup: ", ex);
             }
         } else {
             try {

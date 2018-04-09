@@ -970,7 +970,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
             vl.addComponent(toolbarHL);
             vl.setComponentAlignment(toolbarHL, Alignment.MIDDLE_CENTER);
         } catch (Exception ex) {
-            ErrorUtils.LOG.error("Unable to create order widget list: ", ex);
+            ErrorUtils.LOG.error("Unable to createCertificate order widget list: ", ex);
             Message.showError(ex.toString());
         }
 

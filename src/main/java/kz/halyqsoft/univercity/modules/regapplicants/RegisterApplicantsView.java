@@ -28,7 +28,7 @@ import java.util.Calendar;
  * @author Omarbek
  * @created on 13.03.2018
  */
-public class RegisterApplicantsView extends AbstractTaskView implements EntityListener {
+public class RegisterApplicantsView extends AbstractTaskView  {
 
     static Button regButton;
     private VerticalLayout registerVL;
@@ -121,8 +121,8 @@ public class RegisterApplicantsView extends AbstractTaskView implements EntityLi
 
             registerVL.addComponent(new ApplicantsForm(studentFM, ey));
         } catch (Exception ex) {
-            ErrorUtils.LOG.error("Unable to create new Applicant: ", ex);
-            Message.showError("Unable to create new Applicant");
+            ErrorUtils.LOG.error("Unable to createCertificate new Applicant: ", ex);
+            Message.showError("Unable to createCertificate new Applicant");
         }
     }
 }

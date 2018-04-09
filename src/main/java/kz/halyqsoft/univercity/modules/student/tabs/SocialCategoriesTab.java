@@ -83,7 +83,7 @@ public class SocialCategoriesTab extends VerticalLayout {
                     socialCategoriesTW.refresh();
                     studentEditHelper.showSavedNotification();
                 } catch (Exception ex) {
-                    ErrorUtils.LOG.error("Unable to create a social category: ", ex);
+                    ErrorUtils.LOG.error("Unable to createCertificate a social category: ", ex);
                 }
             } else {
                 try {

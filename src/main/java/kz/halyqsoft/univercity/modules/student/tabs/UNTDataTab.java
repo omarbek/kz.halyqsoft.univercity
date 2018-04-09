@@ -230,14 +230,14 @@ public class UNTDataTab extends VerticalLayout {
                     untCertificateFW.refresh();
                     studentEditHelper.showSavedNotification();
                 } catch (Exception ex) {
-                    ErrorUtils.LOG.error("Unable to create a UNT certificate: ", ex);
+                    ErrorUtils.LOG.error("Unable to createCertificate a Unt certificate: ", ex);
                 }
             } else {
                 try {
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(untCertificate);
                     studentEditHelper.showSavedNotification();
                 } catch (Exception ex) {
-                    ErrorUtils.LOG.error("Unable to merge a UNT certificate: ", ex);
+                    ErrorUtils.LOG.error("Unable to merge a Unt certificate: ", ex);
                 }
             }
 
@@ -251,7 +251,7 @@ public class UNTDataTab extends VerticalLayout {
                     try {
                         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(userDocumentFile);
                     } catch (Exception ex) {
-                        ErrorUtils.LOG.error("Unable to save UNT certificate copy: ", ex);
+                        ErrorUtils.LOG.error("Unable to save Unt certificate copy: ", ex);
                     }
                 }
             }
@@ -262,7 +262,7 @@ public class UNTDataTab extends VerticalLayout {
                     udf.setDeleted(true);
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(udf);
                 } catch (Exception ex) {
-                    ErrorUtils.LOG.error("Unable to delete UNT certificate copy: ", ex);
+                    ErrorUtils.LOG.error("Unable to delete Unt certificate copy: ", ex);
                 }
             }
 
@@ -378,7 +378,7 @@ public class UNTDataTab extends VerticalLayout {
                     untRatesTW.refresh();
                     studentEditHelper.showSavedNotification();
                 } catch (Exception ex) {
-                    ErrorUtils.LOG.error("Unable to create a UNT rate: ", ex);
+                    ErrorUtils.LOG.error("Unable to createCertificate a Unt rate: ", ex);
                 }
             } else {
                 try {
@@ -389,7 +389,7 @@ public class UNTDataTab extends VerticalLayout {
                     untRatesTW.refresh();
                     studentEditHelper.showSavedNotification();
                 } catch (Exception ex) {
-                    ErrorUtils.LOG.error("Unable to merge a UNT rate: ", ex);
+                    ErrorUtils.LOG.error("Unable to merge a Unt rate: ", ex);
                 }
             }
             return false;
@@ -402,7 +402,7 @@ public class UNTDataTab extends VerticalLayout {
                 try {
                     delList.add(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(UNT_CERT_SUBJECT.class, entity.getId()));
                 } catch (Exception ex) {
-                    ErrorUtils.LOG.error("Unable to delete user UNT rates: ", ex);
+                    ErrorUtils.LOG.error("Unable to delete user Unt rates: ", ex);
                 }
             }
 
@@ -410,7 +410,7 @@ public class UNTDataTab extends VerticalLayout {
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(delList);
                 untRatesTW.refresh();
             } catch (Exception ex) {
-                ErrorUtils.LOG.error("Unable to delete user UNT rates: ", ex);
+                ErrorUtils.LOG.error("Unable to delete user Unt rates: ", ex);
                 Message.showError(studentEditHelper.getUiLocaleUtil().getMessage("error.cannotdelentity"));
             }
 

@@ -118,7 +118,7 @@ public class AwardsTab extends VerticalLayout {
                     awardsTW.refresh();
                     studentEditHelper.showSavedNotification();
                 } catch (Exception ex) {
-                    ErrorUtils.LOG.error("Unable to create an award: ", ex);
+                    ErrorUtils.LOG.error("Unable to createCertificate an award: ", ex);
                 }
             } else {
                 try {
