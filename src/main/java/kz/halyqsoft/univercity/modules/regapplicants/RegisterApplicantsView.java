@@ -1,34 +1,29 @@
 package kz.halyqsoft.univercity.modules.regapplicants;
 
-import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.LEVEL;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDENT_CATEGORY;
-import kz.halyqsoft.univercity.utils.ErrorUtils;
+import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.ID;
 import org.r3a.common.entity.beans.AbstractTask;
-import org.r3a.common.entity.event.EntityListener;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.view.AbstractTaskView;
-import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.form.FormModel;
 import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 
-import java.io.IOException;
 import java.util.Calendar;
 
 /**
  * @author Omarbek
  * @created on 13.03.2018
  */
-public class RegisterApplicantsView extends AbstractTaskView  {
+public class RegisterApplicantsView extends AbstractTaskView {
 
     static Button regButton;
     private VerticalLayout registerVL;
@@ -121,8 +116,7 @@ public class RegisterApplicantsView extends AbstractTaskView  {
 
             registerVL.addComponent(new ApplicantsForm(studentFM, ey));
         } catch (Exception ex) {
-            ErrorUtils.LOG.error("Unable to createCertificate new Applicant: ", ex);
-            Message.showError("Unable to createCertificate new Applicant");
+            CommonUtils.showMessageAndWriteLog("Unable to create new Applicant", ex);
         }
     }
 }

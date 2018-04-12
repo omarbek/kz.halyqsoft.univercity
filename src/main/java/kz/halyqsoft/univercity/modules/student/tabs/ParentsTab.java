@@ -9,7 +9,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.catalog.COUNTRY;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.RELATIVE_TYPE;
 import kz.halyqsoft.univercity.modules.student.StudentEdit;
 import kz.halyqsoft.univercity.utils.AddressUtils;
-import kz.halyqsoft.univercity.utils.ErrorUtils;
+import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.changelisteners.CityChangeListener;
 import kz.halyqsoft.univercity.utils.changelisteners.CountryChangeListener;
 import kz.halyqsoft.univercity.utils.changelisteners.RegionChangeListener;
@@ -83,8 +83,7 @@ public class ParentsTab extends VerticalLayout {
                         parentLoginForm.save();
                         ParentsTab.this.studentEditHelper.showSavedNotification();
                     } catch (Exception ex) {
-                        ErrorUtils.LOG.error("Unable to save student parent login: ", ex);
-                        Message.showError(ex.toString());
+                        CommonUtils.showMessageAndWriteLog("Unable to save student parent login", ex);
                     }
                 }
             });
@@ -222,14 +221,14 @@ public class ParentsTab extends VerticalLayout {
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(studentRelative);
                     studentEditHelper.showSavedNotification();
                 } catch (Exception ex) {
-                    ErrorUtils.LOG.error("Unable to createCertificate a fathers data: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to create a fathers data", ex);
                 }
             } else {
                 try {
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(studentRelative);
                     studentEditHelper.showSavedNotification();
                 } catch (Exception ex) {
-                    ErrorUtils.LOG.error("Unable to merge a fathers address: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to merge a fathers address", ex);
                 }
             }
 

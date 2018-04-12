@@ -7,11 +7,11 @@ import com.vaadin.ui.VerticalLayout;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_ADDRESS;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ADDRESS_TYPE;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.COUNTRY;
+import kz.halyqsoft.univercity.modules.student.StudentEdit;
+import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.changelisteners.CityChangeListener;
 import kz.halyqsoft.univercity.utils.changelisteners.CountryChangeListener;
 import kz.halyqsoft.univercity.utils.changelisteners.RegionChangeListener;
-import kz.halyqsoft.univercity.modules.student.StudentEdit;
-import kz.halyqsoft.univercity.utils.ErrorUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
@@ -285,14 +285,14 @@ public class AddressesTab extends VerticalLayout {
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(userAddress);
                     studentEditHelper.showSavedNotification();
                 } catch (Exception ex) {
-                    ErrorUtils.LOG.error("Unable to createCertificate a registration address: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to create a registration address", ex);
                 }
             } else {
                 try {
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(userAddress);
                     studentEditHelper.showSavedNotification();
                 } catch (Exception ex) {
-                    ErrorUtils.LOG.error("Unable to merge a registration address: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to merge a registration address", ex);
                 }
             }
 
@@ -376,14 +376,14 @@ public class AddressesTab extends VerticalLayout {
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(userAddress);
                     studentEditHelper.showSavedNotification();
                 } catch (Exception ex) {
-                    ErrorUtils.LOG.error("Unable to createCertificate a residential address: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to create a residential address", ex);
                 }
             } else {
                 try {
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(userAddress);
                     studentEditHelper.showSavedNotification();
                 } catch (Exception ex) {
-                    ErrorUtils.LOG.error("Unable to merge a residential address: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to merge a residential address", ex);
                 }
             }
 

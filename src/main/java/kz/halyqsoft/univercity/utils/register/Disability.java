@@ -1,12 +1,10 @@
 package kz.halyqsoft.univercity.utils.register;
 
+import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.DISABILITY_DOC;
-import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_DOCUMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_DOCUMENT_FILE;
-import kz.halyqsoft.univercity.modules.regapplicants.ApplicantsForm;
 import kz.halyqsoft.univercity.utils.CommonUtils;
-import kz.halyqsoft.univercity.utils.ErrorUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.facade.CommonIDFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -18,6 +16,7 @@ import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.form.AbstractFormWidget;
+import org.r3a.common.vaadin.widget.form.AbstractFormWidgetView;
 import org.r3a.common.vaadin.widget.form.FormModel;
 import org.r3a.common.vaadin.widget.form.GridFormWidget;
 import org.r3a.common.vaadin.widget.form.field.filelist.FileListFieldModel;
@@ -32,14 +31,14 @@ public class Disability {
 
     private GridFormWidget mainGFW;
     private AbstractFormWidget dataAFW;
-    private ApplicantsForm applicantsForm;
+    private AbstractFormWidgetView applicantsForm;
     private FormModel mainFM;
 
     public GridFormWidget getMainGFW() {
         return mainGFW;
     }
 
-    public Disability(AbstractFormWidget dataAFW, ApplicantsForm applicantsForm) {
+    public Disability(AbstractFormWidget dataAFW, AbstractFormWidgetView applicantsForm) {
         this.dataAFW = dataAFW;
         this.applicantsForm = applicantsForm;
     }
@@ -47,9 +46,9 @@ public class Disability {
     public void create(QueryModel<USER_DOCUMENT_FILE> udfQM) throws Exception {
         StringBuilder sb;
         sb = new StringBuilder();
-        sb.append(ErrorUtils.getUILocaleUtil().getCaption("title.error"));
+        sb.append(CommonUtils.getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
-        sb.append(ErrorUtils.getUILocaleUtil().getCaption("disability.document"));
+        sb.append(CommonUtils.getUILocaleUtil().getCaption("disability.document"));
         mainGFW = new GridFormWidget(DISABILITY_DOC.class);
         mainGFW.addEntityListener(applicantsForm);
         mainFM = mainGFW.getWidgetModel();
@@ -81,7 +80,7 @@ public class Disability {
 
     public boolean preSave(Entity e, boolean isNew) {
         if (dataAFW.getWidgetModel().isCreateNew()) {
-            Message.showInfo(ErrorUtils.getUILocaleUtil().getMessage("info.save.base.data.first"));
+            Message.showInfo(CommonUtils.getUILocaleUtil().getMessage("info.save.base.data.first"));
             return false;
         }
         DISABILITY_DOC dd = (DISABILITY_DOC) e;
@@ -89,18 +88,18 @@ public class Disability {
         if (isNew) {
             try {
                 dd.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USER_DOCUMENT"));
-                dd.setUser((STUDENT) fm.getEntity());
+                dd.setUser((USERS) fm.getEntity());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(dd);
-                ErrorUtils.showSavedNotification();
+                CommonUtils.showSavedNotification();
             } catch (Exception ex) {
-                ErrorUtils.LOG.error("Unable to createCertificate a disability doc: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to create a disability doc", ex);
             }
         } else {
             try {
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(dd);
-                ErrorUtils.showSavedNotification();
+                CommonUtils.showSavedNotification();
             } catch (Exception ex) {
-                ErrorUtils.LOG.error("Unable to merge a disability doc: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to merge a disability doc", ex);
             }
         }
 
@@ -114,7 +113,7 @@ public class Disability {
                 try {
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(udf);
                 } catch (Exception ex) {
-                    ErrorUtils.LOG.error("Unable to save disability doc copy: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to save disability doc copy", ex);
                 }
             }
         }
@@ -125,7 +124,7 @@ public class Disability {
                 udf.setDeleted(true);
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(udf);
             } catch (Exception ex) {
-                ErrorUtils.LOG.error("Unable to delete disability doc copy: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to delete disability doc copy", ex);
             }
         }
 

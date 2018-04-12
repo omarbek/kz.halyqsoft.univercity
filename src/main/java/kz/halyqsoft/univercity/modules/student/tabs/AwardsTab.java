@@ -5,7 +5,7 @@ import com.vaadin.ui.VerticalLayout;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_AWARD;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_USER_AWARD;
 import kz.halyqsoft.univercity.modules.student.StudentEdit;
-import kz.halyqsoft.univercity.utils.ErrorUtils;
+import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
@@ -118,7 +118,7 @@ public class AwardsTab extends VerticalLayout {
                     awardsTW.refresh();
                     studentEditHelper.showSavedNotification();
                 } catch (Exception ex) {
-                    ErrorUtils.LOG.error("Unable to createCertificate an award: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to create an award: ", ex);
                 }
             } else {
                 try {
@@ -128,7 +128,7 @@ public class AwardsTab extends VerticalLayout {
                     awardsTW.refresh();
                     studentEditHelper.showSavedNotification();
                 } catch (Exception ex) {
-                    ErrorUtils.LOG.error("Unable to merge an award: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to merge an award: ", ex);
                 }
             }
 
@@ -142,7 +142,7 @@ public class AwardsTab extends VerticalLayout {
                 try {
                     delList.add(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(USER_AWARD.class, e.getId()));
                 } catch (Exception ex) {
-                    ErrorUtils.LOG.error("Unable to delete user awards: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to delete user awards", ex);
                 }
             }
 
@@ -150,7 +150,7 @@ public class AwardsTab extends VerticalLayout {
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(delList);
                 awardsTW.refresh();
             } catch (Exception ex) {
-                ErrorUtils.LOG.error("Unable to delete user awards: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to delete user awards", ex);
                 Message.showError(studentEditHelper.getUiLocaleUtil().getMessage("error.cannotdelentity"));
             }
 

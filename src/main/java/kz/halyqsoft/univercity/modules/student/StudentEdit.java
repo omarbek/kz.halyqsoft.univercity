@@ -30,7 +30,6 @@ import org.r3a.common.entity.query.from.EJoin;
 import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.select.EAggregate;
 import org.r3a.common.entity.query.where.ECriteria;
-import org.r3a.common.vaadin.AbstractSecureWebUI;
 import org.r3a.common.vaadin.locale.UILocaleUtil;
 import org.r3a.common.vaadin.view.AbstractCommonView;
 import org.r3a.common.vaadin.widget.DBSelectModel;
@@ -163,8 +162,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
             cgsd.getFilterModel().addFilter("fio", fioTF);
             cgsd.initFilter();
         } catch (Exception ex) {
-            LOG.error("Unable to initialize custom grid dialog: ", ex);
-            Message.showError(ex.toString());
+            CommonUtils.showMessageAndWriteLog("Unable to initialize custom grid dialog", ex);
         }
 
         baseDataFW = new CommonFormWidget(baseDataFM);
@@ -188,7 +186,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                     userPhotoFilename = userPhoto.getFileName();
                 }
             } catch (Exception ex) {
-                LOG.error("Unable to load user photo: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to load user photo", ex);
             }
         }
 
@@ -280,8 +278,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
             rightContent.addComponent(educationFL);
             rightContent.setComponentAlignment(educationFL, Alignment.MIDDLE_CENTER);
         } catch (Exception ex) {
-            LOG.error("Unable to load education info: ", ex);
-            Message.showError(ex.toString());
+            CommonUtils.showMessageAndWriteLog("Unable to load education info", ex);
         }
 
         hl.addComponent(rightContent);
@@ -317,8 +314,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                                             merge(userPhoto);
                                 }
                             } catch (Exception e) {
-                                LOG.error("Unable to load user photo: ", e);
-                                Message.showError(e.toString());
+                                CommonUtils.showMessageAndWriteLog("Unable to load user photo", e);
                             }
                         }
                         showSavedNotification();
@@ -392,7 +388,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
             try {
                 sb.append(baseDataFW.getWidgetModel().getEntity().toString());
             } catch (Exception ex) {
-                LOG.error("Unable to createCertificate view title: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to create view title", ex);
             }
 
             return sb.toString();
@@ -1092,7 +1088,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                     }
                 }
             } catch (Exception ex) {
-                LOG.error("Unable to load education document copies: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to load education document copies", ex);
             }
 
             return true;
@@ -1120,7 +1116,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                     }
                 }
             } catch (Exception ex) {
-                LOG.error("Unable to load education document copies: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to load education document copies", ex);
             }
 
             return true;
@@ -1171,7 +1167,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                     }
                 }
             } catch (Exception ex) {
-                LOG.error("Unable to load education document copies: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to load education document copies", ex);
             }
 
             return true;
@@ -1199,7 +1195,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                     }
                 }
             } catch (Exception ex) {
-                LOG.error("Unable to load education document copies: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to load education document copies", ex);
             }
 
             return true;
@@ -1265,10 +1261,10 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 baseDataFW.refresh();
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to createCertificate a entrant: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to create a entrant", ex);
             }
         } else {
-			s.setUpdated(new Date());
+            s.setUpdated(new Date());
             s.setUpdatedBy(CommonUtils.getCurrentUserLogin());
             s.setFirstName(s.getFirstName().trim());
             s.setLastName(s.getLastName().trim());
@@ -1334,7 +1330,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 }
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to merge a entrant: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to merge a entrant", ex);
             }
         }
 
@@ -1355,14 +1351,14 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(p);
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to createCertificate a passport: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to create a passport", ex);
             }
         } else {
             try {
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(p);
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to merge a passport: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to merge a passport", ex);
             }
         }
 
@@ -1376,7 +1372,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 try {
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(udf);
                 } catch (Exception ex) {
-                    LOG.error("Unable to save passport copy: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to save passport copy", ex);
                 }
             }
         }
@@ -1387,7 +1383,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 udf.setDeleted(true);
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(udf);
             } catch (Exception ex) {
-                LOG.error("Unable to delete passport copy: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to delete passport copy", ex);
             }
         }
 
@@ -1408,14 +1404,14 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(md);
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to createCertificate a military doc: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to create a military doc", ex);
             }
         } else {
             try {
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(md);
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to merge a military doc: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to merge a military doc", ex);
             }
         }
 
@@ -1429,7 +1425,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 try {
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(udf);
                 } catch (Exception ex) {
-                    LOG.error("Unable to save military doc copy: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to save military doc copy", ex);
                 }
             }
         }
@@ -1440,7 +1436,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 udf.setDeleted(true);
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(udf);
             } catch (Exception ex) {
-                LOG.error("Unable to delete military doc copy: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to delete military doc copy", ex);
             }
         }
 
@@ -1461,14 +1457,14 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(dd);
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to createCertificate a disability doc: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to create a disability doc", ex);
             }
         } else {
             try {
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(dd);
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to merge a disability doc: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to merge a disability doc", ex);
             }
         }
 
@@ -1482,7 +1478,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 try {
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(udf);
                 } catch (Exception ex) {
-                    LOG.error("Unable to save disability doc copy: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to save disability doc copy", ex);
                 }
             }
         }
@@ -1493,7 +1489,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 udf.setDeleted(true);
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(udf);
             } catch (Exception ex) {
-                LOG.error("Unable to delete disability doc copy: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to delete disability doc copy", ex);
             }
         }
 
@@ -1514,14 +1510,14 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(rd);
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to createCertificate a repatriate doc: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to create a repatriate doc", ex);
             }
         } else {
             try {
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(rd);
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to merge a repatriate doc: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to merge a repatriate doc", ex);
             }
         }
 
@@ -1535,7 +1531,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 try {
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(udf);
                 } catch (Exception ex) {
-                    LOG.error("Unable to save repatriate doc copy: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to save repatriate doc copy", ex);
                 }
             }
         }
@@ -1546,7 +1542,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 udf.setDeleted(true);
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(udf);
             } catch (Exception ex) {
-                LOG.error("Unable to delete repatriate doc copy: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to delete repatriate doc copy", ex);
             }
         }
 
@@ -1568,7 +1564,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 educationTW.refresh();
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to createCertificate a education doc: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to create a education doc", ex);
             }
         } else {
             try {
@@ -1576,7 +1572,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 educationTW.refresh();
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to merge a education doc: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to merge a education doc", ex);
             }
         }
 
@@ -1590,7 +1586,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 try {
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(udf);
                 } catch (Exception ex) {
-                    LOG.error("Unable to save education doc copy: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to save education doc copy", ex);
                 }
             }
         }
@@ -1601,7 +1597,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 udf.setDeleted(true);
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(udf);
             } catch (Exception ex) {
-                LOG.error("Unable to delete repatriate doc copy: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to delete repatriate doc copy", ex);
             }
         }
 
@@ -1625,7 +1621,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 languageTW.refresh();
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to createCertificate a language: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to create a language", ex);
             }
         } else {
             try {
@@ -1636,7 +1632,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 languageTW.refresh();
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to merge a language: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to merge a language", ex);
             }
         }
 
@@ -1657,14 +1653,14 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(pr);
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to createCertificate a preemptive right: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to create a preemptive right", ex);
             }
         } else {
             try {
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(pr);
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to merge a preemptive right: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to merge a preemptive right", ex);
             }
         }
 
@@ -1678,7 +1674,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 try {
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(udf);
                 } catch (Exception ex) {
-                    LOG.error("Unable to save preemptive right copy: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to save preemptive right copy", ex);
                 }
             }
         }
@@ -1689,7 +1685,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 udf.setDeleted(true);
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(udf);
             } catch (Exception ex) {
-                LOG.error("Unable to delete preemptive right copy: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to delete preemptive right copy", ex);
             }
         }
 
@@ -1710,14 +1706,14 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(gd);
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to createCertificate a grant doc: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to create a grant doc", ex);
             }
         } else {
             try {
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(gd);
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to merge a grant doc: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to merge a grant doc", ex);
             }
         }
 
@@ -1731,7 +1727,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 try {
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(udf);
                 } catch (Exception ex) {
-                    LOG.error("Unable to save grant doc copy: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to save grant doc copy", ex);
                 }
             }
         }
@@ -1742,7 +1738,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 udf.setDeleted(true);
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(udf);
             } catch (Exception ex) {
-                LOG.error("Unable to delete grant doc copy: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to delete grant doc copy", ex);
             }
         }
 
@@ -1774,7 +1770,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 medicalCheckupTW.refresh();
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to createCertificate a medical checkup: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to create a medical checkup", ex);
             }
         } else {
             try {
@@ -1790,7 +1786,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 medicalCheckupTW.refresh();
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to merge a medical checkup: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to merge a medical checkup", ex);
             }
         }
 
@@ -1804,7 +1800,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 try {
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(udf);
                 } catch (Exception ex) {
-                    LOG.error("Unable to save medical checkup copy: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to save medical checkup copy", ex);
                 }
             }
         }
@@ -1815,7 +1811,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 udf.setDeleted(true);
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(udf);
             } catch (Exception ex) {
-                LOG.error("Unable to delete medical checkup copy: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to delete medical checkup copy", ex);
             }
         }
 
@@ -1833,7 +1829,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(entities);
                 educationTW.refresh();
             } catch (Exception ex) {
-                LOG.error("Unable to delete education docs: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to delete education docs", ex);
                 Message.showError(getUILocaleUtil().getMessage("error.cannotdelentity"));
             }
 
@@ -1844,7 +1840,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 try {
                     delList.add(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(USER_LANGUAGE.class, e.getId()));
                 } catch (Exception ex) {
-                    LOG.error("Unable to delete user languages: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to delete user languages", ex);
                 }
             }
 
@@ -1865,7 +1861,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                     mc.setDeleted(true);
                     delList.add(mc);
                 } catch (Exception ex) {
-                    LOG.error("Unable to delete medical checkup: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to delete medical checkup", ex);
                 }
             }
 
@@ -1949,7 +1945,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 lockUnlockButton.setCaption(getUILocaleUtil().getCaption("unlock"));
                 lockUnlockButton.setIcon(new ThemeResource("img/button/unlock.png"));
             } catch (Exception ex) {
-                LOG.error("Unable to lock the student: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to lock the student", ex);
                 Message.showError(ex.toString());
             }
         }
@@ -1984,7 +1980,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 lockUnlockButton.setCaption(getUILocaleUtil().getCaption("lock"));
                 lockUnlockButton.setIcon(new ThemeResource("img/button/lock.png"));
             } catch (Exception ex) {
-                LOG.error("Unable to unlock the student: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to unlock the student", ex);
                 Message.showError(ex.toString());
             }
         }

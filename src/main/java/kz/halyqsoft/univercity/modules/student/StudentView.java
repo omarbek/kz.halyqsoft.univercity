@@ -14,7 +14,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDY_YEAR;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VStudent;
 import kz.halyqsoft.univercity.filter.FStudentFilter;
 import kz.halyqsoft.univercity.filter.panel.StudentFilterPanel;
-import kz.halyqsoft.univercity.utils.ErrorUtils;
+import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.changelisteners.FacultyChangeListener;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -209,8 +209,7 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
 
                 return false;
             } catch (Exception ex) {
-                LOG.error("Unable to edit the student: ", ex);
-                Message.showError("Unable to edit the student");
+                CommonUtils.showMessageAndWriteLog("Unable to edit the student", ex);
             }
         }
 
@@ -234,8 +233,7 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
 
                 return false;
             } catch (Exception ex) {
-                LOG.error("Unable to preview the student: ", ex);
-                Message.showError("Unable to preview the student");
+                CommonUtils.showMessageAndWriteLog("Unable to preview the student", ex);
             }
         }
 
@@ -253,7 +251,7 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
                     s.setDeleted(true);
                     mergeList.add(s);
                 } catch (Exception ex) {
-                    LOG.error("Unable to delete the student: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to delete the student", ex);
                 }
             }
 
@@ -261,7 +259,7 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(mergeList);
                 studentGW.refresh();
             } catch (Exception ex) {
-                LOG.error("Unable to delete the students: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to delete the students", ex);
             }
             return false;
         }
@@ -386,8 +384,7 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
                     }
                 }
             } catch (Exception ex) {
-                ErrorUtils.LOG.error("Unable to load student list: ", ex);
-                Message.showError(ex.toString());
+                CommonUtils.showMessageAndWriteLog("Unable to load student list", ex);
             }
         } else {
             Message.showInfo(getUILocaleUtil().getMessage("select.1.search.condition"));
@@ -397,8 +394,7 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
         try {
             studentGW.refresh();
         } catch (Exception ex) {
-            ErrorUtils.LOG.error("Unable to refresh student grid: ", ex);
-            Message.showError(ex.toString());
+            CommonUtils.showMessageAndWriteLog("Unable to refresh student grid", ex);
         }
     }
 
@@ -408,8 +404,7 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
         try {
             studentGW.refresh();
         } catch (Exception ex) {
-            ErrorUtils.LOG.error("Unable to refresh student grid: ", ex);
-            Message.showError(ex.toString());
+            CommonUtils.showMessageAndWriteLog("Unable to refresh student grid", ex);
         }
     }
 

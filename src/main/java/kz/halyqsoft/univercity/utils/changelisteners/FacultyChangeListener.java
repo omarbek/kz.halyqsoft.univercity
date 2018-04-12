@@ -5,7 +5,7 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.ComboBox;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEPARTMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SPECIALITY;
-import kz.halyqsoft.univercity.utils.ErrorUtils;
+import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.ID;
@@ -50,8 +50,7 @@ public class FacultyChangeListener implements Property.ValueChangeListener {
         try {
             list = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(specialtyQM);
         } catch (Exception ex) {
-            ErrorUtils.LOG.error("Unable to load specialty list: ", ex);
-            Message.showError(ex.toString());
+            CommonUtils.showMessageAndWriteLog("Unable to load specialty list", ex);
         }
         BeanItemContainer<SPECIALITY> specialtyBIC = new BeanItemContainer<>(SPECIALITY.class, list);
         specialtyCB.setContainerDataSource(specialtyBIC);

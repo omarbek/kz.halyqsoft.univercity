@@ -1,6 +1,5 @@
 package kz.halyqsoft.univercity.utils;
 
-import com.vaadin.ui.Button;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_DOCUMENT_FILE;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -8,8 +7,14 @@ import org.r3a.common.entity.ID;
 import org.r3a.common.entity.file.FileBean;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.vaadin.AbstractSecureWebUI;
+import org.r3a.common.vaadin.AbstractWebUI;
+import org.r3a.common.vaadin.locale.UILocaleUtil;
+import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.form.field.filelist.FileListFieldModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -17,6 +22,9 @@ import java.util.List;
  * @created on 15.03.2018
  */
 public class CommonUtils {
+
+    public static final Logger LOG = LoggerFactory.getLogger("ROOT");
+    public static int currentYear = Calendar.getInstance().get(Calendar.YEAR);
 
     public static String getCurrentUserLogin() {
         return AbstractSecureWebUI.getInstance().getUsername();
@@ -70,7 +78,7 @@ public class CommonUtils {
                 }
             }
         } catch (Exception ex) {
-            ErrorUtils.LOG.error("Unable to load education document copies: ", ex);
+            LOG.error("Unable to load education document copies: ", ex);
         }
     }
 
@@ -81,9 +89,21 @@ public class CommonUtils {
                 udf.setDeleted(true);
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(udf);
             } catch (Exception ex) {
-                ErrorUtils.LOG.error("Unable to delete repatriate doc copy: ", ex);
+                LOG.error("Unable to delete repatriate doc copy: ", ex);
             }
         }
     }
 
+    public static UILocaleUtil getUILocaleUtil() {
+        return AbstractWebUI.getInstance().getUILocaleUtil();
+    }
+
+    public static void showSavedNotification() {
+        AbstractWebUI.getInstance().showNotificationInfo(getUILocaleUtil().getMessage("info.record.saved"));
+    }
+
+    public static void showMessageAndWriteLog(String message, Exception ex) {
+        LOG.error(message + ": ", ex);
+        Message.showError(ex.toString());
+    }
 }

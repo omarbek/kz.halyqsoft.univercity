@@ -5,7 +5,7 @@ import com.vaadin.ui.VerticalLayout;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_SOCIAL_CATEGORY;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_USER_SOCIAL_CATEGORY;
 import kz.halyqsoft.univercity.modules.student.StudentEdit;
-import kz.halyqsoft.univercity.utils.ErrorUtils;
+import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
@@ -83,7 +83,7 @@ public class SocialCategoriesTab extends VerticalLayout {
                     socialCategoriesTW.refresh();
                     studentEditHelper.showSavedNotification();
                 } catch (Exception ex) {
-                    ErrorUtils.LOG.error("Unable to createCertificate a social category: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to create a social category", ex);
                 }
             } else {
                 try {
@@ -93,7 +93,7 @@ public class SocialCategoriesTab extends VerticalLayout {
                     socialCategoriesTW.refresh();
                     studentEditHelper.showSavedNotification();
                 } catch (Exception ex) {
-                    ErrorUtils.LOG.error("Unable to merge a social category: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to merge a social category", ex);
                 }
             }
             return false;
@@ -106,7 +106,7 @@ public class SocialCategoriesTab extends VerticalLayout {
                 try {
                     delList.add(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(USER_SOCIAL_CATEGORY.class, e.getId()));
                 } catch (Exception ex) {
-                    ErrorUtils.LOG.error("Unable to delete user social categories: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to delete user social categories", ex);
                 }
             }
 
@@ -114,7 +114,7 @@ public class SocialCategoriesTab extends VerticalLayout {
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(delList);
                 socialCategoriesTW.refresh();
             } catch (Exception ex) {
-                ErrorUtils.LOG.error("Unable to delete user social categories: ", ex);
+                CommonUtils.LOG.error("Unable to delete user social categories: ", ex);
                 Message.showError(studentEditHelper.getUiLocaleUtil().getMessage("error.cannotdelentity"));
             }
 

@@ -1,12 +1,10 @@
 package kz.halyqsoft.univercity.utils.register;
 
+import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.REPATRIATE_DOC;
-import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_DOCUMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_DOCUMENT_FILE;
-import kz.halyqsoft.univercity.modules.regapplicants.ApplicantsForm;
 import kz.halyqsoft.univercity.utils.CommonUtils;
-import kz.halyqsoft.univercity.utils.ErrorUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.facade.CommonIDFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -18,6 +16,7 @@ import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.form.AbstractFormWidget;
+import org.r3a.common.vaadin.widget.form.AbstractFormWidgetView;
 import org.r3a.common.vaadin.widget.form.FormModel;
 import org.r3a.common.vaadin.widget.form.GridFormWidget;
 import org.r3a.common.vaadin.widget.form.field.filelist.FileListFieldModel;
@@ -32,14 +31,14 @@ public class Repatriate {
 
     private GridFormWidget mainGFW;
     private AbstractFormWidget dataAFW;
-    private ApplicantsForm applicantsForm;
+    private AbstractFormWidgetView applicantsForm;
     private FormModel mainFM;
 
     public GridFormWidget getMainGFW() {
         return mainGFW;
     }
 
-    public Repatriate(AbstractFormWidget dataAFW, ApplicantsForm applicantsForm) {
+    public Repatriate(AbstractFormWidget dataAFW, AbstractFormWidgetView applicantsForm) {
         this.dataAFW = dataAFW;
         this.applicantsForm = applicantsForm;
     }
@@ -47,9 +46,9 @@ public class Repatriate {
     public void create(QueryModel<USER_DOCUMENT_FILE> udfQM) throws Exception {
         StringBuilder sb;
         sb = new StringBuilder();
-        sb.append(ErrorUtils.getUILocaleUtil().getCaption("title.error"));
+        sb.append(CommonUtils.getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
-        sb.append(ErrorUtils.getUILocaleUtil().getCaption("repatriate.document"));
+        sb.append(CommonUtils.getUILocaleUtil().getCaption("repatriate.document"));
         mainGFW = new GridFormWidget(REPATRIATE_DOC.class);
         mainGFW.addEntityListener(applicantsForm);
         mainFM = mainGFW.getWidgetModel();
@@ -80,7 +79,7 @@ public class Repatriate {
 
     public boolean preSave(Entity e, boolean isNew) {
         if (dataAFW.getWidgetModel().isCreateNew()) {
-            Message.showInfo(ErrorUtils.getUILocaleUtil().getMessage("info.save.base.data.first"));
+            Message.showInfo(CommonUtils.getUILocaleUtil().getMessage("info.save.base.data.first"));
             return false;
         }
         REPATRIATE_DOC rd = (REPATRIATE_DOC) e;
@@ -88,18 +87,18 @@ public class Repatriate {
         if (isNew) {
             try {
                 rd.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USER_DOCUMENT"));
-                rd.setUser((STUDENT) fm.getEntity());
+                rd.setUser((USERS) fm.getEntity());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(rd);
-                ErrorUtils.showSavedNotification();
+                CommonUtils.showSavedNotification();
             } catch (Exception ex) {
-                ErrorUtils.LOG.error("Unable to createCertificate a repatriate doc: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to create a repatriate doc", ex);
             }
         } else {
             try {
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(rd);
-                ErrorUtils.showSavedNotification();
+                CommonUtils.showSavedNotification();
             } catch (Exception ex) {
-                ErrorUtils.LOG.error("Unable to merge a repatriate doc: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to merge a repatriate doc", ex);
             }
         }
 
@@ -113,7 +112,7 @@ public class Repatriate {
                 try {
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(udf);
                 } catch (Exception ex) {
-                    ErrorUtils.LOG.error("Unable to save repatriate doc copy: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to save repatriate doc copy", ex);
                 }
             }
         }

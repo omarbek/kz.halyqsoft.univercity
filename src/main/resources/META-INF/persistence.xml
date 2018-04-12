@@ -39,9 +39,9 @@
         <class>kz.halyqsoft.univercity.entity.beans.USER_ROLES</class>
         <class>kz.halyqsoft.univercity.entity.beans.USERS</class>
 
-        <!--<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.AbstractCategoryEntity</class>-->
-        <!--<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.AbstractStatusEntity</class>-->
-        <!--<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.AbstractTypeEntity</class>-->
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.AbstractCategoryEntity</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.AbstractStatusEntity</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.AbstractTypeEntity</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.ACADEMIC_CALENDAR_FACULTY</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.ACADEMIC_CALENDAR_ITEM</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.ACADEMIC_DEGREE</class>
@@ -151,7 +151,7 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_SCIENTIFIC_ACTIVITY</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_SCIENTIFIC_MANAGEMENT</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_EMPLOYEE</class>
-        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.VT_EMPLOYEE_DEPT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_EMPLOYEE_DEPT</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_ROOM</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_ROOM_EQUIPMENT</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_ROOM_SUBJECT</class>

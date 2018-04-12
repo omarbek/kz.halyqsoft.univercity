@@ -4,7 +4,7 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.HorizontalLayout;
 import kz.halyqsoft.univercity.entity.beans.univercity.GRADUATION_PROJECT;
 import kz.halyqsoft.univercity.modules.student.StudentEdit;
-import kz.halyqsoft.univercity.utils.ErrorUtils;
+import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
@@ -45,7 +45,7 @@ public class DiplomaTab extends HorizontalLayout {
                 diplomaFormModel.loadEntity(studentEditHelper.getStudent().getGraduationProject().getId());
             }
         } catch (Exception e) {
-            ErrorUtils.LOG.error("Ошибка дипломного проекта", e);
+            CommonUtils.showMessageAndWriteLog("Ошибка дипломного проекта", e);
         }
     }
 

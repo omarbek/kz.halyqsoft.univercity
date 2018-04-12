@@ -1,12 +1,10 @@
 package kz.halyqsoft.univercity.utils.register;
 
+import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.PREEMPTIVE_RIGHT;
-import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_DOCUMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_DOCUMENT_FILE;
-import kz.halyqsoft.univercity.modules.regapplicants.ApplicantsForm;
 import kz.halyqsoft.univercity.utils.CommonUtils;
-import kz.halyqsoft.univercity.utils.ErrorUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.facade.CommonIDFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -18,6 +16,7 @@ import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.form.AbstractFormWidget;
+import org.r3a.common.vaadin.widget.form.AbstractFormWidgetView;
 import org.r3a.common.vaadin.widget.form.FormModel;
 import org.r3a.common.vaadin.widget.form.GridFormWidget;
 import org.r3a.common.vaadin.widget.form.field.filelist.FileListFieldModel;
@@ -32,21 +31,21 @@ public class PreemptiveRight {
 
     private GridFormWidget mainGFW;
     private AbstractFormWidget dataAFW;
-    private ApplicantsForm applicantsForm;
+    private AbstractFormWidgetView applicantsForm;
     private FormModel mainFM;
 
     public GridFormWidget getMainGFW() {
         return mainGFW;
     }
 
-    public PreemptiveRight(AbstractFormWidget dataAFW, ApplicantsForm applicantsForm) {
+    public PreemptiveRight(AbstractFormWidget dataAFW, AbstractFormWidgetView applicantsForm) {
         this.dataAFW = dataAFW;
         this.applicantsForm = applicantsForm;
     }
 
     public void create(QueryModel<USER_DOCUMENT_FILE> udfQM) throws Exception {
-        String sb = ErrorUtils.getUILocaleUtil().getCaption("title.error") + ": "
-                + ErrorUtils.getUILocaleUtil().getCaption("preemptive.right");
+        String sb = CommonUtils.getUILocaleUtil().getCaption("title.error") + ": "
+                + CommonUtils.getUILocaleUtil().getCaption("preemptive.right");
         mainGFW = new GridFormWidget(PREEMPTIVE_RIGHT.class);
         mainGFW.addEntityListener(applicantsForm);
         mainFM = mainGFW.getWidgetModel();
@@ -79,7 +78,7 @@ public class PreemptiveRight {
 
     public boolean preSave(Entity e, boolean isNew) {
         if (dataAFW.getWidgetModel().isCreateNew()) {
-            Message.showInfo(ErrorUtils.getUILocaleUtil().getMessage("info.save.base.data.first"));
+            Message.showInfo(CommonUtils.getUILocaleUtil().getMessage("info.save.base.data.first"));
             return false;
         }
         PREEMPTIVE_RIGHT pr = (PREEMPTIVE_RIGHT) e;
@@ -87,18 +86,18 @@ public class PreemptiveRight {
         if (isNew) {
             try {
                 pr.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USER_DOCUMENT"));
-                pr.setUser((STUDENT) fm.getEntity());
+                pr.setUser((USERS) fm.getEntity());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(pr);
-                ErrorUtils.showSavedNotification();
+                CommonUtils.showSavedNotification();
             } catch (Exception ex) {
-                ErrorUtils.LOG.error("Unable to createCertificate a preemptive right: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to create a preemptive right", ex);
             }
         } else {
             try {
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(pr);
-                ErrorUtils.showSavedNotification();
+                CommonUtils.showSavedNotification();
             } catch (Exception ex) {
-                ErrorUtils.LOG.error("Unable to merge a preemptive right: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to merge a preemptive right", ex);
             }
         }
 
@@ -113,7 +112,7 @@ public class PreemptiveRight {
                 try {
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(udf);
                 } catch (Exception ex) {
-                    ErrorUtils.LOG.error("Unable to save preemptive right copy: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to save preemptive right copy", ex);
                 }
             }
         }
@@ -124,7 +123,7 @@ public class PreemptiveRight {
                 udf.setDeleted(true);
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(udf);
             } catch (Exception ex) {
-                ErrorUtils.LOG.error("Unable to delete preemptive right copy: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to delete preemptive right copy", ex);
             }
         }
 

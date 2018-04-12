@@ -1,5 +1,6 @@
 package kz.halyqsoft.univercity.modules.catalog;
 
+import kz.halyqsoft.univercity.entity.beans.USER_ROLES;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.ID;

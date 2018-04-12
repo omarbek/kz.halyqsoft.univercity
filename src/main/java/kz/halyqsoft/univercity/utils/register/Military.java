@@ -1,12 +1,10 @@
 package kz.halyqsoft.univercity.utils.register;
 
+import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.MILITARY_DOC;
-import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_DOCUMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_DOCUMENT_FILE;
-import kz.halyqsoft.univercity.modules.regapplicants.ApplicantsForm;
 import kz.halyqsoft.univercity.utils.CommonUtils;
-import kz.halyqsoft.univercity.utils.ErrorUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.facade.CommonIDFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -18,6 +16,7 @@ import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.form.AbstractFormWidget;
+import org.r3a.common.vaadin.widget.form.AbstractFormWidgetView;
 import org.r3a.common.vaadin.widget.form.FormModel;
 import org.r3a.common.vaadin.widget.form.GridFormWidget;
 import org.r3a.common.vaadin.widget.form.field.filelist.FileListFieldModel;
@@ -31,7 +30,7 @@ import javax.persistence.NoResultException;
 public class Military {
     private GridFormWidget mainGFW;
     private AbstractFormWidget dataAFW;
-    private ApplicantsForm applicantsForm;
+    private AbstractFormWidgetView applicantsForm;
     private FormModel mainFM;
     private FileListFieldModel militaryFLFM;
 
@@ -43,7 +42,7 @@ public class Military {
         return militaryFLFM;
     }
 
-    public Military(AbstractFormWidget dataAFW, ApplicantsForm applicantsForm) {
+    public Military(AbstractFormWidget dataAFW, AbstractFormWidgetView applicantsForm) {
         this.dataAFW = dataAFW;
         this.applicantsForm = applicantsForm;
     }
@@ -51,9 +50,9 @@ public class Military {
     public FormModel create(QueryModel<USER_DOCUMENT_FILE> udfQM) throws Exception {
         StringBuilder sb;
         sb = new StringBuilder();
-        sb.append(ErrorUtils.getUILocaleUtil().getCaption("title.error"));
+        sb.append(CommonUtils.getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
-        sb.append(ErrorUtils.getUILocaleUtil().getCaption("military.document"));
+        sb.append(CommonUtils.getUILocaleUtil().getCaption("military.document"));
         mainGFW = new GridFormWidget(MILITARY_DOC.class);
         mainGFW.addEntityListener(applicantsForm);
         mainFM = mainGFW.getWidgetModel();
@@ -86,7 +85,7 @@ public class Military {
 
     public boolean preSave(Entity e, boolean isNew) {
         if (dataAFW.getWidgetModel().isCreateNew()) {
-            Message.showInfo(ErrorUtils.getUILocaleUtil().getMessage("info.save.base.data.first"));
+            Message.showInfo(CommonUtils.getUILocaleUtil().getMessage("info.save.base.data.first"));
             return false;
         }
         MILITARY_DOC md = (MILITARY_DOC) e;
@@ -94,18 +93,18 @@ public class Military {
         if (isNew) {
             try {
                 md.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USER_DOCUMENT"));
-                md.setUser((STUDENT) fm.getEntity());
+                md.setUser((USERS) fm.getEntity());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(md);
-                ErrorUtils.showSavedNotification();
+                CommonUtils.showSavedNotification();
             } catch (Exception ex) {
-                ErrorUtils.LOG.error("Unable to createCertificate a military doc: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to create a military doc", ex);
             }
         } else {
             try {
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(md);
-                ErrorUtils.showSavedNotification();
+                CommonUtils.showSavedNotification();
             } catch (Exception ex) {
-                ErrorUtils.LOG.error("Unable to merge a military doc: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to merge a military doc", ex);
             }
         }
 
@@ -119,7 +118,7 @@ public class Military {
                 try {
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(udf);
                 } catch (Exception ex) {
-                    ErrorUtils.LOG.error("Unable to save military doc copy: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to save military doc copy", ex);
                 }
             }
         }
@@ -130,7 +129,7 @@ public class Military {
                 udf.setDeleted(true);
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(udf);
             } catch (Exception ex) {
-                ErrorUtils.LOG.error("Unable to delete military doc copy: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to delete military doc copy", ex);
             }
         }
 

@@ -6,13 +6,12 @@ import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.TextField;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
-import kz.halyqsoft.univercity.utils.ErrorUtils;
+import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.utility.PasswordGenerator;
-import org.r3a.common.vaadin.widget.dialog.Message;
 
 import java.util.List;
 
@@ -29,10 +28,10 @@ public class ParentLoginForm extends FormLayout {
 
     public ParentLoginForm(STUDENT student) {
         this.student = student;
-        setCaption(ErrorUtils.getUILocaleUtil().getCaption("student.parent.login"));
+        setCaption(CommonUtils.getUILocaleUtil().getCaption("student.parent.login"));
 
         loginTF = new TextField();
-        loginTF.setCaption(ErrorUtils.getUILocaleUtil().getCaption("username"));
+        loginTF.setCaption(CommonUtils.getUILocaleUtil().getCaption("username"));
         loginTF.setImmediate(true);
         loginTF.setEnabled(false);
         loginTF.setNullSettingAllowed(true);
@@ -41,7 +40,7 @@ public class ParentLoginForm extends FormLayout {
         loginTF.setValue(student.getParentLogin());
 
         passwdTF = new TextField();
-        passwdTF.setCaption(ErrorUtils.getUILocaleUtil().getCaption("password"));
+        passwdTF.setCaption(CommonUtils.getUILocaleUtil().getCaption("password"));
         passwdTF.setImmediate(true);
         passwdTF.setNullSettingAllowed(true);
         passwdTF.setNullRepresentation("");
@@ -52,7 +51,7 @@ public class ParentLoginForm extends FormLayout {
         addComponent(passwdTF);
 
         Button generate = new Button();
-        generate.setCaption(ErrorUtils.getUILocaleUtil().getCaption("generate.login.and.passwd"));
+        generate.setCaption(CommonUtils.getUILocaleUtil().getCaption("generate.login.and.passwd"));
         generate.addClickListener(new ClickListener() {
 
             @Override
@@ -84,8 +83,7 @@ public class ParentLoginForm extends FormLayout {
                 passwdTF.setValue(PasswordGenerator.verySimple(8));
             }
         } catch (Exception ex) {
-            ErrorUtils.LOG.error("Unable to generate student parent login and password: ", ex);
-            Message.showError(ex.toString());
+            CommonUtils.showMessageAndWriteLog("Unable to generate student parent login and password", ex);
         }
     }
 

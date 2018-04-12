@@ -12,7 +12,6 @@ import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.enumeration.Flag;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.*;
 import kz.halyqsoft.univercity.utils.CommonUtils;
-import kz.halyqsoft.univercity.utils.ErrorUtils;
 import kz.halyqsoft.univercity.utils.changelisteners.SchoolCountryChangeListener;
 import kz.halyqsoft.univercity.utils.register.*;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
@@ -84,7 +83,6 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
     private boolean saveData, saveSpec, savePass, saveEduc, saveUNT;
     private Integer beginYear;
 
-    private STUDENT student;
     private Flag flag;
     private PreemptiveRight preemptiveRight;
     private EducationDoc educationDoc;
@@ -131,6 +129,57 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         dataFM.getFieldModel("email").setReadOnly(false);
         dataFM.getFieldModel("phoneMobile").setRequired(true);
 
+        setAdviser(dataFM);
+
+        QueryModel<USER_DOCUMENT_FILE> udfQM = new QueryModel<>(USER_DOCUMENT_FILE.class);
+        udfQM.addSelect("id");
+        udfQM.addSelect("fileName");
+        udfQM.addWhere("userDocument", ECriteria.EQUAL, null);
+        udfQM.addWhereAnd("deleted", Boolean.FALSE);
+
+        preemptiveRight = new PreemptiveRight(dataAFW, this);
+        preemptiveRight.create(udfQM);
+
+        passport = new Passport(dataAFW, this);
+        passport.create(udfQM);
+
+        military = new Military(dataAFW, this);
+        military.create(udfQM);
+
+        disability = new Disability(dataAFW, this);
+        disability.create(udfQM);
+
+        repatriate = new Repatriate(dataAFW, this);
+        repatriate.create(udfQM);
+
+        grant = new Grant(dataAFW, this);
+        grant.create(udfQM);
+
+        unt = new Unt(dataAFW, this);
+        unt.create(udfQM);
+
+        address = new Address(dataAFW, this);
+        address.create("address.registration", ADDRESS_REG);
+        address.create("address.residential", ADDRESS_FACT);
+
+        parent = new Parent(dataAFW, this);
+        parent.create("parents.data.father", FATHER);
+        parent.create("parents.data.mother", MOTHER);
+
+        contract = new Contract(dataAFW, this);
+        contract.create(udfQM, military.getMilitaryFLFM());
+
+        educationDoc = new EducationDoc(dataAFW, this, documentsTW, educationUDFI);
+        educationDoc.create(udfQM);
+
+        createFormButtons(dataFM);
+
+        addFormButtons();
+
+        form.click();
+    }
+
+    private void setAdviser(FormModel dataFM) {
         FKFieldModel advisorFM = (FKFieldModel) dataFM.getFieldModel("advisor");
         advisorFM.setSelectType(ESelectType.CUSTOM_GRID);
         advisorFM.setDialogHeight(400);
@@ -176,56 +225,8 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
             cgsd.getFilterModel().addFilter("fio", fioTF);
             cgsd.initFilter();
         } catch (Exception ex) {
-            LOG.error("Unable to initialize custom grid dialog: ", ex);
-            Message.showError(ex.toString());
+            CommonUtils.showMessageAndWriteLog("Unable to initialize custom grid dialog", ex);
         }
-
-        QueryModel<USER_DOCUMENT_FILE> udfQM = new QueryModel<>(USER_DOCUMENT_FILE.class);
-        udfQM.addSelect("id");
-        udfQM.addSelect("fileName");
-        udfQM.addWhere("userDocument", ECriteria.EQUAL, null);
-        udfQM.addWhereAnd("deleted", Boolean.FALSE);
-
-        preemptiveRight = new PreemptiveRight(dataAFW, this);
-        preemptiveRight.create(udfQM);
-
-        passport = new Passport(dataAFW, this);
-        passport.create(udfQM);
-
-        military = new Military(dataAFW, this);
-        military.create(udfQM);
-
-        disability = new Disability(dataAFW, this);
-        disability.create(udfQM);
-
-        repatriate = new Repatriate(dataAFW, this);
-        repatriate.create(udfQM);
-
-        grant = new Grant(dataAFW, this);
-        grant.create(udfQM);
-
-        unt = new Unt(dataAFW, this);
-        unt.createCertificate(udfQM);
-
-        address = new Address(dataAFW, this);
-        address.create("address.registration", ADDRESS_REG);
-        address.create("address.residential", ADDRESS_FACT);
-
-        parent = new Parent(dataAFW, this);
-        parent.create("parents.data.father", FATHER);
-        parent.create("parents.data.mother", MOTHER);
-
-        contract = new Contract(dataAFW, this);
-        contract.create(udfQM, military.getMilitaryFLFM());
-
-        educationDoc = new EducationDoc(dataAFW, this, documentsTW, educationUDFI);
-        educationDoc.create(udfQM);
-
-        createFormButtons(dataFM);
-
-        addFormButtons();
-
-        form.click();
     }
 
     private void createFormButtons(FormModel dataFM) {
@@ -292,12 +293,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
             @Override
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM);
-                flag = Flag.FACT_ADDRESS;
-                contentHL.removeAllComponents();
-                contentHL.addComponent(address.getAddressFactGFW());
-                Button nextButton = createNextButton(regAddressButton, "next");
-                contentHL.addComponent(nextButton);
-                contentHL.setComponentAlignment(nextButton, Alignment.MIDDLE_CENTER);
+                addToLayout(Flag.FACT_ADDRESS, address.getAddressFactGFW(), regAddressButton);
             }
         });
 
@@ -306,12 +302,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
             @Override
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM);
-                flag = Flag.REG_ADDRESS;
-                contentHL.removeAllComponents();
-                contentHL.addComponent(address.getAddressRegGFW());
-                Button nextButton = createNextButton(specButton, "next");
-                contentHL.addComponent(nextButton);
-                contentHL.setComponentAlignment(nextButton, Alignment.MIDDLE_CENTER);
+                addToLayout(Flag.REG_ADDRESS, address.getAddressRegGFW(), specButton);
             }
         });
 
@@ -356,13 +347,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
             @Override
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM);
-
-                flag = Flag.ID_DOC;
-                contentHL.removeAllComponents();
-                contentHL.addComponent(passport.getMainGFW());
-                Button nextButton = createNextButton(militaryButton, "next");
-                contentHL.addComponent(nextButton);
-                contentHL.setComponentAlignment(nextButton, Alignment.MIDDLE_CENTER);
+                addToLayout(Flag.ID_DOC, passport.getMainGFW(), militaryButton);
             }
         });
 
@@ -371,12 +356,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
             @Override
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM);
-                flag = Flag.MILITARY;
-                contentHL.removeAllComponents();
-                contentHL.addComponent(military.getMainGFW());
-                Button nextButton = createNextButton(disabilityButton, "next");
-                contentHL.addComponent(nextButton);
-                contentHL.setComponentAlignment(nextButton, Alignment.MIDDLE_CENTER);
+                addToLayout(Flag.MILITARY, military.getMainGFW(), disabilityButton);
             }
         });
 
@@ -385,13 +365,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
             @Override
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM);
-
-                flag = Flag.DISABILITY;
-                contentHL.removeAllComponents();
-                contentHL.addComponent(disability.getMainGFW());
-                Button nextButton = createNextButton(repatriateButton, "next");
-                contentHL.addComponent(nextButton);
-                contentHL.setComponentAlignment(nextButton, Alignment.MIDDLE_CENTER);
+                addToLayout(Flag.DISABILITY, disability.getMainGFW(), repatriateButton);
             }
         });
 
@@ -400,12 +374,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
             @Override
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM);
-                flag = Flag.REPATRIATE;
-                contentHL.removeAllComponents();
-                contentHL.addComponent(repatriate.getMainGFW());
-                Button nextButton = createNextButton(eduDocButton, "next");
-                contentHL.addComponent(nextButton);
-                contentHL.setComponentAlignment(nextButton, Alignment.MIDDLE_CENTER);
+                addToLayout(Flag.REPATRIATE, repatriate.getMainGFW(), eduDocButton);
             }
         });
 
@@ -414,12 +383,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
             @Override
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM);
-                flag = Flag.EDU_DOC;
-                contentHL.removeAllComponents();
-                contentHL.addComponent(educationDoc.getMainGFW());
-                Button nextButton = createNextButton(eduDocsButton, "next");
-                contentHL.addComponent(nextButton);
-                contentHL.setComponentAlignment(nextButton, Alignment.MIDDLE_CENTER);
+                addToLayout(Flag.EDU_DOC, educationDoc.getMainGFW(), eduDocsButton);
             }
         });
 
@@ -561,12 +525,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
             @Override
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM);
-                flag = Flag.GRANT_DOC;
-                contentHL.removeAllComponents();
-                contentHL.addComponent(grant.getMainGFW());
-                Button nextButton = createNextButton(motherButton, "next");
-                contentHL.addComponent(nextButton);
-                contentHL.setComponentAlignment(nextButton, Alignment.MIDDLE_CENTER);
+                addToLayout(Flag.GRANT_DOC, grant.getMainGFW(), motherButton);
             }
         });
 
@@ -575,12 +534,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
             @Override
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM);
-                flag = Flag.MOTHER;
-                contentHL.removeAllComponents();
-                contentHL.addComponent(parent.getMotherGFW());
-                Button nextButton = createNextButton(fatherButton, "next");
-                contentHL.addComponent(nextButton);
-                contentHL.setComponentAlignment(nextButton, Alignment.MIDDLE_CENTER);
+                addToLayout(Flag.MOTHER, parent.getMotherGFW(), fatherButton);
             }
         });
 
@@ -589,12 +543,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
             @Override
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM);
-                flag = Flag.FATHER;
-                contentHL.removeAllComponents();
-                contentHL.addComponent(parent.getFatherGFW());
-                Button nextButton = createNextButton(contractButton, "next");
-                contentHL.addComponent(nextButton);
-                contentHL.setComponentAlignment(nextButton, Alignment.MIDDLE_CENTER);
+                addToLayout(Flag.FATHER, parent.getFatherGFW(), contractButton);
             }
         });
 
@@ -603,12 +552,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
             @Override
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM);
-                flag = Flag.CONTRACT;
-                contentHL.removeAllComponents();
-                contentHL.addComponent(contract.getMainGFW());
-                Button nextButton = createNextButton(moreButton, "next");
-                contentHL.addComponent(nextButton);
-                contentHL.setComponentAlignment(nextButton, Alignment.MIDDLE_CENTER);
+                addToLayout(Flag.CONTRACT, contract.getMainGFW(), moreButton);
             }
         });
 
@@ -748,6 +692,14 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         });
     }
 
+    private void addToLayout(Flag currentFlag, GridFormWidget currentGFW, Button currentButton) {
+        flag = currentFlag;
+        contentHL.removeAllComponents();
+        contentHL.addComponent(currentGFW);
+        Button nextButton = createNextButton(currentButton, "next");
+        contentHL.addComponent(nextButton);
+        contentHL.setComponentAlignment(nextButton, Alignment.MIDDLE_CENTER);
+    }
 
     private VerticalLayout getPhotoVL() {
         VerticalLayout photoAndButtonVL = new VerticalLayout();
@@ -944,15 +896,14 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                             SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(s);
                             dataAFW.refresh();
                         } catch (Exception ex) {
-                            LOG.error("Unable to generate code for entrant: ", ex);
-                            Message.showError(ex.getMessage());
+                            CommonUtils.showMessageAndWriteLog("Unable to generate code for entrant", ex);
                         }
                     }
                 }
 
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to createCertificate a entrant speciality: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to create an entrant speciality", ex);
             }
         } else {
             try {
@@ -964,7 +915,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 specTW.refresh();
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to merge a entrant speciality: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to merge an entrant speciality", ex);
             }
         }
 
@@ -998,8 +949,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
 
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to save new applicant: ", ex);
-                Message.showError("Ошибка сохранения основных данных");
+                CommonUtils.showMessageAndWriteLog("Unable to save new applicant", ex);
             }
         } else {
             s.setUpdated(new Date());
@@ -1008,7 +958,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(s);
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to merge a entrant: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to merge an entrant", ex);
             }
         }
         return false;
@@ -1028,14 +978,14 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(md);
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to createCertificate a Education document: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to create an education document", ex);
             }
         } else {
             try {
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(md);
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to merge a Education document: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to merge an education document", ex);
             }
         }
 
@@ -1049,7 +999,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 try {
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(udf);
                 } catch (Exception ex) {
-                    LOG.error("Unable to save Education document copy: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to save education document copy", ex);
                 }
             }
         }
@@ -1060,7 +1010,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 udf.setDeleted(true);
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(udf);
             } catch (Exception ex) {
-                LOG.error("Unable to delete Education document copy: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to delete education document copy", ex);
             }
         }
 
@@ -1084,7 +1034,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 languagesTW.refresh();
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to createCertificate a language: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to create a language", ex);
             }
         } else {
             try {
@@ -1095,7 +1045,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 languagesTW.refresh();
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to merge a language: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to merge a language", ex);
             }
         }
 
@@ -1127,7 +1077,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 medicalCheckupTW.refresh();
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to createCertificate a medical checkup: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to create a medical checkup", ex);
             }
         } else {
             try {
@@ -1143,7 +1093,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 medicalCheckupTW.refresh();
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to merge a medical checkup: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to merge a medical checkup", ex);
             }
         }
 
@@ -1157,7 +1107,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 try {
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(udf);
                 } catch (Exception ex) {
-                    LOG.error("Unable to save medical checkup copy: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to save medical checkup copy", ex);
                 }
             }
         }
@@ -1168,7 +1118,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 udf.setDeleted(true);
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(udf);
             } catch (Exception ex) {
-                LOG.error("Unable to delete medical checkup copy: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to delete medical checkup copy", ex);
             }
         }
         return false;
@@ -1192,7 +1142,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 awardsTW.refresh();
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to createCertificate an award: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to create an award", ex);
             }
         } else {
             try {
@@ -1202,7 +1152,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 awardsTW.refresh();
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to merge an award: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to merge an award", ex);
             }
         }
         return false;
@@ -1226,7 +1176,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 socialCategoriesTW.refresh();
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to createCertificate a social category: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to create a social category", ex);
             }
         } else {
             try {
@@ -1236,7 +1186,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 socialCategoriesTW.refresh();
                 showSavedNotification();
             } catch (Exception ex) {
-                LOG.error("Unable to merge a social category: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to merge a social category", ex);
             }
         }
         return false;
@@ -1272,7 +1222,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
             try {
                 CommonUtils.addFiles(udfQM, educationFLFM);
             } catch (Exception ex) {
-                LOG.error("Unable to load education document copies: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to load education document copies", ex);
             }
 
             return true;
@@ -1339,8 +1289,8 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
             educationFM.getFieldModel("schoolCertificateType").setRequired(true);
             educationFM.getFieldModel("schoolRegion").setRequired(true);
             educationFM.getFieldModel("schoolAddress").setRequired(true);
-            educationFM.getFieldModel("entryYear").getValidators().add(new IntegerRangeValidator("Значение года не может быть больше текущего года", 0, ErrorUtils.currentYear));
-            educationFM.getFieldModel("endYear").getValidators().add(new IntegerRangeValidator("Значение года не может быть больше текущего года", 0, ErrorUtils.currentYear));
+            educationFM.getFieldModel("entryYear").getValidators().add(new IntegerRangeValidator("Значение года не может быть больше текущего года", 0, CommonUtils.currentYear));
+            educationFM.getFieldModel("endYear").getValidators().add(new IntegerRangeValidator("Значение года не может быть больше текущего года", 0, CommonUtils.currentYear));
 
             FileListFieldModel educationFLFM = (FileListFieldModel) educationFM.getFieldModel("fileList");
             educationFLFM.permitMimeType(FileListFieldModel.JPEG);
@@ -1360,7 +1310,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
             try {
                 unt.getCertificateGFW().post();
             } catch (Exception e) {
-                LOG.error("Failed to post: ", e);// TODO catch
+                CommonUtils.showMessageAndWriteLog("Unable to pre create unt rates", e);
             }
 
             if (unt.getCertificateGFW().getWidgetModel().isCreateNew()) {
@@ -1501,7 +1451,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(entities);
                 documentsTW.refresh();
             } catch (Exception ex) {
-                LOG.error("Unable to delete education docs: ", ex);
+                LOG.error("Unable to delete education docs", ex);
                 Message.showError(getUILocaleUtil().getMessage("error.cannotdelentity"));
             }
 
@@ -1512,7 +1462,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 try {
                     delList.add(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(USER_LANGUAGE.class, e.getId()));
                 } catch (Exception ex) {
-                    LOG.error("Unable to delete user languages: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to delete user languages", ex);
                 }
             }
 
@@ -1520,7 +1470,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(delList);
                 languagesTW.refresh();
             } catch (Exception ex) {
-                LOG.error("Unable to delete user languages: ", ex);
+                LOG.error("Unable to delete user languages", ex);
                 Message.showError(getUILocaleUtil().getMessage("error.cannotdelentity"));
             }
 
@@ -1533,7 +1483,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                     mc.setDeleted(true);
                     delList.add(mc);
                 } catch (Exception ex) {
-                    LOG.error("Unable to delete medical checkup: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to delete medical checkup", ex);
                 }
             }
 
@@ -1541,7 +1491,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(delList);
                 medicalCheckupTW.refresh();
             } catch (Exception ex) {
-                LOG.error("Unable to delete medical checkup: ", ex);
+                LOG.error("Unable to delete medical checkup", ex);
                 Message.showError(getUILocaleUtil().getMessage("error.cannotdelentity"));
             }
 
@@ -1552,7 +1502,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 try {
                     delList.add(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(UNT_CERT_SUBJECT.class, e.getId()));
                 } catch (Exception ex) {
-                    LOG.error("Unable to delete user Unt rates: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to delete user Unt rates", ex);
                 }
             }
 
@@ -1560,7 +1510,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(delList);
                 unt.getUntRatesTW().refresh();
             } catch (Exception ex) {
-                LOG.error("Unable to delete user Unt rates: ", ex);
+                LOG.error("Unable to delete user Unt rates", ex);
                 Message.showError(getUILocaleUtil().getMessage("error.cannotdelentity"));
             }
 
@@ -1571,7 +1521,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 try {
                     delList.add(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(ENTRANT_SPECIALITY.class, e.getId()));
                 } catch (Exception ex) {
-                    LOG.error("Unable to delete entrant specialities: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to delete entrant specialities", ex);
                 }
             }
 
@@ -1590,7 +1540,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 try {
                     delList.add(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(USER_AWARD.class, e.getId()));
                 } catch (Exception ex) {
-                    LOG.error("Unable to delete user awards: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to delete user awards", ex);
                 }
             }
 
@@ -1598,7 +1548,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(delList);
                 awardsTW.refresh();
             } catch (Exception ex) {
-                LOG.error("Unable to delete user awards: ", ex);
+                LOG.error("Unable to delete user awards", ex);
                 Message.showError(getUILocaleUtil().getMessage("error.cannotdelentity"));
             }
 
@@ -1609,7 +1559,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 try {
                     delList.add(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(USER_SOCIAL_CATEGORY.class, e.getId()));
                 } catch (Exception ex) {
-                    LOG.error("Unable to delete user social categories: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to delete user social categories", ex);
                 }
             }
 
@@ -1617,7 +1567,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(delList);
                 socialCategoriesTW.refresh();
             } catch (Exception ex) {
-                LOG.error("Unable to delete user social categories: ", ex);
+                LOG.error("Unable to delete user social categories", ex);
                 Message.showError(getUILocaleUtil().getMessage("error.cannotdelentity"));
             }
 
@@ -1643,7 +1593,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 student.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USER"));
                 student.setCategory(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(STUDENT_CATEGORY.class, ID.valueOf(1)));
             } catch (Exception ex) {
-                LOG.error("Unable to createCertificate a social category: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to create a social category", ex);
             }
             student.setCode("000000000000");
             student.setFirstName(student.getFirstName());
@@ -1666,14 +1616,6 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
     @Override
     protected String getViewTitle(Locale locale) {
         return getUILocaleUtil().getCaption("regapplicant");
-    }
-
-    public STUDENT getStudent() {
-        return student;
-    }
-
-    public void setStudent(STUDENT student) {
-        this.student = student;
     }
 
     @Override

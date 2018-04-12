@@ -12,15 +12,12 @@ import org.r3a.common.entity.beans.AbstractTask;
 import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.event.EntityListener;
 import org.r3a.common.entity.query.QueryModel;
-import org.r3a.common.entity.query.from.EJoin;
-import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.select.EAggregate;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.entity.tree.CommonTree;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.AbstractSelectWidget;
 import org.r3a.common.vaadin.widget.DBSelectModel;
-import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.form.FormModel;
 import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
@@ -199,8 +196,7 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                         count++;
                         ((DEPARTMENT) e).setCode(CommonUtils.getCode(count));
                     } catch (Exception ex) {
-                        LOG.error("Unable to generate a code for department: ", ex);
-                        Message.showError(ex.getMessage());
+                        CommonUtils.showMessageAndWriteLog("Unable to generate a code for department", ex);
                         return false;
                     }
                 }
@@ -221,8 +217,7 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                     try {
                         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(e);
                     } catch (Exception ex) {
-                        LOG.error("Unable to delete a department: ", ex);
-                        Message.showError("Unable to delete a department");
+                        CommonUtils.showMessageAndWriteLog("Unable to delete a department", ex);
                     }
                 } else if (e instanceof SPECIALITY) {
                     delete = false;
@@ -230,8 +225,7 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                         ((SPECIALITY) e).setDeleted(true);
                         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(e);
                     } catch (Exception ex) {
-                        LOG.error("Unable to delete a speciality: ", ex);
-                        Message.showError("Unable to delete a speciality");
+                        CommonUtils.showMessageAndWriteLog("Unable to delete a speciality", ex);
                     }
                 }
             }
@@ -239,7 +233,7 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
             try {
                 classASW.refresh();
             } catch (Exception ex) {
-                LOG.error("Unable to refresh entities: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to refresh entities", ex);
             }
             return delete;
         }
