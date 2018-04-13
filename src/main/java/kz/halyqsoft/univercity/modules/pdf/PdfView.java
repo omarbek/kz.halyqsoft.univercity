@@ -45,7 +45,7 @@ public class PdfView extends AbstractTaskView {
         generateButton = new Button("Генерировать");
         addComponentButton = new Button("Добавить");
         openPdfButton = new Button("Открыть");
-
+//
         cf.pdfTitle = new TextField("Название файла");
         cf.pdfTitle.setImmediate(true);
         cf.pdfTitle.setRequired(true);
