@@ -11,7 +11,7 @@ import org.r3a.common.vaadin.widget.form.FormModel;
 public class UnivercityUsersView extends UsersView {//
 
     public UnivercityUsersView(AbstractTask task) throws Exception {
-        super(task);
+        super(task);//
     }
 
     @Override
