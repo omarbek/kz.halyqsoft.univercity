@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>kz.halyqsoft</groupId>
@@ -67,9 +67,9 @@
 			<artifactId>vaadin-themes</artifactId>
 		</dependency>
 		<dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-            <version>2.10.0</version>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>2.10.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
@@ -106,23 +106,44 @@
 			<artifactId>ehcache</artifactId>
 			<version>3.4.0</version>
 		</dependency>
-		<dependency>
-			<groupId>javax.persistence</groupId>
-			<artifactId>javax.persistence-api</artifactId>
-			<version>2.2</version>
-			<scope>provided</scope>
-		</dependency>
+		<!--<dependency>-->
+		<!--<groupId>javax.persistence</groupId>-->
+		<!--<artifactId>javax.persistence-api</artifactId>-->
+		<!--<version>2.2</version>-->
+		<!--<scope>provided</scope>-->
+		<!--</dependency>-->
+		<!--<dependency>-->
+		<!--<groupId>org.eclipse.persistence</groupId>-->
+		<!--<artifactId>eclipselink</artifactId>-->
+		<!--<version>2.7.1</version>-->
+		<!--&lt;!&ndash;<scope>provided</scope>&lt;!&ndash;real&ndash;&gt;&ndash;&gt;-->
+		<!--</dependency>-->
 		<dependency>
 			<groupId>org.eclipse.persistence</groupId>
 			<artifactId>eclipselink</artifactId>
-			<version>2.7.1</version>
-			<scope>provided</scope><!--real-->
+			<version>2.7.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.eclipse.persistence</groupId>
+					<artifactId>javax.persistence</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.persistence</groupId>
+			<artifactId>javax.persistence</artifactId>
+			<version>2.1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<version>9.1-901-1.jdbc4</version>
-			<scope>provided</scope><!--real-->
+			<!--<scope>provided</scope>&lt;!&ndash;real&ndash;&gt;-->
+		</dependency>
+		<dependency>
+			<groupId>com.itextpdf</groupId>
+			<artifactId>itextpdf</artifactId>
+			<version>5.5.11</version>
 		</dependency>
 		<dependency>
 			<groupId>org.r3a</groupId>
@@ -134,12 +155,6 @@
 			<artifactId>vaadin-add-on</artifactId>
 			<version>1.0</version>
 		</dependency>
-		<dependency>
-			<groupId>com.itextpdf</groupId>
-			<artifactId>itextpdf</artifactId>
-			<version>5.5.11</version>
-		</dependency>
-		<!--last-->
 	</dependencies>
 
 	<build>

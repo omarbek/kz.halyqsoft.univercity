@@ -39,9 +39,9 @@
         <class>kz.halyqsoft.univercity.entity.beans.USER_ROLES</class>
         <class>kz.halyqsoft.univercity.entity.beans.USERS</class>
 
-        <!--<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.AbstractCategoryEntity</class>-->
-        <!--<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.AbstractStatusEntity</class>-->
-        <!--<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.AbstractTypeEntity</class>-->
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.AbstractCategoryEntity</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.AbstractStatusEntity</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.AbstractTypeEntity</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.ACADEMIC_CALENDAR_FACULTY</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.ACADEMIC_CALENDAR_ITEM</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.ACADEMIC_DEGREE</class>
@@ -283,14 +283,16 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM_SUMMER</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM_SUMMER_DETAIL</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.GRADUATION_PROJECT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.PDF_DOCUMENT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.PDF_PROPERTY</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
         <properties>
             <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
             <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/univerdb"/>
-            <property name="javax.persistence.jdbc.user" value="postgres"/>
-            <property name="javax.persistence.jdbc.password" value="postgres"/>
+            <property name="javax.persistence.jdbc.user" value="admin"/>
+            <property name="javax.persistence.jdbc.password" value="admin"/>
             <property name="eclipselink.connection-pool.default.initial" value="1"/>
             <property name="eclipselink.connection-pool.default.min" value="2"/>
             <property name="eclipselink.connection-pool.default.max" value="8"/>

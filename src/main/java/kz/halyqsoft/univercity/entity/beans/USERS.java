@@ -1,5 +1,6 @@
 package kz.halyqsoft.univercity.entity.beans;
 
+import kz.halyqsoft.univercity.entity.beans.univercity.PDF_DOCUMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
@@ -25,6 +26,9 @@ public class USERS extends AbstractUser implements CommonTree<USERS> {
     @JoinColumns({
             @JoinColumn(name = "TASK_ID", referencedColumnName = "ID")})
     private TASKS task;
+
+    @OneToMany(mappedBy = "user"/*,cascade = CascadeType.PERSIST*/)
+    private List<PDF_DOCUMENT> pdfDocuments;
 
     @OneToMany(mappedBy = "user")
     private List<USER_ROLES> userRoles;
@@ -403,5 +407,14 @@ public class USERS extends AbstractUser implements CommonTree<USERS> {
 
     public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
+    }
+
+
+    public List<PDF_DOCUMENT> getPdfDocuments() {
+        return pdfDocuments;
+    }
+
+    public void setPdfDocuments(List<PDF_DOCUMENT> pdfDocuments) {
+        this.pdfDocuments = pdfDocuments;
     }
 }
