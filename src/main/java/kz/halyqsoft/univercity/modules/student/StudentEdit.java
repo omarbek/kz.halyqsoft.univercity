@@ -13,7 +13,6 @@ import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_MEDICAL_CHECKUP;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_USER_LANGUAGE;
-import kz.halyqsoft.univercity.filter.FStudentFilter;
 import kz.halyqsoft.univercity.modules.student.tabs.*;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.changelisteners.BirthCountryChangeListener;
@@ -45,11 +44,8 @@ import org.r3a.common.vaadin.widget.photo.PhotoWidgetEvent;
 import org.r3a.common.vaadin.widget.photo.PhotoWidgetListener;
 import org.r3a.common.vaadin.widget.table.TableWidget;
 import org.r3a.common.vaadin.widget.table.model.DBTableModel;
-import org.r3a.common.vaadinaddon.IntegerField;
 
 import javax.persistence.NoResultException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -62,9 +58,7 @@ import java.util.Locale;
 @SuppressWarnings({"serial", "unchecked"})
 public final class StudentEdit extends AbstractFormWidgetView implements PhotoWidgetListener {
 
-    private final DateFormat uriDateFormat = new SimpleDateFormat("dd MMM yyyy HH:mm:ss");
     private final AbstractFormWidget baseDataFW;
-    private final FStudentFilter filter;
     private USER_PHOTO userPhoto;
     private String userPhotoFilename;
     private byte[] userPhotoBytes;
@@ -75,20 +69,16 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
     private FromItem educationUDFI;
     private Label lockLabel, lockReasonLabel;
     private Button lockUnlockButton;
-    private IntegerField xIntegerField, yIntegerField;
-    private ComboBox xCoordinateComboBox, yCoordinateComboBox;
     private LockDialog lockDialog;
     private STUDENT student;
-    private VerticalLayout viewVL;
     private VerticalLayout mainVL;
+    private StudentView studentView;
 
-    StudentEdit(final FormModel baseDataFM, FStudentFilter filter, VerticalLayout mainVL,
-                VerticalLayout viewVL) throws Exception {
+    StudentEdit(final FormModel baseDataFM, VerticalLayout mainVL, StudentView studentView)
+            throws Exception {
         super();
-
-        this.filter = filter;
         this.mainVL = mainVL;
-        this.viewVL = viewVL;
+        this.studentView = studentView;
 
         VerticalLayout content = new VerticalLayout();
         content.setSpacing(true);
@@ -267,8 +257,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                     @Override
                     public void buttonClick(ClickEvent ev) {
                         mainVL.removeComponent(StudentEdit.this);
-                        EducationDetailPanel edp = new EducationDetailPanel(baseDataFM, filter, studentEducation,
-                                mainVL, StudentEdit.this);
+                        EducationDetailPanel edp = new EducationDetailPanel(studentEducation, mainVL, StudentEdit.this);
                         mainVL.addComponent(edp);
                     }
                 });
@@ -361,9 +350,15 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
 
     @Override
     protected AbstractCommonView getParentView() {
+        try {
+            studentView.getStudentGW().refresh();
+        } catch (Exception e) {
+            e.printStackTrace();//TODO catch
+        }
         mainVL.removeComponent(this);
-        mainVL.addComponent(viewVL);
-        return null;
+        mainVL.addComponent(studentView.getFilterPanel());
+        mainVL.addComponent(studentView.getStudentGW());
+        return studentView;
     }
 
     @Override

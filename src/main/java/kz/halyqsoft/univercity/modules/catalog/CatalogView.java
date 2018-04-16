@@ -2,6 +2,7 @@ package kz.halyqsoft.univercity.modules.catalog;
 
 import com.vaadin.ui.HorizontalSplitPanel;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_ACADEMIC_DEGREE;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.changelisteners.CountryChangeListener;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
@@ -145,7 +146,11 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                         FormModel fm = ((DBSelectModel) classASW.getWidgetModel()).getFormModel();
                         QueryModel specQM = ((FKFieldModel) fm.getFieldModel("department")).getQueryModel();
                         specQM.addWhereNotNull("parent");
-                    }
+                    } /*else if (entityClass.equals(ACADEMIC_DEGREE.class)) {
+                        FormModel fm = ((DBSelectModel) classASW.getWidgetModel()).getFormModel();
+                        ((FKFieldModel) fm.getFieldModel("speciality")).setDialogWidth(500);
+//                        (fm.getFieldModel("speciality")).setWidth(500);
+                    }*/
                 }
                 mainHSP.addComponent(classASW);
             }

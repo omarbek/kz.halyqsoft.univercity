@@ -506,3 +506,340 @@ create sequence s_users_code
 minvalue 0
 start with 1
 no cycle;
+
+--
+INSERT INTO student_education_type VALUES (1, 'Договор');
+INSERT INTO student_education_type VALUES (2, 'Грант');
+INSERT INTO student_education_type VALUES (3, 'Внутренний грант');
+INSERT INTO student_education_type VALUES (4, 'Кредит');
+
+INSERT INTO study_year VALUES (1, 1);
+INSERT INTO study_year VALUES (2, 2);
+INSERT INTO study_year VALUES (3, 3);
+INSERT INTO study_year VALUES (4, 4);
+
+CREATE SEQUENCE s_student_education
+MINVALUE 0
+START WITH 1
+NO CYCLE;
+
+ALTER TABLE STUDENT_FIN_DEBT
+  ALTER COLUMN DELETED TYPE BOOLEAN
+  USING CASE WHEN DELETED = 0
+  THEN FALSE
+        WHEN DELETED = 1
+          THEN TRUE
+        ELSE NULL
+        END;
+
+CREATE OR REPLACE VIEW V_ORDER_DOC AS
+  SELECT
+    order_doc.ID,
+    usr_doc.USER_ID,
+    usr_doc.DOCUMENT_NO,
+    order_doc.ORDER_TYPE_ID,
+    order_type.TYPE_NAME ORDER_TYPE_NAME,
+    order_doc.STUDY_YEAR_ID,
+    study_year.STUDY_YEAR,
+    usr_doc.ISSUE_DATE,
+    usr_doc.EXPIRE_DATE,
+    order_doc.DESCR,
+    order_doc.HIDE_TRANSCRIPT,
+    usr_doc.DELETED
+  FROM ORDER_DOC order_doc INNER JOIN USER_DOCUMENT usr_doc ON order_doc.ID = usr_doc.ID
+    INNER JOIN ORDER_TYPE order_type ON order_doc.ORDER_TYPE_ID = order_type.ID
+    LEFT JOIN STUDY_YEAR study_year ON order_doc.STUDY_YEAR_ID = study_year.ID;
+
+CREATE SEQUENCE S_USER_PHOTO
+MINVALUE 0
+START WITH 1
+NO CYCLE;
+
+INSERT INTO academic_status VALUES (1, 'Полный');
+INSERT INTO academic_status VALUES (2, 'Условный');
+
+ALTER TABLE lock_reason
+  DROP COLUMN lock_type;
+
+ALTER TABLE lock_reason
+  ADD COLUMN USER_TYPE_ID BIGINT NOT NULL DEFAULT 2;
+ALTER TABLE ONLY lock_reason
+  ADD CONSTRAINT fk_lock_reason_user_type FOREIGN KEY (USER_TYPE_ID) REFERENCES user_type (id) ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+CREATE SEQUENCE S_LOCK_REASON
+MINVALUE 0
+START WITH 1
+NO CYCLE;
+
+ALTER TABLE users
+  ADD COLUMN updated TIMESTAMP;
+ALTER TABLE users
+  ADD COLUMN UPDATED_BY VARCHAR(255);
+
+INSERT INTO document_type VALUES (10, 'Приказ об обучении');
+
+DROP VIEW v_order_doc;
+
+ALTER TABLE order_doc
+  ALTER COLUMN hide_transcript TYPE BOOLEAN
+  USING CASE WHEN hide_transcript = 0
+  THEN FALSE
+        WHEN hide_transcript = 1
+          THEN TRUE
+        ELSE NULL
+        END;
+
+CREATE OR REPLACE VIEW V_ORDER_DOC AS
+  SELECT
+    order_doc.ID,
+    usr_doc.USER_ID,
+    usr_doc.DOCUMENT_NO,
+    order_doc.ORDER_TYPE_ID,
+    order_type.TYPE_NAME ORDER_TYPE_NAME,
+    order_doc.STUDY_YEAR_ID,
+    study_year.STUDY_YEAR,
+    usr_doc.ISSUE_DATE,
+    usr_doc.EXPIRE_DATE,
+    order_doc.DESCR,
+    order_doc.HIDE_TRANSCRIPT,
+    usr_doc.DELETED
+  FROM ORDER_DOC order_doc INNER JOIN USER_DOCUMENT usr_doc ON order_doc.ID = usr_doc.ID
+    INNER JOIN ORDER_TYPE order_type ON order_doc.ORDER_TYPE_ID = order_type.ID
+    LEFT JOIN STUDY_YEAR study_year ON order_doc.STUDY_YEAR_ID = study_year.ID;
+
+INSERT INTO employee_status VALUES (1, 'Штатный');
+INSERT INTO employee_status VALUES (2, 'Внештатный');
+INSERT INTO employee_status VALUES (3, 'Совместитель');
+INSERT INTO employee_status VALUES (4, 'Не работает');
+INSERT INTO employee_status VALUES (5, 'Почасовик');
+
+ALTER TABLE employee
+  ALTER COLUMN bachelor TYPE BOOLEAN
+  USING CASE WHEN bachelor = 0
+  THEN FALSE
+        WHEN bachelor = 1
+          THEN TRUE
+        ELSE NULL
+        END;
+
+ALTER TABLE employee
+  ALTER COLUMN master TYPE BOOLEAN
+  USING CASE WHEN master = 0
+  THEN FALSE
+        WHEN master = 1
+          THEN TRUE
+        ELSE NULL
+        END;
+
+CREATE OR REPLACE VIEW V_EMPLOYEE_DEGREE AS
+  SELECT
+    empl_degree.ID,
+    usr_doc.USER_ID    EMPLOYEE_ID,
+    usr_doc.DOCUMENT_NO,
+    usr_doc.ISSUE_DATE,
+    usr_doc.EXPIRE_DATE,
+    empl_degree.DEGREE_ID,
+    degree.DEGREE_NAME DEGREE_NAME,
+    empl_degree.SCHOOL_NAME,
+    empl_degree.DISSERTATION_TOPIC,
+    usr_doc.DELETED
+  FROM EMPLOYEE_DEGREE empl_degree INNER JOIN USER_DOCUMENT usr_doc ON empl_degree.ID = usr_doc.ID
+    INNER JOIN DEGREE degree ON empl_degree.DEGREE_ID = degree.ID;
+
+INSERT INTO document_type VALUES (12, 'Научная степень');
+
+CREATE VIEW V_PUBLICATION AS
+  SELECT
+    publ.ID,
+    empl_scient.EMPLOYEE_ID,
+    publ.PUBLICATION_TYPE_ID,
+    publ_type.TYPE_NAME PUBLICATION_TYPE_NAME,
+    empl_scient.TOPIC
+  FROM PUBLICATION publ INNER JOIN EMPLOYEE_SCIENTIFIC empl_scient ON publ.ID = empl_scient.ID
+    INNER JOIN PUBLICATION_TYPE publ_type ON publ.PUBLICATION_TYPE_ID = publ_type.ID;
+
+CREATE VIEW V_SCIENTIFIC_ACTIVITY AS
+  SELECT
+    scient_act.ID,
+    empl_scient.EMPLOYEE_ID,
+    scient_act.SCIENTIFIC_ACTIVITY_TYPE_ID,
+    scient_act_type.TYPE_NAME SCIENTIFIC_ACTIVITY_TYPE_NAME,
+    empl_scient.TOPIC,
+    scient_act.BEGIN_DATE,
+    scient_act.END_DATE
+  FROM SCIENTIFIC_ACTIVITY scient_act INNER JOIN EMPLOYEE_SCIENTIFIC empl_scient ON scient_act.ID = empl_scient.ID
+    INNER JOIN SCIENTIFIC_ACTIVITY_TYPE scient_act_type ON scient_act.SCIENTIFIC_ACTIVITY_TYPE_ID = scient_act_type.ID;
+
+CREATE VIEW V_SCIENTIFIC_MANAGEMENT AS
+  SELECT
+    scient_managem.ID,
+    empl_scient.EMPLOYEE_ID,
+    scient_managem.SCIENTIFIC_MANAGEMENT_TYPE_ID,
+    scient_managem_type.TYPE_NAME SCIENTIFIC_MANAGEMENT_TYPE_NAME,
+    scient_managem.STUDENTS_FIO,
+    scient_managem.STUDENTS_COUNT,
+    scient_managem.PROJECT_NAME,
+    empl_scient.TOPIC,
+    scient_managem.RESULT_,
+    scient_managem.ACHIEVEMENT
+  FROM SCIENTIFIC_MANAGEMENT scient_managem INNER JOIN EMPLOYEE_SCIENTIFIC empl_scient
+      ON scient_managem.ID = empl_scient.ID
+    INNER JOIN SCIENTIFIC_MANAGEMENT_TYPE scient_managem_type
+      ON scient_managem.SCIENTIFIC_MANAGEMENT_TYPE_ID = scient_managem_type.ID;
+
+INSERT INTO scientific_management_type VALUES (1, 'Научные интересы');
+INSERT INTO scientific_management_type VALUES (2, 'Проведенные семинары');
+INSERT INTO scientific_management_type VALUES (3, 'Планируемые семинары');
+INSERT INTO scientific_management_type VALUES (4, 'Членство (СМУ, СНО)');
+INSERT INTO scientific_management_type VALUES (5, 'Патенты и заявки');
+INSERT INTO scientific_management_type VALUES (6, 'Участие в проектах');
+INSERT INTO scientific_management_type VALUES (7, 'Участие в конференциях');
+
+INSERT INTO scientific_activity_type VALUES (1, 'Олимпиада');
+INSERT INTO scientific_activity_type VALUES (2, 'Конкурс');
+INSERT INTO scientific_activity_type VALUES (3, 'Проект');
+
+INSERT INTO publication_type VALUES (1, 'Публикация с импакт-фактором');
+INSERT INTO publication_type VALUES (2, 'Международные публикации');
+INSERT INTO publication_type VALUES (3, 'Другие публикации');
+INSERT INTO publication_type VALUES (4, 'Опубликованные книги');
+INSERT INTO publication_type VALUES (5, 'Опубликованные методические и иные пособия');
+
+INSERT INTO scientific_type VALUES (1, 'Публикации');
+INSERT INTO scientific_type VALUES (2, 'Научная деятельность, интересы и направления');
+INSERT INTO scientific_type VALUES (3, 'Научное руководство и кураторство');
+
+CREATE SEQUENCE S_EMPLOYEE_SCIENTIFIC
+MINVALUE 0
+START WITH 1
+NO CYCLE;
+
+CREATE SEQUENCE s_previous_experience
+MINVALUE 0
+START WITH 1
+NO CYCLE;
+
+INSERT INTO employee_type VALUES (1, 'Администрированный сотрудник');
+INSERT INTO employee_type VALUES (2, 'Преподаватель');
+
+ALTER TABLE employee_dept
+  ALTER COLUMN adviser TYPE BOOLEAN
+  USING CASE WHEN adviser = 0
+  THEN FALSE
+        WHEN adviser = 1
+          THEN TRUE
+        ELSE NULL
+        END;
+
+CREATE OR REPLACE VIEW V_EMPLOYEE_DEPT AS
+  SELECT
+    empl_dept.ID,
+    empl_dept.EMPLOYEE_ID,
+    empl_dept.EMPLOYEE_TYPE_ID,
+    empl_type.TYPE_NAME EMPLOYEE_TYPE_NAME,
+    empl_dept.DEPT_ID,
+    dep.DEPT_NAME,
+    dep.DEPT_SHORT_NAME,
+    empl_dept.POST_ID,
+    post.POST_NAME,
+    empl_dept.LIVE_LOAD,
+    empl_dept.WAGE_RATE,
+    empl_dept.RATE_LOAD,
+    empl_dept.HOUR_COUNT,
+    empl_dept.HIRE_DATE,
+    empl_dept.DISMISS_DATE,
+    empl_dept.ADVISER,
+    empl_dept.PARENT_ID
+  FROM EMPLOYEE_DEPT empl_dept INNER JOIN EMPLOYEE_TYPE empl_type ON empl_dept.EMPLOYEE_TYPE_ID = empl_type.ID
+    INNER JOIN DEPARTMENT dep ON empl_dept.DEPT_ID = dep.ID
+    LEFT JOIN POST post ON empl_dept.POST_ID = post.ID
+    INNER JOIN EMPLOYEE empl ON empl_dept.EMPLOYEE_ID = empl.ID;
+
+CREATE SEQUENCE s_employee_dept
+MINVALUE 0
+START WITH 1
+NO CYCLE;
+
+CREATE VIEW V_TEACHER_ROOM AS
+  SELECT
+    teacher_room.ID,
+    teacher_room.TEACHER_ID,
+    corpus.CORPUS_NAME,
+    room.ROOM_NO,
+    room_type.TYPE_NAME ROOM_TYPE_NAME,
+    room.CAPACITY,
+    room.EQUIPMENT,
+    room.DESCR
+  FROM TEACHER_ROOM teacher_room INNER JOIN ROOM room ON teacher_room.ROOM_ID = room.ID
+    INNER JOIN CORPUS corpus ON room.CORPUS_ID = corpus.ID
+    INNER JOIN ROOM_TYPE room_type ON room.ROOM_TYPE_ID = room_type.ID;
+
+ALTER TABLE teacher_subject
+  ALTER COLUMN LOAD_PER_HOURS TYPE BOOLEAN
+  USING CASE WHEN LOAD_PER_HOURS = 0
+  THEN FALSE
+        WHEN LOAD_PER_HOURS = 1
+          THEN TRUE
+        ELSE NULL
+        END;
+
+CREATE OR REPLACE VIEW V_TEACHER_SUBJECT AS
+  SELECT
+    teacher_subject.ID,
+    teacher_subject.EMPLOYEE_ID,
+    subj.NAME_RU     SUBJECT_NAME,
+    subj.CODE        SUBJECT_CODE,
+    teacher_subject.GROUP_LEC_COUNT,
+    gr_size_lec.SIZE GROUP_LEC_SIZE,
+    teacher_subject.GROUP_LAB_COUNT,
+    gr_size_lab.SIZE GROUP_LAB_SIZE,
+    teacher_subject.GROUP_PRAC_COUNT,
+    gr_size_pr.SIZE  GROUP_PRAC_SIZE,
+    teacher_subject.FALL,
+    teacher_subject.SPRING,
+    teacher_subject.SUMMER,
+    teacher_subject.LOAD_PER_HOURS
+  FROM TEACHER_SUBJECT teacher_subject INNER JOIN SUBJECT subj ON teacher_subject.SUBJECT_ID = subj.ID
+    LEFT JOIN GROUP_SIZE_LECTURE gr_size_lec ON teacher_subject.GROUP_LEC_ID = gr_size_lec.ID
+    LEFT JOIN GROUP_SIZE_LAB gr_size_lab ON teacher_subject.GROUP_LAB_ID = gr_size_lab.ID
+    LEFT JOIN GROUP_SIZE_PRAC gr_size_pr ON teacher_subject.GROUP_PRAC_ID = gr_size_pr.ID;
+
+INSERT INTO day_hour VALUES (1, 8.00, 9.00, '08:00-09:00');
+INSERT INTO day_hour VALUES (2, 09.00, 10.00, '09:00-10:00');
+INSERT INTO day_hour VALUES (3, 10.00, 11.00, '10:00-11:00');
+INSERT INTO day_hour VALUES (4, 11.00, 12.00, '11:00-12:00');
+INSERT INTO day_hour VALUES (5, 12.00, 13.00, '12:00-13:00');
+INSERT INTO day_hour VALUES (6, 13.00, 14.00, '13:00-14:00');
+INSERT INTO day_hour VALUES (7, 14.00, 15.00, '14:00-15:00');
+INSERT INTO day_hour VALUES (8, 15.00, 16.00, '15:00-16:00');
+INSERT INTO day_hour VALUES (9, 16.00, 17.00, '16:00-17:00');
+INSERT INTO day_hour VALUES (10, 17.00, 18.00, '17:00-18:00');
+INSERT INTO day_hour VALUES (11, 18.00, 19.00, '18:00-19:00');
+INSERT INTO day_hour VALUES (12, 19.00, 20.00, '19:00-20:00');
+INSERT INTO day_hour VALUES (13, 20.00, 21.00, '20:00-21:00');
+INSERT INTO day_hour VALUES (14, 21.00, 22.00, '21:00-22:00');
+
+INSERT INTO week_day VALUES (1, 'Понедельник', 'Пн', 'Дүйсенбі', 'Дүй', 'Monday', 'Mon');
+INSERT INTO week_day VALUES (2, 'Вторник', 'Вт', 'Сейсенбі', 'Сей', 'Tuesday', 'Tue');
+INSERT INTO week_day VALUES (3, 'Среда', 'Ср', 'Сәрсенбі', 'Сәр', 'Wednesday', 'Wed');
+INSERT INTO week_day VALUES (4, 'Четверг', 'Чт', 'Бейсенбі', 'Бей', 'Thursday', 'Thu');
+INSERT INTO week_day VALUES (5, 'Пятница', 'Пт', 'Жұма', 'Жұма', 'Friday', 'Fri');
+INSERT INTO week_day VALUES (6, 'Суббота', 'Сб', 'Сенбі', 'Сб', 'Saturday', 'Sat');
+INSERT INTO week_day VALUES (7, 'Воскресенье', 'Вс', 'Жексенбі', 'Жекс', 'Sunday', 'Sun');
+
+CREATE SEQUENCE S_EMPLOYEE_WORK_HOUR
+MINVALUE 0
+START WITH 1
+NO CYCLE;
+
+INSERT into work_hour_status VALUES (1, 'Доступно');
+INSERT into work_hour_status VALUES (2, 'Не доступно');
+
+CREATE VIEW V_ACADEMIC_DEGREE AS
+  SELECT
+    academ_degree.ID,
+    academ_degree.SPECIALITY_ID,
+    spec.SPEC_NAME,
+    academ_degree.DEGREE_NAME,
+    academ_degree.STUDY_PERIOD
+  FROM ACADEMIC_DEGREE academ_degree INNER JOIN SPECIALITY spec ON academ_degree.SPECIALITY_ID = spec.ID;

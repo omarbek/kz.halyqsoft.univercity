@@ -26,7 +26,7 @@ public class POST extends AbstractEntity {
 	
 	@FieldInfo(type = EFieldType.BOOLEAN, order = 3, required = false, inGrid = false)
 	@Column(name = "TP", nullable = false)
-    private boolean tp;
+    private boolean tp;//teacher post
 	
 	@FieldInfo(type = EFieldType.INTEGER, order = 4)
 	@Column(name = "PRIORITY", nullable = false)
