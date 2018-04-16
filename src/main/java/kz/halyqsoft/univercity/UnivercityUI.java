@@ -34,7 +34,7 @@ import java.util.Locale;
  * Created: 09.03.2018 22:49
  */
 @Theme("univercity")
-public class UnivercityUI extends AbstractSecureWebUI {
+public class UnivercityUI extends AbstractSecureWebUI {//
 
     private static final Logger LOG = LoggerFactory.getLogger(UnivercityUI.class);
 
