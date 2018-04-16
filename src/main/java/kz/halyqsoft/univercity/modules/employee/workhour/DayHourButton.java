@@ -61,7 +61,7 @@ final class DayHourButton extends Button {
     }
 
     private void refresh() {
-        String iconPath = ICON_PATH;
+        String iconPath = ICON_PATH;//
         if (awhe.getWorkHourStatus().getId().equals(ID.valueOf(1))) {
             iconPath += "active.png";
         } else {
