@@ -5,7 +5,6 @@ import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEPARTMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDENT_EDUCATION_TYPE;
@@ -191,25 +190,24 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
 
     @Override
     public boolean onEdit(Object source, Entity e, int buttonId) {
+        return openStudentEdit(source, e, false);
+    }
+
+    private boolean openStudentEdit(Object source, Entity e, boolean readOnly) {
         if (source.equals(studentGW)) {
             FormModel fm = new FormModel(STUDENT.class);
-            fm.setReadOnly(false);
+            fm.setReadOnly(readOnly);
             fm.setTitleVisible(false);
             try {
                 fm.loadEntity(e.getId());
                 getContent().removeComponent(filterPanel);
                 getContent().removeComponent(studentGW);
-                VerticalLayout viewVL = new VerticalLayout();
-                viewVL.addComponent(filterPanel);
-                viewVL.addComponent(studentGW);
-                StudentEdit studentEdit = new StudentEdit(fm, (FStudentFilter) filterPanel.getFilterBean(),
-                        getContent(), viewVL);
+                StudentEdit studentEdit = new StudentEdit(fm, getContent(), this);
                 getContent().addComponent(studentEdit);
-//                StudentUI.getInstance().openCommonView(se);//TODO
 
                 return false;
             } catch (Exception ex) {
-                CommonUtils.showMessageAndWriteLog("Unable to edit the student", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to open studentEdit", ex);
             }
         }
 
@@ -218,26 +216,7 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
 
     @Override
     public boolean onPreview(Object source, Entity e, int buttonId) {
-        if (source.equals(studentGW)) {
-            FormModel fm = new FormModel(STUDENT.class);
-            fm.setReadOnly(true);
-            fm.setTitleVisible(false);
-            try {
-                fm.loadEntity(e.getId());
-                //TODO remove from getContent
-                VerticalLayout viewVL = new VerticalLayout();
-                viewVL.addComponent(filterPanel);
-                viewVL.addComponent(studentGW);
-                StudentEdit se = new StudentEdit(fm, (FStudentFilter) filterPanel.getFilterBean(), getContent(), viewVL);
-//                StudentUI.getInstance().openCommonView(se);
-
-                return false;
-            } catch (Exception ex) {
-                CommonUtils.showMessageAndWriteLog("Unable to preview the student", ex);
-            }
-        }
-
-        return true;
+        return openStudentEdit(source, e, true);
     }
 
     @Override
@@ -453,5 +432,13 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
 
     @Override
     public void onCreate(Object arg0, Entity arg1, int arg2) {
+    }
+
+    public StudentFilterPanel getFilterPanel() {
+        return filterPanel;
+    }
+
+    public GridWidget getStudentGW() {
+        return studentGW;
     }
 }

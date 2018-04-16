@@ -8,10 +8,10 @@ import org.r3a.common.vaadin.widget.form.FormModel;
  * @author Omarbek
  * Created 21.10.2014 10:25:37
  */
-public class UnivercityUsersView extends UsersView {//
+public class UnivercityUsersView extends UsersView {
 
-    public UnivercityUsersView(AbstractTask task) throws Exception {
-        super(task);//
+    public UnivercityUsersView(AbstractTask task) throws Exception {//
+        super(task);
     }
 
     @Override
