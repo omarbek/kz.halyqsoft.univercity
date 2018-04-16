@@ -1,6 +1,7 @@
 package kz.halyqsoft.univercity.modules.catalog;
 
-import kz.halyqsoft.univercity.entity.beans.USER_ROLES;
+import kz.halyqsoft.univercity.entity.beans.TASKS;
+import kz.halyqsoft.univercity.entity.beans.ROLES;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.ID;
@@ -52,6 +53,9 @@ class CatalogList {
         addCatalogEntityToList(ACADEMIC_DEGREE.class);
         addCatalogEntityToList(ORGANIZATION.class);
         addCatalogEntityToList(SEMESTER_DATA.class);
+
+        addCatalogEntityToList(ROLES.class);
+        addCatalogEntityToList(TASKS.class);
 
         return new ArrayList<>(list);
     }

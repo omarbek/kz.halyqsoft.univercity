@@ -1,6 +1,8 @@
 package kz.halyqsoft.univercity.modules.catalog;
 
 import com.vaadin.ui.HorizontalSplitPanel;
+import kz.halyqsoft.univercity.entity.beans.ROLES;
+import kz.halyqsoft.univercity.entity.beans.TASKS;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.changelisteners.CountryChangeListener;
@@ -87,7 +89,11 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                     qm.addWhere("deleted", Boolean.FALSE);
                     qm.addWhereNull("parent");
                     qm.addOrder("deptName");
-                } else {
+                } else if (entityClass.equals(TASKS.class)) {
+                    classASW = new LazyCommonTreeWidget(TASKS.class);
+                    classASW.addEntityListener(this);
+                    ((LazyCommonTreeWidget) classASW).setCheckParents(false);
+                }else {
                     classASW = new GridWidget(entityClass);
                     classASW.addEntityListener(this);
                     DBGridModel tm = (DBGridModel) classASW.getWidgetModel();
@@ -145,6 +151,8 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                         FormModel fm = ((DBSelectModel) classASW.getWidgetModel()).getFormModel();
                         QueryModel specQM = ((FKFieldModel) fm.getFieldModel("department")).getQueryModel();
                         specQM.addWhereNotNull("parent");
+                    }else if (entityClass.equals(ROLES.class)) {
+                        classASW.setButtonVisible(AbstractToolbar.EDIT_BUTTON, false);
                     }
                 }
                 mainHSP.addComponent(classASW);
