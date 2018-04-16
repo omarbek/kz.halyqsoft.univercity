@@ -2,6 +2,10 @@ package kz.halyqsoft.univercity.modules.catalog;
 
 import kz.halyqsoft.univercity.entity.beans.USER_ROLES;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_ACADEMIC_DEGREE;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_ORGANIZATION;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_SEMESTER_DATA;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_SPECIALITY;
 import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.ID;
 
