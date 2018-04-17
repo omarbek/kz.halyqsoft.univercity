@@ -83,5 +83,6 @@
     <orderEntry type="library" name="Maven: org.r3a:utility:1.0" level="project" />
     <orderEntry type="library" name="Maven: com.unboundid:unboundid-ldapsdk:4.0.4" level="project" />
     <orderEntry type="library" name="Maven: com.itextpdf:itextpdf:5.5.11" level="project" />
+    <orderEntry type="library" name="Maven: commons-io:commons-io:2.6" level="project" />
   </component>
 </module>
