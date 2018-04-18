@@ -1,5 +1,6 @@
 package kz.halyqsoft.univercity.filter;
 
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.USER_TYPE;
 import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 
 import java.util.Date;
@@ -13,13 +14,12 @@ public final class FUserFilter extends AbstractFilterBean {
     private String code;
     private String firstname;
     private String lastname;
-    private boolean student;
+    private USER_TYPE userType;
     private Date date;
 
     @Override
     public boolean hasFilter() {
-        return (!(code == null && firstname == null && lastname == null && date == null))
-                || student;
+        return (!(code == null && firstname == null && lastname == null && date == null && userType == null));
     }
 
     public String getCode() {
@@ -46,12 +46,12 @@ public final class FUserFilter extends AbstractFilterBean {
         this.lastname = lastname;
     }
 
-    public boolean isStudent() {
-        return student;
+    public USER_TYPE getUserType() {
+        return userType;
     }
 
-    public void setStudent(boolean student) {
-        this.student = student;
+    public void setUserType(USER_TYPE userType) {
+        this.userType = userType;
     }
 
     public Date getDate() {

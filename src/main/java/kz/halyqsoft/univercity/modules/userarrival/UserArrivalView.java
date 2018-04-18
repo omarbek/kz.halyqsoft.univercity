@@ -1,9 +1,13 @@
 package kz.halyqsoft.univercity.modules.userarrival;
 
+import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.Alignment;
-import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.TextField;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.USER_TYPE;
+import kz.halyqsoft.univercity.entity.beans.univercity.enumeration.UserType;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VUser;
 import kz.halyqsoft.univercity.filter.FUserFilter;
 import kz.halyqsoft.univercity.filter.panel.UserFilterPanel;
@@ -12,6 +16,7 @@ import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.ID;
 import org.r3a.common.entity.beans.AbstractTask;
+import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.ERefreshType;
 import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
@@ -32,36 +37,51 @@ public class UserArrivalView extends AbstractTaskView implements FilterPanelList
 
     private final UserFilterPanel filterPanel;
     private GridWidget userGW;
+    private ComboBox userTypeCB;
+
+    private USER_TYPE userType;
 
     public UserArrivalView(AbstractTask task) throws Exception {
         super(task);
         filterPanel = new UserFilterPanel(new FUserFilter());
+        userType = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                lookup(USER_TYPE.class, ID.valueOf(UserType.STUDENT_INDEX));
     }
 
     @Override
     public void initView(boolean b) throws Exception {
         filterPanel.addFilterPanelListener(this);
-        TextField tf = new TextField();
-        tf.setNullRepresentation("");
-        tf.setNullSettingAllowed(true);
-        filterPanel.addFilterComponent("code", tf);
+        TextField textField = new TextField();
+        textField.setNullRepresentation("");
+        textField.setNullSettingAllowed(true);
+        filterPanel.addFilterComponent("code", textField);
 
-        tf = new TextField();
-        tf.setNullRepresentation("");
-        tf.setNullSettingAllowed(true);
-        filterPanel.addFilterComponent("firstname", tf);
+        textField = new TextField();
+        textField.setNullRepresentation("");
+        textField.setNullSettingAllowed(true);
+        filterPanel.addFilterComponent("firstname", textField);
 
-        tf = new TextField();
-        tf.setNullRepresentation("");
-        tf.setNullSettingAllowed(true);
-        filterPanel.addFilterComponent("lastname", tf);
+        textField = new TextField();
+        textField.setNullRepresentation("");
+        textField.setNullSettingAllowed(true);
+        filterPanel.addFilterComponent("lastname", textField);
 
-        CheckBox cb = new CheckBox();
-        filterPanel.addFilterComponent("student", cb);
+        userTypeCB = new ComboBox();
+        userTypeCB.setNullSelectionAllowed(false);
+        userTypeCB.setTextInputAllowed(false);
+        userTypeCB.setFilteringMode(FilteringMode.OFF);
+        userTypeCB.setPageLength(0);
+        QueryModel<USER_TYPE> typeQM = new QueryModel<>(USER_TYPE.class);
+        BeanItemContainer<USER_TYPE> typeBIC = new BeanItemContainer<>(USER_TYPE.class,
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(typeQM));
+        userTypeCB.setContainerDataSource(typeBIC);
+        filterPanel.addFilterComponent("userType", userTypeCB);
+        userTypeCB.setValue(userType);
 
         DateField createdDF = new DateField();
-        createdDF.setValue(new Date());
+        createdDF.setHeight(24, Unit.PIXELS);
         filterPanel.addFilterComponent("date", createdDF);
+        createdDF.setValue(new Date());
 
         getContent().addComponent(filterPanel);
         getContent().setComponentAlignment(filterPanel, Alignment.TOP_CENTER);
@@ -73,13 +93,14 @@ public class UserArrivalView extends AbstractTaskView implements FilterPanelList
         userGW.setButtonVisible(AbstractToolbar.ADD_BUTTON, false);
         userGW.setButtonVisible(AbstractToolbar.EDIT_BUTTON, false);
         userGW.setButtonVisible(AbstractToolbar.DELETE_BUTTON, false);
+        userGW.setButtonVisible(AbstractToolbar.REFRESH_BUTTON, false);
         DBGridModel userGM = (DBGridModel) userGW.getWidgetModel();
-        userGM.setTitleVisible(true);
+        userGM.setTitleVisible(false);
         userGM.setRefreshType(ERefreshType.MANUAL);
 
-        FUserFilter ef = (FUserFilter) filterPanel.getFilterBean();
-        if (ef.hasFilter()) {
-            doFilter(ef);
+        FUserFilter fUserFilter = (FUserFilter) filterPanel.getFilterBean();
+        if (fUserFilter.hasFilter()) {
+            doFilter(fUserFilter);
         }
 
         getContent().addComponent(userGW);
@@ -88,28 +109,28 @@ public class UserArrivalView extends AbstractTaskView implements FilterPanelList
 
     @Override
     public void doFilter(AbstractFilterBean abstractFilterBean) {
-        FUserFilter sf = (FUserFilter) abstractFilterBean;
+        FUserFilter fUserFilter = (FUserFilter) abstractFilterBean;
         Map<Integer, Object> params = new HashMap<>();
         StringBuilder userSB = new StringBuilder();
-        if (sf.getCode() != null && sf.getCode().trim().length() >= 2) {
+        if (fUserFilter.getCode() != null && fUserFilter.getCode().trim().length() >= 2) {
             userSB.append(" and lower(usr.CODE) like '");
-            userSB.append(sf.getCode().trim().toLowerCase());
+            userSB.append(fUserFilter.getCode().trim().toLowerCase());
             userSB.append("%'");
         }
-        if (sf.getFirstname() != null && sf.getFirstname().trim().length() >= 3) {
+        if (fUserFilter.getFirstname() != null && fUserFilter.getFirstname().trim().length() >= 3) {
             userSB.append(" and lower(usr.FIRST_NAME) like '");
-            userSB.append(sf.getFirstname().trim().toLowerCase());
+            userSB.append(fUserFilter.getFirstname().trim().toLowerCase());
             userSB.append("%'");
         }
-        if (sf.getLastname() != null && sf.getLastname().trim().length() >= 3) {
+        if (fUserFilter.getLastname() != null && fUserFilter.getLastname().trim().length() >= 3) {
             userSB.append(" and lower(usr.LAST_NAME) like '");
-            userSB.append(sf.getLastname().trim().toLowerCase());
+            userSB.append(fUserFilter.getLastname().trim().toLowerCase());
             userSB.append("%'");
         }
-        if (sf.getDate() != null) {
+        if (fUserFilter.getDate() != null) {
             userSB.append(" and date_trunc('day', usr_arriv.created) = date_trunc('day', TIMESTAMP '");
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-            userSB.append(dateFormat.format(sf.getDate()));
+            userSB.append(dateFormat.format(fUserFilter.getDate()));
             userSB.append("')");
         }
 
@@ -119,7 +140,7 @@ public class UserArrivalView extends AbstractTaskView implements FilterPanelList
                 "  usr.ID, " +
                 "  usr.CODE, " +
                 "  trim(usr.LAST_NAME || ' ' || usr.FIRST_NAME || ' ' || coalesce(usr.MIDDLE_NAME, '')) FIO, ");
-        if (sf.isStudent()) {
+        if (fUserFilter.getUserType().equals(userType)) {
             sqlSB.append("spec.SPEC_NAME                                                            specialty, " +
                     "  year.study_year                                                              studyYear, " +
                     "  NULL                                                                          deptName, " +
@@ -148,15 +169,16 @@ public class UserArrivalView extends AbstractTaskView implements FilterPanelList
                     "  INNER JOIN POST post ON empl_dept.POST_ID = post.id ");
         }
         sqlSB.append(userSB.toString());
-        sqlSB.append(" ORDER BY FIO");
+        sqlSB.append(" ORDER BY usr_arriv.created DESC");
         try {
             List tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
                     lookupItemsList(sqlSB.toString(), params);
             if (!tmpList.isEmpty()) {
+                long id = 1;
                 for (Object o : tmpList) {
                     Object[] oo = (Object[]) o;
                     VUser vs = new VUser();
-                    vs.setId(ID.valueOf((long) oo[0]));
+                    vs.setId(ID.valueOf(id++));
                     vs.setCode((String) oo[1]);
                     vs.setFio((String) oo[2]);
                     vs.setSpecialty((String) oo[3]);
@@ -176,6 +198,7 @@ public class UserArrivalView extends AbstractTaskView implements FilterPanelList
 
     @Override
     public void clearFilter() {
+        userTypeCB.setValue(userType);
         refresh(new ArrayList<>());
     }
 
