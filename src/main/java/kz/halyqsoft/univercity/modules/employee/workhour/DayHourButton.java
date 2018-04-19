@@ -10,7 +10,7 @@ import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.ID;
 
 /**
- * @author Rakymzhan A. Kenzhegul
+ * @author Omarbek Dinassil
  * @created Jan 2, 2016 8:17:52 PM
  */
 @SuppressWarnings("serial")
