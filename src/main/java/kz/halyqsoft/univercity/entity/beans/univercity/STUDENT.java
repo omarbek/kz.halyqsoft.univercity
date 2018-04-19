@@ -7,6 +7,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.catalog.LEVEL;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDENT_CATEGORY;
 import kz.halyqsoft.univercity.entity.beans.univercity.enumeration.UserType;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_ADVISOR;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_COORDINATOR;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
 
@@ -61,6 +62,12 @@ public class STUDENT extends USERS {
     @JoinColumns({
             @JoinColumn(name = "ADVISOR_ID", referencedColumnName = "ID")})
     private V_ADVISOR advisor;
+
+    @FieldInfo(type = EFieldType.FK_DIALOG, order = 37, inGrid = false, required = false)
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "COORDINATOR_ID", referencedColumnName = "ID")})
+    private V_COORDINATOR coordinator;
 
     @Column(name = "PLOGIN")
     private String parentLogin;
@@ -128,6 +135,14 @@ public class STUDENT extends USERS {
 
     public void setAdvisor(V_ADVISOR advisor) {
         this.advisor = advisor;
+    }
+
+    public V_COORDINATOR getCoordinator() {
+        return coordinator;
+    }
+
+    public void setCoordinator(V_COORDINATOR coordinator) {
+        this.coordinator = coordinator;
     }
 
     public String getParentLogin() {

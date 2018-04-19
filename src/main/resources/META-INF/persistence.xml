@@ -178,6 +178,7 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_LESSON_DETAIL_FULL</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_SEMESTER_DATA</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_ADVISOR</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_COORDINATOR</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_SUBJECT_SELECT</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_SEMESTER_SUBJECT</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_STUDENT_SELECT</class>

@@ -46,31 +46,6 @@ public class RegisterApplicantsView extends AbstractTaskView {
             }
         });
         registerVL.addComponent(regButton);
-//        TextField firstTF = new TextField("Number of iteration:");
-//        TextField secondTF = new TextField("Parameter: ");
-//        TextField thirdTF = new TextField("The Star:");
-//        Button submitButton = new Button("calculate");
-//        submitButton.addClickListener(new Button.ClickListener() {
-//            @Override
-//            public void buttonClick(Button.ClickEvent clickEvent) {
-//                try {
-//                    AllLabs.calculate(Double.parseDouble(secondTF.getValue()), Integer.parseInt(thirdTF.getValue()),
-//                            Integer.parseInt(firstTF.getValue()));
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
-//
-//        registerVL.addComponent(firstTF);
-//        registerVL.setComponentAlignment(firstTF, Alignment.MIDDLE_CENTER);
-//        registerVL.addComponent(secondTF);
-//        registerVL.setComponentAlignment(secondTF, Alignment.MIDDLE_CENTER);
-//        registerVL.addComponent(thirdTF);
-//        registerVL.setComponentAlignment(thirdTF, Alignment.MIDDLE_CENTER);
-//        registerVL.addComponent(submitButton);
-//        registerVL.setComponentAlignment(submitButton, Alignment.MIDDLE_CENTER);
-
         getContent().addComponent(registerVL);
     }
 
