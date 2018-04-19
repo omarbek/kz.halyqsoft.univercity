@@ -168,7 +168,7 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
 
     @Override
     public boolean onEdit(Object source, Entity e, int buttonId) {
-        if (e instanceof ORGANIZATION) {//TODO check
+        if (e instanceof ORGANIZATION) {
             FormModel fm = ((DBSelectModel) classASW.getWidgetModel()).getFormModel();
             FKFieldModel countryFM = (FKFieldModel) fm.getFieldModel("country");
 

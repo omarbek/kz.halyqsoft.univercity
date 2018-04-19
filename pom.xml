@@ -139,12 +139,32 @@
 			<artifactId>itextpdf</artifactId>
 			<version>5.5.11</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>2.6</version>
 		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20180130</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.7</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.5</version>
+		</dependency>
+		<!--<dependency>-->
+			<!--<groupId>javax.json</groupId>-->
+			<!--<artifactId>javax.json-api</artifactId>-->
+			<!--<version>1.1.2</version>-->
+		<!--</dependency>-->
+
 
 		<!--last-->
 	</dependencies>
