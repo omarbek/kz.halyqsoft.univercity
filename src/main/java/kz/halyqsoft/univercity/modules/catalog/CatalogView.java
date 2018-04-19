@@ -2,7 +2,6 @@ package kz.halyqsoft.univercity.modules.catalog;
 
 import com.vaadin.ui.HorizontalSplitPanel;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.V_ACADEMIC_DEGREE;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.changelisteners.CountryChangeListener;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
@@ -19,6 +18,7 @@ import org.r3a.common.entity.tree.CommonTree;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.AbstractSelectWidget;
 import org.r3a.common.vaadin.widget.DBSelectModel;
+import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.form.FormModel;
 import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
@@ -146,7 +146,8 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                         FormModel fm = ((DBSelectModel) classASW.getWidgetModel()).getFormModel();
                         QueryModel specQM = ((FKFieldModel) fm.getFieldModel("department")).getQueryModel();
                         specQM.addWhereNotNull("parent");
-                    } /*else if (entityClass.equals(ACADEMIC_DEGREE.class)) {
+                    }
+                    /*else if (entityClass.equals(ACADEMIC_DEGREE.class)) {
                         FormModel fm = ((DBSelectModel) classASW.getWidgetModel()).getFormModel();
                         ((FKFieldModel) fm.getFieldModel("speciality")).setDialogWidth(500);
 //                        (fm.getFieldModel("speciality")).setWidth(500);
@@ -183,9 +184,36 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
             }
 
             countryFM.getListeners().add(new CountryChangeListener(((ORGANIZATION) e).getRegion(), regionFM));
+        } else if (e instanceof ORDER_TYPE) {
+            Integer[] ids = {3, 4, 5, 7, 8};
+            if (onEdit(e, ids)) {
+                return false;
+            }
+
+        } else if (e instanceof STUDENT_CATEGORY) {
+            Integer[] ids = {1, 2, 3};
+            if (onEdit(e, ids)) {
+                return false;
+            }
+        } else if (e instanceof STUDENT_STATUS) {
+            Integer[] ids = {1, 2, 3, 4, 5, 6, 7, 8};
+            if (onEdit(e, ids)) {
+                return false;
+            }
         }
 
         return true;
+    }
+
+    private boolean onEdit(Entity e, Integer[] ids) {
+        ID entityId = e.getId();
+        for (Integer id : ids) {
+            if (entityId.equals(ID.valueOf(id))) {
+                Message.showInfo(getUILocaleUtil().getMessage("cannot.edit"));
+                return true;
+            }
+        }
+        return false;
     }
 
 
