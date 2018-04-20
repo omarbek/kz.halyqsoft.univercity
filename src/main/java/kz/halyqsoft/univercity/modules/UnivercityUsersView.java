@@ -16,7 +16,7 @@ public class UnivercityUsersView extends UsersView {
 
     @Override
     public void initView(boolean readOnly) throws Exception {
-        super.initView(readOnly);
+        super.initView(readOnly);//
         FormModel fm = getUsersForm().getWidgetModel();
         fm.getFieldModel("task").setInEdit(false);
         fm.getFieldModel("task").setInView(false);
