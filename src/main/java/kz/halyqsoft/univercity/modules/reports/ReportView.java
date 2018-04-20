@@ -134,7 +134,7 @@ public class ReportView extends AbstractTaskView {
         }
         foldersAndFilesTT.setContainerDataSource(hierarchicalContainer);
 
-        foldersAndFilesTT.setSizeFull();//
+        foldersAndFilesTT.setSizeFull();
         foldersAndFilesTT.addStyleName("schedule");
         foldersAndFilesTT.setSelectable(true);
         foldersAndFilesTT.setMultiSelect(false);
