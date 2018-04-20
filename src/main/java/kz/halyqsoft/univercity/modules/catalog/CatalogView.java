@@ -157,7 +157,7 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                         ((FKFieldModel) fm.getFieldModel("speciality")).setDialogWidth(500);
 //                        (fm.getFieldModel("speciality")).setWidth(500);
                     }*/
-                    }else if (entityClass.equals(ROLES.class)) {
+                    else if (entityClass.equals(ROLES.class)) {
                         classASW.setButtonVisible(AbstractToolbar.EDIT_BUTTON, false);
                     }
                 }

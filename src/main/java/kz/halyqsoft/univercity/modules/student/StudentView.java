@@ -156,7 +156,7 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
 
         studentGW = new GridWidget(VStudent.class);
         studentGW.addEntityListener(this);
-        studentGW.showToolbar(false);
+        //studentGW.showToolbar(false);
         DBGridModel studentGM = (DBGridModel) studentGW.getWidgetModel();
         studentGM.setReadOnly(true);
         studentGM.setRefreshType(ERefreshType.MANUAL);
