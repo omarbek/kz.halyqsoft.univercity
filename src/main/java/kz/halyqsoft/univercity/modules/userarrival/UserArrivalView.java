@@ -129,7 +129,7 @@ public class UserArrivalView extends AbstractTaskView implements FilterPanelList
         }
         if (fUserFilter.getDate() != null) {
             userSB.append(" and date_trunc('day', usr_arriv.created) = date_trunc('day', TIMESTAMP '");
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             userSB.append(dateFormat.format(fUserFilter.getDate()));
             userSB.append("')");
         }

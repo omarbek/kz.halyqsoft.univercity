@@ -98,10 +98,16 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                         classASW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
                         qm.addWhere("categoryName", null, null, true);
                     } else if (AbstractStatusEntity.class.isAssignableFrom(entityClass)) {
-                        classASW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
+                        if (entityClass.equals(MARITAL_STATUS.class)) {
+                            classASW.setButtonVisible(IconToolbar.DELETE_BUTTON, true);
+                        } else {
+                            classASW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
+                        }
                         qm.addWhere("statusName", null, null, true);
                     } else if (AbstractTypeEntity.class.isAssignableFrom(entityClass)) {
-                        if (!entityClass.equals(SCHOOL_TYPE.class)) {
+                        if (!(entityClass.equals(SCHOOL_TYPE.class)
+                                || entityClass.equals(MEDICAL_CHECKUP_TYPE.class)
+                                || entityClass.equals(CONTRACT_TYPE.class))) {
                             classASW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
                         } else {
                             classASW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
@@ -128,30 +134,33 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                         classASW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
                         qm.addWhere("universityName", null, null, true);
                         qm.addWhere("useDefault", Boolean.FALSE, true);
-                    } else if (entityClass.equals(MARITAL_STATUS.class)) {
-                        classASW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
+                    }/* else if (entityClass.equals(MARITAL_STATUS.class)) {
+                        classASW.setButtonVisible(IconToolbar.DELETE_BUTTON, true);
                         qm.addWhere("statusName", null, null, true);
-                    } else if (entityClass.equals(UNT_SUBJECT.class)) {
+                    }*/ else if (entityClass.equals(UNT_SUBJECT.class)) {
                         classASW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
                         qm.addWhere("subjectName", null, null, true);
-                    } /*else if (entityClass.equals(ENTRANCE_YEAR.class)) {
-                        classASW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
-                        tm.getColumnModel("beginYear").setFormat(NumberUtils.INTEGER_FORMAT);
-                        tm.getColumnModel("endYear").setFormat(NumberUtils.INTEGER_FORMAT);
-                    } */ else if (entityClass.equals(CORPUS.class)) {
+                    } else if (entityClass.equals(CORPUS.class)) {
                         classASW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
                     } else if (entityClass.equals(LOCK_REASON.class)) {
                         qm.addWhere("reason", null, null, true);//for filter
                     } else if (entityClass.equals(SPECIALITY.class)) {
+                        qm.addWhere("deleted", Boolean.FALSE);
+
                         FormModel fm = ((DBSelectModel) classASW.getWidgetModel()).getFormModel();
                         QueryModel specQM = ((FKFieldModel) fm.getFieldModel("department")).getQueryModel();
                         specQM.addWhereNotNull("parent");
+                        specQM.addWhere("deleted", Boolean.FALSE);
                     }
                     /*else if (entityClass.equals(ACADEMIC_DEGREE.class)) {
                         FormModel fm = ((DBSelectModel) classASW.getWidgetModel()).getFormModel();
                         ((FKFieldModel) fm.getFieldModel("speciality")).setDialogWidth(500);
 //                        (fm.getFieldModel("speciality")).setWidth(500);
-                    }*/
+                    } else if (entityClass.equals(ENTRANCE_YEAR.class)) {
+                        classASW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
+                        tm.getColumnModel("beginYear").setFormat(NumberUtils.INTEGER_FORMAT);
+                        tm.getColumnModel("endYear").setFormat(NumberUtils.INTEGER_FORMAT);
+                    } */
                 }
                 mainHSP.addComponent(classASW);
             }

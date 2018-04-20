@@ -65,6 +65,7 @@ public class ReportView extends AbstractTaskView {
     private static final String B = "b";
 
     private static final String JASPER_REPORT_URL = "http://78.40.108.39:8080/jasperreport/GenerateReport";
+//    private static final String JASPER_REPORT_URL = "http://localhost:8080/jasperreport/GenerateReport";
 
     public ReportView(AbstractTask task) throws Exception {
         super(task);
