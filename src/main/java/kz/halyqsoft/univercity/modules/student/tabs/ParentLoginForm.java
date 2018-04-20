@@ -16,7 +16,7 @@ import org.r3a.common.utility.PasswordGenerator;
 import java.util.List;
 
 /**
- * @author Rakymzhan A. Kenzhegul
+ * @author Omarbek Dinassil
  * @created Aug 8, 2016 3:39:24 PM
  */
 @SuppressWarnings("serial")

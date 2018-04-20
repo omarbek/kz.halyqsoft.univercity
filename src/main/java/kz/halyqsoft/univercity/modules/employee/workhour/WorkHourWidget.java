@@ -22,7 +22,7 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * @author Rakymzhan A. Kenzhegul
+ * @author Omarbek Dinassil
  * @created Jan 2, 2016 3:49:56 PM
  */
 @SuppressWarnings("serial")

@@ -10,7 +10,7 @@ import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.ID;
 
 /**
- * @author Rakymzhan A. Kenzhegul
+ * @author Omarbek Dinassil
  * @created Jan 2, 2016 8:17:52 PM
  */
 @SuppressWarnings("serial")
@@ -61,7 +61,7 @@ final class DayHourButton extends Button {
     }
 
     private void refresh() {
-        String iconPath = ICON_PATH;//
+        String iconPath = ICON_PATH;
         if (awhe.getWorkHourStatus().getId().equals(ID.valueOf(1))) {
             iconPath += "active.png";
         } else {

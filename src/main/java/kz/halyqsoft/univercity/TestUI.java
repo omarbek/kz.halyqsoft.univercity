@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Author: Rakymzhan A. Kenzhegul
+ * Author: Omarbek Dinassil
  * Created: 11.03.2018 11:21
  */
 public class TestUI extends UI {
