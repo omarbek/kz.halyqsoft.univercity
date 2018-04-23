@@ -69,7 +69,7 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
         cb.setPageLength(0);
         cb.setWidth(300, Unit.PIXELS);
         QueryModel<DEPARTMENT> chairQM = new QueryModel<>(DEPARTMENT.class);
-//        chairQM.addWhere("type", ECriteria.EQUAL, DEPARTMENT_TYPE.CHAIR_ID);//TODO
+        chairQM.addWhereNotNull("parent");
         chairQM.addWhereAnd("deleted", Boolean.FALSE);
         chairQM.addOrder("deptName");
         BeanItemContainer<DEPARTMENT> chairBIC = new BeanItemContainer<>(DEPARTMENT.class,
