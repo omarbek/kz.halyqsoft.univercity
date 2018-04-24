@@ -50,7 +50,7 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
 //    private boolean needDorm;
 //    private boolean needDormFilter;
 
-    public StudentView(AbstractTask task) throws Exception {
+       public StudentView(AbstractTask task) throws Exception {
         super(task);
 
         filterPanel = new StudentFilterPanel(new FStudentFilter());
@@ -157,6 +157,7 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
         studentGW = new GridWidget(VStudent.class);
         studentGW.addEntityListener(this);
         //studentGW.showToolbar(false);
+
         DBGridModel studentGM = (DBGridModel) studentGW.getWidgetModel();
         studentGM.setReadOnly(true);
         studentGM.setRefreshType(ERefreshType.MANUAL);

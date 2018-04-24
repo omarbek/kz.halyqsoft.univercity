@@ -2,6 +2,7 @@ package kz.halyqsoft.univercity.modules.catalog;
 
 import com.vaadin.ui.HorizontalSplitPanel;
 import kz.halyqsoft.univercity.entity.beans.ROLES;
+import kz.halyqsoft.univercity.entity.beans.ROLE_TASKS;
 import kz.halyqsoft.univercity.entity.beans.TASKS;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_ACADEMIC_DEGREE;
@@ -21,6 +22,7 @@ import org.r3a.common.entity.tree.CommonTree;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.AbstractSelectWidget;
 import org.r3a.common.vaadin.widget.DBSelectModel;
+import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.form.FormModel;
 import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
@@ -241,6 +243,34 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                     } catch (Exception ex) {
                         CommonUtils.showMessageAndWriteLog("Unable to delete a speciality", ex);
                     }
+                }else if(e instanceof TASKS){
+                        try{
+                            //1 role tasks
+                            QueryModel<ROLE_TASKS> queryModel = new QueryModel<>(ROLE_TASKS.class);
+                            queryModel.addWhere("task" , ECriteria.EQUAL , e.getId());
+                            List<ROLE_TASKS> roleTasks = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(queryModel);
+                            if(roleTasks!=null) {
+                                if (roleTasks.size() > 0) {
+                                    Message.showError(getUILocaleUtil().getMessage("error.binded"));
+                                    return false;
+                                }
+                            }
+                            //2
+                            TASKS task = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(TASKS.class , e.getId());
+                            if(task!=null){
+                                if(task.getChildren()!=null)
+                                {
+                                    if(task.getChildren().size()>0)
+                                    {
+                                        Message.showError(getUILocaleUtil().getMessage("error.children"));
+                                        return false;
+                                    }
+                                }
+                            }
+
+                        }catch (Exception ex ){
+                            Message.showError(ex.getMessage());
+                        }
                 }
             }
 
@@ -253,5 +283,4 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
         }
         return true;
     }
-
 }
