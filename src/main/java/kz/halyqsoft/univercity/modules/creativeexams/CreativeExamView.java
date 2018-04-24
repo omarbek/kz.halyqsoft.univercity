@@ -42,7 +42,7 @@ public class CreativeExamView extends AbstractTaskView implements FilterPanelLis
 
     public CreativeExamView(AbstractTask task) throws Exception {
         super(task);
-        filterPanel = new StudentFilterPanel(new FStudentFilter(true));
+        filterPanel = new StudentFilterPanel(new FStudentFilter());
     }
 
     @Override
