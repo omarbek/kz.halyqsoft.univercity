@@ -31,12 +31,11 @@ import java.util.List;
 import java.util.Map;
 
 public class TaskRoleBindingView extends AbstractTaskView implements EntityListener, FilterPanelListener {
-    private TaskRolesFilterPanel filterPanel;
-    private HorizontalLayout horizontalLayout;
 
-    private Button bindBtn;
-    private ComboBox cbTasks;
-    private ComboBox cbRoles;
+    private TaskRolesFilterPanel filterPanel;
+
+    private ComboBox tasksCB;
+    private ComboBox rolesCB;
     private GridWidget taskRoleGW;
 
     public TaskRoleBindingView(AbstractTask task) throws Exception {
@@ -48,14 +47,14 @@ public class TaskRoleBindingView extends AbstractTaskView implements EntityListe
     public void initView(boolean b) throws Exception {
         filterPanel.addFilterPanelListener(this);
 
-        bindBtn = new Button(getUILocaleUtil().getCaption("creation.bind"));
-        horizontalLayout = new HorizontalLayout();
+        Button bindButton = new Button(getUILocaleUtil().getCaption("creation.bind"));
+        HorizontalLayout componentHL = new HorizontalLayout();
 
-        bindBtn.addClickListener(new Button.ClickListener() {
+        bindButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
-                TASKS task = (TASKS)cbTasks.getValue();
-                ROLES role = (ROLES)cbRoles.getValue();
+                TASKS task = (TASKS) tasksCB.getValue();
+                ROLES role = (ROLES) rolesCB.getValue();
 
                 if(role==null || task == null)
                 {
@@ -82,41 +81,41 @@ public class TaskRoleBindingView extends AbstractTaskView implements EntityListe
             }
         });
 
-        cbRoles = new ComboBox();
-        cbRoles.setNullSelectionAllowed(true);
-        cbRoles.setTextInputAllowed(false);
-        cbRoles.setFilteringMode(FilteringMode.CONTAINS);
-        cbRoles.setPageLength(0);
-        cbRoles.setWidth(300, Unit.PIXELS);
+        rolesCB = new ComboBox();
+        rolesCB.setNullSelectionAllowed(true);
+        rolesCB.setTextInputAllowed(false);
+        rolesCB.setFilteringMode(FilteringMode.CONTAINS);
+        rolesCB.setPageLength(0);
+        rolesCB.setWidth(300, Unit.PIXELS);
         QueryModel<ROLES> roleQM = new QueryModel<>(ROLES.class);
         BeanItemContainer<ROLES> roleBIC = new BeanItemContainer<>(ROLES.class,
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(roleQM));
-        cbRoles.setContainerDataSource(roleBIC);
-        filterPanel.addFilterComponent("roleName", cbRoles);
+        rolesCB.setContainerDataSource(roleBIC);
+        filterPanel.addFilterComponent("roleName", rolesCB);
 
 
-        cbTasks = new ComboBox();
-        cbTasks.setNullSelectionAllowed(true);
-        cbTasks.setTextInputAllowed(false);
-        cbTasks.setFilteringMode(FilteringMode.CONTAINS);
-        cbTasks.setPageLength(0);
-        cbTasks.setWidth(220, Unit.PIXELS);
+        tasksCB = new ComboBox();
+        tasksCB.setNullSelectionAllowed(true);
+        tasksCB.setTextInputAllowed(false);
+        tasksCB.setFilteringMode(FilteringMode.CONTAINS);
+        tasksCB.setPageLength(0);
+        tasksCB.setWidth(220, Unit.PIXELS);
         QueryModel<TASKS> taskQM = new QueryModel<>(TASKS.class);
         BeanItemContainer<TASKS> taskBIC = new BeanItemContainer<>(TASKS.class,
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(taskQM));
-        cbTasks.setContainerDataSource(taskBIC);
+        tasksCB.setContainerDataSource(taskBIC);
 
-        filterPanel.addFilterComponent("taskName", cbTasks);
+        filterPanel.addFilterComponent("taskName", tasksCB);
 
-        horizontalLayout.addComponent(bindBtn);
-        horizontalLayout.setComponentAlignment(bindBtn,Alignment.MIDDLE_CENTER);
+        componentHL.addComponent(bindButton);
+        componentHL.setComponentAlignment(bindButton,Alignment.MIDDLE_CENTER);
 
 
         getContent().addComponent(filterPanel);
         getContent().setComponentAlignment(filterPanel, Alignment.TOP_CENTER);
 
-        getContent().addComponent(horizontalLayout);
-        getContent().setComponentAlignment(horizontalLayout, Alignment.MIDDLE_CENTER);
+        getContent().addComponent(componentHL);
+        getContent().setComponentAlignment(componentHL, Alignment.MIDDLE_CENTER);
 
         taskRoleGW = new GridWidget(VTaskRoles.class);
         taskRoleGW.addEntityListener(this);

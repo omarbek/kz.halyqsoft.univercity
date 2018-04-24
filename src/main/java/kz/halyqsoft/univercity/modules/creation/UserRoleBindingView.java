@@ -4,10 +4,8 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.ROLES;
-import kz.halyqsoft.univercity.entity.beans.ROLE_TASKS;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.USER_ROLES;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.VTaskRoles;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VUserRoles;
 import kz.halyqsoft.univercity.filter.FUserRolesFilter;
 import kz.halyqsoft.univercity.filter.panel.UserRolesFilterPanel;
@@ -32,14 +30,13 @@ import org.r3a.common.vaadin.widget.toolbar.IconToolbar;
 import java.util.*;
 
 public class UserRoleBindingView extends AbstractTaskView implements EntityListener, FilterPanelListener {
+
     private UserRolesFilterPanel filterPanel;
-    private HorizontalLayout horizontalLayout;
 
     private GridWidget userRoleGW;
 
-    private Button bindBtn;
-    private ComboBox cbRoles;
-    private ComboBox cbUsers;
+    private ComboBox rolesCB;
+    private ComboBox usersCB;
 
     public UserRoleBindingView(AbstractTask task) throws Exception {
         super(task);
@@ -51,41 +48,41 @@ public class UserRoleBindingView extends AbstractTaskView implements EntityListe
 
         filterPanel.addFilterPanelListener(this);
 
-        cbRoles = new ComboBox();
-        cbRoles.setNullSelectionAllowed(true);
-        cbRoles.setTextInputAllowed(false);
-        cbRoles.setFilteringMode(FilteringMode.CONTAINS);
-        cbRoles.setPageLength(0);
-        cbRoles.setWidth(300, Unit.PIXELS);
+        rolesCB = new ComboBox();
+        rolesCB.setNullSelectionAllowed(true);
+        rolesCB.setTextInputAllowed(false);
+        rolesCB.setFilteringMode(FilteringMode.CONTAINS);
+        rolesCB.setPageLength(0);
+        rolesCB.setWidth(300, Unit.PIXELS);
         QueryModel<ROLES> roleQM = new QueryModel<>(ROLES.class);
         BeanItemContainer<ROLES> roleBIC = new BeanItemContainer<>(ROLES.class,
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(roleQM));
-        cbRoles.setContainerDataSource(roleBIC);
-        filterPanel.addFilterComponent("roleName", cbRoles);
+        rolesCB.setContainerDataSource(roleBIC);
+        filterPanel.addFilterComponent("roleName", rolesCB);
 
 
-        cbUsers = new ComboBox();
-        cbUsers.setCaption(getUILocaleUtil().getCaption(""));
-        cbUsers.setNullSelectionAllowed(true);
-        cbUsers.setTextInputAllowed(false);
-        cbUsers.setFilteringMode(FilteringMode.CONTAINS);
-        cbUsers.setPageLength(0);
-        cbUsers.setWidth(220, Unit.PIXELS);
+        usersCB = new ComboBox();
+        usersCB.setCaption(getUILocaleUtil().getCaption(""));
+        usersCB.setNullSelectionAllowed(true);
+        usersCB.setTextInputAllowed(false);
+        usersCB.setFilteringMode(FilteringMode.CONTAINS);
+        usersCB.setPageLength(0);
+        usersCB.setWidth(220, Unit.PIXELS);
         QueryModel<USERS> userQM = new QueryModel<>(USERS.class);
         BeanItemContainer<USERS> userBIC = new BeanItemContainer<>(USERS.class,
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(userQM));
-        cbUsers.setContainerDataSource(userBIC);
+        usersCB.setContainerDataSource(userBIC);
 
-        filterPanel.addFilterComponent("userName", cbUsers);
-        bindBtn = new Button(getUILocaleUtil().getCaption("creation.bind"));
-        horizontalLayout = new HorizontalLayout();
+        filterPanel.addFilterComponent("userName", usersCB);
+        Button bindButton = new Button(getUILocaleUtil().getCaption("creation.bind"));
+        HorizontalLayout componentHL = new HorizontalLayout();
 
-        bindBtn.addClickListener(new Button.ClickListener() {
+        bindButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
 
-                USERS user = (USERS) cbUsers.getValue();
-                ROLES role = (ROLES) cbRoles.getValue();
+                USERS user = (USERS) usersCB.getValue();
+                ROLES role = (ROLES) rolesCB.getValue();
 
                 if(role==null || user == null)
                 {
@@ -115,15 +112,15 @@ public class UserRoleBindingView extends AbstractTaskView implements EntityListe
                 });
             }
         });
-        horizontalLayout.addComponent(bindBtn);
-        horizontalLayout.setComponentAlignment(bindBtn,Alignment.MIDDLE_CENTER);
+        componentHL.addComponent(bindButton);
+        componentHL.setComponentAlignment(bindButton,Alignment.MIDDLE_CENTER);
 
 
         getContent().addComponent(filterPanel);
         getContent().setComponentAlignment(filterPanel, Alignment.TOP_CENTER);
 
-        getContent().addComponent(horizontalLayout);
-        getContent().setComponentAlignment(horizontalLayout, Alignment.MIDDLE_CENTER);
+        getContent().addComponent(componentHL);
+        getContent().setComponentAlignment(componentHL, Alignment.MIDDLE_CENTER);
 
         userRoleGW = new GridWidget(VUserRoles.class);
         userRoleGW.addEntityListener(this);
@@ -234,14 +231,6 @@ public class UserRoleBindingView extends AbstractTaskView implements EntityListe
             refresh();
         }
         return false;
-    }
-
-    public GridWidget getUserRoleGW() {
-        return userRoleGW;
-    }
-
-    public void setUserRoleGW(GridWidget userRoleGW) {
-        this.userRoleGW = userRoleGW;
     }
 
     private void refresh(){
