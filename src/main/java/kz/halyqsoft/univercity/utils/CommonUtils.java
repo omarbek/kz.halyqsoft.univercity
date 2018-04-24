@@ -1,9 +1,16 @@
 package kz.halyqsoft.univercity.utils;
 
+import com.vaadin.server.Sizeable;
+import com.vaadin.server.ThemeResource;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.HorizontalLayout;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_DOCUMENT_FILE;
+import kz.halyqsoft.univercity.modules.student.StudentEdit;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
+import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.ID;
+import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.file.FileBean;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.vaadin.AbstractSecureWebUI;
@@ -105,5 +112,32 @@ public class CommonUtils {
     public static void showMessageAndWriteLog(String message, Exception ex) {
         LOG.error(message + ": ", ex);
         Message.showError(ex.toString());
+    }
+
+    public static HorizontalLayout createButtonPanel() {
+        HorizontalLayout buttonPanel = new HorizontalLayout();
+        buttonPanel.setSpacing(true);
+        buttonPanel.setWidthUndefined();
+        return buttonPanel;
+    }
+
+    public static Button createSaveButton() {
+        Button save = new Button();
+        save.setData(10);
+        save.setWidth(120.0F, Sizeable.Unit.PIXELS);
+        save.setIcon(new ThemeResource("img/button/ok.png"));
+        save.addStyleName("save");
+        save.setCaption(getUILocaleUtil().getCaption("save"));
+        return save;
+    }
+
+    public static Button createCancelButton() {
+        Button cancel = new Button();
+        cancel.setData(11);
+        cancel.setWidth(120.0F, Sizeable.Unit.PIXELS);
+        cancel.setIcon(new ThemeResource("img/button/cancel.png"));
+        cancel.addStyleName("cancel");
+        cancel.setCaption(getUILocaleUtil().getCaption("cancel"));
+        return cancel;
     }
 }

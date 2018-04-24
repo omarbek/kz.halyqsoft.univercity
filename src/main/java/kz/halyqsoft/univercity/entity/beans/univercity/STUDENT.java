@@ -193,4 +193,18 @@ public class STUDENT extends USERS {
     public void setGraduationProject(GRADUATION_PROJECT graduationProject) {
         this.graduationProject = graduationProject;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(getLastName());
+        sb.append(" ");
+        sb.append(getFirstName());
+        if (getMiddleName() != null) {
+            sb.append(" ");
+            sb.append(getMiddleName());
+        }
+
+        return sb.toString();
+    }
 }
