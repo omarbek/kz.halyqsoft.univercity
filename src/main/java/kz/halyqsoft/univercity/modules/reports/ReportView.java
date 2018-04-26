@@ -362,7 +362,7 @@ public class ReportView extends AbstractTaskView {
                     Date dateValue = new Date();
 
                     if (INTEGER.equals(param.getType())) {
-                        if (!NumberUtils.isNumber(value)) {
+                        if (!NumberUtils.isCreatable(value)) {
                             Message.showError(getUILocaleUtil().getMessage("write.number"));//TODO kk,ru
                             return;
                         }

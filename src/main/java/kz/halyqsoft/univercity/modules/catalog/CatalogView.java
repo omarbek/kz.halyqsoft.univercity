@@ -153,6 +153,10 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                         QueryModel specQM = ((FKFieldModel) specFM.getFieldModel("department")).getQueryModel();
                         specQM.addWhere("deleted", Boolean.FALSE);
                         specQM.addWhereNotNull("parent");
+                    } else if (entityClass.equals(CREATIVE_EXAM_SUBJECT.class)) {
+                        classASW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
+                        classASW.setButtonVisible(IconToolbar.ADD_BUTTON, false);
+                        qm.addWhere("subjectName", null, null, true);
                     }
                     /*else if (entityClass.equals(ACADEMIC_DEGREE.class)) {
                         FormModel fm = ((DBSelectModel) classASW.getWidgetModel()).getFormModel();

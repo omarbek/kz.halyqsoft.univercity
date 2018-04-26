@@ -63,14 +63,6 @@ public class CommonUtils {
         return codeSB.toString();
     }
 
-    public static void main(String[] args) {
-        int a = 1;
-        String code = getCode(a);
-        String codeBuilder = getCodeBuilder(a);
-        System.out.println("code: " + code);
-        System.out.println("builder: " + codeBuilder);
-    }
-
     public static void addFiles(QueryModel<USER_DOCUMENT_FILE> udfQM, FileListFieldModel medicalCheckupFLFM) {
         try {
             List udfList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(udfQM);
