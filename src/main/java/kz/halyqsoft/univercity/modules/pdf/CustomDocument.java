@@ -17,13 +17,12 @@ import java.util.*;
 
 public class CustomDocument {
     private Document document;
+    CustomSource cs = new CustomSource();
     private ByteArrayOutputStream byteArrayOutputStream;
     private HashMap<Integer, String> styleHash = new HashMap<Integer, String>();
     private List<PDF_PROPERTY> pdfProperties = new ArrayList<>();
     public static final String FONTBOLD = "resources/fonts/FreeSansBold.ttf";
 
-
-    Font pFont = new Font(Font.FontFamily.TIMES_ROMAN, 22, Font.BOLD);
     public ByteArrayOutputStream getByteArrayOutputStream() {
         return byteArrayOutputStream;
     }
@@ -31,6 +30,8 @@ public class CustomDocument {
     public void setByteArrayOutputStream(ByteArrayOutputStream byteArrayOutputStream) {
         this.byteArrayOutputStream = byteArrayOutputStream;
     }
+
+    Font pFont = new Font(Font.FontFamily.TIMES_ROMAN, 22, Font.BOLD);
 
     public Document getDocument() {
         return document;
@@ -84,6 +85,7 @@ public class CustomDocument {
                 paragraph1.setIndentationLeft(y);
 
                 PDF_PROPERTY pdfProperty=new PDF_PROPERTY();
+                pdfProperty.setId(cf.getId());
                 pdfProperty.setText(cf.getTextField().getValue());
                 pdfProperty.setX(x);
                 pdfProperty.setY(y);
@@ -95,6 +97,7 @@ public class CustomDocument {
 //                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(pdfProperty);
 
                 document.add(paragraph1);
+
             }
 
             document.close();
