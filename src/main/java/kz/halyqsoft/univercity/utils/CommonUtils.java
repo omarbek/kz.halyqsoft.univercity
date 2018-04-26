@@ -8,6 +8,8 @@ import org.r3a.common.entity.ID;
 import org.r3a.common.entity.file.FileBean;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.vaadin.AbstractSecureWebUI;
+import org.r3a.common.vaadin.AbstractWebUI;
+import org.r3a.common.vaadin.locale.UILocaleUtil;
 import org.r3a.common.vaadin.widget.form.field.filelist.FileListFieldModel;
 
 import java.util.List;
@@ -86,4 +88,11 @@ public class CommonUtils {
         }
     }
 
+    public static UILocaleUtil getUILocaleUtil() {
+        return AbstractWebUI.getInstance().getUILocaleUtil();
+    }
+
+    public static void showSavedNotification() {
+        AbstractWebUI.getInstance().showNotificationInfo(getUILocaleUtil().getMessage("info.record.saved"));
+    }
 }
