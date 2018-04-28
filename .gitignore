@@ -1,0 +1,8 @@
+/target/
+/ready_db
+/univerdb
+/README.md
+/kz.halyqsoft.univercity.iml
+/.idea/
+/tmp/
+/src/main/resources/persistence/config.properties
