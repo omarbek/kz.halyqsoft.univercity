@@ -24,9 +24,6 @@ public class PDF_PROPERTY extends AbstractEntity{
     @Column(name = "font", nullable = false)
     private String font;
 
-    @Column(name = "style", nullable = false)
-    private String style;
-
     @Column(name = "size", nullable = false)
     private Integer size;
 
@@ -60,14 +57,6 @@ public class PDF_PROPERTY extends AbstractEntity{
 
     public void setFont(String font) {
         this.font = font;
-    }
-
-    public String getStyle() {
-        return style;
-    }
-
-    public void setStyle(String style) {
-        this.style = style;
     }
 
     public Integer getSize() {

@@ -42,3 +42,5 @@ ALTER TABLE pdf_property
   ADD CONSTRAINT fk_pdf_property_pdf_document FOREIGN KEY (pdf_document_id)
 REFERENCES pdf_document (id)
 ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE pdf_property drop COLUMN style;

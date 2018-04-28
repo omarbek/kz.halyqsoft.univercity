@@ -1,71 +1,45 @@
 package kz.halyqsoft.univercity.modules.pdf;
 
-import com.itextpdf.text.Document;
-import com.vaadin.server.*;
+import com.vaadin.data.Property;
+import com.vaadin.server.BrowserWindowOpener;
+import com.vaadin.server.StreamResource;
 import com.vaadin.ui.*;
-import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.PDF_DOCUMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.PDF_PROPERTY;
-import kz.halyqsoft.univercity.utils.CommonUtils;
-import org.apache.commons.io.FileUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
-import org.r3a.common.entity.ID;
-import org.r3a.common.entity.beans.AbstractTask;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.where.ECriteria;
-import org.r3a.common.vaadin.AbstractWebUI;
 import org.r3a.common.vaadin.view.AbstractCommonView;
-import org.r3a.common.vaadin.view.AbstractTaskView;
-import org.r3a.common.vaadin.widget.dialog.AbstractDialog;
-import org.r3a.common.vaadin.widget.dialog.Message;
 
-import javax.persistence.NoResultException;
-import java.io.*;
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
 public class PdfEdit extends AbstractCommonView {
-    private Button addComponentButton;
-    private Button openPdfButton;
-    private Button createDbButton;
+
     private StreamResource myResource;
-    private ArrayList<CustomField> customFieldList = new ArrayList<CustomField>();
-    CustomField cf = new CustomField();
+    private ArrayList<CustomField> customFieldList = new ArrayList<>();
     private StreamResource.StreamSource streamSource;
+    private BrowserWindowOpener opener;
 
-    private StreamResource createResource() {
-        String defaultName = "default.pdf";
-        return new StreamResource(streamSource, defaultName);
+    public PdfEdit(PDF_DOCUMENT file) {
+
+        try {
+            addOrEdit(file);
+        } catch (Exception e) {
+            e.printStackTrace();//TODO catch
+        }
     }
-
-    public PdfEdit(PDF_DOCUMENT file) throws Exception {
-
-        addOrEdit(file);
-    }
-
-    @Override
-    public String getViewName() {
-        return "PdfEdit";
-    }
-
-    @Override
-    protected String getViewTitle(Locale locale) {
-        return "PdfEdit";//TODO
-    }
-
-    @Override
-    public void initView(boolean b) throws Exception {
-
-    }
-
 
     private void addOrEdit(PDF_DOCUMENT fileDoc) throws Exception {
-        List<HorizontalLayout> horizontalLayoutList = new ArrayList<HorizontalLayout>();
-        addComponentButton = new Button("Добавить");
-        openPdfButton = new Button("Открыть");
-        createDbButton = new Button("Создать");
+        CustomField cf = new CustomField();
+        VerticalLayout itemsVL = new VerticalLayout();
+        Button addComponentButton = new Button("Добавить");
+        Button openPdfButton = new Button("Открыть");
+        Button createDbButton = new Button("Создать");
         CustomField customField = new CustomField();
         if (fileDoc.getId() != null) {
             QueryModel<PDF_PROPERTY> propertyQM = new QueryModel<>(PDF_PROPERTY.class);
@@ -79,84 +53,86 @@ public class PdfEdit extends AbstractCommonView {
                 textHL.addComponent(customField.getTextField());
                 textHL.addComponent(customField.getxIntegerField());
                 textHL.addComponent(customField.getyIntegerField());
-                textHL.addComponent(customField.getStyleComboBox());
                 textHL.addComponent(customField.getFontComboBox());
                 textHL.addComponent(customField.getTextSize());
 
                 customField.getTextField().setValue(property.getText());
-                customField.getxIntegerField().setValue(Integer.toString((int) Math.round(property.getX())));
-                customField.getyIntegerField().setValue(Integer.toString((int) Math.round(property.getY())));
-                customField.getStyleComboBox().setValue(property.getStyle());
+                customField.getxIntegerField().setValue(Integer.toString(Math.round(property.getX())));
+                customField.getyIntegerField().setValue(Integer.toString(Math.round(property.getY())));
                 customField.getFontComboBox().setValue(property.getFont());
                 customField.getTextSize().setValue(property.getSize().toString());
                 customField.setId(property.getId());
 
                 customFieldList.add(customField);
-                horizontalLayoutList.add(textHL);
-                getContent().addComponent(textHL);
-                getContent().setComponentAlignment(textHL, Alignment.MIDDLE_CENTER);
+                itemsVL.addComponent(textHL);
+                itemsVL.setComponentAlignment(textHL, Alignment.MIDDLE_CENTER);
+//                getContent().addComponent(textHL);
+//                getContent().setComponentAlignment(textHL, Alignment.MIDDLE_CENTER);
 
             }
             cf.pdfTitle.setValue(fileDoc.getFileName());
             cf.title.setValue(fileDoc.getTitle());
-        }
-
-        else {
-
-
-            myResource = createResource();
-
+        } else {
+            myResource = createResource(cf);
             myResource.setMIMEType("application/pdf");
-            BrowserWindowOpener opener = new BrowserWindowOpener(myResource);
+            opener = new BrowserWindowOpener(myResource);
             opener.extend(openPdfButton);
 
-
             HorizontalLayout mainHL = new HorizontalLayout();
+            cf.pdfTitle.addValueChangeListener(new Property.ValueChangeListener() {
+                @Override
+                public void valueChange(Property.ValueChangeEvent event) {
+                    refresh(cf);
+                }
+            });
             mainHL.addComponent(cf.pdfTitle);
+            cf.title.addValueChangeListener(new Property.ValueChangeListener() {
+                @Override
+                public void valueChange(Property.ValueChangeEvent event) {
+                    refresh(cf);
+                }
+            });
             mainHL.addComponent(cf.title);
-            horizontalLayoutList.add(mainHL);
+            itemsVL.addComponent(mainHL);
+            itemsVL.setComponentAlignment(mainHL, Alignment.MIDDLE_CENTER);
             addComponentButton.addClickListener(new Button.ClickListener() {
                 @Override
                 public void buttonClick(Button.ClickEvent clickEvent) {
                     CustomField customField = new CustomField();
 
                     HorizontalLayout textHL = new HorizontalLayout();
-                    textHL.addComponent(customField.getTextField());
-                    textHL.addComponent(customField.getxIntegerField());
-                    textHL.addComponent(customField.getyIntegerField());
-                    textHL.addComponent(customField.getStyleComboBox());
-                    textHL.addComponent(customField.getFontComboBox());
-                    textHL.addComponent(customField.getTextSize());
+                    setTextField(customField.getTextField(), textHL);
+                    setTextField(customField.getxIntegerField(), textHL);
+                    setTextField(customField.getyIntegerField(), textHL);
+                    ComboBox fontComboBox = customField.getFontComboBox();
+                    fontComboBox.addValueChangeListener(new Property.ValueChangeListener() {
+                        @Override
+                        public void valueChange(Property.ValueChangeEvent event) {
+                            refresh(cf);
+                        }
+                    });
+                    textHL.addComponent(fontComboBox);
+                    setTextField(customField.getTextSize(), textHL);
+
 
                     customFieldList.add(customField);
-                    horizontalLayoutList.add(textHL);
-                    getContent().addComponent(textHL);
-                    getContent().setComponentAlignment(textHL, Alignment.MIDDLE_CENTER);
+                    itemsVL.addComponent(textHL);
+                    itemsVL.setComponentAlignment(textHL, Alignment.MIDDLE_CENTER);
+//                    getContent().addComponent(textHL);
+//                    getContent().setComponentAlignment(textHL, Alignment.MIDDLE_CENTER);
 
                 }
 
-            });
-
-
-            openPdfButton.addClickListener(new Button.ClickListener() {
-                @Override
-                public void buttonClick(Button.ClickEvent clickEvent) {
-                    CustomDocument dc = new CustomDocument();
-                    dc.initialize(customFieldList, cf.getTitle().getValue());
-
-                    ByteArrayOutputStream byteArrayOutputStream = dc.getByteArrayOutputStream();
-                    streamSource = new CustomSource(byteArrayOutputStream);
-                    myResource.setStreamSource(streamSource);
-                    if (!cf.getPdfTitle().getValue().trim().equals("")) {
-                        myResource.setFilename(cf.getPdfTitle().getValue() + ".pdf");
-                        opener.setResource(myResource);
-                    } else {
-                        myResource.setFilename("default.pdf");
-                        opener.setResource(myResource);
-                    }
-
-
+                private void setTextField(TextField mainTF, HorizontalLayout textHL) {
+                    mainTF.addValueChangeListener(new Property.ValueChangeListener() {
+                        @Override
+                        public void valueChange(Property.ValueChangeEvent event) {
+                            refresh(cf);
+                        }
+                    });
+                    textHL.addComponent(mainTF);
                 }
+
             });
 
             createDbButton.addClickListener(new Button.ClickListener() {
@@ -223,24 +199,69 @@ public class PdfEdit extends AbstractCommonView {
 //                    }
             });
 
+            getContent().addComponent(itemsVL);
+            getContent().setComponentAlignment(itemsVL, Alignment.MIDDLE_CENTER);
+
             HorizontalLayout activityHL = new HorizontalLayout();
-            horizontalLayoutList.add(activityHL);
-
-            getHL(horizontalLayoutList);
-
             activityHL.addComponent(addComponentButton);
             activityHL.addComponent(createDbButton);
             activityHL.addComponent(openPdfButton);
 
+            getContent().addComponent(activityHL);
+            getContent().setComponentAlignment(activityHL, Alignment.MIDDLE_CENTER);
+
         }
     }
 
-    private void getHL(List<HorizontalLayout> horizontalLayoutList) {
-        for (HorizontalLayout hl : horizontalLayoutList) {
-            getContent().addComponent(hl);
-
-            getContent().setComponentAlignment(hl, Alignment.MIDDLE_CENTER);
+    private void refresh(CustomField cf) {
+        if (customFieldList.isEmpty()) {
+            return;
         }
+        for (CustomField customField : customFieldList) {
+            if (customField.getTextSize().isEmpty() || customField.getTextField().isEmpty()
+                    || cf.getTitle().isEmpty() || cf.getPdfTitle().isEmpty()
+                    || customField.getFontComboBox().getValue() == null
+                    || customField.getxIntegerField().isEmpty() || customField.getyIntegerField().isEmpty()) {
+                return;
+            }
+        }
+        CustomDocument dc = new CustomDocument();
+        dc.initialize(customFieldList, cf.getTitle().getValue());
+        ByteArrayOutputStream byteArrayOutputStream = dc.getByteArrayOutputStream();
+        streamSource = new CustomSource(byteArrayOutputStream);
+        myResource.setStreamSource(streamSource);
+        String filename = getFileName(cf);
+        myResource.setFilename(filename);
+        opener.setResource(myResource);
+    }
+
+    private String getFileName(CustomField cf) {
+        String timeInMillisWithPdf = Calendar.getInstance().getTimeInMillis() + ".pdf";
+        String filename;
+        if (!cf.getPdfTitle().getValue().isEmpty()) {
+            filename = cf.getPdfTitle().getValue() + "_" + timeInMillisWithPdf;
+        } else {
+            filename = timeInMillisWithPdf;
+        }
+        return filename;
+    }
+
+    private StreamResource createResource(CustomField cf) {
+        return new StreamResource(streamSource, getFileName(cf));
+    }
+
+    @Override
+    public String getViewName() {
+        return "PdfEdit";
+    }
+
+    @Override
+    protected String getViewTitle(Locale locale) {
+        return "PdfEdit";//TODO
+    }
+
+    @Override
+    public void initView(boolean b) throws Exception {
     }
 }
 

@@ -1,17 +1,27 @@
 package kz.halyqsoft.univercity.utils;
 
+import com.vaadin.server.Sizeable;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.HorizontalLayout;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_DOCUMENT_FILE;
+import kz.halyqsoft.univercity.modules.student.StudentEdit;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
+import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.ID;
+import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.file.FileBean;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.vaadin.AbstractSecureWebUI;
 import org.r3a.common.vaadin.AbstractWebUI;
 import org.r3a.common.vaadin.locale.UILocaleUtil;
+import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.form.field.filelist.FileListFieldModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -19,6 +29,9 @@ import java.util.List;
  * @created on 15.03.2018
  */
 public class CommonUtils {
+
+    public static final Logger LOG = LoggerFactory.getLogger("ROOT");
+    public static int currentYear = Calendar.getInstance().get(Calendar.YEAR);
 
     public static String getCurrentUserLogin() {
         return AbstractSecureWebUI.getInstance().getUsername();
@@ -50,14 +63,6 @@ public class CommonUtils {
         return codeSB.toString();
     }
 
-    public static void main(String[] args) {
-        int a = 1;
-        String code = getCode(a);
-        String codeBuilder = getCodeBuilder(a);
-        System.out.println("code: " + code);
-        System.out.println("builder: " + codeBuilder);
-    }
-
     public static void addFiles(QueryModel<USER_DOCUMENT_FILE> udfQM, FileListFieldModel medicalCheckupFLFM) {
         try {
             List udfList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(udfQM);
@@ -72,7 +77,7 @@ public class CommonUtils {
                 }
             }
         } catch (Exception ex) {
-            ErrorUtils.LOG.error("Unable to load education document copies: ", ex);
+            LOG.error("Unable to load education document copies: ", ex);
         }
     }
 
@@ -83,7 +88,7 @@ public class CommonUtils {
                 udf.setDeleted(true);
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(udf);
             } catch (Exception ex) {
-                ErrorUtils.LOG.error("Unable to delete repatriate doc copy: ", ex);
+                LOG.error("Unable to delete repatriate doc copy: ", ex);
             }
         }
     }
@@ -94,5 +99,37 @@ public class CommonUtils {
 
     public static void showSavedNotification() {
         AbstractWebUI.getInstance().showNotificationInfo(getUILocaleUtil().getMessage("info.record.saved"));
+    }
+
+    public static void showMessageAndWriteLog(String message, Exception ex) {
+        LOG.error(message + ": ", ex);
+        Message.showError(ex.toString());
+    }
+
+    public static HorizontalLayout createButtonPanel() {
+        HorizontalLayout buttonPanel = new HorizontalLayout();
+        buttonPanel.setSpacing(true);
+        buttonPanel.setWidthUndefined();
+        return buttonPanel;
+    }
+
+    public static Button createSaveButton() {
+        Button save = new Button();
+        save.setData(10);
+        save.setWidth(120.0F, Sizeable.Unit.PIXELS);
+        save.setIcon(new ThemeResource("img/button/ok.png"));
+        save.addStyleName("save");
+        save.setCaption(getUILocaleUtil().getCaption("save"));
+        return save;
+    }
+
+    public static Button createCancelButton() {
+        Button cancel = new Button();
+        cancel.setData(11);
+        cancel.setWidth(120.0F, Sizeable.Unit.PIXELS);
+        cancel.setIcon(new ThemeResource("img/button/cancel.png"));
+        cancel.addStyleName("cancel");
+        cancel.setCaption(getUILocaleUtil().getCaption("cancel"));
+        return cancel;
     }
 }

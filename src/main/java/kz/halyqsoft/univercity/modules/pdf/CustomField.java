@@ -3,6 +3,9 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.TextField;
 import org.r3a.common.entity.ID;
 
+import java.awt.*;
+import java.io.FileOutputStream;
+
 public class CustomField {
 
     ID id;
@@ -10,19 +13,20 @@ public class CustomField {
     TextField xIntegerField;
     TextField yIntegerField;
     ComboBox fontComboBox;
-    ComboBox styleComboBox;
     TextField textSize;
     TextField pdfTitle;
     TextField title;
 
-
+    static final String BOLD = "Bold";
+    static final String ITALIC = "Italic";
+    static final String NORMAL = "Normal";
+    static final String UNDERLINE = "Underline";
 
     public CustomField() {
         this.textField = new TextField("Текст:");
         this.xIntegerField = new TextField();
         this.yIntegerField = new TextField();
         this.fontComboBox = new ComboBox();
-        this.styleComboBox = new ComboBox();
         this.textSize = new TextField();
         this.pdfTitle = new TextField();
         this.title = new TextField();
@@ -30,7 +34,6 @@ public class CustomField {
         this.xIntegerField.setCaption("X:");
         this.yIntegerField.setCaption("Y:");
         this.fontComboBox.setCaption("Шрифт:");
-        this.styleComboBox.setCaption("Стиль:");
         this.textSize.setCaption("Размер");
         this.title.setCaption("Заголовок");
         this.pdfTitle.setCaption("Название файла");
@@ -39,7 +42,6 @@ public class CustomField {
         this.xIntegerField.setRequired(true);
         this.yIntegerField.setRequired(true);
         this.fontComboBox.setRequired(true);
-        this.styleComboBox.setRequired(true);
         this.textSize.setRequired(true);
         this.title.setRequired(true);
         this.pdfTitle.setRequired(true);
@@ -48,19 +50,14 @@ public class CustomField {
         this.xIntegerField.setImmediate(true);
         this.yIntegerField.setImmediate(true);
         this.fontComboBox.setImmediate(true);
-        this.styleComboBox.setImmediate(true);
         this.textSize.setImmediate(true);
         this.title.setImmediate(true);
         this.pdfTitle.setImmediate(true);
 
-        this.fontComboBox.addItem("Bold");
-        this.fontComboBox.addItem("Italic");
-        this.fontComboBox.addItem("Normal");
-
-        this.styleComboBox.addItem("Times_Roman");
-        this.styleComboBox.addItem("Helvetica");
-        this.styleComboBox.addItem("Courier");
-
+        this.fontComboBox.addItem(BOLD);
+        this.fontComboBox.addItem(ITALIC);
+        this.fontComboBox.addItem(NORMAL);
+        this.fontComboBox.addItem(UNDERLINE);
     }
 
     public TextField getTextField() {
@@ -93,14 +90,6 @@ public class CustomField {
 
     public void setFontComboBox(ComboBox fontComboBox) {
         this.fontComboBox = fontComboBox;
-    }
-
-    public ComboBox getStyleComboBox() {
-        return styleComboBox;
-    }
-
-    public void setStyleComboBox(ComboBox styleComboBox) {
-        this.styleComboBox = styleComboBox;
     }
 
     public TextField getTextSize() {

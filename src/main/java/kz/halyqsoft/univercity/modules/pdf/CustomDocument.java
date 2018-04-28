@@ -3,47 +3,46 @@ package kz.halyqsoft.univercity.modules.pdf;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfWriter;
-import kz.halyqsoft.univercity.entity.beans.univercity.PDF_DOCUMENT;
+import com.vaadin.server.VaadinService;
 import kz.halyqsoft.univercity.entity.beans.univercity.PDF_PROPERTY;
 import kz.halyqsoft.univercity.utils.ErrorUtils;
-import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
-import org.r3a.common.dblink.utils.SessionFacadeFactory;
-import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.vaadin.widget.dialog.Message;
 
 import java.io.ByteArrayOutputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class CustomDocument {
+
     private Document document;
-    CustomSource cs = new CustomSource();
     private ByteArrayOutputStream byteArrayOutputStream;
-    private HashMap<Integer, String> styleHash = new HashMap<Integer, String>();
     private List<PDF_PROPERTY> pdfProperties = new ArrayList<>();
-    public static final String FONTBOLD = "resources/fonts/FreeSansBold.ttf";
-
-    public ByteArrayOutputStream getByteArrayOutputStream() {
-        return byteArrayOutputStream;
-    }
-
-    public void setByteArrayOutputStream(ByteArrayOutputStream byteArrayOutputStream) {
-        this.byteArrayOutputStream = byteArrayOutputStream;
-    }
-
-    Font pFont = new Font(Font.FontFamily.TIMES_ROMAN, 22, Font.BOLD);
-
-    public Document getDocument() {
-        return document;
-    }
-
-    public void setDocument(Document document) {
-        this.document = document;
-    }
+    private Map<String, Integer> fontMap;
 
     public CustomDocument() {
         byteArrayOutputStream = new ByteArrayOutputStream();
         document = new Document();
+        fontMap = new HashMap<>();
+        fontMap.put(CustomField.BOLD, Font.BOLD);
+        fontMap.put(CustomField.NORMAL, Font.NORMAL);
+        fontMap.put(CustomField.ITALIC, Font.ITALIC);
+        fontMap.put(CustomField.UNDERLINE, Font.UNDERLINE);
+    }
+
+    private Font getFont(int fontSize, int font) {
+        String fontPath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath() + "/WEB-INF/classes/fonts";
+        BaseFont timesNewRoman = null;
+        try {
+            timesNewRoman = BaseFont.createFont(fontPath + "/TimesNewRoman/times.ttf", BaseFont.IDENTITY_H,
+                    BaseFont.EMBEDDED);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new Font(timesNewRoman, fontSize, font);
     }
 
 
@@ -51,16 +50,16 @@ public class CustomDocument {
         try {
             PdfWriter pdfWriter = PdfWriter.getInstance(this.document, byteArrayOutputStream);
 
-
             document.open();
-            Paragraph paragraph = new Paragraph(title, pFont);
+            Paragraph paragraph = new Paragraph(title, getFont(22, Font.BOLD));
             paragraph.setSpacingBefore(35f);
             paragraph.setIndentationLeft(200f);
             document.add(paragraph);
 
             for (CustomField cf : customFieldList) {
-                Font font = new Font(Font.FontFamily.valueOf(cf.getStyleComboBox().getValue().toString().toUpperCase()),
-                        Integer.parseInt(cf.getTextSize().getValue()), cf.getFontComboBox().getTabIndex());
+//                Font font = new Font(Font.FontFamily.TIMES_ROMAN,
+//                        Integer.parseInt(cf.getTextSize().getValue()), cf.getFontComboBox().getTabIndex());
+
 //                BaseFont bf = BaseFont.createFont(BaseFont.COURIER, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
 //                PdfContentByte cb = pdfWriter.getDirectContent();
 //                cb.saveState();
@@ -77,20 +76,21 @@ public class CustomDocument {
 //
 //                cb.endText();
 //                cb.restoreState();
-                Paragraph paragraph1 = new Paragraph(cf.getTextField().getValue(), font);
+                Paragraph paragraph1 = new Paragraph(cf.getTextField().getValue(),
+                        getFont(Integer.parseInt(cf.getTextSize().getValue()),
+                                fontMap.get(cf.getFontComboBox().getValue().toString())));
                 float x = (float) Integer.parseInt(cf.getxIntegerField().getValue());
                 float y = (float) Integer.parseInt(cf.getyIntegerField().getValue());
 
                 paragraph1.setSpacingBefore(x);
                 paragraph1.setIndentationLeft(y);
 
-                PDF_PROPERTY pdfProperty=new PDF_PROPERTY();
+                PDF_PROPERTY pdfProperty = new PDF_PROPERTY();
                 pdfProperty.setId(cf.getId());
                 pdfProperty.setText(cf.getTextField().getValue());
                 pdfProperty.setX(x);
                 pdfProperty.setY(y);
                 pdfProperty.setFont(cf.getFontComboBox().getValue().toString());
-                pdfProperty.setStyle(cf.getStyleComboBox().getValue().toString());
                 pdfProperty.setSize(Integer.parseInt(cf.getTextSize().getValue()));
                 pdfProperties.add(pdfProperty);
 //                pdfProperty.setPdfDocument(pdfDocument);
@@ -103,7 +103,7 @@ public class CustomDocument {
             document.close();
             pdfWriter.close();
         } catch (Exception e) {
-          ErrorUtils.LOG.error("Unable to create pdf property",e);
+            ErrorUtils.LOG.error("Unable to create pdf property", e);
             Message.showError(e.toString());
             e.printStackTrace();
         }
@@ -115,5 +115,21 @@ public class CustomDocument {
 
     public void setPdfProperties(List<PDF_PROPERTY> pdfProperties) {
         this.pdfProperties = pdfProperties;
+    }
+
+    public ByteArrayOutputStream getByteArrayOutputStream() {
+        return byteArrayOutputStream;
+    }
+
+    public void setByteArrayOutputStream(ByteArrayOutputStream byteArrayOutputStream) {
+        this.byteArrayOutputStream = byteArrayOutputStream;
+    }
+
+    public Document getDocument() {
+        return document;
+    }
+
+    public void setDocument(Document document) {
+        this.document = document;
     }
 }
