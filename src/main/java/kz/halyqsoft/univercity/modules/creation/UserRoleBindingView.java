@@ -62,7 +62,7 @@ public class UserRoleBindingView extends AbstractTaskView implements EntityListe
 
 
         usersCB = new ComboBox();
-        usersCB.setCaption(getUILocaleUtil().getCaption(""));
+//        usersCB.setCaption(getUILocaleUtil().getCaption(""));//TODO
         usersCB.setNullSelectionAllowed(true);
         usersCB.setTextInputAllowed(false);
         usersCB.setFilteringMode(FilteringMode.CONTAINS);

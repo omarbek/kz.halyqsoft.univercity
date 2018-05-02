@@ -20,7 +20,7 @@ import java.util.List;
 @Entity
 public class TASKS extends AbstractTask implements CommonTree<TASKS> {
 
-    @FieldInfo(type = EFieldType.FK_DIALOG, order = 6, required = false)
+    @FieldInfo(type = EFieldType.FK_DIALOG, order = 6, required = false,readOnlyFixed = true)
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "PARENT_ID", referencedColumnName = "ID")})

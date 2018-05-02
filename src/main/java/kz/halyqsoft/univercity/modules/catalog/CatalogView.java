@@ -149,7 +149,7 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                     } else if (entityClass.equals(CORPUS.class)) {
                         classASW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
                     } else if (entityClass.equals(LOCK_REASON.class)) {
-                        qm.addWhere("reason", null, null, true);//for filter
+                        qm.addWhere("reason", null, null, true);//for filter button
                     } else if (entityClass.equals(SPECIALITY.class)) {
                         qm.addWhere("deleted", Boolean.FALSE);
                         FromItem departmentFI = qm.addJoin(EJoin.INNER_JOIN, "department", DEPARTMENT.class, "id");
