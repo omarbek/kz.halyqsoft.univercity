@@ -186,7 +186,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         createExperienceTab(readOnly);
         createCareerTab(readOnly);
         createWorkDayTab(readOnly);
-//        createSubjectPPSTab(readOnly);
+//        createSubjectPPSTab(readOnly);//TODO add later
 //        createRoomTab(readOnly);
     }
 
@@ -281,10 +281,11 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
 
         try {
             QueryModel<DEPARTMENT> chairQM = new QueryModel<>(DEPARTMENT.class);
-//            chairQM.addWhere("type", ECriteria.EQUAL, DEPARTMENT_TYPE.CHAIR_ID);//TODO
+            chairQM.addWhereNotNull("parent");
             chairQM.addWhereAnd("deleted", Boolean.FALSE);
             chairQM.addOrder("deptName");
-            BeanItemContainer<DEPARTMENT> chairBIC = new BeanItemContainer<DEPARTMENT>(DEPARTMENT.class, SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(chairQM));
+            BeanItemContainer<DEPARTMENT> chairBIC = new BeanItemContainer<>(DEPARTMENT.class,
+                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(chairQM));
             ComboBox chairCB = new ComboBox();
             chairCB.setContainerDataSource(chairBIC);
             chairCB.setImmediate(true);
@@ -363,7 +364,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
 
         try {
             QueryModel<DEPARTMENT> chairQM = new QueryModel<DEPARTMENT>(DEPARTMENT.class);
-//            chairQM.addWhere("type", ECriteria.EQUAL, DEPARTMENT_TYPE.CHAIR_ID);//TODO
+            chairQM.addWhereNotNull("parent");
             chairQM.addWhereAnd("deleted", Boolean.FALSE);
             chairQM.addOrder("deptName");
             BeanItemContainer<DEPARTMENT> chairBIC = new BeanItemContainer<DEPARTMENT>(DEPARTMENT.class, SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(chairQM));
@@ -1217,7 +1218,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         departmentFM.setDialogHeight(400);
         QueryModel departmentQM = departmentFM.getQueryModel();
         departmentQM.addWhere("deleted", Boolean.FALSE);
-//        departmentQM.addWhereAnd("type", ECriteria.EQUAL, DEPARTMENT_TYPE.CHAIR_ID);//TODO
+        departmentQM.addWhereNotNull("parent");
 
         FKFieldModel postFM = (FKFieldModel) careerFM.getFieldModel("post");
         QueryModel postQM = postFM.getQueryModel();

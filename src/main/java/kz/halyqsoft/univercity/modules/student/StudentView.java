@@ -98,7 +98,7 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
         cb.setPageLength(0);
         cb.setWidth(250, Unit.PIXELS);
         QueryModel<DEPARTMENT> facultyQM = new QueryModel<>(DEPARTMENT.class);
-//        facultyQM.addWhere("type", ECriteria.EQUAL, T_DEPARTMENT_TYPE.FACULTY_ID);//TODO faculty
+        facultyQM.addWhereNull("parent");
         facultyQM.addWhereAnd("deleted", Boolean.FALSE);
         facultyQM.addOrder("deptName");
         BeanItemContainer<DEPARTMENT> facultyBIC = new BeanItemContainer<>(DEPARTMENT.class,
