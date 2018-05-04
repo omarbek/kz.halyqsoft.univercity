@@ -6,6 +6,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.LEVEL;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDENT_CATEGORY;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDENT_DIPLOMA_TYPE;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -76,6 +77,7 @@ public class RegisterApplicantsView extends AbstractTaskView {
         studentFM.getFieldModel("phoneMobile").setWidth(300);
         studentFM.getFieldModel("level").setWidth(300);
         studentFM.getFieldModel("category").setWidth(300);
+        studentFM.getFieldModel("diplomaType").setWidth(300);
 
         try {
             studentFM.createNew();
@@ -86,8 +88,12 @@ public class RegisterApplicantsView extends AbstractTaskView {
             ENTRANCE_YEAR ey = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(qmEntranceYear);
 
             ((STUDENT) studentFM.getEntity()).setEntranceYear(ey);
-            ((STUDENT) studentFM.getEntity()).setLevel(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(LEVEL.class, ID.valueOf(1)));
-            ((STUDENT) studentFM.getEntity()).setCategory(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(STUDENT_CATEGORY.class, ID.valueOf(1)));
+            ((STUDENT) studentFM.getEntity()).setLevel(SessionFacadeFactory.getSessionFacade(
+                    CommonEntityFacadeBean.class).lookup(LEVEL.class, ID.valueOf(1)));
+            ((STUDENT) studentFM.getEntity()).setCategory(SessionFacadeFactory.getSessionFacade(
+                    CommonEntityFacadeBean.class).lookup(STUDENT_CATEGORY.class, ID.valueOf(1)));
+            ((STUDENT) studentFM.getEntity()).setDiplomaType(SessionFacadeFactory.getSessionFacade(
+                    CommonEntityFacadeBean.class).lookup(STUDENT_DIPLOMA_TYPE.class, ID.valueOf(1)));
 
             registerVL.addComponent(new ApplicantsForm(studentFM, ey));
         } catch (Exception ex) {

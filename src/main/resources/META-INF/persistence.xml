@@ -137,6 +137,7 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.WEEK_DAY</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.WORK_HOUR_STATUS</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.CREATIVE_EXAM_SUBJECT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDENT_DIPLOMA_TYPE</class>
 
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_SPECIALITY</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_ORGANIZATION</class>
