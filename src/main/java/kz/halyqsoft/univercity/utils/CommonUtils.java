@@ -39,7 +39,7 @@ public class CommonUtils {
         return AbstractSecureWebUI.getInstance().getUsername();
     }
 
-    public static USERS getCurrentUser() throws Exception {
+    public static USERS getCurrentUser() {
         try {
             Map<String, Object> params = new HashMap<>();
             params.put("login", getCurrentUserLogin());
@@ -57,14 +57,22 @@ public class CommonUtils {
         return null;
     }
 
-    private static STUDENT getStudent(Map<String, Object> params) throws Exception {
-        return (STUDENT) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
-                getEntityByNamedQuery("STUDENT.getStudentByLogin", params);
+    private static STUDENT getStudent(Map<String, Object> params) {
+        try {
+            return (STUDENT) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                    getEntityByNamedQuery("STUDENT.getStudentByLogin", params);
+        } catch (Exception ignored) {
+        }
+        return null;
     }
 
-    private static EMPLOYEE getEmployee(Map<String, Object> params) throws Exception {
-        return (EMPLOYEE) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
-                getEntityByNamedQuery("EMPLOYEE.getEmployeeByLogin", params);
+    private static EMPLOYEE getEmployee(Map<String, Object> params) {
+        try {
+            return (EMPLOYEE) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                    getEntityByNamedQuery("EMPLOYEE.getEmployeeByLogin", params);
+        } catch (Exception ignored) {
+        }
+        return null;
     }
 
     public static String getCode(Integer count) {
