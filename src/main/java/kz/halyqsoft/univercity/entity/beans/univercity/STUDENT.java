@@ -19,7 +19,7 @@ import java.util.Set;
 @Entity
 @DiscriminatorValue(value = UserType.STUDENT_INDEX)
 @NamedQueries({
-        @NamedQuery(name = "T_STUDENT.getStudentByLogin",
+        @NamedQuery(name = "STUDENT.getStudentByLogin",
                 query = "SELECT s FROM STUDENT s WHERE s.login = :login")
 })
 public class STUDENT extends USERS {

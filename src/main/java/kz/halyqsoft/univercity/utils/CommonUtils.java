@@ -4,13 +4,13 @@ import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
+import kz.halyqsoft.univercity.entity.beans.USERS;
+import kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE;
+import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_DOCUMENT_FILE;
-import kz.halyqsoft.univercity.modules.student.StudentEdit;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
-import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.ID;
-import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.file.FileBean;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.vaadin.AbstractSecureWebUI;
@@ -22,7 +22,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Omarbek
@@ -35,6 +37,34 @@ public class CommonUtils {
 
     public static String getCurrentUserLogin() {
         return AbstractSecureWebUI.getInstance().getUsername();
+    }
+
+    public static USERS getCurrentUser() throws Exception {
+        try {
+            Map<String, Object> params = new HashMap<>();
+            params.put("login", getCurrentUserLogin());
+            EMPLOYEE employee = getEmployee(params);
+            if (employee != null) {
+                return employee;
+            }
+            STUDENT student = getStudent(params);
+            if (student != null) {
+                return student;
+            }
+        } catch (Exception e) {
+            CommonUtils.showMessageAndWriteLog("Unable to get user", e);
+        }
+        return null;
+    }
+
+    private static STUDENT getStudent(Map<String, Object> params) throws Exception {
+        return (STUDENT) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                getEntityByNamedQuery("STUDENT.getStudentByLogin", params);
+    }
+
+    private static EMPLOYEE getEmployee(Map<String, Object> params) throws Exception {
+        return (EMPLOYEE) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                getEntityByNamedQuery("EMPLOYEE.getEmployeeByLogin", params);
     }
 
     public static String getCode(Integer count) {
