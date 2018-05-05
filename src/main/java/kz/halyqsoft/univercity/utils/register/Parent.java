@@ -7,7 +7,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.catalog.COUNTRY;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.RELATIVE_TYPE;
 import kz.halyqsoft.univercity.modules.regapplicants.ApplicantsForm;
 import kz.halyqsoft.univercity.utils.AddressUtils;
-import kz.halyqsoft.univercity.utils.ErrorUtils;
+import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.changelisteners.CityChangeListener;
 import kz.halyqsoft.univercity.utils.changelisteners.CountryChangeListener;
 import kz.halyqsoft.univercity.utils.changelisteners.RegionChangeListener;
@@ -53,7 +53,7 @@ public class Parent {
 
     public boolean preSave(Entity e, boolean isNew, int parentNumber) {
         if (dataAFW.getWidgetModel().isCreateNew()) {
-            Message.showInfo(ErrorUtils.getUILocaleUtil().getMessage("info.save.base.data.first"));
+            Message.showInfo(CommonUtils.getUILocaleUtil().getMessage("info.save.base.data.first"));
             return false;
         }
         STUDENT_RELATIVE sr = (STUDENT_RELATIVE) e;
@@ -64,16 +64,16 @@ public class Parent {
                 sr.setStudent((STUDENT) fm.getEntity());
                 sr.setRelativeType(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(RELATIVE_TYPE.class, ID.valueOf(parentNumber)));
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(sr);
-                ErrorUtils.showSavedNotification();
+                CommonUtils.showSavedNotification();
             } catch (Exception ex) {
-                ErrorUtils.LOG.error("Unable to createCertificate a fathers data: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to create a fathers data", ex);
             }
         } else {
             try {
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(sr);
-                ErrorUtils.showSavedNotification();
+                CommonUtils.showSavedNotification();
             } catch (Exception ex) {
-                ErrorUtils.LOG.error("Unable to merge a fathers address: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to merge a fathers address", ex);
             }
         }
         return false;
@@ -81,9 +81,9 @@ public class Parent {
 
     public void create(String caption, int parent_number) throws Exception {
         StringBuilder parentSB = new StringBuilder();
-        parentSB.append(ErrorUtils.getUILocaleUtil().getCaption("title.error"));
+        parentSB.append(CommonUtils.getUILocaleUtil().getCaption("title.error"));
         parentSB.append(": ");
-        parentSB.append(ErrorUtils.getUILocaleUtil().getCaption(caption));
+        parentSB.append(CommonUtils.getUILocaleUtil().getCaption(caption));
         FormModel parentFM;
         if (parent_number == FATHER) {
             fatherGFW = new GridFormWidget(STUDENT_RELATIVE.class);
@@ -142,7 +142,8 @@ public class Parent {
             fkQM.addWhere("parent", ECriteria.EQUAL, ID.valueOf(-1));
         return fkFM;
     }
-    public void save(int parentNumber){
+
+    public void save(int parentNumber) {
         if (parentNumber == FATHER) {
             if (fatherFM.isModified()) {
                 fatherGFW.save();

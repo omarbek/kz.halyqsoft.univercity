@@ -5,7 +5,6 @@ import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEPARTMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDENT_EDUCATION_TYPE;
@@ -14,7 +13,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDY_YEAR;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VStudent;
 import kz.halyqsoft.univercity.filter.FStudentFilter;
 import kz.halyqsoft.univercity.filter.panel.StudentFilterPanel;
-import kz.halyqsoft.univercity.utils.ErrorUtils;
+import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.changelisteners.FacultyChangeListener;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -51,7 +50,7 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
 //    private boolean needDorm;
 //    private boolean needDormFilter;
 
-    public StudentView(AbstractTask task) throws Exception {
+       public StudentView(AbstractTask task) throws Exception {
         super(task);
 
         filterPanel = new StudentFilterPanel(new FStudentFilter());
@@ -99,7 +98,7 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
         cb.setPageLength(0);
         cb.setWidth(250, Unit.PIXELS);
         QueryModel<DEPARTMENT> facultyQM = new QueryModel<>(DEPARTMENT.class);
-//        facultyQM.addWhere("type", ECriteria.EQUAL, T_DEPARTMENT_TYPE.FACULTY_ID);//TODO faculty
+        facultyQM.addWhereNull("parent");
         facultyQM.addWhereAnd("deleted", Boolean.FALSE);
         facultyQM.addOrder("deptName");
         BeanItemContainer<DEPARTMENT> facultyBIC = new BeanItemContainer<>(DEPARTMENT.class,
@@ -157,7 +156,8 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
 
         studentGW = new GridWidget(VStudent.class);
         studentGW.addEntityListener(this);
-        studentGW.showToolbar(false);
+        //studentGW.showToolbar(false);
+
         DBGridModel studentGM = (DBGridModel) studentGW.getWidgetModel();
         studentGM.setReadOnly(true);
         studentGM.setRefreshType(ERefreshType.MANUAL);
@@ -191,26 +191,24 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
 
     @Override
     public boolean onEdit(Object source, Entity e, int buttonId) {
+        return openStudentEdit(source, e, false);
+    }
+
+    private boolean openStudentEdit(Object source, Entity e, boolean readOnly) {
         if (source.equals(studentGW)) {
             FormModel fm = new FormModel(STUDENT.class);
-            fm.setReadOnly(false);
+            fm.setReadOnly(readOnly);
             fm.setTitleVisible(false);
             try {
                 fm.loadEntity(e.getId());
                 getContent().removeComponent(filterPanel);
                 getContent().removeComponent(studentGW);
-                VerticalLayout viewVL = new VerticalLayout();
-                viewVL.addComponent(filterPanel);
-                viewVL.addComponent(studentGW);
-                StudentEdit studentEdit = new StudentEdit(fm, (FStudentFilter) filterPanel.getFilterBean(),
-                        getContent(), viewVL);
+                StudentEdit studentEdit = new StudentEdit(fm, getContent(), this);
                 getContent().addComponent(studentEdit);
-//                StudentUI.getInstance().openCommonView(se);//TODO
 
                 return false;
             } catch (Exception ex) {
-                LOG.error("Unable to edit the student: ", ex);
-                Message.showError("Unable to edit the student");
+                CommonUtils.showMessageAndWriteLog("Unable to open studentEdit", ex);
             }
         }
 
@@ -219,27 +217,7 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
 
     @Override
     public boolean onPreview(Object source, Entity e, int buttonId) {
-        if (source.equals(studentGW)) {
-            FormModel fm = new FormModel(STUDENT.class);
-            fm.setReadOnly(true);
-            fm.setTitleVisible(false);
-            try {
-                fm.loadEntity(e.getId());
-                //TODO remove from getContent
-                VerticalLayout viewVL = new VerticalLayout();
-                viewVL.addComponent(filterPanel);
-                viewVL.addComponent(studentGW);
-                StudentEdit se = new StudentEdit(fm, (FStudentFilter) filterPanel.getFilterBean(), getContent(), viewVL);
-//                StudentUI.getInstance().openCommonView(se);
-
-                return false;
-            } catch (Exception ex) {
-                LOG.error("Unable to preview the student: ", ex);
-                Message.showError("Unable to preview the student");
-            }
-        }
-
-        return true;
+        return openStudentEdit(source, e, true);
     }
 
     @Override
@@ -253,7 +231,7 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
                     s.setDeleted(true);
                     mergeList.add(s);
                 } catch (Exception ex) {
-                    LOG.error("Unable to delete the student: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to delete the student", ex);
                 }
             }
 
@@ -261,7 +239,7 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(mergeList);
                 studentGW.refresh();
             } catch (Exception ex) {
-                LOG.error("Unable to delete the students: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to delete the students", ex);
             }
             return false;
         }
@@ -386,8 +364,7 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
                     }
                 }
             } catch (Exception ex) {
-                ErrorUtils.LOG.error("Unable to load student list: ", ex);
-                Message.showError(ex.toString());
+                CommonUtils.showMessageAndWriteLog("Unable to load student list", ex);
             }
         } else {
             Message.showInfo(getUILocaleUtil().getMessage("select.1.search.condition"));
@@ -397,8 +374,7 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
         try {
             studentGW.refresh();
         } catch (Exception ex) {
-            ErrorUtils.LOG.error("Unable to refresh student grid: ", ex);
-            Message.showError(ex.toString());
+            CommonUtils.showMessageAndWriteLog("Unable to refresh student grid", ex);
         }
     }
 
@@ -408,8 +384,7 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
         try {
             studentGW.refresh();
         } catch (Exception ex) {
-            ErrorUtils.LOG.error("Unable to refresh student grid: ", ex);
-            Message.showError(ex.toString());
+            CommonUtils.showMessageAndWriteLog("Unable to refresh student grid", ex);
         }
     }
 
@@ -458,5 +433,13 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
 
     @Override
     public void onCreate(Object arg0, Entity arg1, int arg2) {
+    }
+
+    public StudentFilterPanel getFilterPanel() {
+        return filterPanel;
+    }
+
+    public GridWidget getStudentGW() {
+        return studentGW;
     }
 }

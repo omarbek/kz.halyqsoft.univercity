@@ -18,8 +18,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.enumeration.OperType;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_ORDER_DOC;
-import kz.halyqsoft.univercity.filter.FStudentFilter;
-import kz.halyqsoft.univercity.utils.ErrorUtils;
+import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.facade.CommonIDFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -33,7 +32,6 @@ import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.view.AbstractCommonView;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.form.AbstractFormWidgetView;
-import org.r3a.common.vaadin.widget.form.FormModel;
 import org.r3a.common.vaadin.widget.form.field.filelist.FileListFieldModel;
 import org.r3a.common.vaadin.widget.table.TableWidget;
 import org.r3a.common.vaadin.widget.table.model.DBTableModel;
@@ -51,7 +49,6 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
 
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
 
-    private final FormModel parentBaseDataFM;
     private TableWidget ordersTW;
     private Table orderFilesTable;
     private DateField endDateField, orderDateField;
@@ -74,13 +71,9 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
 
     private OperType operType;
     private StudentEdit studentEdit;
-    private final FStudentFilter parentFilter;
     private STUDENT_EDUCATION studentEducation;
 
-    EducationDetailPanel(FormModel parentBaseDataFM, FStudentFilter parentFilter,
-                         STUDENT_EDUCATION studentEducation, VerticalLayout mainVL, StudentEdit studentEdit) {
-        this.parentBaseDataFM = parentBaseDataFM;
-        this.parentFilter = parentFilter;
+    EducationDetailPanel(STUDENT_EDUCATION studentEducation, VerticalLayout mainVL, StudentEdit studentEdit) {
         this.studentEducation = studentEducation;
         this.mainVL = mainVL;
         this.studentEdit = studentEdit;
@@ -521,8 +514,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
             orderFilesTable.setContainerDataSource(udfBIC);
             orderFilesTable.setVisibleColumns("fileName", "download");
         } catch (Exception ex) {
-            ErrorUtils.LOG.error("Unable to refresh files list: ", ex);
-            Message.showError(ex.toString());
+            CommonUtils.showMessageAndWriteLog("Unable to refresh files list", ex);
         }
     }
 
@@ -561,8 +553,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
             facultyCB.addValueChangeListener(new FacultyChangeListener());
             facultyHL.addComponent(facultyCB);
         } catch (Exception ex) {
-            ErrorUtils.LOG.error("Unable to load faculty list: ", ex);
-            Message.showError(ex.toString());
+            CommonUtils.showMessageAndWriteLog("Unable to load faculty list", ex);
         }
 
         return facultyHL;
@@ -599,8 +590,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
             BeanItemContainer<SPECIALITY> specialityBIC = new BeanItemContainer<SPECIALITY>(SPECIALITY.class, specialityList);
             specCB.setContainerDataSource(specialityBIC);
         } catch (Exception ex) {
-            ErrorUtils.LOG.error("Unable to load speciality list: ", ex);
-            Message.showError(ex.toString());
+            CommonUtils.showMessageAndWriteLog("Unable to load speciality list", ex);
         }
     }
 
@@ -668,8 +658,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
             educationTypeCB.setEnabled(operType.equals(OperType.TRANSFER));
             hl.addComponent(educationTypeCB);
         } catch (Exception ex) {
-            ErrorUtils.LOG.error("Unable to load records: ", ex);
-            Message.showError(ex.toString());
+            CommonUtils.showMessageAndWriteLog("Unable to load records", ex);
         }
 
         return hl;
@@ -733,8 +722,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
             statusCB.setEnabled(false);
             hl.addComponent(statusCB);
         } catch (Exception ex) {
-            ErrorUtils.LOG.error("Unable to load student status list: ", ex);
-            Message.showError(ex.toString());
+            CommonUtils.showMessageAndWriteLog("Unable to load student status list", ex);
         }
 
         return hl;
@@ -970,8 +958,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
             vl.addComponent(toolbarHL);
             vl.setComponentAlignment(toolbarHL, Alignment.MIDDLE_CENTER);
         } catch (Exception ex) {
-            ErrorUtils.LOG.error("Unable to createCertificate order widget list: ", ex);
-            Message.showError(ex.toString());
+            CommonUtils.showMessageAndWriteLog("Unable to create order widget list", ex);
         }
 
         return vl;
@@ -1058,7 +1045,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
                             SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(mergeList);
                         }
                     } catch (Exception ex) {
-                        ErrorUtils.LOG.error("Unable to transfer student subjects: ", ex);
+                        CommonUtils.showMessageAndWriteLog("Unable to transfer student subjects", ex);
                     }
                 }
 
@@ -1078,8 +1065,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
                 rightVL.setCaption("");
             }
         } catch (Exception ex) {
-            ErrorUtils.LOG.error("Unable to transfer the student: ", ex);
-            Message.showError(ex.getMessage());
+            CommonUtils.showMessageAndWriteLog("Unable to transfer the student", ex);
         }
     }
 
@@ -1102,8 +1088,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
             rightVL.removeAllComponents();
             rightVL.setCaption("");
         } catch (Exception ex) {
-            ErrorUtils.LOG.error("Unable to academic leave the student: ", ex);
-            Message.showError(ex.getMessage());
+            CommonUtils.showMessageAndWriteLog("Unable to academic leave the student", ex);
         }
     }
 
@@ -1126,8 +1111,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
             rightVL.removeAllComponents();
             rightVL.setCaption("");
         } catch (Exception ex) {
-            ErrorUtils.LOG.error("Unable to restore the student: ", ex);
-            Message.showError(ex.getMessage());
+            CommonUtils.showMessageAndWriteLog("Unable to restore the student", ex);
         }
     }
 
@@ -1154,8 +1138,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
             rightVL.removeAllComponents();
             rightVL.setCaption("");
         } catch (Exception ex) {
-            ErrorUtils.LOG.error("Unable to restore the student: ", ex);
-            Message.showError(ex.getMessage());
+            CommonUtils.showMessageAndWriteLog("Unable to restore the student", ex);
         }
     }
 
@@ -1182,8 +1165,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
             rightVL.removeAllComponents();
             rightVL.setCaption("");
         } catch (Exception ex) {
-            ErrorUtils.LOG.error("Unable to restore the student: ", ex);
-            Message.showError(ex.getMessage());
+            CommonUtils.showMessageAndWriteLog("Unable to restore the student", ex);
         }
     }
 
@@ -1229,8 +1211,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
                 rightVL.removeAllComponents();
                 rightVL.setCaption("");
             } catch (Exception ex) {
-                ErrorUtils.LOG.error("Unable to save order: ", ex);
-                Message.showError(ex.getMessage());
+                CommonUtils.showMessageAndWriteLog("Unable to save order", ex);
             }
         }
     }
@@ -1359,8 +1340,8 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
 
         @Override
         public void uploadFailed(FailedEvent ev) {
-            ErrorUtils.LOG.error("Order files: Unable to upload the file: " + ev.getFilename());
-            ErrorUtils.LOG.error(String.valueOf(ev.getReason()));
+            CommonUtils.LOG.error("Order files: Unable to upload the file: " + ev.getFilename());
+            CommonUtils.LOG.error(String.valueOf(ev.getReason()));
         }
 
         @Override
@@ -1378,7 +1359,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
 
                 orderFilesLS.getContainerDataSource().addItem(fb);
             } catch (Exception ex) {
-                ErrorUtils.LOG.error("FileListWidget: Unable to read temp file: ", ex);
+                CommonUtils.showMessageAndWriteLog("FileListWidget: Unable to read temp file", ex);
             } finally {
                 if (fis != null) {
                     try {
@@ -1393,13 +1374,14 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
         public OutputStream receiveUpload(String filename, String mimeType) {
             FileOutputStream fos = null;
             try {
-                file = new File("/tmp/" + filename);
+                file = new File("/tmp/files/" + filename);
+//                file = new File("C:/Users/Omarbek/IdeaProjects/univercity/tmp/files/" + filename);
                 if (file.exists()) {
                     file.delete();
                 }
                 fos = new FileOutputStream(file);
             } catch (Exception ex) {
-                ErrorUtils.LOG.error("Cannot upload file: " + filename, ex);
+                CommonUtils.showMessageAndWriteLog("Cannot upload file: " + filename, ex);
             }
 
             return fos;
@@ -1415,7 +1397,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
             long size = ev.getContentLength();
             long maxSize = FileListFieldModel.MAX_FILE_SIZE;
             if (size > maxSize) {
-                ErrorUtils.LOG.error("Trying to upload a big file: Filename = " + ev.getFilename() + ", size = " + size);
+                CommonUtils.LOG.error("Trying to upload a big file: Filename = " + ev.getFilename() + ", size = " + size);
                 upload.interruptUpload();
                 String message = getUILocaleUtil().getMessage("error.filetoobig");
                 Message.showError(String.format(message, maxSize / 1024));

@@ -1,11 +1,10 @@
 package kz.halyqsoft.univercity.utils.register;
 
-import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
+import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_ADDRESS;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ADDRESS_TYPE;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.COUNTRY;
-import kz.halyqsoft.univercity.modules.regapplicants.ApplicantsForm;
-import kz.halyqsoft.univercity.utils.ErrorUtils;
+import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.changelisteners.CityChangeListener;
 import kz.halyqsoft.univercity.utils.changelisteners.CountryChangeListener;
 import kz.halyqsoft.univercity.utils.changelisteners.RegionChangeListener;
@@ -17,6 +16,7 @@ import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.form.AbstractFormWidget;
+import org.r3a.common.vaadin.widget.form.AbstractFormWidgetView;
 import org.r3a.common.vaadin.widget.form.FormModel;
 import org.r3a.common.vaadin.widget.form.GridFormWidget;
 import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
@@ -32,7 +32,7 @@ public class Address {
     private GridFormWidget addressRegGFW;
     private GridFormWidget addressFactGFW;
     private AbstractFormWidget dataAFW;
-    private ApplicantsForm applicantsForm;
+    private AbstractFormWidgetView applicantsForm;
     private FormModel addressRegFM;
     private FormModel addressFactFM;
 
@@ -46,7 +46,7 @@ public class Address {
         return addressFactGFW;
     }
 
-    public Address(AbstractFormWidget dataAFW, ApplicantsForm applicantsForm) {
+    public Address(AbstractFormWidget dataAFW, AbstractFormWidgetView applicantsForm) {
         this.dataAFW = dataAFW;
         this.applicantsForm = applicantsForm;
     }
@@ -54,9 +54,9 @@ public class Address {
     public void create(String caption, int addressNumber) throws Exception {
         StringBuilder sb;
         sb = new StringBuilder();
-        sb.append(ErrorUtils.getUILocaleUtil().getCaption("title.error"));
+        sb.append(CommonUtils.getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
-        sb.append(ErrorUtils.getUILocaleUtil().getCaption(caption));
+        sb.append(CommonUtils.getUILocaleUtil().getCaption(caption));
         FormModel addressFM;
         if (addressNumber == ADDRESS_REG) {
             addressRegGFW = new GridFormWidget(USER_ADDRESS.class);
@@ -69,11 +69,11 @@ public class Address {
             addressFactFM = addressFactGFW.getWidgetModel();
             addressFM = addressFactFM;
         }
-        setFormModel(addressNumber, sb, addressFM);
+        setFormModel(caption, addressNumber, sb, addressFM);
     }
 
-    private void setFormModel(int addressNumber, StringBuilder sb, FormModel addressFM) throws Exception {
-        addressFM.setTitleResource("address.registration");
+    private void setFormModel(String title, int addressNumber, StringBuilder sb, FormModel addressFM) throws Exception {
+        addressFM.setTitleResource(title);
         addressFM.setErrorMessageTitle(sb.toString());
         addressFM.setButtonsVisible(false);
 
@@ -121,7 +121,7 @@ public class Address {
 
     public boolean preSave(Entity e, boolean isNew, int addressNumber) {
         if (dataAFW.getWidgetModel().isCreateNew()) {
-            Message.showInfo(ErrorUtils.getUILocaleUtil().getMessage("info.save.base.data.first"));
+            Message.showInfo(CommonUtils.getUILocaleUtil().getMessage("info.save.base.data.first"));
             return false;
         }
         USER_ADDRESS ua = (USER_ADDRESS) e;
@@ -129,19 +129,19 @@ public class Address {
 
         if (isNew) {
             try {
-                ua.setUser((STUDENT) fm.getEntity());
+                ua.setUser((USERS) fm.getEntity());
                 ua.setAddressType(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(ADDRESS_TYPE.class, ID.valueOf(addressNumber)));
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(ua);
-                ErrorUtils.showSavedNotification();
+                CommonUtils.showSavedNotification();
             } catch (Exception ex) {
-                ErrorUtils.LOG.error("Unable to createCertificate a registration address: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to create a registration address", ex);
             }
         } else {
             try {
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(ua);
-                ErrorUtils.showSavedNotification();
+                CommonUtils.showSavedNotification();
             } catch (Exception ex) {
-                ErrorUtils.LOG.error("Unable to merge a registration address: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to merge a registration address", ex);
             }
         }
         return false;

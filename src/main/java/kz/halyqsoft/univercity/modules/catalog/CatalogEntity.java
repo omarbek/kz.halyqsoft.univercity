@@ -1,11 +1,9 @@
 package kz.halyqsoft.univercity.modules.catalog;
 
-import kz.halyqsoft.univercity.utils.ErrorUtils;
+import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.ID;
 import org.r3a.common.entity.tree.CommonTree;
-import org.r3a.common.vaadin.AbstractWebUI;
-import org.r3a.common.vaadin.locale.UILocaleUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,6 +89,6 @@ public class CatalogEntity implements CommonTree<CatalogEntity> {
 
     @Override
     public String toString() {
-        return ErrorUtils.getUILocaleUtil().getEntityLabel(entityClass);//TODO
+        return CommonUtils.getUILocaleUtil().getEntityLabel(entityClass);
     }
 }

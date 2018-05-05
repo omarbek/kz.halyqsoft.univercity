@@ -6,7 +6,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.USER_DOCUMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_DOCUMENT_FILE;
 import kz.halyqsoft.univercity.modules.regapplicants.ApplicantsForm;
 import kz.halyqsoft.univercity.utils.CommonUtils;
-import kz.halyqsoft.univercity.utils.ErrorUtils;
+import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.facade.CommonIDFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -18,6 +18,7 @@ import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.form.AbstractFormWidget;
+import org.r3a.common.vaadin.widget.form.AbstractFormWidgetView;
 import org.r3a.common.vaadin.widget.form.FormModel;
 import org.r3a.common.vaadin.widget.form.GridFormWidget;
 import org.r3a.common.vaadin.widget.form.field.filelist.FileListFieldModel;
@@ -32,14 +33,14 @@ public class Contract {
 
     private GridFormWidget mainGFW;
     private AbstractFormWidget dataAFW;
-    private ApplicantsForm applicantsForm;
+    private AbstractFormWidgetView applicantsForm;
     private FormModel mainFM;
 
     public GridFormWidget getMainGFW() {
         return mainGFW;
     }
 
-    public Contract(AbstractFormWidget dataAFW, ApplicantsForm applicantsForm) {
+    public Contract(AbstractFormWidget dataAFW, AbstractFormWidgetView applicantsForm) {
         this.dataAFW = dataAFW;
         this.applicantsForm = applicantsForm;
     }
@@ -47,9 +48,9 @@ public class Contract {
     public void create(QueryModel<USER_DOCUMENT_FILE> udfQM, FileListFieldModel militaryFLFM) throws Exception {
         StringBuilder sb;
         sb = new StringBuilder();
-        sb.append(ErrorUtils.getUILocaleUtil().getCaption("title.error"));
+        sb.append(CommonUtils.getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
-        sb.append(ErrorUtils.getUILocaleUtil().getCaption("contract.data"));
+        sb.append(CommonUtils.getUILocaleUtil().getCaption("contract.data"));
         mainGFW = new GridFormWidget(STUDENT_CONTRACT.class);
         mainGFW.addEntityListener(applicantsForm);
         mainFM = mainGFW.getWidgetModel();
@@ -80,7 +81,7 @@ public class Contract {
 
     public boolean preSave(Entity e, boolean isNew) {
         if (dataAFW.getWidgetModel().isCreateNew()) {
-            Message.showInfo(ErrorUtils.getUILocaleUtil().getMessage("info.save.base.data.first"));
+            Message.showInfo(CommonUtils.getUILocaleUtil().getMessage("info.save.base.data.first"));
             return false;
         }
         STUDENT_CONTRACT md = (STUDENT_CONTRACT) e;
@@ -90,16 +91,16 @@ public class Contract {
                 md.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USER_DOCUMENT"));
                 md.setUser((STUDENT) fm.getEntity());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(md);
-                ErrorUtils.showSavedNotification();
+                CommonUtils.showSavedNotification();
             } catch (Exception ex) {
-                ErrorUtils.LOG.error("Unable to createCertificate a contract doc: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to create a contract doc", ex);
             }
         } else {
             try {
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(md);
-                ErrorUtils.showSavedNotification();
+                CommonUtils.showSavedNotification();
             } catch (Exception ex) {
-                ErrorUtils.LOG.error("Unable to merge a contract doc: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to merge a contract doc", ex);
             }
         }
 
@@ -113,7 +114,7 @@ public class Contract {
                 try {
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(udf);
                 } catch (Exception ex) {
-                    ErrorUtils.LOG.error("Unable to save contract doc copy: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to save contract doc copy", ex);
                 }
             }
         }
@@ -124,7 +125,7 @@ public class Contract {
                 udf.setDeleted(true);
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(udf);
             } catch (Exception ex) {
-                ErrorUtils.LOG.error("Unable to delete contract doc copy: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to delete contract doc copy", ex);
             }
         }
 

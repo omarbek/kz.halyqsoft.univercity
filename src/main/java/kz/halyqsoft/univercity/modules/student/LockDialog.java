@@ -4,6 +4,7 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.ComboBox;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.LOCK_REASON;
+import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.ID;
@@ -40,7 +41,7 @@ final class LockDialog extends AbstractDialog {
             lockCB.setContainerDataSource(lockBIC);
             getContent().addComponent(lockCB);
         } catch (Exception ex) {
-            LOG.error("Unable to load lock reasons: ", ex);
+            CommonUtils.showMessageAndWriteLog("Unable to load lock reasons", ex);
         }
     }
 

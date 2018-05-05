@@ -1,16 +1,12 @@
 package kz.halyqsoft.univercity.utils.register;
 
 import com.vaadin.data.validator.IntegerRangeValidator;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
+import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.EDUCATION_DOC;
-import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_DOCUMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_DOCUMENT_FILE;
-import kz.halyqsoft.univercity.entity.beans.univercity.enumeration.Flag;
-import kz.halyqsoft.univercity.modules.regapplicants.ApplicantsForm;
 import kz.halyqsoft.univercity.utils.CommonUtils;
-import kz.halyqsoft.univercity.utils.ErrorUtils;
+import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.changelisteners.SchoolCountryChangeListener;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.facade.CommonIDFacadeBean;
@@ -24,6 +20,7 @@ import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.widget.DBSelectModel;
 import org.r3a.common.vaadin.widget.form.AbstractFormWidget;
+import org.r3a.common.vaadin.widget.form.AbstractFormWidgetView;
 import org.r3a.common.vaadin.widget.form.FormModel;
 import org.r3a.common.vaadin.widget.form.GridFormWidget;
 import org.r3a.common.vaadin.widget.form.field.filelist.FileListFieldModel;
@@ -41,7 +38,7 @@ public class EducationDoc {
 
     private GridFormWidget mainGFW;
     private AbstractFormWidget dataAFW;
-    private ApplicantsForm applicantsForm;
+    private AbstractFormWidgetView applicantsForm;
     private TableWidget documentsTW;
     private FromItem educationUDFI;
     private FormModel mainFM;
@@ -56,7 +53,7 @@ public class EducationDoc {
     }
 
     public EducationDoc(AbstractFormWidget dataAFW,
-                        ApplicantsForm applicantsForm, TableWidget documentsTW, FromItem educationUDFI) {
+                        AbstractFormWidgetView applicantsForm, TableWidget documentsTW, FromItem educationUDFI) {
         this.dataAFW = dataAFW;
         this.applicantsForm = applicantsForm;
         this.documentsTW = documentsTW;
@@ -66,9 +63,9 @@ public class EducationDoc {
     public void create(QueryModel<USER_DOCUMENT_FILE> udfQM) throws Exception {
         StringBuilder sb;
         sb = new StringBuilder();
-        sb.append(ErrorUtils.getUILocaleUtil().getCaption("title.error"));
+        sb.append(CommonUtils.getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
-        sb.append(ErrorUtils.getUILocaleUtil().getCaption("education.document"));
+        sb.append(CommonUtils.getUILocaleUtil().getCaption("education.document"));
         mainGFW = new GridFormWidget(EDUCATION_DOC.class);
         mainGFW.addEntityListener(applicantsForm);
         mainFM = mainGFW.getWidgetModel();
@@ -84,8 +81,8 @@ public class EducationDoc {
         mainFM.getFieldModel("schoolRegion").setRequired(false);
 
         mainFM.getFieldModel("schoolAddress").setRequired(true);
-        mainFM.getFieldModel("entryYear").getValidators().add(new IntegerRangeValidator("Значение года не может быть больше текущего года", 0, ErrorUtils.currentYear));
-        mainFM.getFieldModel("endYear").getValidators().add(new IntegerRangeValidator("Значение года не может быть больше текущего года", 0, ErrorUtils.currentYear));
+        mainFM.getFieldModel("entryYear").getValidators().add(new IntegerRangeValidator("Значение года не может быть больше текущего года", 0, CommonUtils.currentYear));
+        mainFM.getFieldModel("endYear").getValidators().add(new IntegerRangeValidator("Значение года не может быть больше текущего года", 0, CommonUtils.currentYear));
 
         FKFieldModel schoolRegionFieldModel = (FKFieldModel) mainFM.getFieldModel("schoolRegion");
         QueryModel schoolRegionQM = schoolRegionFieldModel.getQueryModel();
@@ -122,24 +119,24 @@ public class EducationDoc {
         if (isNew) {
             try {
                 ed.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USER_DOCUMENT"));
-                ed.setUser((STUDENT) fm.getEntity());
+                ed.setUser((USERS) fm.getEntity());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(ed);
 
                 QueryModel educationQM = ((DBSelectModel) documentsTW.getWidgetModel()).getQueryModel();
                 educationQM.addWhere(educationUDFI, "user", ECriteria.EQUAL, dataAFW.getWidgetModel().getEntity().getId());
 
                 documentsTW.refresh();
-                ErrorUtils.showSavedNotification();
+                CommonUtils.showSavedNotification();
             } catch (Exception ex) {
-                ErrorUtils.LOG.error("Unable to createCertificate a education doc: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to create a education doc", ex);
             }
         } else {
             try {
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(ed);
                 documentsTW.refresh();
-                ErrorUtils.showSavedNotification();
+                CommonUtils.showSavedNotification();
             } catch (Exception ex) {
-                ErrorUtils.LOG.error("Unable to merge a education doc: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to merge a education doc", ex);
             }
         }
 
@@ -153,7 +150,7 @@ public class EducationDoc {
                 try {
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(udf);
                 } catch (Exception ex) {
-                    ErrorUtils.LOG.error("Unable to save education doc copy: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to save education doc copy", ex);
                 }
             }
         }
@@ -162,7 +159,8 @@ public class EducationDoc {
 
         return false;
     }
-    public void save(){
+
+    public void save() {
         if (mainFM.isModified() && mainGFW.save()) {
             saveEduc = true;
         }

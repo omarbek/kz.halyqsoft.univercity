@@ -6,7 +6,6 @@ import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_UNT_CERT_SUBJECT;
 import kz.halyqsoft.univercity.modules.regapplicants.ApplicantsForm;
 import kz.halyqsoft.univercity.utils.CommonUtils;
-import kz.halyqsoft.univercity.utils.ErrorUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.facade.CommonIDFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -77,10 +76,10 @@ public class Unt {
 
                 untRatesTW.refresh();
                 certificateGFW.refresh();
-                ErrorUtils.showSavedNotification();
+                CommonUtils.showSavedNotification();
 
             } catch (Exception ex) {
-                ErrorUtils.LOG.error("Unable to createCertificate a Unt rate: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to create a Unt rate", ex);
             }
         } else {
             try {
@@ -94,9 +93,9 @@ public class Unt {
                 saveUNT = true;
                 untRatesTW.refresh();
                 certificateGFW.refresh();
-                ErrorUtils.showSavedNotification();
+                CommonUtils.showSavedNotification();
             } catch (Exception ex) {
-                ErrorUtils.LOG.error("Unable to merge a Unt rate: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to merge a Unt rate", ex);
             }
         }
         return false;
@@ -104,7 +103,7 @@ public class Unt {
 
     public boolean preSaveCertificate(Entity e, boolean isNew) {
         if (dataAFW.getWidgetModel().isCreateNew()) {
-            Message.showInfo(ErrorUtils.getUILocaleUtil().getMessage("info.save.base.data.first"));
+            Message.showInfo(CommonUtils.getUILocaleUtil().getMessage("info.save.base.data.first"));
             return false;
         }
         UNT_CERTIFICATE uc = (UNT_CERTIFICATE) e;
@@ -116,16 +115,16 @@ public class Unt {
                 uc.setUser((STUDENT) fm.getEntity());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(uc);
                 certificateGFW.getWidgetModel().loadEntity(uc.getId());
-                ErrorUtils.showSavedNotification();
+                CommonUtils.showSavedNotification();
             } catch (Exception ex) {
-                ErrorUtils.LOG.error("Unable to createCertificate a Unt certificate: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to create a Unt certificate", ex);
             }
         } else {
             try {
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(uc);
-                ErrorUtils.showSavedNotification();
+                CommonUtils.showSavedNotification();
             } catch (Exception ex) {
-                ErrorUtils.LOG.error("Unable to merge a Unt certificate: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to merge a Unt certificate", ex);
             }
         }
 
@@ -139,7 +138,7 @@ public class Unt {
                 try {
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(udf);
                 } catch (Exception ex) {
-                    ErrorUtils.LOG.error("Unable to save Unt certificate copy: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to save Unt certificate copy", ex);
                 }
             }
         }
@@ -150,18 +149,18 @@ public class Unt {
                 udf.setDeleted(true);
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(udf);
             } catch (Exception ex) {
-                ErrorUtils.LOG.error("Unable to delete Unt certificate copy: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to delete Unt certificate copy", ex);
             }
         }
         return false;
     }
 
-    public void createCertificate(QueryModel<USER_DOCUMENT_FILE> udfQM) throws Exception {
+    public void create(QueryModel<USER_DOCUMENT_FILE> udfQM) throws Exception {
         StringBuilder sb;
         sb = new StringBuilder();
-        sb.append(ErrorUtils.getUILocaleUtil().getCaption("title.error"));
+        sb.append(CommonUtils.getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
-        sb.append(ErrorUtils.getUILocaleUtil().getCaption("unt"));
+        sb.append(CommonUtils.getUILocaleUtil().getCaption("unt"));
         certificateGFW = new GridFormWidget(UNT_CERTIFICATE.class);
         certificateGFW.addEntityListener(applicantsForm);
         untCertificateFM = certificateGFW.getWidgetModel();

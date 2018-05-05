@@ -24,7 +24,7 @@ import javax.persistence.TemporalType;
  * @created Jan 2, 2016 12:24:49 PM
  */
 @Entity
-public class VT_EMPLOYEE_DEPT extends AbstractEntity {
+public class V_EMPLOYEE_DEPT extends AbstractEntity {
 
 	private static final long serialVersionUID = -1646900881175952040L;
 
@@ -76,7 +76,7 @@ public class VT_EMPLOYEE_DEPT extends AbstractEntity {
 	@Column(name = "WAGE_RATE", nullable = false)
     private Double wageRate;
 	
-	@FieldInfo(type = EFieldType.DOUBLE, order = 11, columnWidth = 130, readOnlyFixed = true)
+	@FieldInfo(type = EFieldType.DOUBLE, order = 11, columnWidth = 130, readOnlyFixed = true,required = false)
 	@Column(name = "RATE_LOAD", nullable = false)
     private Double rateLoad;
 	
@@ -104,7 +104,7 @@ public class VT_EMPLOYEE_DEPT extends AbstractEntity {
         @JoinColumn(name = "PARENT_ID", referencedColumnName = "ID")})
     private EMPLOYEE_DEPT parent;
 	
-	public VT_EMPLOYEE_DEPT() {
+	public V_EMPLOYEE_DEPT() {
 	}
 
 	public EMPLOYEE getEmployee() {

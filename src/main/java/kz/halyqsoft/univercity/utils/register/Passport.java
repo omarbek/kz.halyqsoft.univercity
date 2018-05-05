@@ -1,13 +1,12 @@
 package kz.halyqsoft.univercity.utils.register;
 
 import com.vaadin.data.validator.RegexpValidator;
-import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
+import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_DOCUMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_DOCUMENT_FILE;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_PASSPORT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.COUNTRY;
-import kz.halyqsoft.univercity.modules.regapplicants.ApplicantsForm;
-import kz.halyqsoft.univercity.utils.ErrorUtils;
+import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.changelisteners.BirthCountryChangeListener;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.facade.CommonIDFacadeBean;
@@ -21,6 +20,7 @@ import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.form.AbstractFormWidget;
+import org.r3a.common.vaadin.widget.form.AbstractFormWidgetView;
 import org.r3a.common.vaadin.widget.form.FormModel;
 import org.r3a.common.vaadin.widget.form.GridFormWidget;
 import org.r3a.common.vaadin.widget.form.field.filelist.FileListFieldModel;
@@ -37,7 +37,7 @@ public class Passport {
 
     private GridFormWidget mainGFW;
     private AbstractFormWidget dataAFW;
-    private ApplicantsForm applicantsForm;
+    private AbstractFormWidgetView applicantsForm;
     private FormModel mainFM;
     private boolean savePass;
 
@@ -49,7 +49,7 @@ public class Passport {
         return mainGFW;
     }
 
-    public Passport(AbstractFormWidget dataAFW, ApplicantsForm applicantsForm) {
+    public Passport(AbstractFormWidget dataAFW, AbstractFormWidgetView applicantsForm) {
         this.dataAFW = dataAFW;
         this.applicantsForm = applicantsForm;
     }
@@ -57,9 +57,9 @@ public class Passport {
     public void create(QueryModel<USER_DOCUMENT_FILE> udfQM) throws Exception {
         StringBuilder sb;
         sb = new StringBuilder();
-        sb.append(ErrorUtils.getUILocaleUtil().getCaption("title.error"));
+        sb.append(CommonUtils.getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
-        sb.append(ErrorUtils.getUILocaleUtil().getCaption("identity.document"));
+        sb.append(CommonUtils.getUILocaleUtil().getCaption("identity.document"));
         mainGFW = new GridFormWidget(USER_PASSPORT.class);
         mainGFW.addEntityListener(applicantsForm);
         mainGFW.focus();
@@ -105,7 +105,7 @@ public class Passport {
                             FileBean fe = new FileBean(USER_DOCUMENT_FILE.class);
                             fe.setId(ID.valueOf((Long) oo[0]));
                             fe.setFileName((String) oo[1]);
-                            ErrorUtils.LOG.error("It somehow works! " + fe.toString());
+                            CommonUtils.LOG.error("It works! " + fe.toString());
                             fe.setNewFile(false);
                             passportFLFM.getFileList().add(fe);
                         }
@@ -120,7 +120,7 @@ public class Passport {
 
     public boolean preSave(Entity e, boolean isNew) {
         if (dataAFW.getWidgetModel().isCreateNew()) {
-            Message.showInfo(ErrorUtils.getUILocaleUtil().getMessage("info.save.base.data.first"));
+            Message.showInfo(CommonUtils.getUILocaleUtil().getMessage("info.save.base.data.first"));
             return false;
         }
 
@@ -129,18 +129,18 @@ public class Passport {
         if (isNew) {
             try {
                 p.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USER_DOCUMENT"));
-                p.setUser((STUDENT) fm.getEntity());
+                p.setUser((USERS) fm.getEntity());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(p);
-                ErrorUtils.showSavedNotification();
+                CommonUtils.showSavedNotification();
             } catch (Exception ex) {
-                ErrorUtils.LOG.error("Unable to createCertificate a passport: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to create a passport", ex);
             }
         } else {
             try {
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(p);
-                ErrorUtils.showSavedNotification();
+                CommonUtils.showSavedNotification();
             } catch (Exception ex) {
-                ErrorUtils.LOG.error("Unable to merge a passport: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to merge a passport", ex);
             }
         }
 
@@ -154,7 +154,7 @@ public class Passport {
                 try {
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(udf);
                 } catch (Exception ex) {
-                    ErrorUtils.LOG.error("Unable to save passport copy: ", ex);
+                    CommonUtils.showMessageAndWriteLog("Unable to save passport copy", ex);
                 }
             }
         }
@@ -165,7 +165,7 @@ public class Passport {
                 udf.setDeleted(true);
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(udf);
             } catch (Exception ex) {
-                ErrorUtils.LOG.error("Unable to delete passport copy: ", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to delete passport copy", ex);
             }
         }
 
