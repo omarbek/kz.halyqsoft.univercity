@@ -1,6 +1,7 @@
 package kz.halyqsoft.univercity.modules.pdf;
 
 import com.itextpdf.text.Document;
+import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.BaseFont;
@@ -51,9 +52,9 @@ public class CustomDocument {
             PdfWriter pdfWriter = PdfWriter.getInstance(this.document, byteArrayOutputStream);
 
             document.open();
-            Paragraph paragraph = new Paragraph(title, getFont(22, Font.BOLD));
+            Paragraph paragraph = new Paragraph(title, getFont(13, Font.BOLD));
             paragraph.setSpacingBefore(35f);
-            paragraph.setIndentationLeft(200f);
+            paragraph.setIndentationLeft(220f);
             document.add(paragraph);
 
             for (CustomField cf : customFieldList) {
@@ -77,10 +78,10 @@ public class CustomDocument {
 //                cb.endText();
 //                cb.restoreState();
                 Paragraph paragraph1 = new Paragraph(cf.getTextField().getValue(),
-                        getFont(Integer.parseInt(cf.getTextSize().getValue()),
+                        getFont(Integer.parseInt(cf.getTextSizeComboBox().getValue().toString()),
                                 fontMap.get(cf.getFontComboBox().getValue().toString())));
-                float x = (float) Integer.parseInt(cf.getxIntegerField().getValue());
-                float y = (float) Integer.parseInt(cf.getyIntegerField().getValue());
+                float x = (float) Integer.parseInt(cf.getxComboBox().getValue().toString());
+                float y = (float) Integer.parseInt(cf.getyComboBox().getValue().toString());
 
                 paragraph1.setSpacingBefore(x);
                 paragraph1.setIndentationLeft(y);
@@ -91,7 +92,8 @@ public class CustomDocument {
                 pdfProperty.setX(x);
                 pdfProperty.setY(y);
                 pdfProperty.setFont(cf.getFontComboBox().getValue().toString());
-                pdfProperty.setSize(Integer.parseInt(cf.getTextSize().getValue()));
+                pdfProperty.setSize(Integer.parseInt(cf.getTextSizeComboBox().getValue().toString()));
+                pdfProperty.setOrderNumber(Double.parseDouble(cf.getOrder().getValue().toString()));
                 pdfProperties.add(pdfProperty);
 //                pdfProperty.setPdfDocument(pdfDocument);
 //                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(pdfProperty);
