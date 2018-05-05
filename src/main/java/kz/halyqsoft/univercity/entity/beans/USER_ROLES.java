@@ -21,7 +21,7 @@ public class USER_ROLES extends AbstractUserRole {
     @FieldInfo(type = EFieldType.FK_COMBO, inGrid = false, inEdit = false, inView = false)
     @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "USER_ID", referencedColumnName = "ID", nullable = false)})
+        @JoinColumn(name = "USER_ID", referencedColumnName = "ID", nullable = false )})
     private USERS user;
 
     @FieldInfo(type = EFieldType.FK_COMBO)

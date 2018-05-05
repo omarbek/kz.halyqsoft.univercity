@@ -18,7 +18,6 @@ import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.enumeration.OperType;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_ORDER_DOC;
-import kz.halyqsoft.univercity.filter.FStudentFilter;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.facade.CommonIDFacadeBean;
@@ -33,7 +32,6 @@ import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.view.AbstractCommonView;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.form.AbstractFormWidgetView;
-import org.r3a.common.vaadin.widget.form.FormModel;
 import org.r3a.common.vaadin.widget.form.field.filelist.FileListFieldModel;
 import org.r3a.common.vaadin.widget.table.TableWidget;
 import org.r3a.common.vaadin.widget.table.model.DBTableModel;
@@ -51,7 +49,6 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
 
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
 
-    private final FormModel parentBaseDataFM;
     private TableWidget ordersTW;
     private Table orderFilesTable;
     private DateField endDateField, orderDateField;
@@ -74,13 +71,9 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
 
     private OperType operType;
     private StudentEdit studentEdit;
-    private final FStudentFilter parentFilter;
     private STUDENT_EDUCATION studentEducation;
 
-    EducationDetailPanel(FormModel parentBaseDataFM, FStudentFilter parentFilter,
-                         STUDENT_EDUCATION studentEducation, VerticalLayout mainVL, StudentEdit studentEdit) {
-        this.parentBaseDataFM = parentBaseDataFM;
-        this.parentFilter = parentFilter;
+    EducationDetailPanel(STUDENT_EDUCATION studentEducation, VerticalLayout mainVL, StudentEdit studentEdit) {
         this.studentEducation = studentEducation;
         this.mainVL = mainVL;
         this.studentEdit = studentEdit;
@@ -1381,8 +1374,8 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
         public OutputStream receiveUpload(String filename, String mimeType) {
             FileOutputStream fos = null;
             try {
-//                file = new File("/tmp/" + filename);
-                file = new File("C:/Users/Omarbek/IdeaProjects/univercity/tmp/files/" + filename);//TODO change
+                file = new File("/tmp/files/" + filename);
+//                file = new File("C:/Users/Omarbek/IdeaProjects/univercity/tmp/files/" + filename);
                 if (file.exists()) {
                     file.delete();
                 }

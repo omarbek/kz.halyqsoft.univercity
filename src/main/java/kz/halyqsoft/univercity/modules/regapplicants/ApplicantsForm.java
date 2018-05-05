@@ -129,7 +129,8 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         dataFM.getFieldModel("email").setReadOnly(false);
         dataFM.getFieldModel("phoneMobile").setRequired(true);
 
-        setAdviser(dataFM);
+        setAdviser(dataFM, "advisor");
+        setAdviser(dataFM, "coordinator");
 
         QueryModel<USER_DOCUMENT_FILE> udfQM = new QueryModel<>(USER_DOCUMENT_FILE.class);
         udfQM.addSelect("id");
@@ -179,8 +180,8 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         form.click();
     }
 
-    private void setAdviser(FormModel dataFM) {
-        FKFieldModel advisorFM = (FKFieldModel) dataFM.getFieldModel("advisor");
+    private void setAdviser(FormModel dataFM, String field) {
+        FKFieldModel advisorFM = (FKFieldModel) dataFM.getFieldModel(field);
         advisorFM.setSelectType(ESelectType.CUSTOM_GRID);
         advisorFM.setDialogHeight(400);
         advisorFM.setDialogWidth(600);

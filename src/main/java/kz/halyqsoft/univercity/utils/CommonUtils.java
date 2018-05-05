@@ -1,5 +1,12 @@
 package kz.halyqsoft.univercity.utils;
 
+import com.vaadin.server.Sizeable;
+import com.vaadin.server.ThemeResource;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.HorizontalLayout;
+import kz.halyqsoft.univercity.entity.beans.USERS;
+import kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE;
+import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_DOCUMENT_FILE;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -15,7 +22,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Omarbek
@@ -28,6 +37,42 @@ public class CommonUtils {
 
     public static String getCurrentUserLogin() {
         return AbstractSecureWebUI.getInstance().getUsername();
+    }
+
+    public static USERS getCurrentUser() {
+        try {
+            Map<String, Object> params = new HashMap<>();
+            params.put("login", getCurrentUserLogin());
+            EMPLOYEE employee = getEmployee(params);
+            if (employee != null) {
+                return employee;
+            }
+            STUDENT student = getStudent(params);
+            if (student != null) {
+                return student;
+            }
+        } catch (Exception e) {
+            CommonUtils.showMessageAndWriteLog("Unable to get user", e);
+        }
+        return null;
+    }
+
+    private static STUDENT getStudent(Map<String, Object> params) {
+        try {
+            return (STUDENT) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                    getEntityByNamedQuery("STUDENT.getStudentByLogin", params);
+        } catch (Exception ignored) {
+        }
+        return null;
+    }
+
+    private static EMPLOYEE getEmployee(Map<String, Object> params) {
+        try {
+            return (EMPLOYEE) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                    getEntityByNamedQuery("EMPLOYEE.getEmployeeByLogin", params);
+        } catch (Exception ignored) {
+        }
+        return null;
     }
 
     public static String getCode(Integer count) {
@@ -54,14 +99,6 @@ public class CommonUtils {
         }
         codeSB.append(code);
         return codeSB.toString();
-    }
-
-    public static void main(String[] args) {
-        int a = 1;
-        String code = getCode(a);
-        String codeBuilder = getCodeBuilder(a);
-        System.out.println("code: " + code);
-        System.out.println("builder: " + codeBuilder);
     }
 
     public static void addFiles(QueryModel<USER_DOCUMENT_FILE> udfQM, FileListFieldModel medicalCheckupFLFM) {
@@ -105,5 +142,32 @@ public class CommonUtils {
     public static void showMessageAndWriteLog(String message, Exception ex) {
         LOG.error(message + ": ", ex);
         Message.showError(ex.toString());
+    }
+
+    public static HorizontalLayout createButtonPanel() {
+        HorizontalLayout buttonPanel = new HorizontalLayout();
+        buttonPanel.setSpacing(true);
+        buttonPanel.setWidthUndefined();
+        return buttonPanel;
+    }
+
+    public static Button createSaveButton() {
+        Button save = new Button();
+        save.setData(10);
+        save.setWidth(120.0F, Sizeable.Unit.PIXELS);
+        save.setIcon(new ThemeResource("img/button/ok.png"));
+        save.addStyleName("save");
+        save.setCaption(getUILocaleUtil().getCaption("save"));
+        return save;
+    }
+
+    public static Button createCancelButton() {
+        Button cancel = new Button();
+        cancel.setData(11);
+        cancel.setWidth(120.0F, Sizeable.Unit.PIXELS);
+        cancel.setIcon(new ThemeResource("img/button/cancel.png"));
+        cancel.addStyleName("cancel");
+        cancel.setCaption(getUILocaleUtil().getCaption("cancel"));
+        return cancel;
     }
 }
