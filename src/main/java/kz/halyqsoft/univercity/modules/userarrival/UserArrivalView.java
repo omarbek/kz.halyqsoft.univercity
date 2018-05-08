@@ -1,213 +1,198 @@
 package kz.halyqsoft.univercity.modules.userarrival;
 
-import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.shared.ui.combobox.FilteringMode;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.DateField;
-import com.vaadin.ui.TextField;
+import com.vaadin.data.Property;
+import com.vaadin.data.util.HierarchicalContainer;
+import com.vaadin.event.MouseEvents;
+import com.vaadin.server.ThemeResource;
+import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.USER_TYPE;
 import kz.halyqsoft.univercity.entity.beans.univercity.enumeration.UserType;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.VUser;
-import kz.halyqsoft.univercity.filter.FUserFilter;
-import kz.halyqsoft.univercity.filter.panel.UserFilterPanel;
-import kz.halyqsoft.univercity.utils.CommonUtils;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_EMPLOYEE;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_STUDENT;
+import kz.halyqsoft.univercity.modules.reports.MenuColumn;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.ID;
 import org.r3a.common.entity.beans.AbstractTask;
 import org.r3a.common.entity.query.QueryModel;
+import org.r3a.common.entity.query.select.EAggregate;
 import org.r3a.common.vaadin.view.AbstractTaskView;
-import org.r3a.common.vaadin.widget.ERefreshType;
-import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
-import org.r3a.common.vaadin.widget.filter2.FilterPanelListener;
-import org.r3a.common.vaadin.widget.grid.GridWidget;
-import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
-import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
+import org.r3a.common.vaadin.widget.dialog.Message;
 
-import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.HashMap;
 
 /**
  * @author Omarbek
  * @created on 16.04.2018
  */
-public class UserArrivalView extends AbstractTaskView implements FilterPanelListener {
+public class UserArrivalView extends AbstractTaskView {
 
-    private final UserFilterPanel filterPanel;
-    private GridWidget userGW;
-    private ComboBox userTypeCB;
+    private HorizontalSplitPanel mainHSP;
+    private HorizontalLayout mainHL;
 
     private USER_TYPE userType;
 
     public UserArrivalView(AbstractTask task) throws Exception {
         super(task);
-        filterPanel = new UserFilterPanel(new FUserFilter());
         userType = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
                 lookup(USER_TYPE.class, ID.valueOf(UserType.STUDENT_INDEX));
     }
 
     @Override
     public void initView(boolean b) throws Exception {
-        filterPanel.addFilterPanelListener(this);
-        TextField textField = new TextField();
-        textField.setNullRepresentation("");
-        textField.setNullSettingAllowed(true);
-        filterPanel.addFilterComponent("code", textField);
+        mainHSP = new HorizontalSplitPanel();
+        mainHSP.setSizeFull();
+        mainHSP.setSplitPosition(20);
 
-        textField = new TextField();
-        textField.setNullRepresentation("");
-        textField.setNullSettingAllowed(true);
-        filterPanel.addFilterComponent("firstname", textField);
+        mainHL = new HorizontalLayout();
+        mainHL.setSpacing(true);
+        mainHL.setSizeFull();
 
-        textField = new TextField();
-        textField.setNullRepresentation("");
-        textField.setNullSettingAllowed(true);
-        filterPanel.addFilterComponent("lastname", textField);
+        final TreeTable menuTT = new TreeTable();
 
-        userTypeCB = new ComboBox();
-        userTypeCB.setNullSelectionAllowed(false);
-        userTypeCB.setTextInputAllowed(false);
-        userTypeCB.setFilteringMode(FilteringMode.OFF);
-        userTypeCB.setPageLength(0);
-        QueryModel<USER_TYPE> typeQM = new QueryModel<>(USER_TYPE.class);
-        BeanItemContainer<USER_TYPE> typeBIC = new BeanItemContainer<>(USER_TYPE.class,
-                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(typeQM));
-        userTypeCB.setContainerDataSource(typeBIC);
-        filterPanel.addFilterComponent("userType", userTypeCB);
-        userTypeCB.setValue(userType);
+        HierarchicalContainer hierarchicalContainer = new HierarchicalContainer();
+        String main = "Главная";
+        hierarchicalContainer.addItem(main);
+        hierarchicalContainer.addItem("Студенты");
+        hierarchicalContainer.addItem("Сотрудники");
+        hierarchicalContainer.addItem("Опаздавшие");
+        hierarchicalContainer.addItem("Отсутсвующие");
+        hierarchicalContainer.addItem("Годовая");
 
-        DateField createdDF = new DateField();
-        createdDF.setHeight(24, Unit.PIXELS);
-        filterPanel.addFilterComponent("date", createdDF);
-        createdDF.setValue(new Date());
-
-        getContent().addComponent(filterPanel);
-        getContent().setComponentAlignment(filterPanel, Alignment.TOP_CENTER);
-
-        userGW = new GridWidget(VUser.class);
-        userGW.addEntityListener(this);
-        userGW.setReadOnly(true);
-        userGW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
-        userGW.setButtonVisible(AbstractToolbar.ADD_BUTTON, false);
-        userGW.setButtonVisible(AbstractToolbar.EDIT_BUTTON, false);
-        userGW.setButtonVisible(AbstractToolbar.DELETE_BUTTON, false);
-        userGW.setButtonVisible(AbstractToolbar.REFRESH_BUTTON, false);
-        DBGridModel userGM = (DBGridModel) userGW.getWidgetModel();
-        userGM.setTitleVisible(false);
-        userGM.setRefreshType(ERefreshType.MANUAL);
-
-        FUserFilter fUserFilter = (FUserFilter) filterPanel.getFilterBean();
-        if (fUserFilter.hasFilter()) {
-            doFilter(fUserFilter);
-        }
-
-        getContent().addComponent(userGW);
-        getContent().setComponentAlignment(userGW, Alignment.MIDDLE_CENTER);
-    }
-
-    @Override
-    public void doFilter(AbstractFilterBean abstractFilterBean) {
-        FUserFilter fUserFilter = (FUserFilter) abstractFilterBean;
-        Map<Integer, Object> params = new HashMap<>();
-        StringBuilder userSB = new StringBuilder();
-        if (fUserFilter.getCode() != null && fUserFilter.getCode().trim().length() >= 2) {
-            userSB.append(" and lower(usr.CODE) like '");
-            userSB.append(fUserFilter.getCode().trim().toLowerCase());
-            userSB.append("%'");
-        }
-        if (fUserFilter.getFirstname() != null && fUserFilter.getFirstname().trim().length() >= 3) {
-            userSB.append(" and lower(usr.FIRST_NAME) like '");
-            userSB.append(fUserFilter.getFirstname().trim().toLowerCase());
-            userSB.append("%'");
-        }
-        if (fUserFilter.getLastname() != null && fUserFilter.getLastname().trim().length() >= 3) {
-            userSB.append(" and lower(usr.LAST_NAME) like '");
-            userSB.append(fUserFilter.getLastname().trim().toLowerCase());
-            userSB.append("%'");
-        }
-        if (fUserFilter.getDate() != null) {
-            userSB.append(" and date_trunc('day', usr_arriv.created) = date_trunc('day', TIMESTAMP '");
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            userSB.append(dateFormat.format(fUserFilter.getDate()));
-            userSB.append("')");
-        }
-
-        List<VUser> list = new ArrayList<>();
-        userSB.insert(0, " where usr.deleted = FALSE ");
-        StringBuilder sqlSB = new StringBuilder("SELECT " +
-                "  usr.ID, " +
-                "  usr.CODE, " +
-                "  trim(usr.LAST_NAME || ' ' || usr.FIRST_NAME || ' ' || coalesce(usr.MIDDLE_NAME, '')) FIO, ");
-        if (fUserFilter.getUserType().equals(userType)) {
-            sqlSB.append("spec.SPEC_NAME                                                            specialty, " +
-                    "  year.study_year                                                              studyYear, " +
-                    "  NULL                                                                          deptName, " +
-                    "  NULL                                                                          postName, " +
-                    "  usr_arriv.created " +
-                    "FROM USERS usr " +
-                    "  INNER JOIN user_arrival usr_arriv ON usr.id = usr_arriv.user_id " +
-                    "  INNER JOIN STUDENT stu ON stu.ID = usr.ID " +
-                    "  INNER JOIN STUDENT_EDUCATION stu_edu ON stu.ID = stu_edu.STUDENT_ID AND" +
-                    " stu_edu.CHILD_ID IS NULL " +
-                    "  INNER JOIN SPECIALITY spec ON stu_edu.SPECIALITY_ID = spec.ID " +
-                    "  INNER JOIN STUDY_YEAR year ON year.id = stu_edu.study_year_id ");
-            sqlSB.append(" AND spec.deleted = FALSE");
-        } else {
-            sqlSB.append("NULL                                                                      specialty, " +
-                    "  NULL                                                                         studyYear, " +
-                    "  dep.dept_name                                                                 deptName, " +
-                    "  post.post_name                                                                postName, " +
-                    "  usr_arriv.created " +
-                    "FROM USERS usr " +
-                    "  INNER JOIN user_arrival usr_arriv ON usr.id = usr_arriv.user_id " +
-                    "  INNER JOIN employee empl ON empl.id = usr.id " +
-                    "  INNER JOIN employee_dept empl_dept ON empl.id = empl_dept.employee_id AND" +
-                    " empl_dept.DISMISS_DATE IS NULL " +
-                    "  INNER JOIN DEPARTMENT dep ON empl_dept.DEPT_ID = dep.ID " +
-                    "  INNER JOIN POST post ON empl_dept.POST_ID = post.id ");
-        }
-        sqlSB.append(userSB.toString());
-        sqlSB.append(" ORDER BY usr_arriv.created DESC");
-        try {
-            List tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
-                    lookupItemsList(sqlSB.toString(), params);
-            if (!tmpList.isEmpty()) {
-                long id = 1;
-                for (Object o : tmpList) {
-                    Object[] oo = (Object[]) o;
-                    VUser vs = new VUser();
-                    vs.setId(ID.valueOf(id++));
-                    vs.setCode((String) oo[1]);
-                    vs.setFio((String) oo[2]);
-                    vs.setSpecialty((String) oo[3]);
-                    vs.setStudyYear(oo[4] != null ? ((BigDecimal) oo[4]).intValue() : 0);
-                    vs.setDeptName((String) oo[5]);
-                    vs.setPostName((String) oo[6]);
-                    vs.setCreated((Date) oo[7]);
-                    list.add(vs);
+        menuTT.setContainerDataSource(hierarchicalContainer);
+        menuTT.setSizeFull();
+        menuTT.addStyleName("schedule");
+        menuTT.setSelectable(true);
+        menuTT.setMultiSelect(false);
+        menuTT.setNullSelectionAllowed(false);
+        menuTT.setImmediate(true);
+        menuTT.setColumnReorderingAllowed(false);
+        menuTT.setPageLength(20);
+        MenuColumn menuColumn = new MenuColumn();
+        menuTT.addGeneratedColumn("user arrival", menuColumn);
+        menuTT.setColumnHeader("user arrival", "Посещаемость");//TODO kk,ru
+        menuTT.addValueChangeListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                try {
+                    if (event != null && event.getProperty() != null && event.getProperty().getValue() != null) {
+                        mainHSP.removeComponent(mainHL);
+                        mainHL.removeAllComponents();
+                        if (main.equals(event.getProperty().getValue().toString())) {
+                            setStudents();
+                            setLaters();
+                            setEmployees();
+                            setNoCards();
+                        } else {
+                            mainHL.addComponent(new Button("asd"));
+                        }
+                        mainHSP.addComponent(mainHL);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
-        } catch (Exception ex) {
-            CommonUtils.showMessageAndWriteLog("Unable to load users' list", ex);
-        }
 
-        refresh(list);
-    }
+            private void setNoCards() {
+                Panel noCardButton = new Panel("<html><b>Без карточки</b><br>" +
+                        "0%<br>" +
+                        "(0 из 3209)</html>");
+                noCardButton.setIcon(new ThemeResource("img/card.png"));
+                noCardButton.addClickListener(new MouseEvents.ClickListener() {
+                    @Override
+                    public void click(MouseEvents.ClickEvent event) {
+                        Message.showInfo("no card");
+                    }
+                });
+                mainHL.addComponent(noCardButton);
+                mainHL.setComponentAlignment(noCardButton, Alignment.MIDDLE_CENTER);
+            }
 
-    @Override
-    public void clearFilter() {
-        userTypeCB.setValue(userType);
-        refresh(new ArrayList<>());
-    }
+            private void setEmployees() throws Exception {
+                QueryModel<V_EMPLOYEE> employeeQM = new QueryModel<>(V_EMPLOYEE.class);
+                employeeQM.addSelect("code", EAggregate.COUNT);
+                employeeQM.addWhere("deleted", Boolean.FALSE);
+                Long allEmployees = (Long) SessionFacadeFactory.
+                        getSessionFacade(CommonEntityFacadeBean.class).lookupItems(employeeQM);
 
-    private void refresh(List<VUser> list) {
-        ((DBGridModel) userGW.getWidgetModel()).setEntities(list);
-        try {
-            userGW.refresh();
-        } catch (Exception ex) {
-            CommonUtils.showMessageAndWriteLog("Unable to refresh users' grid", ex);
-        }
+                String sql = "SELECT count(1) " +
+                        "FROM user_arrival arriv INNER JOIN v_employee empl ON empl.id = arriv.user_id " +
+                        "WHERE date_trunc('day', arriv.created) = date_trunc('day', now()) " +
+                        "      AND arriv.created = (SELECT max(max_arriv.created) " +
+                        "                           FROM user_arrival max_arriv " +
+                        "                           WHERE max_arriv.user_id = arriv.user_id) " +
+                        "      AND come_in = TRUE";
+                Long inEmployees = (Long) SessionFacadeFactory.getSessionFacade(
+                        CommonEntityFacadeBean.class).lookupSingle(sql, new HashMap<>());
+                long inPercent = inEmployees * 100 / allEmployees;
+
+                Panel employeesPanel = new Panel("<b>Сотрудники - " + allEmployees + "</b><br>" +
+                        "Присутс. - " + inEmployees + " (" + inPercent + "%)<br>" +
+                        "Отсутс. - " + (allEmployees - inEmployees) + " (" + (100 - inPercent) + "%)" +
+                        "<br>");
+                employeesPanel.setIcon(new ThemeResource("img/employee.png"));
+                employeesPanel.setHeight(155, Unit.PIXELS);
+                employeesPanel.addClickListener(new MouseEvents.ClickListener() {
+                    @Override
+                    public void click(MouseEvents.ClickEvent event) {
+                        Message.showInfo("employees");
+                    }
+                });
+                mainHL.addComponent(employeesPanel);
+                mainHL.setComponentAlignment(employeesPanel, Alignment.MIDDLE_CENTER);
+            }
+
+            private void setLaters() {
+                Panel latersPanel = new Panel("<html><b>Опоздавшие</b><br>" +
+                        "9.8%<br>" +
+                        "(313 из 3209)</html>");
+                latersPanel.setIcon(new ThemeResource("img/clock.png"));
+                latersPanel.addClickListener(new MouseEvents.ClickListener() {
+                    @Override
+                    public void click(MouseEvents.ClickEvent event) {
+                        Message.showInfo("laters");
+                    }
+                });
+                mainHL.addComponent(latersPanel);
+                mainHL.setComponentAlignment(latersPanel, Alignment.MIDDLE_CENTER);
+            }
+
+            private void setStudents() throws Exception {
+                QueryModel<V_STUDENT> studentQM = new QueryModel<>(V_STUDENT.class);
+                studentQM.addSelect("userCode", EAggregate.COUNT);
+                studentQM.addWhere("deleted", Boolean.FALSE);
+                Long allStudents = (Long) SessionFacadeFactory.
+                        getSessionFacade(CommonEntityFacadeBean.class).lookupItems(studentQM);
+
+                String sql = "SELECT count(1) " +
+                        "FROM user_arrival arriv INNER JOIN v_student stu ON stu.id = arriv.user_id " +
+                        "WHERE date_trunc('day', arriv.created) = date_trunc('day', now()) " +
+                        "      AND arriv.created = (SELECT max(max_arriv.created) " +
+                        "                           FROM user_arrival max_arriv " +
+                        "                           WHERE max_arriv.user_id = arriv.user_id) " +
+                        "      AND come_in = TRUE";
+                Long inStudents = (Long) SessionFacadeFactory.getSessionFacade(
+                        CommonEntityFacadeBean.class).lookupSingle(sql, new HashMap<>());
+                long inPercent = inStudents * 100 / allStudents;
+
+                Panel studentsPanel = new Panel("<b>Учащиеся - " + allStudents + "</b><br>" +
+                        "Присутс. - " + inStudents + " (" + inPercent + "%)<br>" +
+                        "Отсутс. - " + (allStudents - inStudents) + " (" + (100 - inPercent) + "%)" +
+                        "<br>");
+                studentsPanel.setIcon(new ThemeResource("img/student.png"));
+                studentsPanel.addClickListener(new MouseEvents.ClickListener() {
+                    @Override
+                    public void click(MouseEvents.ClickEvent event) {
+                        Message.showInfo("Students");
+                    }
+                });
+                mainHL.addComponent(studentsPanel);
+                mainHL.setComponentAlignment(studentsPanel, Alignment.MIDDLE_CENTER);
+            }
+        });
+
+        mainHSP.addComponent(menuTT);
+
+        getContent().addComponent(mainHSP);
     }
 }
