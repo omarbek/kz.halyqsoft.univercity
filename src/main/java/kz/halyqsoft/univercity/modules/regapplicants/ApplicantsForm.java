@@ -673,7 +673,8 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                     regAddressButton.setEnabled(false);
                     finishButton.setEnabled(false);
 
-                    downloadButton = new Button("download");
+                    downloadButton = new Button();
+                    downloadButton.setCaption(getUILocaleUtil().getCaption("download"));
 
                     STUDENT_EDUCATION studentEducation = new STUDENT_EDUCATION();
                     try {
