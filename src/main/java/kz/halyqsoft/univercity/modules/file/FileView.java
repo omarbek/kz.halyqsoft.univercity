@@ -52,7 +52,12 @@ public class FileView extends AbstractTaskView {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
                 Set<PDF_DOCUMENT> pdfDocuments = (Set<PDF_DOCUMENT>) docTable.getValue();
+                if(pdfDocuments.isEmpty()){
+                    Message.showError("choose document");
+                }
+                else{
                 new FileEdit(pdfDocuments.iterator().next(), FileView.this);
+                }
             }
         });
 
@@ -63,6 +68,10 @@ public class FileView extends AbstractTaskView {
             public void buttonClick(Button.ClickEvent clickEvent) {
                 try {
                     Set<PDF_DOCUMENT> pdfDocuments = (Set<PDF_DOCUMENT>) docTable.getValue();
+                    if(pdfDocuments.isEmpty()){
+                        Message.showError("choose document");
+                    }
+                    else{
                     PDF_DOCUMENT pdfDocument = pdfDocuments.iterator().next();
                     QueryModel<PDF_PROPERTY> propertyFileByIdQM = new QueryModel<>(PDF_PROPERTY.class);
                     propertyFileByIdQM.addWhere("pdfDocument", ECriteria.EQUAL, pdfDocument.getId());
@@ -71,7 +80,7 @@ public class FileView extends AbstractTaskView {
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(properties);
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(pdfDocument);
 
-                    refresh();
+                    refresh();}
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

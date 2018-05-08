@@ -44,3 +44,7 @@ REFERENCES pdf_document (id)
 ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 ALTER TABLE pdf_property drop COLUMN style;
+
+ALTER TABLE pdf_property ALTER COLUMN text SET DATA TYPE VARCHAR(1500);
+
+ALTER TABLE pdf_property ADD COLUMN order_number NUMERIC(5,2) NULL;

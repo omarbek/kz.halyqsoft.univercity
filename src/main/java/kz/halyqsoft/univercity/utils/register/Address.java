@@ -35,6 +35,11 @@ public class Address {
     private AbstractFormWidgetView applicantsForm;
     private FormModel addressRegFM;
     private FormModel addressFactFM;
+    private boolean saveAddress;
+
+    public boolean isSaveEduc() {
+        return saveAddress;
+    }
 
     private static final int ADDRESS_REG = 1;
 
@@ -148,6 +153,8 @@ public class Address {
     }
 
     public void save(int addressNumber) {
+
+
         if (addressNumber == ADDRESS_REG) {
             if (addressRegFM.isModified()) {
                 addressRegGFW.save();
@@ -155,6 +162,7 @@ public class Address {
         } else {
             if (addressFactFM.isModified()) {
                 addressFactGFW.save();
+                saveAddress = true;
             }
         }
     }

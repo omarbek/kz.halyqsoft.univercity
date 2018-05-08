@@ -27,6 +27,9 @@ public class PDF_PROPERTY extends AbstractEntity{
     @Column(name = "size", nullable = false)
     private Integer size;
 
+    @Column(name = "order_number", nullable = false)
+    private double orderNumber;
+
     public String getText() {
         return text;
     }
@@ -73,5 +76,13 @@ public class PDF_PROPERTY extends AbstractEntity{
 
     public void setPdfDocument(PDF_DOCUMENT pdfDocument) {
         this.pdfDocument = pdfDocument;
+    }
+
+    public double getOrderNumber() {
+        return orderNumber;
+    }
+
+    public void setOrderNumber(double orderNumber) {
+        this.orderNumber = orderNumber;
     }
 }
