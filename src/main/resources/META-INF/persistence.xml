@@ -287,6 +287,8 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM_SUMMER</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM_SUMMER_DETAIL</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.GRADUATION_PROJECT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.PDF_DOCUMENT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.PDF_PROPERTY</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.USER_ARRIVAL</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_CREATIVE_EXAM</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_CREATIVE_EXAM_SUBJECT</class>
@@ -298,6 +300,8 @@
             <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/univerdb"/>
             <property name="javax.persistence.jdbc.user" value="postgres"/>
             <property name="javax.persistence.jdbc.password" value="postgres"/>
+            <!--<property name="javax.persistence.jdbc.user" value="${javax.persistence.jdbc.user}"/>-->
+            <!--<property name="javax.persistence.jdbc.password" value="${javax.persistence.jdbc.password}"/>-->
             <property name="eclipselink.connection-pool.default.initial" value="1"/>
             <property name="eclipselink.connection-pool.default.min" value="2"/>
             <property name="eclipselink.connection-pool.default.max" value="8"/>
