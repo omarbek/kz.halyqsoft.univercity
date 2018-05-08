@@ -1,12 +1,21 @@
 package kz.halyqsoft.univercity.modules.regapplicants;
 
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfWriter;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.data.validator.IntegerRangeValidator;
+import com.vaadin.server.FileDownloader;
+import com.vaadin.server.StreamResource;
+import com.vaadin.server.VaadinService;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
+import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.enumeration.Flag;
@@ -42,6 +51,9 @@ import org.r3a.common.vaadin.widget.photo.PhotoWidgetListener;
 import org.r3a.common.vaadin.widget.table.TableWidget;
 import org.r3a.common.vaadin.widget.table.model.DBTableModel;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -63,6 +75,8 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
     private VerticalLayout messForm;
     private FromItem educationUDFI;
 
+    private Map<String, Integer> fontMap;
+
     private TableWidget specTW, documentsTW, languagesTW, medicalCheckupTW;
     private TableWidget awardsTW, socialCategoriesTW;
 
@@ -75,12 +89,13 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
     private Button motherButton, fatherButton;
     private Button contractButton, moreButton;
     private Button finishButton;
+    private Button downloadButton;
 
     private String userPhotoFilename;
     private byte[] userPhotoBytes;
     private boolean userPhotoChanged;
 
-    private boolean saveData, saveSpec, savePass, saveEduc, saveUNT;
+    private boolean saveData, saveSpec, savePass, saveEduc, saveUNT, saveFactAddress;
     private Integer beginYear;
 
     private Flag flag;
@@ -109,6 +124,12 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         registrationHSP = new HorizontalSplitPanel();
         registrationHSP.setSplitPosition(20);
         registrationHSP.setSizeFull();
+
+        fontMap = new HashMap<>();
+        fontMap.put("Bold", Font.BOLD);
+        fontMap.put("Normal", Font.NORMAL);
+        fontMap.put("Italic", Font.ITALIC);
+        fontMap.put("Underline", Font.UNDERLINE);
 
         buttonsVL = new VerticalLayout();
         buttonsVL.setSpacing(true);
@@ -242,6 +263,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 saveEduc = false;
                 savePass = false;
                 saveUNT = false;
+                saveFactAddress = false;
                 specTW = new TableWidget(V_ENTRANT_SPECIALITY.class);
                 specTW.addEntityListener(ApplicantsForm.this);
                 specTW.setWidth("667px");
@@ -608,21 +630,29 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         finishButton = new Button();
         finishButton.setCaption(getUILocaleUtil().getCaption("exit"));
         finishButton.setWidth("230px");
+
+
+
         finishButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM);
                 if (!saveData) {
                     Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
-                } else if (!saveSpec) {
-                    Message.showInfo(getUILocaleUtil().getMessage("info.save.speciality"));
-                } else if (!savePass) {
-                    Message.showInfo(getUILocaleUtil().getMessage("info.save.passport"));
-                } else if (!saveEduc) {
-                    Message.showInfo(getUILocaleUtil().getMessage("info.save.educ"));
-                } else if (!saveUNT) {
-                    Message.showInfo(getUILocaleUtil().getMessage("info.save.unt"));
-                } else {
+                }
+                else if(!saveFactAddress){
+                    Message.showInfo(getUILocaleUtil().getMessage("info.save.address"));
+                }
+//                else if (!saveSpec) {
+//                    Message.showInfo(getUILocaleUtil().getMessage("info.save.speciality"));
+//                } else if (!savePass) {
+//                    Message.showInfo(getUILocaleUtil().getMessage("info.save.passport"));
+//                } else if (!saveEduc) {
+//                    Message.showInfo(getUILocaleUtil().getMessage("info.save.educ"));
+//                } else if (!saveUNT) {
+//                    Message.showInfo(getUILocaleUtil().getMessage("info.save.unt"));
+//                }
+                    else {
                     mainDataButton.setEnabled(false);
                     idDocButton.setEnabled(false);
                     eduDocButton.setEnabled(false);
@@ -642,6 +672,8 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                     factAddressButton.setEnabled(false);
                     regAddressButton.setEnabled(false);
                     finishButton.setEnabled(false);
+
+                    downloadButton = new Button("download");
 
                     STUDENT_EDUCATION studentEducation = new STUDENT_EDUCATION();
                     try {
@@ -664,6 +696,21 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                         studentEducation.setCreated(new Date());
 
                         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(studentEducation);
+                        QueryModel<USERS> usersQM = new QueryModel<>(USERS.class);
+
+
+                        USER_ADDRESS userAddress = new USER_ADDRESS();
+                        QueryModel<USER_ADDRESS> userAddressQueryModel = new QueryModel<>(USER_ADDRESS.class);
+                        userAddressQueryModel.addWhere("user",ECriteria.EQUAL, student.getId());
+                        userAddressQueryModel.addWhereAnd("addressType", ECriteria.EQUAL, ID.valueOf(ADDRESS_FACT));
+                        userAddress = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(userAddressQueryModel);
+
+                        StreamResource myResource = createResource(student.toString(),studentEducation.getFaculty().toString(),
+                              student.getDiplomaType().toString(), student.getPhoneMobile(), userAddress.getStreet(), userAddress.getPostalCode());
+                        FileDownloader fileDownloader = new FileDownloader(myResource);
+                        myResource.setMIMEType("application/pdf");
+                        myResource.setCacheTime(0);
+                        fileDownloader.extend(downloadButton);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -680,6 +727,8 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                             RegisterApplicantsView.regButton.click();
                         }
                     });
+
+                    messForm.addComponent(downloadButton);
                     messForm.addComponent(againButton);
 
                     registrationHSP.removeAllComponents();
@@ -690,8 +739,11 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                     registrationHSP.addComponent(contentHL);
                 }
             }
+
         });
     }
+
+
 
     private void addToLayout(Flag currentFlag, GridFormWidget currentGFW, Button currentButton) {
         flag = currentFlag;
@@ -717,6 +769,85 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         photoAndButtonVL.addComponent(nextButton);
         photoAndButtonVL.setComponentAlignment(nextButton, Alignment.MIDDLE_CENTER);
         return photoAndButtonVL;
+    }
+
+    private StreamResource createResource(String fio, String faculty, String formaobuch,String phone,String address, String index) {
+        return new StreamResource(new StreamResource.StreamSource() {
+            @Override
+            public InputStream getStream() {
+
+                String ochnii = "";
+                Document docum = new Document();
+                QueryModel<PDF_PROPERTY> propertyQM = new QueryModel<>(PDF_PROPERTY.class);
+                FromItem doc = propertyQM.addJoin(EJoin.INNER_JOIN,"pdfDocument",PDF_DOCUMENT.class,"id");
+                propertyQM.addWhere(doc,"id",ECriteria.EQUAL, "85");
+                propertyQM.addOrder("orderNumber");
+                List<PDF_PROPERTY> properties = null;
+                try {
+                    properties = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(propertyQM);
+                    ByteArrayOutputStream byteArrayOutputStream1 = new ByteArrayOutputStream();
+                    PdfWriter pdfWriter = PdfWriter.getInstance(docum, byteArrayOutputStream1);
+                    docum.open();
+                    Paragraph title = new Paragraph("Договор",getFont(12, Font.BOLD));
+                    title.setSpacingBefore(35f);
+                    title.setIndentationLeft(220f);
+                    docum.add(title);
+                    Date date = Calendar.getInstance().getTime();
+                    for (PDF_PROPERTY property : properties) {
+
+                        String text = new String(property.getText());
+                        DateFormat formatter = new SimpleDateFormat("\"dd\".MM.yyyy");
+                        String today = formatter.format(date);
+                        if(formaobuch.equals("Очный")){
+                            ochnii = "очной";
+                        }
+                        else if(formaobuch.equals("Заочный")){
+                            ochnii = "заочной";
+                        }
+                        String replaced = text.replaceAll("\\$fio",fio)
+                                .replaceAll("\\$money","17000")
+                                .replaceAll("\\$faculty",faculty)
+                                .replaceAll("\\$DataMonthYear",today + " года")
+                                .replaceAll("\\$formaobuch", ochnii)
+                                .replaceAll("\\$data\\$month\\$year", today + "г.")
+                                .replaceAll("\\$email", index)
+                                .replaceAll("\\$rekvizit", address)
+                                .replaceAll("\\$phone","+7" + phone)
+                                .replaceAll("\\$InLetters","Сто пятьдесять тысяча");;
+
+                        Paragraph paragraph = new Paragraph(replaced,
+                                getFont(Integer.parseInt(property.getSize().toString()), fontMap.get(property.getFont().toString())));
+
+                        paragraph.setSpacingBefore(property.getX());
+                        paragraph.setIndentationLeft(property.getY());
+
+
+
+                        docum.add(paragraph);
+                    }
+                    pdfWriter.close();
+                    docum.close();
+                    return new ByteArrayInputStream(byteArrayOutputStream1.toByteArray());
+
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+        },    "default.pdf");
+    }
+
+    private Font getFont(int fontSize, int font) {
+        String fontPath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath() + "/WEB-INF/classes/fonts";
+        BaseFont timesNewRoman = null;
+        try {
+            timesNewRoman = BaseFont.createFont(fontPath + "/TimesNewRoman/times.ttf", BaseFont.IDENTITY_H,
+                    BaseFont.EMBEDDED);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new Font(timesNewRoman, fontSize, font);
     }
 
     private void flagSave(Flag flag, FormModel dataFM) {
@@ -748,6 +879,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 educationDoc.save();
                 saveEduc = educationDoc.isSaveEduc();
                 break;
+
             case PREEM_RIGHT:
                 preemptiveRight.save();
                 break;
@@ -767,6 +899,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 break;
             case FACT_ADDRESS:
                 address.save(ADDRESS_FACT);
+                saveFactAddress = address.isSaveEduc();
                 break;
             case REG_ADDRESS:
                 address.save(ADDRESS_REG);
