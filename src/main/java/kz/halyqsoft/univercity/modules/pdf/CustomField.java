@@ -22,7 +22,6 @@ public class CustomField {
     static final String UNDERLINE = "Underline";
 
     public CustomField() {
-        this.textField = new TextArea("Текст:");
         this.xComboBox = new ComboBox();
         this.yComboBox = new ComboBox();
         this.fontComboBox = new ComboBox();
@@ -31,6 +30,7 @@ public class CustomField {
         this.title = new TextField();
         this.order = new TextField();
 
+        this.textField = new TextArea("Текст:");
         this.xComboBox.setCaption("X:");
         this.yComboBox.setCaption("Y:");
         this.fontComboBox.setCaption("Шрифт:");

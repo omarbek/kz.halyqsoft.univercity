@@ -8,7 +8,7 @@ import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.vaadin.server.VaadinService;
 import kz.halyqsoft.univercity.entity.beans.univercity.PDF_PROPERTY;
-import kz.halyqsoft.univercity.utils.ErrorUtils;
+import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.vaadin.widget.dialog.Message;
 
 import java.io.ByteArrayOutputStream;
@@ -52,7 +52,7 @@ public class CustomDocument {
             PdfWriter pdfWriter = PdfWriter.getInstance(this.document, byteArrayOutputStream);
 
             document.open();
-            Paragraph paragraph = new Paragraph(title, getFont(13, Font.BOLD));
+            Paragraph paragraph = new Paragraph(title, getFont(12, Font.BOLD));
             paragraph.setSpacingBefore(35f);
             paragraph.setIndentationLeft(220f);
             document.add(paragraph);
@@ -105,7 +105,7 @@ public class CustomDocument {
             document.close();
             pdfWriter.close();
         } catch (Exception e) {
-            ErrorUtils.LOG.error("Unable to create pdf property", e);
+            CommonUtils.LOG.error("Unable to create pdf property", e);
             Message.showError(e.toString());
             e.printStackTrace();
         }

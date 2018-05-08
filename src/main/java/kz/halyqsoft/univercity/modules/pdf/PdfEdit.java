@@ -255,9 +255,6 @@ public class PdfEdit extends AbstractCommonView {
                     }
                 });
 
-                customFieldProp.getOrder().setValue(String.valueOf(property.getOrderNumber()));
-                setTextField(customFieldProp.getOrder(),textHL,cf);
-
                 fontComboBox.setValue(property.getFont());
                 textHL.addComponent(fontComboBox);
                 ComboBox xComboBox = customFieldProp.getxComboBox();
@@ -289,6 +286,10 @@ public class PdfEdit extends AbstractCommonView {
 
                 textSizeComboBox.setValue(property.getSize());
                 textHL.addComponent(textSizeComboBox);
+
+                customFieldProp.getOrder().setValue(String.valueOf(property.getOrderNumber()));
+                setTextField(customFieldProp.getOrder(),textHL,cf);
+
                 customFieldList.add(customFieldProp);
                 textHL.addComponent(addComponentButton);
                 textHL.setComponentAlignment(addComponentButton,Alignment.BOTTOM_CENTER);
