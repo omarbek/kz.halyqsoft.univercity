@@ -632,27 +632,23 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         finishButton.setWidth("230px");
 
 
-
         finishButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
                 flagSave(flag, dataFM);
                 if (!saveData) {
                     Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
-                }
-                else if(!saveFactAddress){
+                } else if (!saveFactAddress) {
                     Message.showInfo(getUILocaleUtil().getMessage("info.save.address"));
-                }
-//                else if (!saveSpec) {
-//                    Message.showInfo(getUILocaleUtil().getMessage("info.save.speciality"));
-//                } else if (!savePass) {
-//                    Message.showInfo(getUILocaleUtil().getMessage("info.save.passport"));
-//                } else if (!saveEduc) {
-//                    Message.showInfo(getUILocaleUtil().getMessage("info.save.educ"));
-//                } else if (!saveUNT) {
-//                    Message.showInfo(getUILocaleUtil().getMessage("info.save.unt"));
-//                }
-                    else {
+                } else if (!saveSpec) {
+                    Message.showInfo(getUILocaleUtil().getMessage("info.save.speciality"));
+                } else if (!savePass) {
+                    Message.showInfo(getUILocaleUtil().getMessage("info.save.passport"));
+                } else if (!saveEduc) {
+                    Message.showInfo(getUILocaleUtil().getMessage("info.save.educ"));
+                } else if (!saveUNT) {
+                    Message.showInfo(getUILocaleUtil().getMessage("info.save.unt"));
+                } else {
                     mainDataButton.setEnabled(false);
                     idDocButton.setEnabled(false);
                     eduDocButton.setEnabled(false);
@@ -702,12 +698,12 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
 
                         USER_ADDRESS userAddress = new USER_ADDRESS();
                         QueryModel<USER_ADDRESS> userAddressQueryModel = new QueryModel<>(USER_ADDRESS.class);
-                        userAddressQueryModel.addWhere("user",ECriteria.EQUAL, student.getId());
+                        userAddressQueryModel.addWhere("user", ECriteria.EQUAL, student.getId());
                         userAddressQueryModel.addWhereAnd("addressType", ECriteria.EQUAL, ID.valueOf(ADDRESS_FACT));
                         userAddress = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(userAddressQueryModel);
 
-                        StreamResource myResource = createResource(student.toString(),studentEducation.getFaculty().toString(),
-                              student.getDiplomaType().toString(), student.getPhoneMobile(), userAddress.getStreet(), userAddress.getPostalCode());
+                        StreamResource myResource = createResource(student.toString(), studentEducation.getFaculty().toString(),
+                                student.getDiplomaType().toString(), student.getPhoneMobile(), userAddress.getStreet(), userAddress.getPostalCode());
                         FileDownloader fileDownloader = new FileDownloader(myResource);
                         myResource.setMIMEType("application/pdf");
                         myResource.setCacheTime(0);
@@ -745,7 +741,6 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
     }
 
 
-
     private void addToLayout(Flag currentFlag, GridFormWidget currentGFW, Button currentButton) {
         flag = currentFlag;
         contentHL.removeAllComponents();
@@ -772,7 +767,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         return photoAndButtonVL;
     }
 
-    private StreamResource createResource(String fio, String faculty, String formaobuch,String phone,String address, String index) {
+    private StreamResource createResource(String fio, String faculty, String formaobuch, String phone, String address, String index) {
         return new StreamResource(new StreamResource.StreamSource() {
             @Override
             public InputStream getStream() {
@@ -780,8 +775,8 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 String ochnii = "";
                 Document docum = new Document();
                 QueryModel<PDF_PROPERTY> propertyQM = new QueryModel<>(PDF_PROPERTY.class);
-                FromItem doc = propertyQM.addJoin(EJoin.INNER_JOIN,"pdfDocument",PDF_DOCUMENT.class,"id");
-                propertyQM.addWhere(doc,"id",ECriteria.EQUAL, "85");
+                FromItem doc = propertyQM.addJoin(EJoin.INNER_JOIN, "pdfDocument", PDF_DOCUMENT.class, "id");
+                propertyQM.addWhere(doc, "id", ECriteria.EQUAL, "85");
                 propertyQM.addOrder("orderNumber");
                 List<PDF_PROPERTY> properties = null;
                 try {
@@ -789,7 +784,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                     ByteArrayOutputStream byteArrayOutputStream1 = new ByteArrayOutputStream();
                     PdfWriter pdfWriter = PdfWriter.getInstance(docum, byteArrayOutputStream1);
                     docum.open();
-                    Paragraph title = new Paragraph("Договор",getFont(12, Font.BOLD));
+                    Paragraph title = new Paragraph("Договор", getFont(12, Font.BOLD));
                     title.setSpacingBefore(35f);
                     title.setIndentationLeft(220f);
                     docum.add(title);
@@ -799,22 +794,22 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                         String text = new String(property.getText());
                         DateFormat formatter = new SimpleDateFormat("\"dd\".MM.yyyy");
                         String today = formatter.format(date);
-                        if(formaobuch.equals("Очный")){
+                        if (formaobuch.equals("Очный")) {
                             ochnii = "очной";
-                        }
-                        else if(formaobuch.equals("Заочный")){
+                        } else if (formaobuch.equals("Заочный")) {
                             ochnii = "заочной";
                         }
-                        String replaced = text.replaceAll("\\$fio",fio)
-                                .replaceAll("\\$money","17000")
-                                .replaceAll("\\$faculty",faculty)
-                                .replaceAll("\\$DataMonthYear",today + " года")
+                        String replaced = text.replaceAll("\\$fio", fio)
+                                .replaceAll("\\$money", "17000")
+                                .replaceAll("\\$faculty", faculty)
+                                .replaceAll("\\$DataMonthYear", today + " года")
                                 .replaceAll("\\$formaobuch", ochnii)
                                 .replaceAll("\\$data\\$month\\$year", today + "г.")
                                 .replaceAll("\\$email", index)
                                 .replaceAll("\\$rekvizit", address)
-                                .replaceAll("\\$phone","+7" + phone)
-                                .replaceAll("\\$InLetters","Сто пятьдесять тысяча");;
+                                .replaceAll("\\$phone", "+7" + phone)
+                                .replaceAll("\\$InLetters", "Сто пятьдесять тысяча");
+                        ;
 
                         Paragraph paragraph = new Paragraph(replaced,
                                 getFont(Integer.parseInt(property.getSize().toString()), fontMap.get(property.getFont().toString())));
@@ -823,20 +818,18 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                         paragraph.setIndentationLeft(property.getY());
 
 
-
                         docum.add(paragraph);
                     }
                     pdfWriter.close();
                     docum.close();
                     return new ByteArrayInputStream(byteArrayOutputStream1.toByteArray());
 
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                     return null;
                 }
             }
-        },    "default.pdf");
+        }, "default.pdf");
     }
 
     private Font getFont(int fontSize, int font) {
