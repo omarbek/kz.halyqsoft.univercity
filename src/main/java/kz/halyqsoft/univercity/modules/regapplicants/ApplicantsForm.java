@@ -712,12 +712,6 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                         fileDownloader.extend(downloadButton);
 
                         if(student.isNeedDorm() == true) {
-
-                            QueryModel<USER_ADDRESS> userAddressDormQueryModel = new QueryModel<>(USER_ADDRESS.class);
-                            userAddressQueryModel.addWhere("user",ECriteria.EQUAL, student.getId());
-                            userAddressQueryModel.addWhereAnd("addressType", ECriteria.EQUAL, ID.valueOf(ADDRESS_FACT));
-                            userAddress = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(userAddressQueryModel);
-
                             StreamResource myResourceDorm = createResourceDorm(student.toString(),studentEducation.getFaculty().toString(),
                                     student.getDiplomaType().toString(), student.getPhoneMobile(), userAddress.getStreet(), userAddress.getPostalCode());
                             FileDownloader fileDownloaderDorm = new FileDownloader(myResourceDorm);
