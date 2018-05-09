@@ -697,8 +697,6 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                         studentEducation.setCreated(new Date());
 
                         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(studentEducation);
-                        QueryModel<USERS> usersQM = new QueryModel<>(USERS.class);
-
 
                         USER_ADDRESS userAddress = new USER_ADDRESS();
                         QueryModel<USER_ADDRESS> userAddressQueryModel = new QueryModel<>(USER_ADDRESS.class);
@@ -712,6 +710,23 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                         myResource.setMIMEType("application/pdf");
                         myResource.setCacheTime(0);
                         fileDownloader.extend(downloadButton);
+
+                        if(student.isNeedDorm() == true) {
+
+                            QueryModel<USER_ADDRESS> userAddressDormQueryModel = new QueryModel<>(USER_ADDRESS.class);
+                            userAddressQueryModel.addWhere("user",ECriteria.EQUAL, student.getId());
+                            userAddressQueryModel.addWhereAnd("addressType", ECriteria.EQUAL, ID.valueOf(ADDRESS_FACT));
+                            userAddress = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(userAddressQueryModel);
+
+                            StreamResource myResourceDorm = createResourceDorm(student.toString(),studentEducation.getFaculty().toString(),
+                                    student.getDiplomaType().toString(), student.getPhoneMobile(), userAddress.getStreet(), userAddress.getPostalCode());
+                            FileDownloader fileDownloaderDorm = new FileDownloader(myResourceDorm);
+                            myResourceDorm.setMIMEType("application/pdf");
+                            myResourceDorm.setCacheTime(0);
+                            fileDownloaderDorm.extend(downloadButton);
+
+                        }
+
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -836,8 +851,77 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                     return null;
                 }
             }
-        },    "default.pdf");
+        },    "Договор на рус.pdf");
     }
+
+    private StreamResource createResourceDorm(String fio, String faculty, String formaobuch,String phone,String address, String index) {
+        return new StreamResource(new StreamResource.StreamSource() {
+            @Override
+            public InputStream getStream() {
+
+                String ochnii = "";
+                Document docum = new Document();
+                QueryModel<PDF_PROPERTY> propertyQM = new QueryModel<>(PDF_PROPERTY.class);
+                FromItem doc = propertyQM.addJoin(EJoin.INNER_JOIN,"pdfDocument",PDF_DOCUMENT.class,"id");
+                propertyQM.addWhere(doc,"id",ECriteria.EQUAL, "92");
+                propertyQM.addOrder("orderNumber");
+                List<PDF_PROPERTY> properties = null;
+                try {
+                    properties = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(propertyQM);
+                    ByteArrayOutputStream byteArrayOutputStream1 = new ByteArrayOutputStream();
+                    PdfWriter pdfWriter = PdfWriter.getInstance(docum, byteArrayOutputStream1);
+                    docum.open();
+                    Paragraph title = new Paragraph("Договор",getFont(12, Font.BOLD));
+                    title.setSpacingBefore(35f);
+                    title.setIndentationLeft(220f);
+                    docum.add(title);
+                    Date date = Calendar.getInstance().getTime();
+                    for (PDF_PROPERTY property : properties) {
+
+                        String text = new String(property.getText());
+                        DateFormat formatter = new SimpleDateFormat("\"dd\".MM.yyyy");
+                        String today = formatter.format(date);
+                        if(formaobuch.equals("Очный")){
+                            ochnii = "очной";
+                        }
+                        else if(formaobuch.equals("Заочный")){
+                            ochnii = "заочной";
+                        }
+                        String replaced = text.replaceAll("\\$fio",fio)
+                                .replaceAll("\\$money","170000")
+                                .replaceAll("\\$faculty",faculty)
+                                .replaceAll("\\$DataMonthYear",today + " года")
+                                .replaceAll("\\$formaobuch", ochnii)
+                                .replaceAll("\\$data\\$month\\$year", today + "г.")
+                                .replaceAll("\\$email", index)
+                                .replaceAll("\\$rekvizit", address)
+                                .replaceAll("\\$phone","+7" + phone)
+                                .replaceAll("\\$InLetters","Сто семдесять тысяч тенге")
+                                .replaceAll("\\$Obshaga","63000")
+                                .replaceAll("\\$Dorm","Шестьдесять три тысяч тенге");
+                        Paragraph paragraph = new Paragraph(replaced,
+                                getFont(Integer.parseInt(property.getSize().toString()), fontMap.get(property.getFont().toString())));
+
+                        paragraph.setSpacingBefore(property.getX());
+                        paragraph.setIndentationLeft(property.getY());
+
+
+
+                        docum.add(paragraph);
+                    }
+                    pdfWriter.close();
+                    docum.close();
+                    return new ByteArrayInputStream(byteArrayOutputStream1.toByteArray());
+
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+        },    "Договор общага.pdf");
+    }
+
 
     private Font getFont(int fontSize, int font) {
         String fontPath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath() + "/WEB-INF/classes/fonts";
