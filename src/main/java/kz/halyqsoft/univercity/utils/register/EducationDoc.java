@@ -160,9 +160,10 @@ public class EducationDoc {
         return false;
     }
 
-    public void save() {
-        if (mainFM.isModified() && mainGFW.save()) {
-            saveEduc = true;
+    public Boolean save() {
+        if (mainFM.isModified()) {
+            return mainGFW.save();
         }
+        return null;
     }
 }

@@ -24,6 +24,7 @@ import org.r3a.common.entity.query.from.EJoin;
 import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.view.AbstractCommonView;
+import org.r3a.common.vaadin.widget.DBSelectModel;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.form.AbstractFormWidget;
 import org.r3a.common.vaadin.widget.form.AbstractFormWidgetView;
@@ -376,6 +377,31 @@ public class EmployeesForm extends AbstractFormWidgetView implements PhotoWidget
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
                 careerTW = getTableWidget(V_EMPLOYEE_DEPT.class, "employee", null);
+
+                FormModel specFM = ((DBSelectModel) careerTW.getWidgetModel()).getFormModel();
+                QueryModel specQM = ((FKFieldModel) specFM.getFieldModel("department")).getQueryModel();
+                specQM.addWhere("deleted", Boolean.FALSE);
+                specQM.addWhereNotNull("parent");
+
+                EMPLOYEE emp = null;
+                try {
+                    emp = (EMPLOYEE) dataAFW.getWidgetModel().getEntity();
+                } catch (Exception e) {
+                    e.printStackTrace();//TODO catch
+                }
+                DBTableModel careerTM = (DBTableModel) careerTW.getWidgetModel();
+                if (emp != null && emp.getStatus() != null && emp.getStatus().getId().equals(ID.valueOf(5))) {
+                    careerTM.getColumnModel("liveLoad").setInTable(false);
+                    careerTM.getColumnModel("wageRate").setInTable(false);
+                    careerTM.getColumnModel("rateLoad").setInTable(false);
+                    careerTM.getColumnModel("hourCount").setInTable(true);
+                } else {
+                    careerTM.getColumnModel("liveLoad").setInTable(true);
+                    careerTM.getColumnModel("wageRate").setInTable(true);
+                    careerTM.getColumnModel("rateLoad").setInTable(true);
+                    careerTM.getColumnModel("hourCount").setInTable(false);
+                }
+
                 addToLayout(careerTW, moreButton);
             }
         });
@@ -466,6 +492,7 @@ public class EmployeesForm extends AbstractFormWidgetView implements PhotoWidget
         currentTW.setWidth("667px");
         DBTableModel currentTM = (DBTableModel) currentTW.getWidgetModel();
         QueryModel currentQM = currentTM.getQueryModel();
+
         ID employeeId = ID.valueOf(-1);
         if (!dataAFW.getWidgetModel().isCreateNew()) {
             try {
@@ -1086,29 +1113,15 @@ public class EmployeesForm extends AbstractFormWidgetView implements PhotoWidget
 
     private boolean preSaveCareer(Entity e, boolean isNew) {
         V_EMPLOYEE_DEPT vEmployeeDept = (V_EMPLOYEE_DEPT) e;
-        EMPLOYEE_DEPT employeeDept;
         FormModel fm = dataAFW.getWidgetModel();
         if (isNew) {
-            employeeDept = new EMPLOYEE_DEPT();
             try {
-                EMPLOYEE s = (EMPLOYEE) fm.getEntity();
-                employeeDept.setEmployee(s);
-                employeeDept.setHireDate(vEmployeeDept.getHireDate());
-                employeeDept.setDismissDate(vEmployeeDept.getHireDate());
-                employeeDept.setAdviser(vEmployeeDept.isAdviser());
-                employeeDept.setDepartment(vEmployeeDept.getDepartment());
-                employeeDept.setEmployeeType(vEmployeeDept.getEmployeeType());
-                employeeDept.setHourCount(vEmployeeDept.getHourCount());
-                employeeDept.setLiveLoad(vEmployeeDept.getLiveLoad());
-                employeeDept.setParent(vEmployeeDept.getParent());
-                employeeDept.setPost(vEmployeeDept.getPost());
-                employeeDept.setWageRate(vEmployeeDept.getWageRate());
-                employeeDept.setRateLoad(employeeDept.getLiveLoad() / employeeDept.getWageRate());
-//                employeeDept.setDescr();//TODO
+                EMPLOYEE employee = (EMPLOYEE) fm.getEntity();
+                EMPLOYEE_DEPT employeeDept = getEmployeeDept(vEmployeeDept, employee);
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(employeeDept);
 
                 QueryModel expQM = ((DBTableModel) careerTW.getWidgetModel()).getQueryModel();
-                expQM.addWhere("employee", ECriteria.EQUAL, s.getId());
+                expQM.addWhere("employee", ECriteria.EQUAL, employee.getId());
 
                 careerTW.refresh();
                 showSavedNotification();
@@ -1117,18 +1130,7 @@ public class EmployeesForm extends AbstractFormWidgetView implements PhotoWidget
             }
         } else {
             try {
-                employeeDept = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(EMPLOYEE_DEPT.class, vEmployeeDept.getId());
-                employeeDept.setHireDate(vEmployeeDept.getHireDate());
-                employeeDept.setDismissDate(vEmployeeDept.getHireDate());
-                employeeDept.setAdviser(vEmployeeDept.isAdviser());
-                employeeDept.setDepartment(vEmployeeDept.getDepartment());
-                employeeDept.setEmployeeType(vEmployeeDept.getEmployeeType());
-                employeeDept.setHourCount(vEmployeeDept.getHourCount());
-                employeeDept.setLiveLoad(vEmployeeDept.getLiveLoad());
-                employeeDept.setParent(vEmployeeDept.getParent());
-                employeeDept.setPost(vEmployeeDept.getPost());
-                employeeDept.setRateLoad(vEmployeeDept.getRateLoad());
-                employeeDept.setWageRate(vEmployeeDept.getWageRate());
+                EMPLOYEE_DEPT employeeDept = getEmployeeDept(vEmployeeDept, null);
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(employeeDept);
                 careerTW.refresh();
                 showSavedNotification();
@@ -1137,6 +1139,30 @@ public class EmployeesForm extends AbstractFormWidgetView implements PhotoWidget
             }
         }
         return false;
+    }
+
+    private EMPLOYEE_DEPT getEmployeeDept(V_EMPLOYEE_DEPT vEmployeeDept, EMPLOYEE employee) throws Exception {
+        EMPLOYEE_DEPT employeeDept;
+        if (employee != null) {
+            employeeDept = new EMPLOYEE_DEPT();
+            employeeDept.setEmployee(employee);
+        } else {
+            employeeDept = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(EMPLOYEE_DEPT.class, vEmployeeDept.getId());
+        }
+        employeeDept.setHireDate(vEmployeeDept.getHireDate());
+        employeeDept.setDismissDate(vEmployeeDept.getHireDate());
+        employeeDept.setAdviser(vEmployeeDept.isAdviser());
+        employeeDept.setDepartment(vEmployeeDept.getDepartment());
+        employeeDept.setEmployeeType(vEmployeeDept.getEmployeeType());
+        employeeDept.setHourCount(vEmployeeDept.getHourCount() == null ? 0.0 : vEmployeeDept.getHourCount());
+        employeeDept.setLiveLoad(vEmployeeDept.getLiveLoad() == null ? 0 : vEmployeeDept.getLiveLoad());
+        employeeDept.setParent(vEmployeeDept.getParent());
+        employeeDept.setPost(vEmployeeDept.getPost());
+        employeeDept.setWageRate(vEmployeeDept.getWageRate() == null ? 0.0 : vEmployeeDept.getWageRate());
+        employeeDept.setRateLoad(employeeDept.getWageRate() == 0.0 ? 0.0 :
+                (employeeDept.getLiveLoad() / employeeDept.getWageRate()));
+//      employeeDept.setDescr();//TODO
+        return employeeDept;
     }
 
     private boolean preSaveScientificActivity(Entity e, boolean isNew) {
@@ -1360,7 +1386,26 @@ public class EmployeesForm extends AbstractFormWidgetView implements PhotoWidget
         } else if (source.equals(experienceTW)) {
             return canSave();
         } else if (source.equals(careerTW)) {
-            return canSave();
+            boolean canSave = canSave();
+            try {
+                if (canSave) {
+                    DBTableModel careerTM = (DBTableModel) careerTW.getWidgetModel();
+                    FormModel careerFM = careerTM.getFormModel();
+
+                    EMPLOYEE employee = (EMPLOYEE) dataAFW.getWidgetModel().getEntity();
+                    if (!employee.getStatus().getId().equals(ID.valueOf(5))) {
+                        careerFM.getFieldModel("hourCount").setInEdit(false);
+                    } else {
+                        careerFM.getFieldModel("liveLoad").setInEdit(false);
+                        careerFM.getFieldModel("wageRate").setInEdit(false);
+                        careerFM.getFieldModel("rateLoad").setInEdit(false);
+                    }
+                    careerTW.refresh();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();//TODO catch
+            }
+            return canSave;
         } else if (source.equals(scientificActivityTW)) {
             return canSave();
         } else if (source.equals(socialCategoriesTW)) {

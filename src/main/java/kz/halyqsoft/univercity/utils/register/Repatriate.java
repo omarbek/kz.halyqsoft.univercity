@@ -122,8 +122,10 @@ public class Repatriate {
         return false;
     }
 
-    public void save() {
-        if (mainFM.isModified())
-            mainGFW.save();
+    public Boolean save() {
+        if (mainFM.isModified()) {
+            return mainGFW.save();
+        }
+        return null;
     }
 }

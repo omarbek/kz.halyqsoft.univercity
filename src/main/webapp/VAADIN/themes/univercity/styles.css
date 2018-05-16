@@ -13762,6 +13762,16 @@ div.v-layout.v-horizontal.v-widget {
 	position: relative;
 }
 
+.univercity .v-verticallayout-blue {
+	color: white;
+	background: #66ffff;
+}
+
+.univercity .v-horizontallayout-blue {
+	color: white;
+	background: #66ffff;
+}
+
 .univercity .v-verticallayout-file-list-widget .v-spacing {
 	height: 3px;
 }

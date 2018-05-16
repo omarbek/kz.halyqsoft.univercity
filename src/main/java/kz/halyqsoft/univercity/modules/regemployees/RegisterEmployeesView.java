@@ -3,10 +3,13 @@ package kz.halyqsoft.univercity.modules.regemployees;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.VerticalLayout;
 import kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE;
+import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.EMPLOYEE_STATUS;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
+import org.r3a.common.entity.ID;
 import org.r3a.common.entity.beans.AbstractTask;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.where.ECriteria;
@@ -81,7 +84,11 @@ public class RegisterEmployeesView extends AbstractTaskView {
             Calendar c = Calendar.getInstance();
             QueryModel<ENTRANCE_YEAR> qmEntranceYear = new QueryModel<>(ENTRANCE_YEAR.class);
             qmEntranceYear.addWhere("beginYear", ECriteria.EQUAL, c.get(Calendar.YEAR));
-            ENTRANCE_YEAR ey = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(qmEntranceYear);
+            ENTRANCE_YEAR ey = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(
+                    qmEntranceYear);
+
+            ((EMPLOYEE) employeeFM.getEntity()).setStatus(SessionFacadeFactory.getSessionFacade(
+                    CommonEntityFacadeBean.class).lookup(EMPLOYEE_STATUS.class, ID.valueOf(1)));
 
             registerVL.addComponent(new EmployeesForm(employeeFM, ey));
         } catch (Exception ex) {

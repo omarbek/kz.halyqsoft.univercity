@@ -5,7 +5,7 @@
 // Defines the plaintext font size, weight and family. Font size affects general component sizing.
 $v-font-size: 12px;
 $v-font-weight: 300;
-$v-font-family: Arial,Helvetica,sans-serif;
+$v-font-family: Arial, Helvetica, sans-serif;
 
 $v-caption-font-size: 12px;
 $v-caption-font-weight: 600;
@@ -396,6 +396,16 @@ $v-caption-font-weight: 600;
 
   .v-slot-file-list-widget .v-has-caption {
     position: relative;
+  }
+
+  .v-verticallayout-blue {
+    color: white;
+    background: #66ffff;
+  }
+
+  .v-horizontallayout-blue {
+    color: white;
+    background: #66ffff;
   }
 
   .v-verticallayout-file-list-widget {

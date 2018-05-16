@@ -36,7 +36,6 @@ public class Unt {
     private TableWidget untRatesTW;
     private AbstractFormWidget dataAFW;
     private ApplicantsForm applicantsForm;
-    private boolean saveUNT;
     private FormModel untCertificateFM;
 
     public GridFormWidget getCertificateGFW() {
@@ -45,10 +44,6 @@ public class Unt {
 
     public TableWidget getUntRatesTW() {
         return untRatesTW;
-    }
-
-    public boolean isSaveUNT() {
-        return saveUNT;
     }
 
     public Unt(AbstractFormWidget dataAFW, ApplicantsForm applicantsForm) {
@@ -70,7 +65,6 @@ public class Unt {
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(ucs);
                 untCertificate.setRate(untCertificate.getRate() + vucs.getRate());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(untCertificate);
-                saveUNT = true;
                 QueryModel untRatesQM = ((DBTableModel) untRatesTW.getWidgetModel()).getQueryModel();
                 untRatesQM.addWhere("untCertificate", ECriteria.EQUAL, fm.getEntity().getId());
 
@@ -90,7 +84,6 @@ public class Unt {
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(ucs);
                 untCertificate.setRate(untCertificate.getRate() + vucs.getRate());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(untCertificate);
-                saveUNT = true;
                 untRatesTW.refresh();
                 certificateGFW.refresh();
                 CommonUtils.showSavedNotification();
@@ -164,7 +157,7 @@ public class Unt {
         certificateGFW = new GridFormWidget(UNT_CERTIFICATE.class);
         certificateGFW.addEntityListener(applicantsForm);
         untCertificateFM = certificateGFW.getWidgetModel();
-        untCertificateFM.setTitleResource("unt.certificate");
+        untCertificateFM.setTitleResource("unt");
         untCertificateFM.setErrorMessageTitle(sb.toString());
         untCertificateFM.setButtonsVisible(false);
         untCertificateFM.getFieldModel("ict").getValidators().add(new RegexpValidator("^\\d{9}$", "ИКТ должен состоять из 9 цифр"));
@@ -219,7 +212,7 @@ public class Unt {
                 if (untCertificateFM.isModified()) {
                     certificateGFW.save();
                 } else {
-                    Message.showError("fill main data");
+                    Message.showError(CommonUtils.getUILocaleUtil().getCaption("add.news.required"));
                 }
             }
         });

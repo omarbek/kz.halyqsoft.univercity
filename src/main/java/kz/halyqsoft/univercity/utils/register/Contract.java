@@ -4,8 +4,6 @@ import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_CONTRACT;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_DOCUMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_DOCUMENT_FILE;
-import kz.halyqsoft.univercity.modules.regapplicants.ApplicantsForm;
-import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.facade.CommonIDFacadeBean;
@@ -132,8 +130,10 @@ public class Contract {
         return false;
     }
 
-    public void save() {
-        if (mainFM.isModified())
-            mainGFW.save();
+    public Boolean save() {
+        if (mainFM.isModified()) {
+            return mainGFW.save();
+        }
+        return null;
     }
 }

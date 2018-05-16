@@ -172,9 +172,10 @@ public class Passport {
         return false;
     }
 
-    public void save() {
-        if (mainFM.isModified() && mainGFW.save()) {
-            savePass = true;
+    public Boolean save() {
+        if (mainFM.isModified()) {
+            return mainGFW.save();
         }
+        return null;
     }
 }

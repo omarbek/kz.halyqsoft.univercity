@@ -8,9 +8,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.data.validator.IntegerRangeValidator;
-import com.vaadin.server.FileDownloader;
-import com.vaadin.server.StreamResource;
-import com.vaadin.server.VaadinService;
+import com.vaadin.server.*;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
@@ -68,12 +66,14 @@ import static com.vaadin.ui.Table.Align;
  */
 public final class ApplicantsForm extends AbstractFormWidgetView implements PhotoWidgetListener {
 
+
     private AbstractFormWidget dataAFW;
     private HorizontalSplitPanel registrationHSP;
     private HorizontalLayout contentHL;
     private VerticalLayout buttonsVL;
     private VerticalLayout messForm;
     private FromItem educationUDFI;
+    private Button untNextButton;
 
     private Map<String, Integer> fontMap;
 
@@ -95,7 +95,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
     private byte[] userPhotoBytes;
     private boolean userPhotoChanged;
 
-    private boolean saveData, saveSpec, savePass, saveEduc, saveUNT, saveFactAddress;
+    private boolean saveData, saveSpec, savePass, saveEduc, saveFactAddress;
     private Integer beginYear;
 
     private Flag flag;
@@ -115,6 +115,8 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
     private static final int MOTHER = 2;
     private static final int ADDRESS_REG = 1;
     private static final int ADDRESS_FACT = 2;
+    private static String FORM_BUTTON_WIDTH = "250px";
+    private static String NEXT_BUTTON_CAPTION = "next";
 
     ApplicantsForm(final FormModel dataFM, ENTRANCE_YEAR entranceYear) throws Exception {
         super();
@@ -122,7 +124,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         beginYear = entranceYear.getBeginYear();
         setBackButtonVisible(false);
         registrationHSP = new HorizontalSplitPanel();
-        registrationHSP.setSplitPosition(20);
+        registrationHSP.setSplitPosition(22);
         registrationHSP.setSizeFull();
 
         fontMap = new HashMap<>();
@@ -132,12 +134,14 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         fontMap.put("Underline", Font.UNDERLINE);
 
         buttonsVL = new VerticalLayout();
+        buttonsVL.addStyleName("blue");
         buttonsVL.setSpacing(true);
         buttonsVL.setSizeFull();
 
         contentHL = new HorizontalLayout();
         contentHL.setSpacing(true);
         contentHL.setSizeFull();
+        contentHL.addStyleName("blue");
 
         dataFM.setButtonsVisible(false);
         dataFM.getFieldModel("academicStatus").setInEdit(false);
@@ -252,7 +256,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
     }
 
     private void createFormButtons(FormModel dataFM) {
-        form = createFormButton("regapplicant.main.data");
+        form = createFormButton("regapplicant.main.data", true);
         form.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
@@ -262,7 +266,6 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 saveSpec = false;
                 saveEduc = false;
                 savePass = false;
-                saveUNT = false;
                 saveFactAddress = false;
                 specTW = new TableWidget(V_ENTRANT_SPECIALITY.class);
                 specTW.addEntityListener(ApplicantsForm.this);
@@ -271,6 +274,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 entrantSpecialityTM.setPageLength(5);
                 QueryModel entrantSpecialityQM = ((DBTableModel) specTW.getWidgetModel()).getQueryModel();
                 ID studentId1 = ID.valueOf(-1);
+
                 if (!dataFM.isCreateNew()) {
                     try {
                         studentId1 = dataFM.getEntity().getId();
@@ -294,11 +298,11 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
 
         });
 
-        mainDataButton = createFormButton("regapplicant.main.data");
+        mainDataButton = createFormButton("regapplicant.main.data", true);
         mainDataButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
-                flagSave(flag, dataFM);
+//                flagSave(flag, dataFM);
                 flag = Flag.MAIN_DATA;
                 registrationHSP.removeComponent(contentHL);
                 contentHL = new HorizontalLayout();
@@ -311,25 +315,29 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
             }
         });
 
-        factAddressButton = createFormButton("address.residential");
+        factAddressButton = createFormButton("address.residential", true);
         factAddressButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
-                flagSave(flag, dataFM);
-                addToLayout(Flag.FACT_ADDRESS, address.getAddressFactGFW(), regAddressButton);
+                if ((flagSave(flag, dataFM) && Flag.MAIN_DATA.equals(flag))
+                        || !Flag.MAIN_DATA.equals(flag)) {
+                    addToLayout(Flag.FACT_ADDRESS, address.getAddressFactGFW(), regAddressButton);
+                }
             }
         });
 
-        regAddressButton = createFormButton("address.registration");
+        regAddressButton = createFormButton("address.registration", false);
         regAddressButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
-                flagSave(flag, dataFM);
-                addToLayout(Flag.REG_ADDRESS, address.getAddressRegGFW(), specButton);
+                if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.FACT_ADDRESS.equals(flag)))
+                        || !(Flag.MAIN_DATA.equals(flag) || Flag.FACT_ADDRESS.equals(flag))) {
+                    addToLayout(Flag.REG_ADDRESS, address.getAddressRegGFW(), specButton);
+                }
             }
         });
 
-        specButton = createFormButton("speciality");
+        specButton = createFormButton("speciality", true);
         specButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
@@ -352,285 +360,326 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 }
                 entrantSpecialityQM.addWhere("student", ECriteria.EQUAL, studentId1);
 
-                flagSave(flag, dataFM);
-
-                flag = Flag.SPECIALITY;
-                registrationHSP.removeComponent(contentHL);
-                contentHL = new HorizontalLayout();
-                contentHL.addComponent(specTW);
-                Button nextButton = createNextButton(idDocButton, "next");
-                contentHL.addComponent(nextButton);
-                contentHL.setComponentAlignment(nextButton, Alignment.MIDDLE_CENTER);
-                registrationHSP.addComponent(contentHL);
+                if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.REG_ADDRESS.equals(flag)))
+                        || !(Flag.MAIN_DATA.equals(flag) || Flag.REG_ADDRESS.equals(flag))) {
+                    flag = Flag.SPECIALITY;
+                    registrationHSP.removeComponent(contentHL);
+                    contentHL = new HorizontalLayout();
+                    contentHL.addComponent(specTW);
+                    Button nextButton = createNextButton(idDocButton, NEXT_BUTTON_CAPTION);
+                    contentHL.addComponent(nextButton);
+                    contentHL.setComponentAlignment(nextButton, Alignment.MIDDLE_CENTER);
+                    registrationHSP.addComponent(contentHL);
+                }
             }
         });
 
-        idDocButton = createFormButton("identity.document");
+        idDocButton = createFormButton("identity.document", true);
         idDocButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
-                flagSave(flag, dataFM);
-                addToLayout(Flag.ID_DOC, passport.getMainGFW(), militaryButton);
+                if ((flagSave(flag, dataFM) && Flag.MAIN_DATA.equals(flag))
+                        || !Flag.MAIN_DATA.equals(flag)) {
+                    addToLayout(Flag.ID_DOC, passport.getMainGFW(), militaryButton);
+                }
             }
         });
 
-        militaryButton = createFormButton("military.document");
+        militaryButton = createFormButton("military.document", false);
         militaryButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
-                flagSave(flag, dataFM);
-                addToLayout(Flag.MILITARY, military.getMainGFW(), disabilityButton);
+                if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.ID_DOC.equals(flag)))
+                        || !(Flag.MAIN_DATA.equals(flag) || Flag.ID_DOC.equals(flag))) {
+                    addToLayout(Flag.MILITARY, military.getMainGFW(), disabilityButton);
+                }
             }
         });
 
-        disabilityButton = createFormButton("disability.document");
+        disabilityButton = createFormButton("disability.document", false);
         disabilityButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
-                flagSave(flag, dataFM);
-                addToLayout(Flag.DISABILITY, disability.getMainGFW(), repatriateButton);
+                if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.MILITARY.equals(flag)))
+                        || !(Flag.MAIN_DATA.equals(flag) || Flag.MILITARY.equals(flag))) {
+                    addToLayout(Flag.DISABILITY, disability.getMainGFW(), repatriateButton);
+                }
             }
         });
 
-        repatriateButton = createFormButton("repatriate.document");
+        repatriateButton = createFormButton("repatriate.document", false);
         repatriateButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
-                flagSave(flag, dataFM);
-                addToLayout(Flag.REPATRIATE, repatriate.getMainGFW(), eduDocButton);
+                if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.DISABILITY.equals(flag)))
+                        || !(Flag.MAIN_DATA.equals(flag) || Flag.DISABILITY.equals(flag))) {
+                    addToLayout(Flag.REPATRIATE, repatriate.getMainGFW(), eduDocButton);
+                }
             }
         });
 
-        eduDocButton = createFormButton("education.document");
+        eduDocButton = createFormButton("education.document", true);
         eduDocButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
-                flagSave(flag, dataFM);
-                addToLayout(Flag.EDU_DOC, educationDoc.getMainGFW(), eduDocsButton);
+                if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.REPATRIATE.equals(flag)))
+                        || !(Flag.MAIN_DATA.equals(flag) || Flag.REPATRIATE.equals(flag))) {
+                    addToLayout(Flag.EDU_DOC, educationDoc.getMainGFW(), eduDocsButton);
+                }
             }
         });
 
-        eduDocsButton = createFormButton("education.documents");
+        eduDocsButton = createFormButton("education.documents", false);
         eduDocsButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
-                flagSave(flag, dataFM);
-                flag = Flag.EDU_DOCS;
-                documentsTW = new TableWidget(EDUCATION_DOC.class);
-                documentsTW.addEntityListener(ApplicantsForm.this);
-                documentsTW.setWidth("667px");
-                documentsTW.addStyleName("toTop");
-                FormModel docFM = new FormModel(EDUCATION_DOC.class, true);
-                docFM.getFieldModel("schoolCountry").setRequired(true);
-                docFM.getFieldModel("language").setRequired(true);
-                docFM.getFieldModel("schoolCertificateType").setRequired(true);
-                docFM.getFieldModel("schoolRegion").setRequired(true);
-                docFM.getFieldModel("schoolAddress").setRequired(true);
+                if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.EDU_DOC.equals(flag)))
+                        || !(Flag.MAIN_DATA.equals(flag) || Flag.EDU_DOC.equals(flag))) {
+                    flag = Flag.EDU_DOCS;
+                    documentsTW = new TableWidget(EDUCATION_DOC.class);
+                    documentsTW.addEntityListener(ApplicantsForm.this);
+                    documentsTW.setWidth("667px");
+                    documentsTW.addStyleName("toTop");
+                    FormModel docFM = new FormModel(EDUCATION_DOC.class, true);
+                    docFM.getFieldModel("schoolCountry").setRequired(true);
+                    docFM.getFieldModel("language").setRequired(true);
+                    docFM.getFieldModel("schoolCertificateType").setRequired(true);
+                    docFM.getFieldModel("schoolRegion").setRequired(true);
+                    docFM.getFieldModel("schoolAddress").setRequired(true);
 
-                DBTableModel educationTM = (DBTableModel) documentsTW.getWidgetModel();
-                educationTM.getColumnModel("entryYear").setAlignment(Align.CENTER);
-                educationTM.getColumnModel("endYear").setAlignment(Align.CENTER);
-                QueryModel educationQM = educationTM.getQueryModel();
-                educationUDFI = educationQM.addJoin(EJoin.INNER_JOIN, "id", USER_DOCUMENT.class, "id");
-                educationQM.addWhere(educationUDFI, "deleted", Boolean.FALSE);
-                ID userId1 = ID.valueOf(-1);
-                if (!dataFM.isCreateNew()) {
-                    try {
-                        userId1 = dataFM.getEntity().getId();
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    DBTableModel educationTM = (DBTableModel) documentsTW.getWidgetModel();
+                    educationTM.getColumnModel("entryYear").setAlignment(Align.CENTER);
+                    educationTM.getColumnModel("endYear").setAlignment(Align.CENTER);
+                    QueryModel educationQM = educationTM.getQueryModel();
+                    educationUDFI = educationQM.addJoin(EJoin.INNER_JOIN, "id", USER_DOCUMENT.class, "id");
+                    educationQM.addWhere(educationUDFI, "deleted", Boolean.FALSE);
+                    ID userId1 = ID.valueOf(-1);
+                    if (!dataFM.isCreateNew()) {
+                        try {
+                            userId1 = dataFM.getEntity().getId();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
-                }
-                educationQM.addWhereAnd(educationUDFI, "user", ECriteria.EQUAL, userId1);
+                    educationQM.addWhereAnd(educationUDFI, "user", ECriteria.EQUAL, userId1);
 
-                contentHL.removeAllComponents();
-                contentHL.addComponent(documentsTW);
-                Button nextButton = createNextButton(preemRightButton, "next");
-                contentHL.addComponent(nextButton);
-                contentHL.setComponentAlignment(nextButton, Alignment.MIDDLE_CENTER);
+                    contentHL.removeAllComponents();
+                    contentHL.addComponent(documentsTW);
+                    Button nextButton = createNextButton(preemRightButton, NEXT_BUTTON_CAPTION);
+                    contentHL.addComponent(nextButton);
+                    contentHL.setComponentAlignment(nextButton, Alignment.MIDDLE_CENTER);
+                }
             }
         });
 
-        preemRightButton = createFormButton("preemptive.right");
+        preemRightButton = createFormButton("preemptive.right", false);
         preemRightButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
-                flagSave(flag, dataFM);
-                flag = Flag.PREEM_RIGHT;
-                ID userId1 = ID.valueOf(-1);
-                if (!dataFM.isCreateNew()) {
-                    try {
-                        userId1 = dataFM.getEntity().getId();
-                    } catch (Exception e) {
-                        e.printStackTrace();//TODO catch
+                if ((flagSave(flag, dataFM) && Flag.MAIN_DATA.equals(flag))
+                        || !Flag.MAIN_DATA.equals(flag)) {
+                    flag = Flag.PREEM_RIGHT;
+                    ID userId1 = ID.valueOf(-1);
+                    if (!dataFM.isCreateNew()) {
+                        try {
+                            userId1 = dataFM.getEntity().getId();
+                        } catch (Exception e) {
+                            e.printStackTrace();//TODO catch
+                        }
                     }
+                    languagesTW = new TableWidget(V_USER_LANGUAGE.class);
+                    languagesTW.addEntityListener(ApplicantsForm.this);
+                    languagesTW.setWidth("667px");
+                    DBTableModel languageTM = (DBTableModel) languagesTW.getWidgetModel();
+                    QueryModel languageQM = languageTM.getQueryModel();
+                    languageQM.addWhere("user", ECriteria.EQUAL, userId1);
+
+                    VerticalLayout preemLang = new VerticalLayout();
+                    preemLang.addComponent(preemptiveRight.getMainGFW());
+                    preemLang.addComponent(languagesTW);
+
+                    contentHL.removeAllComponents();
+                    contentHL.addComponent(preemLang);
+                    Button nextButton = createNextButton(medButton, NEXT_BUTTON_CAPTION);
+                    contentHL.addComponent(nextButton);
+                    contentHL.setComponentAlignment(nextButton, Alignment.MIDDLE_CENTER);
                 }
-                languagesTW = new TableWidget(V_USER_LANGUAGE.class);
-                languagesTW.addEntityListener(ApplicantsForm.this);
-                languagesTW.setWidth("667px");
-                DBTableModel languageTM = (DBTableModel) languagesTW.getWidgetModel();
-                QueryModel languageQM = languageTM.getQueryModel();
-                languageQM.addWhere("user", ECriteria.EQUAL, userId1);
-
-                VerticalLayout preemLang = new VerticalLayout();
-                preemLang.addComponent(preemptiveRight.getMainGFW());
-                preemLang.addComponent(languagesTW);
-
-                contentHL.removeAllComponents();
-                contentHL.addComponent(preemLang);
-                Button nextButton = createNextButton(medButton, "next");
-                contentHL.addComponent(nextButton);
-                contentHL.setComponentAlignment(nextButton, Alignment.MIDDLE_CENTER);
             }
         });
 
-        medButton = createFormButton("medical.checkup");
+        medButton = createFormButton("medical.checkup", false);
         medButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
-                flagSave(flag, dataFM);
-                flag = Flag.MED;
+                if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.PREEM_RIGHT.equals(flag)))
+                        || !(Flag.MAIN_DATA.equals(flag) || Flag.PREEM_RIGHT.equals(flag))) {
+                    flag = Flag.MED;
 
-                medicalCheckupTW = new TableWidget(V_MEDICAL_CHECKUP.class);
-                medicalCheckupTW.addEntityListener(ApplicantsForm.this);
-                medicalCheckupTW.setWidth("667px");
-                DBTableModel medicalCheckupTM = (DBTableModel) medicalCheckupTW.getWidgetModel();
-                medicalCheckupTM.getColumnModel("allowWork").setInTable(false);
-                QueryModel medicalCheckupQM = medicalCheckupTM.getQueryModel();
-                medicalCheckupQM.addWhere("deleted", Boolean.FALSE);
-                ID userId2 = ID.valueOf(-1);
-                if (!dataAFW.getWidgetModel().isCreateNew()) {
-                    try {
-                        userId2 = dataAFW.getWidgetModel().getEntity().getId();
-                    } catch (Exception e) {
-                        e.printStackTrace();//TODO catch
+                    medicalCheckupTW = new TableWidget(V_MEDICAL_CHECKUP.class);
+                    medicalCheckupTW.addEntityListener(ApplicantsForm.this);
+                    medicalCheckupTW.setWidth("667px");
+                    DBTableModel medicalCheckupTM = (DBTableModel) medicalCheckupTW.getWidgetModel();
+                    medicalCheckupTM.getColumnModel("allowWork").setInTable(false);
+                    QueryModel medicalCheckupQM = medicalCheckupTM.getQueryModel();
+                    medicalCheckupQM.addWhere("deleted", Boolean.FALSE);
+                    ID userId2 = ID.valueOf(-1);
+                    if (!dataAFW.getWidgetModel().isCreateNew()) {
+                        try {
+                            userId2 = dataAFW.getWidgetModel().getEntity().getId();
+                        } catch (Exception e) {
+                            e.printStackTrace();//TODO catch
+                        }
                     }
+                    medicalCheckupQM.addWhereAnd("user", ECriteria.EQUAL, userId2);
+
+                    FormModel medicalCheckupFM = medicalCheckupTM.getFormModel();
+                    medicalCheckupFM.getFieldModel("allowWork").setInEdit(false);
+                    medicalCheckupFM.getFieldModel("allowWork").setInView(false);
+
+                    contentHL.removeAllComponents();
+                    contentHL.addComponent(medicalCheckupTW);
+                    Button nextButton = createNextButton(untButton, NEXT_BUTTON_CAPTION);
+                    contentHL.addComponent(nextButton);
+                    contentHL.setComponentAlignment(nextButton, Alignment.MIDDLE_CENTER);
                 }
-                medicalCheckupQM.addWhereAnd("user", ECriteria.EQUAL, userId2);
-
-                FormModel medicalCheckupFM = medicalCheckupTM.getFormModel();
-                medicalCheckupFM.getFieldModel("allowWork").setInEdit(false);
-                medicalCheckupFM.getFieldModel("allowWork").setInView(false);
-
-                contentHL.removeAllComponents();
-                contentHL.addComponent(medicalCheckupTW);
-                Button nextButton = createNextButton(untButton, "next");
-                contentHL.addComponent(nextButton);
-                contentHL.setComponentAlignment(nextButton, Alignment.MIDDLE_CENTER);
             }
         });
 
-        untButton = createFormButton("unt");
+        untButton = createFormButton("unt", true);
         untButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
-                flagSave(flag, dataFM);
-                flag = Flag.UNT;
+                if ((flagSave(flag, dataFM) && Flag.MAIN_DATA.equals(flag))
+                        || !Flag.MAIN_DATA.equals(flag)) {
+                    flag = Flag.UNT;
 
-                Button saveButton = unt.createRates(createSaveButton());
+                    Button savedUntButton = unt.createRates(createSaveButton());
 
-                VerticalLayout dataUNT = new VerticalLayout();
-                dataUNT.addComponent(unt.getCertificateGFW());
-                dataUNT.addComponent(saveButton);
-                dataUNT.setComponentAlignment(saveButton, Alignment.MIDDLE_CENTER);
-                dataUNT.addComponent(unt.getUntRatesTW());
+                    VerticalLayout dataUNT = new VerticalLayout();
+                    dataUNT.addComponent(unt.getCertificateGFW());
+                    dataUNT.addComponent(savedUntButton);
+                    dataUNT.setComponentAlignment(savedUntButton, Alignment.MIDDLE_CENTER);
+                    dataUNT.addComponent(unt.getUntRatesTW());
 
-                contentHL.removeAllComponents();
-                contentHL.addComponent(dataUNT);
-                Button nextButton = createNextButton(grantDocButton, "next");
-                contentHL.addComponent(nextButton);
-                contentHL.setComponentAlignment(nextButton, Alignment.MIDDLE_CENTER);
+                    contentHL.removeAllComponents();
+                    contentHL.addComponent(dataUNT);
+
+                    untNextButton = new Button();
+                    untNextButton.setIcon(new ThemeResource("img/button/arrow_right.png"));
+                    untNextButton.setCaption(getUILocaleUtil().getCaption(NEXT_BUTTON_CAPTION));
+                    untNextButton.setEnabled(false);
+                    untNextButton.addClickListener(new Button.ClickListener() {
+
+                        @Override
+                        public void buttonClick(ClickEvent event) {
+                            grantDocButton.click();
+                        }
+                    });
+                    contentHL.addComponent(untNextButton);
+                    contentHL.setComponentAlignment(untNextButton, Alignment.MIDDLE_CENTER);
+                }
             }
         });
 
-        grantDocButton = createFormButton("grant.document");
+        grantDocButton = createFormButton("grant.document", false);
         grantDocButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
-                flagSave(flag, dataFM);
-                addToLayout(Flag.GRANT_DOC, grant.getMainGFW(), motherButton);
+                if ((flagSave(flag, dataFM) && Flag.MAIN_DATA.equals(flag))
+                        || !Flag.MAIN_DATA.equals(flag)) {
+                    addToLayout(Flag.GRANT_DOC, grant.getMainGFW(), motherButton);
+                }
             }
         });
 
-        motherButton = createFormButton("parents.data.mother");
+        motherButton = createFormButton("parents.data.mother", false);
         motherButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
-                flagSave(flag, dataFM);
-                addToLayout(Flag.MOTHER, parent.getMotherGFW(), fatherButton);
+                if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.GRANT_DOC.equals(flag)))
+                        || !(Flag.MAIN_DATA.equals(flag) || Flag.GRANT_DOC.equals(flag))) {
+                    addToLayout(Flag.MOTHER, parent.getMotherGFW(), fatherButton);
+                }
             }
         });
 
-        fatherButton = createFormButton("parents.data.father");
+        fatherButton = createFormButton("parents.data.father", false);
         fatherButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
-                flagSave(flag, dataFM);
-                addToLayout(Flag.FATHER, parent.getFatherGFW(), contractButton);
+                if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.MOTHER.equals(flag)))
+                        || !(Flag.MAIN_DATA.equals(flag) || Flag.MOTHER.equals(flag))) {
+                    addToLayout(Flag.FATHER, parent.getFatherGFW(), contractButton);
+                }
             }
         });
 
-        contractButton = createFormButton("contract.data");
+        contractButton = createFormButton("contract.data", false);
         contractButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
-                flagSave(flag, dataFM);
-                addToLayout(Flag.CONTRACT, contract.getMainGFW(), moreButton);
+                if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.FATHER.equals(flag)))
+                        || !(Flag.MAIN_DATA.equals(flag) || Flag.FATHER.equals(flag))) {
+                    addToLayout(Flag.CONTRACT, contract.getMainGFW(), moreButton);
+                }
             }
         });
 
-        moreButton = createFormButton("inform.more");
+        moreButton = createFormButton("inform.more", false);
         moreButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
-                flagSave(flag, dataFM);
-                flag = Flag.DEFAULT_FLAG;
+                if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.CONTRACT.equals(flag)))
+                        || !(Flag.MAIN_DATA.equals(flag) || Flag.CONTRACT.equals(flag))) {
+                    flag = Flag.DEFAULT_FLAG;
 
-                awardsTW = new TableWidget(V_USER_AWARD.class);
-                awardsTW.addEntityListener(ApplicantsForm.this);
-                awardsTW.setWidth("667px");
-                DBTableModel awardsTM = (DBTableModel) awardsTW.getWidgetModel();
-                QueryModel awardsQM = awardsTM.getQueryModel();
-                ID studentId2 = ID.valueOf(-1);
-                if (!dataAFW.getWidgetModel().isCreateNew()) {
-                    try {
-                        studentId2 = dataAFW.getWidgetModel().getEntity().getId();
-                    } catch (Exception e) {
-                        e.printStackTrace();//TODO catch
+                    awardsTW = new TableWidget(V_USER_AWARD.class);
+                    awardsTW.addEntityListener(ApplicantsForm.this);
+                    awardsTW.setWidth("667px");
+                    DBTableModel awardsTM = (DBTableModel) awardsTW.getWidgetModel();
+                    QueryModel awardsQM = awardsTM.getQueryModel();
+                    ID studentId2 = ID.valueOf(-1);
+                    if (!dataAFW.getWidgetModel().isCreateNew()) {
+                        try {
+                            studentId2 = dataAFW.getWidgetModel().getEntity().getId();
+                        } catch (Exception e) {
+                            e.printStackTrace();//TODO catch
+                        }
                     }
-                }
-                awardsQM.addWhere("user", ECriteria.EQUAL, studentId2);
+                    awardsQM.addWhere("user", ECriteria.EQUAL, studentId2);
 
-                socialCategoriesTW = new TableWidget(V_USER_SOCIAL_CATEGORY.class);
-                socialCategoriesTW.addEntityListener(ApplicantsForm.this);
-                socialCategoriesTW.setWidth("667px");
-                DBTableModel socialCategoriesTM = (DBTableModel) socialCategoriesTW.getWidgetModel();
-                QueryModel socialCategoriesQM = socialCategoriesTM.getQueryModel();
-                ID userId = ID.valueOf(-1);
-                if (!dataAFW.getWidgetModel().isCreateNew()) {
-                    try {
-                        userId = dataAFW.getWidgetModel().getEntity().getId();
-                    } catch (Exception e) {
+                    socialCategoriesTW = new TableWidget(V_USER_SOCIAL_CATEGORY.class);
+                    socialCategoriesTW.addEntityListener(ApplicantsForm.this);
+                    socialCategoriesTW.setWidth("667px");
+                    DBTableModel socialCategoriesTM = (DBTableModel) socialCategoriesTW.getWidgetModel();
+                    QueryModel socialCategoriesQM = socialCategoriesTM.getQueryModel();
+                    ID userId = ID.valueOf(-1);
+                    if (!dataAFW.getWidgetModel().isCreateNew()) {
+                        try {
+                            userId = dataAFW.getWidgetModel().getEntity().getId();
+                        } catch (Exception e) {
+                        }
                     }
+                    socialCategoriesQM.addWhere("user", ECriteria.EQUAL, userId);
+
+                    VerticalLayout dopData = new VerticalLayout();
+                    dopData.addComponent(socialCategoriesTW);
+                    dopData.addComponent(awardsTW);
+
+                    contentHL.removeAllComponents();
+                    contentHL.addComponent(dopData);
+                    Button nextButton = createNextButton(finishButton, "exit");
+                    contentHL.addComponent(nextButton);
+                    contentHL.setComponentAlignment(nextButton, Alignment.MIDDLE_CENTER);
                 }
-                socialCategoriesQM.addWhere("user", ECriteria.EQUAL, userId);
-
-                VerticalLayout dopData = new VerticalLayout();
-                dopData.addComponent(socialCategoriesTW);
-                dopData.addComponent(awardsTW);
-
-                contentHL.removeAllComponents();
-                contentHL.addComponent(dopData);
-                Button nextButton = createNextButton(finishButton, "exit");
-                contentHL.addComponent(nextButton);
-                contentHL.setComponentAlignment(nextButton, Alignment.MIDDLE_CENTER);
             }
         });
 
         finishButton = new Button();
-        finishButton.setCaption(getUILocaleUtil().getCaption("exit"));
-        finishButton.setWidth("230px");
-
+        finishButton.setHtmlContentAllowed(true);
+        finishButton.setCaption("<b>" + getUILocaleUtil().getCaption("exit") + "</b>");
+        finishButton.setIcon(new ThemeResource("img/button/ok.png"));
+        finishButton.setWidth(FORM_BUTTON_WIDTH);
 
         finishButton.addClickListener(new Button.ClickListener() {
             @Override
@@ -646,8 +695,6 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                     Message.showInfo(getUILocaleUtil().getMessage("info.save.passport"));
                 } else if (!saveEduc) {
                     Message.showInfo(getUILocaleUtil().getMessage("info.save.educ"));
-                } else if (!saveUNT) {
-                    Message.showInfo(getUILocaleUtil().getMessage("info.save.unt"));
                 } else {
                     mainDataButton.setEnabled(false);
                     idDocButton.setEnabled(false);
@@ -745,26 +792,54 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         flag = currentFlag;
         contentHL.removeAllComponents();
         contentHL.addComponent(currentGFW);
-        Button nextButton = createNextButton(currentButton, "next");
-        contentHL.addComponent(nextButton);
-        contentHL.setComponentAlignment(nextButton, Alignment.MIDDLE_CENTER);
+
+        Button nextButton = createNextButton(currentButton, NEXT_BUTTON_CAPTION);
+
+        Button cancelButton = createCancelButton();
+        cancelButton.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(ClickEvent event) {
+                currentGFW.cancel();
+            }
+        });
+
+        HorizontalLayout buttonsHL = createButtonPanel();
+        buttonsHL.addComponent(nextButton);
+        buttonsHL.addComponent(cancelButton);
+
+        contentHL.addComponent(buttonsHL);
+        contentHL.setComponentAlignment(buttonsHL, Alignment.MIDDLE_CENTER);
     }
 
     private VerticalLayout getPhotoVL() {
-        VerticalLayout photoAndButtonVL = new VerticalLayout();
+        VerticalLayout photoAndButtonsVL = new VerticalLayout();
 
         PhotoWidget userPW = new PhotoWidget(userPhotoBytes);
         userPW.setPhotoHeight(290, Unit.PIXELS);
         userPW.setPhotoWidth(230, Unit.PIXELS);
         userPW.setSaveButtonVisible(false);
         userPW.addListener(ApplicantsForm.this);
-        photoAndButtonVL.addComponent(userPW);
-        photoAndButtonVL.setComponentAlignment(userPW, Alignment.TOP_CENTER);
+        photoAndButtonsVL.addComponent(userPW);
+        photoAndButtonsVL.setComponentAlignment(userPW, Alignment.TOP_CENTER);
 
-        Button nextButton = createNextButton(factAddressButton, "next");
-        photoAndButtonVL.addComponent(nextButton);
-        photoAndButtonVL.setComponentAlignment(nextButton, Alignment.MIDDLE_CENTER);
-        return photoAndButtonVL;
+        Button nextButton = createNextButton(factAddressButton, NEXT_BUTTON_CAPTION);
+
+        Button cancelButton = createCancelButton();
+        cancelButton.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(ClickEvent event) {
+                dataAFW.cancel();
+            }
+        });
+
+        HorizontalLayout buttonsHL = createButtonPanel();
+        buttonsHL.addComponent(nextButton);
+        buttonsHL.addComponent(cancelButton);
+
+        photoAndButtonsVL.addComponent(buttonsHL);
+        photoAndButtonsVL.setComponentAlignment(buttonsHL, Alignment.MIDDLE_CENTER);
+
+        return photoAndButtonsVL;
     }
 
     private StreamResource createResource(String fio, String faculty, String formaobuch, String phone, String address, String index) {
@@ -839,17 +914,31 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
             timesNewRoman = BaseFont.createFont(fontPath + "/TimesNewRoman/times.ttf", BaseFont.IDENTITY_H,
                     BaseFont.EMBEDDED);
         } catch (Exception e) {
-            e.printStackTrace();
+            e.printStackTrace();//TODO
         }
         return new Font(timesNewRoman, fontSize, font);
     }
 
-    private void flagSave(Flag flag, FormModel dataFM) {
-
+    private boolean flagSave(Flag flag, FormModel dataFM) {
+        Boolean saved;
         switch (flag) {
             case MAIN_DATA:
-                if (dataFM.isModified() && dataAFW.save())
-                    saveData = true;
+                return saveIfModify(dataFM);
+            case FACT_ADDRESS:
+                saved = address.save(ADDRESS_FACT);
+                if (saved == null) {
+                    return true;
+                }
+                if (saved || saveFactAddress) {
+                    saveFactAddress = true;
+                    return true;
+                }
+                break;
+            case REG_ADDRESS:
+                saved = address.save(ADDRESS_REG);
+                if (saved == null || saved) {
+                    return true;
+                }
                 break;
             case SPECIALITY:
                 if (specTW.getEntityCount() > 0) {
@@ -857,53 +946,91 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 }
                 break;
             case ID_DOC:
-                passport.save();
-                savePass = passport.isSavePass();
+                saved = passport.save();
+                if (saved == null) {
+                    return true;
+                }
+                if (saved || savePass) {
+                    savePass = true;
+                    return true;
+                }
                 break;
             case MILITARY:
-                military.save();
+                saved = military.save();
+                if (saved == null || saved) {
+                    return true;
+                }
                 break;
             case DISABILITY:
-                disability.save();
+                saved = disability.save();
+                if (saved == null || saved) {
+                    return true;
+                }
                 break;
             case REPATRIATE:
-                repatriate.save();
+                saved = repatriate.save();
+                if (saved == null || saved) {
+                    return true;
+                }
                 break;
             case EDU_DOC:
-                educationDoc.save();
-                saveEduc = educationDoc.isSaveEduc();
+                saved = educationDoc.save();
+                if (saved == null) {
+                    return true;
+                }
+                if (saved || saveEduc) {
+                    saveEduc = true;
+                    return true;
+                }
                 break;
-
             case PREEM_RIGHT:
-                preemptiveRight.save();
-                break;
-            case UNT:
-                if (unt.getUntRatesTW().getEntityCount() > 1) {
-                    saveUNT = true;
+                saved = preemptiveRight.save();
+                if (saved == null || saved) {
+                    return true;
                 }
                 break;
             case GRANT_DOC:
-                grant.save();
+                saved = grant.save();
+                if (saved == null || saved) {
+                    return true;
+                }
                 break;
             case MOTHER:
-                parent.save(MOTHER);
+                saved = parent.save(MOTHER);
+                if (saved == null || saved) {
+                    return true;
+                }
                 break;
             case FATHER:
-                parent.save(FATHER);
-                break;
-            case FACT_ADDRESS:
-                address.save(ADDRESS_FACT);
-                saveFactAddress = address.isSaveEduc();
-                break;
-            case REG_ADDRESS:
-                address.save(ADDRESS_REG);
+                saved = parent.save(FATHER);
+                if (saved == null || saved) {
+                    return true;
+                }
                 break;
             case CONTRACT:
-                contract.save();
+                saved = contract.save();
+                if (saved == null || saved) {
+                    return true;
+                }
                 break;
             default:
                 break;
         }
+        return false;
+    }
+
+    private boolean saveIfModify(FormModel dataFM) {
+        if (dataFM.isModified()) {
+            if (dataAFW.save()) {
+                saveData = true;
+                return true;
+            }
+        } else if (saveData) {
+            return true;
+        } else {
+            Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
+        }
+        return false;
     }
 
     private void addFormButtons() {
@@ -933,6 +1060,12 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
     private Button createNextButton(Button clickButton, String caption) {
         Button temp = new Button();
         temp.setCaption(getUILocaleUtil().getCaption(caption));
+        if (NEXT_BUTTON_CAPTION.equals(caption)) {
+            temp.setIcon(new ThemeResource("img/button/arrow_right.png"));
+        } else {
+            temp.setIcon(new ThemeResource("img/button/ok.png"));
+        }
+        temp.setWidth(120.0F, Sizeable.Unit.PIXELS);
         temp.addClickListener(new Button.ClickListener() {
 
             @Override
@@ -943,10 +1076,16 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         return temp;
     }
 
-    private Button createFormButton(String caption) {
+    private Button createFormButton(String caption, boolean main) {
         Button temp = new Button();
-        temp.setCaption(getUILocaleUtil().getCaption(caption));
-        temp.setWidth("230px");
+        if (main) {
+            temp.setHtmlContentAllowed(true);
+            temp.setCaption("<b>" + getUILocaleUtil().getCaption(caption) + "</b>");
+        } else {
+            temp.setCaption(getUILocaleUtil().getCaption(caption));
+
+        }
+        temp.setWidth(FORM_BUTTON_WIDTH);
         return temp;
     }
 
@@ -1551,9 +1690,11 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         } else if (source.equals(unt.getCertificateGFW())) {
             return unt.preSaveCertificate(e, isNew);
         } else if (source.equals(unt.getUntRatesTW())) {
-            boolean saved = unt.preSaveRates(e, isNew);
-            saveUNT = unt.isSaveUNT();
-            return saved;
+            boolean preSaveRates = unt.preSaveRates(e, isNew);
+            if (unt.getUntRatesTW().getEntityCount() > 1) {
+                untNextButton.setEnabled(true);
+            }
+            return preSaveRates;
         } else if (source.equals(address.getAddressRegGFW())) {
             return address.preSave(e, isNew, ADDRESS_REG);
         } else if (source.equals(address.getAddressFactGFW())) {
