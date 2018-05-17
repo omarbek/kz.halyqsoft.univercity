@@ -1,15 +1,19 @@
 package kz.halyqsoft.univercity.modules.catalog;
 
 import com.vaadin.ui.HorizontalSplitPanel;
+import com.vaadin.ui.TextField;
 import kz.halyqsoft.univercity.entity.beans.ROLES;
 import kz.halyqsoft.univercity.entity.beans.ROLE_TASKS;
 import kz.halyqsoft.univercity.entity.beans.TASKS;
+import kz.halyqsoft.univercity.entity.beans.univercity.USER_ADDRESS;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.changelisteners.CountryChangeListener;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
+import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.Entity;
+import org.r3a.common.entity.FieldInfo;
 import org.r3a.common.entity.ID;
 import org.r3a.common.entity.beans.AbstractTask;
 import org.r3a.common.entity.event.EntityEvent;
@@ -25,6 +29,8 @@ import org.r3a.common.vaadin.widget.AbstractSelectWidget;
 import org.r3a.common.vaadin.widget.DBSelectModel;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.form.FormModel;
+import org.r3a.common.vaadin.widget.form.GridFormWidget;
+import org.r3a.common.vaadin.widget.form.field.FieldModel;
 import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
@@ -96,6 +102,9 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                 } else if (entityClass.equals(TASKS.class)) {
                     classASW = new LazyCommonTreeWidget(TASKS.class);
                     classASW.addEntityListener(this);
+                    FormModel taskFM = ((DBSelectModel) classASW.getWidgetModel()).getFormModel();
+                    QueryModel<TASKS> tasksQM = new QueryModel<>(TASKS.class);
+                    TASKS tasks = new TASKS();
                     ((LazyCommonTreeWidget) classASW).setCheckParents(false);
                 } else {
                     classASW = new GridWidget(entityClass);

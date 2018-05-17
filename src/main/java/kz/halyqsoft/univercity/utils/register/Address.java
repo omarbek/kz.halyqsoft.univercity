@@ -72,6 +72,8 @@ public class Address {
             addressFactGFW = new GridFormWidget(USER_ADDRESS.class);
             addressFactGFW.addEntityListener(applicantsForm);
             addressFactFM = addressFactGFW.getWidgetModel();
+            addressFactFM.getFieldModel("street").setRequired(true);
+            addressFactFM.getFieldModel("postalCode").setRequired(true);
             addressFM = addressFactFM;
         }
         setFormModel(caption, addressNumber, sb, addressFM);

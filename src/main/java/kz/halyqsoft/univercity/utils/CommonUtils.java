@@ -1,5 +1,6 @@
 package kz.halyqsoft.univercity.utils;
 
+import com.itextpdf.text.Font;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
@@ -34,6 +35,7 @@ public class CommonUtils {
 
     public static final Logger LOG = LoggerFactory.getLogger("ROOT");
     public static int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+    public static Map<String, Integer> fontMap;
 
     public static String getCurrentUserLogin() {
         return AbstractSecureWebUI.getInstance().getUsername();
@@ -85,6 +87,15 @@ public class CommonUtils {
             code = "0" + code;
         }
         return code;
+    }
+
+    public static int getFontMap(String font){
+        fontMap = new HashMap<>();
+        fontMap.put("Bold", Font.BOLD);
+        fontMap.put("Normal", Font.NORMAL);
+        fontMap.put("Italic", Font.ITALIC);
+        fontMap.put("Underline", Font.UNDERLINE);
+        return fontMap.get(font);
     }
 
     private static String getCodeBuilder(Integer count) {

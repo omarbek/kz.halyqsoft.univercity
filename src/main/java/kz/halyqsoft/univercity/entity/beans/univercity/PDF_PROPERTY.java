@@ -30,6 +30,9 @@ public class PDF_PROPERTY extends AbstractEntity{
     @Column(name = "order_number", nullable = false)
     private double orderNumber;
 
+    @Column(name = "center", nullable = false)
+    private boolean center;
+
     public String getText() {
         return text;
     }
@@ -84,5 +87,13 @@ public class PDF_PROPERTY extends AbstractEntity{
 
     public void setOrderNumber(double orderNumber) {
         this.orderNumber = orderNumber;
+    }
+
+    public boolean isCenter() {
+        return center;
+    }
+
+    public void setCenter(boolean center) {
+        this.center = center;
     }
 }

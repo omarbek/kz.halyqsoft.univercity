@@ -4,6 +4,7 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.*;
+import kz.halyqsoft.univercity.entity.beans.univercity.USER_ADDRESS;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VTaskRoles;
 import kz.halyqsoft.univercity.filter.FTaskRolesFilter;
 import kz.halyqsoft.univercity.filter.panel.TaskRolesFilterPanel;
@@ -37,6 +38,7 @@ public class TaskRoleBindingView extends AbstractTaskView implements EntityListe
     private ComboBox tasksCB;
     private ComboBox rolesCB;
     private GridWidget taskRoleGW;
+
 
     public TaskRoleBindingView(AbstractTask task) throws Exception {
         super(task);

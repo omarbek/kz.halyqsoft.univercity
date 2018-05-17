@@ -1,6 +1,7 @@
 package kz.halyqsoft.univercity.modules.regapplicants;
 
 import com.itextpdf.text.Document;
+import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.BaseFont;
@@ -23,6 +24,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.view.*;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.changelisteners.SchoolCountryChangeListener;
 import kz.halyqsoft.univercity.utils.register.*;
+import org.apache.commons.io.FileUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.facade.CommonIDFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -51,9 +53,7 @@ import org.r3a.common.vaadin.widget.photo.PhotoWidgetListener;
 import org.r3a.common.vaadin.widget.table.TableWidget;
 import org.r3a.common.vaadin.widget.table.model.DBTableModel;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -75,7 +75,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
     private VerticalLayout messForm;
     private FromItem educationUDFI;
 
-    private Map<String, Integer> fontMap;
+
 
     private TableWidget specTW, documentsTW, languagesTW, medicalCheckupTW;
     private TableWidget awardsTW, socialCategoriesTW;
@@ -124,12 +124,6 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         registrationHSP = new HorizontalSplitPanel();
         registrationHSP.setSplitPosition(20);
         registrationHSP.setSizeFull();
-
-        fontMap = new HashMap<>();
-        fontMap.put("Bold", Font.BOLD);
-        fontMap.put("Normal", Font.NORMAL);
-        fontMap.put("Italic", Font.ITALIC);
-        fontMap.put("Underline", Font.UNDERLINE);
 
         buttonsVL = new VerticalLayout();
         buttonsVL.setSpacing(true);
@@ -409,6 +403,8 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                 addToLayout(Flag.EDU_DOC, educationDoc.getMainGFW(), eduDocsButton);
             }
         });
+
+
 
         eduDocsButton = createFormButton("education.documents");
         eduDocsButton.addClickListener(new Button.ClickListener() {
@@ -781,7 +777,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         return photoAndButtonVL;
     }
 
-    private StreamResource createResource(String fio, String faculty, String formaobuch,String phone,String address, String index) {
+    public static StreamResource createResource(String fio, String faculty, String formaobuch,String phone,String address, String index) {
         return new StreamResource(new StreamResource.StreamSource() {
             @Override
             public InputStream getStream() {
@@ -799,8 +795,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                     PdfWriter pdfWriter = PdfWriter.getInstance(docum, byteArrayOutputStream1);
                     docum.open();
                     Paragraph title = new Paragraph("Договор",getFont(12, Font.BOLD));
-                    title.setSpacingBefore(35f);
-                    title.setIndentationLeft(220f);
+                    title.setAlignment(Element.ALIGN_CENTER);
                     docum.add(title);
                     Date date = Calendar.getInstance().getTime();
                     for (PDF_PROPERTY property : properties) {
@@ -826,15 +821,19 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                                 .replaceAll("\\$InLetters","Сто пятьдесять тысяча");;
 
                         Paragraph paragraph = new Paragraph(replaced,
-                                getFont(Integer.parseInt(property.getSize().toString()), fontMap.get(property.getFont().toString())));
+                                getFont(Integer.parseInt(property.getSize().toString()), CommonUtils.getFontMap(property.getFont().toString())));
 
-                        paragraph.setSpacingBefore(property.getX());
-                        paragraph.setIndentationLeft(property.getY());
+                        if(property.isCenter() == true){
+                            paragraph.setAlignment(Element.ALIGN_CENTER);
+                        }
+                        paragraph.setSpacingBefore(property.getY());
+                        paragraph.setIndentationLeft(property.getX());
 
 
 
                         docum.add(paragraph);
                     }
+
                     pdfWriter.close();
                     docum.close();
                     return new ByteArrayInputStream(byteArrayOutputStream1.toByteArray());
@@ -848,7 +847,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         },    "Договор на рус.pdf");
     }
 
-    private StreamResource createResourceDorm(String fio, String faculty, String formaobuch,String phone,String address, String index) {
+    public static StreamResource createResourceDorm(String fio, String faculty, String formaobuch,String phone,String address, String index) {
         return new StreamResource(new StreamResource.StreamSource() {
             @Override
             public InputStream getStream() {
@@ -866,8 +865,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                     PdfWriter pdfWriter = PdfWriter.getInstance(docum, byteArrayOutputStream1);
                     docum.open();
                     Paragraph title = new Paragraph("Договор",getFont(12, Font.BOLD));
-                    title.setSpacingBefore(35f);
-                    title.setIndentationLeft(220f);
+                    title.setAlignment(Element.ALIGN_CENTER);
                     docum.add(title);
                     Date date = Calendar.getInstance().getTime();
                     for (PDF_PROPERTY property : properties) {
@@ -894,10 +892,13 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
                                 .replaceAll("\\$Obshaga","63000")
                                 .replaceAll("\\$Dorm","Шестьдесять три тысяч тенге");
                         Paragraph paragraph = new Paragraph(replaced,
-                                getFont(Integer.parseInt(property.getSize().toString()), fontMap.get(property.getFont().toString())));
+                                getFont(Integer.parseInt(property.getSize().toString()), CommonUtils.getFontMap(property.getFont().toString())));
 
-                        paragraph.setSpacingBefore(property.getX());
-                        paragraph.setIndentationLeft(property.getY());
+                        if(property.isCenter() == true){
+                            paragraph.setAlignment(Element.ALIGN_CENTER);
+                        }
+                        paragraph.setSpacingBefore(property.getY());
+                        paragraph.setIndentationLeft(property.getX());
 
 
 
@@ -916,8 +917,11 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
         },    "Договор общага.pdf");
     }
 
+    private static ByteArrayInputStream reteriveByteArrayInputStream(File file) throws IOException {
+        return new ByteArrayInputStream(FileUtils.readFileToByteArray(file));
+    }
 
-    private Font getFont(int fontSize, int font) {
+    public static Font getFont(int fontSize, int font) {
         String fontPath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath() + "/WEB-INF/classes/fonts";
         BaseFont timesNewRoman = null;
         try {
@@ -1510,6 +1514,7 @@ public final class ApplicantsForm extends AbstractFormWidgetView implements Phot
 
             educationFLFM.getFileList().clear();
             educationFLFM.getDeleteList().clear();
+
 
             return true;
         } else if (source.equals(languagesTW)) {

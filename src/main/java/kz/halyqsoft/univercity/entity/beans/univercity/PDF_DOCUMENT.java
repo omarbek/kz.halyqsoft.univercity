@@ -22,6 +22,9 @@ public class PDF_DOCUMENT extends AbstractEntity {
     @Column(name = "file_name", nullable = false)
     private String fileName;
 
+    @Column(name = "deleted", nullable = false)
+    private Boolean deleted;
+
     @Column(name = "file_byte")
     @Lob
     @Basic(fetch = FetchType.LAZY)
@@ -60,5 +63,13 @@ public class PDF_DOCUMENT extends AbstractEntity {
 
     public void setFileByte(byte[] fileByte) {
         this.fileByte = fileByte;
+    }
+
+    public Boolean getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
     }
 }

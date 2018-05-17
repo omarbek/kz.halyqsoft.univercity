@@ -53,11 +53,11 @@ public class CustomDocument {
 
             document.open();
             Paragraph paragraph = new Paragraph(title, getFont(12, Font.BOLD));
-            paragraph.setSpacingBefore(35f);
-            paragraph.setIndentationLeft(220f);
+            paragraph.setAlignment(Element.ALIGN_CENTER);
             document.add(paragraph);
 
             for (CustomField cf : customFieldList) {
+                cf.getxComboBox().setEnabled(true);
 //                Font font = new Font(Font.FontFamily.TIMES_ROMAN,
 //                        Integer.parseInt(cf.getTextSize().getValue()), cf.getFontComboBox().getTabIndex());
 
@@ -83,8 +83,13 @@ public class CustomDocument {
                 float x = (float) Integer.parseInt(cf.getxComboBox().getValue().toString());
                 float y = (float) Integer.parseInt(cf.getyComboBox().getValue().toString());
 
-                paragraph1.setSpacingBefore(x);
-                paragraph1.setIndentationLeft(y);
+                if(cf.getCenterCheckBox().getValue()){
+                    paragraph1.setAlignment(Element.ALIGN_CENTER);
+                }
+
+                paragraph1.setSpacingBefore(y);
+                paragraph1.setIndentationLeft(x);
+
 
                 PDF_PROPERTY pdfProperty = new PDF_PROPERTY();
                 pdfProperty.setId(cf.getId());
@@ -94,6 +99,7 @@ public class CustomDocument {
                 pdfProperty.setFont(cf.getFontComboBox().getValue().toString());
                 pdfProperty.setSize(Integer.parseInt(cf.getTextSizeComboBox().getValue().toString()));
                 pdfProperty.setOrderNumber(Double.parseDouble(cf.getOrder().getValue().toString()));
+                pdfProperty.setCenter(cf.getCenterCheckBox().getValue());
                 pdfProperties.add(pdfProperty);
 //                pdfProperty.setPdfDocument(pdfDocument);
 //                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(pdfProperty);

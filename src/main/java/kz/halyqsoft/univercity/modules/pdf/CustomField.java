@@ -1,7 +1,10 @@
 package kz.halyqsoft.univercity.modules.pdf;
+import com.vaadin.server.Sizeable;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.CheckBox;
+import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.entity.ID;
 
 public class CustomField {
@@ -12,6 +15,7 @@ public class CustomField {
     ComboBox yComboBox;
     ComboBox fontComboBox;
     ComboBox textSizeComboBox;
+    CheckBox centerCheckBox;
     TextField pdfTitle;
     TextField title;
     TextField order;
@@ -29,15 +33,17 @@ public class CustomField {
         this.pdfTitle = new TextField();
         this.title = new TextField();
         this.order = new TextField();
+        this.centerCheckBox = new CheckBox();
 
-        this.textField = new TextArea("Текст:");
-        this.xComboBox.setCaption("X:");
-        this.yComboBox.setCaption("Y:");
-        this.fontComboBox.setCaption("Шрифт:");
-        this.textSizeComboBox.setCaption("Размер");
-        this.title.setCaption("Заголовок");
-        this.pdfTitle.setCaption("Название файла");
-        this.order.setCaption("Очередь");
+        this.textField = new TextArea(CommonUtils.getUILocaleUtil().getCaption("text") + ":");
+        this.yComboBox.setCaption(CommonUtils.getUILocaleUtil().getCaption("space.top") + ":");
+        this.xComboBox.setCaption(CommonUtils.getUILocaleUtil().getCaption("space.right") + ":");
+        this.fontComboBox.setCaption(CommonUtils.getUILocaleUtil().getCaption("font") + ":");
+        this.textSizeComboBox.setCaption(CommonUtils.getUILocaleUtil().getCaption("text.size") + ":");
+        this.title.setCaption(CommonUtils.getUILocaleUtil().getCaption("title") + ":");
+        this.pdfTitle.setCaption(CommonUtils.getUILocaleUtil().getCaption("file.name") + ":");
+        this.order.setCaption(CommonUtils.getUILocaleUtil().getCaption("text.order") + ":");
+        this.centerCheckBox.setCaption(CommonUtils.getUILocaleUtil().getCaption("text.center") + ":");
 
         this.textField.setRequired(true);
         this.xComboBox.setRequired(true);
@@ -56,22 +62,27 @@ public class CustomField {
         this.title.setImmediate(true);
         this.pdfTitle.setImmediate(true);
         this.order.setImmediate(true);
+        this.centerCheckBox.setImmediate(true);
 
         this.fontComboBox.addItem(BOLD);
         this.fontComboBox.addItem(ITALIC);
         this.fontComboBox.addItem(NORMAL);
         this.fontComboBox.addItem(UNDERLINE);
 
-        for(int i = -90; i <= 200; i+=3){
-            this.xComboBox.addItem(i);
+        this.textField.setWidth(450, Sizeable.Unit.PIXELS);
+        this.textField.setHeight(150, Sizeable.Unit.PIXELS);
+
+        for(int i = -90; i <= 100; i+=3){
+            this.yComboBox.addItem(i);
 
         }
         for(int i = 0; i<=500;i+=3){
-            this.yComboBox.addItem(i);
+            this.xComboBox.addItem(i);
         }
         for(int i = 8; i <= 72; i+=2){
             this.textSizeComboBox.addItem(i);
         }
+
     }
 
 
@@ -141,5 +152,13 @@ public class CustomField {
 
     public void setOrder(TextField order) {
         this.order = order;
+    }
+
+    public CheckBox getCenterCheckBox() {
+        return centerCheckBox;
+    }
+
+    public void setCenterCheckBox(CheckBox centerCheckBox) {
+        this.centerCheckBox = centerCheckBox;
     }
 }

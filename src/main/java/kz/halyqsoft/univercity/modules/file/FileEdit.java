@@ -20,15 +20,15 @@ import org.r3a.common.vaadin.widget.table.TableWidget;
 public class FileEdit extends AbstractDialog {
 
     FileEdit(PDF_DOCUMENT pdfDocument, FileView fileView)  {
-        setWidth(1000,Unit.PIXELS);
+        setWidth(1300,Unit.PIXELS);
         setHeight(500,Unit.PIXELS);
         center();
 
-        PdfEdit pdfEdit = new PdfEdit((PDF_DOCUMENT) pdfDocument);
+        PdfEdit pdfEdit = new PdfEdit(pdfDocument);
         getContent().addComponent(pdfEdit);
         getContent().setComponentAlignment(pdfEdit, Alignment.MIDDLE_CENTER);
 
-        Button closeButton = new Button("close");//TODO
+        Button closeButton = new Button(getUILocaleUtil().getCaption("close"));
         closeButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
@@ -36,7 +36,7 @@ public class FileEdit extends AbstractDialog {
                 try {
                     fileView.refresh();
                 } catch (Exception e) {
-                    e.printStackTrace();//TODO catch
+                   CommonUtils.showMessageAndWriteLog("Unable to refresh fileView", e);
                 }
             }
         });
@@ -48,6 +48,6 @@ public class FileEdit extends AbstractDialog {
 
     @Override
     protected String createTitle() {
-        return "ASD";
+        return "Document";
     }
 }
