@@ -92,29 +92,28 @@ public class RegisterApplicantsView extends AbstractTaskView {
             ((STUDENT) studentFM.getEntity()).setDiplomaType(SessionFacadeFactory.getSessionFacade(
                     CommonEntityFacadeBean.class).lookup(STUDENT_DIPLOMA_TYPE.class, ID.valueOf(1)));
 
-//            String qewe = "qewe";
-//            ((STUDENT)studentFM.getEntity()).setFirstName(qewe);
-//            ((STUDENT)studentFM.getEntity()).setFirstNameEN(qewe);
-//            ((STUDENT)studentFM.getEntity()).setLastName(qewe);
-//            ((STUDENT)studentFM.getEntity()).setLastNameEN(qewe);
-//            ((STUDENT)studentFM.getEntity()).setBirthDate(new Date());
-//            ((STUDENT) studentFM.getEntity()).setSex(SessionFacadeFactory.getSessionFacade(
-//                    CommonEntityFacadeBean.class).lookup(SEX.class, ID.valueOf(1)));
-//            ((STUDENT) studentFM.getEntity()).setMaritalStatus(SessionFacadeFactory.getSessionFacade(
-//                    CommonEntityFacadeBean.class).lookup(MARITAL_STATUS.class, ID.valueOf(1)));
-//            ((STUDENT) studentFM.getEntity()).setNationality(SessionFacadeFactory.getSessionFacade(
-//                    CommonEntityFacadeBean.class).lookup(NATIONALITY.class, ID.valueOf(1)));
-//            ((STUDENT) studentFM.getEntity()).setCitizenship(SessionFacadeFactory.getSessionFacade(
-//                    CommonEntityFacadeBean.class).lookup(COUNTRY.class, ID.valueOf(1)));
-//            ((STUDENT)studentFM.getEntity()).setEmail(qewe+"@mail.ru");
-//            ((STUDENT)studentFM.getEntity()).setPhoneMobile("707");
-
+            String qewe = "qewe";
+            ((STUDENT) studentFM.getEntity()).setFirstName(qewe);
+            ((STUDENT) studentFM.getEntity()).setFirstNameEN(qewe);
+            ((STUDENT) studentFM.getEntity()).setLastName(qewe);
+            ((STUDENT) studentFM.getEntity()).setLastNameEN(qewe);
+            ((STUDENT) studentFM.getEntity()).setBirthDate(new Date());
+            ((STUDENT) studentFM.getEntity()).setSex(SessionFacadeFactory.getSessionFacade(
+                    CommonEntityFacadeBean.class).lookup(SEX.class, ID.valueOf(1)));
+            ((STUDENT) studentFM.getEntity()).setMaritalStatus(SessionFacadeFactory.getSessionFacade(
+                    CommonEntityFacadeBean.class).lookup(MARITAL_STATUS.class, ID.valueOf(1)));
+            ((STUDENT) studentFM.getEntity()).setNationality(SessionFacadeFactory.getSessionFacade(
+                    CommonEntityFacadeBean.class).lookup(NATIONALITY.class, ID.valueOf(1)));
+            ((STUDENT) studentFM.getEntity()).setCitizenship(SessionFacadeFactory.getSessionFacade(
+                    CommonEntityFacadeBean.class).lookup(COUNTRY.class, ID.valueOf(1)));
+            ((STUDENT) studentFM.getEntity()).setEmail(qewe + "@mail.ru");
+            ((STUDENT) studentFM.getEntity()).setPhoneMobile("707");
 
 
             registerVL.addComponent(new ApplicantsForm(studentFM, ey));
 
         } catch (Exception ex) {
-            CommonUtils.showMessageAndWriteLog("Unable to create new Applicant", ex);
+            CommonUtils.showMessageAndWriteLog("Unable to create new applicant", ex);
         }
     }
 }

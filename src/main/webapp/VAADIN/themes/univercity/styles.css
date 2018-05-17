@@ -13474,6 +13474,10 @@ div.v-layout.v-horizontal.v-widget {
 	height: 30px;
 }
 
+.univercity .v-button-left {
+	text-align: left;
+}
+
 .univercity .v-button-icon-only, .univercity .v-upload-file-list-widget .v-button {
 	width: 30px;
 }

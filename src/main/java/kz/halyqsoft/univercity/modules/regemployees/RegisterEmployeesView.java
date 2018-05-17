@@ -3,9 +3,8 @@ package kz.halyqsoft.univercity.modules.regemployees;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.VerticalLayout;
 import kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE;
-import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.EMPLOYEE_STATUS;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
+import kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -18,6 +17,7 @@ import org.r3a.common.vaadin.widget.form.FormModel;
 import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * @author Omarbek
@@ -86,13 +86,29 @@ public class RegisterEmployeesView extends AbstractTaskView {
             qmEntranceYear.addWhere("beginYear", ECriteria.EQUAL, c.get(Calendar.YEAR));
             ENTRANCE_YEAR ey = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(
                     qmEntranceYear);
-
             ((EMPLOYEE) employeeFM.getEntity()).setStatus(SessionFacadeFactory.getSessionFacade(
                     CommonEntityFacadeBean.class).lookup(EMPLOYEE_STATUS.class, ID.valueOf(1)));
 
+            String qewe = "qewe";
+            ((EMPLOYEE) employeeFM.getEntity()).setFirstName(qewe);
+            ((EMPLOYEE) employeeFM.getEntity()).setFirstNameEN(qewe);
+            ((EMPLOYEE) employeeFM.getEntity()).setLastName(qewe);
+            ((EMPLOYEE) employeeFM.getEntity()).setLastNameEN(qewe);
+            ((EMPLOYEE) employeeFM.getEntity()).setBirthDate(new Date());
+            ((EMPLOYEE) employeeFM.getEntity()).setSex(SessionFacadeFactory.getSessionFacade(
+                    CommonEntityFacadeBean.class).lookup(SEX.class, ID.valueOf(1)));
+            ((EMPLOYEE) employeeFM.getEntity()).setMaritalStatus(SessionFacadeFactory.getSessionFacade(
+                    CommonEntityFacadeBean.class).lookup(MARITAL_STATUS.class, ID.valueOf(1)));
+            ((EMPLOYEE) employeeFM.getEntity()).setNationality(SessionFacadeFactory.getSessionFacade(
+                    CommonEntityFacadeBean.class).lookup(NATIONALITY.class, ID.valueOf(1)));
+            ((EMPLOYEE) employeeFM.getEntity()).setCitizenship(SessionFacadeFactory.getSessionFacade(
+                    CommonEntityFacadeBean.class).lookup(COUNTRY.class, ID.valueOf(1)));
+            ((EMPLOYEE) employeeFM.getEntity()).setEmail(qewe + "@mail.ru");
+            ((EMPLOYEE) employeeFM.getEntity()).setPhoneMobile("707");
+
             registerVL.addComponent(new EmployeesForm(employeeFM, ey));
         } catch (Exception ex) {
-            CommonUtils.showMessageAndWriteLog("Unable to create new applicant", ex);
+            CommonUtils.showMessageAndWriteLog("Unable to create new employee", ex);
         }
     }
 }
