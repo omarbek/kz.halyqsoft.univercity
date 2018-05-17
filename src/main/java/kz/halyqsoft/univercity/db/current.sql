@@ -1,0 +1,2 @@
+ALTER TABLE education_doc
+  ALTER COLUMN gpa DROP NOT NULL;

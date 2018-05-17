@@ -143,15 +143,16 @@ public class Parent {
         return fkFM;
     }
 
-    public void save(int parentNumber) {
+    public Boolean save(int parentNumber) {
         if (parentNumber == FATHER) {
             if (fatherFM.isModified()) {
-                fatherGFW.save();
+                return fatherGFW.save();
             }
         } else {
             if (motherFM.isModified()) {
-                motherGFW.save();
+                return motherGFW.save();
             }
         }
+        return null;
     }
 }

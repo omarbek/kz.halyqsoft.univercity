@@ -126,15 +126,17 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
 
         if (!baseDataFM.isCreateNew()) {
             QueryModel<USER_PHOTO> qmUserPhoto = new QueryModel<>(USER_PHOTO.class);
+            qmUserPhoto.addWhere("user", ECriteria.EQUAL, baseDataFM.getEntity().getId());
             try {
-                qmUserPhoto.addWhere("user", ECriteria.EQUAL, baseDataFM.getEntity().getId());
                 userPhoto = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(qmUserPhoto);
-                if (userPhoto != null) {
-                    userPhotoBytes = userPhoto.getPhoto();
-                    userPhotoFilename = userPhoto.getFileName();
-                }
+            } catch (NoResultException e) {
+                userPhoto = null;
             } catch (Exception ex) {
                 CommonUtils.showMessageAndWriteLog("Unable to load user photo", ex);
+            }
+            if (userPhoto != null) {
+                userPhotoBytes = userPhoto.getPhoto();
+                userPhotoFilename = userPhoto.getFileName();
             }
         }
         PhotoWidget userPW = new PhotoWidget(userPhotoBytes, baseDataFM.isReadOnly());
@@ -1221,8 +1223,6 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         departmentQM.addWhereNotNull("parent");
 
         FKFieldModel postFM = (FKFieldModel) careerFM.getFieldModel("post");
-        QueryModel postQM = postFM.getQueryModel();
-        postQM.addWhere("tp", Boolean.TRUE);
 
         FieldModel liveLoadFM = careerFM.getFieldModel("liveLoad");
         FieldModel wageRateFM = careerFM.getFieldModel("wageRate");
@@ -1969,7 +1969,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         if (isNew) {
             emp.setCreated(new Date());
             try {
-                emp.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_T_USER"));
+                emp.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USERS"));
                 emp.setCode("000000000000");
                 emp.setFirstName(emp.getFirstName().trim());
                 emp.setLastName(emp.getLastName().trim());
@@ -2093,7 +2093,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         FormModel fm = baseDataFW.getWidgetModel();
         if (isNew) {
             try {
-                p.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_T_USER_DOCUMENT"));
+                p.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USER_DOCUMENT"));
                 p.setUser((EMPLOYEE) fm.getEntity());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(p);
                 showSavedNotification();
@@ -2154,7 +2154,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         FormModel fm = baseDataFW.getWidgetModel();
         if (isNew) {
             try {
-                md.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_T_USER_DOCUMENT"));
+                md.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USER_DOCUMENT"));
                 md.setUser((EMPLOYEE) fm.getEntity());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(md);
                 showSavedNotification();
@@ -2215,7 +2215,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         FormModel fm = baseDataFW.getWidgetModel();
         if (isNew) {
             try {
-                dd.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_T_USER_DOCUMENT"));
+                dd.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USER_DOCUMENT"));
                 dd.setUser((EMPLOYEE) fm.getEntity());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(dd);
                 showSavedNotification();
@@ -2276,7 +2276,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         FormModel fm = baseDataFW.getWidgetModel();
         if (isNew) {
             try {
-                rd.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_T_USER_DOCUMENT"));
+                rd.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USER_DOCUMENT"));
                 rd.setUser((EMPLOYEE) fm.getEntity());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(rd);
                 showSavedNotification();
@@ -2333,7 +2333,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         FormModel fm = baseDataFW.getWidgetModel();
         if (isNew) {
             try {
-                ed.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_T_USER_DOCUMENT"));
+                ed.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USER_DOCUMENT"));
                 ed.setUser((EMPLOYEE) fm.getEntity());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(ed);
 
@@ -2433,7 +2433,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         if (isNew) {
             mc = new MEDICAL_CHECKUP();
             try {
-                mc.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_T_USER_DOCUMENT"));
+                mc.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USER_DOCUMENT"));
                 EMPLOYEE emp = (EMPLOYEE) fm.getEntity();
                 mc.setUser(emp);
                 mc.setDocumentNo(vmc.getDocumentNo());
@@ -2563,7 +2563,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
             ed = new EMPLOYEE_DEGREE();
             try {
                 EMPLOYEE emp = (EMPLOYEE) fm.getEntity();
-                ed.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_T_USER_DOCUMENT"));
+                ed.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USER_DOCUMENT"));
                 ed.setUser(emp);
                 ed.setDocumentNo(ved.getDocumentNo());
                 ed.setIssueDate(ved.getIssueDate());

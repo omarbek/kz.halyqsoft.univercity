@@ -44,7 +44,7 @@ public class V_EMPLOYEE_DEPT extends AbstractEntity {
 	@Column(name = "EMPLOYEE_TYPE_NAME", nullable = false)
 	private String employeeTypeName;
 	
-	@FieldInfo(type = EFieldType.FK_DIALOG, order = 4, inGrid = false)
+	@FieldInfo(type = EFieldType.FK_COMBO, order = 4, inGrid = false)
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "DEPT_ID", referencedColumnName = "ID")})
