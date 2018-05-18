@@ -89,22 +89,22 @@ public class RegisterEmployeesView extends AbstractTaskView {
             ((EMPLOYEE) employeeFM.getEntity()).setStatus(SessionFacadeFactory.getSessionFacade(
                     CommonEntityFacadeBean.class).lookup(EMPLOYEE_STATUS.class, ID.valueOf(1)));
 
-            String qewe = "qewe";
-            ((EMPLOYEE) employeeFM.getEntity()).setFirstName(qewe);
-            ((EMPLOYEE) employeeFM.getEntity()).setFirstNameEN(qewe);
-            ((EMPLOYEE) employeeFM.getEntity()).setLastName(qewe);
-            ((EMPLOYEE) employeeFM.getEntity()).setLastNameEN(qewe);
-            ((EMPLOYEE) employeeFM.getEntity()).setBirthDate(new Date());
-            ((EMPLOYEE) employeeFM.getEntity()).setSex(SessionFacadeFactory.getSessionFacade(
-                    CommonEntityFacadeBean.class).lookup(SEX.class, ID.valueOf(1)));
-            ((EMPLOYEE) employeeFM.getEntity()).setMaritalStatus(SessionFacadeFactory.getSessionFacade(
-                    CommonEntityFacadeBean.class).lookup(MARITAL_STATUS.class, ID.valueOf(1)));
-            ((EMPLOYEE) employeeFM.getEntity()).setNationality(SessionFacadeFactory.getSessionFacade(
-                    CommonEntityFacadeBean.class).lookup(NATIONALITY.class, ID.valueOf(1)));
-            ((EMPLOYEE) employeeFM.getEntity()).setCitizenship(SessionFacadeFactory.getSessionFacade(
-                    CommonEntityFacadeBean.class).lookup(COUNTRY.class, ID.valueOf(1)));
-            ((EMPLOYEE) employeeFM.getEntity()).setEmail(qewe + "@mail.ru");
-            ((EMPLOYEE) employeeFM.getEntity()).setPhoneMobile("707");
+//            String qewe = "qewe";
+//            ((EMPLOYEE) employeeFM.getEntity()).setFirstName(qewe);
+//            ((EMPLOYEE) employeeFM.getEntity()).setFirstNameEN(qewe);
+//            ((EMPLOYEE) employeeFM.getEntity()).setLastName(qewe);
+//            ((EMPLOYEE) employeeFM.getEntity()).setLastNameEN(qewe);
+//            ((EMPLOYEE) employeeFM.getEntity()).setBirthDate(new Date());
+//            ((EMPLOYEE) employeeFM.getEntity()).setSex(SessionFacadeFactory.getSessionFacade(
+//                    CommonEntityFacadeBean.class).lookup(SEX.class, ID.valueOf(1)));
+//            ((EMPLOYEE) employeeFM.getEntity()).setMaritalStatus(SessionFacadeFactory.getSessionFacade(
+//                    CommonEntityFacadeBean.class).lookup(MARITAL_STATUS.class, ID.valueOf(1)));
+//            ((EMPLOYEE) employeeFM.getEntity()).setNationality(SessionFacadeFactory.getSessionFacade(
+//                    CommonEntityFacadeBean.class).lookup(NATIONALITY.class, ID.valueOf(1)));
+//            ((EMPLOYEE) employeeFM.getEntity()).setCitizenship(SessionFacadeFactory.getSessionFacade(
+//                    CommonEntityFacadeBean.class).lookup(COUNTRY.class, ID.valueOf(1)));
+//            ((EMPLOYEE) employeeFM.getEntity()).setEmail(qewe + "@mail.ru");
+//            ((EMPLOYEE) employeeFM.getEntity()).setPhoneMobile("707");
 
             registerVL.addComponent(new EmployeesForm(employeeFM, ey));
         } catch (Exception ex) {
