@@ -118,6 +118,8 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
         dataFM.getFieldModel("email").setRequired(true);
         dataFM.getFieldModel("email").setReadOnly(false);
         dataFM.getFieldModel("phoneMobile").setRequired(true);
+        dataFM.getFieldModel("code").setInEdit(false);
+        dataFM.getFieldModel("card").setInEdit(false);
 
         udfQM = new QueryModel<>(USER_DOCUMENT_FILE.class);
         udfQM.addSelect("id");

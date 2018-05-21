@@ -139,6 +139,7 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.CREATIVE_EXAM_SUBJECT</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDENT_DIPLOMA_TYPE</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.TURNSTILE_TYPE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.CARD</class>
 
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_SPECIALITY</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_ORGANIZATION</class>

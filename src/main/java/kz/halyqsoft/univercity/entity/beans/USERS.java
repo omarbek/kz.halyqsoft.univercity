@@ -46,7 +46,7 @@ public class USERS extends AbstractUser implements CommonTree<USERS> {
     private String firstName;
 
     @FieldInfo(type = EFieldType.TEXT, max = 32, order = 4, required = false)
-    @Column(name = "MIDDLE_NAME", nullable = true)
+    @Column(name = "MIDDLE_NAME")
     private String middleName;
 
     @FieldInfo(type = EFieldType.TEXT_LATIN, max = 32, order = 5, inGrid = false)
@@ -58,7 +58,7 @@ public class USERS extends AbstractUser implements CommonTree<USERS> {
     private String lastNameEN;
 
     @FieldInfo(type = EFieldType.TEXT_LATIN, max = 32, order = 7, required = false, inGrid = false)
-    @Column(name = "MIDDLE_NAME_EN", nullable = true)
+    @Column(name = "MIDDLE_NAME_EN")
     private String middleNameEN;
 
     @FieldInfo(type = EFieldType.DATE, order = 8, inGrid = false)
@@ -106,21 +106,27 @@ public class USERS extends AbstractUser implements CommonTree<USERS> {
     @Column(name = "PHONE_INTERNAL")
     private String phoneInternal;
 
-    @FieldInfo(type = EFieldType.BOOLEAN, order = 18, required = false, inEdit = false, inGrid = false, inView = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 18, required= false)//TODO
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "CARD_ID", referencedColumnName = "ID")})
+    private CARD card;
+
+    @FieldInfo(type = EFieldType.BOOLEAN, order = 19, required = false, inEdit = false, inGrid = false, inView = false)
     @Column(name = "LOCKED", nullable = false)
     private boolean locked;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 19, inGrid = false, inEdit = false, inView = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 20, inGrid = false, inEdit = false, inView = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "LOCK_REASON_ID", referencedColumnName = "ID")})
     private LOCK_REASON lockReason;
 
-    @FieldInfo(type = EFieldType.BOOLEAN, order = 23, required = false, inEdit = false, inGrid = false, inView = false)
+    @FieldInfo(type = EFieldType.BOOLEAN, order = 21, required = false, inEdit = false, inGrid = false, inView = false)
     @Column(name = "DELETED", nullable = false)
     private boolean deleted;
 
-    @FieldInfo(type = EFieldType.DATETIME, order = 24, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false)
+    @FieldInfo(type = EFieldType.DATETIME, order = 22, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false)
     @Column(name = "CREATED")
     @Temporal(TemporalType.TIMESTAMP)
     private Date created;
@@ -128,7 +134,7 @@ public class USERS extends AbstractUser implements CommonTree<USERS> {
     @Column(name = "USER_TYPE_ID", insertable = false, updatable = false)
     private int typeIndex;
 
-    @FieldInfo(type = EFieldType.DATETIME, order = 25, required = false, readOnlyFixed = true, inGrid = false,
+    @FieldInfo(type = EFieldType.DATETIME, order = 23, required = false, readOnlyFixed = true, inGrid = false,
             inEdit = false, inView = false)
     @Column(name = "UPDATED")
     @Temporal(TemporalType.TIMESTAMP)
@@ -290,6 +296,14 @@ public class USERS extends AbstractUser implements CommonTree<USERS> {
 
     public void setTypeIndex(int typeIndex) {
         this.typeIndex = typeIndex;
+    }
+
+    public CARD getCard() {
+        return card;
+    }
+
+    public void setCard(CARD card) {
+        this.card = card;
     }
 
     @Override
