@@ -55,3 +55,6 @@ UPDATE pdf_document SET deleted = FALSE;
 
 ALTER TABLE pdf_property ADD COLUMN center BOOLEAN;
 UPDATE pdf_property set center = FALSE;
+
+ALTER TABLE education_doc
+  ALTER COLUMN gpa DROP NOT NULL;

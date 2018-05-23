@@ -3,10 +3,7 @@ package kz.halyqsoft.univercity.modules.regapplicants;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.VerticalLayout;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.LEVEL;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDENT_CATEGORY;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDENT_DIPLOMA_TYPE;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -19,6 +16,7 @@ import org.r3a.common.vaadin.widget.form.FormModel;
 import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * @author Omarbek
@@ -78,7 +76,6 @@ public class RegisterApplicantsView extends AbstractTaskView {
         studentFM.getFieldModel("level").setWidth(300);
         studentFM.getFieldModel("category").setWidth(300);
         studentFM.getFieldModel("diplomaType").setWidth(300);
-
         try {
             studentFM.createNew();
 
@@ -95,9 +92,28 @@ public class RegisterApplicantsView extends AbstractTaskView {
             ((STUDENT) studentFM.getEntity()).setDiplomaType(SessionFacadeFactory.getSessionFacade(
                     CommonEntityFacadeBean.class).lookup(STUDENT_DIPLOMA_TYPE.class, ID.valueOf(1)));
 
+//            String qewe = "qewe";
+//            ((STUDENT) studentFM.getEntity()).setFirstName(qewe);
+//            ((STUDENT) studentFM.getEntity()).setFirstNameEN(qewe);
+//            ((STUDENT) studentFM.getEntity()).setLastName(qewe);
+//            ((STUDENT) studentFM.getEntity()).setLastNameEN(qewe);
+//            ((STUDENT) studentFM.getEntity()).setBirthDate(new Date());
+//            ((STUDENT) studentFM.getEntity()).setSex(SessionFacadeFactory.getSessionFacade(
+//                    CommonEntityFacadeBean.class).lookup(SEX.class, ID.valueOf(1)));
+//            ((STUDENT) studentFM.getEntity()).setMaritalStatus(SessionFacadeFactory.getSessionFacade(
+//                    CommonEntityFacadeBean.class).lookup(MARITAL_STATUS.class, ID.valueOf(1)));
+//            ((STUDENT) studentFM.getEntity()).setNationality(SessionFacadeFactory.getSessionFacade(
+//                    CommonEntityFacadeBean.class).lookup(NATIONALITY.class, ID.valueOf(1)));
+//            ((STUDENT) studentFM.getEntity()).setCitizenship(SessionFacadeFactory.getSessionFacade(
+//                    CommonEntityFacadeBean.class).lookup(COUNTRY.class, ID.valueOf(1)));
+//            ((STUDENT) studentFM.getEntity()).setEmail(qewe + "@mail.ru");
+//            ((STUDENT) studentFM.getEntity()).setPhoneMobile("707");
+
+
             registerVL.addComponent(new ApplicantsForm(studentFM, ey));
+
         } catch (Exception ex) {
-            CommonUtils.showMessageAndWriteLog("Unable to create new Applicant", ex);
+            CommonUtils.showMessageAndWriteLog("Unable to create new applicant", ex);
         }
     }
 }

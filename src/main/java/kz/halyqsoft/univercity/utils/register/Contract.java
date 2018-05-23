@@ -6,7 +6,6 @@ import kz.halyqsoft.univercity.entity.beans.univercity.USER_DOCUMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_DOCUMENT_FILE;
 import kz.halyqsoft.univercity.modules.regapplicants.ApplicantsForm;
 import kz.halyqsoft.univercity.utils.CommonUtils;
-import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.facade.CommonIDFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -40,7 +39,7 @@ public class Contract {
         return mainGFW;
     }
 
-    public Contract(AbstractFormWidget dataAFW, AbstractFormWidgetView applicantsForm) {
+    public Contract(AbstractFormWidget dataAFW, ApplicantsForm applicantsForm) {
         this.dataAFW = dataAFW;
         this.applicantsForm = applicantsForm;
     }
@@ -132,8 +131,10 @@ public class Contract {
         return false;
     }
 
-    public void save() {
-        if (mainFM.isModified())
-            mainGFW.save();
+    public Boolean save() {
+        if (mainFM.isModified()) {
+            return mainGFW.save();
+        }
+        return null;
     }
 }

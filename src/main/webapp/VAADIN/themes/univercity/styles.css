@@ -13474,6 +13474,10 @@ div.v-layout.v-horizontal.v-widget {
 	height: 30px;
 }
 
+.univercity .v-button-left {
+	text-align: left;
+}
+
 .univercity .v-button-icon-only, .univercity .v-upload-file-list-widget .v-button {
 	width: 30px;
 }
@@ -13760,6 +13764,16 @@ div.v-layout.v-horizontal.v-widget {
 
 .univercity .v-slot-file-list-widget .v-has-caption {
 	position: relative;
+}
+
+.univercity .v-verticallayout-blue {
+	color: white;
+	background: #66ffff;
+}
+
+.univercity .v-horizontallayout-blue {
+	color: white;
+	background: #66ffff;
 }
 
 .univercity .v-verticallayout-file-list-widget .v-spacing {

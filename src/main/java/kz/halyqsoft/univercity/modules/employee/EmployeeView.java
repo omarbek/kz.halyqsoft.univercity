@@ -5,7 +5,6 @@ import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
 import kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEPARTMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.POST;
@@ -22,7 +21,6 @@ import org.r3a.common.entity.event.EntityListener;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.ERefreshType;
-import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 import org.r3a.common.vaadin.widget.filter2.FilterPanelListener;
 import org.r3a.common.vaadin.widget.form.FormModel;
@@ -84,7 +82,6 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
         cb.setPageLength(0);
         cb.setWidth(220, Unit.PIXELS);
         QueryModel<POST> postQM = new QueryModel<>(POST.class);
-        postQM.addWhere("tp", Boolean.TRUE);
         BeanItemContainer<POST> postBIC = new BeanItemContainer<>(POST.class,
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(postQM));
         cb.setContainerDataSource(postBIC);
@@ -97,15 +94,13 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
         teacherGW.addEntityListener(this);
         teacherGW.setButtonVisible(AbstractToolbar.REFRESH_BUTTON, false);
         teacherGW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
+        teacherGW.setButtonVisible(AbstractToolbar.ADD_BUTTON, false);
         DBGridModel teacherGM = (DBGridModel) teacherGW.getWidgetModel();
         teacherGM.setTitleVisible(false);
         teacherGM.setMultiSelect(true);
         teacherGM.setRefreshType(ERefreshType.MANUAL);
 
-        FEmployeeFilter ef = (FEmployeeFilter) filterPanel.getFilterBean();
-        if (ef.hasFilter()) {
-            doFilter(ef);
-        }
+        doFilter(filterPanel.getFilterBean());
 
         getContent().addComponent(teacherGW);
         getContent().setComponentAlignment(teacherGW, Alignment.MIDDLE_CENTER);
@@ -149,40 +144,37 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
 
         List<VEmployee> list = new ArrayList<>();
         if (sb.length() > 0) {
-            params.put(i, Boolean.FALSE);
-            sb.append(" and usr.DELETED = ?");
-            sb.append(i);
-            sb.insert(0, " where ");
-            String sql = "SELECT " +
-                    "  empl.ID, " +
-                    "  usr.CODE, " +
-                    "  trim(usr.LAST_NAME || ' ' || usr.FIRST_NAME || ' ' || coalesce(usr.MIDDLE_NAME, '')) FIO, " +
-                    "  dep.DEPT_NAME, " +
-                    "  post.POST_NAME " +
-                    "FROM EMPLOYEE empl INNER JOIN USERS usr ON empl.ID = usr.ID " +
-                    "  LEFT JOIN EMPLOYEE_DEPT empl_dept ON empl_dept.EMPLOYEE_ID = empl.ID AND empl_dept.DISMISS_DATE IS NULL " +
-                    "  LEFT JOIN DEPARTMENT dep ON empl_dept.DEPT_ID = dep.ID " +
-                    "  LEFT JOIN POST post ON empl_dept.POST_ID = post.id " + sb.toString() +
-                    " order by FIO";
-            try {
-                List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
-                if (!tmpList.isEmpty()) {
-                    for (Object o : tmpList) {
-                        Object[] oo = (Object[]) o;
-                        VEmployee ve = new VEmployee();
-                        ve.setId(ID.valueOf((long) oo[0]));
-                        ve.setCode((String) oo[1]);
-                        ve.setFio((String) oo[2]);
-                        ve.setDeptName((String) oo[3]);
-                        ve.setPostName((String) oo[4]);
-                        list.add(ve);
-                    }
+            sb.append(" and ");
+        }
+        sb.insert(0, " where ");
+        String sql = "SELECT " +
+                "  empl.ID, " +
+                "  usr.CODE, " +
+                "  trim(usr.LAST_NAME || ' ' || usr.FIRST_NAME || ' ' || coalesce(usr.MIDDLE_NAME, '')) FIO, " +
+                "  dep.DEPT_NAME, " +
+                "  post.POST_NAME " +
+                "FROM EMPLOYEE empl INNER JOIN USERS usr ON empl.ID = usr.ID " +
+                "  LEFT JOIN EMPLOYEE_DEPT empl_dept ON empl_dept.EMPLOYEE_ID = empl.ID AND empl_dept.DISMISS_DATE IS NULL " +
+                "  LEFT JOIN DEPARTMENT dep ON empl_dept.DEPT_ID = dep.ID " +
+                "  LEFT JOIN POST post ON empl_dept.POST_ID = post.id " + sb.toString() +
+                " usr.id not in (1,2) and usr.deleted = FALSE" +
+                " order by FIO";
+        try {
+            List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
+            if (!tmpList.isEmpty()) {
+                for (Object o : tmpList) {
+                    Object[] oo = (Object[]) o;
+                    VEmployee ve = new VEmployee();
+                    ve.setId(ID.valueOf((long) oo[0]));
+                    ve.setCode((String) oo[1]);
+                    ve.setFio((String) oo[2]);
+                    ve.setDeptName((String) oo[3]);
+                    ve.setPostName((String) oo[4]);
+                    list.add(ve);
                 }
-            } catch (Exception ex) {
-                CommonUtils.showMessageAndWriteLog("Unable to load teacher list", ex);
             }
-        } else {
-            Message.showInfo(getUILocaleUtil().getMessage("select.1.search.condition"));
+        } catch (Exception ex) {
+            CommonUtils.showMessageAndWriteLog("Unable to load teacher list", ex);
         }
 
         ((DBGridModel) teacherGW.getWidgetModel()).setEntities(list);
@@ -195,12 +187,7 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
 
     @Override
     public void clearFilter() {
-        ((DBGridModel) teacherGW.getWidgetModel()).setEntities(new ArrayList<>(1));
-        try {
-            teacherGW.refresh();
-        } catch (Exception ex) {
-            CommonUtils.showMessageAndWriteLog("Unable to refresh teacher grid", ex);
-        }
+        doFilter(filterPanel.getFilterBean());
     }
 
     @Override
@@ -224,7 +211,7 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
 //                VerticalLayout viewVL = new VerticalLayout();
 //                viewVL.addComponent(filterPanel);
 //                viewVL.addComponent(teacherGW);
-                EmployeeEdit employeeEdit = new EmployeeEdit(fm, getContent(),this);
+                EmployeeEdit employeeEdit = new EmployeeEdit(fm, getContent(), this);
                 getContent().addComponent(employeeEdit);
 
                 return false;

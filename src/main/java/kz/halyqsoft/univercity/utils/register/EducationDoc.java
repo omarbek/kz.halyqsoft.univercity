@@ -80,7 +80,6 @@ public class EducationDoc {
         mainFM.getFieldModel("schoolCertificateType").setRequired(true);
         mainFM.getFieldModel("schoolRegion").setRequired(false);
 
-        mainFM.getFieldModel("schoolAddress").setRequired(true);
         mainFM.getFieldModel("entryYear").getValidators().add(new IntegerRangeValidator("Значение года не может быть больше текущего года", 0, CommonUtils.currentYear));
         mainFM.getFieldModel("endYear").getValidators().add(new IntegerRangeValidator("Значение года не может быть больше текущего года", 0, CommonUtils.currentYear));
 
@@ -160,9 +159,10 @@ public class EducationDoc {
         return false;
     }
 
-    public void save() {
-        if (mainFM.isModified() && mainGFW.save()) {
-            saveEduc = true;
+    public Boolean save() {
+        if (mainFM.isModified()) {
+            return mainGFW.save();
         }
+        return null;
     }
 }
