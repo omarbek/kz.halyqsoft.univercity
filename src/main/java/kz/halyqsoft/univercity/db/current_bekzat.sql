@@ -47,3 +47,6 @@ ALTER TABLE accountant_price
   ADD CONSTRAINT fk_accountant_price_contract_payment_type FOREIGN KEY (contract_payment_type_id)
 REFERENCES contract_payment_type (id)
 ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+CREATE UNIQUE INDEX idx_accountant_price ON accountant_price USING btree
+(student_diploma_type_id,level_id,contract_payment_type_id) where deleted = false;
