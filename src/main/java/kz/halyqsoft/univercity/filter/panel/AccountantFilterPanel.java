@@ -35,15 +35,6 @@ public class AccountantFilterPanel extends AbstractFilterPanel {
             hl.addComponent(af);
         }
 
-        af = getFilterComponent("price");
-        if (af != null) {
-            hl.addComponent(af);
-        }
-
-        af = getFilterComponent("priceInLetters");
-        if (af != null) {
-            hl.addComponent(af);
-        }
 
         getContent().addComponent(hl);
         getContent().setComponentAlignment(hl, Alignment.MIDDLE_CENTER);

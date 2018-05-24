@@ -527,7 +527,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         Button downloadButton = new Button();
         downloadButton.setData(11);
         downloadButton.setCaption(getUILocaleUtil().getCaption("download.contract"));
-        downloadButton.setWidth(140, Unit.PIXELS);
+        downloadButton.setWidth(130, Unit.PIXELS);
 
         return downloadButton;
     }
@@ -545,8 +545,8 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
     private Button createDownloadButtonLetter(){
         Button letterDownloadButton = new Button();
         letterDownloadButton.setData(11);
-        letterDownloadButton.setCaption(getUILocaleUtil().getCaption("download.contract.dorm"));
-        letterDownloadButton.setWidth(220, Unit.PIXELS);
+        letterDownloadButton.setCaption(getUILocaleUtil().getCaption("download.contract.register"));
+        letterDownloadButton.setWidth(150, Unit.PIXELS);
 
         return letterDownloadButton;
         }

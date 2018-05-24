@@ -27,7 +27,7 @@ import javax.persistence.NoResultException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AccountantEdit extends AbstractDialog{
+public class AccountantEdit extends AbstractDialog {
     private CommonFormWidget accountantPriceFW;
     private ID accountantPriceId;
 
@@ -102,7 +102,7 @@ public class AccountantEdit extends AbstractDialog{
         accountantFM.setButtonsVisible(false);
 
         QueryModel<ACCOUNTANT_PRICE> accountantPriceQueryModel = new QueryModel<>(ACCOUNTANT_PRICE.class);
-        List<ACCOUNTANT_PRICE> accountantPrices= SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+        List<ACCOUNTANT_PRICE> accountantPrices = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
                 lookup(accountantPriceQueryModel);
         List<ID> ids = new ArrayList<>();
         for (ACCOUNTANT_PRICE accountantPrice : accountantPrices) {
@@ -218,10 +218,11 @@ public class AccountantEdit extends AbstractDialog{
 
         @Override
         public void onException(Object o, Throwable throwable) {
-        }}
+        }
+    }
 
     @Override
     protected String createTitle() {
         return "Accountant";
     }
-    }
+}

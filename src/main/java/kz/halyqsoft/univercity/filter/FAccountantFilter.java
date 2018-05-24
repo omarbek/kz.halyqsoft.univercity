@@ -10,8 +10,6 @@ public class FAccountantFilter extends AbstractFilterBean{
     private STUDENT_DIPLOMA_TYPE diplomaType;
     private LEVEL level;
     private CONTRACT_PAYMENT_TYPE contractPaymentType;
-    private double price;
-    private String priceInLetters;
 
     public FAccountantFilter() {
     }
@@ -40,24 +38,9 @@ public class FAccountantFilter extends AbstractFilterBean{
         this.contractPaymentType = contractPaymentType;
     }
 
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
-    public String getPriceInLetters() {
-        return priceInLetters;
-    }
-
-    public void setPriceInLetters(String priceInLetters) {
-        this.priceInLetters = priceInLetters;
-    }
 
     @Override
     public boolean hasFilter() {
-        return false;
+        return !(diplomaType == null && level == null && contractPaymentType == null);
     }
 }

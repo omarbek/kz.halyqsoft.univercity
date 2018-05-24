@@ -57,15 +57,6 @@ public class AccountantView extends AbstractTaskView implements EntityListener, 
     @Override
     public void initView(boolean b) throws Exception {
         filterPanel.addFilterPanelListener(this);
-        TextField priceTF = new TextField();
-        priceTF.setNullRepresentation(String.valueOf(Double.parseDouble("0")));
-        priceTF.setNullSettingAllowed(true);
-        filterPanel.addFilterComponent("price", priceTF);
-
-        priceTF = new TextField();
-        priceTF.setNullRepresentation("");
-        priceTF.setNullSettingAllowed(true);
-        filterPanel.addFilterComponent("priceInLetters", priceTF);
 
         ComboBox diplomaComboBox = new ComboBox();
         diplomaComboBox.setNullSelectionAllowed(true);
@@ -129,9 +120,9 @@ public class AccountantView extends AbstractTaskView implements EntityListener, 
         StringBuilder sb = new StringBuilder();
         if (sf.getLevel() != null) {
 
-                sb.append(" and ");
+            sb.append(" and ");
             params.put(i, sf.getLevel().getId().getId());
-            sb.append("lvl.ID = ?"  + i++);
+            sb.append("lvl.ID = ?" + i++);
 
         }
 
@@ -144,51 +135,39 @@ public class AccountantView extends AbstractTaskView implements EntityListener, 
         }
         if (sf.getDiplomaType() != null) {
 
-                sb.append(" and ");
+            sb.append(" and ");
             params.put(i, sf.getDiplomaType().getId().getId());
-            sb.append("stud_diploma_type.ID = ?"  + i++);
+            sb.append("stud_diploma_type.ID = ?" + i++);
 
-        }
-
-        if (sf.getPrice() != 0) {
-                sb.append(" and ");
-            params.put(i, sf.getPrice());
-                sb.append("acc_price.PRICE = ?" + i++);
-        }
-
-        if (sf.getPriceInLetters() != null) {
-            sb.append(" and lower(acc_price.PRICE_IN_LETTERS) like '");
-            sb.append(sf.getPriceInLetters().toString().trim());
-            sb.append("%'");
         }
 
         List<VAccountants> list = new ArrayList<>();
 
-            sb.insert(0, " where acc_price.deleted = false ");
-            String sql = "SELECT acc_price.id, stud_diploma_type.type_name, lvl.level_name, cont_pay_type.type_name, " +
-                    "  acc_price.price, acc_price.price_in_letters FROM accountant_price acc_price " +
-                    "  INNER JOIN student_diploma_type stud_diploma_type ON acc_price.student_diploma_type_id = stud_diploma_type.id " +
-                    "  INNER JOIN level lvl ON acc_price.level_id = lvl.id " +
-                    "  INNER JOIN contract_payment_type cont_pay_type ON acc_price.contract_payment_type_id = cont_pay_type.id"
-                    + sb.toString();
-            try {
-                List tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
-                if (!tmpList.isEmpty()) {
-                    for (Object o : tmpList) {
-                        Object[] oo = (Object[]) o;
-                        VAccountants accountants = new VAccountants();
-                        accountants.setId(ID.valueOf((long) oo[0]));
-                        accountants.setDiplomaType((String) oo[1]);
-                        accountants.setLevel((String) oo[2]);
-                        accountants.setContractPaymentType((String) oo[3]);
-                        accountants.setPrice(((BigDecimal) oo[4]).doubleValue());
-                        accountants.setPriceInLetters((String) oo[5]);
-                        list.add(accountants);
-                    }
+        sb.insert(0, " where acc_price.deleted = false ");
+        String sql = "SELECT acc_price.id, stud_diploma_type.type_name, lvl.level_name, cont_pay_type.type_name, " +
+                "  acc_price.price, acc_price.price_in_letters FROM accountant_price acc_price " +
+                "  INNER JOIN student_diploma_type stud_diploma_type ON acc_price.student_diploma_type_id = stud_diploma_type.id " +
+                "  INNER JOIN level lvl ON acc_price.level_id = lvl.id " +
+                "  INNER JOIN contract_payment_type cont_pay_type ON acc_price.contract_payment_type_id = cont_pay_type.id"
+                + sb.toString();
+        try {
+            List tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
+            if (!tmpList.isEmpty()) {
+                for (Object o : tmpList) {
+                    Object[] oo = (Object[]) o;
+                    VAccountants accountants = new VAccountants();
+                    accountants.setId(ID.valueOf((long) oo[0]));
+                    accountants.setDiplomaType((String) oo[1]);
+                    accountants.setLevel((String) oo[2]);
+                    accountants.setContractPaymentType((String) oo[3]);
+                    accountants.setPrice(((BigDecimal) oo[4]).doubleValue());
+                    accountants.setPriceInLetters((String) oo[5]);
+                    list.add(accountants);
                 }
-            } catch (Exception ex) {
-                CommonUtils.showMessageAndWriteLog("Unable to load accounts list", ex);
             }
+        } catch (Exception ex) {
+            CommonUtils.showMessageAndWriteLog("Unable to load accounts list", ex);
+        }
 
 
         refresh(list);
@@ -208,7 +187,6 @@ public class AccountantView extends AbstractTaskView implements EntityListener, 
     public void clearFilter() {
         refresh(new ArrayList<>());
     }
-
 
 
     public void refresh() throws Exception {
@@ -245,6 +223,8 @@ public class AccountantView extends AbstractTaskView implements EntityListener, 
 
             try {
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(delList);
+                priceGW.refresh();
+                refresh();
             } catch (Exception ex) {
                 CommonUtils.LOG.error("Unable to delete account: ", ex);
                 Message.showError(getUILocaleUtil().getMessage("error.cannotdelentity"));

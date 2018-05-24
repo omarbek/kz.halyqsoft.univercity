@@ -16,6 +16,7 @@ import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.enumeration.Flag;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_COORDINATOR;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_ENTRANT_SPECIALITY;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_KBTU_ENTRANTS;
 import kz.halyqsoft.univercity.utils.CommonUtils;
@@ -39,6 +40,7 @@ import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 import org.r3a.common.vaadin.widget.table.TableWidget;
 import org.r3a.common.vaadin.widget.table.model.DBTableModel;
 
+import javax.persistence.NoResultException;
 import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -64,7 +66,7 @@ public final class ApplicantsForm extends UsersForm {
     private Button finishButton;
     private Button downloadContractButton;
     private Button downloadButtonRegisterButton;
-    private Button contractButton, specButton;
+    private Button specButton;
 
     private boolean saveSpec;
 
@@ -179,13 +181,12 @@ public final class ApplicantsForm extends UsersForm {
         grantDocButton.setEnabled(false);
         fatherButton.setEnabled(false);
 
-        Button downloadButton = new Button();
-        downloadButton.setCaption(getUILocaleUtil().getCaption("download"));
-                    downloadContractButton = new Button();
-                    downloadContractButton.setCaption(getUILocaleUtil().getCaption("download"));
+        downloadContractButton = new Button();
+        downloadContractButton.setCaption(getUILocaleUtil().getCaption("download.contract"));
 
-                    downloadButtonRegisterButton = new Button();
-                    downloadButtonRegisterButton.setCaption(getUILocaleUtil().getCaption("download"));
+        downloadButtonRegisterButton = new Button();
+        downloadButtonRegisterButton.setCaption(getUILocaleUtil().getCaption("download.contract.register"));
+
 
         STUDENT_EDUCATION studentEducation = new STUDENT_EDUCATION();
         try {
@@ -207,39 +208,39 @@ public final class ApplicantsForm extends UsersForm {
                     CommonEntityFacadeBean.class).lookup(STUDENT_STATUS.class, ID.valueOf(1)));
             studentEducation.setCreated(new Date());
 
-                        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(studentEducation);
+            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(studentEducation);
 
 
-                        StreamResource myResource = createResourceStudent("85", student);
-                        FileDownloader fileDownloader = new FileDownloader(myResource);
-                        myResource.setMIMEType("application/pdf");
-                        myResource.setCacheTime(0);
-                        fileDownloader.extend(downloadContractButton);
+            StreamResource myResource = createResourceStudent("85", student);
+            FileDownloader fileDownloader = new FileDownloader(myResource);
+            myResource.setMIMEType("application/pdf");
+            myResource.setCacheTime(0);
+            fileDownloader.extend(downloadContractButton);
 
-                        StreamResource myResourceParents = createResourceStudent("27", student);
-                        FileDownloader fileDownloaderParent = new FileDownloader(myResourceParents);
-                        myResourceParents.setMIMEType("application/pdf");
-                        myResourceParents.setCacheTime(0);
-                        fileDownloaderParent.extend(downloadButtonRegisterButton);
+            StreamResource myResourceParents = createResourceStudent("27", student);
+            FileDownloader fileDownloaderParent = new FileDownloader(myResourceParents);
+            myResourceParents.setMIMEType("application/pdf");
+            myResourceParents.setCacheTime(0);
+            fileDownloaderParent.extend(downloadButtonRegisterButton);
 
-                        StreamResource myResourceTitul = createResourceStudent("32", student);
-                        FileDownloader fileDownloaderTitul = new FileDownloader(myResourceTitul);
-                        myResourceTitul.setMIMEType("application/pdf");
-                        myResourceTitul.setCacheTime(0);
-                        fileDownloaderTitul.extend(downloadButtonRegisterButton);
+            StreamResource myResourceTitul = createResourceStudent("32", student);
+            FileDownloader fileDownloaderTitul = new FileDownloader(myResourceTitul);
+            myResourceTitul.setMIMEType("application/pdf");
+            myResourceTitul.setCacheTime(0);
+            fileDownloaderTitul.extend(downloadButtonRegisterButton);
 
-                        StreamResource myResourceReg = createResourceStudent("33", student);
-                        FileDownloader fileDownloaderReg = new FileDownloader(myResourceReg);
-                        myResourceReg.setMIMEType("application/pdf");
-                        myResourceReg.setCacheTime(0);
-                        fileDownloaderReg.extend(downloadButtonRegisterButton);
+            StreamResource myResourceReg = createResourceStudent("33", student);
+            FileDownloader fileDownloaderReg = new FileDownloader(myResourceReg);
+            myResourceReg.setMIMEType("application/pdf");
+            myResourceReg.setCacheTime(0);
+            fileDownloaderReg.extend(downloadButtonRegisterButton);
 
-                        if (student.isNeedDorm() == true) {
-                            StreamResource myResourceDorm = createResourceStudent("92", student);
-                            FileDownloader fileDownloaderDorm = new FileDownloader(myResourceDorm);
-                            myResourceDorm.setMIMEType("application/pdf");
-                            myResourceDorm.setCacheTime(0);
-                            fileDownloaderDorm.extend(downloadContractButton);
+            if (student.isNeedDorm() == true) {
+                StreamResource myResourceDorm = createResourceStudent("92", student);
+                FileDownloader fileDownloaderDorm = new FileDownloader(myResourceDorm);
+                myResourceDorm.setMIMEType("application/pdf");
+                myResourceDorm.setCacheTime(0);
+                fileDownloaderDorm.extend(downloadContractButton);
 
             }
 
@@ -258,7 +259,8 @@ public final class ApplicantsForm extends UsersForm {
             }
         });
 
-        messForm.addComponent(downloadButton);
+        messForm.addComponent(downloadButtonRegisterButton);
+        messForm.addComponent(downloadContractButton);
         messForm.addComponent(againButton);
         return messForm;
     }
@@ -284,9 +286,7 @@ public final class ApplicantsForm extends UsersForm {
     protected Button getAfterMedButton() {
         return specButton;
     }
-                    messForm.addComponent(downloadContractButton);
-                    messForm.addComponent(downloadButtonRegisterButton);
-                    messForm.addComponent(againButton);
+
 
     @Override
     protected void initOwnButtons(FormModel dataFM) {
@@ -332,13 +332,6 @@ public final class ApplicantsForm extends UsersForm {
                     setActive(event);
                     flag = Flag.UNT;
 
-    private void addToLayout(Flag currentFlag, GridFormWidget currentGFW, Button currentButton) {
-        flag = currentFlag;
-        contentHL.removeAllComponents();
-        contentHL.addComponent(currentGFW);
-        Button nextButton = createNextButton(currentButton, "next");
-        contentHL.addComponent(nextButton);
-        contentHL.setComponentAlignment(nextButton, Alignment.MIDDLE_CENTER);
                     Button savedUntButton = unt.createRates(createSaveButton());
 
                     VerticalLayout dataUNT = new VerticalLayout();
@@ -410,7 +403,9 @@ public final class ApplicantsForm extends UsersForm {
                 }
             }
         });
+
     }
+
 
     @Override
     protected void initSpec(FormModel dataFM) {
@@ -626,20 +621,8 @@ public final class ApplicantsForm extends UsersForm {
         SPECIALITY speciality = (student).getEntrantSpecialities().iterator().next().getSpeciality();
         studentEducation.setFaculty(speciality.getDepartment().getParent());
 
-        STUDENT_RELATIVE studentRelativeMother;
-        QueryModel<STUDENT_RELATIVE> mother = new QueryModel<>(STUDENT_RELATIVE.class);
-        mother.addWhere("student", ECriteria.EQUAL, student.getId());
-        mother.addWhere("relativeType", ECriteria.EQUAL, ID.valueOf(MOTHER));
-        studentRelativeMother = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class)
-                .lookupSingle(mother);
-
-        STUDENT_RELATIVE studentRelativeFather;
-        QueryModel<STUDENT_RELATIVE> father = new QueryModel<>(STUDENT_RELATIVE.class);
-        father.addWhere("student", ECriteria.EQUAL, student.getId());
-        father.addWhere("relativeType", ECriteria.EQUAL, ID.valueOf(FATHER));
-        studentRelativeFather = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class)
-                .lookupSingle(father);
-
+        STUDENT_RELATIVE studentRelativeMother = getStudent_relative(student, MOTHER);
+        STUDENT_RELATIVE studentRelativeFather = getStudent_relative(student, FATHER);
 
         USER_ADDRESS userAddress;
         QueryModel<USER_ADDRESS> userAddressQueryModel = new QueryModel<>(USER_ADDRESS.class);
@@ -657,7 +640,7 @@ public final class ApplicantsForm extends UsersForm {
         UNT_CERTIFICATE untCertificate;
         QueryModel<UNT_CERTIFICATE> untCertificateQueryModel = new QueryModel<>(UNT_CERTIFICATE.class);
         FromItem unt = untCertificateQueryModel.addJoin(EJoin.INNER_JOIN, "id", USER_DOCUMENT.class, "id");
-        untCertificateQueryModel.addWhere(unt,"user",ECriteria.EQUAL,student.getId());
+        untCertificateQueryModel.addWhere(unt, "user", ECriteria.EQUAL, student.getId());
         untCertificate = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class)
                 .lookupSingle(untCertificateQueryModel);
 
@@ -670,7 +653,6 @@ public final class ApplicantsForm extends UsersForm {
         accountantPriceQueryModel.addWhere("deleted", ECriteria.EQUAL, false);
         accountantPrice = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(accountantPriceQueryModel);
 
-        if(studentRelativeFather != null && studentRelativeFather != null){
 
         String money = String.valueOf(accountantPrice.getPrice());
         String inLetters = accountantPrice.getPriceInLetters();
@@ -689,63 +671,64 @@ public final class ApplicantsForm extends UsersForm {
         }
 
         DateFormat form = new SimpleDateFormat("E MMM dd HH:mm:ss Z yyyy");
-        Date dateBirth = (Date) form.parse(student.getBirthDate().toString());
-        Date dateDocument = (Date)form.parse(educationDoc.getIssueDate().toString());
-        Date created = (Date)form.parse(student.getCreated().toString());
 
+        Date dateBirth = (Date) form.parse(student.getBirthDate().toString());
         Calendar cal = Calendar.getInstance();
         cal.setTime(dateBirth);
-        String formatedDate = cal.get(Calendar.DATE) + "." + (cal.get(Calendar.MONTH) + 1) + "." + cal.get(Calendar.YEAR);
+        String birthdayDate = cal.get(Calendar.DATE) + "." + (cal.get(Calendar.MONTH) + 1) + "." + cal.get(Calendar.YEAR);
+        Date date1 = formatter.parse(birthdayDate);
+        String birthday = formatter.format(date1);
 
+        Date dateDocument = (Date) form.parse(educationDoc.getIssueDate().toString());
         Calendar cal1 = Calendar.getInstance();
         cal1.setTime(dateDocument);
         String formatDate = cal1.get(Calendar.DATE) + "." + (cal1.get(Calendar.MONTH) + 1) + "." + cal1.get(Calendar.YEAR);
-        String dorm = "қажет емес";
+        Date date2 = formatter.parse(formatDate);
+        String attestationDate = formatter.format(date2);
 
+        Date created = (Date) form.parse(student.getCreated().toString());
         Calendar cal2 = Calendar.getInstance();
         cal2.setTime(created);
         String format = cal2.get(Calendar.DATE) + "." + (cal2.get(Calendar.MONTH) + 1) + "." + cal2.get(Calendar.YEAR);
-        if(student.isNeedDorm()) {
-            dorm =  "қажет";
+        Date date3 = formatter.parse(format);
+        String createdDate = formatter.format(date3);
+
+        String dorm = "қажет емес";
+        if (student.isNeedDorm()) {
+            dorm = "қажет";
         }
-            String fatherName = student.getMiddleName();
-            String mobileFather = "+7 " + studentRelativeFather.getPhoneMobile();
-            String mobileMother = "+7 " + studentRelativeMother.getPhoneMobile();
-            String endYear = educationDoc.getEndYear().toString();
-            String coordinator = student.getCoordinator().toString();
-            String motherPostName = studentRelativeMother.getPostName();
-            String fatherPostName = studentRelativeFather.getPostName();
-            String motherWorkPlace = studentRelativeMother.getWorkPlace();
-            String fatherWorkPlace = studentRelativeFather.getWorkPlace();
 
-            if(fatherName ==  null){
-                fatherName = "";
-            }
-            if(mobileFather ==  null){
-                mobileFather = "";
-            }
-            if(mobileMother ==  null){
-                mobileMother = "";
-            }
-            if(endYear ==  null){
-                endYear = "";
-            }
-            if(coordinator ==  null){
-                coordinator = "";
-            }
-            if(motherPostName ==  null){
-                motherPostName = "";
-            }
-            if(fatherPostName ==  null){
-                fatherPostName = "";
-            }
-            if(motherWorkPlace ==  null){
-                motherWorkPlace = "";
-            }
-            if(fatherWorkPlace ==  null){
-                fatherWorkPlace = "";
-            }
+        if (student.getMiddleName() == null) {
+            student.setMiddleName("");
+        }
 
+        V_COORDINATOR coordinator = new V_COORDINATOR();
+        coordinator.setFio("-");
+        if (student.getCoordinator() == null) {
+            student.setCoordinator(coordinator);
+        }
+        if (educationDoc.getEndYear() == null) {
+            educationDoc.setEndYear(Calendar.getInstance().get(Calendar.YEAR));
+        }
+        if (studentRelativeFather.getPhoneMobile() == null) {
+            studentRelativeFather.setPhoneMobile("***");
+        }
+        if (studentRelativeMother.getPhoneMobile() == null) {
+            studentRelativeMother.setPhoneMobile("***");
+        }
+
+        if (studentRelativeMother.getWorkPlace() == null) {
+            studentRelativeMother.setWorkPlace("-");
+        }
+        if (studentRelativeFather.getWorkPlace() == null) {
+            studentRelativeFather.setWorkPlace("-");
+        }
+        if (studentRelativeFather.getPostName() == null) {
+            studentRelativeFather.setPostName("-");
+        }
+        if (studentRelativeMother.getPostName() == null) {
+            studentRelativeMother.setPostName("-");
+        }
 
 
         replaced = text.replaceAll("\\$fio", student.toString())
@@ -765,37 +748,47 @@ public final class ApplicantsForm extends UsersForm {
                 .replaceAll("\\$status", student.getMaritalStatus().toString())
                 .replaceAll("\\$father", studentRelativeFather.getFio())
                 .replaceAll("\\$mother", studentRelativeMother.getFio())
-                .replaceAll("\\$numFather",mobileFather)
-                .replaceAll("\\$numMother",mobileMother)
+                .replaceAll("\\$numFather", "+7 " + studentRelativeFather.getPhoneMobile())
+                .replaceAll("\\$numMother", "+7 " + studentRelativeMother.getPhoneMobile())
                 .replaceAll("\\$gender", student.getSex().toString())
-                .replaceAll("\\$birthYear", formatedDate)
+                .replaceAll("\\$birthYear", birthday)
                 .replaceAll("\\$nationality", student.getNationality().toString())
-                .replaceAll("\\$info", endYear + ", "
+                .replaceAll("\\$info", educationDoc.getEndYear().toString() + ", "
                         + educationDoc.getEducationType() + ", " + educationDoc.getSchoolName())
                 .replaceAll("\\$speciality", speciality.getSpecName())
                 .replaceAll("\\$parentsAddress", studentRelativeFather.getFio() + ", "
-                        + fatherWorkPlace + "    "
-                        + fatherPostName + '\n'
+                        + studentRelativeFather.getWorkPlace() + "    "
+                        + studentRelativeFather.getPostName() + '\n'
                         + studentRelativeMother.getFio() + ", "
-                        + motherWorkPlace + "    "
-                        + motherPostName)
+                        + studentRelativeMother.getWorkPlace() + "    "
+                        + studentRelativeMother.getPostName())
                 .replaceAll("\\$trudovoe", "Ничем не занимался")
                 .replaceAll("\\$name", student.getLastName())
                 .replaceAll("\\$surname", student.getFirstName())
-                .replaceAll("\\$firstName", fatherName)
+                .replaceAll("\\$firstName", student.getMiddleName())
                 .replaceAll("\\$education", educationDoc.getEducationType().toString())
-                .replaceAll("\\$technic", coordinator)
-                .replaceAll("\\$attestat",formatDate)
+                .replaceAll("\\$technic", student.getCoordinator().toString())
+                .replaceAll("\\$attestat", attestationDate)
                 .replaceAll("\\$nomer", educationDoc.getDocumentNo())
-                .replaceAll("\\$ent",untCertificate.getDocumentNo() )
-                .replaceAll("\\$document",format)
+                .replaceAll("\\$ent", untCertificate.getDocumentNo())
+                .replaceAll("\\$document", createdDate)
                 .replaceAll("\\$diplomaType", student.getDiplomaType().toString())
                 .replaceAll("қажет, қажет емес", dorm);
-    }}
+    }
 
-
-    private static ByteArrayInputStream reteriveByteArrayInputStream(File file) throws IOException {
-        return new ByteArrayInputStream(FileUtils.readFileToByteArray(file));
+    public static STUDENT_RELATIVE getStudent_relative(STUDENT student, int relativeType) throws Exception {
+        STUDENT_RELATIVE studentRelative;
+        try {
+            QueryModel<STUDENT_RELATIVE> relative = new QueryModel<>(STUDENT_RELATIVE.class);
+            relative.addWhere("student", ECriteria.EQUAL, student.getId());
+            relative.addWhere("relativeType", ECriteria.EQUAL, ID.valueOf(relativeType));
+            studentRelative = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class)
+                    .lookupSingle(relative);
+        } catch (NoResultException ex) {
+            studentRelative = new STUDENT_RELATIVE();
+            studentRelative.setFio("-");
+        }
+        return studentRelative;
     }
 
     public static Font getFont(int fontSize, int font) {
