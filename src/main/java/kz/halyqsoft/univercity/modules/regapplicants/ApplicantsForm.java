@@ -1,10 +1,8 @@
 package kz.halyqsoft.univercity.modules.regapplicants;
 
-import com.itextpdf.text.Document;
-import com.itextpdf.text.Element;
-import com.itextpdf.text.Font;
-import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.FileDownloader;
@@ -13,10 +11,12 @@ import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinService;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.*;
+import com.vaadin.ui.Button.ClickEvent;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.enumeration.Flag;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_COORDINATOR;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_ENTRANT_SPECIALITY;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_KBTU_ENTRANTS;
 import kz.halyqsoft.univercity.utils.CommonUtils;
@@ -40,11 +40,13 @@ import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 import org.r3a.common.vaadin.widget.table.TableWidget;
 import org.r3a.common.vaadin.widget.table.model.DBTableModel;
 
+import javax.persistence.NoResultException;
 import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Calendar;
+import java.util.List;
 
 /**
  * @author Omarbek
@@ -52,6 +54,7 @@ import java.util.Calendar;
  */
 public final class ApplicantsForm extends UsersForm {
 
+    private static String replaced;
     private Button untNextButton;
     private Map<String, Integer> fontMap;
 
@@ -59,7 +62,11 @@ public final class ApplicantsForm extends UsersForm {
 
     private Button untButton, grantDocButton;
     private Button motherButton, fatherButton;
-    private Button contractButton, specButton;
+    private Button contractButton, moreButton;
+    private Button finishButton;
+    private Button downloadContractButton;
+    private Button downloadButtonRegisterButton;
+    private Button specButton;
 
     private boolean saveSpec;
 
@@ -174,8 +181,12 @@ public final class ApplicantsForm extends UsersForm {
         grantDocButton.setEnabled(false);
         fatherButton.setEnabled(false);
 
-        Button downloadButton = new Button();
-        downloadButton.setCaption(getUILocaleUtil().getCaption("download"));
+        downloadContractButton = new Button();
+        downloadContractButton.setCaption(getUILocaleUtil().getCaption("download.contract"));
+
+        downloadButtonRegisterButton = new Button();
+        downloadButtonRegisterButton.setCaption(getUILocaleUtil().getCaption("download.contract.register"));
+
 
         STUDENT_EDUCATION studentEducation = new STUDENT_EDUCATION();
         try {
@@ -198,29 +209,38 @@ public final class ApplicantsForm extends UsersForm {
             studentEducation.setCreated(new Date());
 
             SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(studentEducation);
-            QueryModel<USERS> usersQM = new QueryModel<>(USERS.class);
 
 
-            USER_ADDRESS userAddress = new USER_ADDRESS();
-            QueryModel<USER_ADDRESS> userAddressQueryModel = new QueryModel<>(USER_ADDRESS.class);
-            userAddressQueryModel.addWhere("user", ECriteria.EQUAL, student.getId());
-            userAddressQueryModel.addWhereAnd("addressType", ECriteria.EQUAL, ID.valueOf(ADDRESS_FACT));
-            userAddress = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(userAddressQueryModel);
-
-            StreamResource myResource = createResource(student.toString(), studentEducation.getFaculty().toString(),
-                    student.getDiplomaType().toString(), student.getPhoneMobile(), userAddress.getStreet(), userAddress.getPostalCode());
+            StreamResource myResource = createResourceStudent("85", student);
             FileDownloader fileDownloader = new FileDownloader(myResource);
             myResource.setMIMEType("application/pdf");
             myResource.setCacheTime(0);
-            fileDownloader.extend(downloadButton);
+            fileDownloader.extend(downloadContractButton);
+
+            StreamResource myResourceParents = createResourceStudent("27", student);
+            FileDownloader fileDownloaderParent = new FileDownloader(myResourceParents);
+            myResourceParents.setMIMEType("application/pdf");
+            myResourceParents.setCacheTime(0);
+            fileDownloaderParent.extend(downloadButtonRegisterButton);
+
+            StreamResource myResourceTitul = createResourceStudent("32", student);
+            FileDownloader fileDownloaderTitul = new FileDownloader(myResourceTitul);
+            myResourceTitul.setMIMEType("application/pdf");
+            myResourceTitul.setCacheTime(0);
+            fileDownloaderTitul.extend(downloadButtonRegisterButton);
+
+            StreamResource myResourceReg = createResourceStudent("33", student);
+            FileDownloader fileDownloaderReg = new FileDownloader(myResourceReg);
+            myResourceReg.setMIMEType("application/pdf");
+            myResourceReg.setCacheTime(0);
+            fileDownloaderReg.extend(downloadButtonRegisterButton);
 
             if (student.isNeedDorm() == true) {
-                StreamResource myResourceDorm = createResourceDorm(student.toString(), studentEducation.getFaculty().toString(),
-                        student.getDiplomaType().toString(), student.getPhoneMobile(), userAddress.getStreet(), userAddress.getPostalCode());
+                StreamResource myResourceDorm = createResourceStudent("92", student);
                 FileDownloader fileDownloaderDorm = new FileDownloader(myResourceDorm);
                 myResourceDorm.setMIMEType("application/pdf");
                 myResourceDorm.setCacheTime(0);
-                fileDownloaderDorm.extend(downloadButton);
+                fileDownloaderDorm.extend(downloadContractButton);
 
             }
 
@@ -239,7 +259,8 @@ public final class ApplicantsForm extends UsersForm {
             }
         });
 
-        messForm.addComponent(downloadButton);
+        messForm.addComponent(downloadButtonRegisterButton);
+        messForm.addComponent(downloadContractButton);
         messForm.addComponent(againButton);
         return messForm;
     }
@@ -265,6 +286,7 @@ public final class ApplicantsForm extends UsersForm {
     protected Button getAfterMedButton() {
         return specButton;
     }
+
 
     @Override
     protected void initOwnButtons(FormModel dataFM) {
@@ -381,7 +403,9 @@ public final class ApplicantsForm extends UsersForm {
                 }
             }
         });
+
     }
+
 
     @Override
     protected void initSpec(FormModel dataFM) {
@@ -448,16 +472,28 @@ public final class ApplicantsForm extends UsersForm {
         return null;
     }
 
-    public static StreamResource createResource(String fio, String faculty, String formaobuch, String phone, String address, String index) {
+    public static StreamResource createResourceStudent(String value, STUDENT student) {
+        String fileName = "";
+        if (value.equals("92")) {
+            fileName = "Договор общага.pdf";
+        } else if (value.equals("85")) {
+            fileName = "Договор на рус.pdf";
+        } else if (value.equals("32")) {
+            fileName = "Титул.pdf";
+        } else if (value.equals("33")) {
+            fileName = "Қолхат.pdf";
+        } else {
+            fileName = "Өтініш.pdf";
+        }
         return new StreamResource(new StreamResource.StreamSource() {
             @Override
             public InputStream getStream() {
-
-                String ochnii = "";
                 Document docum = new Document();
+                Paragraph title = new Paragraph();
                 QueryModel<PDF_PROPERTY> propertyQM = new QueryModel<>(PDF_PROPERTY.class);
                 FromItem doc = propertyQM.addJoin(EJoin.INNER_JOIN, "pdfDocument", PDF_DOCUMENT.class, "id");
-                propertyQM.addWhere(doc, "id", ECriteria.EQUAL, "85");
+
+                propertyQM.addWhere(doc, "id", ECriteria.EQUAL, value);
                 propertyQM.addOrder("orderNumber");
                 List<PDF_PROPERTY> properties = null;
                 try {
@@ -465,32 +501,92 @@ public final class ApplicantsForm extends UsersForm {
                     ByteArrayOutputStream byteArrayOutputStream1 = new ByteArrayOutputStream();
                     PdfWriter pdfWriter = PdfWriter.getInstance(docum, byteArrayOutputStream1);
                     docum.open();
-                    Paragraph title = new Paragraph("Договор", getFont(12, Font.BOLD));
-                    title.setAlignment(Element.ALIGN_CENTER);
+                    if (value.equals("32")) {
+                        PdfContentByte canvas = pdfWriter.getDirectContent();
+                        Rectangle rect = new Rectangle(36, 26, 559, 816);
+                        Rectangle rect1 = new Rectangle(86, 790, 187, 685);
+                        rect1.setBorderWidth(1);
+                        rect1.setBorder(Rectangle.BOX);
+                        rect.setBorder(Rectangle.BOX);
+                        rect.setBorderWidth(1);
+                        canvas.rectangle(rect1);
+                        canvas.rectangle(rect);
+                        title = new Paragraph("ОҢТҮСТІК ҚАЗАҚСТАН",
+                                getFont(12, Font.BOLD));
+                        title.setAlignment(Element.ALIGN_CENTER);
+                        title.setSpacingBefore(10f);
+                    } else if (value.equals("33")) {
+                        Rectangle one = new Rectangle(70, 140);
+                        Rectangle two = new Rectangle(1000, 800);
+                        docum.setPageSize(one);
+                        docum.setMargins(2, 2, 2, 2);
+                        docum.open();
+                        docum.setPageSize(two);
+                        docum.setMargins(20, 20, 20, 20);
+                        docum.newPage();
+                        PdfContentByte canvas = pdfWriter.getDirectContent();
+                        canvas.moveTo(12, 554);
+                        canvas.lineTo(700, 554);
+                        canvas.lineTo(700, 344);
+                        canvas.lineTo(12, 344);
+                        canvas.moveTo(12, 524);
+                        canvas.lineTo(700, 524);
+                        canvas.moveTo(12, 506);
+                        canvas.lineTo(700, 506);
+                        canvas.moveTo(12, 488);
+                        canvas.lineTo(700, 488);
+                        canvas.moveTo(12, 470);
+                        canvas.lineTo(700, 470);
+                        canvas.moveTo(12, 452);
+                        canvas.lineTo(700, 452);
+                        canvas.moveTo(12, 416);
+                        canvas.lineTo(700, 416);
+                        canvas.moveTo(12, 380);
+                        canvas.lineTo(700, 380);
+                        canvas.moveTo(12, 362);
+                        canvas.lineTo(700, 362);
+                        canvas.moveTo(12, 344);
+                        canvas.lineTo(12, 344);
+                        canvas.moveTo(12, 554);
+                        canvas.lineTo(12, 344);
+                        canvas.moveTo(250, 554);
+                        canvas.lineTo(250, 344);
+                        canvas.moveTo(570, 554);
+                        canvas.lineTo(570, 344);
+
+                        canvas.moveTo(12, 334);
+                        canvas.lineTo(640, 334);
+                        canvas.lineTo(640, 309);
+                        canvas.lineTo(12, 309);
+
+                        canvas.moveTo(160, 334);
+                        canvas.lineTo(160, 309);
+                        canvas.moveTo(410, 334);
+                        canvas.lineTo(410, 309);
+                        canvas.moveTo(560, 334);
+                        canvas.lineTo(560, 309);
+                        canvas.moveTo(12, 334);
+                        canvas.lineTo(12, 309);
+                        canvas.closePathStroke();
+                        title = new Paragraph("ОҢТҮСТІК ҚАЗАҚСТАН ПЕДАГОГИКАЛЫҚ УНИВЕРСИТЕТІ",
+                                getFont(12, Font.BOLD));
+                        title.setSpacingBefore(0f);
+                        title.setIndentationLeft(150f);
+                    } else if (value.equals("27")) {
+                        title = new Paragraph("ОҢТҮСТІК ҚАЗАҚСТАН ПЕДАГОГИКАЛЫҚ УНИВЕРСИТЕТІ",
+                                getFont(12, Font.BOLD));
+                        title.setAlignment(Element.ALIGN_CENTER);
+                    } else {
+                        title = new Paragraph("Договор",
+                                getFont(12, Font.BOLD));
+                        title.setAlignment(Element.ALIGN_CENTER);
+                    }
                     docum.add(title);
-                    Date date = Calendar.getInstance().getTime();
+
                     for (PDF_PROPERTY property : properties) {
 
                         String text = new String(property.getText());
-                        DateFormat formatter = new SimpleDateFormat("\"dd\".MM.yyyy");
-                        String today = formatter.format(date);
-                        if (formaobuch.equals("Очный")) {
-                            ochnii = "очной";
-                        } else if (formaobuch.equals("Заочный")) {
-                            ochnii = "заочной";
-                        }
-                        String replaced = text.replaceAll("\\$fio", fio)
-                                .replaceAll("\\$money", "17000")
-                                .replaceAll("\\$faculty", faculty)
-                                .replaceAll("\\$DataMonthYear", today + " года")
-                                .replaceAll("\\$formaobuch", ochnii)
-                                .replaceAll("\\$data\\$month\\$year", today + "г.")
-                                .replaceAll("\\$email", index)
-                                .replaceAll("\\$rekvizit", address)
-                                .replaceAll("\\$phone", "+7" + phone)
-                                .replaceAll("\\$InLetters", "Сто пятьдесять тысяча");
-                        ;
-
+                        setReplaced(text, student);
                         Paragraph paragraph = new Paragraph(replaced,
                                 getFont(Integer.parseInt(property.getSize().toString()), CommonUtils.getFontMap(property.getFont().toString())));
 
@@ -513,78 +609,186 @@ public final class ApplicantsForm extends UsersForm {
                     return null;
                 }
             }
-        }, "Договор на рус.pdf");
+        }, fileName);
     }
 
-    public static StreamResource createResourceDorm(String fio, String faculty, String formaobuch, String phone, String address, String index) {
-        return new StreamResource(new StreamResource.StreamSource() {
-            @Override
-            public InputStream getStream() {
+    private static void setReplaced(String text, STUDENT student) throws Exception {
+        Date date = Calendar.getInstance().getTime();
 
-                String ochnii = "";
-                Document docum = new Document();
-                QueryModel<PDF_PROPERTY> propertyQM = new QueryModel<>(PDF_PROPERTY.class);
-                FromItem doc = propertyQM.addJoin(EJoin.INNER_JOIN, "pdfDocument", PDF_DOCUMENT.class, "id");
-                propertyQM.addWhere(doc, "id", ECriteria.EQUAL, "92");
-                propertyQM.addOrder("orderNumber");
-                List<PDF_PROPERTY> properties = null;
-                try {
-                    properties = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(propertyQM);
-                    ByteArrayOutputStream byteArrayOutputStream1 = new ByteArrayOutputStream();
-                    PdfWriter pdfWriter = PdfWriter.getInstance(docum, byteArrayOutputStream1);
-                    docum.open();
-                    Paragraph title = new Paragraph("Договор", getFont(12, Font.BOLD));
-                    title.setAlignment(Element.ALIGN_CENTER);
-                    docum.add(title);
-                    Date date = Calendar.getInstance().getTime();
-                    for (PDF_PROPERTY property : properties) {
+        STUDENT_EDUCATION studentEducation = new STUDENT_EDUCATION();
+        studentEducation.setStudent(student);
 
-                        String text = new String(property.getText());
-                        DateFormat formatter = new SimpleDateFormat("\"dd\".MM.yyyy");
-                        String today = formatter.format(date);
-                        if (formaobuch.equals("Очный")) {
-                            ochnii = "очной";
-                        } else if (formaobuch.equals("Заочный")) {
-                            ochnii = "заочной";
-                        }
-                        String replaced = text.replaceAll("\\$fio", fio)
-                                .replaceAll("\\$money", "170000")
-                                .replaceAll("\\$faculty", faculty)
-                                .replaceAll("\\$DataMonthYear", today + " года")
-                                .replaceAll("\\$formaobuch", ochnii)
-                                .replaceAll("\\$data\\$month\\$year", today + "г.")
-                                .replaceAll("\\$email", index)
-                                .replaceAll("\\$rekvizit", address)
-                                .replaceAll("\\$phone", "+7" + phone)
-                                .replaceAll("\\$InLetters", "Сто семдесять тысяч тенге")
-                                .replaceAll("\\$Obshaga", "63000")
-                                .replaceAll("\\$Dorm", "Шестьдесять три тысяч тенге");
-                        Paragraph paragraph = new Paragraph(replaced,
-                                getFont(Integer.parseInt(property.getSize().toString()), CommonUtils.getFontMap(property.getFont().toString())));
+        SPECIALITY speciality = (student).getEntrantSpecialities().iterator().next().getSpeciality();
+        studentEducation.setFaculty(speciality.getDepartment().getParent());
 
-                        if (property.isCenter() == true) {
-                            paragraph.setAlignment(Element.ALIGN_CENTER);
-                        }
-                        paragraph.setSpacingBefore(property.getY());
-                        paragraph.setIndentationLeft(property.getX());
+        STUDENT_RELATIVE studentRelativeMother = getStudent_relative(student, MOTHER);
+        STUDENT_RELATIVE studentRelativeFather = getStudent_relative(student, FATHER);
+
+        USER_ADDRESS userAddress;
+        QueryModel<USER_ADDRESS> userAddressQueryModel = new QueryModel<>(USER_ADDRESS.class);
+        userAddressQueryModel.addWhere("user", ECriteria.EQUAL, student.getId());
+        userAddressQueryModel.addWhereAnd("addressType", ECriteria.EQUAL, ID.valueOf(ADDRESS_FACT));
+        userAddress = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(userAddressQueryModel);
+
+        QueryModel<EDUCATION_DOC> educationDocQueryModel = new QueryModel<>(EDUCATION_DOC.class);
+
+        EDUCATION_DOC educationDoc;
+        FromItem sc = educationDocQueryModel.addJoin(EJoin.INNER_JOIN, "id", USER_DOCUMENT.class, "id");
+        educationDocQueryModel.addWhere(sc, "user", ECriteria.EQUAL, student.getId());
+        educationDoc = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(educationDocQueryModel);
+
+        UNT_CERTIFICATE untCertificate;
+        QueryModel<UNT_CERTIFICATE> untCertificateQueryModel = new QueryModel<>(UNT_CERTIFICATE.class);
+        FromItem unt = untCertificateQueryModel.addJoin(EJoin.INNER_JOIN, "id", USER_DOCUMENT.class, "id");
+        untCertificateQueryModel.addWhere(unt, "user", ECriteria.EQUAL, student.getId());
+        untCertificate = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class)
+                .lookupSingle(untCertificateQueryModel);
 
 
-                        docum.add(paragraph);
-                    }
-                    pdfWriter.close();
-                    docum.close();
-                    return new ByteArrayInputStream(byteArrayOutputStream1.toByteArray());
+        ACCOUNTANT_PRICE accountantPrice;
+        QueryModel<ACCOUNTANT_PRICE> accountantPriceQueryModel = new QueryModel<>(ACCOUNTANT_PRICE.class);
+        accountantPriceQueryModel.addWhere("diplomaType", ECriteria.EQUAL, student.getDiplomaType().getId());
+        accountantPriceQueryModel.addWhere("level", ECriteria.EQUAL, student.getLevel().getId());
+        accountantPriceQueryModel.addWhere("contractPaymentType", ECriteria.EQUAL, ID.valueOf(2));
+        accountantPriceQueryModel.addWhere("deleted", ECriteria.EQUAL, false);
+        accountantPrice = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(accountantPriceQueryModel);
 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return null;
-                }
-            }
-        }, "Договор общага.pdf");
+
+        String money = String.valueOf(accountantPrice.getPrice());
+        String inLetters = accountantPrice.getPriceInLetters();
+        if (student.isNeedDorm()) {
+            accountantPriceQueryModel.addWhere("contractPaymentType", ECriteria.EQUAL, ID.valueOf(1));
+        }
+        accountantPrice = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(accountantPriceQueryModel);
+
+        String ochnii = student.getDiplomaType().toString();
+        DateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
+        String today = formatter.format(date);
+        if (student.getDiplomaType().toString().equals("Очный")) {
+            ochnii = "очной";
+        } else if (student.getDiplomaType().toString().equals("Заочный")) {
+            ochnii = "заочной";
+        }
+
+        DateFormat form = new SimpleDateFormat("E MMM dd HH:mm:ss Z yyyy");
+
+        Date dateBirth = (Date) form.parse(student.getBirthDate().toString());
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(dateBirth);
+        String birthdayDate = cal.get(Calendar.DATE) + "." + (cal.get(Calendar.MONTH) + 1) + "." + cal.get(Calendar.YEAR);
+        Date date1 = formatter.parse(birthdayDate);
+        String birthday = formatter.format(date1);
+
+        Date dateDocument = (Date) form.parse(educationDoc.getIssueDate().toString());
+        Calendar cal1 = Calendar.getInstance();
+        cal1.setTime(dateDocument);
+        String formatDate = cal1.get(Calendar.DATE) + "." + (cal1.get(Calendar.MONTH) + 1) + "." + cal1.get(Calendar.YEAR);
+        Date date2 = formatter.parse(formatDate);
+        String attestationDate = formatter.format(date2);
+
+        Date created = (Date) form.parse(student.getCreated().toString());
+        Calendar cal2 = Calendar.getInstance();
+        cal2.setTime(created);
+        String format = cal2.get(Calendar.DATE) + "." + (cal2.get(Calendar.MONTH) + 1) + "." + cal2.get(Calendar.YEAR);
+        Date date3 = formatter.parse(format);
+        String createdDate = formatter.format(date3);
+
+        String dorm = "қажет емес";
+        if (student.isNeedDorm()) {
+            dorm = "қажет";
+        }
+
+        if (student.getMiddleName() == null) {
+            student.setMiddleName("");
+        }
+
+        V_COORDINATOR coordinator = new V_COORDINATOR();
+        coordinator.setFio("-");
+        if (student.getCoordinator() == null) {
+            student.setCoordinator(coordinator);
+        }
+        if (educationDoc.getEndYear() == null) {
+            educationDoc.setEndYear(Calendar.getInstance().get(Calendar.YEAR));
+        }
+        if (studentRelativeFather.getPhoneMobile() == null) {
+            studentRelativeFather.setPhoneMobile("***");
+        }
+        if (studentRelativeMother.getPhoneMobile() == null) {
+            studentRelativeMother.setPhoneMobile("***");
+        }
+
+        if (studentRelativeMother.getWorkPlace() == null) {
+            studentRelativeMother.setWorkPlace("-");
+        }
+        if (studentRelativeFather.getWorkPlace() == null) {
+            studentRelativeFather.setWorkPlace("-");
+        }
+        if (studentRelativeFather.getPostName() == null) {
+            studentRelativeFather.setPostName("-");
+        }
+        if (studentRelativeMother.getPostName() == null) {
+            studentRelativeMother.setPostName("-");
+        }
+
+
+        replaced = text.replaceAll("\\$fio", student.toString())
+                .replaceAll("\\$money", money)
+                .replaceAll("\\$faculty", studentEducation.getFaculty().toString())
+                .replaceAll("\\$DataMonthYear", today + " года")
+                .replaceAll("\\$formaobuch", ochnii)
+                .replaceAll("\\$data\\$month\\$year", today)
+                .replaceAll("\\$email", userAddress.getPostalCode())
+                .replaceAll("\\$rekvizit", userAddress.getStreet())
+                .replaceAll("\\$phone", "+7" + student.getPhoneMobile())
+                .replaceAll("\\$InLetters", inLetters)
+                .replaceAll("\\$Obshaga", String.valueOf(accountantPrice.getPrice()))
+                .replaceAll("\\$Dorm", accountantPrice.getPriceInLetters())
+                .replaceAll("\\$aboutMe", "My name is " + student.toString())
+                .replaceAll("\\$country", student.getCitizenship().toString())
+                .replaceAll("\\$status", student.getMaritalStatus().toString())
+                .replaceAll("\\$father", studentRelativeFather.getFio())
+                .replaceAll("\\$mother", studentRelativeMother.getFio())
+                .replaceAll("\\$numFather", "+7 " + studentRelativeFather.getPhoneMobile())
+                .replaceAll("\\$numMother", "+7 " + studentRelativeMother.getPhoneMobile())
+                .replaceAll("\\$gender", student.getSex().toString())
+                .replaceAll("\\$birthYear", birthday)
+                .replaceAll("\\$nationality", student.getNationality().toString())
+                .replaceAll("\\$info", educationDoc.getEndYear().toString() + ", "
+                        + educationDoc.getEducationType() + ", " + educationDoc.getSchoolName())
+                .replaceAll("\\$speciality", speciality.getSpecName())
+                .replaceAll("\\$parentsAddress", studentRelativeFather.getFio() + ", "
+                        + studentRelativeFather.getWorkPlace() + "    "
+                        + studentRelativeFather.getPostName() + '\n'
+                        + studentRelativeMother.getFio() + ", "
+                        + studentRelativeMother.getWorkPlace() + "    "
+                        + studentRelativeMother.getPostName())
+                .replaceAll("\\$trudovoe", "Ничем не занимался")
+                .replaceAll("\\$name", student.getLastName())
+                .replaceAll("\\$surname", student.getFirstName())
+                .replaceAll("\\$firstName", student.getMiddleName())
+                .replaceAll("\\$education", educationDoc.getEducationType().toString())
+                .replaceAll("\\$technic", student.getCoordinator().toString())
+                .replaceAll("\\$attestat", attestationDate)
+                .replaceAll("\\$nomer", educationDoc.getDocumentNo())
+                .replaceAll("\\$ent", untCertificate.getDocumentNo())
+                .replaceAll("\\$document", createdDate)
+                .replaceAll("\\$diplomaType", student.getDiplomaType().toString())
+                .replaceAll("қажет, қажет емес", dorm);
     }
 
-    private static ByteArrayInputStream reteriveByteArrayInputStream(File file) throws IOException {
-        return new ByteArrayInputStream(FileUtils.readFileToByteArray(file));
+    public static STUDENT_RELATIVE getStudent_relative(STUDENT student, int relativeType) throws Exception {
+        STUDENT_RELATIVE studentRelative;
+        try {
+            QueryModel<STUDENT_RELATIVE> relative = new QueryModel<>(STUDENT_RELATIVE.class);
+            relative.addWhere("student", ECriteria.EQUAL, student.getId());
+            relative.addWhere("relativeType", ECriteria.EQUAL, ID.valueOf(relativeType));
+            studentRelative = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class)
+                    .lookupSingle(relative);
+        } catch (NoResultException ex) {
+            studentRelative = new STUDENT_RELATIVE();
+            studentRelative.setFio("-");
+        }
+        return studentRelative;
     }
 
     public static Font getFont(int fontSize, int font) {

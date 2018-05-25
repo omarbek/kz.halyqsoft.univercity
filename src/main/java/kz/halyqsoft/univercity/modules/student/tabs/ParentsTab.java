@@ -4,6 +4,7 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
+import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_RELATIVE;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.COUNTRY;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.RELATIVE_TYPE;
@@ -44,7 +45,7 @@ public class ParentsTab extends VerticalLayout {
     private static final int FATHER = 1;
     private static final int MOTHER = 2;
 
-    public ParentsTab(StudentEdit.StudentEditHelper studentEditHelper, boolean readOnly) throws Exception {
+    public ParentsTab(STUDENT student, StudentEdit.StudentEditHelper studentEditHelper, boolean readOnly) throws Exception {
         this.studentEditHelper = studentEditHelper;
         this.readOnly = readOnly;
 
@@ -80,6 +81,7 @@ public class ParentsTab extends VerticalLayout {
                     }
 
                     try {
+                        StudentEdit.studentEditPdfDownload(student);
                         parentLoginForm.save();
                         ParentsTab.this.studentEditHelper.showSavedNotification();
                     } catch (Exception ex) {

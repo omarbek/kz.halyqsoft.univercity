@@ -295,14 +295,17 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_CREATIVE_EXAM_SUBJECT</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.PDF_DOCUMENT</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.PDF_PROPERTY</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.CONTRACT_PAYMENT_TYPE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.ACCOUNTANT_PRICE</class>
+
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
         <properties>
             <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
-            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/univerdb"/>
-            <property name="javax.persistence.jdbc.user" value="postgres"/>
-            <property name="javax.persistence.jdbc.password" value="postgres"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/univerdb2"/>
+            <property name="javax.persistence.jdbc.user" value="admin"/>
+            <property name="javax.persistence.jdbc.password" value="admin"/>
             <property name="eclipselink.connection-pool.default.initial" value="1"/>
             <property name="eclipselink.connection-pool.default.min" value="2"/>
             <property name="eclipselink.connection-pool.default.max" value="8"/>

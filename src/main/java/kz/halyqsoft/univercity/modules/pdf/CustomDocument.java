@@ -1,10 +1,8 @@
 package kz.halyqsoft.univercity.modules.pdf;
 
-import com.itextpdf.text.Document;
-import com.itextpdf.text.Element;
-import com.itextpdf.text.Font;
-import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.vaadin.server.VaadinService;
 import kz.halyqsoft.univercity.entity.beans.univercity.PDF_PROPERTY;
@@ -32,6 +30,7 @@ public class CustomDocument {
         fontMap.put(CustomField.NORMAL, Font.NORMAL);
         fontMap.put(CustomField.ITALIC, Font.ITALIC);
         fontMap.put(CustomField.UNDERLINE, Font.UNDERLINE);
+        fontMap.put(CustomField.BOLDITALIC, Font.BOLDITALIC);
     }
 
     private Font getFont(int fontSize, int font) {

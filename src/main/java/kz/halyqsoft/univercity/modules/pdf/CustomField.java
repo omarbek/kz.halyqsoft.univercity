@@ -24,6 +24,7 @@ public class CustomField {
     static final String ITALIC = "Italic";
     static final String NORMAL = "Normal";
     static final String UNDERLINE = "Underline";
+    static final String BOLDITALIC = "BoldItalic";
 
     public CustomField() {
         this.xComboBox = new ComboBox();
@@ -68,15 +69,16 @@ public class CustomField {
         this.fontComboBox.addItem(ITALIC);
         this.fontComboBox.addItem(NORMAL);
         this.fontComboBox.addItem(UNDERLINE);
+        this.fontComboBox.addItem(BOLDITALIC);
 
         this.textField.setWidth(450, Sizeable.Unit.PIXELS);
         this.textField.setHeight(150, Sizeable.Unit.PIXELS);
 
-        for(int i = -90; i <= 100; i+=3){
+        for(int i = -210; i <= 100; i+=3){
             this.yComboBox.addItem(i);
 
         }
-        for(int i = 0; i<=500;i+=3){
+        for(int i = 0; i<=700;i+=3){
             this.xComboBox.addItem(i);
         }
         for(int i = 8; i <= 72; i+=2){

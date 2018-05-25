@@ -5,6 +5,7 @@ import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Upload;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
@@ -26,6 +27,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.NoResultException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -99,6 +104,7 @@ public class CommonUtils {
         fontMap.put("Normal", Font.NORMAL);
         fontMap.put("Italic", Font.ITALIC);
         fontMap.put("Underline", Font.UNDERLINE);
+        fontMap.put("BoldItalic", Font.BOLDITALIC);
         return fontMap.get(font);
     }
 

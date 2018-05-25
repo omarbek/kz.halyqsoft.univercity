@@ -4,10 +4,7 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
-import kz.halyqsoft.univercity.entity.beans.univercity.UNT_CERTIFICATE;
-import kz.halyqsoft.univercity.entity.beans.univercity.UNT_CERT_SUBJECT;
-import kz.halyqsoft.univercity.entity.beans.univercity.USER_DOCUMENT;
-import kz.halyqsoft.univercity.entity.beans.univercity.USER_DOCUMENT_FILE;
+import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_UNT_CERT_SUBJECT;
 import kz.halyqsoft.univercity.modules.student.StudentEdit;
 import kz.halyqsoft.univercity.utils.CommonUtils;
@@ -51,7 +48,7 @@ public class UNTDataTab extends VerticalLayout {
 
     private TableWidget untRatesTW;
 
-    public UNTDataTab(StudentEdit.StudentEditHelper studentEditHelper, boolean readOnly) throws Exception {
+    public UNTDataTab(STUDENT student, StudentEdit.StudentEditHelper studentEditHelper, boolean readOnly) throws Exception {
         this.studentEditHelper = studentEditHelper;
         this.readOnly = readOnly;
         setSpacing(true);
@@ -72,6 +69,11 @@ public class UNTDataTab extends VerticalLayout {
                 public void buttonClick(Button.ClickEvent ev) {
                     if (untCertificateFW.getWidgetModel().isModified()) {
                         untCertificateFW.save();
+                    }
+                    try {
+                        StudentEdit.studentEditPdfDownload(student);
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
             });
