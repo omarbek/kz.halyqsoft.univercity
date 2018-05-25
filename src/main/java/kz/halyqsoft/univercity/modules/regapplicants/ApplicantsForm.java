@@ -245,13 +245,13 @@ public final class ApplicantsForm extends UsersForm {
     }
 
     @Override
-    protected Map<Boolean, String> getConditionsMap() {
-        Map<Boolean, String> conditionsMap = new HashMap<>();
-        conditionsMap.put(!saveData, getUILocaleUtil().getMessage("info.save.base.data.first"));
-        conditionsMap.put(!savePass, getUILocaleUtil().getMessage("info.save.passport"));
-        conditionsMap.put(!saveFactAddress, getUILocaleUtil().getMessage("info.save.address"));
-        conditionsMap.put(!saveSpec, getUILocaleUtil().getMessage("info.save.speciality"));
-        conditionsMap.put(!saveEduc, getUILocaleUtil().getMessage("info.save.educ"));
+    protected Map<String, Boolean> getConditionsMap() {
+        Map<String, Boolean> conditionsMap = new HashMap<>();
+        conditionsMap.put(getUILocaleUtil().getMessage("info.save.base.data.first"), !saveData);
+        conditionsMap.put(getUILocaleUtil().getMessage("info.save.passport"), !savePass);
+        conditionsMap.put(getUILocaleUtil().getMessage("info.save.address"), !saveFactAddress);
+        conditionsMap.put(getUILocaleUtil().getMessage("info.save.speciality"), !saveSpec);
+        conditionsMap.put(getUILocaleUtil().getMessage("info.save.educ"), !saveEduc);
         return conditionsMap;
     }
 
@@ -301,7 +301,7 @@ public final class ApplicantsForm extends UsersForm {
             }
         });
 
-        untButton = createFormButton("unt", true);
+        untButton = createFormButton("unt", false);
         untButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {

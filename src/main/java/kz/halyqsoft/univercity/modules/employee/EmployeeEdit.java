@@ -4,6 +4,7 @@ import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.*;
+import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.*;
@@ -118,6 +119,8 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         QueryModel citizenshipQM = citizenshipFM.getQueryModel();
         citizenshipQM.addWhereNull("parent");
         citizenshipQM.addOrder("countryName");
+
+        CommonUtils.setCards(baseDataFM);
 
         baseDataFW = new CommonFormWidget(baseDataFM);
         baseDataFW.addEntityListener(this);
@@ -2012,7 +2015,12 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
                 emp.setMiddleNameEN(emp.getMiddleNameEN().trim());
             }
             try {
+                CARD oldCard = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
+                        USERS.class, emp.getId()).getCard();
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(emp);
+                if (oldCard != null) {
+                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(oldCard);
+                }
                 if (userPhotoChanged) {
                     if (userPhoto == null) {
                         userPhoto = new USER_PHOTO();

@@ -14,14 +14,18 @@ import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.ID;
 import org.r3a.common.entity.file.FileBean;
 import org.r3a.common.entity.query.QueryModel;
+import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.AbstractSecureWebUI;
 import org.r3a.common.vaadin.AbstractWebUI;
 import org.r3a.common.vaadin.locale.UILocaleUtil;
 import org.r3a.common.vaadin.widget.dialog.Message;
+import org.r3a.common.vaadin.widget.form.FormModel;
 import org.r3a.common.vaadin.widget.form.field.filelist.FileListFieldModel;
+import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.persistence.NoResultException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -89,7 +93,7 @@ public class CommonUtils {
         return code;
     }
 
-    public static int getFontMap(String font){
+    public static int getFontMap(String font) {
         fontMap = new HashMap<>();
         fontMap.put("Bold", Font.BOLD);
         fontMap.put("Normal", Font.NORMAL);
@@ -180,5 +184,25 @@ public class CommonUtils {
         cancel.addStyleName("cancel");
         cancel.setCaption(getUILocaleUtil().getCaption("cancel"));
         return cancel;
+    }
+
+    public static void setCards(FormModel baseDataFM) throws Exception {
+        String sql = "SELECT id " +
+                "FROM card " +
+                "WHERE created = (SELECT max(card.created) " +
+                "                 FROM card card LEFT " +
+                "                   JOIN users usr ON usr.card_id = card.id " +
+                "                 WHERE usr.card_id IS NULL)";
+        Long cardId;
+        try {
+            cardId = (Long) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(sql,
+                    new HashMap<>());
+        } catch (NoResultException e) {
+            cardId = -1L;
+        }
+
+        FKFieldModel cardFM = (FKFieldModel) baseDataFM.getFieldModel("card");
+        QueryModel cardQM = cardFM.getQueryModel();
+        cardQM.addWhere("id", ECriteria.EQUAL, ID.valueOf(cardId));
     }
 }

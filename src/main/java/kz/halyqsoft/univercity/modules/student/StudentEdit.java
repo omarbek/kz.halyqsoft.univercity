@@ -114,6 +114,8 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         QueryModel categoryQM = categoryFM.getQueryModel();
         categoryQM.addWhere("id", ECriteria.NOT_EQUAL, ID.valueOf(1));
 
+        CommonUtils.setCards(baseDataFM);
+
         FKFieldModel entranceYearFM = (FKFieldModel) baseDataFM.getFieldModel("entranceYear");
         entranceYearFM.setReadOnlyFixed(true);
 
@@ -409,8 +411,6 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
     }
 
     public static void studentEditPdfDownload(STUDENT student) {
-
-
         STUDENT_EDUCATION studentEducation = new STUDENT_EDUCATION();
         studentEducation.setStudent(student);
 
@@ -1401,6 +1401,8 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 s.setMiddleNameEN(s.getMiddleNameEN().trim());
             }
             try {
+                CARD oldCard = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
+                        USERS.class, s.getId()).getCard();
                 if (s.getCategory().getId().equals(ID.valueOf(3))) {
                     QueryModel<STUDENT_EDUCATION> qmSE = new QueryModel<>(STUDENT_EDUCATION.class);
                     qmSE.addSelect("student", EAggregate.COUNT);
@@ -1437,6 +1439,9 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                     }
                 }
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(s);
+                if (oldCard != null) {
+                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(oldCard);
+                }
                 if (userPhotoChanged) {
                     if (userPhoto == null) {
                         userPhoto = new USER_PHOTO();
