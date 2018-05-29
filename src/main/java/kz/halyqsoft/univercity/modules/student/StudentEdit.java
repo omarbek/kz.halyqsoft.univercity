@@ -53,8 +53,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import static kz.halyqsoft.univercity.modules.regapplicants.ApplicantsForm.createResource;
-import static kz.halyqsoft.univercity.modules.regapplicants.ApplicantsForm.createResourceDorm;
+import static kz.halyqsoft.univercity.modules.regapplicants.ApplicantsForm.createResourceStudent;
 
 /**
  * @author Omarbek
@@ -77,10 +76,12 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
     private LockDialog lockDialog;
     private STUDENT student;
     private VerticalLayout mainVL;
-    private static Button pdfDownload, pdfDownloadDorm;
+    private static Button pdfDownload, pdfDownloadDorm, pdfDownloadLetter;
     private StudentView studentView;
-    private static FileDownloader fileDownloaderDorm, fileDownloader;
-    private static StreamResource myResource, myResourceDorm;
+    private static FileDownloader fileDownloaderDorm, fileDownloader,
+            fileDownloaderParent, fileDownloaderTitle, fileDownloaderLetter;
+    private static StreamResource myResource, myResourceDorm, resourceParents,
+            myResourceTitle, myResourceLetter;
 
     StudentEdit(final FormModel baseDataFM, VerticalLayout mainVL, StudentView studentView)
             throws Exception {
@@ -113,6 +114,8 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         FKFieldModel categoryFM = (FKFieldModel) baseDataFM.getFieldModel("category");
         QueryModel categoryQM = categoryFM.getQueryModel();
         categoryQM.addWhere("id", ECriteria.NOT_EQUAL, ID.valueOf(1));
+
+        CommonUtils.setCards(baseDataFM);
 
         FKFieldModel entranceYearFM = (FKFieldModel) baseDataFM.getFieldModel("entranceYear");
         entranceYearFM.setReadOnlyFixed(true);
@@ -351,8 +354,12 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
 
             pdfDownloadDorm = createDownloadButtonDorm();
             buttonPanel.addComponent(pdfDownloadDorm);
-            buttonPanel.setComponentAlignment(pdfDownload, Alignment.MIDDLE_CENTER);
+            buttonPanel.setComponentAlignment(pdfDownloadDorm, Alignment.MIDDLE_CENTER);
             pdfDownloadDorm.setEnabled(false);
+
+            pdfDownloadLetter = createDownloadButtonLetter();
+            buttonPanel.addComponent(pdfDownloadLetter);
+            buttonPanel.setComponentAlignment(pdfDownloadLetter, Alignment.MIDDLE_CENTER);
 
 
             content.addComponent(buttonPanel);
@@ -360,34 +367,30 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         }
         getTabSheet().addTab(content, getMasterTabTitle());
 
-        STUDENT_EDUCATION studentEducation = new STUDENT_EDUCATION();
-        studentEducation.setStudent(student);
 
-        SPECIALITY speciality = (student).getEntrantSpecialities().iterator().next().getSpeciality();
-        studentEducation.setFaculty(speciality.getDepartment().getParent());
-
-        USER_ADDRESS userAddress = new USER_ADDRESS();
-        QueryModel<USER_ADDRESS> userAddressQueryModel = new QueryModel<>(USER_ADDRESS.class);
-        userAddressQueryModel.addWhere("user", ECriteria.EQUAL, student.getId());
-        userAddressQueryModel.addWhereAnd("addressType", ECriteria.EQUAL, ID.valueOf(2));
-
-        try {
-            userAddress = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(userAddressQueryModel);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        myResource = createResource(student.toString(), studentEducation.getFaculty().toString(),
-                student.getDiplomaType().toString(), student.getPhoneMobile(), userAddress.getStreet(), userAddress.getPostalCode());
+        myResource = createResourceStudent("85", student);
         fileDownloader = new FileDownloader(myResource);
         myResource.setMIMEType("application/pdf");
         fileDownloader.extend(pdfDownload);
 
+        myResourceLetter = createResourceStudent("33", student);
+        fileDownloaderLetter = new FileDownloader(myResourceLetter);
+        myResourceLetter.setMIMEType("application/pdf");
+        fileDownloaderLetter.extend(pdfDownloadLetter);
+
+        myResourceTitle = createResourceStudent("32", student);
+        fileDownloaderTitle = new FileDownloader(myResourceTitle);
+        myResourceTitle.setMIMEType("application/pdf");
+        fileDownloaderTitle.extend(pdfDownloadLetter);
+
+        resourceParents = createResourceStudent("27", student);
+        fileDownloaderParent = new FileDownloader(resourceParents);
+        resourceParents.setMIMEType("application/pdf");
+        fileDownloaderParent.extend(pdfDownloadLetter);
+
         if (student.isNeedDorm()) {
             pdfDownloadDorm.setEnabled(true);
-            myResourceDorm = createResourceDorm(student.toString(), studentEducation.getFaculty().toString(),
-                    student.getDiplomaType().toString(), student.getPhoneMobile(),
-                    userAddress.getStreet(), userAddress.getPostalCode());
+            myResourceDorm = createResourceStudent("92", student);
             fileDownloaderDorm = new FileDownloader(myResourceDorm);
             myResourceDorm.setMIMEType("application/pdf");
             myResourceDorm.setCacheTime(0);
@@ -408,47 +411,53 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         createDiplomaTab(readOnly);
     }
 
-    public static void studentEditPdfDownload(STUDENT student) {
-
-
-        STUDENT_EDUCATION studentEducation = new STUDENT_EDUCATION();
-        studentEducation.setStudent(student);
-
-        SPECIALITY speciality = (student).getEntrantSpecialities().iterator().next().getSpeciality();
-        studentEducation.setFaculty(speciality.getDepartment().getParent());
-
-        USER_ADDRESS userAddress = new USER_ADDRESS();
-        QueryModel<USER_ADDRESS> userAddressQueryModel = new QueryModel<>(USER_ADDRESS.class);
-        userAddressQueryModel.addWhere("user", ECriteria.EQUAL, student.getId());
-        userAddressQueryModel.addWhereAnd("addressType", ECriteria.EQUAL, ID.valueOf(2));
-
-        try {
-            userAddress = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(userAddressQueryModel);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public static void studentEditPdfDownload(STUDENT student) throws Exception {
 
         if (pdfDownload.getExtensions().size() > 0) {
-            pdfDownload.removeExtension(fileDownloader);
 
+            pdfDownload.removeExtension(fileDownloader);
         }
+
+        if (pdfDownloadLetter.getExtensions().size() > 0) {
+            pdfDownloadLetter.removeExtension(fileDownloaderLetter);
+            pdfDownloadLetter.removeExtension(fileDownloaderTitle);
+            pdfDownloadLetter.removeExtension(fileDownloaderParent);
+        }
+
 
         if (pdfDownloadDorm.getExtensions().size() > 0) {
             pdfDownloadDorm.removeExtension(fileDownloaderDorm);
         }
 
+
+
         pdfDownloadDorm.setEnabled(false);
-        myResource = createResource(student.toString(), studentEducation.getFaculty().toString(),
-                student.getDiplomaType().toString(), student.getPhoneMobile(), userAddress.getStreet(), userAddress.getPostalCode());
+
+        myResource = createResourceStudent("85", student);
         fileDownloader = new FileDownloader(myResource);
         myResource.setMIMEType("application/pdf");
         myResource.setCacheTime(0);
         fileDownloader.extend(pdfDownload);
 
+        myResourceLetter = createResourceStudent("33", student);
+        fileDownloaderLetter = new FileDownloader(myResourceLetter);
+        myResourceLetter.setMIMEType("application/pdf");
+        fileDownloaderLetter.extend(pdfDownloadLetter);
+
+        myResourceTitle = createResourceStudent("32", student);
+        fileDownloaderTitle = new FileDownloader(myResourceTitle);
+        myResourceTitle.setMIMEType("application/pdf");
+        fileDownloaderTitle.extend(pdfDownloadLetter);
+
+        resourceParents = createResourceStudent("27", student);
+        fileDownloaderParent = new FileDownloader(resourceParents);
+        resourceParents.setMIMEType("application/pdf");
+        fileDownloaderParent.extend(pdfDownloadLetter);
+
         if (student.isNeedDorm()) {
             pdfDownloadDorm.setEnabled(true);
-            myResourceDorm = createResourceDorm(student.toString(), studentEducation.getFaculty().toString(), student.getDiplomaType().toString(), student.getPhoneMobile(), userAddress.getStreet(), userAddress.getPostalCode());
+
+            myResourceDorm = createResourceStudent("92", student);
             fileDownloaderDorm = new FileDownloader(myResourceDorm);
             myResourceDorm.setMIMEType("application/pdf");
             myResourceDorm.setCacheTime(0);
@@ -520,7 +529,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         Button downloadButton = new Button();
         downloadButton.setData(11);
         downloadButton.setCaption(getUILocaleUtil().getCaption("download.contract"));
-        downloadButton.setWidth(140, Unit.PIXELS);
+        downloadButton.setWidth(130, Unit.PIXELS);
 
         return downloadButton;
     }
@@ -534,6 +543,15 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
 
         return dormDownloadButton;
     }
+
+    private Button createDownloadButtonLetter(){
+        Button letterDownloadButton = new Button();
+        letterDownloadButton.setData(11);
+        letterDownloadButton.setCaption(getUILocaleUtil().getCaption("download.contract.register"));
+        letterDownloadButton.setWidth(150, Unit.PIXELS);
+
+        return letterDownloadButton;
+        }
 
     @Override
     public void initView(boolean readOnly) throws Exception {
@@ -961,6 +979,11 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                     if (grantDocFM.isModified()) {
                         grantDocFW.save();
                     }
+                    try {
+                        studentEditPdfDownload(student);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             });
             buttonPanel.addComponent(save);
@@ -1072,7 +1095,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
     }
 
     private void createUNTDataTab(boolean readOnly) throws Exception {
-        UNTDataTab content = new UNTDataTab(new StudentEditHelperImpl(), readOnly);
+        UNTDataTab content = new UNTDataTab(student,new StudentEditHelperImpl(), readOnly);
         getTabSheet().addTab(content, getUILocaleUtil().getCaption("unt"));
     }
 
@@ -1082,7 +1105,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
     }
 
     private void createParentsTab(boolean readOnly) throws Exception {
-        ParentsTab parentsTab = new ParentsTab(new StudentEditHelperImpl(), readOnly);
+        ParentsTab parentsTab = new ParentsTab(student, new StudentEditHelperImpl(), readOnly);
         getTabSheet().addTab(parentsTab, getUILocaleUtil().getCaption("parents.data"));
     }
 
@@ -1401,6 +1424,8 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 s.setMiddleNameEN(s.getMiddleNameEN().trim());
             }
             try {
+                CARD oldCard = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
+                        USERS.class, s.getId()).getCard();
                 if (s.getCategory().getId().equals(ID.valueOf(3))) {
                     QueryModel<STUDENT_EDUCATION> qmSE = new QueryModel<>(STUDENT_EDUCATION.class);
                     qmSE.addSelect("student", EAggregate.COUNT);
@@ -1437,6 +1462,9 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                     }
                 }
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(s);
+                if (oldCard != null) {
+                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(oldCard);
+                }
                 if (userPhotoChanged) {
                     if (userPhoto == null) {
                         userPhoto = new USER_PHOTO();

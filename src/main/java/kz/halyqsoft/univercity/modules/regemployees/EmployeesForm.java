@@ -43,6 +43,8 @@ public class EmployeesForm extends UsersForm {
 
     private int sequenceForEmployee = 1;
 
+    private boolean saveCareer;
+
     EmployeesForm(final FormModel dataFM, ENTRANCE_YEAR entranceYear) throws Exception {
         super(dataFM, entranceYear);
 
@@ -77,10 +79,11 @@ public class EmployeesForm extends UsersForm {
     }
 
     @Override
-    protected Map<Boolean, String> getConditionsMap() {
-        Map<Boolean, String> conditionsMap = new HashMap<>();
-        conditionsMap.put(!saveData, getUILocaleUtil().getMessage("info.save.base.data.first"));
-        conditionsMap.put(!savePass, getUILocaleUtil().getMessage("info.save.passport"));
+    protected Map<String, Boolean> getConditionsMap() {
+        Map<String, Boolean> conditionsMap = new HashMap<>();
+        conditionsMap.put(getUILocaleUtil().getMessage("info.save.base.data.first"), !saveData);
+        conditionsMap.put(getUILocaleUtil().getMessage("info.save.passport"), !savePass);
+        conditionsMap.put(getUILocaleUtil().getMessage("info.save.career"), !saveCareer);
         return conditionsMap;
     }
 
@@ -154,12 +157,12 @@ public class EmployeesForm extends UsersForm {
             }
         });
 
-        careerButton = createFormButton(V_EMPLOYEE_DEPT.class);
+        careerButton = createFormButton("career", true);
         careerButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 careerTW = getTableWidget(V_EMPLOYEE_DEPT.class, "employee", null);
-
+                flag = Flag.CAREER;
                 FormModel specFM = ((DBSelectModel) careerTW.getWidgetModel()).getFormModel();
                 QueryModel specQM = ((FKFieldModel) specFM.getFieldModel("department")).getQueryModel();
                 specQM.addWhere("deleted", Boolean.FALSE);
@@ -196,6 +199,15 @@ public class EmployeesForm extends UsersForm {
 
     @Override
     protected boolean checkFlag(Flag flag) {
+        Boolean saved;
+        switch (flag) {
+            case CAREER:
+                if (careerTW.getEntityCount() > 0) {
+                    saveCareer = true;
+                }
+                break;
+        }
+
         return false;
     }
 
@@ -486,7 +498,7 @@ public class EmployeesForm extends UsersForm {
             employeeDept = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(EMPLOYEE_DEPT.class, vEmployeeDept.getId());
         }
         employeeDept.setHireDate(vEmployeeDept.getHireDate());
-        employeeDept.setDismissDate(vEmployeeDept.getHireDate());
+        employeeDept.setDismissDate(vEmployeeDept.getDismissDate());
         employeeDept.setAdviser(vEmployeeDept.isAdviser());
         employeeDept.setDepartment(vEmployeeDept.getDepartment());
         employeeDept.setEmployeeType(vEmployeeDept.getEmployeeType());

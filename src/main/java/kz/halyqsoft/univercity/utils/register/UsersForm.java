@@ -436,10 +436,10 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 flagSave(flag, dataFM);
-                Map<Boolean, String> conditionsMap = getConditionsMap();
-                for (Map.Entry<Boolean, String> entry : conditionsMap.entrySet()) {
-                    if (entry.getKey()) {
-                        Message.showInfo(entry.getValue());
+                Map<String, Boolean> conditionsMap = getConditionsMap();
+                for (Map.Entry<String, Boolean> entry : conditionsMap.entrySet()) {
+                    if (entry.getValue()) {
+                        Message.showInfo(entry.getKey());
                         return;
                     }
                 }
@@ -533,7 +533,7 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
 
     protected abstract VerticalLayout getMessForm(FormModel dataFM, Label mess);
 
-    protected abstract Map<Boolean, String> getConditionsMap();
+    protected abstract Map<String, Boolean> getConditionsMap();
 
     protected abstract boolean checkForMoreButton(FormModel dataFM);
 
