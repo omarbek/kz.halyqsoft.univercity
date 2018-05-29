@@ -40,6 +40,7 @@ import org.r3a.common.vaadin.widget.tree.CommonTreeWidget;
 import org.r3a.common.vaadin.widget.tree.LazyCommonTreeWidget;
 import org.r3a.common.vaadin.widget.tree.model.UOTreeModel;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -101,8 +102,25 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                     qm.addOrder("deptName");
                 } else if (entityClass.equals(TASKS.class)) {
                     classASW = new LazyCommonTreeWidget(TASKS.class);
+
+                    classASW.setButtonVisible(IconToolbar.PREVIEW_BUTTON, true);
+
                     classASW.addEntityListener(this);
                     FormModel taskFM = ((DBSelectModel) classASW.getWidgetModel()).getFormModel();
+
+                    taskFM.getFieldModel("taskOrder").setRequired(false);
+                    (taskFM.getFieldModel("taskOrder")).setInEdit(false);
+
+                    taskFM.getFieldModel("visible").setRequired(false);
+                    (taskFM.getFieldModel("visible")).setInEdit(false);
+
+                    taskFM.getFieldModel("taskType").setRequired(false);
+                    (taskFM.getFieldModel("taskType")).setInEdit(false);
+
+                    taskFM.getFieldModel("iconPath").setRequired(false);
+                    (taskFM.getFieldModel("iconPath")).setInEdit(false);
+
+
                     QueryModel<TASKS> tasksQM = new QueryModel<>(TASKS.class);
                     TASKS tasks = new TASKS();
                     ((LazyCommonTreeWidget) classASW).setCheckParents(false);
@@ -182,7 +200,7 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                         tm.getColumnModel("beginYear").setFormat(NumberUtils.INTEGER_FORMAT);
                         tm.getColumnModel("endYear").setFormat(NumberUtils.INTEGER_FORMAT);
                     }*/ else if (entityClass.equals(ROLES.class)) {
-                        classASW.setButtonVisible(AbstractToolbar.EDIT_BUTTON, false);
+                        classASW.setButtonVisible(AbstractToolbar.FILTER_BUTTON, true);
                     }
 
                 }
@@ -190,6 +208,7 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
             }
         }
     }
+
 
     @Override
     public void onCreate(Object source, Entity e, int buttonId) {
@@ -199,6 +218,8 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
             }
         }
     }
+
+
 
     @Override
     public boolean onEdit(Object source, Entity e, int buttonId) {
@@ -266,6 +287,50 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                         return false;
                     }
                 }
+            }else if(e instanceof TASKS)
+            {
+                TASKS parent = ((TASKS) e).getParent();
+                if(parent!=null) {
+                    Integer max = parent.getTaskOrder();
+                    List<TASKS> children = parent.getChildren();
+                    if(children.size()>0)
+                    {
+                        for(TASKS task : children)
+                        {
+                            if(task.getTaskOrder() > max)
+                            {
+                                max  = task.getTaskOrder();
+                            }
+                        }
+                    }
+                    try {
+                            max++;
+                            ((TASKS) e).setTaskOrder(max);
+
+                    } catch (Exception ex) {
+                        CommonUtils.showMessageAndWriteLog("Unable to generate a taskOrder for TASKS", ex);
+                        return false;
+                    }
+
+                }else{
+                    QueryModel<TASKS> qm = new QueryModel<>(TASKS.class);
+                    qm.addSelect("TASK_ORDER" , EAggregate.MAX);
+
+                    try {
+                        BigDecimal bigDecimalMax = (BigDecimal) (SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItems(qm));
+                        Integer max = bigDecimalMax.intValue();
+                        max = max / 100;
+                        max++;
+                        max = max * 100;
+                        ((TASKS) e).setTaskOrder(max);
+                    } catch (Exception ex) {
+                        CommonUtils.showMessageAndWriteLog("Unable to generate a taskOrder for TASKS", ex);
+                        return false;
+                    }
+
+                }
+                ((TASKS) e).setVisible(true);
+
             }
         }
 

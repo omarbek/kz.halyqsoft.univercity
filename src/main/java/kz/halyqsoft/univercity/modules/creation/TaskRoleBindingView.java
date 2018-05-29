@@ -83,26 +83,11 @@ public class TaskRoleBindingView extends AbstractTaskView implements EntityListe
             }
         });
 
-        rolesCB = new ComboBox();
-//        rolesCB.setCaption(getUILocaleUtil().getCaption(""));//TODO
-        rolesCB.setNullSelectionAllowed(true);
-        rolesCB.setTextInputAllowed(false);
-        rolesCB.setFilteringMode(FilteringMode.CONTAINS);
-        rolesCB.setPageLength(0);
-        rolesCB.setWidth(300, Unit.PIXELS);
-        QueryModel<ROLES> roleQM = new QueryModel<>(ROLES.class);
-        BeanItemContainer<ROLES> roleBIC = new BeanItemContainer<>(ROLES.class,
-                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(roleQM));
-        rolesCB.setContainerDataSource(roleBIC);
-        filterPanel.addFilterComponent("roleName", rolesCB);
-
-
         tasksCB = new ComboBox();
         tasksCB.setNullSelectionAllowed(true);
         tasksCB.setTextInputAllowed(false);
         tasksCB.setFilteringMode(FilteringMode.CONTAINS);
-        tasksCB.setPageLength(0);
-        tasksCB.setWidth(220, Unit.PIXELS);
+        tasksCB.setWidth(300, Unit.PIXELS);
         QueryModel<TASKS> taskQM = new QueryModel<>(TASKS.class);
         BeanItemContainer<TASKS> taskBIC = new BeanItemContainer<>(TASKS.class,
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(taskQM));
@@ -110,8 +95,25 @@ public class TaskRoleBindingView extends AbstractTaskView implements EntityListe
 
         filterPanel.addFilterComponent("taskName", tasksCB);
 
+
+        rolesCB = new ComboBox();
+//        rolesCB.setCaption(getUILocaleUtil().getCaption(""));//TODO
+        rolesCB.setNullSelectionAllowed(true);
+        rolesCB.setTextInputAllowed(false);
+        rolesCB.setFilteringMode(FilteringMode.CONTAINS);
+        rolesCB.setWidth(300, Unit.PIXELS);
+        QueryModel<ROLES> roleQM = new QueryModel<>(ROLES.class);
+        BeanItemContainer<ROLES> roleBIC = new BeanItemContainer<>(ROLES.class,
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(roleQM));
+        rolesCB.setContainerDataSource(roleBIC);
+
+        filterPanel.addFilterComponent("roleName", rolesCB);
+
+        filterPanel.getContent().addComponentAsFirst(tasksCB);
+
         componentHL.addComponent(bindButton);
         componentHL.setComponentAlignment(bindButton,Alignment.MIDDLE_CENTER);
+
 
 
         getContent().addComponent(filterPanel);

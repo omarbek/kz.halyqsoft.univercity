@@ -18,15 +18,17 @@ public class TaskRolesFilterPanel extends AbstractFilterPanel {
         hl.setSpacing(true);
         hl.setWidthUndefined();
 
-        AbstractField af = getFilterComponent("roleName");
+        AbstractField af= getFilterComponent("taskName");
         if (af != null) {
             hl.addComponent(af);
         }
 
-        af= getFilterComponent("taskName");
+         af = getFilterComponent("roleName");
         if (af != null) {
             hl.addComponent(af);
         }
+
+
 
         getContent().addComponent(hl);
         getContent().setComponentAlignment(hl, Alignment.MIDDLE_CENTER);

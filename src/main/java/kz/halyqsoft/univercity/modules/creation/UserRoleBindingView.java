@@ -47,12 +47,11 @@ public class UserRoleBindingView extends AbstractTaskView implements EntityListe
     public void initView(boolean b) throws Exception {
 
         filterPanel.addFilterPanelListener(this);
-
+//getUILocaleUtil().getCaption("role")
         rolesCB = new ComboBox();
         rolesCB.setNullSelectionAllowed(true);
         rolesCB.setTextInputAllowed(false);
         rolesCB.setFilteringMode(FilteringMode.CONTAINS);
-        rolesCB.setPageLength(0);
         rolesCB.setWidth(300, Unit.PIXELS);
         QueryModel<ROLES> roleQM = new QueryModel<>(ROLES.class);
         BeanItemContainer<ROLES> roleBIC = new BeanItemContainer<>(ROLES.class,
@@ -65,9 +64,9 @@ public class UserRoleBindingView extends AbstractTaskView implements EntityListe
 //        usersCB.setCaption(getUILocaleUtil().getCaption(""));//TODO
         usersCB.setNullSelectionAllowed(true);
         usersCB.setTextInputAllowed(false);
+
         usersCB.setFilteringMode(FilteringMode.CONTAINS);
-        usersCB.setPageLength(0);
-        usersCB.setWidth(220, Unit.PIXELS);
+        usersCB.setWidth(300, Unit.PIXELS);
         QueryModel<USERS> userQM = new QueryModel<>(USERS.class);
         BeanItemContainer<USERS> userBIC = new BeanItemContainer<>(USERS.class,
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(userQM));
