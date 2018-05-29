@@ -136,6 +136,10 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.WEEK</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.WEEK_DAY</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.WORK_HOUR_STATUS</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.CREATIVE_EXAM_SUBJECT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDENT_DIPLOMA_TYPE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.TURNSTILE_TYPE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.CARD</class>
 
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_SPECIALITY</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_ORGANIZATION</class>
@@ -284,7 +288,16 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM_SUMMER</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM_SUMMER_DETAIL</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.GRADUATION_PROJECT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.PDF_DOCUMENT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.PDF_PROPERTY</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.USER_ARRIVAL</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_CREATIVE_EXAM</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_CREATIVE_EXAM_SUBJECT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.PDF_DOCUMENT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.PDF_PROPERTY</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.CONTRACT_PAYMENT_TYPE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.ACCOUNTANT_PRICE</class>
+
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
@@ -293,6 +306,8 @@
             <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/univerdb"/>
             <property name="javax.persistence.jdbc.user" value="postgres"/>
             <property name="javax.persistence.jdbc.password" value="postgres"/>
+            <!--<property name="javax.persistence.jdbc.user" value="${javax.persistence.jdbc.user}"/>-->
+            <!--<property name="javax.persistence.jdbc.password" value="${javax.persistence.jdbc.password}"/>-->
             <property name="eclipselink.connection-pool.default.initial" value="1"/>
             <property name="eclipselink.connection-pool.default.min" value="2"/>
             <property name="eclipselink.connection-pool.default.max" value="8"/>

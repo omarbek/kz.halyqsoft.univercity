@@ -98,7 +98,7 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
         cb.setPageLength(0);
         cb.setWidth(250, Unit.PIXELS);
         QueryModel<DEPARTMENT> facultyQM = new QueryModel<>(DEPARTMENT.class);
-//        facultyQM.addWhere("type", ECriteria.EQUAL, T_DEPARTMENT_TYPE.FACULTY_ID);//TODO faculty
+        facultyQM.addWhereNull("parent");
         facultyQM.addWhereAnd("deleted", Boolean.FALSE);
         facultyQM.addOrder("deptName");
         BeanItemContainer<DEPARTMENT> facultyBIC = new BeanItemContainer<>(DEPARTMENT.class,
@@ -156,7 +156,8 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
 
         studentGW = new GridWidget(VStudent.class);
         studentGW.addEntityListener(this);
-        studentGW.showToolbar(false);
+        //studentGW.showToolbar(false);
+
         DBGridModel studentGM = (DBGridModel) studentGW.getWidgetModel();
         studentGM.setReadOnly(true);
         studentGM.setRefreshType(ERefreshType.MANUAL);
@@ -167,10 +168,7 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
         studentGM.getColumnModel("category").setInGrid(false);
         studentGM.getColumnModel("lockReason").setInGrid(false);
 
-        FStudentFilter sf = (FStudentFilter) filterPanel.getFilterBean();
-        if (sf.hasFilter()) {
-            doFilter(sf);
-        }
+        doFilter(filterPanel.getFilterBean());
 
         getContent().addComponent(studentGW);
         getContent().setComponentAlignment(studentGW, Alignment.MIDDLE_CENTER);
@@ -330,43 +328,43 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
 
         List<VStudent> list = new ArrayList<>();
         if (sb.length() > 0) {
-            sb.insert(0, " where ");
-            String sql = "SELECT " +
-                    "  stu.ID, " +
-                    "  usr.CODE, " +
-                    "  trim(usr.LAST_NAME || ' ' || usr.FIRST_NAME || ' ' || coalesce(usr.MIDDLE_NAME, '')) FIO, " +
-                    "  stu_status.STATUS_NAME, " +
-                    "  dep.DEPT_SHORT_NAME                                                              FACULTY, " +
-                    "  spec.SPEC_NAME " +
-                    "FROM STUDENT stu INNER JOIN USERS usr ON stu.ID = usr.ID " +
-                    "  INNER JOIN STUDENT_EDUCATION stu_edu ON stu.ID = stu_edu.STUDENT_ID AND stu_edu.CHILD_ID IS NULL " +
-                    "  LEFT JOIN DORM_STUDENT dorm_stu ON dorm_stu.student_id = stu_edu.id " +
-                    "  INNER JOIN STUDENT_STATUS stu_status ON stu_edu.STUDENT_STATUS_ID = stu_status.ID " +
-                    "  INNER JOIN DEPARTMENT dep ON stu_edu.FACULTY_ID = dep.ID " +
-                    "  INNER JOIN SPECIALITY spec ON stu_edu.SPECIALITY_ID = spec.ID " +
-                    sb.toString() +
-                    " and usr.deleted = FALSE AND dep.deleted = FALSE AND spec.deleted = FALSE " +
-                    "ORDER BY FIO";
-            try {
-                List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
-                if (!tmpList.isEmpty()) {
-                    for (Object o : tmpList) {
-                        Object[] oo = (Object[]) o;
-                        VStudent vs = new VStudent();
-                        vs.setId(ID.valueOf((long) oo[0]));
-                        vs.setCode((String) oo[1]);
-                        vs.setFio((String) oo[2]);
-                        vs.setStatus((String) oo[3]);
-                        vs.setFaculty((String) oo[4]);
-                        vs.setSpecialty((String) oo[5]);
-                        list.add(vs);
-                    }
+            sb.append(" and ");
+        }
+        sb.insert(0, " where ");
+        String sql = "SELECT " +
+                "  stu.ID, " +
+                "  usr.CODE, " +
+                "  trim(usr.LAST_NAME || ' ' || usr.FIRST_NAME || ' ' || coalesce(usr.MIDDLE_NAME, '')) FIO, " +
+                "  stu_status.STATUS_NAME, " +
+                "  dep.DEPT_SHORT_NAME                                                              FACULTY, " +
+                "  spec.SPEC_NAME " +
+                "FROM STUDENT stu INNER JOIN USERS usr ON stu.ID = usr.ID " +
+                "  INNER JOIN STUDENT_EDUCATION stu_edu ON stu.ID = stu_edu.STUDENT_ID AND stu_edu.CHILD_ID IS NULL " +
+                "  LEFT JOIN DORM_STUDENT dorm_stu ON dorm_stu.student_id = stu_edu.id " +
+                "  INNER JOIN STUDENT_STATUS stu_status ON stu_edu.STUDENT_STATUS_ID = stu_status.ID " +
+                "  INNER JOIN DEPARTMENT dep ON stu_edu.FACULTY_ID = dep.ID " +
+                "  INNER JOIN SPECIALITY spec ON stu_edu.SPECIALITY_ID = spec.ID " +
+                sb.toString() +
+                " usr.deleted = FALSE AND dep.deleted = FALSE AND spec.deleted = FALSE" +
+                " and stu.category_id = 3" +
+                "ORDER BY FIO";
+        try {
+            List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
+            if (!tmpList.isEmpty()) {
+                for (Object o : tmpList) {
+                    Object[] oo = (Object[]) o;
+                    VStudent vs = new VStudent();
+                    vs.setId(ID.valueOf((long) oo[0]));
+                    vs.setCode((String) oo[1]);
+                    vs.setFio((String) oo[2]);
+                    vs.setStatus((String) oo[3]);
+                    vs.setFaculty((String) oo[4]);
+                    vs.setSpecialty((String) oo[5]);
+                    list.add(vs);
                 }
-            } catch (Exception ex) {
-                CommonUtils.showMessageAndWriteLog("Unable to load student list", ex);
             }
-        } else {
-            Message.showInfo(getUILocaleUtil().getMessage("select.1.search.condition"));
+        } catch (Exception ex) {
+            CommonUtils.showMessageAndWriteLog("Unable to load student list", ex);
         }
 
         ((DBGridModel) studentGW.getWidgetModel()).setEntities(list);
@@ -379,12 +377,7 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
 
     @Override
     public void clearFilter() {
-        ((DBGridModel) studentGW.getWidgetModel()).setEntities(new ArrayList<>(1));
-        try {
-            studentGW.refresh();
-        } catch (Exception ex) {
-            CommonUtils.showMessageAndWriteLog("Unable to refresh student grid", ex);
-        }
+        doFilter(filterPanel.getFilterBean());
     }
 
     @Override

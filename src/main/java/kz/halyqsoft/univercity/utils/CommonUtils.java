@@ -1,21 +1,40 @@
 package kz.halyqsoft.univercity.utils;
 
+import com.itextpdf.text.Font;
+import com.vaadin.server.Sizeable;
+import com.vaadin.server.ThemeResource;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Upload;
+import kz.halyqsoft.univercity.entity.beans.USERS;
+import kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE;
+import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_DOCUMENT_FILE;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.ID;
 import org.r3a.common.entity.file.FileBean;
 import org.r3a.common.entity.query.QueryModel;
+import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.AbstractSecureWebUI;
 import org.r3a.common.vaadin.AbstractWebUI;
 import org.r3a.common.vaadin.locale.UILocaleUtil;
 import org.r3a.common.vaadin.widget.dialog.Message;
+import org.r3a.common.vaadin.widget.form.FormModel;
 import org.r3a.common.vaadin.widget.form.field.filelist.FileListFieldModel;
+import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.persistence.NoResultException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Omarbek
@@ -25,9 +44,46 @@ public class CommonUtils {
 
     public static final Logger LOG = LoggerFactory.getLogger("ROOT");
     public static int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+    public static Map<String, Integer> fontMap;
 
     public static String getCurrentUserLogin() {
         return AbstractSecureWebUI.getInstance().getUsername();
+    }
+
+    public static USERS getCurrentUser() {
+        try {
+            Map<String, Object> params = new HashMap<>();
+            params.put("login", getCurrentUserLogin());
+            EMPLOYEE employee = getEmployee(params);
+            if (employee != null) {
+                return employee;
+            }
+            STUDENT student = getStudent(params);
+            if (student != null) {
+                return student;
+            }
+        } catch (Exception e) {
+            CommonUtils.showMessageAndWriteLog("Unable to get user", e);
+        }
+        return null;
+    }
+
+    private static STUDENT getStudent(Map<String, Object> params) {
+        try {
+            return (STUDENT) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                    getEntityByNamedQuery("STUDENT.getStudentByLogin", params);
+        } catch (Exception ignored) {
+        }
+        return null;
+    }
+
+    private static EMPLOYEE getEmployee(Map<String, Object> params) {
+        try {
+            return (EMPLOYEE) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                    getEntityByNamedQuery("EMPLOYEE.getEmployeeByLogin", params);
+        } catch (Exception ignored) {
+        }
+        return null;
     }
 
     public static String getCode(Integer count) {
@@ -42,6 +98,16 @@ public class CommonUtils {
         return code;
     }
 
+    public static int getFontMap(String font) {
+        fontMap = new HashMap<>();
+        fontMap.put("Bold", Font.BOLD);
+        fontMap.put("Normal", Font.NORMAL);
+        fontMap.put("Italic", Font.ITALIC);
+        fontMap.put("Underline", Font.UNDERLINE);
+        fontMap.put("BoldItalic", Font.BOLDITALIC);
+        return fontMap.get(font);
+    }
+
     private static String getCodeBuilder(Integer count) {
         String code = String.valueOf(count);
         StringBuilder codeSB = new StringBuilder();
@@ -54,14 +120,6 @@ public class CommonUtils {
         }
         codeSB.append(code);
         return codeSB.toString();
-    }
-
-    public static void main(String[] args) {
-        int a = 1;
-        String code = getCode(a);
-        String codeBuilder = getCodeBuilder(a);
-        System.out.println("code: " + code);
-        System.out.println("builder: " + codeBuilder);
     }
 
     public static void addFiles(QueryModel<USER_DOCUMENT_FILE> udfQM, FileListFieldModel medicalCheckupFLFM) {
@@ -105,5 +163,52 @@ public class CommonUtils {
     public static void showMessageAndWriteLog(String message, Exception ex) {
         LOG.error(message + ": ", ex);
         Message.showError(ex.toString());
+    }
+
+    public static HorizontalLayout createButtonPanel() {
+        HorizontalLayout buttonPanel = new HorizontalLayout();
+        buttonPanel.setSpacing(true);
+        buttonPanel.setWidthUndefined();
+        return buttonPanel;
+    }
+
+    public static Button createSaveButton() {
+        Button save = new Button();
+        save.setData(10);
+        save.setWidth(120.0F, Sizeable.Unit.PIXELS);
+        save.setIcon(new ThemeResource("img/button/ok.png"));
+        save.addStyleName("save");
+        save.setCaption(getUILocaleUtil().getCaption("save"));
+        return save;
+    }
+
+    public static Button createCancelButton() {
+        Button cancel = new Button();
+        cancel.setData(11);
+        cancel.setWidth(120.0F, Sizeable.Unit.PIXELS);
+        cancel.setIcon(new ThemeResource("img/button/cancel.png"));
+        cancel.addStyleName("cancel");
+        cancel.setCaption(getUILocaleUtil().getCaption("cancel"));
+        return cancel;
+    }
+
+    public static void setCards(FormModel baseDataFM) throws Exception {
+        String sql = "SELECT id " +
+                "FROM card " +
+                "WHERE created = (SELECT max(card.created) " +
+                "                 FROM card card LEFT " +
+                "                   JOIN users usr ON usr.card_id = card.id " +
+                "                 WHERE usr.card_id IS NULL)";
+        Long cardId;
+        try {
+            cardId = (Long) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(sql,
+                    new HashMap<>());
+        } catch (NoResultException e) {
+            cardId = -1L;
+        }
+
+        FKFieldModel cardFM = (FKFieldModel) baseDataFM.getFieldModel("card");
+        QueryModel cardQM = cardFM.getQueryModel();
+        cardQM.addWhere("id", ECriteria.EQUAL, ID.valueOf(cardId));
     }
 }

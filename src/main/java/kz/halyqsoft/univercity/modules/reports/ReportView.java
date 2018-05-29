@@ -56,7 +56,7 @@ public class ReportView extends AbstractTaskView {
     private static final String INTEGER = "class java.lang.Integer";
     private static final String STRING = "class java.lang.String";
     private static final String BOOLEAN = "class java.lang.Boolean";
-    private static final String DATE = "Date";
+    private static final String DATE = "class java.util.Date";
 
     private static final String RESULT = "result";
     private static final String MESSAGE = "message";
@@ -209,7 +209,7 @@ public class ReportView extends AbstractTaskView {
         });
     }
 
-    private void initParams() throws Exception {
+    private void  initParams() throws Exception {
         paramsVL.removeAllComponents();
 
         paramsVL.setSpacing(true);
@@ -362,7 +362,7 @@ public class ReportView extends AbstractTaskView {
                     Date dateValue = new Date();
 
                     if (INTEGER.equals(param.getType())) {
-                        if (!NumberUtils.isNumber(value)) {
+                        if (!NumberUtils.isCreatable(value)) {
                             Message.showError(getUILocaleUtil().getMessage("write.number"));//TODO kk,ru
                             return;
                         }
@@ -447,7 +447,7 @@ public class ReportView extends AbstractTaskView {
                     case DATE:
                         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
                         Date dateValue = ((DateField) componentMap.get(param)).getValue();
-                        value = df.format(dateValue);
+                        value = "date_" + df.format(dateValue);
                         break;
                     default:
                         value = ((TextField) componentMap.get(param)).getValue();

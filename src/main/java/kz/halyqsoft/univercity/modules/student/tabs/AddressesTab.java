@@ -4,6 +4,7 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
+import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_ADDRESS;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ADDRESS_TYPE;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.COUNTRY;
@@ -43,7 +44,8 @@ public class AddressesTab extends VerticalLayout {
 
     private CommonFormWidget residentialAddressFW;
 
-    public AddressesTab(StudentEdit.StudentEditHelper studentEditHelper, boolean readOnly) throws Exception {
+
+    public AddressesTab(STUDENT student, StudentEdit.StudentEditHelper studentEditHelper, boolean readOnly) throws Exception {
         this.studentEditHelper = studentEditHelper;
         this.readOnly = readOnly;
 
@@ -65,6 +67,8 @@ public class AddressesTab extends VerticalLayout {
         if (!readOnly) {
             Button save = studentEditHelper.createSaveButton();
             save.addClickListener(new Button.ClickListener() {
+
+
                 @Override
                 public void buttonClick(Button.ClickEvent ev) {
                     if (registrationAddressFW.getWidgetModel().isModified()) {
@@ -73,7 +77,13 @@ public class AddressesTab extends VerticalLayout {
 
                     if (residentialAddressFW.getWidgetModel().isModified()) {
                         residentialAddressFW.save();
+                        try {
+                            StudentEdit.studentEditPdfDownload(student);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
+
                 }
             });
 

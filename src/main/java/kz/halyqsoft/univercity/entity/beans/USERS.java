@@ -1,5 +1,6 @@
 package kz.halyqsoft.univercity.entity.beans;
 
+import kz.halyqsoft.univercity.entity.beans.univercity.PDF_DOCUMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
@@ -26,10 +27,13 @@ public class USERS extends AbstractUser implements CommonTree<USERS> {
             @JoinColumn(name = "TASK_ID", referencedColumnName = "ID")})
     private TASKS task;
 
+    @OneToMany(mappedBy = "user"/*,cascade = CascadeType.PERSIST*/)
+    private List<PDF_DOCUMENT> pdfDocuments;
+
     @OneToMany(mappedBy = "user")
     private List<USER_ROLES> userRoles;
 
-    @FieldInfo(type = EFieldType.TEXT_LABEL, max = 32, order = 14, required = false, readOnlyFixed = true, inGrid = false)
+    @FieldInfo(type = EFieldType.TEXT_LABEL, max = 32, order = 14, required = false, readOnlyFixed = true, inGrid = false, inEdit = false)
     @Column(name = "LOGIN")
     private String login;
 
@@ -42,7 +46,7 @@ public class USERS extends AbstractUser implements CommonTree<USERS> {
     private String firstName;
 
     @FieldInfo(type = EFieldType.TEXT, max = 32, order = 4, required = false)
-    @Column(name = "MIDDLE_NAME", nullable = true)
+    @Column(name = "MIDDLE_NAME")
     private String middleName;
 
     @FieldInfo(type = EFieldType.TEXT_LATIN, max = 32, order = 5, inGrid = false)
@@ -54,7 +58,7 @@ public class USERS extends AbstractUser implements CommonTree<USERS> {
     private String lastNameEN;
 
     @FieldInfo(type = EFieldType.TEXT_LATIN, max = 32, order = 7, required = false, inGrid = false)
-    @Column(name = "MIDDLE_NAME_EN", nullable = true)
+    @Column(name = "MIDDLE_NAME_EN")
     private String middleNameEN;
 
     @FieldInfo(type = EFieldType.DATE, order = 8, inGrid = false)
@@ -86,7 +90,7 @@ public class USERS extends AbstractUser implements CommonTree<USERS> {
             @JoinColumn(name = "CITIZENSHIP_ID", referencedColumnName = "ID")})
     private COUNTRY citizenship;
 
-    @FieldInfo(type = EFieldType.TEXT_LABEL, max = 12, order = 13, inGrid = false, required = false, readOnlyFixed = true)
+    @FieldInfo(type = EFieldType.TEXT_LABEL, max = 12, order = 13, inGrid = false, required = false, readOnlyFixed = true, inEdit = false)
     @Column(name = "CODE")
     private String code;
 
@@ -102,21 +106,27 @@ public class USERS extends AbstractUser implements CommonTree<USERS> {
     @Column(name = "PHONE_INTERNAL")
     private String phoneInternal;
 
-    @FieldInfo(type = EFieldType.BOOLEAN, order = 18, required = false, inEdit = false, inGrid = false, inView = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 18, required= false)//TODO
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "CARD_ID", referencedColumnName = "ID")})
+    private CARD card;
+
+    @FieldInfo(type = EFieldType.BOOLEAN, order = 19, required = false, inEdit = false, inGrid = false, inView = false)
     @Column(name = "LOCKED", nullable = false)
     private boolean locked;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 19, inGrid = false, inEdit = false, inView = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 20, inGrid = false, inEdit = false, inView = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "LOCK_REASON_ID", referencedColumnName = "ID")})
     private LOCK_REASON lockReason;
 
-    @FieldInfo(type = EFieldType.BOOLEAN, order = 23, required = false, inEdit = false, inGrid = false, inView = false)
+    @FieldInfo(type = EFieldType.BOOLEAN, order = 21, required = false, inEdit = false, inGrid = false, inView = false)
     @Column(name = "DELETED", nullable = false)
     private boolean deleted;
 
-    @FieldInfo(type = EFieldType.DATETIME, order = 24, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false)
+    @FieldInfo(type = EFieldType.DATETIME, order = 22, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false)
     @Column(name = "CREATED")
     @Temporal(TemporalType.TIMESTAMP)
     private Date created;
@@ -124,7 +134,7 @@ public class USERS extends AbstractUser implements CommonTree<USERS> {
     @Column(name = "USER_TYPE_ID", insertable = false, updatable = false)
     private int typeIndex;
 
-    @FieldInfo(type = EFieldType.DATETIME, order = 25, required = false, readOnlyFixed = true, inGrid = false,
+    @FieldInfo(type = EFieldType.DATETIME, order = 23, required = false, readOnlyFixed = true, inGrid = false,
             inEdit = false, inView = false)
     @Column(name = "UPDATED")
     @Temporal(TemporalType.TIMESTAMP)
@@ -288,6 +298,14 @@ public class USERS extends AbstractUser implements CommonTree<USERS> {
         this.typeIndex = typeIndex;
     }
 
+    public CARD getCard() {
+        return card;
+    }
+
+    public void setCard(CARD card) {
+        this.card = card;
+    }
+
     @Override
     public TASKS getTask() {
         return task;
@@ -403,5 +421,14 @@ public class USERS extends AbstractUser implements CommonTree<USERS> {
 
     public void setUpdatedBy(String updatedBy) {
         this.updatedBy = updatedBy;
+    }
+
+
+    public List<PDF_DOCUMENT> getPdfDocuments() {
+        return pdfDocuments;
+    }
+
+    public void setPdfDocuments(List<PDF_DOCUMENT> pdfDocuments) {
+        this.pdfDocuments = pdfDocuments;
     }
 }

@@ -84,7 +84,7 @@ public class EDUCATION_DOC extends USER_DOCUMENT {
 	@Column(name = "GOLD_MARK", nullable = true)
     private boolean goldMark;
 	
-	@FieldInfo(type = EFieldType.DOUBLE, order = 16, inGrid = false)
+	@FieldInfo(type = EFieldType.DOUBLE, order = 16,required = false,inGrid = false)
 	@Column(name = "GPA")
     private Double gpa;
 	

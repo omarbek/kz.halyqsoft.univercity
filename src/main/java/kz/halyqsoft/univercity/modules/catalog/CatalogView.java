@@ -1,17 +1,26 @@
 package kz.halyqsoft.univercity.modules.catalog;
 
 import com.vaadin.ui.HorizontalSplitPanel;
+import com.vaadin.ui.TextField;
+import kz.halyqsoft.univercity.entity.beans.ROLES;
+import kz.halyqsoft.univercity.entity.beans.ROLE_TASKS;
+import kz.halyqsoft.univercity.entity.beans.TASKS;
+import kz.halyqsoft.univercity.entity.beans.univercity.USER_ADDRESS;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.changelisteners.CountryChangeListener;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
+import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.Entity;
+import org.r3a.common.entity.FieldInfo;
 import org.r3a.common.entity.ID;
 import org.r3a.common.entity.beans.AbstractTask;
 import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.event.EntityListener;
 import org.r3a.common.entity.query.QueryModel;
+import org.r3a.common.entity.query.from.EJoin;
+import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.select.EAggregate;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.entity.tree.CommonTree;
@@ -20,6 +29,8 @@ import org.r3a.common.vaadin.widget.AbstractSelectWidget;
 import org.r3a.common.vaadin.widget.DBSelectModel;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.form.FormModel;
+import org.r3a.common.vaadin.widget.form.GridFormWidget;
+import org.r3a.common.vaadin.widget.form.field.FieldModel;
 import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
@@ -88,6 +99,13 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                     qm.addWhere("deleted", Boolean.FALSE);
                     qm.addWhereNull("parent");
                     qm.addOrder("deptName");
+                } else if (entityClass.equals(TASKS.class)) {
+                    classASW = new LazyCommonTreeWidget(TASKS.class);
+                    classASW.addEntityListener(this);
+                    FormModel taskFM = ((DBSelectModel) classASW.getWidgetModel()).getFormModel();
+                    QueryModel<TASKS> tasksQM = new QueryModel<>(TASKS.class);
+                    TASKS tasks = new TASKS();
+                    ((LazyCommonTreeWidget) classASW).setCheckParents(false);
                 } else {
                     classASW = new GridWidget(entityClass);
                     classASW.addEntityListener(this);
@@ -134,25 +152,28 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                         classASW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
                         qm.addWhere("universityName", null, null, true);
                         qm.addWhere("useDefault", Boolean.FALSE, true);
-                    }/* else if (entityClass.equals(MARITAL_STATUS.class)) {
-                        classASW.setButtonVisible(IconToolbar.DELETE_BUTTON, true);
-                        qm.addWhere("statusName", null, null, true);
-                    }*/ else if (entityClass.equals(UNT_SUBJECT.class)) {
+                    } else if (entityClass.equals(UNT_SUBJECT.class)) {
                         classASW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
                         qm.addWhere("subjectName", null, null, true);
                     } else if (entityClass.equals(CORPUS.class)) {
                         classASW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
                     } else if (entityClass.equals(LOCK_REASON.class)) {
-                        qm.addWhere("reason", null, null, true);//for filter
+                        qm.addWhere("reason", null, null, true);//for filter button
                     } else if (entityClass.equals(SPECIALITY.class)) {
                         qm.addWhere("deleted", Boolean.FALSE);
+                        FromItem departmentFI = qm.addJoin(EJoin.INNER_JOIN, "department", DEPARTMENT.class, "id");
+                        qm.addWhere(departmentFI, "deleted", Boolean.FALSE);
+                        qm.addWhereNotNull(departmentFI, "parent");
 
-                        FormModel fm = ((DBSelectModel) classASW.getWidgetModel()).getFormModel();
-                        QueryModel specQM = ((FKFieldModel) fm.getFieldModel("department")).getQueryModel();
-                        specQM.addWhereNotNull("parent");
+                        FormModel specFM = ((DBSelectModel) classASW.getWidgetModel()).getFormModel();
+                        QueryModel specQM = ((FKFieldModel) specFM.getFieldModel("department")).getQueryModel();
                         specQM.addWhere("deleted", Boolean.FALSE);
-                    }
-                    /*else if (entityClass.equals(ACADEMIC_DEGREE.class)) {
+                        specQM.addWhereNotNull("parent");
+                    } else if (entityClass.equals(CREATIVE_EXAM_SUBJECT.class)) {
+                        classASW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
+                        classASW.setButtonVisible(IconToolbar.ADD_BUTTON, false);
+                        qm.addWhere("subjectName", null, null, true);
+                    } /*else if (entityClass.equals(ACADEMIC_DEGREE.class)) {
                         FormModel fm = ((DBSelectModel) classASW.getWidgetModel()).getFormModel();
                         ((FKFieldModel) fm.getFieldModel("speciality")).setDialogWidth(500);
 //                        (fm.getFieldModel("speciality")).setWidth(500);
@@ -160,7 +181,10 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                         classASW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
                         tm.getColumnModel("beginYear").setFormat(NumberUtils.INTEGER_FORMAT);
                         tm.getColumnModel("endYear").setFormat(NumberUtils.INTEGER_FORMAT);
-                    } */
+                    }*/ else if (entityClass.equals(ROLES.class)) {
+                        classASW.setButtonVisible(AbstractToolbar.EDIT_BUTTON, false);
+                    }
+
                 }
                 mainHSP.addComponent(classASW);
             }
@@ -255,9 +279,21 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
             for (Entity e : entities) {
                 if (e instanceof DEPARTMENT) {
                     delete = false;
-                    ((DEPARTMENT) e).setDeleted(true);
+                    DEPARTMENT faculty = (DEPARTMENT) e;
+                    faculty.setDeleted(true);
                     try {
-                        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(e);
+                        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(faculty);
+                        deleteSpecialities(faculty);
+
+                        QueryModel<DEPARTMENT> chairQM = new QueryModel<>(DEPARTMENT.class);
+                        chairQM.addWhere("parent", ECriteria.EQUAL, faculty.getId());
+                        List<DEPARTMENT> chairs = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                                lookup(chairQM);
+                        for (DEPARTMENT chair : chairs) {
+                            chair.setDeleted(true);
+                            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(chair);
+                            deleteSpecialities(chair);
+                        }
                     } catch (Exception ex) {
                         CommonUtils.showMessageAndWriteLog("Unable to delete a department", ex);
                     }
@@ -268,6 +304,32 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(e);
                     } catch (Exception ex) {
                         CommonUtils.showMessageAndWriteLog("Unable to delete a speciality", ex);
+                    }
+                } else if (e instanceof TASKS) {
+                    try {
+                        //1 role tasks
+                        QueryModel<ROLE_TASKS> queryModel = new QueryModel<>(ROLE_TASKS.class);
+                        queryModel.addWhere("task", ECriteria.EQUAL, e.getId());
+                        List<ROLE_TASKS> roleTasks = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(queryModel);
+                        if (roleTasks != null) {
+                            if (roleTasks.size() > 0) {
+                                Message.showError(getUILocaleUtil().getMessage("error.binded"));
+                                return false;
+                            }
+                        }
+                        //2
+                        TASKS task = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(TASKS.class, e.getId());
+                        if (task != null) {
+                            if (task.getChildren() != null) {
+                                if (task.getChildren().size() > 0) {
+                                    Message.showError(getUILocaleUtil().getMessage("error.children"));
+                                    return false;
+                                }
+                            }
+                        }
+
+                    } catch (Exception ex) {
+                        Message.showError(ex.getMessage());
                     }
                 }
             }
@@ -282,4 +344,14 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
         return true;
     }
 
+    private void deleteSpecialities(DEPARTMENT chair) throws Exception {
+        QueryModel<SPECIALITY> specQM = new QueryModel<>(SPECIALITY.class);
+        specQM.addWhere("department", ECriteria.EQUAL, chair.getId());
+        List<SPECIALITY> specialities = SessionFacadeFactory.getSessionFacade(
+                CommonEntityFacadeBean.class).lookup(specQM);
+        for (SPECIALITY speciality : specialities) {
+            speciality.setDeleted(true);
+            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(speciality);
+        }
+    }
 }

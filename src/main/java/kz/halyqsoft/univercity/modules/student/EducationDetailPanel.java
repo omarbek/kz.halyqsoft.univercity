@@ -1374,8 +1374,8 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
         public OutputStream receiveUpload(String filename, String mimeType) {
             FileOutputStream fos = null;
             try {
-//                file = new File("/tmp/files/" + filename);
-                file = new File("C:/Users/Omarbek/IdeaProjects/univercity/tmp/files/" + filename);//TODO change
+                file = new File("/tmp/files/" + filename);
+//                file = new File("C:/Users/Omarbek/IdeaProjects/univercity/tmp/files/" + filename);
                 if (file.exists()) {
                     file.delete();
                 }

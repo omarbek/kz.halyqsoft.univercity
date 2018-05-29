@@ -130,9 +130,10 @@ public class PreemptiveRight {
         return false;
     }
 
-    public void save() {
+    public Boolean save() {
         if (mainFM.isModified()) {
-            mainGFW.save();
+            return mainGFW.save();
         }
+        return null;
     }
 }

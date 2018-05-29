@@ -67,6 +67,8 @@ public class Address {
             addressFactGFW = new GridFormWidget(USER_ADDRESS.class);
             addressFactGFW.addEntityListener(applicantsForm);
             addressFactFM = addressFactGFW.getWidgetModel();
+            addressFactFM.getFieldModel("street").setRequired(true);
+            addressFactFM.getFieldModel("postalCode").setRequired(true);
             addressFM = addressFactFM;
         }
         setFormModel(caption, addressNumber, sb, addressFM);
@@ -147,16 +149,17 @@ public class Address {
         return false;
     }
 
-    public void save(int addressNumber) {
+    public Boolean save(int addressNumber) {
         if (addressNumber == ADDRESS_REG) {
             if (addressRegFM.isModified()) {
-                addressRegGFW.save();
+                return addressRegGFW.save();
             }
         } else {
             if (addressFactFM.isModified()) {
-                addressFactGFW.save();
+                return addressFactGFW.save();
             }
         }
+        return null;
     }
 
 }

@@ -1,10 +1,7 @@
 package kz.halyqsoft.univercity.entity.beans.univercity;
 
 import kz.halyqsoft.univercity.entity.beans.USERS;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ACADEMIC_STATUS;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.LEVEL;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDENT_CATEGORY;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.enumeration.UserType;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_ADVISOR;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_COORDINATOR;
@@ -22,7 +19,7 @@ import java.util.Set;
 @Entity
 @DiscriminatorValue(value = UserType.STUDENT_INDEX)
 @NamedQueries({
-        @NamedQuery(name = "T_STUDENT.getStudentByLogin",
+        @NamedQuery(name = "STUDENT.getStudentByLogin",
                 query = "SELECT s FROM STUDENT s WHERE s.login = :login")
 })
 public class STUDENT extends USERS {
@@ -41,23 +38,29 @@ public class STUDENT extends USERS {
             @JoinColumn(name = "CATEGORY_ID", referencedColumnName = "ID")})
     private STUDENT_CATEGORY category;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 32, inGrid = false, required = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 32, inGrid = false)
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "DIPLOMA_TYPE_ID", referencedColumnName = "ID")})
+    private STUDENT_DIPLOMA_TYPE diplomaType;
+
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 33, inGrid = false, required = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "ACADEMIC_STATUS_ID", referencedColumnName = "ID")})
     private ACADEMIC_STATUS academicStatus;
 
-    @FieldInfo(type = EFieldType.BOOLEAN, order = 33, required = false, inGrid = false)
+    @FieldInfo(type = EFieldType.BOOLEAN, order = 34, required = false, inGrid = false)
     @Column(name = "NEED_DORM", nullable = false)
     private boolean needDorm;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 34, inGrid = false, readOnlyFixed = true)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 35, inGrid = false, readOnlyFixed = true)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "ENTRANCE_YEAR_ID", referencedColumnName = "ID")})
     private ENTRANCE_YEAR entranceYear;
 
-    @FieldInfo(type = EFieldType.FK_DIALOG, order = 35, inGrid = false, required = false)
+    @FieldInfo(type = EFieldType.FK_DIALOG, order = 36, inGrid = false, required = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "ADVISOR_ID", referencedColumnName = "ID")})
@@ -192,5 +195,27 @@ public class STUDENT extends USERS {
 
     public void setGraduationProject(GRADUATION_PROJECT graduationProject) {
         this.graduationProject = graduationProject;
+    }
+
+    public STUDENT_DIPLOMA_TYPE getDiplomaType() {
+        return diplomaType;
+    }
+
+    public void setDiplomaType(STUDENT_DIPLOMA_TYPE diplomaType) {
+        this.diplomaType = diplomaType;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(getLastName());
+        sb.append(" ");
+        sb.append(getFirstName());
+        if (getMiddleName() != null) {
+            sb.append(" ");
+            sb.append(getMiddleName());
+        }
+
+        return sb.toString();
     }
 }
