@@ -1,21 +1,17 @@
 package kz.halyqsoft.univercity.modules.accountant;
 
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.server.Page;
 import com.vaadin.shared.ui.combobox.FilteringMode;
-import com.vaadin.ui.*;
-import kz.halyqsoft.univercity.entity.beans.univercity.*;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.ComboBox;
+import kz.halyqsoft.univercity.entity.beans.univercity.ACCOUNTANT_PRICE;
+import kz.halyqsoft.univercity.entity.beans.univercity.CONTRACT_PAYMENT_TYPE;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.LEVEL;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDENT_DIPLOMA_TYPE;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VAccountants;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.VCreativeExam;
 import kz.halyqsoft.univercity.filter.FAccountantFilter;
-import kz.halyqsoft.univercity.filter.FEmployeeFilter;
-import kz.halyqsoft.univercity.filter.FStudentFilter;
 import kz.halyqsoft.univercity.filter.panel.AccountantFilterPanel;
-import kz.halyqsoft.univercity.filter.panel.EmployeeFilterPanel;
-import kz.halyqsoft.univercity.modules.creativeexams.CreativeExamEdit;
-import kz.halyqsoft.univercity.modules.creativeexams.CreativeExamView;
-import kz.halyqsoft.univercity.modules.employee.EmployeeEdit;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.EntityUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
@@ -25,23 +21,17 @@ import org.r3a.common.entity.ID;
 import org.r3a.common.entity.beans.AbstractTask;
 import org.r3a.common.entity.event.EntityListener;
 import org.r3a.common.entity.query.QueryModel;
-import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.ERefreshType;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 import org.r3a.common.vaadin.widget.filter2.FilterPanelListener;
-import org.r3a.common.vaadin.widget.form.FormModel;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
-import org.r3a.common.vaadinaddon.DoubleField;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 public class AccountantView extends AbstractTaskView implements EntityListener, FilterPanelListener {
@@ -110,7 +100,32 @@ public class AccountantView extends AbstractTaskView implements EntityListener, 
         getContent().addComponent(priceGW);
         getContent().setComponentAlignment(priceGW, Alignment.MIDDLE_CENTER);
 
+//        TimerTask timerTask = new MyTimerTask();
+//        //running timer task as daemon thread
+//        Timer timer = new Timer(true);
+//        timer.scheduleAtFixedRate(timerTask, 0, 10 * 1000);
+//        System.out.println("TimerTask started");
+//        //cancel after sometime
+//        try {
+//            Thread.sleep(12000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
     }
+
+//    public class MyTimerTask extends TimerTask {
+//
+//        @Override
+//        public void run() {
+//            System.out.println("Timer task started at:" + new Date());
+//            completeTask();
+//            System.out.println("Timer task finished at:" + new Date());
+//        }
+//
+//        private void completeTask() {
+//            Message.showInfo("asd");
+//        }
+//    }
 
     @Override
     public void doFilter(AbstractFilterBean abstractFilterBean) {
