@@ -1,5 +1,6 @@
 package kz.halyqsoft.univercity;
 
+import com.vaadin.annotations.Push;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
@@ -9,13 +10,16 @@ import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.query.QueryModel;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.servlet.http.HttpSession;
+import java.time.Instant;
+import java.util.*;
 
 /**
  * Author: Omarbek Dinassil
  * Created: 11.03.2018 11:21
  */
+@Push
+@SuppressWarnings("serial")
 public class TestUI extends UI {
 
     @Override
@@ -33,5 +37,6 @@ public class TestUI extends UI {
             vl.addComponent(new Label(user.toString()));
         }
         setContent(vl);
+
     }
 }

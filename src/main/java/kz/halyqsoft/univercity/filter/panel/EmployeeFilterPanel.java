@@ -27,16 +27,21 @@ public final class EmployeeFilterPanel extends AbstractFilterPanel {
 		if (af != null) {
 			hl.addComponent(af);
 		}
-		
-		af = getFilterComponent("firstname");
+
+		af = getFilterComponent("card");
 		if (af != null) {
 			hl.addComponent(af);
 		}
-		
-		af = getFilterComponent("lastname");
-		if (af != null) {
-			hl.addComponent(af);
-		}
+
+//		af = getFilterComponent("firstname");
+//		if (af != null) {
+//			hl.addComponent(af);
+//		}
+//
+//		af = getFilterComponent("lastname");
+//		if (af != null) {
+//			hl.addComponent(af);
+//		}
 		
 		af = getFilterComponent("department");
 		if (af != null) {
