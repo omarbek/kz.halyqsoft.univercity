@@ -1,24 +1,20 @@
 package kz.halyqsoft.univercity.modules.chat;
 
-import com.vaadin.data.Property;
 import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.event.ItemClickEvent;
-import com.vaadin.event.MouseEvents;
-import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.CHAT;
 import kz.halyqsoft.univercity.entity.beans.univercity.MESSAGE;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.V_STUDENT;
 import kz.halyqsoft.univercity.modules.reports.MenuColumn;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
+import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.ID;
 import org.r3a.common.entity.beans.AbstractTask;
 import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.event.EntityListener;
 import org.r3a.common.entity.query.QueryModel;
-import org.r3a.common.entity.query.select.EAggregate;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.entity.tree.CommonTree;
 import org.r3a.common.vaadin.AbstractSecureWebUI;
@@ -27,18 +23,17 @@ import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.toolbar.IconToolbar;
 import org.r3a.common.vaadin.widget.tree.CommonTreeWidget;
-import sun.jvm.hotspot.HotSpotAgent;
+import org.r3a.common.vaadin.widget.tree.model.UOTreeModel;
 
 import javax.persistence.NoResultException;
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.math.BigInteger;
 import java.util.*;
-import java.util.Timer;
-import java.util.concurrent.TimeUnit;
 
 public class ChatView extends AbstractTaskView implements EntityListener  {
+
+    private static String FRIENDS = "Друзья";
+    private static String OUTCOMING_REQUEST = "Исходящие запросы";
+    private static String INCOMING_REQUESTS = "Входящие запросы";
 
     private HorizontalSplitPanel mainHSP;
 
@@ -46,6 +41,8 @@ public class ChatView extends AbstractTaskView implements EntityListener  {
     private AbstractLayout mainLayout;
     private CHAT mainChat;
     private  TextArea chatBodyTextArea;
+    private CustomSearchTreeVerticalLayout customSearchTreeVerticalLayout;
+    private HierarchicalContainer hierarchicalContainer;
     public ChatView(AbstractTask task) throws Exception{
         super(task);
     }
@@ -53,17 +50,48 @@ public class ChatView extends AbstractTaskView implements EntityListener  {
     @Override
     public void initView(boolean b) throws Exception {
         mainHSP = new HorizontalSplitPanel();
+
         mainHSP.setSplitPosition(25);
         mainHSP.isResponsive();
 
 
         final TreeTable menuTT = new TreeTable();
 
-        HierarchicalContainer hierarchicalContainer = new HierarchicalContainer();
-        hierarchicalContainer.addItem("Друзья");
-        hierarchicalContainer.addItem("Исходящие запросы");
-        hierarchicalContainer.addItem("Входящие запросы");
-        menuTT.setContainerDataSource(hierarchicalContainer);
+        hierarchicalContainer = new HierarchicalContainer();
+
+
+        hierarchicalContainer.addItem(FRIENDS);
+        hierarchicalContainer.setChildrenAllowed(FRIENDS, true);
+
+        hierarchicalContainer.addItem(INCOMING_REQUESTS);
+        hierarchicalContainer.setChildrenAllowed(INCOMING_REQUESTS, true);
+
+        hierarchicalContainer.addItem(OUTCOMING_REQUEST);
+        hierarchicalContainer.setChildrenAllowed(OUTCOMING_REQUEST, true);
+
+        List<CHAT> chats = getCurrentUserChats();
+
+        if(chats!=null)
+        {
+
+            for(CHAT singleChat : chats)
+            {
+                USERS anotherUser = getAnotherUserFromChat(singleChat);
+                hierarchicalContainer.addItem(anotherUser.getLogin());
+                hierarchicalContainer.setChildrenAllowed(anotherUser.getLogin(), false);
+
+                if(singleChat.getAccepted()) {
+                    hierarchicalContainer.setParent(anotherUser.getLogin(), FRIENDS);
+                }else if(singleChat.getFirst_user().getLogin().equals(getCurrentUser().getLogin())){
+                    hierarchicalContainer.setParent(anotherUser.getLogin(), OUTCOMING_REQUEST);
+                }else{
+                    Message.showInfo("INCOMING REQUESTS");
+                    hierarchicalContainer.setParent(anotherUser.getLogin(), INCOMING_REQUESTS);
+                }
+            }
+        }
+
+
         menuTT.setContainerDataSource(hierarchicalContainer);
         menuTT.setSizeFull();
         menuTT.addStyleName("schedule");
@@ -77,68 +105,187 @@ public class ChatView extends AbstractTaskView implements EntityListener  {
         menuTT.addGeneratedColumn("users", menuColumn);
         menuTT.setColumnHeader("users", "Пользователи");
 
-        menuTT.addValueChangeListener(new Property.ValueChangeListener() {
+        menuTT.addItemClickListener(new ItemClickEvent.ItemClickListener() {
             @Override
-            public void valueChange(Property.ValueChangeEvent event) {
-                try {
-                    if (event != null && event.getProperty() != null && event.getProperty().getValue() != null) {
-                        if ("Студенты".equals(event.getProperty().getValue().toString())) {
-                            setStudents();
-                        }
+            public void itemClick(ItemClickEvent event) {
+                if(event.getItem()!=null)
+                {
+                    if(!event.getItemId().equals(FRIENDS) && !event.getItemId().equals(OUTCOMING_REQUEST) && !event.getItemId().equals(INCOMING_REQUESTS))
+                    {
+
+                            if (mainLayout != null) {
+                                mainLayout.removeAllComponents();
+                                mainHSP.removeComponent(mainLayout);
+                            }
+                            if (getUserByLogin((String)event.getItemId())!=null) {
+
+                                CHAT chat = new CHAT();
+                                chat.setFirst_user(getCurrentUser());
+                                chat.setSecond_user((USERS) getUserByLogin((String)event.getItemId()));
+                                chat = searchForChat(chat);
+                                if(chat!= null)
+                                {
+                                    if(chat.getAccepted())
+                                    {
+                                        chatBodyTextArea = new TextArea();
+                                        chatBodyTextArea.setValue("");
+                                        mainLayout = initChatView(chat);
+                                    }else if(chat.getFirst_user().getLogin().equals(getCurrentUser().getLogin())) {
+                                        mainLayout = initWaitingForResponseView();
+                                    }else{
+                                        mainLayout = initChatAcceptRequestView(chat);
+                                    }
+                                }else{
+                                    mainLayout = initChatSendRequestView();
+                                }
+
+                                mainHSP.addComponent(mainLayout);
+                            }
+
                     }
-
-
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
-            }
-            private void setStudents() throws Exception {
-                QueryModel<V_STUDENT> studentQM = new QueryModel<>(V_STUDENT.class);
-                studentQM.addSelect("userCode", EAggregate.COUNT);
-                studentQM.addWhere("deleted", Boolean.FALSE);
-                Long allStudents = (Long) SessionFacadeFactory.
-                        getSessionFacade(CommonEntityFacadeBean.class).lookupItems(studentQM);
-
-                String sql = "SELECT count(1) " +
-                        "FROM user_arrival arriv INNER JOIN v_student stu ON stu.id = arriv.user_id " +
-                        "WHERE date_trunc('day', arriv.created) = date_trunc('day', now()) " +
-                        "      AND arriv.created = (SELECT max(max_arriv.created) " +
-                        "                           FROM user_arrival max_arriv " +
-                        "                           WHERE max_arriv.user_id = arriv.user_id) " +
-                        "      AND come_in = TRUE";
-                Long inStudents = (Long) SessionFacadeFactory.getSessionFacade(
-                        CommonEntityFacadeBean.class).lookupSingle(sql, new HashMap<>());
-                long inPercent = inStudents * 100 / allStudents;
-
-                Panel studentsPanel = new Panel("<b>Учащиеся - " + allStudents + "</b><br>" +
-                        "Присутс. - " + inStudents + " (" + inPercent + "%)<br>" +
-                        "Отсутс. - " + (allStudents - inStudents) + " (" + (100 - inPercent) + "%)" +
-                        "<br>");
-                studentsPanel.setIcon(new ThemeResource("img/student.png"));
-                studentsPanel.addClickListener(new MouseEvents.ClickListener() {
-                    @Override
-                    public void click(MouseEvents.ClickEvent event) {
-                        Message.showInfo("Students");
-                    }
-                });
             }
         });
 
+        customSearchTreeVerticalLayout = new CustomSearchTreeVerticalLayout(menuTT);
+        customSearchTreeVerticalLayout.setResponsive(true);
+        customSearchTreeVerticalLayout.setImmediate(true);
+        customSearchTreeVerticalLayout.getSearchButton().setCaption("Search");
+        customSearchTreeVerticalLayout.getLoginLabel().setValue("Login:");
+        customSearchTreeVerticalLayout.getSearchButton().addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                String login = customSearchTreeVerticalLayout.getSearchTextField().getValue();
+                if(!login.trim().equals("")){
+
+                    USERS user = getUserByLogin(login);
+                    ArrayList<Entity> usersArrayList = new ArrayList<>();
+                    if(user!=null) {
+                        usersArrayList.add(user);
+                    }
+                    UOTreeModel uoTreeModel=new UOTreeModel(usersArrayList);
+                    usersCTW = new CommonTreeWidget(uoTreeModel);
+                    usersCTW.setButtonVisible(IconToolbar.REFRESH_BUTTON , false);
+                    usersCTW.setButtonVisible(IconToolbar.EDIT_BUTTON , false);
+                    usersCTW.setButtonVisible(IconToolbar.DELETE_BUTTON , false);
+                    usersCTW.setButtonVisible(IconToolbar.ADD_BUTTON , false);
+                    usersCTW.setButtonVisible(IconToolbar.FILTER_BUTTON , false);
+                    usersCTW.addEntityListener(new EntityListener() {
+                        @Override
+                        public void handleEntityEvent(EntityEvent ev){
+                            if(ev.getAction()==EntityEvent.SELECTED) {
+
+                                if (ev.getSource().equals(usersCTW)) {
+                                    if (mainLayout != null) {
+                                        mainLayout.removeAllComponents();
+                                        mainHSP.removeComponent(mainLayout);
+                                    }
+                                    if (usersCTW.getSelectedEntity() instanceof USERS) {
+                                        CHAT chat = new CHAT();
+                                        chat.setFirst_user(getCurrentUser());
+                                        chat.setSecond_user((USERS) usersCTW.getSelectedEntity());
+                                        chat = searchForChat(chat);
+                                        if(chat!= null)
+                                        {
+                                            if(chat.getAccepted())
+                                            {
+                                                chatBodyTextArea = new TextArea();
+                                                chatBodyTextArea.setValue("");
+                                                mainLayout = initChatView(chat);
+                                            }else if(chat.getFirst_user().getLogin().equals(getCurrentUser().getLogin())) {
+                                                mainLayout = initWaitingForResponseView();
+                                            }else{
+                                                mainLayout = initChatAcceptRequestView(chat);
+                                            }
+                                        }else{
+                                            mainLayout = initChatSendRequestView();
+                                        }
+
+                                        mainHSP.addComponent(mainLayout);
+                                    }
+                                }
+                            }
+                        }
 
 
-        //usersCTW = new CommonTreeWidget(AbstractSecureWebUI.getInstance().getUserClass().asSubclass(CommonTree.class));
-//        usersCTW = new CommonTreeWidget();
-//
-//        usersCTW.setButtonVisible(IconToolbar.REFRESH_BUTTON , true);
-//        usersCTW.setButtonVisible(IconToolbar.EDIT_BUTTON , false);
-//        usersCTW.setButtonVisible(IconToolbar.DELETE_BUTTON , false);
-//        usersCTW.setButtonVisible(IconToolbar.ADD_BUTTON , false);
-//        usersCTW.setButtonVisible(IconToolbar.FILTER_BUTTON , true);
-//
-//        usersCTW.addEntityListener(this);
-//
-//        mainHSP.addComponent(usersCTW);
-        mainHSP.addComponent(menuTT);
+                        @Override
+                        public boolean preCreate(Object o, int i) {
+                            return false;
+                        }
+
+                        @Override
+                        public void onCreate(Object o, Entity entity, int i) {
+
+                        }
+
+                        @Override
+                        public boolean onEdit(Object o, Entity entity, int i) {
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onPreview(Object o, Entity entity, int i) {
+                            return false;
+                        }
+
+                        @Override
+                        public void beforeRefresh(Object o, int i) {
+
+                        }
+
+                        @Override
+                        public void onRefresh(Object o, List<Entity> list) {
+
+                        }
+
+                        @Override
+                        public void onFilter(Object o, QueryModel queryModel, int i) {
+
+                        }
+
+                        @Override
+                        public void onAccept(Object o, List<Entity> list, int i) {
+
+                        }
+
+                        @Override
+                        public boolean preSave(Object o, Entity entity, boolean b, int i) throws Exception {
+                            return false;
+                        }
+
+                        @Override
+                        public boolean preDelete(Object o, List<Entity> list, int i) {
+                            return false;
+                        }
+
+                        @Override
+                        public void onDelete(Object o, List<Entity> list, int i) {
+
+                        }
+
+                        @Override
+                        public void deferredCreate(Object o, Entity entity) {
+
+                        }
+
+                        @Override
+                        public void deferredDelete(Object o, List<Entity> list) {
+
+                        }
+
+                        @Override
+                        public void onException(Object o, Throwable throwable) {
+
+                        }
+                    });
+
+
+                    customSearchTreeVerticalLayout.setUsersCTW(usersCTW);
+                }
+            }
+        });
+        mainHSP.addComponent(customSearchTreeVerticalLayout);
+
         getContent().addComponent(mainHSP);
     }
 
@@ -232,15 +379,21 @@ public class ChatView extends AbstractTaskView implements EntityListener  {
         chatBodyTextArea.clear();
         chatBodyTextArea.setValue(result);
         chatBodyTextArea.setReadOnly(true);
+        USERS anotherUser = getAnotherUserFromChat(chat);
+        Label label = new Label(anotherUser.getFirstName() + " " + anotherUser.getLastName());
 
 
+        upperSideLayout.addComponent(label);
 
+        upperSideLayout.addComponent(chatBodyTextArea);
+        upperSideLayout.setComponentAlignment(chatBodyTextArea, Alignment.TOP_LEFT);
 
         upperSideLayout.addComponent(chatBodyTextArea);
         upperSideLayout.setComponentAlignment(chatBodyTextArea, Alignment.MIDDLE_CENTER);
 
         TextArea textArea = new TextArea();
         textArea.setSizeFull();
+
         textArea.setWordwrap(true);
         textArea.setImmediate(true);
 
@@ -324,43 +477,7 @@ public class ChatView extends AbstractTaskView implements EntityListener  {
         return  result;
     }
 
-    @Override
-    public void handleEntityEvent(EntityEvent ev){
-        super.handleEntityEvent(ev);
-        if(ev.getAction()==EntityEvent.SELECTED) {
 
-            if (ev.getSource().equals(usersCTW)) {
-                if (mainLayout != null) {
-                    mainLayout.removeAllComponents();
-                    mainHSP.removeComponent(mainLayout);
-                }
-                if (usersCTW.getSelectedEntity() instanceof USERS) {
-
-                    CHAT chat = new CHAT();
-                    chat.setFirst_user(getCurrentUser());
-                    chat.setSecond_user((USERS) usersCTW.getSelectedEntity());
-                    chat = searchForChat(chat);
-                    if(chat!= null)
-                    {
-                        if(chat.getAccepted())
-                        {
-                            chatBodyTextArea = new TextArea();
-                            chatBodyTextArea.setValue("");
-                            mainLayout = initChatView(chat);
-                        }else if(chat.getFirst_user().getLogin().equals(getCurrentUser().getLogin())) {
-                            mainLayout = initWaitingForResponseView();
-                        }else{
-                            mainLayout = initChatAcceptRequestView(chat);
-                        }
-                    }else{
-                        mainLayout = initChatSendRequestView();
-                    }
-
-                    mainHSP.addComponent(mainLayout);
-                }
-            }
-        }
-    }
 
     private CHAT searchForChat(CHAT chat){
         List<ID> usersList = new ArrayList<>();
@@ -387,7 +504,7 @@ public class ChatView extends AbstractTaskView implements EntityListener  {
         return null;
     }
 
-    public BigInteger getCurrentUserId() {
+    private BigInteger getCurrentUserId() {
         if (AbstractWebUI.getInstance() instanceof AbstractSecureWebUI) {
             QueryModel<USERS> qm = new QueryModel<>(USERS.class);
             qm.addWhere("login" , ECriteria.EQUAL ,AbstractSecureWebUI.getInstance().getUsername());
@@ -408,7 +525,7 @@ public class ChatView extends AbstractTaskView implements EntityListener  {
         return null;
     }
 
-    public USERS getCurrentUser(){
+    private USERS getCurrentUser(){
         if (AbstractWebUI.getInstance() instanceof AbstractSecureWebUI) {
             QueryModel<USERS> qm = new QueryModel<>(USERS.class);
             qm.addWhere("login" , ECriteria.EQUAL ,AbstractSecureWebUI.getInstance().getUsername());
@@ -425,7 +542,26 @@ public class ChatView extends AbstractTaskView implements EntityListener  {
         return null;
     }
 
-    public boolean isChatExists(USERS first  , USERS second){
+    private USERS getUserByLogin(String login){
+            QueryModel<USERS> qm = new QueryModel<>(USERS.class);
+            qm.addWhere("login" , ECriteria.EQUAL ,login);
+            USERS u = null;
+            try {
+                u = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(qm);
+                return u;
+            }catch (NoResultException e)
+            {
+                Message.showError("Not found!");
+            }catch (Exception e)
+            {
+                Message.showError(e.getMessage());
+                e.printStackTrace();
+            };
+
+        return null;
+    }
+
+    private boolean isChatExists(USERS first  , USERS second){
         List<ID> usersList = new ArrayList<>();
         usersList.add(first.getId());
         usersList.add(second.getId());
@@ -447,4 +583,32 @@ public class ChatView extends AbstractTaskView implements EntityListener  {
         return false;
     }
 
+    private List<CHAT> getCurrentUserChats(){
+        QueryModel<CHAT> qm = new QueryModel<>(CHAT.class);
+        qm.addWhere("second_user" , ECriteria.EQUAL , getCurrentUser().getId());
+        qm.addWhereOr("first_user" , ECriteria.EQUAL , getCurrentUser().getId());
+        List<CHAT> chatList = null;
+        try {
+
+            chatList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(qm);
+
+        }catch (NoResultException e)
+        {
+            e.printStackTrace();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        };
+        return chatList;
+    }
+
+    private USERS getAnotherUserFromChat(CHAT chat){
+        if(chat.getFirst_user().getLogin().equals(getCurrentUser().getLogin()))
+        {
+            return chat.getSecond_user();
+        }else{
+            return  chat.getFirst_user();
+        }
+    }
 }
