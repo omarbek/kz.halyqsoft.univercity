@@ -1,25 +1,10 @@
 package kz.halyqsoft.univercity;
 
 import com.vaadin.annotations.Theme;
-import kz.halyqsoft.univercity.entity.beans.ROLES;
-import kz.halyqsoft.univercity.entity.beans.ROLE_TASKS;
-import kz.halyqsoft.univercity.entity.beans.ROLE_TASK_FUNCTIONS;
-import kz.halyqsoft.univercity.entity.beans.SETTINGS;
-import kz.halyqsoft.univercity.entity.beans.TABLES;
-import kz.halyqsoft.univercity.entity.beans.TASKS;
-import kz.halyqsoft.univercity.entity.beans.USERS;
-import kz.halyqsoft.univercity.entity.beans.USER_ROLES;
+import kz.halyqsoft.univercity.entity.beans.*;
 import org.r3a.common.dblink.lifecycle.LifecycleManager;
 import org.r3a.common.dblink.utils.DBLink;
-import org.r3a.common.entity.beans.AbstractLog;
-import org.r3a.common.entity.beans.AbstractRole;
-import org.r3a.common.entity.beans.AbstractRoleTask;
-import org.r3a.common.entity.beans.AbstractRoleTaskFunction;
-import org.r3a.common.entity.beans.AbstractSetting;
-import org.r3a.common.entity.beans.AbstractTable;
-import org.r3a.common.entity.beans.AbstractTask;
-import org.r3a.common.entity.beans.AbstractUser;
-import org.r3a.common.entity.beans.AbstractUserRole;
+import org.r3a.common.entity.beans.*;
 import org.r3a.common.resources.Resource;
 import org.r3a.common.vaadin.AbstractSecureWebUI;
 import org.slf4j.Logger;

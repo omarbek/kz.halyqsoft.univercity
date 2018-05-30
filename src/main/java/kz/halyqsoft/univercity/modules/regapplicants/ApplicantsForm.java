@@ -670,9 +670,10 @@ public final class ApplicantsForm extends UsersForm {
             ochnii = "заочной";
         }
 
-        DateFormat form = new SimpleDateFormat("E MMM dd HH:mm:ss Z yyyy");
+//        DateFormat form = new SimpleDateFormat("E MMM dd HH:mm:ss Z yyyy");
+        DateFormat form = new SimpleDateFormat( "EEE MMM dd HH:mm:ss z yyyy", Locale.US);
 
-        Date dateBirth = (Date) form.parse(student.getBirthDate().toString());
+        Date dateBirth = form.parse(student.getBirthDate().toString());
         Calendar cal = Calendar.getInstance();
         cal.setTime(dateBirth);
         String birthdayDate = cal.get(Calendar.DATE) + "." + (cal.get(Calendar.MONTH) + 1) + "." + cal.get(Calendar.YEAR);
@@ -733,7 +734,7 @@ public final class ApplicantsForm extends UsersForm {
 
         replaced = text.replaceAll("\\$fio", student.toString())
                 .replaceAll("\\$money", money)
-                .replaceAll("\\$faculty", studentEducation.getFaculty().toString())
+                .replaceAll("\\$faculty", studentEducation.getFaculty().toString().substring(0,studentEducation.getFaculty().toString().lastIndexOf('/')-1))
                 .replaceAll("\\$DataMonthYear", today + " года")
                 .replaceAll("\\$formaobuch", ochnii)
                 .replaceAll("\\$data\\$month\\$year", today)
@@ -743,7 +744,7 @@ public final class ApplicantsForm extends UsersForm {
                 .replaceAll("\\$InLetters", inLetters)
                 .replaceAll("\\$Obshaga", String.valueOf(accountantPrice.getPrice()))
                 .replaceAll("\\$Dorm", accountantPrice.getPriceInLetters())
-                .replaceAll("\\$aboutMe", "My name is " + student.toString())
+                .replaceAll("\\$aboutMe", "-")
                 .replaceAll("\\$country", student.getCitizenship().toString())
                 .replaceAll("\\$status", student.getMaritalStatus().toString())
                 .replaceAll("\\$father", studentRelativeFather.getFio())
@@ -755,14 +756,14 @@ public final class ApplicantsForm extends UsersForm {
                 .replaceAll("\\$nationality", student.getNationality().toString())
                 .replaceAll("\\$info", educationDoc.getEndYear().toString() + ", "
                         + educationDoc.getEducationType() + ", " + educationDoc.getSchoolName())
-                .replaceAll("\\$speciality", speciality.getSpecName())
+                .replaceAll("\\$speciality", speciality.getSpecName().substring(0,speciality.getSpecName().lastIndexOf('/')-1))
                 .replaceAll("\\$parentsAddress", studentRelativeFather.getFio() + ", "
                         + studentRelativeFather.getWorkPlace() + "    "
                         + studentRelativeFather.getPostName() + '\n'
                         + studentRelativeMother.getFio() + ", "
                         + studentRelativeMother.getWorkPlace() + "    "
                         + studentRelativeMother.getPostName())
-                .replaceAll("\\$trudovoe", "Ничем не занимался")
+                .replaceAll("\\$trudovoe", "-")
                 .replaceAll("\\$name", student.getLastName())
                 .replaceAll("\\$surname", student.getFirstName())
                 .replaceAll("\\$firstName", student.getMiddleName())

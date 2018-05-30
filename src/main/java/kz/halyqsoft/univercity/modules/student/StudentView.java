@@ -5,11 +5,9 @@ import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.TextField;
+import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEPARTMENT;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDENT_EDUCATION_TYPE;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDENT_STATUS;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDY_YEAR;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VStudent;
 import kz.halyqsoft.univercity.filter.FStudentFilter;
 import kz.halyqsoft.univercity.filter.panel.StudentFilterPanel;
@@ -23,10 +21,11 @@ import org.r3a.common.entity.beans.AbstractTask;
 import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.event.EntityListener;
 import org.r3a.common.entity.query.QueryModel;
+import org.r3a.common.entity.query.from.EJoin;
+import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.ERefreshType;
-import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 import org.r3a.common.vaadin.widget.filter2.FilterPanelListener;
 import org.r3a.common.vaadin.widget.form.FormModel;
@@ -64,17 +63,29 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
         tf.setNullSettingAllowed(true);
         filterPanel.addFilterComponent("code", tf);
 
-        tf = new TextField();
-        tf.setNullRepresentation("");
-        tf.setNullSettingAllowed(true);
-        filterPanel.addFilterComponent("firstname", tf);
-
-        tf = new TextField();
-        tf.setNullRepresentation("");
-        tf.setNullSettingAllowed(true);
-        filterPanel.addFilterComponent("lastname", tf);
+//        tf = new TextField();
+//        tf.setNullRepresentation("");
+//        tf.setNullSettingAllowed(true);
+//        filterPanel.addFilterComponent("firstname", tf);
+//
+//        tf = new TextField();
+//        tf.setNullRepresentation("");
+//        tf.setNullSettingAllowed(true);
+//        filterPanel.addFilterComponent("lastname", tf);
 
         ComboBox cb = new ComboBox();
+        cb.setNullSelectionAllowed(true);
+        cb.setTextInputAllowed(true);
+        cb.setFilteringMode(FilteringMode.OFF);
+        QueryModel<CARD> cardQM = new QueryModel<>(CARD.class);
+        FromItem userFI = cardQM.addJoin(EJoin.INNER_JOIN, "id", USERS.class, "card");
+        cardQM.addWhere(userFI, "typeIndex", ECriteria.EQUAL, 2);
+        BeanItemContainer<CARD> cardBIC = new BeanItemContainer<>(CARD.class,
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(cardQM));
+        cb.setContainerDataSource(cardBIC);
+        filterPanel.addFilterComponent("card", cb);
+
+        cb = new ComboBox();
         cb.setNullSelectionAllowed(true);
         cb.setTextInputAllowed(false);
         cb.setFilteringMode(FilteringMode.OFF);
@@ -255,21 +266,29 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
             sb.append(sf.getCode().trim().toLowerCase());
             sb.append("%'");
         }
-        if (sf.getFirstname() != null && sf.getFirstname().trim().length() >= 3) {
+//        if (sf.getFirstname() != null && sf.getFirstname().trim().length() >= 3) {
+//            if (sb.length() > 0) {
+//                sb.append(" and ");
+//            }
+//            sb.append("lower(usr.FIRST_NAME) like '");
+//            sb.append(sf.getFirstname().trim().toLowerCase());
+//            sb.append("%'");
+//        }
+//        if (sf.getLastname() != null && sf.getLastname().trim().length() >= 3) {
+//            if (sb.length() > 0) {
+//                sb.append(" and ");
+//            }
+//            sb.append("lower(usr.LAST_NAME) like '");
+//            sb.append(sf.getLastname().trim().toLowerCase());
+//            sb.append("%'");
+//        }
+        if (sf.getCard() != null) {
+            params.put(i, sf.getCard().getId().getId());
             if (sb.length() > 0) {
                 sb.append(" and ");
             }
-            sb.append("lower(usr.FIRST_NAME) like '");
-            sb.append(sf.getFirstname().trim().toLowerCase());
-            sb.append("%'");
-        }
-        if (sf.getLastname() != null && sf.getLastname().trim().length() >= 3) {
-            if (sb.length() > 0) {
-                sb.append(" and ");
-            }
-            sb.append("lower(usr.LAST_NAME) like '");
-            sb.append(sf.getLastname().trim().toLowerCase());
-            sb.append("%'");
+            sb.append("usr.card_id = ?");
+            sb.append(i++);
         }
         if (sf.getStudentStatus() != null) {
             params.put(i, sf.getStudentStatus().getId().getId());
@@ -340,7 +359,7 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
                 "  spec.SPEC_NAME " +
                 "FROM STUDENT stu INNER JOIN USERS usr ON stu.ID = usr.ID " +
                 "  INNER JOIN STUDENT_EDUCATION stu_edu ON stu.ID = stu_edu.STUDENT_ID AND stu_edu.CHILD_ID IS NULL " +
-                "  LEFT JOIN DORM_STUDENT dorm_stu ON dorm_stu.student_id = stu_edu.id " +
+                "  LEFT JOIN DORM_STUDENT dorm_stu ON dorm_stu.student_id = stu_edu.id" +
                 "  INNER JOIN STUDENT_STATUS stu_status ON stu_edu.STUDENT_STATUS_ID = stu_status.ID " +
                 "  INNER JOIN DEPARTMENT dep ON stu_edu.FACULTY_ID = dep.ID " +
                 "  INNER JOIN SPECIALITY spec ON stu_edu.SPECIALITY_ID = spec.ID " +

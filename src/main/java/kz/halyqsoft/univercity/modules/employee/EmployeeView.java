@@ -5,7 +5,9 @@ import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.TextField;
+import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.CARD;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEPARTMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.POST;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VEmployee;
@@ -19,6 +21,9 @@ import org.r3a.common.entity.ID;
 import org.r3a.common.entity.beans.AbstractTask;
 import org.r3a.common.entity.event.EntityListener;
 import org.r3a.common.entity.query.QueryModel;
+import org.r3a.common.entity.query.from.EJoin;
+import org.r3a.common.entity.query.from.FromItem;
+import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.ERefreshType;
 import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
@@ -53,14 +58,30 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
         TextField tf = new TextField();
         tf.setNullRepresentation("");
         tf.setNullSettingAllowed(true);
-        filterPanel.addFilterComponent("firstname", tf);
-
-        tf = new TextField();
-        tf.setNullRepresentation("");
-        tf.setNullSettingAllowed(true);
-        filterPanel.addFilterComponent("lastname", tf);
+        filterPanel.addFilterComponent("code", tf);
+//        TextField tf = new TextField();
+//        tf.setNullRepresentation("");
+//        tf.setNullSettingAllowed(true);
+//        filterPanel.addFilterComponent("firstname", tf);
+//
+//        tf = new TextField();
+//        tf.setNullRepresentation("");
+//        tf.setNullSettingAllowed(true);
+//        filterPanel.addFilterComponent("lastname", tf);
 
         ComboBox cb = new ComboBox();
+        cb.setNullSelectionAllowed(true);
+        cb.setTextInputAllowed(true);
+        cb.setFilteringMode(FilteringMode.OFF);
+        QueryModel<CARD> cardQM = new QueryModel<>(CARD.class);
+        FromItem userFI = cardQM.addJoin(EJoin.INNER_JOIN, "id", USERS.class, "card");
+        cardQM.addWhere(userFI, "typeIndex", ECriteria.EQUAL, 1);
+        BeanItemContainer<CARD> cardBIC = new BeanItemContainer<>(CARD.class,
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(cardQM));
+        cb.setContainerDataSource(cardBIC);
+        filterPanel.addFilterComponent("card", cb);
+
+         cb = new ComboBox();
         cb.setNullSelectionAllowed(true);
         cb.setTextInputAllowed(true);
         cb.setFilteringMode(FilteringMode.CONTAINS);
@@ -112,18 +133,31 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
         int i = 1;
         Map<Integer, Object> params = new HashMap<>();
         StringBuilder sb = new StringBuilder();
-        if (ef.getFirstname() != null && ef.getFirstname().trim().length() >= 3) {
-            sb.append("lower(usr.FIRST_NAME) like '");
-            sb.append(ef.getFirstname().trim().toLowerCase());
+        if (ef.getCode() != null && ef.getCode().trim().length() >= 2) {
+            sb.append("lower(usr.CODE) like '");
+            sb.append(ef.getCode().trim().toLowerCase());
             sb.append("%'");
         }
-        if (ef.getLastname() != null && ef.getLastname().trim().length() >= 3) {
+//        if (ef.getFirstname() != null && ef.getFirstname().trim().length() >= 3) {
+//            sb.append("lower(usr.FIRST_NAME) like '");
+//            sb.append(ef.getFirstname().trim().toLowerCase());
+//            sb.append("%'");
+//        }
+//        if (ef.getLastname() != null && ef.getLastname().trim().length() >= 3) {
+//            if (sb.length() > 0) {
+//                sb.append(" and ");
+//            }
+//            sb.append("lower(usr.LAST_NAME) like '");
+//            sb.append(ef.getLastname().trim().toLowerCase());
+//            sb.append("%'");
+//        }
+        if (ef.getCard() != null) {
+            params.put(i, ef.getCard().getId().getId());
             if (sb.length() > 0) {
                 sb.append(" and ");
             }
-            sb.append("lower(usr.LAST_NAME) like '");
-            sb.append(ef.getLastname().trim().toLowerCase());
-            sb.append("%'");
+            sb.append("usr.card_id = ?");
+            sb.append(i++);
         }
         if (ef.getDepartment() != null) {
             params.put(i, ef.getDepartment().getId().getId());
