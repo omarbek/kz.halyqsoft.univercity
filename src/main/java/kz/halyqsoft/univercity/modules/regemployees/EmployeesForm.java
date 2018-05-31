@@ -55,6 +55,10 @@ public class EmployeesForm extends UsersForm {
     }
 
     @Override
+    protected void setOpeners() {
+    }
+
+    @Override
     protected VerticalLayout getMessForm(FormModel dataFM, Label mess) {
         employeeDegreeButton.setEnabled(false);
         publicationButton.setEnabled(false);

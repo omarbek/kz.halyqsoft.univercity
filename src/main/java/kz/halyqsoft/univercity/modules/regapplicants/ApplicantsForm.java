@@ -5,14 +5,12 @@ import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.server.FileDownloader;
+import com.vaadin.server.BrowserWindowOpener;
 import com.vaadin.server.StreamResource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinService;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.*;
-import com.vaadin.ui.Button.ClickEvent;
-import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.enumeration.Flag;
@@ -21,7 +19,6 @@ import kz.halyqsoft.univercity.entity.beans.univercity.view.V_ENTRANT_SPECIALITY
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_KBTU_ENTRANTS;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.register.*;
-import org.apache.commons.io.FileUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.facade.CommonIDFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -41,7 +38,9 @@ import org.r3a.common.vaadin.widget.table.TableWidget;
 import org.r3a.common.vaadin.widget.table.model.DBTableModel;
 
 import javax.persistence.NoResultException;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -62,18 +61,22 @@ public final class ApplicantsForm extends UsersForm {
 
     private Button untButton, grantDocButton;
     private Button motherButton, fatherButton;
-    private Button contractButton, moreButton;
-    private Button finishButton;
-    private Button downloadContractButton;
-    private Button downloadButtonRegisterButton;
+    private Button contractButton;
     private Button specButton;
 
-    private boolean saveSpec;
+    private boolean saveSpec, saveUnt;
+    private boolean came = false;
 
     private Parent parent;
     private Unt unt;
     private Grant grant;
     private Contract contract;
+
+    private BrowserWindowOpener contractBWO;
+    private BrowserWindowOpener requestBWO;
+    private BrowserWindowOpener titleBWO;
+    private BrowserWindowOpener voucherBWO;
+    private BrowserWindowOpener dormBWO;
 
     private static final int FATHER = 1;
     private static final int MOTHER = 2;
@@ -107,6 +110,22 @@ public final class ApplicantsForm extends UsersForm {
 
         contract = new Contract(dataAFW, this);
         contract.create(udfQM, military.getMilitaryFLFM());
+    }
+
+    @Override
+    protected void setOpeners() {
+        StreamResource myResource = createResourceStudent("85", null);
+        contractBWO = new BrowserWindowOpener(myResource);
+        contractBWO.extend(finishButton);
+
+        requestBWO = new BrowserWindowOpener(myResource);
+        requestBWO.extend(finishButton);
+
+        titleBWO = new BrowserWindowOpener(myResource);
+        titleBWO.extend(finishButton);
+
+        voucherBWO = new BrowserWindowOpener(myResource);
+        voucherBWO.extend(finishButton);
     }
 
     @Override
@@ -181,13 +200,6 @@ public final class ApplicantsForm extends UsersForm {
         grantDocButton.setEnabled(false);
         fatherButton.setEnabled(false);
 
-        downloadContractButton = new Button();
-        downloadContractButton.setCaption(getUILocaleUtil().getCaption("download.contract"));
-
-        downloadButtonRegisterButton = new Button();
-        downloadButtonRegisterButton.setCaption(getUILocaleUtil().getCaption("download.contract.register"));
-
-
         STUDENT_EDUCATION studentEducation = new STUDENT_EDUCATION();
         try {
             STUDENT student = (STUDENT) dataFM.getEntity();
@@ -210,39 +222,37 @@ public final class ApplicantsForm extends UsersForm {
 
             SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(studentEducation);
 
-
-            StreamResource myResource = createResourceStudent("85", student);
-            FileDownloader fileDownloader = new FileDownloader(myResource);
-            myResource.setMIMEType("application/pdf");
-            myResource.setCacheTime(0);
-            fileDownloader.extend(downloadContractButton);
-
-            StreamResource myResourceParents = createResourceStudent("27", student);
-            FileDownloader fileDownloaderParent = new FileDownloader(myResourceParents);
-            myResourceParents.setMIMEType("application/pdf");
-            myResourceParents.setCacheTime(0);
-            fileDownloaderParent.extend(downloadButtonRegisterButton);
-
-            StreamResource myResourceTitul = createResourceStudent("32", student);
-            FileDownloader fileDownloaderTitul = new FileDownloader(myResourceTitul);
-            myResourceTitul.setMIMEType("application/pdf");
-            myResourceTitul.setCacheTime(0);
-            fileDownloaderTitul.extend(downloadButtonRegisterButton);
-
-            StreamResource myResourceReg = createResourceStudent("33", student);
-            FileDownloader fileDownloaderReg = new FileDownloader(myResourceReg);
-            myResourceReg.setMIMEType("application/pdf");
-            myResourceReg.setCacheTime(0);
-            fileDownloaderReg.extend(downloadButtonRegisterButton);
-
-            if (student.isNeedDorm() == true) {
-                StreamResource myResourceDorm = createResourceStudent("92", student);
-                FileDownloader fileDownloaderDorm = new FileDownloader(myResourceDorm);
-                myResourceDorm.setMIMEType("application/pdf");
-                myResourceDorm.setCacheTime(0);
-                fileDownloaderDorm.extend(downloadContractButton);
-
-            }
+//            StreamResource myResource = createResourceStudent("85", student);
+//            FileDownloader fileDownloader = new FileDownloader(myResource);
+//            myResource.setMIMEType("application/pdf");
+//            myResource.setCacheTime(0);
+//            fileDownloader.extend(downloadContractButton);
+//
+//            StreamResource myResourceParents = createResourceStudent("27", student);
+//            FileDownloader fileDownloaderParent = new FileDownloader(myResourceParents);
+//            myResourceParents.setMIMEType("application/pdf");
+//            myResourceParents.setCacheTime(0);
+//            fileDownloaderParent.extend(downloadButtonRegisterButton);
+//
+//            StreamResource myResourceTitul = createResourceStudent("32", student);//TODO docs
+//            FileDownloader fileDownloaderTitul = new FileDownloader(myResourceTitul);
+//            myResourceTitul.setMIMEType("application/pdf");
+//            myResourceTitul.setCacheTime(0);
+//            fileDownloaderTitul.extend(downloadButtonRegisterButton);
+//
+//            StreamResource myResourceReg = createResourceStudent("33", student);
+//            FileDownloader fileDownloaderReg = new FileDownloader(myResourceReg);
+//            myResourceReg.setMIMEType("application/pdf");
+//            myResourceReg.setCacheTime(0);
+//            fileDownloaderReg.extend(downloadButtonRegisterButton);
+//
+//            if (student.isNeedDorm() == true) {
+//                StreamResource myResourceDorm = createResourceStudent("92", student);
+//                FileDownloader fileDownloaderDorm = new FileDownloader(myResourceDorm);
+//                myResourceDorm.setMIMEType("application/pdf");
+//                myResourceDorm.setCacheTime(0);
+//                fileDownloaderDorm.extend(downloadContractButton);
+//            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -259,8 +269,6 @@ public final class ApplicantsForm extends UsersForm {
             }
         });
 
-        messForm.addComponent(downloadButtonRegisterButton);
-        messForm.addComponent(downloadContractButton);
         messForm.addComponent(againButton);
         return messForm;
     }
@@ -273,6 +281,7 @@ public final class ApplicantsForm extends UsersForm {
         conditionsMap.put(getUILocaleUtil().getMessage("info.save.address"), !saveFactAddress);
         conditionsMap.put(getUILocaleUtil().getMessage("info.save.speciality"), !saveSpec);
         conditionsMap.put(getUILocaleUtil().getMessage("info.save.educ"), !saveEduc);
+        conditionsMap.put(getUILocaleUtil().getMessage("info.save.unt"), !saveUnt);
         return conditionsMap;
     }
 
@@ -304,6 +313,7 @@ public final class ApplicantsForm extends UsersForm {
                 if (!dataFM.isCreateNew()) {
                     try {
                         studentId1 = dataFM.getEntity().getId();
+
                         if (dataAFW.save()) {
                             saveData = true;
                         }
@@ -315,6 +325,7 @@ public final class ApplicantsForm extends UsersForm {
 
                 if ((flagSave(flag, dataFM) && Flag.MAIN_DATA.equals(flag))
                         || !Flag.MAIN_DATA.equals(flag)) {
+                    setResource(dataFM);
                     flag = Flag.SPECIALITY;
                     registrationHSP.removeComponent(contentHL);
                     addToLayout(specTW, untButton, event);
@@ -323,12 +334,13 @@ public final class ApplicantsForm extends UsersForm {
             }
         });
 
-        untButton = createFormButton("unt", false);
+        untButton = createFormButton("unt", true);
         untButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 if ((flagSave(flag, dataFM) && Flag.MAIN_DATA.equals(flag))
                         || !Flag.MAIN_DATA.equals(flag)) {
+                    setResource(dataFM);
                     setActive(event);
                     flag = Flag.UNT;
 
@@ -406,11 +418,40 @@ public final class ApplicantsForm extends UsersForm {
 
     }
 
+    private void setResource(FormModel dataFM) {
+        STUDENT student = null;
+        try {
+            student = (STUDENT) dataFM.getEntity();
+        } catch (Exception e) {
+            e.printStackTrace();//TODO catch
+        }
+
+        StreamResource myResource = createResourceStudent("85", student);
+        contractBWO.setResource(myResource);
+
+        myResource = createResourceStudent("27", student);
+        requestBWO.setResource(myResource);
+
+        myResource = createResourceStudent("33", student);
+        voucherBWO.setResource(myResource);
+
+        myResource = createResourceStudent("32", student);
+        titleBWO.setResource(myResource);
+
+        if (student != null && student.isNeedDorm() && !came) {
+            came = true;
+            myResource = createResourceStudent("92", student);
+            dormBWO = new BrowserWindowOpener(myResource);
+            dormBWO.extend(finishButton);
+        }
+    }
+
 
     @Override
     protected void initSpec(FormModel dataFM) {
         saveSpec = false;
         saveEduc = false;
+        saveUnt = false;
         saveFactAddress = false;
         specTW = new TableWidget(V_ENTRANT_SPECIALITY.class);
         specTW.addEntityListener(ApplicantsForm.this);
@@ -586,7 +627,9 @@ public final class ApplicantsForm extends UsersForm {
                     for (PDF_PROPERTY property : properties) {
 
                         String text = new String(property.getText());
-                        setReplaced(text, student);
+                        if (student != null) {
+                            setReplaced(text, student);
+                        }
                         Paragraph paragraph = new Paragraph(replaced,
                                 getFont(Integer.parseInt(property.getSize().toString()), CommonUtils.getFontMap(property.getFont().toString())));
 
@@ -671,7 +714,7 @@ public final class ApplicantsForm extends UsersForm {
         }
 
 //        DateFormat form = new SimpleDateFormat("E MMM dd HH:mm:ss Z yyyy");
-        DateFormat form = new SimpleDateFormat( "EEE MMM dd HH:mm:ss z yyyy", Locale.US);
+        DateFormat form = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.US);
 
         Date dateBirth = form.parse(student.getBirthDate().toString());
         Calendar cal = Calendar.getInstance();
@@ -731,10 +774,12 @@ public final class ApplicantsForm extends UsersForm {
             studentRelativeMother.setPostName("-");
         }
 
+        String facultyName = getStringBeforeSlash(studentEducation.getFaculty().toString());
+        String specialityName = getStringBeforeSlash(speciality.getSpecName());
 
         replaced = text.replaceAll("\\$fio", student.toString())
                 .replaceAll("\\$money", money)
-                .replaceAll("\\$faculty", studentEducation.getFaculty().toString().substring(0,studentEducation.getFaculty().toString().lastIndexOf('/')-1))
+                .replaceAll("\\$faculty", facultyName)
                 .replaceAll("\\$DataMonthYear", today + " года")
                 .replaceAll("\\$formaobuch", ochnii)
                 .replaceAll("\\$data\\$month\\$year", today)
@@ -756,7 +801,7 @@ public final class ApplicantsForm extends UsersForm {
                 .replaceAll("\\$nationality", student.getNationality().toString())
                 .replaceAll("\\$info", educationDoc.getEndYear().toString() + ", "
                         + educationDoc.getEducationType() + ", " + educationDoc.getSchoolName())
-                .replaceAll("\\$speciality", speciality.getSpecName().substring(0,speciality.getSpecName().lastIndexOf('/')-1))
+                .replaceAll("\\$speciality", specialityName)
                 .replaceAll("\\$parentsAddress", studentRelativeFather.getFio() + ", "
                         + studentRelativeFather.getWorkPlace() + "    "
                         + studentRelativeFather.getPostName() + '\n'
@@ -775,6 +820,16 @@ public final class ApplicantsForm extends UsersForm {
                 .replaceAll("\\$document", createdDate)
                 .replaceAll("\\$diplomaType", student.getDiplomaType().toString())
                 .replaceAll("қажет, қажет емес", dorm);
+    }
+
+    private static String getStringBeforeSlash(String name) {
+        String returnName;
+        try {
+            returnName = name.substring(0, name.lastIndexOf('/') - 1);
+        } catch (Exception e) {
+            returnName = name;
+        }
+        return returnName;
     }
 
     public static STUDENT_RELATIVE getStudent_relative(STUDENT student, int relativeType) throws Exception {
@@ -972,6 +1027,7 @@ public final class ApplicantsForm extends UsersForm {
             boolean preSaveRates = unt.preSaveRates(e, isNew);
             if (unt.getUntRatesTW().getEntityCount() > 1) {
                 untNextButton.setEnabled(true);
+                saveUnt = true;
             }
             return preSaveRates;
         } else if (source.equals(parent.getFatherGFW())) {

@@ -278,7 +278,8 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
             List<EMPLOYEE> mergeList = new ArrayList<>();
             for (Entity e : entities) {
                 try {
-                    EMPLOYEE e1 = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(EMPLOYEE.class, e.getId());
+                    EMPLOYEE e1 = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(EMPLOYEE.class,
+                            e.getId());
                     e1.setDeleted(true);
                     mergeList.add(e1);
                 } catch (Exception ex) {

@@ -65,9 +65,9 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
     private Button mainDataButton, regAddressButton;
     private Button militaryButton, disabilityButton, repatriateButton;
     private Button eduDocsButton, preemRightButton;
-    private Button medButton, finishButton;
+    private Button medButton;
     private Button form, idDocButton;
-    protected Button factAddressButton, eduDocButton,moreButton;
+    protected Button factAddressButton, eduDocButton, moreButton, finishButton;
 
     private String userPhotoFilename;
     private byte[] userPhotoBytes;
@@ -418,9 +418,6 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
 
                     contentHL.removeAllComponents();
                     contentHL.addComponent(additionalDataVL);
-                    Button nextButton = createNextButton(finishButton, "exit");
-                    contentHL.addComponent(nextButton);
-                    contentHL.setComponentAlignment(nextButton, Alignment.MIDDLE_CENTER);
                 }
             }
         });
@@ -431,6 +428,8 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
         finishButton.setIcon(new ThemeResource("img/button/ok.png"));
         finishButton.addStyleName("left");
         finishButton.setWidth(FORM_BUTTON_WIDTH);
+
+        setOpeners();
 
         finishButton.addClickListener(new Button.ClickListener() {
             @Override
@@ -509,6 +508,8 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
         buttons.add(moreButton);
     }
 
+    protected abstract void setOpeners();
+
     protected void setActive(Button.ClickEvent event) {
         setInactive();
         event.getButton().setIcon(new ThemeResource("img/button/active.png"));
@@ -539,7 +540,7 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
 
     protected abstract Button getAfterMedButton();
 
-    protected abstract void initOwnButtons(FormModel dataFM);
+    protected abstract void initOwnButtons(FormModel dataFM) ;
 
     protected abstract void initSpec(FormModel dataFM);
 
