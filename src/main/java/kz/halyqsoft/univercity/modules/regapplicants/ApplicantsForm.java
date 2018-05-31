@@ -1,6 +1,7 @@
 package kz.halyqsoft.univercity.modules.regapplicants;
 
 import com.itextpdf.text.*;
+import com.itextpdf.text.Image;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfWriter;
@@ -41,11 +42,15 @@ import javax.persistence.NoResultException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import javax.swing.*;
+import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Calendar;
 import java.util.List;
+
+import static javax.swing.JOptionPane.showInputDialog;
 
 /**
  * @author Omarbek
@@ -56,7 +61,6 @@ public final class ApplicantsForm extends UsersForm {
     private static String replaced;
     private Button untNextButton;
     private Map<String, Integer> fontMap;
-
     private TableWidget specTW;
 
     private Button untButton, grantDocButton;
@@ -313,7 +317,6 @@ public final class ApplicantsForm extends UsersForm {
                 if (!dataFM.isCreateNew()) {
                     try {
                         studentId1 = dataFM.getEntity().getId();
-
                         if (dataAFW.save()) {
                             saveData = true;
                         }
@@ -542,16 +545,49 @@ public final class ApplicantsForm extends UsersForm {
                     ByteArrayOutputStream byteArrayOutputStream1 = new ByteArrayOutputStream();
                     PdfWriter pdfWriter = PdfWriter.getInstance(docum, byteArrayOutputStream1);
                     docum.open();
+
                     if (value.equals("32")) {
                         PdfContentByte canvas = pdfWriter.getDirectContent();
+
+
+
                         Rectangle rect = new Rectangle(36, 26, 559, 816);
+
                         Rectangle rect1 = new Rectangle(86, 790, 187, 685);
                         rect1.setBorderWidth(1);
                         rect1.setBorder(Rectangle.BOX);
                         rect.setBorder(Rectangle.BOX);
                         rect.setBorderWidth(1);
+
+                        byte[] imageArray = null;
+                        try{
+                            QueryModel<USER_PHOTO> qm = new QueryModel<>(USER_PHOTO.class);
+                            qm.addWhere("user" , ECriteria.EQUAL , student.getId());
+                            imageArray = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(qm).getPhoto();
+                        }catch (NoResultException e)
+                        {
+                            e.printStackTrace();
+                        }catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+
+                        if(imageArray!=null)
+                        {
+                            Image image = Image.getInstance(imageArray);
+                            image.rotate();
+                            Rectangle rectImage = new Rectangle(86,685, 187,790);
+
+                            image.scaleAbsolute(rectImage);
+                            image.setAbsolutePosition(86,685);
+                            canvas.addImage(image);
+                        }
+
+
                         canvas.rectangle(rect1);
                         canvas.rectangle(rect);
+
+
                         title = new Paragraph("ОҢТҮСТІК ҚАЗАҚСТАН",
                                 getFont(12, Font.BOLD));
                         title.setAlignment(Element.ALIGN_CENTER);
@@ -559,56 +595,91 @@ public final class ApplicantsForm extends UsersForm {
                     } else if (value.equals("33")) {
                         Rectangle one = new Rectangle(70, 140);
                         Rectangle two = new Rectangle(1000, 800);
+
                         docum.setPageSize(one);
                         docum.setMargins(2, 2, 2, 2);
                         docum.open();
                         docum.setPageSize(two);
                         docum.setMargins(20, 20, 20, 20);
                         docum.newPage();
+
                         PdfContentByte canvas = pdfWriter.getDirectContent();
-                        canvas.moveTo(12, 554);
-                        canvas.lineTo(700, 554);
-                        canvas.lineTo(700, 344);
-                        canvas.lineTo(12, 344);
-                        canvas.moveTo(12, 524);
-                        canvas.lineTo(700, 524);
-                        canvas.moveTo(12, 506);
-                        canvas.lineTo(700, 506);
-                        canvas.moveTo(12, 488);
-                        canvas.lineTo(700, 488);
-                        canvas.moveTo(12, 470);
-                        canvas.lineTo(700, 470);
-                        canvas.moveTo(12, 452);
-                        canvas.lineTo(700, 452);
-                        canvas.moveTo(12, 416);
-                        canvas.lineTo(700, 416);
-                        canvas.moveTo(12, 380);
-                        canvas.lineTo(700, 380);
-                        canvas.moveTo(12, 362);
-                        canvas.lineTo(700, 362);
-                        canvas.moveTo(12, 344);
-                        canvas.lineTo(12, 344);
-                        canvas.moveTo(12, 554);
-                        canvas.lineTo(12, 344);
-                        canvas.moveTo(250, 554);
-                        canvas.lineTo(250, 344);
-                        canvas.moveTo(570, 554);
-                        canvas.lineTo(570, 344);
+                        SPECIALITY speciality = (student).getEntrantSpecialities().iterator().next().getSpeciality();
+                        String spec = speciality.getSpecName().substring(0,speciality.getSpecName().lastIndexOf('/')-1);
 
-                        canvas.moveTo(12, 334);
-                        canvas.lineTo(640, 334);
-                        canvas.lineTo(640, 309);
-                        canvas.lineTo(12, 309);
+                        STUDENT_EDUCATION studentEducation = new STUDENT_EDUCATION();
+                        studentEducation.setFaculty(speciality.getDepartment().getParent());
+                        String faculty = studentEducation.getFaculty().toString().substring(0,studentEducation.getFaculty().toString().lastIndexOf('/')-1);
 
-                        canvas.moveTo(160, 334);
-                        canvas.lineTo(160, 309);
-                        canvas.moveTo(410, 334);
-                        canvas.lineTo(410, 309);
-                        canvas.moveTo(560, 334);
-                        canvas.lineTo(560, 309);
-                        canvas.moveTo(12, 334);
-                        canvas.lineTo(12, 309);
+
+
+                        int y = 0;
+                        int offset = -19;
+                        int row = 0;
+
+                        if(faculty.length() > 29)
+                        {
+                            row = row + 1;
+                        }
+                        if(faculty.length() > 60)
+                        {
+                            row = row + 1;
+                        }
+                        if(spec.length() > 29)
+                        {
+                            row = row + 1;
+                        }
+                        if(spec.length()>60)
+                        {
+                            row = row + 1;
+                        }
+
+                        y =  offset * row;
+                        canvas.moveTo(12, 554+y);
+                        canvas.lineTo(700, 554+y);
+                        canvas.lineTo(700, 344+y);
+                        canvas.lineTo(12, 344+y);
+
+                        canvas.moveTo(12, 524+y);
+                        canvas.lineTo(700, 524+y);
+                        canvas.moveTo(12, 506+y);
+                        canvas.lineTo(700, 506+y);
+                        canvas.moveTo(12, 488+y);
+                        canvas.lineTo(700, 488+y);
+                        canvas.moveTo(12, 470+y);
+                        canvas.lineTo(700, 470+y);
+                        canvas.moveTo(12, 452+y);
+                        canvas.lineTo(700, 452+y);
+                        canvas.moveTo(12, 416+y);
+                        canvas.lineTo(700, 416+y);
+                        canvas.moveTo(12, 380+y);
+                        canvas.lineTo(700, 380+y);
+                        canvas.moveTo(12, 362+y);
+                        canvas.lineTo(700, 362+y);
+                        canvas.moveTo(12, 344+y);
+                        canvas.lineTo(12, 344+y);
+                        canvas.moveTo(12, 554+y);
+                        canvas.lineTo(12, 344+y);
+                        canvas.moveTo(250, 554+y);
+                        canvas.lineTo(250, 344+y);
+                        canvas.moveTo(570, 554+y);
+                        canvas.lineTo(570, 344+y);
+
+                        canvas.moveTo(12, 334+y);
+                        canvas.lineTo(640, 334+y);
+                        canvas.lineTo(640, 309+y);
+                        canvas.lineTo(12, 309+y);
+
+                        canvas.moveTo(160, 334+y);
+                        canvas.lineTo(160, 309+y);
+                        canvas.moveTo(410, 334+y);
+                        canvas.lineTo(410, 309+y);
+                        canvas.moveTo(560, 334+y);
+                        canvas.lineTo(560, 309+y);
+                        canvas.moveTo(12, 334+y);
+                        canvas.lineTo(12, 309+y);
                         canvas.closePathStroke();
+
                         title = new Paragraph("ОҢТҮСТІК ҚАЗАҚСТАН ПЕДАГОГИКАЛЫҚ УНИВЕРСИТЕТІ",
                                 getFont(12, Font.BOLD));
                         title.setSpacingBefore(0f);
@@ -656,6 +727,7 @@ public final class ApplicantsForm extends UsersForm {
     }
 
     private static void setReplaced(String text, STUDENT student) throws Exception {
+
         Date date = Calendar.getInstance().getTime();
 
         STUDENT_EDUCATION studentEducation = new STUDENT_EDUCATION();
@@ -819,6 +891,8 @@ public final class ApplicantsForm extends UsersForm {
                 .replaceAll("\\$ent", untCertificate.getDocumentNo())
                 .replaceAll("\\$document", createdDate)
                 .replaceAll("\\$diplomaType", student.getDiplomaType().toString())
+                .replaceAll("\\$group", "")
+
                 .replaceAll("қажет, қажет емес", dorm);
     }
 
