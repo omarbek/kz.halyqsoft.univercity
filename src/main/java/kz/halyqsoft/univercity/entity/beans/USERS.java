@@ -143,6 +143,9 @@ public class USERS extends AbstractUser implements CommonTree<USERS> {
     @Column(name = "UPDATED_BY")
     private String updatedBy;
 
+    @Column(name = "CREATED_BY")
+    private String createdBy;
+
     public USERS() {
     }
 
@@ -430,5 +433,13 @@ public class USERS extends AbstractUser implements CommonTree<USERS> {
 
     public void setPdfDocuments(List<PDF_DOCUMENT> pdfDocuments) {
         this.pdfDocuments = pdfDocuments;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
     }
 }

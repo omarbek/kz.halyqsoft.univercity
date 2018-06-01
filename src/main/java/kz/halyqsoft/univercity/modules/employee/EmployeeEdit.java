@@ -1971,6 +1971,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         EMPLOYEE emp = (EMPLOYEE) e;
         if (isNew) {
             emp.setCreated(new Date());
+            emp.setCreatedBy(CommonUtils.getCurrentUserLogin());
             try {
                 emp.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USERS"));
                 emp.setCode("000000000000");

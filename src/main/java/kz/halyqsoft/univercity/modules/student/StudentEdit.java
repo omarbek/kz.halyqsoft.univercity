@@ -1382,6 +1382,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         STUDENT s = (STUDENT) e;
         if (isNew) {
             s.setCreated(new Date());
+            s.setCreatedBy(CommonUtils.getCurrentUserLogin());
             try {
                 s.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USERS"));
                 s.setCategory(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(STUDENT_CATEGORY.class, ID.valueOf(1)));

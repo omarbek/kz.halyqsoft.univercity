@@ -540,7 +540,7 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
 
     protected abstract Button getAfterMedButton();
 
-    protected abstract void initOwnButtons(FormModel dataFM) ;
+    protected abstract void initOwnButtons(FormModel dataFM);
 
     protected abstract void initSpec(FormModel dataFM);
 
@@ -747,6 +747,7 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
 
         if (isNew) {
             user.setCreated(new Date());
+            user.setCreatedBy(CommonUtils.getCurrentUserLogin());
             try {
                 user.setPasswd("12345678");
                 user.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USERS"));
