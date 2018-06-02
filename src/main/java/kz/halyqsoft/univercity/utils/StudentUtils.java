@@ -42,24 +42,26 @@ import java.util.*;
  */
 public abstract class StudentUtils extends AbstractFormWidgetView implements EntityListener, FilterPanelListener {
 
-    private final StudentFilterPanel filterPanel;
+    private StudentFilterPanel filterPanel;
     private GridWidget studentGW;
     private StudentOrApplicantView studentOrApplicantView;
     private HorizontalLayout buttonsHL;
-
     private int categoryType;
 
-    public StudentUtils(int categoryType) throws Exception {
-        super();
-        this.categoryType = categoryType;
+    public void setFilterPanel(StudentFilterPanel filterPanel) {
+        this.filterPanel = filterPanel;
+    }
 
-        filterPanel = new StudentFilterPanel(new FStudentFilter());
-        filterPanel.addFilterPanelListener(this);
+    public StudentFilterPanel createStudentFilterPanel() throws Exception{
+        StudentFilterPanel studentFilterPanel = new StudentFilterPanel(new FStudentFilter());
+        studentFilterPanel = new StudentFilterPanel(new FStudentFilter());
+        studentFilterPanel.addFilterPanelListener(this);
+        studentFilterPanel.setImmediate(true);
         setBackButtonVisible(false);
         TextField tf = new TextField();
         tf.setNullRepresentation("");
         tf.setNullSettingAllowed(true);
-        filterPanel.addFilterComponent("code", tf);
+        studentFilterPanel.addFilterComponent("code", tf);
 
         ComboBox cb = new ComboBox();
         cb.setNullSelectionAllowed(true);
@@ -71,7 +73,7 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
         BeanItemContainer<CARD> cardBIC = new BeanItemContainer<>(CARD.class,
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(cardQM));
         cb.setContainerDataSource(cardBIC);
-        filterPanel.addFilterComponent("card", cb);
+        studentFilterPanel.addFilterComponent("card", cb);
 
         cb = new ComboBox();
         cb.setNullSelectionAllowed(true);
@@ -88,7 +90,7 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
         BeanItemContainer<STUDENT_STATUS> ssBIC = new BeanItemContainer<>(STUDENT_STATUS.class,
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(ssQM));
         cb.setContainerDataSource(ssBIC);
-        filterPanel.addFilterComponent("studentStatus", cb);
+        studentFilterPanel.addFilterComponent("studentStatus", cb);
 
         cb = new ComboBox();
         cb.setNullSelectionAllowed(true);
@@ -103,7 +105,7 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
         BeanItemContainer<DEPARTMENT> facultyBIC = new BeanItemContainer<>(DEPARTMENT.class,
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(facultyQM));
         cb.setContainerDataSource(facultyBIC);
-        filterPanel.addFilterComponent("faculty", cb);
+        studentFilterPanel.addFilterComponent("faculty", cb);
 
         ComboBox specialtyCB = new ComboBox();
         specialtyCB.setNullSelectionAllowed(true);
@@ -112,7 +114,7 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
         specialtyCB.setPageLength(0);
         specialtyCB.setWidth(250, Unit.PIXELS);
         cb.addValueChangeListener(new FacultyChangeListener(specialtyCB));
-        filterPanel.addFilterComponent("speciality", specialtyCB);
+        studentFilterPanel.addFilterComponent("speciality", specialtyCB);
 
         cb = new ComboBox();
         cb.setNullSelectionAllowed(true);
@@ -126,7 +128,7 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
         BeanItemContainer<STUDY_YEAR> studyYearBIC = new BeanItemContainer<>(STUDY_YEAR.class,
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(studyYearQM));
         cb.setContainerDataSource(studyYearBIC);
-        filterPanel.addFilterComponent("studyYear", cb);
+        studentFilterPanel.addFilterComponent("studyYear", cb);
 
         cb = new ComboBox();
         cb.setNullSelectionAllowed(true);
@@ -137,7 +139,16 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
         BeanItemContainer<STUDENT_EDUCATION_TYPE> educationTypeBIC = new BeanItemContainer<>(STUDENT_EDUCATION_TYPE.class,
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(educationTypeQM));
         cb.setContainerDataSource(educationTypeBIC);
-        filterPanel.addFilterComponent("educationType", cb);
+        studentFilterPanel.addFilterComponent("educationType", cb);
+
+        return studentFilterPanel;
+    }
+
+    public StudentUtils(int categoryType) throws Exception {
+        super();
+        this.categoryType = categoryType;
+
+        filterPanel = createStudentFilterPanel();
 
         getContent().addComponent(filterPanel);
         getContent().setComponentAlignment(filterPanel, Alignment.TOP_CENTER);
@@ -209,6 +220,7 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
             fm.setTitleVisible(false);
             try {
                 fm.loadEntity(e.getId());
+
 //                getContent().removeComponent(buttonsHL);
                 getContent().removeComponent(filterPanel);
                 getContent().removeComponent(studentGW);
@@ -222,6 +234,8 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
 
         return true;
     }
+
+
 
     @Override
     public boolean onPreview(Object source, Entity e, int buttonId) {

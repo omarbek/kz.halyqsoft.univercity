@@ -16,6 +16,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_MEDICAL_CHECKUP;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_USER_LANGUAGE;
 import kz.halyqsoft.univercity.filter.FStudentFilter;
+import kz.halyqsoft.univercity.filter.panel.StudentFilterPanel;
 import kz.halyqsoft.univercity.modules.student.tabs.*;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.changelisteners.BirthCountryChangeListener;
@@ -327,7 +328,6 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                             }
                         }
                         showSavedNotification();
-
                         try{
                             baseDataFM.loadEntity(student.getId());
                             CommonUtils.setCards(baseDataFM);
@@ -485,8 +485,19 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         studentOrApplicantView.doFilter(new FStudentFilter());
         mainVL.removeComponent(this);
 //        mainVL.addComponent(studentOrApplicantView.getButtonsHL());
+
+        try {
+            StudentFilterPanel studentFilterPanel = studentOrApplicantView.createStudentFilterPanel();
+            studentOrApplicantView.setFilterPanel(studentFilterPanel);
+        }catch (Exception e)
+        {
+            Message.showError(e.getMessage());
+            e.printStackTrace();
+        }
+
         mainVL.addComponent(studentOrApplicantView.getFilterPanel());
         mainVL.addComponent(studentOrApplicantView.getStudentGW());
+
         return null;
     }
 
