@@ -22,7 +22,6 @@ import kz.halyqsoft.univercity.entity.beans.univercity.view.V_ENTRANT_SPECIALITY
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_KBTU_ENTRANTS;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.register.*;
-import org.apache.commons.io.FileUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.facade.CommonIDFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -42,15 +41,12 @@ import org.r3a.common.vaadin.widget.table.TableWidget;
 import org.r3a.common.vaadin.widget.table.model.DBTableModel;
 
 import javax.persistence.NoResultException;
-import javax.swing.*;
 import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Calendar;
 import java.util.List;
-
-import static javax.swing.JOptionPane.showInputDialog;
 
 /**
  * @author Omarbek

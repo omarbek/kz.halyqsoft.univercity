@@ -4,6 +4,7 @@ import com.itextpdf.text.Font;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Upload;
 import kz.halyqsoft.univercity.entity.beans.USERS;
@@ -209,6 +210,7 @@ public class CommonUtils {
 
         FKFieldModel cardFM = (FKFieldModel) baseDataFM.getFieldModel("card");
         QueryModel cardQM = cardFM.getQueryModel();
+
         cardQM.addWhere("id", ECriteria.EQUAL, ID.valueOf(cardId));
     }
 }

@@ -10,6 +10,7 @@ import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Table.Align;
+import kz.halyqsoft.univercity.entity.beans.TASKS;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
@@ -24,6 +25,7 @@ import org.r3a.common.dblink.facade.CommonIDFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.ID;
+import org.r3a.common.entity.beans.AbstractTask;
 import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.file.FileBean;
 import org.r3a.common.entity.query.QueryModel;
@@ -48,10 +50,7 @@ import org.r3a.common.vaadin.widget.table.TableWidget;
 import org.r3a.common.vaadin.widget.table.model.DBTableModel;
 
 import javax.persistence.NoResultException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 import static kz.halyqsoft.univercity.modules.regapplicants.ApplicantsForm.createResourceStudent;
 
@@ -60,9 +59,9 @@ import static kz.halyqsoft.univercity.modules.regapplicants.ApplicantsForm.creat
  * @created Apr 4, 2016 4:29:57 PM
  */
 @SuppressWarnings({"serial", "unchecked"})
-public final class StudentEdit extends AbstractFormWidgetView implements PhotoWidgetListener {
+public class StudentEdit extends AbstractFormWidgetView implements PhotoWidgetListener {
 
-    private final AbstractFormWidget baseDataFW;
+    private  AbstractFormWidget baseDataFW;
     private USER_PHOTO userPhoto;
     private String userPhotoFilename;
     private byte[] userPhotoBytes;
@@ -78,24 +77,26 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
     private VerticalLayout mainVL;
     private static Button pdfDownload, pdfDownloadDorm, pdfDownloadLetter;
     private StudentView studentView;
+    private HorizontalLayout hl;
     private static FileDownloader fileDownloaderDorm, fileDownloader,
             fileDownloaderParent, fileDownloaderTitle, fileDownloaderLetter;
     private static StreamResource myResource, myResourceDorm, resourceParents,
             myResourceTitle, myResourceLetter;
 
-    StudentEdit(final FormModel baseDataFM, VerticalLayout mainVL, StudentView studentView)
+    StudentEdit(FormModel baseDataFM, VerticalLayout mainVL, StudentView studentView)
             throws Exception {
         super();
         this.mainVL = mainVL;
         this.studentView = studentView;
-
         VerticalLayout content = new VerticalLayout();
         content.setSpacing(true);
         content.setSizeFull();
 
-        HorizontalLayout hl = new HorizontalLayout();
+        hl = new HorizontalLayout();
         hl.setSpacing(true);
         // hl.setSizeFull();
+
+
 
         baseDataFM.setButtonsVisible(false);
         baseDataFM.getFieldModel("academicStatus").setInEdit(true);
@@ -167,6 +168,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         }
 
         baseDataFW = new CommonFormWidget(baseDataFM);
+        baseDataFW.setImmediate(true);
         baseDataFW.addEntityListener(this);
         hl.addComponent(baseDataFW);
         hl.setComponentAlignment(baseDataFW, Alignment.TOP_LEFT);
@@ -302,6 +304,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                         }
 
 
+
                         if (userPhotoChanged) {
                             try {
                                 if (userPhoto == null) {
@@ -325,6 +328,18 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                             }
                         }
                         showSavedNotification();
+
+                        try{
+                            baseDataFM.loadEntity(student.getId());
+                            CommonUtils.setCards(baseDataFM);
+                            hl.removeComponent(baseDataFW);
+                            baseDataFW.getWidgetModel().loadEntity(student.getId());
+                            baseDataFW.refresh();
+                            hl.addComponentAsFirst(baseDataFW);
+                        }catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
                     }
                 }
             });
@@ -409,6 +424,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         createSocialCategoriesTab(readOnly);
 //        createDebtAndPaymentTab(readOnly);//TODO add later
         createDiplomaTab(readOnly);
+
     }
 
     public static void studentEditPdfDownload(STUDENT student) throws Exception {
@@ -551,7 +567,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         letterDownloadButton.setWidth(150, Unit.PIXELS);
 
         return letterDownloadButton;
-        }
+    }
 
     @Override
     public void initView(boolean readOnly) throws Exception {
@@ -1462,7 +1478,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                     }
                 }
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(s);
-                if (oldCard != null) {
+                if (!oldCard.equals(s.getCard())&&oldCard != null) {
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(oldCard);
                 }
                 if (userPhotoChanged) {
@@ -1481,6 +1497,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                     }
                 }
                 showSavedNotification();
+
             } catch (Exception ex) {
                 CommonUtils.showMessageAndWriteLog("Unable to merge a entrant", ex);
             }

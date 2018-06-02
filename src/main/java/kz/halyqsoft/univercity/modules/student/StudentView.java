@@ -3,6 +3,7 @@ package kz.halyqsoft.univercity.modules.student;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.TextField;
 import kz.halyqsoft.univercity.entity.beans.USERS;
@@ -26,6 +27,7 @@ import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.ERefreshType;
+import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 import org.r3a.common.vaadin.widget.filter2.FilterPanelListener;
 import org.r3a.common.vaadin.widget.form.FormModel;
@@ -43,7 +45,7 @@ import java.util.Map;
  */
 public class StudentView extends AbstractTaskView implements EntityListener, FilterPanelListener {
 
-    private final StudentFilterPanel filterPanel;
+    private StudentFilterPanel filterPanel;
     private GridWidget studentGW;
 
 //    private boolean needDorm;
@@ -51,17 +53,19 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
 
     public StudentView(AbstractTask task) throws Exception {
         super(task);
-
+        this.setImmediate(true);
         filterPanel = new StudentFilterPanel(new FStudentFilter());
     }
 
     @Override
     public void initView(boolean b) throws Exception {
+
         filterPanel.addFilterPanelListener(this);
         TextField tf = new TextField();
         tf.setNullRepresentation("");
         tf.setNullSettingAllowed(true);
         filterPanel.addFilterComponent("code", tf);
+        filterPanel.setImmediate(true);
 
 //        tf = new TextField();
 //        tf.setNullRepresentation("");
@@ -76,16 +80,20 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
         ComboBox cb = new ComboBox();
         cb.setNullSelectionAllowed(true);
         cb.setTextInputAllowed(true);
-        cb.setFilteringMode(FilteringMode.OFF);
+        cb.setImmediate(true);
+        cb.setFilteringMode(FilteringMode.STARTSWITH);
         QueryModel<CARD> cardQM = new QueryModel<>(CARD.class);
+
         FromItem userFI = cardQM.addJoin(EJoin.INNER_JOIN, "id", USERS.class, "card");
         cardQM.addWhere(userFI, "typeIndex", ECriteria.EQUAL, 2);
+
         BeanItemContainer<CARD> cardBIC = new BeanItemContainer<>(CARD.class,
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(cardQM));
         cb.setContainerDataSource(cardBIC);
         filterPanel.addFilterComponent("card", cb);
 
         cb = new ComboBox();
+        cb.setImmediate(true);
         cb.setNullSelectionAllowed(true);
         cb.setTextInputAllowed(false);
         cb.setFilteringMode(FilteringMode.OFF);
@@ -105,6 +113,7 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
         cb = new ComboBox();
         cb.setNullSelectionAllowed(true);
         cb.setTextInputAllowed(true);
+        cb.setImmediate(true);
         cb.setFilteringMode(FilteringMode.CONTAINS);
         cb.setPageLength(0);
         cb.setWidth(250, Unit.PIXELS);
@@ -119,6 +128,7 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
 
         ComboBox specialtyCB = new ComboBox();
         specialtyCB.setNullSelectionAllowed(true);
+        specialtyCB.setImmediate(true);
         specialtyCB.setTextInputAllowed(true);
         specialtyCB.setFilteringMode(FilteringMode.CONTAINS);
         specialtyCB.setPageLength(0);
@@ -129,6 +139,7 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
         cb = new ComboBox();
         cb.setNullSelectionAllowed(true);
         cb.setTextInputAllowed(false);
+        cb.setImmediate(true);
         cb.setFilteringMode(FilteringMode.OFF);
         cb.setPageLength(0);
         cb.setWidth(70, Unit.PIXELS);
@@ -143,6 +154,7 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
         cb = new ComboBox();
         cb.setNullSelectionAllowed(true);
         cb.setTextInputAllowed(false);
+        cb.setImmediate(true);
         cb.setFilteringMode(FilteringMode.OFF);
         cb.setPageLength(0);
         QueryModel<STUDENT_EDUCATION_TYPE> educationTypeQM = new QueryModel<>(STUDENT_EDUCATION_TYPE.class);
@@ -453,4 +465,6 @@ public class StudentView extends AbstractTaskView implements EntityListener, Fil
     public GridWidget getStudentGW() {
         return studentGW;
     }
+
+
 }
