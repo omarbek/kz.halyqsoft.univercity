@@ -16,6 +16,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_MEDICAL_CHECKUP;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_USER_LANGUAGE;
+import kz.halyqsoft.univercity.filter.FStudentFilter;
 import kz.halyqsoft.univercity.modules.student.tabs.*;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.changelisteners.BirthCountryChangeListener;
@@ -59,7 +60,7 @@ import static kz.halyqsoft.univercity.modules.regapplicants.ApplicantsForm.creat
  * @created Apr 4, 2016 4:29:57 PM
  */
 @SuppressWarnings({"serial", "unchecked"})
-public class StudentEdit extends AbstractFormWidgetView implements PhotoWidgetListener {
+public final class StudentEdit extends AbstractFormWidgetView implements PhotoWidgetListener {
 
     private  AbstractFormWidget baseDataFW;
     private USER_PHOTO userPhoto;
@@ -76,18 +77,19 @@ public class StudentEdit extends AbstractFormWidgetView implements PhotoWidgetLi
     private STUDENT student;
     private VerticalLayout mainVL;
     private static Button pdfDownload, pdfDownloadDorm, pdfDownloadLetter;
-    private StudentView studentView;
+    private StudentOrApplicantView studentOrApplicantView;
     private HorizontalLayout hl;
     private static FileDownloader fileDownloaderDorm, fileDownloader,
             fileDownloaderParent, fileDownloaderTitle, fileDownloaderLetter;
     private static StreamResource myResource, myResourceDorm, resourceParents,
             myResourceTitle, myResourceLetter;
 
-    StudentEdit(FormModel baseDataFM, VerticalLayout mainVL, StudentView studentView)
+    public StudentEdit(final FormModel baseDataFM, VerticalLayout mainVL, StudentOrApplicantView studentOrApplicantView)
             throws Exception {
         super();
         this.mainVL = mainVL;
-        this.studentView = studentView;
+        this.studentOrApplicantView = studentOrApplicantView;
+
         VerticalLayout content = new VerticalLayout();
         content.setSpacing(true);
         content.setSizeFull();
@@ -95,8 +97,6 @@ public class StudentEdit extends AbstractFormWidgetView implements PhotoWidgetLi
         hl = new HorizontalLayout();
         hl.setSpacing(true);
         // hl.setSizeFull();
-
-
 
         baseDataFM.setButtonsVisible(false);
         baseDataFM.getFieldModel("academicStatus").setInEdit(true);
@@ -263,7 +263,7 @@ public class StudentEdit extends AbstractFormWidgetView implements PhotoWidgetLi
             }
             educationFL.addComponent(lockReasonLabel);
 
-            if (!baseDataFM.isReadOnly()) {
+            if (!baseDataFM.isReadOnly() && student.getCategory().getId().equals(STUDENT_CATEGORY.STUDENT_ID)) {
                 Button moreButton = new NativeButton();
                 moreButton.setCaption(getUILocaleUtil().getCaption("more"));
                 moreButton.addClickListener(new ClickListener() {
@@ -303,8 +303,6 @@ public class StudentEdit extends AbstractFormWidgetView implements PhotoWidgetLi
                             e.printStackTrace();
                         }
 
-
-
                         if (userPhotoChanged) {
                             try {
                                 if (userPhoto == null) {
@@ -328,18 +326,6 @@ public class StudentEdit extends AbstractFormWidgetView implements PhotoWidgetLi
                             }
                         }
                         showSavedNotification();
-
-                        try{
-                            baseDataFM.loadEntity(student.getId());
-                            CommonUtils.setCards(baseDataFM);
-                            hl.removeComponent(baseDataFW);
-                            baseDataFW.getWidgetModel().loadEntity(student.getId());
-                            baseDataFW.refresh();
-                            hl.addComponentAsFirst(baseDataFW);
-                        }catch (Exception e)
-                        {
-                            e.printStackTrace();
-                        }
                     }
                 }
             });
@@ -423,8 +409,9 @@ public class StudentEdit extends AbstractFormWidgetView implements PhotoWidgetLi
         createAwardsTab(readOnly);
         createSocialCategoriesTab(readOnly);
 //        createDebtAndPaymentTab(readOnly);//TODO add later
-        createDiplomaTab(readOnly);
-
+        if (student.getCategory().getId().equals(STUDENT_CATEGORY.STUDENT_ID)) {
+            createDiplomaTab(readOnly);
+        }
     }
 
     public static void studentEditPdfDownload(STUDENT student) throws Exception {
@@ -444,8 +431,6 @@ public class StudentEdit extends AbstractFormWidgetView implements PhotoWidgetLi
         if (pdfDownloadDorm.getExtensions().size() > 0) {
             pdfDownloadDorm.removeExtension(fileDownloaderDorm);
         }
-
-
 
         pdfDownloadDorm.setEnabled(false);
 
@@ -484,15 +469,12 @@ public class StudentEdit extends AbstractFormWidgetView implements PhotoWidgetLi
 
     @Override
     protected AbstractCommonView getParentView() {
-        try {
-            studentView.getStudentGW().refresh();
-        } catch (Exception e) {
-            e.printStackTrace();//TODO catch
-        }
+        studentOrApplicantView.doFilter(new FStudentFilter());
         mainVL.removeComponent(this);
-        mainVL.addComponent(studentView.getFilterPanel());
-        mainVL.addComponent(studentView.getStudentGW());
-        return studentView;
+//        mainVL.addComponent(studentOrApplicantView.getButtonsHL());
+        mainVL.addComponent(studentOrApplicantView.getFilterPanel());
+        mainVL.addComponent(studentOrApplicantView.getStudentGW());
+        return null;
     }
 
     @Override
@@ -560,7 +542,7 @@ public class StudentEdit extends AbstractFormWidgetView implements PhotoWidgetLi
         return dormDownloadButton;
     }
 
-    private Button createDownloadButtonLetter(){
+    private Button createDownloadButtonLetter() {
         Button letterDownloadButton = new Button();
         letterDownloadButton.setData(11);
         letterDownloadButton.setCaption(getUILocaleUtil().getCaption("download.contract.register"));
@@ -1111,7 +1093,7 @@ public class StudentEdit extends AbstractFormWidgetView implements PhotoWidgetLi
     }
 
     private void createUNTDataTab(boolean readOnly) throws Exception {
-        UNTDataTab content = new UNTDataTab(student,new StudentEditHelperImpl(), readOnly);
+        UNTDataTab content = new UNTDataTab(student, new StudentEditHelperImpl(), readOnly);
         getTabSheet().addTab(content, getUILocaleUtil().getCaption("unt"));
     }
 
@@ -1398,6 +1380,7 @@ public class StudentEdit extends AbstractFormWidgetView implements PhotoWidgetLi
         STUDENT s = (STUDENT) e;
         if (isNew) {
             s.setCreated(new Date());
+            s.setCreatedBy(CommonUtils.getCurrentUserLogin());
             try {
                 s.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USERS"));
                 s.setCategory(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(STUDENT_CATEGORY.class, ID.valueOf(1)));
@@ -1497,7 +1480,6 @@ public class StudentEdit extends AbstractFormWidgetView implements PhotoWidgetLi
                     }
                 }
                 showSavedNotification();
-
             } catch (Exception ex) {
                 CommonUtils.showMessageAndWriteLog("Unable to merge a entrant", ex);
             }

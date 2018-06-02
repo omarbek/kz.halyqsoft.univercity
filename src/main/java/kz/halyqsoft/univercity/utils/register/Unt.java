@@ -202,6 +202,7 @@ public class Unt {
         untRatesTW = new TableWidget(V_UNT_CERT_SUBJECT.class);
         untRatesTW.addEntityListener(applicantsForm);
         untRatesTW.setWidth("667px");
+        untRatesTW.setVisible(false);
         DBTableModel untRatesTM = (DBTableModel) untRatesTW.getWidgetModel();
         QueryModel untRatesQM = untRatesTM.getQueryModel();
         untRatesQM.addWhere("untCertificate", ECriteria.EQUAL, untCertificateId);
@@ -210,7 +211,10 @@ public class Unt {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
                 if (untCertificateFM.isModified()) {
-                    certificateGFW.save();
+                    if(certificateGFW.save()){
+                        untRatesTW.setVisible(true);
+                        saveButton.setEnabled(false);
+                    }
                 } else {
                     Message.showError(CommonUtils.getUILocaleUtil().getCaption("add.news.required"));
                 }

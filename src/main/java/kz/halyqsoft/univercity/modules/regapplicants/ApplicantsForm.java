@@ -6,14 +6,9 @@ import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.server.FileDownloader;
-import com.vaadin.server.StreamResource;
-import com.vaadin.server.ThemeResource;
-import com.vaadin.server.VaadinService;
+import com.vaadin.server.*;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.*;
-import com.vaadin.ui.Button.ClickEvent;
-import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.enumeration.Flag;
@@ -41,6 +36,9 @@ import org.r3a.common.vaadin.widget.table.TableWidget;
 import org.r3a.common.vaadin.widget.table.model.DBTableModel;
 
 import javax.persistence.NoResultException;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -61,18 +59,22 @@ public final class ApplicantsForm extends UsersForm {
 
     private Button untButton, grantDocButton;
     private Button motherButton, fatherButton;
-    private Button contractButton, moreButton;
-    private Button finishButton;
-    private Button downloadContractButton;
-    private Button downloadButtonRegisterButton;
+    private Button contractButton;
     private Button specButton;
 
-    private boolean saveSpec;
+    private boolean saveSpec, saveUnt;
+    private boolean came = false;
 
     private Parent parent;
     private Unt unt;
     private Grant grant;
     private Contract contract;
+
+    private BrowserWindowOpener contractBWO;
+    private BrowserWindowOpener requestBWO;
+    private BrowserWindowOpener titleBWO;
+    private BrowserWindowOpener voucherBWO;
+    private BrowserWindowOpener dormBWO;
 
     private static final int FATHER = 1;
     private static final int MOTHER = 2;
@@ -106,6 +108,22 @@ public final class ApplicantsForm extends UsersForm {
 
         contract = new Contract(dataAFW, this);
         contract.create(udfQM, military.getMilitaryFLFM());
+    }
+
+    @Override
+    protected void setOpeners() {
+        StreamResource myResource = createResourceStudent("85", null);
+        contractBWO = new BrowserWindowOpener(myResource);
+        contractBWO.extend(finishButton);
+
+        requestBWO = new BrowserWindowOpener(myResource);
+        requestBWO.extend(finishButton);
+
+        titleBWO = new BrowserWindowOpener(myResource);
+        titleBWO.extend(finishButton);
+
+        voucherBWO = new BrowserWindowOpener(myResource);
+        voucherBWO.extend(finishButton);
     }
 
     @Override
@@ -180,10 +198,10 @@ public final class ApplicantsForm extends UsersForm {
         grantDocButton.setEnabled(false);
         fatherButton.setEnabled(false);
 
-        downloadContractButton = new Button();
+        Button downloadContractButton = new Button();
         downloadContractButton.setCaption(getUILocaleUtil().getCaption("download.contract"));
 
-        downloadButtonRegisterButton = new Button();
+        Button downloadButtonRegisterButton = new Button();
         downloadButtonRegisterButton.setCaption(getUILocaleUtil().getCaption("download.contract.register"));
 
 
@@ -209,7 +227,6 @@ public final class ApplicantsForm extends UsersForm {
 
             SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(studentEducation);
 
-
             StreamResource myResource = createResourceStudent("85", student);
             FileDownloader fileDownloader = new FileDownloader(myResource);
             myResource.setMIMEType("application/pdf");
@@ -222,7 +239,7 @@ public final class ApplicantsForm extends UsersForm {
             myResourceParents.setCacheTime(0);
             fileDownloaderParent.extend(downloadButtonRegisterButton);
 
-            StreamResource myResourceTitul = createResourceStudent("32", student);
+            StreamResource myResourceTitul = createResourceStudent("32", student);//TODO docs
             FileDownloader fileDownloaderTitul = new FileDownloader(myResourceTitul);
             myResourceTitul.setMIMEType("application/pdf");
             myResourceTitul.setCacheTime(0);
@@ -240,7 +257,6 @@ public final class ApplicantsForm extends UsersForm {
                 myResourceDorm.setMIMEType("application/pdf");
                 myResourceDorm.setCacheTime(0);
                 fileDownloaderDorm.extend(downloadContractButton);
-
             }
 
         } catch (Exception e) {
@@ -258,8 +274,8 @@ public final class ApplicantsForm extends UsersForm {
             }
         });
 
-        messForm.addComponent(downloadButtonRegisterButton);
         messForm.addComponent(downloadContractButton);
+        messForm.addComponent(downloadButtonRegisterButton);
         messForm.addComponent(againButton);
         return messForm;
     }
@@ -272,6 +288,7 @@ public final class ApplicantsForm extends UsersForm {
         conditionsMap.put(getUILocaleUtil().getMessage("info.save.address"), !saveFactAddress);
         conditionsMap.put(getUILocaleUtil().getMessage("info.save.speciality"), !saveSpec);
         conditionsMap.put(getUILocaleUtil().getMessage("info.save.educ"), !saveEduc);
+        conditionsMap.put(getUILocaleUtil().getMessage("info.save.unt"), !saveUnt);
         return conditionsMap;
     }
 
@@ -314,6 +331,7 @@ public final class ApplicantsForm extends UsersForm {
 
                 if ((flagSave(flag, dataFM) && Flag.MAIN_DATA.equals(flag))
                         || !Flag.MAIN_DATA.equals(flag)) {
+                    setResource(dataFM);
                     flag = Flag.SPECIALITY;
                     registrationHSP.removeComponent(contentHL);
                     addToLayout(specTW, untButton, event);
@@ -322,12 +340,13 @@ public final class ApplicantsForm extends UsersForm {
             }
         });
 
-        untButton = createFormButton("unt", false);
+        untButton = createFormButton("unt", true);
         untButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 if ((flagSave(flag, dataFM) && Flag.MAIN_DATA.equals(flag))
                         || !Flag.MAIN_DATA.equals(flag)) {
+                    setResource(dataFM);
                     setActive(event);
                     flag = Flag.UNT;
 
@@ -405,11 +424,40 @@ public final class ApplicantsForm extends UsersForm {
 
     }
 
+    private void setResource(FormModel dataFM) {
+        STUDENT student = null;
+        try {
+            student = (STUDENT) dataFM.getEntity();
+        } catch (Exception e) {
+            e.printStackTrace();//TODO catch
+        }
+
+        StreamResource myResource = createResourceStudent("85", student);
+        contractBWO.setResource(myResource);
+
+        myResource = createResourceStudent("27", student);
+        requestBWO.setResource(myResource);
+
+        myResource = createResourceStudent("33", student);
+        voucherBWO.setResource(myResource);
+
+        myResource = createResourceStudent("32", student);
+        titleBWO.setResource(myResource);
+
+        if (student != null && student.isNeedDorm() && !came) {
+            came = true;
+            myResource = createResourceStudent("92", student);
+            dormBWO = new BrowserWindowOpener(myResource);
+            dormBWO.extend(finishButton);
+        }
+    }
+
 
     @Override
     protected void initSpec(FormModel dataFM) {
         saveSpec = false;
         saveEduc = false;
+        saveUnt = false;
         saveFactAddress = false;
         specTW = new TableWidget(V_ENTRANT_SPECIALITY.class);
         specTW.addEntityListener(ApplicantsForm.this);
@@ -474,15 +522,15 @@ public final class ApplicantsForm extends UsersForm {
     public static StreamResource createResourceStudent(String value, STUDENT student) {
         String fileName = "";
         if (value.equals("92")) {
-            fileName = "Договор общага.pdf";
+            fileName = "Договор общага_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
         } else if (value.equals("85")) {
-            fileName = "Договор на рус.pdf";
+            fileName = "Договор на рус_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
         } else if (value.equals("32")) {
-            fileName = "Титул.pdf";
+            fileName = "Титул_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
         } else if (value.equals("33")) {
-            fileName = "Қолхат.pdf";
+            fileName = "Қолхат_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
         } else {
-            fileName = "Өтініш.pdf";
+            fileName = "Өтініш_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
         }
         return new StreamResource(new StreamResource.StreamSource() {
             @Override
@@ -505,7 +553,6 @@ public final class ApplicantsForm extends UsersForm {
                         PdfContentByte canvas = pdfWriter.getDirectContent();
 
 
-
                         Rectangle rect = new Rectangle(36, 26, 559, 816);
 
                         Rectangle rect1 = new Rectangle(86, 790, 187, 685);
@@ -515,26 +562,23 @@ public final class ApplicantsForm extends UsersForm {
                         rect.setBorderWidth(1);
 
                         byte[] imageArray = null;
-                        try{
+                        try {
                             QueryModel<USER_PHOTO> qm = new QueryModel<>(USER_PHOTO.class);
-                            qm.addWhere("user" , ECriteria.EQUAL , student.getId());
+                            qm.addWhere("user", ECriteria.EQUAL, student.getId());
                             imageArray = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(qm).getPhoto();
-                        }catch (NoResultException e)
-                        {
+                        } catch (NoResultException e) {
                             e.printStackTrace();
-                        }catch (Exception e)
-                        {
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
 
-                        if(imageArray!=null)
-                        {
+                        if (imageArray != null) {
                             Image image = Image.getInstance(imageArray);
                             image.rotate();
-                            Rectangle rectImage = new Rectangle(86,685, 187,790);
+                            Rectangle rectImage = new Rectangle(86, 685, 187, 790);
 
                             image.scaleAbsolute(rectImage);
-                            image.setAbsolutePosition(86,685);
+                            image.setAbsolutePosition(86, 685);
                             canvas.addImage(image);
                         }
 
@@ -560,79 +604,74 @@ public final class ApplicantsForm extends UsersForm {
 
                         PdfContentByte canvas = pdfWriter.getDirectContent();
                         SPECIALITY speciality = (student).getEntrantSpecialities().iterator().next().getSpeciality();
-                        String spec = speciality.getSpecName().substring(0,speciality.getSpecName().lastIndexOf('/')-1);
+                        String spec = getStringBeforeSlash(speciality.getSpecName());
 
                         STUDENT_EDUCATION studentEducation = new STUDENT_EDUCATION();
                         studentEducation.setFaculty(speciality.getDepartment().getParent());
-                        String faculty = studentEducation.getFaculty().toString().substring(0,studentEducation.getFaculty().toString().lastIndexOf('/')-1);
-
+                        String faculty = getStringBeforeSlash(studentEducation.getFaculty().toString());
 
 
                         int y = 0;
                         int offset = -19;
                         int row = 0;
 
-                        if(faculty.length() > 29)
-                        {
+                        if (faculty.length() > 29) {
                             row = row + 1;
                         }
-                        if(faculty.length() > 60)
-                        {
+                        if (faculty.length() > 60) {
                             row = row + 1;
                         }
-                        if(spec.length() > 29)
-                        {
+                        if (spec.length() > 29) {
                             row = row + 1;
                         }
-                        if(spec.length()>60)
-                        {
+                        if (spec.length() > 60) {
                             row = row + 1;
                         }
 
-                        y =  offset * row;
-                        canvas.moveTo(12, 554+y);
-                        canvas.lineTo(700, 554+y);
-                        canvas.lineTo(700, 344+y);
-                        canvas.lineTo(12, 344+y);
+                        y = offset * row;
+                        canvas.moveTo(12, 554 + y);
+                        canvas.lineTo(700, 554 + y);
+                        canvas.lineTo(700, 344 + y);
+                        canvas.lineTo(12, 344 + y);
 
-                        canvas.moveTo(12, 524+y);
-                        canvas.lineTo(700, 524+y);
-                        canvas.moveTo(12, 506+y);
-                        canvas.lineTo(700, 506+y);
-                        canvas.moveTo(12, 488+y);
-                        canvas.lineTo(700, 488+y);
-                        canvas.moveTo(12, 470+y);
-                        canvas.lineTo(700, 470+y);
-                        canvas.moveTo(12, 452+y);
-                        canvas.lineTo(700, 452+y);
-                        canvas.moveTo(12, 416+y);
-                        canvas.lineTo(700, 416+y);
-                        canvas.moveTo(12, 380+y);
-                        canvas.lineTo(700, 380+y);
-                        canvas.moveTo(12, 362+y);
-                        canvas.lineTo(700, 362+y);
-                        canvas.moveTo(12, 344+y);
-                        canvas.lineTo(12, 344+y);
-                        canvas.moveTo(12, 554+y);
-                        canvas.lineTo(12, 344+y);
-                        canvas.moveTo(250, 554+y);
-                        canvas.lineTo(250, 344+y);
-                        canvas.moveTo(570, 554+y);
-                        canvas.lineTo(570, 344+y);
+                        canvas.moveTo(12, 524 + y);
+                        canvas.lineTo(700, 524 + y);
+                        canvas.moveTo(12, 506 + y);
+                        canvas.lineTo(700, 506 + y);
+                        canvas.moveTo(12, 488 + y);
+                        canvas.lineTo(700, 488 + y);
+                        canvas.moveTo(12, 470 + y);
+                        canvas.lineTo(700, 470 + y);
+                        canvas.moveTo(12, 452 + y);
+                        canvas.lineTo(700, 452 + y);
+                        canvas.moveTo(12, 416 + y);
+                        canvas.lineTo(700, 416 + y);
+                        canvas.moveTo(12, 380 + y);
+                        canvas.lineTo(700, 380 + y);
+                        canvas.moveTo(12, 362 + y);
+                        canvas.lineTo(700, 362 + y);
+                        canvas.moveTo(12, 344 + y);
+                        canvas.lineTo(12, 344 + y);
+                        canvas.moveTo(12, 554 + y);
+                        canvas.lineTo(12, 344 + y);
+                        canvas.moveTo(250, 554 + y);
+                        canvas.lineTo(250, 344 + y);
+                        canvas.moveTo(570, 554 + y);
+                        canvas.lineTo(570, 344 + y);
 
-                        canvas.moveTo(12, 334+y);
-                        canvas.lineTo(640, 334+y);
-                        canvas.lineTo(640, 309+y);
-                        canvas.lineTo(12, 309+y);
+                        canvas.moveTo(12, 334 + y);
+                        canvas.lineTo(640, 334 + y);
+                        canvas.lineTo(640, 309 + y);
+                        canvas.lineTo(12, 309 + y);
 
-                        canvas.moveTo(160, 334+y);
-                        canvas.lineTo(160, 309+y);
-                        canvas.moveTo(410, 334+y);
-                        canvas.lineTo(410, 309+y);
-                        canvas.moveTo(560, 334+y);
-                        canvas.lineTo(560, 309+y);
-                        canvas.moveTo(12, 334+y);
-                        canvas.lineTo(12, 309+y);
+                        canvas.moveTo(160, 334 + y);
+                        canvas.lineTo(160, 309 + y);
+                        canvas.moveTo(410, 334 + y);
+                        canvas.lineTo(410, 309 + y);
+                        canvas.moveTo(560, 334 + y);
+                        canvas.lineTo(560, 309 + y);
+                        canvas.moveTo(12, 334 + y);
+                        canvas.lineTo(12, 309 + y);
                         canvas.closePathStroke();
 
                         title = new Paragraph("ОҢТҮСТІК ҚАЗАҚСТАН ПЕДАГОГИКАЛЫҚ УНИВЕРСИТЕТІ",
@@ -653,7 +692,9 @@ public final class ApplicantsForm extends UsersForm {
                     for (PDF_PROPERTY property : properties) {
 
                         String text = new String(property.getText());
-                        setReplaced(text, student);
+                        if (student != null) {
+                            setReplaced(text, student);
+                        }
                         Paragraph paragraph = new Paragraph(replaced,
                                 getFont(Integer.parseInt(property.getSize().toString()), CommonUtils.getFontMap(property.getFont().toString())));
 
@@ -739,7 +780,7 @@ public final class ApplicantsForm extends UsersForm {
         }
 
 //        DateFormat form = new SimpleDateFormat("E MMM dd HH:mm:ss Z yyyy");
-        DateFormat form = new SimpleDateFormat( "EEE MMM dd HH:mm:ss z yyyy", Locale.US);
+        DateFormat form = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.US);
 
         Date dateBirth = form.parse(student.getBirthDate().toString());
         Calendar cal = Calendar.getInstance();
@@ -799,9 +840,12 @@ public final class ApplicantsForm extends UsersForm {
             studentRelativeMother.setPostName("-");
         }
 
+        String facultyName = getStringBeforeSlash(studentEducation.getFaculty().toString());
+        String specialityName = getStringBeforeSlash(speciality.getSpecName());
+
         replaced = text.replaceAll("\\$fio", student.toString())
                 .replaceAll("\\$money", money)
-                .replaceAll("\\$faculty", studentEducation.getFaculty().toString().substring(0,studentEducation.getFaculty().toString().lastIndexOf('/')-1))
+                .replaceAll("\\$faculty", facultyName)
                 .replaceAll("\\$DataMonthYear", today + " года")
                 .replaceAll("\\$formaobuch", ochnii)
                 .replaceAll("\\$data\\$month\\$year", today)
@@ -823,7 +867,7 @@ public final class ApplicantsForm extends UsersForm {
                 .replaceAll("\\$nationality", student.getNationality().toString())
                 .replaceAll("\\$info", educationDoc.getEndYear().toString() + ", "
                         + educationDoc.getEducationType() + ", " + educationDoc.getSchoolName())
-                .replaceAll("\\$speciality", speciality.getSpecName().substring(0,speciality.getSpecName().lastIndexOf('/')-1))
+                .replaceAll("\\$speciality", specialityName)
                 .replaceAll("\\$parentsAddress", studentRelativeFather.getFio() + ", "
                         + studentRelativeFather.getWorkPlace() + "    "
                         + studentRelativeFather.getPostName() + '\n'
@@ -844,6 +888,16 @@ public final class ApplicantsForm extends UsersForm {
                 .replaceAll("\\$group", "")
 
                 .replaceAll("қажет, қажет емес", dorm);
+    }
+
+    private static String getStringBeforeSlash(String name) {
+        String returnName;
+        try {
+            returnName = name.substring(0, name.lastIndexOf('/') - 1);
+        } catch (Exception e) {
+            returnName = name;
+        }
+        return returnName;
     }
 
     public static STUDENT_RELATIVE getStudent_relative(STUDENT student, int relativeType) throws Exception {
@@ -1041,6 +1095,7 @@ public final class ApplicantsForm extends UsersForm {
             boolean preSaveRates = unt.preSaveRates(e, isNew);
             if (unt.getUntRatesTW().getEntityCount() > 1) {
                 untNextButton.setEnabled(true);
+                saveUnt = true;
             }
             return preSaveRates;
         } else if (source.equals(parent.getFatherGFW())) {
@@ -1103,6 +1158,7 @@ public final class ApplicantsForm extends UsersForm {
         STUDENT student = (STUDENT) e;
         if (source.equals(dataAFW)) {
             student.setCreated(new Date());
+            student.setCreatedBy(CommonUtils.getCurrentUserLogin());
             try {
                 student.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USER"));
                 student.setCategory(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(STUDENT_CATEGORY.class, ID.valueOf(1)));

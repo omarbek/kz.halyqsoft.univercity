@@ -77,7 +77,6 @@ public class EducationDoc {
         schoolCountryQM.addOrder("countryName");
 
         mainFM.getFieldModel("language").setRequired(true);
-        mainFM.getFieldModel("schoolCertificateType").setRequired(true);
         mainFM.getFieldModel("schoolRegion").setRequired(false);
 
         mainFM.getFieldModel("entryYear").getValidators().add(new IntegerRangeValidator("Значение года не может быть больше текущего года", 0, CommonUtils.currentYear));

@@ -55,6 +55,10 @@ public class EmployeesForm extends UsersForm {
     }
 
     @Override
+    protected void setOpeners() {
+    }
+
+    @Override
     protected VerticalLayout getMessForm(FormModel dataFM, Label mess) {
         employeeDegreeButton.setEnabled(false);
         publicationButton.setEnabled(false);
@@ -805,6 +809,7 @@ public class EmployeesForm extends UsersForm {
         EMPLOYEE employee = (EMPLOYEE) e;
         if (source.equals(dataAFW)) {
             employee.setCreated(new Date());
+            employee.setCreatedBy(CommonUtils.getCurrentUserLogin());
             try {
                 employee.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USER"));
             } catch (Exception ex) {

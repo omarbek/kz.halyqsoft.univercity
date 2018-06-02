@@ -65,9 +65,9 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
     private Button mainDataButton, regAddressButton;
     private Button militaryButton, disabilityButton, repatriateButton;
     private Button eduDocsButton, preemRightButton;
-    private Button medButton, finishButton;
+    private Button medButton;
     private Button form, idDocButton;
-    protected Button factAddressButton, eduDocButton,moreButton;
+    protected Button factAddressButton, eduDocButton, moreButton, finishButton;
 
     private String userPhotoFilename;
     private byte[] userPhotoBytes;
@@ -290,7 +290,6 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
                     FormModel docFM = new FormModel(EDUCATION_DOC.class, true);
                     docFM.getFieldModel("schoolCountry").setRequired(true);
                     docFM.getFieldModel("language").setRequired(true);
-                    docFM.getFieldModel("schoolCertificateType").setRequired(true);
                     docFM.getFieldModel("schoolRegion").setRequired(true);
 
                     DBTableModel educationTM = (DBTableModel) eduDocTW.getWidgetModel();
@@ -418,9 +417,6 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
 
                     contentHL.removeAllComponents();
                     contentHL.addComponent(additionalDataVL);
-                    Button nextButton = createNextButton(finishButton, "exit");
-                    contentHL.addComponent(nextButton);
-                    contentHL.setComponentAlignment(nextButton, Alignment.MIDDLE_CENTER);
                 }
             }
         });
@@ -431,6 +427,8 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
         finishButton.setIcon(new ThemeResource("img/button/ok.png"));
         finishButton.addStyleName("left");
         finishButton.setWidth(FORM_BUTTON_WIDTH);
+
+        setOpeners();
 
         finishButton.addClickListener(new Button.ClickListener() {
             @Override
@@ -508,6 +506,8 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
         buttons.addAll(childButtons);
         buttons.add(moreButton);
     }
+
+    protected abstract void setOpeners();
 
     protected void setActive(Button.ClickEvent event) {
         setInactive();
@@ -746,6 +746,7 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
 
         if (isNew) {
             user.setCreated(new Date());
+            user.setCreatedBy(CommonUtils.getCurrentUserLogin());
             try {
                 user.setPasswd("12345678");
                 user.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USERS"));
@@ -1120,7 +1121,6 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
 
 
             educationFM.getFieldModel("language").setRequired(true);
-            educationFM.getFieldModel("schoolCertificateType").setRequired(true);
             educationFM.getFieldModel("schoolRegion").setRequired(true);
             educationFM.getFieldModel("entryYear").getValidators().add(new IntegerRangeValidator("Значение года не может быть больше текущего года", 0, CommonUtils.currentYear));
             educationFM.getFieldModel("endYear").getValidators().add(new IntegerRangeValidator("Значение года не может быть больше текущего года", 0, CommonUtils.currentYear));

@@ -1,9 +1,14 @@
 package kz.halyqsoft.univercity.modules.enrolltheapplicants;
 
+import com.sun.javaws.CacheUtil;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.server.Sizeable;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Grid;
+import com.vaadin.ui.HorizontalLayout;
+import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDENT_CATEGORY;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VStudent;
@@ -14,10 +19,7 @@ import org.r3a.common.entity.ID;
 import org.r3a.common.entity.beans.AbstractTask;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Omarbek
@@ -33,12 +35,17 @@ public class EnrollTheApplicantsView extends AbstractTaskView {
 
     @Override
     public void initView(boolean b) throws Exception {
-        initButton();
+        initButtons();
         initGrid();
     }
 
-    private void initButton() {
-        Button enrollButton = new Button("enroll");//TODO
+    private void initButtons() {
+        HorizontalLayout buttonsHL = CommonUtils.createButtonPanel();
+
+        Button enrollButton = new Button();
+        enrollButton.setWidth(120.0F, Sizeable.Unit.PIXELS);
+        enrollButton.setIcon(new ThemeResource("img/button/ok.png"));
+        enrollButton.setCaption(getUILocaleUtil().getCaption("enroll"));
         enrollButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
@@ -59,13 +66,43 @@ public class EnrollTheApplicantsView extends AbstractTaskView {
                 }
             }
         });
-        getContent().addComponent(enrollButton);
-        getContent().setComponentAlignment(enrollButton, Alignment.MIDDLE_LEFT);
+        buttonsHL.addComponent(enrollButton);
+        buttonsHL.setComponentAlignment(enrollButton, Alignment.MIDDLE_CENTER);
+
+        Button deleteButton = new Button();
+        deleteButton.setWidth(120.0F, Sizeable.Unit.PIXELS);
+        deleteButton.setIcon(new ThemeResource("img/button/delete.png"));
+        deleteButton.setCaption(getUILocaleUtil().getCaption("delete"));
+        deleteButton.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                try {
+                    Collection<Object> selectedRows = studentGrid.getSelectedRows();
+                    for (Object object : selectedRows) {
+                        VStudent vStudent = (VStudent) object;
+                        USERS user = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                                lookup(USERS.class, vStudent.getId());
+                        user.setDeleted(true);
+                        user.setUpdated(new Date());
+                        user.setUpdatedBy(CommonUtils.getCurrentUserLogin());
+                        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(user);
+                    }
+                    refresh();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        buttonsHL.addComponent(deleteButton);
+        buttonsHL.setComponentAlignment(deleteButton, Alignment.MIDDLE_CENTER);
+
+        getContent().addComponent(buttonsHL);
+        getContent().setComponentAlignment(buttonsHL, Alignment.MIDDLE_LEFT);
     }
 
     private void initGrid() {
         studentGrid = new Grid();
-        studentGrid.setCaption(getUILocaleUtil().getEntityLabel(VStudent.class));
+        studentGrid.setCaption(getUILocaleUtil().getCaption("applicants"));
         studentGrid.setSizeFull();
         studentGrid.addStyleName("lesson-detail");
         studentGrid.setSelectionMode(Grid.SelectionMode.MULTI);

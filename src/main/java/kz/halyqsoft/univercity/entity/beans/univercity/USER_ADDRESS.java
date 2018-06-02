@@ -14,8 +14,7 @@ import javax.persistence.*;
  * @created Nov 23, 2015 1:50:40 PM
  */
 @Entity
-public class
-USER_ADDRESS extends AbstractEntity {
+public class USER_ADDRESS extends AbstractEntity {
 
     private static final long serialVersionUID = 8929462338657286667L;
 

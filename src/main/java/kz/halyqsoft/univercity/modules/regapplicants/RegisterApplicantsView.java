@@ -1,9 +1,15 @@
 package kz.halyqsoft.univercity.modules.regapplicants;
 
+import com.vaadin.server.Sizeable;
+import com.vaadin.server.ThemeResource;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.VerticalLayout;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.LEVEL;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDENT_CATEGORY;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDENT_DIPLOMA_TYPE;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -16,7 +22,6 @@ import org.r3a.common.vaadin.widget.form.FormModel;
 import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 
 import java.util.Calendar;
-import java.util.Date;
 
 /**
  * @author Omarbek
@@ -37,6 +42,8 @@ public class RegisterApplicantsView extends AbstractTaskView {
         registerVL = new VerticalLayout();
         regButton = new Button();
         regButton.setCaption(getUILocaleUtil().getCaption("sign.up"));
+        regButton.setWidth(150.0F, Sizeable.Unit.PIXELS);
+        regButton.setIcon(new ThemeResource("img/button/add.png"));
         regButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
@@ -45,6 +52,7 @@ public class RegisterApplicantsView extends AbstractTaskView {
             }
         });
         registerVL.addComponent(regButton);
+        registerVL.setComponentAlignment(regButton, Alignment.MIDDLE_CENTER);
         getContent().addComponent(registerVL);
     }
 

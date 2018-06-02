@@ -1,5 +1,8 @@
 package kz.halyqsoft.univercity.modules.regemployees;
 
+import com.vaadin.server.Sizeable;
+import com.vaadin.server.ThemeResource;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.VerticalLayout;
 import kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE;
@@ -38,6 +41,8 @@ public class RegisterEmployeesView extends AbstractTaskView {
         registerVL = new VerticalLayout();
         regButton = new Button();
         regButton.setCaption(getUILocaleUtil().getCaption("sign.up"));
+        regButton.setWidth(150.0F, Sizeable.Unit.PIXELS);
+        regButton.setIcon(new ThemeResource("img/button/add.png"));
         regButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
@@ -46,6 +51,7 @@ public class RegisterEmployeesView extends AbstractTaskView {
             }
         });
         registerVL.addComponent(regButton);
+        registerVL.setComponentAlignment(regButton, Alignment.MIDDLE_CENTER);
         getContent().addComponent(registerVL);
     }
 
