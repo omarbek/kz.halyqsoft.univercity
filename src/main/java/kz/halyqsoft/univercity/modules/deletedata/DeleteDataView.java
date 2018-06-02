@@ -129,7 +129,6 @@ public class DeleteDataView extends AbstractTaskView implements EntityListener, 
                         deleteUserDoc(user, "grant_doc", 8);
                         deleteMainTable(user, "student_relative", "STUDENT_ID");
                         deleteUserDoc(user, "student_contract", 9);
-                        deleteUserDoc(user, "order_doc", 10);
                         deleteMainTable(user, "graduation_project", "ID");
                         deleteMainTable(user, "student_education", "student_id");
                         deleteMainTable(user, "student", "ID");
@@ -150,7 +149,6 @@ public class DeleteDataView extends AbstractTaskView implements EntityListener, 
                     deleteMainTable(user, "user_document", "USER_ID");
                     deleteMainTable(user, "users", "id");
                 }
-                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(entities);
             } catch (Exception e1) {
                 e1.printStackTrace();//TODO catch
             }

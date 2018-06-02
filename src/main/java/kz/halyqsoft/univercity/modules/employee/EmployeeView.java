@@ -19,6 +19,7 @@ import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.ID;
 import org.r3a.common.entity.beans.AbstractTask;
+import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.event.EntityListener;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.from.EJoin;
@@ -81,7 +82,7 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
         cb.setContainerDataSource(cardBIC);
         filterPanel.addFilterComponent("card", cb);
 
-         cb = new ComboBox();
+        cb = new ComboBox();
         cb.setNullSelectionAllowed(true);
         cb.setTextInputAllowed(true);
         cb.setFilteringMode(FilteringMode.CONTAINS);
@@ -113,12 +114,10 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
 
         teacherGW = new GridWidget(VEmployee.class);
         teacherGW.addEntityListener(this);
-        teacherGW.setButtonVisible(AbstractToolbar.REFRESH_BUTTON, false);
-        teacherGW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
-        teacherGW.setButtonVisible(AbstractToolbar.ADD_BUTTON, false);
+        teacherGW.showToolbar(false);
         DBGridModel teacherGM = (DBGridModel) teacherGW.getWidgetModel();
         teacherGM.setTitleVisible(false);
-        teacherGM.setMultiSelect(true);
+        teacherGM.setMultiSelect(false);
         teacherGM.setRefreshType(ERefreshType.MANUAL);
 
         doFilter(filterPanel.getFilterBean());
@@ -222,6 +221,18 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
     @Override
     public void clearFilter() {
         doFilter(filterPanel.getFilterBean());
+    }
+
+    @Override
+    public void handleEntityEvent(EntityEvent ev) {
+        if (ev.getSource().equals(teacherGW)) {
+            if (ev.getAction() == EntityEvent.SELECTED) {
+                List<Entity> selectedList = ev.getEntities();
+                if (!selectedList.isEmpty()) {
+                    onEdit(ev.getSource(), selectedList.get(0), 2);
+                }
+            }
+        }
     }
 
     @Override

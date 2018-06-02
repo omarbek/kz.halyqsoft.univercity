@@ -1606,7 +1606,8 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         if (source.equals(careerTW)) {
             EMPLOYEE_DEPT ed = (EMPLOYEE_DEPT) e;
             try {
-                ed.setEmployeeType(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(EMPLOYEE_TYPE.class, ID.valueOf(2)));
+                ed.setEmployeeType(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                        lookup(EMPLOYEE_TYPE.class, ID.valueOf(2)));//TODO
                 ed.setLiveLoad(0);
                 ed.setWageRate(1.0);
                 ed.setRateLoad(0.0);

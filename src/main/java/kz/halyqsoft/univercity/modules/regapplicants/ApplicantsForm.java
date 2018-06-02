@@ -603,11 +603,11 @@ public final class ApplicantsForm extends UsersForm {
 
                         PdfContentByte canvas = pdfWriter.getDirectContent();
                         SPECIALITY speciality = (student).getEntrantSpecialities().iterator().next().getSpeciality();
-                        String spec = speciality.getSpecName().substring(0, speciality.getSpecName().lastIndexOf('/') - 1);
+                        String spec = getStringBeforeSlash(speciality.getSpecName());
 
                         STUDENT_EDUCATION studentEducation = new STUDENT_EDUCATION();
                         studentEducation.setFaculty(speciality.getDepartment().getParent());
-                        String faculty = studentEducation.getFaculty().toString().substring(0, studentEducation.getFaculty().toString().lastIndexOf('/') - 1);
+                        String faculty = getStringBeforeSlash(studentEducation.getFaculty().toString());
 
 
                         int y = 0;

@@ -290,7 +290,6 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
                     FormModel docFM = new FormModel(EDUCATION_DOC.class, true);
                     docFM.getFieldModel("schoolCountry").setRequired(true);
                     docFM.getFieldModel("language").setRequired(true);
-                    docFM.getFieldModel("schoolCertificateType").setRequired(true);
                     docFM.getFieldModel("schoolRegion").setRequired(true);
 
                     DBTableModel educationTM = (DBTableModel) eduDocTW.getWidgetModel();
@@ -1122,7 +1121,6 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
 
 
             educationFM.getFieldModel("language").setRequired(true);
-            educationFM.getFieldModel("schoolCertificateType").setRequired(true);
             educationFM.getFieldModel("schoolRegion").setRequired(true);
             educationFM.getFieldModel("entryYear").getValidators().add(new IntegerRangeValidator("Значение года не может быть больше текущего года", 0, CommonUtils.currentYear));
             educationFM.getFieldModel("endYear").getValidators().add(new IntegerRangeValidator("Значение года не может быть больше текущего года", 0, CommonUtils.currentYear));
