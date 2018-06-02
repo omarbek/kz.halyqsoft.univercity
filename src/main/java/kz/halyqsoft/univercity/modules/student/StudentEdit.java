@@ -10,7 +10,6 @@ import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Table.Align;
-import kz.halyqsoft.univercity.entity.beans.TASKS;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
@@ -26,7 +25,6 @@ import org.r3a.common.dblink.facade.CommonIDFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.ID;
-import org.r3a.common.entity.beans.AbstractTask;
 import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.file.FileBean;
 import org.r3a.common.entity.query.QueryModel;
@@ -51,7 +49,10 @@ import org.r3a.common.vaadin.widget.table.TableWidget;
 import org.r3a.common.vaadin.widget.table.model.DBTableModel;
 
 import javax.persistence.NoResultException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 import static kz.halyqsoft.univercity.modules.regapplicants.ApplicantsForm.createResourceStudent;
 
@@ -62,7 +63,7 @@ import static kz.halyqsoft.univercity.modules.regapplicants.ApplicantsForm.creat
 @SuppressWarnings({"serial", "unchecked"})
 public final class StudentEdit extends AbstractFormWidgetView implements PhotoWidgetListener {
 
-    private  AbstractFormWidget baseDataFW;
+    private AbstractFormWidget baseDataFW;
     private USER_PHOTO userPhoto;
     private String userPhotoFilename;
     private byte[] userPhotoBytes;
@@ -326,6 +327,18 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                             }
                         }
                         showSavedNotification();
+
+                        try{
+                            baseDataFM.loadEntity(student.getId());
+                            CommonUtils.setCards(baseDataFM);
+                            hl.removeComponent(baseDataFW);
+                            baseDataFW.getWidgetModel().loadEntity(student.getId());
+                            baseDataFW.refresh();
+                            hl.addComponentAsFirst(baseDataFW);
+                        }catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
                     }
                 }
             });
@@ -1461,7 +1474,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                     }
                 }
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(s);
-                if (!oldCard.equals(s.getCard())&&oldCard != null) {
+                if (oldCard != null && !oldCard.equals(s.getCard())) {
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(oldCard);
                 }
                 if (userPhotoChanged) {

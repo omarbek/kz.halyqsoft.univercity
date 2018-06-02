@@ -64,7 +64,7 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
         ComboBox cb = new ComboBox();
         cb.setNullSelectionAllowed(true);
         cb.setTextInputAllowed(true);
-        cb.setFilteringMode(FilteringMode.OFF);
+        cb.setFilteringMode(FilteringMode.STARTSWITH);
         QueryModel<CARD> cardQM = new QueryModel<>(CARD.class);
         FromItem userFI = cardQM.addJoin(EJoin.INNER_JOIN, "id", USERS.class, "card");
         cardQM.addWhere(userFI, "typeIndex", ECriteria.EQUAL, 2);
@@ -131,7 +131,7 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
         cb = new ComboBox();
         cb.setNullSelectionAllowed(true);
         cb.setTextInputAllowed(false);
-        cb.setFilteringMode(FilteringMode.OFF);
+        cb.setFilteringMode(FilteringMode.STARTSWITH);
         cb.setPageLength(0);
         QueryModel<STUDENT_EDUCATION_TYPE> educationTypeQM = new QueryModel<>(STUDENT_EDUCATION_TYPE.class);
         BeanItemContainer<STUDENT_EDUCATION_TYPE> educationTypeBIC = new BeanItemContainer<>(STUDENT_EDUCATION_TYPE.class,
