@@ -62,7 +62,7 @@ public final class ApplicantsForm extends UsersForm {
     private Button contractButton;
     private Button specButton;
 
-    private boolean saveSpec, saveUnt;
+    private boolean saveSpec/*, saveUnt*/;
     private boolean came = false;
 
     private Parent parent;
@@ -288,7 +288,7 @@ public final class ApplicantsForm extends UsersForm {
         conditionsMap.put(getUILocaleUtil().getMessage("info.save.address"), !saveFactAddress);
         conditionsMap.put(getUILocaleUtil().getMessage("info.save.speciality"), !saveSpec);
         conditionsMap.put(getUILocaleUtil().getMessage("info.save.educ"), !saveEduc);
-        conditionsMap.put(getUILocaleUtil().getMessage("info.save.unt"), !saveUnt);
+//        conditionsMap.put(getUILocaleUtil().getMessage("info.save.unt"), !saveUnt);
         return conditionsMap;
     }
 
@@ -340,7 +340,7 @@ public final class ApplicantsForm extends UsersForm {
             }
         });
 
-        untButton = createFormButton("unt", true);
+        untButton = createFormButton("unt", false);
         untButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
@@ -457,7 +457,7 @@ public final class ApplicantsForm extends UsersForm {
     protected void initSpec(FormModel dataFM) {
         saveSpec = false;
         saveEduc = false;
-        saveUnt = false;
+//        saveUnt = false;
         saveFactAddress = false;
         specTW = new TableWidget(V_ENTRANT_SPECIALITY.class);
         specTW.addEntityListener(ApplicantsForm.this);
@@ -750,8 +750,12 @@ public final class ApplicantsForm extends UsersForm {
         QueryModel<UNT_CERTIFICATE> untCertificateQueryModel = new QueryModel<>(UNT_CERTIFICATE.class);
         FromItem unt = untCertificateQueryModel.addJoin(EJoin.INNER_JOIN, "id", USER_DOCUMENT.class, "id");
         untCertificateQueryModel.addWhere(unt, "user", ECriteria.EQUAL, student.getId());
-        untCertificate = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class)
-                .lookupSingle(untCertificateQueryModel);
+        try {
+            untCertificate = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class)
+                    .lookupSingle(untCertificateQueryModel);
+        } catch (NoResultException ex) {
+            untCertificate = null;
+        }
 
 
         ACCOUNTANT_PRICE accountantPrice;
@@ -882,7 +886,7 @@ public final class ApplicantsForm extends UsersForm {
                 .replaceAll("\\$technic", student.getCoordinator().toString())
                 .replaceAll("\\$attestat", attestationDate)
                 .replaceAll("\\$nomer", educationDoc.getDocumentNo())
-                .replaceAll("\\$ent", untCertificate.getDocumentNo())
+                .replaceAll("\\$ent", untCertificate == null ? "" : untCertificate.getDocumentNo())
                 .replaceAll("\\$document", createdDate)
                 .replaceAll("\\$diplomaType", student.getDiplomaType().toString())
                 .replaceAll("\\$group", "")
@@ -1095,7 +1099,7 @@ public final class ApplicantsForm extends UsersForm {
             boolean preSaveRates = unt.preSaveRates(e, isNew);
             if (unt.getUntRatesTW().getEntityCount() > 1) {
                 untNextButton.setEnabled(true);
-                saveUnt = true;
+//                saveUnt = true;
             }
             return preSaveRates;
         } else if (source.equals(parent.getFatherGFW())) {

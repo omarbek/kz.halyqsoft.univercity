@@ -2,7 +2,10 @@ package kz.halyqsoft.univercity.modules.creation;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.combobox.FilteringMode;
-import com.vaadin.ui.*;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.HorizontalLayout;
 import kz.halyqsoft.univercity.entity.beans.ROLES;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.USER_ROLES;
@@ -27,7 +30,10 @@ import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 import org.r3a.common.vaadin.widget.toolbar.IconToolbar;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class UserRoleBindingView extends AbstractTaskView implements EntityListener, FilterPanelListener {
 
@@ -50,7 +56,7 @@ public class UserRoleBindingView extends AbstractTaskView implements EntityListe
 //getUILocaleUtil().getCaption("role")
         rolesCB = new ComboBox();
         rolesCB.setNullSelectionAllowed(true);
-        rolesCB.setTextInputAllowed(false);
+        rolesCB.setTextInputAllowed(true);
         rolesCB.setFilteringMode(FilteringMode.CONTAINS);
         rolesCB.setWidth(300, Unit.PIXELS);
         QueryModel<ROLES> roleQM = new QueryModel<>(ROLES.class);
@@ -63,11 +69,15 @@ public class UserRoleBindingView extends AbstractTaskView implements EntityListe
         usersCB = new ComboBox();
 //        usersCB.setCaption(getUILocaleUtil().getCaption(""));//TODO
         usersCB.setNullSelectionAllowed(true);
-        usersCB.setTextInputAllowed(false);
-
+        usersCB.setTextInputAllowed(true);
         usersCB.setFilteringMode(FilteringMode.CONTAINS);
         usersCB.setWidth(300, Unit.PIXELS);
         QueryModel<USERS> userQM = new QueryModel<>(USERS.class);
+        List<ID> values = new ArrayList<>();
+        values.add(ID.valueOf(1));
+        values.add(ID.valueOf(2));
+        userQM.addWhereNotIn("id", values);
+        userQM.addWhere("deleted", Boolean.FALSE);
         BeanItemContainer<USERS> userBIC = new BeanItemContainer<>(USERS.class,
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(userQM));
         usersCB.setContainerDataSource(userBIC);
@@ -83,8 +93,7 @@ public class UserRoleBindingView extends AbstractTaskView implements EntityListe
                 USERS user = (USERS) usersCB.getValue();
                 ROLES role = (ROLES) rolesCB.getValue();
 
-                if(role==null || user == null)
-                {
+                if (role == null || user == null) {
                     Message.showError(getUILocaleUtil().getMessage("error.required.fields"));
                     return;
                 }
@@ -99,9 +108,9 @@ public class UserRoleBindingView extends AbstractTaskView implements EntityListe
                 Message.showConfirm(getUILocaleUtil().getMessage("confirmation.save"), new AbstractYesButtonListener() {
                     @Override
                     public void buttonClick(Button.ClickEvent clickEvent) {
-                        try{
+                        try {
                             SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(user_roles);
-                        }catch (Exception e){
+                        } catch (Exception e) {
                             e.printStackTrace();
                             Message.showError(e.getMessage());
                         }
@@ -112,7 +121,7 @@ public class UserRoleBindingView extends AbstractTaskView implements EntityListe
             }
         });
         componentHL.addComponent(bindButton);
-        componentHL.setComponentAlignment(bindButton,Alignment.MIDDLE_CENTER);
+        componentHL.setComponentAlignment(bindButton, Alignment.MIDDLE_CENTER);
 
 
         getContent().addComponent(filterPanel);
@@ -123,8 +132,8 @@ public class UserRoleBindingView extends AbstractTaskView implements EntityListe
 
         userRoleGW = new GridWidget(VUserRoles.class);
         userRoleGW.addEntityListener(this);
-        userRoleGW.setButtonVisible(IconToolbar.EDIT_BUTTON , false);
-        userRoleGW.setButtonVisible(IconToolbar.ADD_BUTTON , false);
+        userRoleGW.setButtonVisible(IconToolbar.EDIT_BUTTON, false);
+        userRoleGW.setButtonVisible(IconToolbar.ADD_BUTTON, false);
         userRoleGW.setButtonVisible(IconToolbar.PREVIEW_BUTTON, false);
         userRoleGW.setButtonVisible(IconToolbar.REFRESH_BUTTON, false);
 
@@ -146,8 +155,8 @@ public class UserRoleBindingView extends AbstractTaskView implements EntityListe
 
     @Override
     public void doFilter(AbstractFilterBean abstractFilterBean) {
-        FUserRolesFilter urf = (FUserRolesFilter)abstractFilterBean;
-        int i =  1;
+        FUserRolesFilter urf = (FUserRolesFilter) abstractFilterBean;
+        int i = 1;
         Map<Integer, Object> params = new HashMap<>();
         StringBuilder sb = new StringBuilder();
         if (urf.getRoleName() != null) {
@@ -168,18 +177,18 @@ public class UserRoleBindingView extends AbstractTaskView implements EntityListe
         }
 
         List<VUserRoles> list = new ArrayList<>();
-        if(sb.length()>0){
+        if (sb.length() > 0) {
 
 
             String sql = "select ur.id , " +
                     "   trim(u.LAST_NAME || ' ' || u.FIRST_NAME || ' '" +
-                                        "|| coalesce(u.MIDDLE_NAME, '')) userName , r.role_name roleName " +
+                    "|| coalesce(u.MIDDLE_NAME, '')) userName , r.role_name roleName " +
                     "   from user_roles ur " +
                     "   INNER JOIN users u on u.id = ur.user_id " +
                     "   INNER JOIN roles r on r.id = ur.role_id where "
                     + sb.toString();
             try {
-                List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql , params);
+                List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
                 if (!tmpList.isEmpty()) {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
@@ -193,11 +202,11 @@ public class UserRoleBindingView extends AbstractTaskView implements EntityListe
             } catch (Exception ex) {
                 CommonUtils.showMessageAndWriteLog("Unable to load user_roles list", ex);
             }
-        }else {
+        } else {
             Message.showInfo(getUILocaleUtil().getMessage("select.1.search.condition"));
         }
 
-        ((DBGridModel)userRoleGW.getWidgetModel()).setEntities(list);
+        ((DBGridModel) userRoleGW.getWidgetModel()).setEntities(list);
         try {
             userRoleGW.refresh();
         } catch (Exception ex) {
@@ -217,13 +226,13 @@ public class UserRoleBindingView extends AbstractTaskView implements EntityListe
 
     @Override
     public boolean preDelete(Object source, List<Entity> entities, int buttonId) {
-        if(source.equals(userRoleGW)){
-            for(Entity entity:entities){
-                try{
-                    USER_ROLES userRoles= SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(USER_ROLES.class , entity.getId());
+        if (source.equals(userRoleGW)) {
+            for (Entity entity : entities) {
+                try {
+                    USER_ROLES userRoles = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(USER_ROLES.class, entity.getId());
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(userRoles);
                     userRoleGW.refresh();
-                }catch (Exception e){
+                } catch (Exception e) {
                     Message.showError(e.getMessage());
                 }
             }
@@ -232,11 +241,11 @@ public class UserRoleBindingView extends AbstractTaskView implements EntityListe
         return false;
     }
 
-    private void refresh(){
+    private void refresh() {
         try {
             userRoleGW.refresh();
             doFilter(filterPanel.getFilterBean());
-        } catch (Exception e){
+        } catch (Exception e) {
             Message.showError(e.getMessage());
         }
     }

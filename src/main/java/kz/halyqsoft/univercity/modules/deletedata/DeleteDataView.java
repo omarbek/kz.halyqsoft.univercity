@@ -55,7 +55,7 @@ public class DeleteDataView extends AbstractTaskView implements EntityListener, 
         filterPanel.addFilterPanelListener(this);
 
         userTypeCB = new ComboBox();
-        userTypeCB.setNullSelectionAllowed(true);
+        userTypeCB.setNullSelectionAllowed(false);
         userTypeCB.setTextInputAllowed(false);
         userTypeCB.setFilteringMode(FilteringMode.OFF);
         userTypeCB.setPageLength(0);
@@ -64,6 +64,7 @@ public class DeleteDataView extends AbstractTaskView implements EntityListener, 
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(typeQM));
         userTypeCB.setContainerDataSource(typeBIC);
         filterPanel.addFilterComponent("userType", userTypeCB);
+        userTypeCB.setValue(userType);
 
         getContent().addComponent(filterPanel);
         getContent().setComponentAlignment(filterPanel, Alignment.TOP_CENTER);
@@ -74,9 +75,10 @@ public class DeleteDataView extends AbstractTaskView implements EntityListener, 
         usersGW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
         usersGW.setButtonVisible(AbstractToolbar.ADD_BUTTON, false);
         usersGW.setButtonVisible(AbstractToolbar.EDIT_BUTTON, false);
-        DBGridModel examGM = (DBGridModel) usersGW.getWidgetModel();
-        examGM.setMultiSelect(true);
-        examGM.setRefreshType(ERefreshType.MANUAL);
+        DBGridModel usersGM = (DBGridModel) usersGW.getWidgetModel();
+        usersGM.getColumnModel("created").setInGrid(true);
+        usersGM.setMultiSelect(true);
+        usersGM.setRefreshType(ERefreshType.MANUAL);
 
         refresh(null);
 
