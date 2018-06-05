@@ -92,7 +92,7 @@ public class CreativeExamEdit extends AbstractDialog {
         getContent().addComponent(studentCreativeExamSubjectTW);
         getContent().setComponentAlignment(studentCreativeExamSubjectTW, Alignment.MIDDLE_CENTER);
 
-        Button closeButton = new Button("close");//TODO
+        Button closeButton = new Button(getUILocaleUtil().getCaption("close"));
         closeButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {

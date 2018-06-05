@@ -24,112 +24,109 @@ public class SUBJECT extends AbstractEntity {
 	@FieldInfo(type = EFieldType.TEXT, max = 256, order = 1)
 	@Column(name = "NAME_KZ", nullable = false)
 	private String nameKZ;
-	
+
 	@FieldInfo(type = EFieldType.TEXT_LATIN, max = 256, order = 2)
 	@Column(name = "NAME_EN", nullable = false)
 	private String nameEN;
-	
+
 	@FieldInfo(type = EFieldType.TEXT, max = 256, order = 3)
 	@Column(name = "NAME_RU", nullable = false)
 	private String nameRU;
-	
+
 	@FieldInfo(type = EFieldType.TEXT, max = 13, order = 4, required = false, readOnlyFixed = true, columnWidth = 100)
 	@Column(name = "CODE", nullable = false)
 	private String code;
-	
+
 	@FieldInfo(type = EFieldType.FK_DIALOG, order = 5, inGrid = false)
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "STUDY_DIRECT_ID", referencedColumnName = "ID")})
     private STUDY_DIRECT studyDirect;
-	
+
 	@FieldInfo(type = EFieldType.TEXT, isMemo = true, max = 4000, required = false, order = 6, inGrid = false)
 	@Column(name = "DESCR")
 	private String descr;
-	
-	@FieldInfo(type = EFieldType.FK_DIALOG, order = 7)
+
+	@FieldInfo(type = EFieldType.FK_COMBO, order = 7)
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "CHAIR_ID", referencedColumnName = "ID")})
     private DEPARTMENT chair;
-	
+
 	@FieldInfo(type = EFieldType.FK_COMBO, order = 8, inGrid = false)
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "LEVEL_ID", referencedColumnName = "ID")})
     private LEVEL level;
-	
+
 	@FieldInfo(type = EFieldType.FK_COMBO, order = 9, inGrid = false)
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "SUBJECT_CYCLE_ID", referencedColumnName = "ID")})
     private SUBJECT_CYCLE subjectCycle;
-	
+
 	@FieldInfo(type = EFieldType.BOOLEAN, order = 10, required = false, columnWidth = 100)
 	@Column(name = "MANDATORY", nullable = false)
     private boolean mandatory;
-	
+
 	@FieldInfo(type = EFieldType.FK_COMBO, order = 11, inGrid = false)
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "CREDITABILITY_ID", referencedColumnName = "ID")})
     private CREDITABILITY creditability;
-	
+
 	@FieldInfo(type = EFieldType.FK_COMBO, order = 12, inGrid = false)
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "ACADEMIC_FORMULA_ID", referencedColumnName = "ID")})
     private ACADEMIC_FORMULA academicFormula;
-	
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 13, required = false, inGrid = false)
-    @ManyToOne
-    @JoinColumns({
-        @JoinColumn(name = "ECTS_ID", referencedColumnName = "ID")})
-    private ECTS ects;
-	
+
+//	@FieldInfo(type = EFieldType.FK_COMBO, order = 13, required = false)
+//    @ManyToOne
+//    @JoinColumns({
+//        @JoinColumn(name = "ECTS_ID", referencedColumnName = "ID")})
+//    private ECTS ects;
+
 	@FieldInfo(type = EFieldType.BOOLEAN, order = 15, required = false, columnWidth = 100)
 	@Column(name = "LANG_KZ", nullable = false)
     private boolean langKZ;
-	
+
 	@FieldInfo(type = EFieldType.BOOLEAN, order = 16, required = false, columnWidth = 100)
 	@Column(name = "LANG_EN", nullable = false)
     private boolean langEN;
-	
+
 	@FieldInfo(type = EFieldType.BOOLEAN, order = 17, required = false, columnWidth = 100)
 	@Column(name = "LANG_RU", nullable = false)
     private boolean langRU;
-	
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 18, required = false, inGrid = false)
-    @ManyToOne
-    @JoinColumns({
-        @JoinColumn(name = "GROUP_LEC_ID", referencedColumnName = "ID")})
-    private GROUP_SIZE_LECTURE groupSizeLecture;
-	
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 19, required = false, inGrid = false)
-    @ManyToOne
-    @JoinColumns({
-        @JoinColumn(name = "GROUP_PRAC_ID", referencedColumnName = "ID")})
-    private GROUP_SIZE_PRAC groupSizePrac;
-	
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 20, required = false, inGrid = false)
-    @ManyToOne
-    @JoinColumns({
-        @JoinColumn(name = "GROUP_LAB_ID", referencedColumnName = "ID")})
-    private GROUP_SIZE_LAB groupSizeLab;
-	
+
+//	@FieldInfo(type = EFieldType.FK_COMBO, order = 18, required = false, inGrid = false)
+//    @ManyToOne
+//    @JoinColumns({
+//        @JoinColumn(name = "GROUP_LEC_ID", referencedColumnName = "ID")})
+//    private GROUP_SIZE_LECTURE groupSizeLecture;
+//
+//	@FieldInfo(type = EFieldType.FK_COMBO, order = 19, required = false, inGrid = false)
+//    @ManyToOne
+//    @JoinColumns({
+//        @JoinColumn(name = "GROUP_PRAC_ID", referencedColumnName = "ID")})
+//    private GROUP_SIZE_PRAC groupSizePrac;
+//
+//	@FieldInfo(type = EFieldType.FK_COMBO, order = 20, required = false, inGrid = false)
+//    @ManyToOne
+//    @JoinColumns({
+//        @JoinColumn(name = "GROUP_LAB_ID", referencedColumnName = "ID")})
+//    private GROUP_SIZE_LAB groupSizeLab;
+
 	@FieldInfo(type = EFieldType.FK_COMBO, order = 21, inGrid = false)
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "CONTROL_TYPE_ID", referencedColumnName = "ID")})
     private CONTROL_TYPE controlType;
-	
+
 	@FieldInfo(type = EFieldType.BOOLEAN, order = 22, required = false, inEdit = false, inGrid = false, inView = false)
 	@Column(name = "DELETED", nullable = false)
     private boolean deleted;
-	
-	@Column(name = "OLD_ID")
-	private String oldId;
-	
+
 	public SUBJECT() {
 	}
 
@@ -228,14 +225,14 @@ public class SUBJECT extends AbstractEntity {
 	public void setAcademicFormula(ACADEMIC_FORMULA academicFormula) {
 		this.academicFormula = academicFormula;
 	}
-	
-	public ECTS getEcts() {
-		return ects;
-	}
 
-	public void setEcts(ECTS ects) {
-		this.ects = ects;
-	}
+//	public ECTS getEcts() {
+//		return ects;
+//	}
+//
+//	public void setEcts(ECTS ects) {
+//		this.ects = ects;
+//	}
 
 	public boolean isLangKZ() {
 		return langKZ;
@@ -261,29 +258,29 @@ public class SUBJECT extends AbstractEntity {
 		this.langRU = langRU;
 	}
 
-	public GROUP_SIZE_LECTURE getGroupSizeLecture() {
-		return groupSizeLecture;
-	}
-
-	public void setGroupSizeLecture(GROUP_SIZE_LECTURE groupSizeLecture) {
-		this.groupSizeLecture = groupSizeLecture;
-	}
-
-	public GROUP_SIZE_PRAC getGroupSizePrac() {
-		return groupSizePrac;
-	}
-
-	public void setGroupSizePrac(GROUP_SIZE_PRAC groupSizePrac) {
-		this.groupSizePrac = groupSizePrac;
-	}
-
-	public GROUP_SIZE_LAB getGroupSizeLab() {
-		return groupSizeLab;
-	}
-
-	public void setGroupSizeLab(GROUP_SIZE_LAB groupSizeLab) {
-		this.groupSizeLab = groupSizeLab;
-	}
+//	public GROUP_SIZE_LECTURE getGroupSizeLecture() {
+//		return groupSizeLecture;
+//	}
+//
+//	public void setGroupSizeLecture(GROUP_SIZE_LECTURE groupSizeLecture) {
+//		this.groupSizeLecture = groupSizeLecture;
+//	}
+//
+//	public GROUP_SIZE_PRAC getGroupSizePrac() {
+//		return groupSizePrac;
+//	}
+//
+//	public void setGroupSizePrac(GROUP_SIZE_PRAC groupSizePrac) {
+//		this.groupSizePrac = groupSizePrac;
+//	}
+//
+//	public GROUP_SIZE_LAB getGroupSizeLab() {
+//		return groupSizeLab;
+//	}
+//
+//	public void setGroupSizeLab(GROUP_SIZE_LAB groupSizeLab) {
+//		this.groupSizeLab = groupSizeLab;
+//	}
 
 	public CONTROL_TYPE getControlType() {
 		return controlType;
@@ -301,14 +298,6 @@ public class SUBJECT extends AbstractEntity {
 		this.deleted = deleted;
 	}
 
-	public String getOldId() {
-		return oldId;
-	}
-
-	public void setOldId(String oldId) {
-		this.oldId = oldId;
-	}
-	
 	public String toString(Locale l) {
 		String name = nameEN;
 		if (l.getLanguage().equals("kk")) {
@@ -316,7 +305,7 @@ public class SUBJECT extends AbstractEntity {
 		} else if (l.getLanguage().equals("ru")) {
 			name = nameRU;
 		}
-		
+
 		return code + " " + name;
 	}
 }

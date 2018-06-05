@@ -24,14 +24,15 @@ public abstract class WindowUtils extends AbstractDialog {
     }
 
     protected void init(int width, int height) {
-        setWidth(width, Unit.PIXELS);
-        setHeight(height, Unit.PIXELS);
+//        setWidth(width, Unit.PIXELS);
+//        setHeight(height, Unit.PIXELS);
+        setSizeFull();
 
         VerticalLayout mainVL = getVerticalLayout();
         getContent().addComponent(mainVL);
         getContent().setComponentAlignment(mainVL, Alignment.MIDDLE_CENTER);
 
-        Button closeButton = new Button("close");//TODO
+        Button closeButton = new Button(getUILocaleUtil().getCaption("close"));
         closeButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {

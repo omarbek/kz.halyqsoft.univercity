@@ -879,8 +879,8 @@ public final class ApplicantsForm extends UsersForm {
                         + studentRelativeMother.getWorkPlace() + "    "
                         + studentRelativeMother.getPostName())
                 .replaceAll("\\$trudovoe", "-")
-                .replaceAll("\\$name", student.getLastName())
-                .replaceAll("\\$surname", student.getFirstName())
+                .replaceAll("\\$name", student.getFirstName())
+                .replaceAll("\\$surname", student.getLastName())
                 .replaceAll("\\$firstName", student.getMiddleName())
                 .replaceAll("\\$education", educationDoc.getEducationType().toString())
                 .replaceAll("\\$technic", student.getCoordinator().toString())
