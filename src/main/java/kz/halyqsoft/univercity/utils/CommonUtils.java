@@ -1,17 +1,19 @@
 package kz.halyqsoft.univercity.utils;
 
 import com.itextpdf.text.Font;
+import com.vaadin.data.Property;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Field;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Upload;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_DOCUMENT_FILE;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.POST;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
+import org.r3a.common.dblink.facade.CommonIDFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.ID;
 import org.r3a.common.entity.file.FileBean;
@@ -22,16 +24,17 @@ import org.r3a.common.vaadin.AbstractWebUI;
 import org.r3a.common.vaadin.locale.UILocaleUtil;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.form.FormModel;
+import org.r3a.common.vaadin.widget.form.field.FieldModel;
 import org.r3a.common.vaadin.widget.form.field.filelist.FileListFieldModel;
 import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.NoResultException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
+import java.math.BigInteger;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -45,7 +48,7 @@ public class CommonUtils {
 
     public static final Logger LOG = LoggerFactory.getLogger("ROOT");
     public static int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-    public static Map<String, Integer> fontMap;
+    private static int sequenceForEmployee = 1;
 
     public static String getCurrentUserLogin() {
         return AbstractSecureWebUI.getInstance().getUsername();
@@ -100,7 +103,7 @@ public class CommonUtils {
     }
 
     public static int getFontMap(String font) {
-        fontMap = new HashMap<>();
+        Map<String, Integer> fontMap = new HashMap<>();
         fontMap.put("Bold", Font.BOLD);
         fontMap.put("Normal", Font.NORMAL);
         fontMap.put("Italic", Font.ITALIC);
@@ -212,5 +215,38 @@ public class CommonUtils {
         QueryModel cardQM = cardFM.getQueryModel();
 
         cardQM.addWhere("id", ECriteria.EQUAL, ID.valueOf(cardId));
+    }
+
+    public static String getLogin(String login) throws Exception {
+        QueryModel<USERS> usersQM = new QueryModel<>(USERS.class);
+        usersQM.addWhere("login", ECriteria.EQUAL, login);
+        List<USERS> users = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(usersQM);
+        if (!users.isEmpty()) {
+            login = getLogin(login + sequenceForEmployee++);
+        }
+        return login;
+    }
+
+    public static String getCode(String beginYear) {
+        String code = null;
+        try {
+            Integer usersCode = SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USERS_CODE").getId().intValue();
+            if (usersCode < 10) {
+                code = beginYear + "000" + usersCode;
+            } else if (usersCode < 100) {
+                code = beginYear + "00" + usersCode;
+            } else if (usersCode < 1000) {
+                code = beginYear + "0" + usersCode;
+            } else if (usersCode < 10000) {
+                code = beginYear + usersCode;
+            } else {
+                SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USERS_CODE").
+                        setId(BigInteger.valueOf(0));//TODO check
+                code = getCode(beginYear);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();//TODO catch
+        }
+        return code;
     }
 }

@@ -55,6 +55,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
 import java.util.*;
+import java.util.Calendar;
 
 /**
  * @author Omarbek
@@ -83,7 +84,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
     private TableWidget scientificManagementTW;
     private TableWidget experienceTW;
     private TableWidget careerTW;
-    private WorkHourWidget whw;
+    private static WorkHourWidget whw;
     private TableWidget subjectPPSTW;
     private TableWidget loadByHourTW;
     private GridWidget graduateStudentLoadGW;
@@ -191,8 +192,8 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         createExperienceTab(readOnly);
         createCareerTab(readOnly);
         createWorkDayTab(readOnly);
-//        createSubjectPPSTab(readOnly);//TODO add later
-//        createRoomTab(readOnly);
+        createSubjectPPSTab(readOnly);
+        createRoomTab(readOnly);
     }
 
     @Override
@@ -242,6 +243,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         roomTW.setButtonVisible(AbstractToolbar.REFRESH_BUTTON, false);
         roomTW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
         roomTW.setButtonVisible(AbstractToolbar.EDIT_BUTTON, false);
+        roomTW.setButtonVisible(AbstractToolbar.DELETE_BUTTON, false);
         roomTW.addEntityListener(this);
         DBTableModel roomTM = (DBTableModel) roomTW.getWidgetModel();
         roomTM.setReadOnly(baseDataFW.getWidgetModel().isReadOnly());
@@ -469,13 +471,13 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
 
     private boolean preSaveSubjectPPS(Object source, Entity e, boolean isNew, int buttonId) throws Exception {
         TEACHER_SUBJECT sp = (TEACHER_SUBJECT) e;
-        if ((sp.getGroupLecCount() > 0 && sp.getGroupSizeLecture() == null) || (sp.getGroupLabCount() > 0 && sp.getGroupSizeLab() == null) || (sp.getGroupPracCount() > 0 && sp.getGroupSizePrac() == null)) {
-            throw new Exception(getUILocaleUtil().getMessage("error.incorrect.group.size"));
-        }
-
-        if ((sp.getGroupLecCount() == 0 && sp.getGroupSizeLecture() != null) || (sp.getGroupLabCount() == 0 && sp.getGroupSizeLab() != null) || (sp.getGroupPracCount() == 0 && sp.getGroupSizePrac() != null)) {
-            throw new Exception(getUILocaleUtil().getMessage("error.incorrect.group.count"));
-        }
+//        if ((sp.getGroupLecCount() > 0 && sp.getGroupSizeLecture() == null) || (sp.getGroupLabCount() > 0 && sp.getGroupSizeLab() == null) || (sp.getGroupPracCount() > 0 && sp.getGroupSizePrac() == null)) {
+//            throw new Exception(getUILocaleUtil().getMessage("error.incorrect.group.size"));
+//        }
+//
+//        if ((sp.getGroupLecCount() == 0 && sp.getGroupSizeLecture() != null) || (sp.getGroupLabCount() == 0 && sp.getGroupSizeLab() != null) || (sp.getGroupPracCount() == 0 && sp.getGroupSizePrac() != null)) {
+//            throw new Exception(getUILocaleUtil().getMessage("error.incorrect.group.count"));
+//        }
 
         if (isNew) {
             sp.setEmployee((EMPLOYEE) baseDataFW.getWidgetModel().getEntity());
@@ -487,13 +489,13 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
 
     private boolean preSaveLoadByHour(Object source, Entity e, boolean isNew, int buttonId) throws Exception {
         TEACHER_SUBJECT sp = (TEACHER_SUBJECT) e;
-        if ((sp.getGroupLecCount() > 0 && sp.getGroupSizeLecture() == null) || (sp.getGroupLabCount() > 0 && sp.getGroupSizeLab() == null) || (sp.getGroupPracCount() > 0 && sp.getGroupSizePrac() == null)) {
-            throw new Exception(getUILocaleUtil().getMessage("error.incorrect.group.size"));
-        }
-
-        if ((sp.getGroupLecCount() == 0 && sp.getGroupSizeLecture() != null) || (sp.getGroupLabCount() == 0 && sp.getGroupSizeLab() != null) || (sp.getGroupPracCount() == 0 && sp.getGroupSizePrac() != null)) {
-            throw new Exception(getUILocaleUtil().getMessage("error.incorrect.group.count"));
-        }
+//        if ((sp.getGroupLecCount() > 0 && sp.getGroupSizeLecture() == null) || (sp.getGroupLabCount() > 0 && sp.getGroupSizeLab() == null) || (sp.getGroupPracCount() > 0 && sp.getGroupSizePrac() == null)) {
+//            throw new Exception(getUILocaleUtil().getMessage("error.incorrect.group.size"));
+//        }
+//
+//        if ((sp.getGroupLecCount() == 0 && sp.getGroupSizeLecture() != null) || (sp.getGroupLabCount() == 0 && sp.getGroupSizeLab() != null) || (sp.getGroupPracCount() == 0 && sp.getGroupSizePrac() != null)) {
+//            throw new Exception(getUILocaleUtil().getMessage("error.incorrect.group.count"));
+//        }
 
         if (isNew) {
             sp.setEmployee((EMPLOYEE) baseDataFW.getWidgetModel().getEntity());
@@ -1232,6 +1234,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         FieldModel rateLoadFM = careerFM.getFieldModel("rateLoad");
 
         postFM.getListeners().add(new CareerPostChangeListener(liveLoadFM, wageRateFM, rateLoadFM));
+        liveLoadFM.getListeners().add(new LiveLoadChangeListener(rateLoadFM, wageRateFM));
         wageRateFM.getListeners().add(new WageRateChangeListener(liveLoadFM, rateLoadFM));
 
         content.addComponent(careerTW);
@@ -1259,7 +1262,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
             EMPLOYEE_WORK_HOUR ewh1 = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(EMPLOYEE_WORK_HOUR.class, ewh.getId());
             ewhList.add(ewh1);
         }
-        whw = new WorkHourWidget(ewhList, readOnly);
+        whw = new WorkHourWidget(ewhList, readOnly, baseDataFW.getWidgetModel());
         whw.setCaption(getUILocaleUtil().getCaption("work.days.setting"));
         whw.setLegend1Resource("working");
         whw.setLegend2Resource("not.working");
@@ -1974,8 +1977,13 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
             emp.setCreated(new Date());
             emp.setCreatedBy(CommonUtils.getCurrentUserLogin());
             try {
+                Calendar calendar = Calendar.getInstance();
+                QueryModel<ENTRANCE_YEAR> entranceYearQM = new QueryModel<>(ENTRANCE_YEAR.class);
+                entranceYearQM.addWhere("beginYear", ECriteria.EQUAL, calendar.get(Calendar.YEAR));
+                ENTRANCE_YEAR entranceYear = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(entranceYearQM);
+                Integer beginYear = entranceYear.getBeginYear();
+                emp.setCode(CommonUtils.getCode(beginYear.toString().substring(2, 4)));
                 emp.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USERS"));
-                emp.setCode("000000000000");
                 emp.setFirstName(emp.getFirstName().trim());
                 emp.setLastName(emp.getLastName().trim());
                 if (emp.getMiddleName() != null) {
@@ -1986,6 +1994,9 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
                 if (emp.getMiddleNameEN() != null) {
                     emp.setMiddleNameEN(emp.getMiddleNameEN().trim());
                 }
+                emp.setLogin(CommonUtils.getLogin(emp.getFirstNameEN().toLowerCase().substring(0, 1) + "_" +
+                        emp.getLastNameEN().toLowerCase()));
+                emp.setPasswd("12345678");
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(emp);
                 if (userPhotoChanged) {
                     userPhoto = new USER_PHOTO();
@@ -1997,7 +2008,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
                 baseDataFW.getWidgetModel().loadEntity(emp.getId());
                 baseDataFW.refresh();
 
-                saveEmployeeWorkHour(emp);
+                saveEmployeeWorkHour(emp, true);
                 createCareerTab(false);
                 showSavedNotification();
             } catch (Exception ex) {
@@ -2038,7 +2049,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
                         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(userPhoto);
                     }
                 }
-                saveEmployeeWorkHour(emp);
+                saveEmployeeWorkHour(emp, true);
                 createCareerTab(false);
                 showSavedNotification();
             } catch (Exception ex) {
@@ -2049,7 +2060,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         return false;
     }
 
-    private void saveEmployeeWorkHour(EMPLOYEE employee) throws Exception {
+    public static void saveEmployeeWorkHour(EMPLOYEE employee, boolean isEdit) throws Exception {
         QueryModel<EMPLOYEE_WORK_HOUR> ewhQM = new QueryModel<EMPLOYEE_WORK_HOUR>(EMPLOYEE_WORK_HOUR.class);
         ewhQM.addSelect("employee", EAggregate.COUNT);
         ewhQM.addWhere("employee", ECriteria.EQUAL, employee.getId());
@@ -2080,9 +2091,10 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
                     ewhList.add(ewh);
                 }
             }
-
-            whw.setWorkHourList(ewhList);
-            whw.refresh();
+            if (isEdit) {
+                whw.setWorkHourList(ewhList);
+                whw.refresh();
+            }
         }
     }
 
@@ -3033,76 +3045,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
     }
 
 
-    private class CareerPostChangeListener implements Property.ValueChangeListener {
 
-        private final FieldModel liveLoadFM;
-        private final FieldModel wageRateFM;
-        private final FieldModel rateLoadFM;
-
-        CareerPostChangeListener(FieldModel liveLoadFM, FieldModel wageRateFM, FieldModel rateLoadFM) {
-            this.liveLoadFM = liveLoadFM;
-            this.wageRateFM = wageRateFM;
-            this.rateLoadFM = rateLoadFM;
-        }
-
-        @Override
-        public void valueChange(Property.ValueChangeEvent ev) {
-            POST post = (POST) ev.getProperty().getValue();
-            try {
-                if (post != null) {
-                    Integer liveLoad = post.getStudyLoad();
-                    liveLoadFM.refresh(liveLoad.toString());
-                    Field wageRateF = wageRateFM.getField();
-                    Double wageRate = 0.0;
-                    if (wageRateF != null && wageRateF.getValue() != null) {
-                        String a = wageRateF.getValue().toString();
-                        wageRate = Double.valueOf(a.replace(',', '.'));
-                    }
-                    Double rateLoad = liveLoad * wageRate;
-                    rateLoadFM.refresh(rateLoad.toString());
-                } else {
-                    liveLoadFM.refresh(null);
-                    rateLoadFM.refresh(null);
-                }
-            } catch (Exception ex) {
-                CommonUtils.showMessageAndWriteLog("Unable to refresh rate and live load", ex);
-            }
-        }
-    }
-
-    private class WageRateChangeListener implements Property.ValueChangeListener {
-
-        private final FieldModel liveLoadFM;
-        private final FieldModel rateLoadFM;
-
-        public WageRateChangeListener(FieldModel liveLoadFM, FieldModel rateLoadFM) {
-            this.liveLoadFM = liveLoadFM;
-            this.rateLoadFM = rateLoadFM;
-        }
-
-        @Override
-        public void valueChange(Property.ValueChangeEvent ev) {
-            String value = (String) ev.getProperty().getValue();
-            DecimalFormatSymbols dfs = DecimalFormatSymbols.getInstance();
-            dfs.setDecimalSeparator('.');
-            DecimalFormat df = new DecimalFormat("######.##", dfs);
-            try {
-                Double wageRate = df.parse(value).doubleValue();
-                Field liveLoadF = liveLoadFM.getField();
-                Double liveLoad = 0.0;
-                if (liveLoadF != null && liveLoadF.getValue() != null) {
-                    liveLoad = df.parse(liveLoadF.getValue().toString()).doubleValue();
-                }
-
-                Double rateLoad = liveLoad * wageRate;
-                rateLoadFM.refresh(rateLoad.toString());
-            } catch (ParseException ex) {
-                LOG.error("Unable to parse double value");
-            } catch (Exception ex) {
-                CommonUtils.showMessageAndWriteLog("Unable to parse double value", ex);
-            }
-        }
-    }
 
     private class AddNewRoomListener extends AbstractYesButtonListener {
 

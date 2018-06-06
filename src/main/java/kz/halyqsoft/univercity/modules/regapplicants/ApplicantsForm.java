@@ -9,12 +9,11 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.*;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.*;
+import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.enumeration.Flag;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.V_COORDINATOR;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.V_ENTRANT_SPECIALITY;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.V_KBTU_ENTRANTS;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.*;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.register.*;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
@@ -31,6 +30,7 @@ import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.dialog.select.ESelectType;
 import org.r3a.common.vaadin.widget.dialog.select.custom.grid.CustomGridSelectDialog;
 import org.r3a.common.vaadin.widget.form.FormModel;
+import org.r3a.common.vaadin.widget.form.GridFormWidget;
 import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 import org.r3a.common.vaadin.widget.table.TableWidget;
 import org.r3a.common.vaadin.widget.table.model.DBTableModel;
@@ -39,7 +39,6 @@ import javax.persistence.NoResultException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -54,13 +53,14 @@ public final class ApplicantsForm extends UsersForm {
 
     private static String replaced;
     private Button untNextButton;
-    private Map<String, Integer> fontMap;
+
     private TableWidget specTW;
+    private TableWidget awardsTW, socialCategoriesTW;
 
     private Button untButton, grantDocButton;
     private Button motherButton, fatherButton;
     private Button contractButton;
-    private Button specButton;
+    private Button specButton,moreButton;
 
     private boolean saveSpec/*, saveUnt*/;
     private boolean came = false;
@@ -84,12 +84,6 @@ public final class ApplicantsForm extends UsersForm {
     ApplicantsForm(final FormModel dataFM, ENTRANCE_YEAR entranceYear) throws Exception {
         super(dataFM, entranceYear);
 
-        fontMap = new HashMap<>();
-        fontMap.put("Bold", Font.BOLD);
-        fontMap.put("Normal", Font.NORMAL);
-        fontMap.put("Italic", Font.ITALIC);
-        fontMap.put("Underline", Font.UNDERLINE);
-
         dataFM.getFieldModel("academicStatus").setInEdit(false);
         dataFM.getFieldModel("academicStatus").setInView(false);
 
@@ -108,6 +102,14 @@ public final class ApplicantsForm extends UsersForm {
 
         contract = new Contract(dataAFW, this);
         contract.create(udfQM, military.getMilitaryFLFM());
+    }
+
+    @Override
+    protected VerticalLayout getPreemptiveRightVL(GridFormWidget mainGFW, TableWidget languagesTW) {
+        VerticalLayout preemLang = new VerticalLayout();
+        preemLang.addComponent(mainGFW);
+        preemLang.addComponent(languagesTW);
+        return preemLang;
     }
 
     @Override
@@ -135,6 +137,7 @@ public final class ApplicantsForm extends UsersForm {
         buttons.add(motherButton);
         buttons.add(fatherButton);
         buttons.add(contractButton);
+        buttons.add(moreButton);
         return buttons;
     }
 
@@ -197,6 +200,7 @@ public final class ApplicantsForm extends UsersForm {
         specButton.setEnabled(false);
         grantDocButton.setEnabled(false);
         fatherButton.setEnabled(false);
+        moreButton.setEnabled(false);
 
         Button downloadContractButton = new Button();
         downloadContractButton.setCaption(getUILocaleUtil().getCaption("download.contract"));
@@ -290,12 +294,6 @@ public final class ApplicantsForm extends UsersForm {
         conditionsMap.put(getUILocaleUtil().getMessage("info.save.educ"), !saveEduc);
 //        conditionsMap.put(getUILocaleUtil().getMessage("info.save.unt"), !saveUnt);
         return conditionsMap;
-    }
-
-    @Override
-    protected boolean checkForMoreButton(FormModel dataFM) {
-        return (flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.CONTRACT.equals(flag)))
-                || !(Flag.MAIN_DATA.equals(flag) || Flag.CONTRACT.equals(flag));
     }
 
     @Override
@@ -418,6 +416,55 @@ public final class ApplicantsForm extends UsersForm {
                 if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.FATHER.equals(flag)))
                         || !(Flag.MAIN_DATA.equals(flag) || Flag.FATHER.equals(flag))) {
                     addToLayout(Flag.CONTRACT, contract.getMainGFW(), moreButton, event);
+                }
+            }
+        });
+
+        moreButton = createFormButton("inform.more", false);
+        moreButton.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.CONTRACT.equals(flag)))
+                        || !(Flag.MAIN_DATA.equals(flag) || Flag.CONTRACT.equals(flag))) {
+                    setActive(event);
+                    flag = Flag.DEFAULT_FLAG;
+
+                    awardsTW = new TableWidget(V_USER_AWARD.class);
+                    awardsTW.addEntityListener(ApplicantsForm.this);
+                    awardsTW.setWidth("667px");
+                    DBTableModel awardsTM = (DBTableModel) awardsTW.getWidgetModel();
+                    QueryModel awardsQM = awardsTM.getQueryModel();
+                    ID userID = ID.valueOf(-1);
+                    if (!dataAFW.getWidgetModel().isCreateNew()) {
+                        try {
+                            userID = dataAFW.getWidgetModel().getEntity().getId();
+                        } catch (Exception e) {
+                            e.printStackTrace();//TODO catch
+                        }
+                    }
+                    awardsQM.addWhere("user", ECriteria.EQUAL, userID);
+
+                    socialCategoriesTW = new TableWidget(V_USER_SOCIAL_CATEGORY.class);
+                    socialCategoriesTW.addEntityListener(ApplicantsForm.this);
+                    socialCategoriesTW.setWidth("667px");
+                    DBTableModel socialCategoriesTM = (DBTableModel) socialCategoriesTW.getWidgetModel();
+                    QueryModel socialCategoriesQM = socialCategoriesTM.getQueryModel();
+                    ID userId = ID.valueOf(-1);
+                    if (!dataAFW.getWidgetModel().isCreateNew()) {
+                        try {
+                            userId = dataAFW.getWidgetModel().getEntity().getId();
+                        } catch (Exception e) {
+                            e.printStackTrace();//TODO catch
+                        }
+                    }
+                    socialCategoriesQM.addWhere("user", ECriteria.EQUAL, userId);
+
+                    VerticalLayout additionalDataVL = new VerticalLayout();
+                    additionalDataVL.addComponent(socialCategoriesTW);
+                    additionalDataVL.addComponent(awardsTW);
+
+                    contentHL.removeAllComponents();
+                    contentHL.addComponent(additionalDataVL);
                 }
             }
         });
@@ -1008,6 +1055,74 @@ public final class ApplicantsForm extends UsersForm {
         return false;
     }
 
+    private boolean preSaveAwards(Entity e, boolean isNew) {
+        V_USER_AWARD vua = (V_USER_AWARD) e;
+        USER_AWARD ua;
+        FormModel fm = dataAFW.getWidgetModel();
+        if (isNew) {
+            ua = new USER_AWARD();
+            try {
+                USERS s = (USERS) fm.getEntity();
+                ua.setUser(s);
+                ua.setAward(vua.getAward());
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(ua);
+
+                QueryModel awardsQM = ((DBTableModel) awardsTW.getWidgetModel()).getQueryModel();
+                awardsQM.addWhere("user", ECriteria.EQUAL, s.getId());
+
+                awardsTW.refresh();
+                showSavedNotification();
+            } catch (Exception ex) {
+                CommonUtils.showMessageAndWriteLog("Unable to create an award", ex);
+            }
+        } else {
+            try {
+                ua = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(USER_AWARD.class, vua.getId());
+                ua.setAward(vua.getAward());
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(ua);
+                awardsTW.refresh();
+                showSavedNotification();
+            } catch (Exception ex) {
+                CommonUtils.showMessageAndWriteLog("Unable to merge an award", ex);
+            }
+        }
+        return false;
+    }
+
+    private boolean preSaveSocialCategories(Entity e, boolean isNew) {
+        V_USER_SOCIAL_CATEGORY vusc = (V_USER_SOCIAL_CATEGORY) e;
+        USER_SOCIAL_CATEGORY usc;
+        FormModel fm = dataAFW.getWidgetModel();
+        if (isNew) {
+            usc = new USER_SOCIAL_CATEGORY();
+            try {
+                USERS s = (USERS) fm.getEntity();
+                usc.setUser(s);
+                usc.setSocialCategory(vusc.getSocialCategory());
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(usc);
+
+                QueryModel socialCategoriesQM = ((DBTableModel) socialCategoriesTW.getWidgetModel()).getQueryModel();
+                socialCategoriesQM.addWhere("user", ECriteria.EQUAL, s.getId());
+
+                socialCategoriesTW.refresh();
+                showSavedNotification();
+            } catch (Exception ex) {
+                CommonUtils.showMessageAndWriteLog("Unable to create a social category", ex);
+            }
+        } else {
+            try {
+                usc = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(USER_SOCIAL_CATEGORY.class, vusc.getId());
+                usc.setSocialCategory(vusc.getSocialCategory());
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(usc);
+                socialCategoriesTW.refresh();
+                showSavedNotification();
+            } catch (Exception ex) {
+                CommonUtils.showMessageAndWriteLog("Unable to merge a social category", ex);
+            }
+        }
+        return false;
+    }
+
     private boolean addFiles(Object source) {
         QueryModel<USER_DOCUMENT_FILE> udfQM = new QueryModel<>(USER_DOCUMENT_FILE.class);
         udfQM.addSelect("id");
@@ -1023,6 +1138,10 @@ public final class ApplicantsForm extends UsersForm {
             specialityFKFM.setDialogHeight(600);
             QueryModel specialityQM = specialityFKFM.getQueryModel();
             specialityQM.addWhere("deleted", Boolean.FALSE);
+            return true;
+        } else if (source.equals(awardsTW)) {
+            return true;
+        } else if (source.equals(socialCategoriesTW)) {
             return true;
         }
         return false;
@@ -1043,8 +1162,7 @@ public final class ApplicantsForm extends UsersForm {
             }
 
             return true;
-        }
-        if (source.equals(specTW)) {
+        } else if (source.equals(specTW)) {
             saveData = true;
             if (dataAFW.getWidgetModel().isCreateNew() || dataAFW.getWidgetModel().isModified()) {
                 boolean success = dataAFW.save();
@@ -1072,6 +1190,10 @@ public final class ApplicantsForm extends UsersForm {
             }
 
             return true;
+        } else if (source.equals(awardsTW)) {
+            return canSave();
+        } else if (source.equals(socialCategoriesTW)) {
+            return canSave();
         }
 
         return super.preCreate(source, buttonId);
@@ -1108,6 +1230,10 @@ public final class ApplicantsForm extends UsersForm {
             return parent.preSave(e, isNew, MOTHER);
         } else if (source.equals(contract.getMainGFW())) {
             return contract.preSave(e, isNew);
+        } else if (source.equals(awardsTW)) {
+            return preSaveAwards(e, isNew);
+        } else if (source.equals(socialCategoriesTW)) {
+            return preSaveSocialCategories(e, isNew);
         }
         return super.preSave(source, e, isNew, buttonId);
     }
@@ -1148,6 +1274,44 @@ public final class ApplicantsForm extends UsersForm {
                 specTW.refresh();
             } catch (Exception ex) {
                 LOG.error("Unable to delete entrant specialities: ", ex);
+                Message.showError(getUILocaleUtil().getMessage("error.cannotdelentity"));
+            }
+
+            return false;
+        } else if (source.equals(awardsTW)) {
+            List<USER_AWARD> delList = new ArrayList<>();
+            for (Entity e : entities) {
+                try {
+                    delList.add(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(USER_AWARD.class, e.getId()));
+                } catch (Exception ex) {
+                    CommonUtils.showMessageAndWriteLog("Unable to delete user awards", ex);
+                }
+            }
+
+            try {
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(delList);
+                awardsTW.refresh();
+            } catch (Exception ex) {
+                LOG.error("Unable to delete user awards", ex);
+                Message.showError(getUILocaleUtil().getMessage("error.cannotdelentity"));
+            }
+
+            return false;
+        } else if (source.equals(socialCategoriesTW)) {
+            List<USER_SOCIAL_CATEGORY> delList = new ArrayList<>();
+            for (Entity e : entities) {
+                try {
+                    delList.add(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(USER_SOCIAL_CATEGORY.class, e.getId()));
+                } catch (Exception ex) {
+                    CommonUtils.showMessageAndWriteLog("Unable to delete user social categories", ex);
+                }
+            }
+
+            try {
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(delList);
+                socialCategoriesTW.refresh();
+            } catch (Exception ex) {
+                LOG.error("Unable to delete user social categories", ex);
                 Message.showError(getUILocaleUtil().getMessage("error.cannotdelentity"));
             }
 
