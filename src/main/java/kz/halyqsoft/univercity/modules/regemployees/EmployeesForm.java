@@ -81,7 +81,7 @@ public class EmployeesForm extends UsersForm {
 
         try {
             EMPLOYEE employee = (EMPLOYEE) dataFM.getEntity();
-            EmployeeEdit.saveEmployeeWorkHour(employee, false);//TODO check
+            EmployeeEdit.saveEmployeeWorkHour(employee, false);
         } catch (Exception e) {
             e.printStackTrace();//TODO catch
         }
