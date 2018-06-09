@@ -228,6 +228,9 @@ public class CheckStudentsView  extends AbstractTaskView implements EntityListen
 
     }
 
+
+    
+
     private List<USERS> getStudents(){
         QueryModel<USERS> qm = new QueryModel<>(USERS.class);
         qm.addJoin(EJoin.INNER_JOIN, "id", STUDENT.class, "id");
