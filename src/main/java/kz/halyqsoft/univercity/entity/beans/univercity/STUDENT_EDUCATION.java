@@ -47,53 +47,60 @@ public class STUDENT_EDUCATION extends AbstractEntity {
     @JoinColumns({
         @JoinColumn(name = "SPECIALITY_ID", referencedColumnName = "ID")})
     private SPECIALITY speciality;
-	
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 5, readOnlyFixed = true)
+
+
+	@FieldInfo(type = EFieldType.FK_COMBO, order = 5)
+	@ManyToOne
+	@JoinColumns({
+			@JoinColumn(name = "GROUPS_ID", referencedColumnName = "ID")})
+	private GROUPS groups;
+
+	@FieldInfo(type = EFieldType.FK_COMBO, order = 6, readOnlyFixed = true)
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "STUDY_YEAR_ID", referencedColumnName = "ID")})
     private STUDY_YEAR studyYear;
 	
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 6)
+	@FieldInfo(type = EFieldType.FK_COMBO, order = 7)
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "LANGUAGE_ID", referencedColumnName = "ID")})
     private LANGUAGE language;
 	
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 7)
+	@FieldInfo(type = EFieldType.FK_COMBO, order = 8)
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "EDUCATION_TYPE_ID", referencedColumnName = "ID")})
     private STUDENT_EDUCATION_TYPE educationType;
 	
-	@FieldInfo(type = EFieldType.DATE, order = 8, required = false)
+	@FieldInfo(type = EFieldType.DATE, order = 9, required = false)
 	@Column(name = "ENTRY_DATE")
     @Temporal(TemporalType.TIMESTAMP)
     private Date entryDate;
 	
-	@FieldInfo(type = EFieldType.DATE, order = 9, required = false)
+	@FieldInfo(type = EFieldType.DATE, order = 10, required = false)
 	@Column(name = "END_DATE")
     @Temporal(TemporalType.TIMESTAMP)
     private Date endDate;
 	
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 10)
+	@FieldInfo(type = EFieldType.FK_COMBO, order = 11)
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "STUDENT_STATUS_ID", referencedColumnName = "ID")})
     private STUDENT_STATUS status;
 	
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 11, required = false, inEdit = false, inGrid = false, inView = false)
+	@FieldInfo(type = EFieldType.FK_COMBO, order = 12, required = false, inEdit = false, inGrid = false, inView = false)
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "CHILD_ID", referencedColumnName = "ID")})
     private STUDENT_EDUCATION child;
 	
-	@FieldInfo(type = EFieldType.DATETIME, order = 12, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false)
+	@FieldInfo(type = EFieldType.DATETIME, order = 13, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false)
 	@Column(name = "CREATED")
     @Temporal(TemporalType.TIMESTAMP)
     private Date created;
 	
-	@FieldInfo(type = EFieldType.DATETIME, order = 13, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false)
+	@FieldInfo(type = EFieldType.DATETIME, order = 14, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false)
 	@Column(name = "UPDATED")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updated;

@@ -189,6 +189,7 @@ public class AccountantEdit extends AbstractDialog {
 
         @Override
         public void onRefresh(Object o, List<Entity> list) {
+
         }
 
         @Override
