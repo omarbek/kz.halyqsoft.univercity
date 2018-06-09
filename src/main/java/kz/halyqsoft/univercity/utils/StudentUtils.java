@@ -329,7 +329,6 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
             sb.append(" and ");
         }
         sb.insert(0, " where ");
-        params.put(i, categoryType);
         String sql = "SELECT " +
                 "  stu.ID, " +
                 "  usr.CODE, " +
@@ -345,8 +344,8 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
                 "  INNER JOIN SPECIALITY spec ON stu_edu.SPECIALITY_ID = spec.ID " +
                 sb.toString() +
                 " usr.deleted = FALSE AND dep.deleted = FALSE AND spec.deleted = FALSE" +
-                " and stu.category_id = ? " +
-                "ORDER BY FIO";
+                " and stu.category_id = " + categoryType +
+                " ORDER BY FIO";
         try {
             List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(
                     sql, params);

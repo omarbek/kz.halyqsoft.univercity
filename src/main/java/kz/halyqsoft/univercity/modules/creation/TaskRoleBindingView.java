@@ -85,7 +85,7 @@ public class TaskRoleBindingView extends AbstractTaskView implements EntityListe
 
         tasksCB = new ComboBox();
         tasksCB.setNullSelectionAllowed(true);
-        tasksCB.setTextInputAllowed(false);
+        tasksCB.setTextInputAllowed(true);
         tasksCB.setFilteringMode(FilteringMode.CONTAINS);
         tasksCB.setWidth(300, Unit.PIXELS);
         QueryModel<TASKS> taskQM = new QueryModel<>(TASKS.class);
@@ -99,7 +99,7 @@ public class TaskRoleBindingView extends AbstractTaskView implements EntityListe
         rolesCB = new ComboBox();
 //        rolesCB.setCaption(getUILocaleUtil().getCaption(""));//TODO
         rolesCB.setNullSelectionAllowed(true);
-        rolesCB.setTextInputAllowed(false);
+        rolesCB.setTextInputAllowed(true);
         rolesCB.setFilteringMode(FilteringMode.CONTAINS);
         rolesCB.setWidth(300, Unit.PIXELS);
         QueryModel<ROLES> roleQM = new QueryModel<>(ROLES.class);

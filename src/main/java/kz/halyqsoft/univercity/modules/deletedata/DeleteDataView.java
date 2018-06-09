@@ -55,7 +55,7 @@ public class DeleteDataView extends AbstractTaskView implements EntityListener, 
         filterPanel.addFilterPanelListener(this);
 
         userTypeCB = new ComboBox();
-        userTypeCB.setNullSelectionAllowed(true);
+        userTypeCB.setNullSelectionAllowed(false);
         userTypeCB.setTextInputAllowed(false);
         userTypeCB.setFilteringMode(FilteringMode.OFF);
         userTypeCB.setPageLength(0);
@@ -64,6 +64,7 @@ public class DeleteDataView extends AbstractTaskView implements EntityListener, 
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(typeQM));
         userTypeCB.setContainerDataSource(typeBIC);
         filterPanel.addFilterComponent("userType", userTypeCB);
+        userTypeCB.setValue(userType);
 
         getContent().addComponent(filterPanel);
         getContent().setComponentAlignment(filterPanel, Alignment.TOP_CENTER);
@@ -74,11 +75,12 @@ public class DeleteDataView extends AbstractTaskView implements EntityListener, 
         usersGW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
         usersGW.setButtonVisible(AbstractToolbar.ADD_BUTTON, false);
         usersGW.setButtonVisible(AbstractToolbar.EDIT_BUTTON, false);
-        DBGridModel examGM = (DBGridModel) usersGW.getWidgetModel();
-        examGM.setMultiSelect(true);
-        examGM.setRefreshType(ERefreshType.MANUAL);
+        DBGridModel usersGM = (DBGridModel) usersGW.getWidgetModel();
+        usersGM.getColumnModel("created").setInGrid(true);
+        usersGM.setMultiSelect(true);
+        usersGM.setRefreshType(ERefreshType.MANUAL);
 
-        refresh(null);
+        refresh(userType.getId());
 
         getContent().addComponent(usersGW);
         getContent().setComponentAlignment(usersGW, Alignment.MIDDLE_CENTER);
@@ -121,6 +123,7 @@ public class DeleteDataView extends AbstractTaskView implements EntityListener, 
                         deleteMainTable(user, "previous_experience", "EMPLOYEE_ID");
                         deleteMainTable(user, "employee_dept", "EMPLOYEE_ID");
                         deleteMainTable(user, "employee_scientific", "EMPLOYEE_ID");
+                        deleteMainTable(user, "employee_work_hour", "EMPLOYEE_ID");
                         deleteMainTable(user, "employee", "ID");
                     } else {
                         deleteMainTable(user, "entrant_speciality", "STUDENT_ID");
@@ -149,8 +152,7 @@ public class DeleteDataView extends AbstractTaskView implements EntityListener, 
                     deleteMainTable(user, "user_document", "USER_ID");
                     deleteMainTable(user, "users", "id");
                 }
-            } catch (Exception e1) {
-                e1.printStackTrace();//TODO catch
+            } catch (Exception ignored) {
             }
             refresh(((USER_TYPE) userTypeCB.getValue()).getId());
             return false;
@@ -165,8 +167,7 @@ public class DeleteDataView extends AbstractTaskView implements EntityListener, 
             Map<Integer, Object> params = new HashMap<>();
             params.put(1, user.getId().getId());
             SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
         }
     }
 
@@ -179,8 +180,7 @@ public class DeleteDataView extends AbstractTaskView implements EntityListener, 
             Map<Integer, Object> params = new HashMap<>();
             params.put(1, user.getId().getId());
             SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
         }
     }
 
@@ -190,8 +190,7 @@ public class DeleteDataView extends AbstractTaskView implements EntityListener, 
             Map<Integer, Object> params = new HashMap<>();
             params.put(1, user.getId().getId());
             SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
         }
     }
 
@@ -202,8 +201,7 @@ public class DeleteDataView extends AbstractTaskView implements EntityListener, 
             Map<Integer, Object> params = new HashMap<>();
             params.put(1, user.getId().getId());
             SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
         }
     }
 
@@ -215,8 +213,7 @@ public class DeleteDataView extends AbstractTaskView implements EntityListener, 
             params.put(1, user.getId().getId());
             params.put(2, scientificTypeId);
             SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
         }
     }
 
@@ -228,6 +225,6 @@ public class DeleteDataView extends AbstractTaskView implements EntityListener, 
 
     @Override
     public void clearFilter() {
-        refresh(null);
+        refresh(userType.getId());
     }
 }

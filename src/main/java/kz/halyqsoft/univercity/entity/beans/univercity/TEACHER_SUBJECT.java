@@ -34,35 +34,35 @@ public class TEACHER_SUBJECT extends AbstractEntity {
         @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
     private V_SUBJECT_SELECT subject;
 	
-	@FieldInfo(type = EFieldType.INTEGER, order = 3, fieldWidth = 30)
-	@Column(name = "GROUP_LEC_COUNT", nullable = false)
-    private int groupLecCount;
-	
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 4, required = false)
-    @ManyToOne
-    @JoinColumns({
-        @JoinColumn(name = "GROUP_LEC_ID", referencedColumnName = "ID", nullable = true)})
-    private GROUP_SIZE_LECTURE groupSizeLecture;
-	
-	@FieldInfo(type = EFieldType.INTEGER, order = 5, fieldWidth = 30)
-	@Column(name = "GROUP_LAB_COUNT", nullable = false)
-	private int groupLabCount;
-	
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 6, required = false)
-    @ManyToOne
-    @JoinColumns({
-        @JoinColumn(name = "GROUP_LAB_ID", referencedColumnName = "ID", nullable = true)})
-    private GROUP_SIZE_LAB groupSizeLab;
-	
-	@FieldInfo(type = EFieldType.INTEGER, order = 7, fieldWidth = 30)
-	@Column(name = "GROUP_PRAC_COUNT", nullable = false)
-	private int groupPracCount;
-	
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 8, required = false)
-    @ManyToOne
-    @JoinColumns({
-        @JoinColumn(name = "GROUP_PRAC_ID", referencedColumnName = "ID", nullable = true)})
-    private GROUP_SIZE_PRAC groupSizePrac;
+//	@FieldInfo(type = EFieldType.INTEGER, order = 3, fieldWidth = 30)
+//	@Column(name = "GROUP_LEC_COUNT", nullable = false)
+//    private int groupLecCount;
+//
+//	@FieldInfo(type = EFieldType.FK_COMBO, order = 4, required = false)
+//    @ManyToOne
+//    @JoinColumns({
+//        @JoinColumn(name = "GROUP_LEC_ID", referencedColumnName = "ID", nullable = true)})
+//    private GROUP_SIZE_LECTURE groupSizeLecture;
+//
+//	@FieldInfo(type = EFieldType.INTEGER, order = 5, fieldWidth = 30)
+//	@Column(name = "GROUP_LAB_COUNT", nullable = false)
+//	private int groupLabCount;
+//
+//	@FieldInfo(type = EFieldType.FK_COMBO, order = 6, required = false)
+//    @ManyToOne
+//    @JoinColumns({
+//        @JoinColumn(name = "GROUP_LAB_ID", referencedColumnName = "ID", nullable = true)})
+//    private GROUP_SIZE_LAB groupSizeLab;
+//
+//	@FieldInfo(type = EFieldType.INTEGER, order = 7, fieldWidth = 30)
+//	@Column(name = "GROUP_PRAC_COUNT", nullable = false)
+//	private int groupPracCount;
+//
+//	@FieldInfo(type = EFieldType.FK_COMBO, order = 8, required = false)
+//    @ManyToOne
+//    @JoinColumns({
+//        @JoinColumn(name = "GROUP_PRAC_ID", referencedColumnName = "ID", nullable = true)})
+//    private GROUP_SIZE_PRAC groupSizePrac;
 	
 	@FieldInfo(type = EFieldType.BOOLEAN, order = 9, required = false)
 	@Column(name = "FALL", nullable = false)
@@ -98,53 +98,53 @@ public class TEACHER_SUBJECT extends AbstractEntity {
 		this.subject = subject;
 	}
 
-	public int getGroupLecCount() {
-		return groupLecCount;
-	}
-
-	public void setGroupLecCount(int groupLecCount) {
-		this.groupLecCount = groupLecCount;
-	}
-
-	public GROUP_SIZE_LECTURE getGroupSizeLecture() {
-		return groupSizeLecture;
-	}
-
-	public void setGroupSizeLecture(GROUP_SIZE_LECTURE groupSizeLecture) {
-		this.groupSizeLecture = groupSizeLecture;
-	}
-
-	public int getGroupLabCount() {
-		return groupLabCount;
-	}
-
-	public void setGroupLabCount(int groupLabCount) {
-		this.groupLabCount = groupLabCount;
-	}
-
-	public GROUP_SIZE_LAB getGroupSizeLab() {
-		return groupSizeLab;
-	}
-
-	public void setGroupSizeLab(GROUP_SIZE_LAB groupSizeLab) {
-		this.groupSizeLab = groupSizeLab;
-	}
-
-	public int getGroupPracCount() {
-		return groupPracCount;
-	}
-
-	public void setGroupPracCount(int groupPracCount) {
-		this.groupPracCount = groupPracCount;
-	}
-
-	public GROUP_SIZE_PRAC getGroupSizePrac() {
-		return groupSizePrac;
-	}
-
-	public void setGroupSizePrac(GROUP_SIZE_PRAC groupSizePrac) {
-		this.groupSizePrac = groupSizePrac;
-	}
+//	public int getGroupLecCount() {
+//		return groupLecCount;
+//	}
+//
+//	public void setGroupLecCount(int groupLecCount) {
+//		this.groupLecCount = groupLecCount;
+//	}
+//
+//	public GROUP_SIZE_LECTURE getGroupSizeLecture() {
+//		return groupSizeLecture;
+//	}
+//
+//	public void setGroupSizeLecture(GROUP_SIZE_LECTURE groupSizeLecture) {
+//		this.groupSizeLecture = groupSizeLecture;
+//	}
+//
+//	public int getGroupLabCount() {
+//		return groupLabCount;
+//	}
+//
+//	public void setGroupLabCount(int groupLabCount) {
+//		this.groupLabCount = groupLabCount;
+//	}
+//
+//	public GROUP_SIZE_LAB getGroupSizeLab() {
+//		return groupSizeLab;
+//	}
+//
+//	public void setGroupSizeLab(GROUP_SIZE_LAB groupSizeLab) {
+//		this.groupSizeLab = groupSizeLab;
+//	}
+//
+//	public int getGroupPracCount() {
+//		return groupPracCount;
+//	}
+//
+//	public void setGroupPracCount(int groupPracCount) {
+//		this.groupPracCount = groupPracCount;
+//	}
+//
+//	public GROUP_SIZE_PRAC getGroupSizePrac() {
+//		return groupSizePrac;
+//	}
+//
+//	public void setGroupSizePrac(GROUP_SIZE_PRAC groupSizePrac) {
+//		this.groupSizePrac = groupSizePrac;
+//	}
 
 	public boolean isFall() {
 		return fall;

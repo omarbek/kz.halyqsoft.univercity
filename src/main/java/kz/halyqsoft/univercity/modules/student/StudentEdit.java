@@ -335,8 +335,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                             baseDataFW.getWidgetModel().loadEntity(student.getId());
                             baseDataFW.refresh();
                             hl.addComponentAsFirst(baseDataFW);
-                        }catch (Exception e)
-                        {
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }

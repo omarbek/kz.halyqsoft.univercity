@@ -114,7 +114,11 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
 
         teacherGW = new GridWidget(VEmployee.class);
         teacherGW.addEntityListener(this);
-        teacherGW.showToolbar(false);
+        teacherGW.showToolbar(true);
+        teacherGW.setButtonVisible(AbstractToolbar.REFRESH_BUTTON, false);
+        teacherGW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
+        teacherGW.setButtonVisible(AbstractToolbar.EDIT_BUTTON, false);
+        teacherGW.setButtonVisible(AbstractToolbar.DELETE_BUTTON, false);
         DBGridModel teacherGM = (DBGridModel) teacherGW.getWidgetModel();
         teacherGM.setTitleVisible(false);
         teacherGM.setMultiSelect(false);

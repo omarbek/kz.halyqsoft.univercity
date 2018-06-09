@@ -26,7 +26,7 @@ public class EMPLOYEE_DEPT extends AbstractEntity {
 
 	private static final long serialVersionUID = -7690878148670305216L;
 
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 1, inEdit = false, inView = false)
+	@FieldInfo(type = EFieldType.FK_COMBO, order = 1)
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "EMPLOYEE_TYPE_ID", referencedColumnName = "ID")})
@@ -51,15 +51,15 @@ public class EMPLOYEE_DEPT extends AbstractEntity {
 	
 	@FieldInfo(type = EFieldType.INTEGER, order = 5)
 	@Column(name = "LIVE_LOAD", nullable = false)
-    private Integer liveLoad;
+    private Integer liveLoad;//Норма нагрузки
 	
 	@FieldInfo(type = EFieldType.DOUBLE, order = 6)
 	@Column(name = "WAGE_RATE", nullable = false)
-    private Double wageRate;
+    private Double wageRate;//Ставка 1 || 0.5
 	
 	@FieldInfo(type = EFieldType.DOUBLE, order = 7, readOnlyFixed = true)
 	@Column(name = "RATE_LOAD", nullable = false)
-    private Double rateLoad;
+    private Double rateLoad;//LIVE_LOAD / WAGE_RATE
 	
 	@FieldInfo(type = EFieldType.DOUBLE, order = 8)
 	@Column(name = "HOUR_COUNT", nullable = false)

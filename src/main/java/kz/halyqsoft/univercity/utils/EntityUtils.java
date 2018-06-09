@@ -36,7 +36,7 @@ public abstract class EntityUtils implements EntityListener {
     private String moduleName = getModuleName();
     private Class<? extends Entity> entityClass = getEntityClass();
 
-    private boolean openStudentEdit(Object source, Entity e, boolean isNew) {
+    private boolean openEntityEdit(Object source, Entity e, boolean isNew) {
         if (source.equals(mainGW)) {
             try {
                 init(source, e, isNew);
@@ -71,12 +71,12 @@ public abstract class EntityUtils implements EntityListener {
 
     @Override
     public boolean onEdit(Object source, Entity e, int buttonId) {
-        return openStudentEdit(source, e, false);
+        return openEntityEdit(source, e, false);
     }
 
     @Override
     public boolean preCreate(Object source, int buttonId) {
-        return openStudentEdit(source, null, true);
+        return openEntityEdit(source, null, true);
     }
 
     @Override

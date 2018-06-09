@@ -15,6 +15,8 @@ import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.widget.AbstractWidgetModel;
 import org.r3a.common.vaadin.widget.AbstractWidgetPanel;
+import org.r3a.common.vaadin.widget.dialog.Message;
+import org.r3a.common.vaadin.widget.form.FormModel;
 
 import java.util.HashMap;
 import java.util.List;
@@ -36,12 +38,14 @@ public class WorkHourWidget extends AbstractWidgetPanel {
     private GridLayout matrixGW;
     private String legend1Resource;
     private String legend2Resource;
+    private FormModel mainFM;
 
-    public WorkHourWidget(List<? extends AbstractWorkHourEntity> list, boolean readOnly) {
+    public WorkHourWidget(List<? extends AbstractWorkHourEntity> list, boolean readOnly, FormModel mainFM) {
         super();
 
         this.list = list;
         this.readOnly = readOnly;
+        this.mainFM = mainFM;
 
         QueryModel<WEEK_DAY> wdQM = new QueryModel<>(WEEK_DAY.class);
         QueryModel<DAY_HOUR> dhQM = new QueryModel<>(DAY_HOUR.class);
@@ -134,6 +138,10 @@ public class WorkHourWidget extends AbstractWidgetPanel {
 
                 @Override
                 public void buttonClick(ClickEvent ev) {
+                    if (mainFM.isCreateNew()) {
+                        Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
+                        return;
+                    }
                     int strartColumn = (int) b.getData();
                     for (int x = 2; x <= 8; x++) {
                         Button bb = (Button) matrixGW.getComponent(strartColumn, x);
@@ -156,6 +164,10 @@ public class WorkHourWidget extends AbstractWidgetPanel {
 
                 @Override
                 public void buttonClick(ClickEvent ev) {
+                    if (mainFM.isCreateNew()) {
+                        Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
+                        return;
+                    }
                     int strartColumn = (int) b.getData();
                     for (int x = 2; x <= 15; x++) {
                         Button bb = (Button) matrixGW.getComponent(x, strartColumn);

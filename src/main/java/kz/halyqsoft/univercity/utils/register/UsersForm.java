@@ -12,9 +12,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDENT_CATEGORY;
 import kz.halyqsoft.univercity.entity.beans.univercity.enumeration.Flag;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_MEDICAL_CHECKUP;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.V_USER_AWARD;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_USER_LANGUAGE;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.V_USER_SOCIAL_CATEGORY;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.changelisteners.SchoolCountryChangeListener;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
@@ -42,7 +40,6 @@ import org.r3a.common.vaadin.widget.photo.PhotoWidgetListener;
 import org.r3a.common.vaadin.widget.table.TableWidget;
 import org.r3a.common.vaadin.widget.table.model.DBTableModel;
 
-import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -60,14 +57,13 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
     protected AbstractFormWidget dataAFW;
 
     private TableWidget eduDocTW, languagesTW, medicalCheckupTW;
-    private TableWidget awardsTW, socialCategoriesTW;
 
     private Button mainDataButton, regAddressButton;
     private Button militaryButton, disabilityButton, repatriateButton;
     private Button eduDocsButton, preemRightButton;
     private Button medButton;
     private Button form, idDocButton;
-    protected Button factAddressButton, eduDocButton, moreButton, finishButton;
+    protected Button factAddressButton, eduDocButton, finishButton;
 
     private String userPhotoFilename;
     private byte[] userPhotoBytes;
@@ -323,9 +319,7 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
 
                     languagesTW = getTableWidget(V_USER_LANGUAGE.class, "user", null);
 
-                    VerticalLayout preemLang = new VerticalLayout();
-                    preemLang.addComponent(preemptiveRight.getMainGFW());
-                    preemLang.addComponent(languagesTW);
+                    VerticalLayout preemLang = getPreemptiveRightVL(preemptiveRight.getMainGFW(), languagesTW);
 
                     setActive(event);
                     contentHL.removeAllComponents();
@@ -373,54 +367,6 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
 
         initOwnButtons(dataFM);
 
-        moreButton = createFormButton("inform.more", false);
-        moreButton.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                if (checkForMoreButton(dataFM)) {
-                    setActive(event);
-                    flag = Flag.DEFAULT_FLAG;
-
-                    awardsTW = new TableWidget(V_USER_AWARD.class);
-                    awardsTW.addEntityListener(UsersForm.this);
-                    awardsTW.setWidth("667px");
-                    DBTableModel awardsTM = (DBTableModel) awardsTW.getWidgetModel();
-                    QueryModel awardsQM = awardsTM.getQueryModel();
-                    ID userID = ID.valueOf(-1);
-                    if (!dataAFW.getWidgetModel().isCreateNew()) {
-                        try {
-                            userID = dataAFW.getWidgetModel().getEntity().getId();
-                        } catch (Exception e) {
-                            e.printStackTrace();//TODO catch
-                        }
-                    }
-                    awardsQM.addWhere("user", ECriteria.EQUAL, userID);
-
-                    socialCategoriesTW = new TableWidget(V_USER_SOCIAL_CATEGORY.class);
-                    socialCategoriesTW.addEntityListener(UsersForm.this);
-                    socialCategoriesTW.setWidth("667px");
-                    DBTableModel socialCategoriesTM = (DBTableModel) socialCategoriesTW.getWidgetModel();
-                    QueryModel socialCategoriesQM = socialCategoriesTM.getQueryModel();
-                    ID userId = ID.valueOf(-1);
-                    if (!dataAFW.getWidgetModel().isCreateNew()) {
-                        try {
-                            userId = dataAFW.getWidgetModel().getEntity().getId();
-                        } catch (Exception e) {
-                            e.printStackTrace();//TODO catch
-                        }
-                    }
-                    socialCategoriesQM.addWhere("user", ECriteria.EQUAL, userId);
-
-                    VerticalLayout additionalDataVL = new VerticalLayout();
-                    additionalDataVL.addComponent(socialCategoriesTW);
-                    additionalDataVL.addComponent(awardsTW);
-
-                    contentHL.removeAllComponents();
-                    contentHL.addComponent(additionalDataVL);
-                }
-            }
-        });
-
         finishButton = new Button();
         finishButton.setHtmlContentAllowed(true);
         finishButton.setCaption("<b>" + getUILocaleUtil().getCaption("exit") + "</b>");
@@ -453,7 +399,6 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
                 eduDocsButton.setEnabled(false);
                 preemRightButton.setEnabled(false);
                 medButton.setEnabled(false);
-                moreButton.setEnabled(false);
                 finishButton.setEnabled(false);
 
                 Label mess = new Label("<br><br><br><center><strong>Вы успешно прошли регистрацию!!!</strong><br>");
@@ -487,7 +432,6 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
             buttonsVL.addComponent(button);
         }
 
-        buttonsVL.addComponent(moreButton);
         buttonsVL.addComponent(finishButton);
         buttonsVL.setSpacing(false);
         registrationHSP.addComponent(buttonsVL);
@@ -504,8 +448,9 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
         buttons.add(preemRightButton);
         buttons.add(medButton);
         buttons.addAll(childButtons);
-        buttons.add(moreButton);
     }
+
+    protected abstract VerticalLayout getPreemptiveRightVL(GridFormWidget mainGFW, TableWidget languagesTW);
 
     protected abstract void setOpeners();
 
@@ -534,8 +479,6 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
     protected abstract VerticalLayout getMessForm(FormModel dataFM, Label mess);
 
     protected abstract Map<String, Boolean> getConditionsMap();
-
-    protected abstract boolean checkForMoreButton(FormModel dataFM);
 
     protected abstract Button getAfterMedButton();
 
@@ -718,28 +661,6 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
         return temp;
     }
 
-    protected String getCode(String beginYear) {
-        String code = null;
-        try {
-            Integer usersCode = SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USERS_CODE").getId().intValue();
-            if (usersCode < 10) {
-                code = beginYear + "000" + usersCode;
-            } else if (usersCode < 100) {
-                code = beginYear + "00" + usersCode;
-            } else if (usersCode < 1000) {
-                code = beginYear + "0" + usersCode;
-            } else if (usersCode < 10000) {
-                code = beginYear + usersCode;
-            } else {
-                SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USERS_CODE").
-                        setId(BigInteger.valueOf(0));//TODO check
-                code = getCode(beginYear);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();//TODO catch
-        }
-        return code;
-    }
 
     private boolean preSaveData(Entity e, boolean isNew) {
         USERS user = (USERS) e;
@@ -752,7 +673,7 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
                 user.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USERS"));
 
                 String year = beginYear.toString().substring(2, 4);
-                String code = getCode(year);
+                String code = CommonUtils.getCode(year);
                 String login = getLogin(user.getFirstNameEN().toLowerCase().substring(0, 1) + "_" +
                         user.getLastNameEN().toLowerCase());
                 user.setLogin(login == null ? code : login);
@@ -952,39 +873,6 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
         return false;
     }
 
-    private boolean preSaveAwards(Entity e, boolean isNew) {
-        V_USER_AWARD vua = (V_USER_AWARD) e;
-        USER_AWARD ua;
-        FormModel fm = dataAFW.getWidgetModel();
-        if (isNew) {
-            ua = new USER_AWARD();
-            try {
-                USERS s = (USERS) fm.getEntity();
-                ua.setUser(s);
-                ua.setAward(vua.getAward());
-                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(ua);
-
-                QueryModel awardsQM = ((DBTableModel) awardsTW.getWidgetModel()).getQueryModel();
-                awardsQM.addWhere("user", ECriteria.EQUAL, s.getId());
-
-                awardsTW.refresh();
-                showSavedNotification();
-            } catch (Exception ex) {
-                CommonUtils.showMessageAndWriteLog("Unable to create an award", ex);
-            }
-        } else {
-            try {
-                ua = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(USER_AWARD.class, vua.getId());
-                ua.setAward(vua.getAward());
-                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(ua);
-                awardsTW.refresh();
-                showSavedNotification();
-            } catch (Exception ex) {
-                CommonUtils.showMessageAndWriteLog("Unable to merge an award", ex);
-            }
-        }
-        return false;
-    }
 
     protected TableWidget getTableWidget(Class<? extends Entity> entityClass, String fieldName, Boolean isMed) {
         TableWidget currentTW = new TableWidget(entityClass);
@@ -1017,40 +905,6 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
         return currentTW;
     }
 
-    private boolean preSaveSocialCategories(Entity e, boolean isNew) {
-        V_USER_SOCIAL_CATEGORY vusc = (V_USER_SOCIAL_CATEGORY) e;
-        USER_SOCIAL_CATEGORY usc;
-        FormModel fm = dataAFW.getWidgetModel();
-        if (isNew) {
-            usc = new USER_SOCIAL_CATEGORY();
-            try {
-                USERS s = (USERS) fm.getEntity();
-                usc.setUser(s);
-                usc.setSocialCategory(vusc.getSocialCategory());
-                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(usc);
-
-                QueryModel socialCategoriesQM = ((DBTableModel) socialCategoriesTW.getWidgetModel()).getQueryModel();
-                socialCategoriesQM.addWhere("user", ECriteria.EQUAL, s.getId());
-
-                socialCategoriesTW.refresh();
-                showSavedNotification();
-            } catch (Exception ex) {
-                CommonUtils.showMessageAndWriteLog("Unable to create a social category", ex);
-            }
-        } else {
-            try {
-                usc = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(USER_SOCIAL_CATEGORY.class, vusc.getId());
-                usc.setSocialCategory(vusc.getSocialCategory());
-                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(usc);
-                socialCategoriesTW.refresh();
-                showSavedNotification();
-            } catch (Exception ex) {
-                CommonUtils.showMessageAndWriteLog("Unable to merge a social category", ex);
-            }
-        }
-        return false;
-    }
-
     private boolean addFiles(Object source, Entity e) {
         QueryModel<USER_DOCUMENT_FILE> udfQM = new QueryModel<>(USER_DOCUMENT_FILE.class);
         udfQM.addSelect("id");
@@ -1076,10 +930,6 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
 
             return refreshFiles(e, udfQM, medicalCheckupFM);
         } else if (source.equals(languagesTW)) {
-            return true;
-        } else if (source.equals(awardsTW)) {
-            return true;
-        } else if (source.equals(socialCategoriesTW)) {
             return true;
         }
         return false;
@@ -1136,10 +986,6 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
             return canSave();
         } else if (source.equals(medicalCheckupTW)) {
             return preCreateTW(medicalCheckupTW);
-        } else if (source.equals(awardsTW)) {
-            return canSave();
-        } else if (source.equals(socialCategoriesTW)) {
-            return canSave();
         }
 
         return super.preCreate(source, buttonId);
@@ -1194,10 +1040,6 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
             return preSaveLanguage(e, isNew);
         } else if (source.equals(medicalCheckupTW)) {
             return preSaveMedicalCheckup(e, isNew);
-        } else if (source.equals(awardsTW)) {
-            return preSaveAwards(e, isNew);
-        } else if (source.equals(socialCategoriesTW)) {
-            return preSaveSocialCategories(e, isNew);
         } else if (source.equals(military.getMainGFW())) {
             return military.preSave(e, isNew);
         } else if (source.equals(disability.getMainGFW())) {
@@ -1266,44 +1108,6 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
                 medicalCheckupTW.refresh();
             } catch (Exception ex) {
                 LOG.error("Unable to delete medical checkup", ex);
-                Message.showError(getUILocaleUtil().getMessage("error.cannotdelentity"));
-            }
-
-            return false;
-        } else if (source.equals(awardsTW)) {
-            List<USER_AWARD> delList = new ArrayList<>();
-            for (Entity e : entities) {
-                try {
-                    delList.add(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(USER_AWARD.class, e.getId()));
-                } catch (Exception ex) {
-                    CommonUtils.showMessageAndWriteLog("Unable to delete user awards", ex);
-                }
-            }
-
-            try {
-                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(delList);
-                awardsTW.refresh();
-            } catch (Exception ex) {
-                LOG.error("Unable to delete user awards", ex);
-                Message.showError(getUILocaleUtil().getMessage("error.cannotdelentity"));
-            }
-
-            return false;
-        } else if (source.equals(socialCategoriesTW)) {
-            List<USER_SOCIAL_CATEGORY> delList = new ArrayList<>();
-            for (Entity e : entities) {
-                try {
-                    delList.add(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(USER_SOCIAL_CATEGORY.class, e.getId()));
-                } catch (Exception ex) {
-                    CommonUtils.showMessageAndWriteLog("Unable to delete user social categories", ex);
-                }
-            }
-
-            try {
-                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(delList);
-                socialCategoriesTW.refresh();
-            } catch (Exception ex) {
-                LOG.error("Unable to delete user social categories", ex);
                 Message.showError(getUILocaleUtil().getMessage("error.cannotdelentity"));
             }
 

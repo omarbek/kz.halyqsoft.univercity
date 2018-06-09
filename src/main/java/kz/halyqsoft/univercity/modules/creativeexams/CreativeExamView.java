@@ -53,15 +53,15 @@ public class CreativeExamView extends AbstractTaskView implements FilterPanelLis
         tf.setNullSettingAllowed(true);
         filterPanel.addFilterComponent("code", tf);
 
-        tf = new TextField();
-        tf.setNullRepresentation("");
-        tf.setNullSettingAllowed(true);
-        filterPanel.addFilterComponent("firstname", tf);
-
-        tf = new TextField();
-        tf.setNullRepresentation("");
-        tf.setNullSettingAllowed(true);
-        filterPanel.addFilterComponent("lastname", tf);
+//        tf = new TextField();
+//        tf.setNullRepresentation("");
+//        tf.setNullSettingAllowed(true);
+//        filterPanel.addFilterComponent("firstname", tf);
+//
+//        tf = new TextField();
+//        tf.setNullRepresentation("");
+//        tf.setNullSettingAllowed(true);
+//        filterPanel.addFilterComponent("lastname", tf);
 
         getContent().addComponent(filterPanel);
         getContent().setComponentAlignment(filterPanel, Alignment.TOP_CENTER);
