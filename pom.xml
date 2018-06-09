@@ -300,38 +300,8 @@
 				</pluginRepository>
 			</pluginRepositories>
 		</profile>
-		<profile>
-			<id>real</id>
-			<dependencies>
-				<dependency>
-					<groupId>org.eclipse.persistence</groupId>
-					<artifactId>eclipselink</artifactId>
-					<version>2.7.1</version>
-				</dependency>
-				<dependency>
-					<groupId>postgresql</groupId>
-					<artifactId>postgresql</artifactId>
-					<version>9.1-901-1.jdbc4</version>
-				</dependency>
-			</dependencies>
-		</profile>
-		<profile>
-			<id>omar</id>
-			<dependencies>
-				<dependency>
-					<groupId>org.eclipse.persistence</groupId>
-					<artifactId>eclipselink</artifactId>
-					<version>2.7.1</version>
-					<scope>provided</scope>
-				</dependency>
-				<dependency>
-					<groupId>postgresql</groupId>
-					<artifactId>postgresql</artifactId>
-					<version>9.1-901-1.jdbc4</version>
-					<scope>provided</scope>
-				</dependency>
-			</dependencies>
-		</profile>
+
+
 		<profile>
 			<id>local</id>
 			<dependencies>
