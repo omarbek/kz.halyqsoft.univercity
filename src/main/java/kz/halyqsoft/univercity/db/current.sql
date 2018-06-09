@@ -499,3 +499,298 @@ CREATE UNIQUE INDEX idx_t_academic_calendar_detail
 
 INSERT INTO employee VALUES (1, 1, FALSE, FALSE);
 INSERT INTO employee VALUES (2, 1, FALSE, FALSE);
+
+update tasks set parent_id=26 where id in (13,15,22);
+update tasks set task_order=401 where id=13;
+update tasks set task_order=402 where id=15;
+update tasks set task_order=403 where id=22;
+
+update tasks set parent_id=29 where id in (25,28);
+update tasks set task_order=501 where id=25;
+update tasks set task_order=502 where id=28;
+
+insert into CURRICULUM_STATUS values (1, 'На создании');
+insert into CURRICULUM_STATUS values (2, 'На согласовании');
+insert into CURRICULUM_STATUS values (3, 'Утвержден');
+
+ALTER TABLE curriculum_detail
+  ALTER COLUMN consider_credit TYPE BOOLEAN
+  USING CASE WHEN consider_credit = 0
+  THEN FALSE
+        WHEN consider_credit = 1
+          THEN TRUE
+        ELSE NULL
+        END;
+
+CREATE OR REPLACE VIEW V_CURRICULUM_DETAIL AS
+  SELECT
+    a.ID,
+    a.CURRICULUM_ID,
+    a.SEMESTER_ID,
+    b.SEMESTER_NAME,
+    a.SUBJECT_ID,
+    c.CODE                      SUBJECT_CODE,
+    c.NAME_RU                   SUBJECT_NAME,
+    CASE WHEN c.SUBJECT_CYCLE_ID = 4
+      THEN a.SUBJECT_CYCLE_ID
+    ELSE c.SUBJECT_CYCLE_ID END SUBJECT_CYCLE_ID,
+    CASE WHEN c.SUBJECT_CYCLE_ID = 4
+      THEN i.CYCLE_SHORT_NAME
+    ELSE d.CYCLE_SHORT_NAME END CYCLE_SHORT_NAME,
+    c.CREDITABILITY_ID,
+    e.CREDIT,
+    c.ACADEMIC_FORMULA_ID,
+    f.FORMULA,
+    a.RECOMMENDED_SEMESTER,
+    a.CONSIDER_CREDIT,
+    c.CONTROL_TYPE_ID,
+    h.TYPE_NAME                 CONTROL_TYPE_NAME,
+    a.DELETED,
+    FALSE                       ELECTIVE
+  FROM CURRICULUM_DETAIL a INNER JOIN SEMESTER b ON a.SEMESTER_ID = b.ID
+    INNER JOIN SUBJECT c ON a.SUBJECT_ID = c.ID
+    INNER JOIN SUBJECT_CYCLE d ON c.SUBJECT_CYCLE_ID = d.ID
+    INNER JOIN CREDITABILITY e ON c.CREDITABILITY_ID = e.ID
+    INNER JOIN ACADEMIC_FORMULA f ON c.ACADEMIC_FORMULA_ID = f.ID
+    INNER JOIN CONTROL_TYPE h ON c.CONTROL_TYPE_ID = h.ID
+    LEFT JOIN SUBJECT_CYCLE i ON a.SUBJECT_CYCLE_ID = i.ID
+  UNION ALL
+  SELECT
+    aa.ID,
+    aa.CURRICULUM_ID,
+    aa.SEMESTER_ID,
+    bb.SEMESTER_NAME,
+    aa.ELECTIVE_SUBJECT_ID       SUBJECT_ID,
+    NULL                         SUBJECT_CODE,
+    cc.NAME_RU                   SUBJECT_NAME,
+    aa.ELECTIVE_SUBJECT_CYCLE_ID SUBJECT_CYCLE_ID,
+    dd.CYCLE_SHORT_NAME,
+    NULL                         CREDITABILITY_ID,
+    aa.ELECTIVE_SUBJECT_CREDIT   CREDIT,
+    NULL                         ACADEMIC_FORMULA_ID,
+    NULL                         FORMULA,
+    NULL                         RECOMMENDED_SEMESTER,
+    aa.CONSIDER_CREDIT,
+    NULL                         CONTROL_TYPE_ID,
+    NULL                         CONTROL_TYPE_NAME,
+    aa.DELETED,
+    TRUE                         ELECTIVE
+  FROM CURRICULUM_DETAIL aa INNER JOIN SEMESTER bb ON aa.SEMESTER_ID = bb.ID
+    INNER JOIN ELECTIVE_SUBJECT_LABEL cc ON aa.ELECTIVE_SUBJECT_ID = cc.ID
+    INNER JOIN SUBJECT_CYCLE dd ON aa.ELECTIVE_SUBJECT_CYCLE_ID = dd.ID;
+
+CREATE OR REPLACE VIEW V_CURRICULUM_ADD_PROGRAM AS
+  SELECT
+    curr_add_pr.ID,
+    curr_add_pr.CURRICULUM_ID,
+    curr_add_pr.SUBJECT_ID,
+    subj.NAME_RU SUBJECT_NAME_RU,
+    subj.CODE    SUBJECT_CODE,
+    subj.CREDITABILITY_ID,
+    cred.CREDIT,
+    curr_add_pr.SEMESTER_ID,
+    sem.SEMESTER_NAME,
+    curr_add_pr.DELETED
+  FROM CURRICULUM_ADD_PROGRAM curr_add_pr INNER JOIN SUBJECT subj ON curr_add_pr.SUBJECT_ID = subj.ID
+    INNER JOIN CREDITABILITY cred ON subj.CREDITABILITY_ID = cred.ID
+    INNER JOIN SEMESTER sem ON curr_add_pr.SEMESTER_ID = sem.ID;
+
+INSERT INTO MONTH VALUES (1, 'Январь', 'January', 'Қаңтар');
+INSERT INTO MONTH VALUES (2, 'Февраль', 'February', 'Ақпан');
+INSERT INTO MONTH VALUES (3, 'Март', 'March', 'Наурыз');
+INSERT INTO MONTH VALUES (4, 'Апрель', 'April', 'Сәуір');
+INSERT INTO MONTH VALUES (5, 'Май', 'May', 'Мамыр');
+INSERT INTO MONTH VALUES (6, 'Июнь', 'June', 'Маусым');
+INSERT INTO MONTH VALUES (7, 'Июль', 'July', 'Шілде');
+INSERT INTO MONTH VALUES (8, 'Август', 'August', 'Тамыз');
+INSERT INTO MONTH VALUES (9, 'Сентябрь', 'September', 'Қыркүйек');
+INSERT INTO MONTH VALUES (10, 'Октябрь', 'October', 'Қазан');
+INSERT INTO MONTH VALUES (11, 'Ноябрь', 'November', 'Қараша');
+INSERT INTO MONTH VALUES (12, 'Декабрь', 'December', 'Желтоксан');
+
+insert into CURRICULUM_SCHEDULE_SYMBOL values (1, '+' ,'Теоретическое обучение с отрывом от производства');
+insert into CURRICULUM_SCHEDULE_SYMBOL values (2, '::' ,'Экзаменационная сессия');
+insert into CURRICULUM_SCHEDULE_SYMBOL values (3, 'о' ,'Вычислительная практика');
+insert into CURRICULUM_SCHEDULE_SYMBOL values (4, 'х' ,'Производственная, преддипломная практики');
+insert into CURRICULUM_SCHEDULE_SYMBOL values (5, 'П' ,'ПГК');
+insert into CURRICULUM_SCHEDULE_SYMBOL values (6, 'Д' ,'Подготовка дипломного проекта');
+insert into CURRICULUM_SCHEDULE_SYMBOL values (7, 'Г' ,'Государственные экзамены');
+insert into CURRICULUM_SCHEDULE_SYMBOL values (8, '=' ,'Каникулы');
+insert into CURRICULUM_SCHEDULE_SYMBOL values (9, 'З' ,'Защита дипломного проекта');
+
+CREATE SEQUENCE S_CURRICULUM
+MINVALUE 0
+START WITH 1
+NO CYCLE;
+
+insert into SEMESTER_PERIOD values (4, 'Летний 2');
+insert into SEMESTER_PERIOD values (5, 'Летний 3');
+update SEMESTER_PERIOD set PERIOD_NAME = 'Летний 1' where ID = 3;
+
+insert into SEMESTER values (1, 1, 1, '1 семестр');
+insert into SEMESTER values (2, 1, 2, '2 семестр');
+insert into SEMESTER values (3, 2, 1, '3 семестр');
+insert into SEMESTER values (4, 2, 2, '4 семестр');
+insert into SEMESTER values (5, 3, 1, '5 семестр');
+insert into SEMESTER values (6, 3, 2, '6 семестр');
+insert into SEMESTER values (7, 4, 1, '7 семестр');
+insert into SEMESTER values (8, 4, 2, '8 семестр');
+
+CREATE OR REPLACE VIEW V_ELECTIVE_SUBJECT AS
+  SELECT
+    a.ID,
+    a.CURRICULUM_ID,
+    a.SEMESTER_ID,
+    d.SEMESTER_NAME,
+    a.SUBJECT_ID,
+    c.CODE                      SUBJECT_CODE,
+    c.NAME_RU                   SUBJECT_NAME,
+    CASE WHEN c.subject_cycle_id = 4
+      THEN a.subject_cycle_id
+    ELSE c.subject_cycle_id END SUBJECT_CYCLE_ID,
+    CASE WHEN c.subject_cycle_id = 4
+      THEN i.CYCLE_SHORT_NAME
+    ELSE g.CYCLE_SHORT_NAME END CYCLE_SHORT_NAME,
+    c.CREDITABILITY_ID,
+    f.CREDIT,
+    c.ACADEMIC_FORMULA_ID,
+    e.FORMULA,
+    c.CONTROL_TYPE_ID,
+    h.TYPE_NAME                 CONTROL_TYPE_NAME,
+    a.DELETED
+  FROM ELECTIVE_SUBJECT a INNER JOIN CURRICULUM b ON b.ID = a.CURRICULUM_ID
+    INNER JOIN SUBJECT c ON c.ID = a.SUBJECT_ID
+    INNER JOIN SEMESTER d ON d.ID = a.SEMESTER_ID
+    INNER JOIN ACADEMIC_FORMULA e ON c.ACADEMIC_FORMULA_ID = e.ID
+    INNER JOIN CREDITABILITY f ON c.CREDITABILITY_ID = f.ID
+    INNER JOIN SUBJECT_CYCLE g ON c.SUBJECT_CYCLE_ID = g.ID
+    INNER JOIN CONTROL_TYPE h ON c.CONTROL_TYPE_ID = h.ID
+    LEFT JOIN SUBJECT_CYCLE i ON a.SUBJECT_CYCLE_ID = i.ID;
+
+CREATE OR REPLACE VIEW V_ELECTIVE_SUBJECT_LABEL AS
+  SELECT
+    a.ID,
+    a.NAME_KZ,
+    a.NAME_EN,
+    a.NAME_RU,
+    a.CODE,
+    a.STUDY_DIRECT_ID,
+    a.DESCR,
+    a.CHAIR_ID,
+    a.LEVEL_ID,
+    a.SUBJECT_CYCLE_ID,
+    a.CREDITABILITY_ID,
+    a.ACADEMIC_FORMULA_ID,
+    a.GROUP_LEC_ID,
+    a.GROUP_PRAC_ID,
+    a.GROUP_LAB_ID,
+    a.CONTROL_TYPE_ID,
+    a.DELETED,
+    FALSE ELECTIVE
+  FROM SUBJECT a
+  UNION ALL
+  SELECT
+    aa.ID,
+    aa.NAME_KZ,
+    aa.NAME_EN,
+    aa.NAME_RU,
+    NULL  CODE,
+    NULL  STUDY_DIRECT_ID,
+    NULL  DESCR,
+    NULL  CHAIR_ID,
+    NULL  LEVEL_ID,
+    NULL  SUBJECT_CYCLE_ID,
+    NULL  CREDITABILITY_ID,
+    NULL  ACADEMIC_FORMULA_ID,
+    NULL  GROUP_LEC_ID,
+    NULL  GROUP_PRAC_ID,
+    NULL  GROUP_LAB_ID,
+    NULL  CONTROL_TYPE_ID,
+    FALSE DELETED,
+    TRUE  ELECTIVE
+  FROM ELECTIVE_SUBJECT_LABEL aa;
+
+CREATE SEQUENCE S_CURRICULUM_DETAIL
+MINVALUE 0
+START WITH 1
+NO CYCLE;
+
+DROP VIEW V_STUDENT;
+
+CREATE OR REPLACE VIEW V_STUDENT AS
+  SELECT
+    stu.ID,
+    usr.FIRST_NAME,
+    usr.LAST_NAME,
+    usr.MIDDLE_NAME,
+    usr.FIRST_NAME_EN,
+    usr.LAST_NAME_EN,
+    usr.MIDDLE_NAME_EN,
+    usr.BIRTH_DATE,
+    usr.SEX_ID,
+    c.SEX_NAME,
+    usr.MARITAL_STATUS_ID,
+    d.STATUS_NAME                  MARITAL_STATUS_NAME,
+    usr.NATIONALITY_ID,
+    e.NATION_NAME,
+    usr.CITIZENSHIP_ID,
+    f.COUNTRY_NAME                 CITIZENSHIP_NAME,
+    usr.CODE                       USER_CODE,
+    usr.LOGIN,
+    usr.EMAIL,
+    usr.PHONE_MOBILE,
+    stu.LEVEL_ID,
+    g.LEVEL_NAME,
+    stu.CATEGORY_ID,
+    h.CATEGORY_NAME,
+    stu.ACADEMIC_STATUS_ID,
+    i.STATUS_NAME                  ACADEMIC_STATUS_NAME,
+    stu.NEED_DORM,
+    stu.ENTRANCE_YEAR_ID,
+    j.ENTRANCE_YEAR,
+    j.BEGIN_YEAR                   ENTRANCE_BEGIN_YEAR,
+    j.END_YEAR                     ENTRANCE_END_YEAR,
+    k.FACULTY_ID,
+    l.DEPT_NAME                    FACULTY_NAME,
+    l.DEPT_SHORT_NAME              FACULTY_SHORT_NAME,
+    l.CODE                         FACULTY_CODE,
+    k.CHAIR_ID,
+    m.DEPT_NAME                    CHAIR_NAME,
+    m.DEPT_SHORT_NAME              CHAIR_SHORT_NAME,
+    m.CODE                         CHAIR_CODE,
+    k.SPECIALITY_ID,
+    n.CODE || ' - ' || n.SPEC_NAME SPECIALITY_NAME,
+    n.CODE                         SPECIALITY_CODE,
+    k.STUDY_YEAR_ID,
+    k.EDUCATION_TYPE_ID,
+    o.TYPE_NAME                    EDUCATION_TYPE_NAME,
+    k.ENTRY_DATE,
+    k.END_DATE,
+    k.STUDENT_STATUS_ID,
+    p.STATUS_NAME                  STUDENT_STATUS_NAME,
+    card.id                        card_id,
+    card.card_name,
+    usr.DELETED,
+    usr.CREATED,
+    usr.UPDATED,
+    advisor.fio                    advisor,
+    coordinator.fio                coordinator
+  FROM STUDENT stu INNER JOIN USERS usr ON stu.ID = usr.ID
+    INNER JOIN SEX c ON usr.SEX_ID = c.ID
+    INNER JOIN MARITAL_STATUS d ON usr.MARITAL_STATUS_ID = d.ID
+    INNER JOIN NATIONALITY e ON usr.NATIONALITY_ID = e.ID
+    INNER JOIN COUNTRY f ON usr.CITIZENSHIP_ID = f.ID
+    INNER JOIN LEVEL g ON stu.LEVEL_ID = g.ID
+    INNER JOIN STUDENT_CATEGORY h ON stu.CATEGORY_ID = h.ID
+    LEFT JOIN ACADEMIC_STATUS i ON stu.ACADEMIC_STATUS_ID = i.ID
+    INNER JOIN ENTRANCE_YEAR j ON stu.ENTRANCE_YEAR_ID = j.ID
+    INNER JOIN STUDENT_EDUCATION k ON k.STUDENT_ID = stu.ID AND k.CHILD_ID IS NULL
+    INNER JOIN DEPARTMENT l ON k.FACULTY_ID = l.ID AND l.parent_id IS NULL AND l.deleted = FALSE
+    INNER JOIN DEPARTMENT m ON k.CHAIR_ID = m.ID AND m.parent_id IS NOT NULL AND m.deleted = FALSE
+    INNER JOIN SPECIALITY n ON k.SPECIALITY_ID = n.ID AND n.deleted = FALSE
+    INNER JOIN STUDENT_EDUCATION_TYPE o ON k.EDUCATION_TYPE_ID = o.ID
+    INNER JOIN STUDENT_STATUS p ON k.STUDENT_STATUS_ID = p.ID
+    LEFT JOIN v_advisor advisor ON advisor.id = stu.advisor_id
+    LEFT JOIN v_coordinator coordinator ON coordinator.id = stu.coordinator_id
+    LEFT JOIN CARD card ON card.id = usr.card_id
+  WHERE usr.deleted = FALSE AND usr.locked = FALSE;

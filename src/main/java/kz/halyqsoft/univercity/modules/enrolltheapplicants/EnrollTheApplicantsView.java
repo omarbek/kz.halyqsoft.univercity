@@ -133,17 +133,13 @@ public class EnrollTheApplicantsView extends AbstractTaskView {
         List<VStudent> list = new ArrayList<>();
         String sql = "SELECT " +
                 "  stu.ID, " +
-                "  usr.CODE, " +
-                "  trim(usr.LAST_NAME || ' ' || usr.FIRST_NAME || ' ' || coalesce(usr.MIDDLE_NAME, '')) FIO, " +
-                "  stu_status.STATUS_NAME, " +
-                "  dep.DEPT_SHORT_NAME                                                                  FACULTY, " +
-                "  spec.SPEC_NAME " +
-                "FROM STUDENT stu INNER JOIN USERS usr ON stu.ID = usr.ID " +
-                "  INNER JOIN STUDENT_EDUCATION stu_edu ON stu.ID = stu_edu.STUDENT_ID AND stu_edu.CHILD_ID IS NULL " +
-                "  INNER JOIN STUDENT_STATUS stu_status ON stu_edu.STUDENT_STATUS_ID = stu_status.ID " +
-                "  INNER JOIN DEPARTMENT dep ON stu_edu.FACULTY_ID = dep.ID " +
-                "  INNER JOIN SPECIALITY spec ON stu_edu.SPECIALITY_ID = spec.ID " +
-                "WHERE stu.category_id = 1 AND usr.deleted = FALSE AND dep.deleted = FALSE AND spec.deleted = FALSE " +
+                "  stu.user_code                                                                        code, " +
+                "  trim(stu.LAST_NAME || ' ' || stu.FIRST_NAME || ' ' || coalesce(stu.MIDDLE_NAME, '')) FIO, " +
+                "  stu.student_status_name                                                              STATUS_NAME, " +
+                "  stu.faculty_short_name                                                               FACULTY, " +
+                "  stu.speciality_name " +
+                "FROM V_STUDENT stu " +
+                "WHERE stu.category_id = 1 " +
                 "ORDER BY FIO";
         try {
             List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, new HashMap<>());
