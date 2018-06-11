@@ -62,10 +62,6 @@ public final class TwoDateItem extends AbstractACItem {
         }
         hl.addComponent(df2);
 
-        if (isDescrVisible()) {
-            hl.addComponent(getDescrField());
-        }
-
         return hl;
     }
 
@@ -78,9 +74,6 @@ public final class TwoDateItem extends AbstractACItem {
         if (!date1.equals(acd.getDate1()) || !date2.equals(acd.getDate2())) {
             acd.setDate1(date1);
             acd.setDate2(date2);
-            if (isDescrVisible()) {
-                acd.setDescr(getDescrField().getValue());
-            }
             SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(acd);
         }
 

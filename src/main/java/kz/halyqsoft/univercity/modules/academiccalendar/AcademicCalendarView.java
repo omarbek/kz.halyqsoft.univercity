@@ -16,7 +16,10 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import kz.halyqsoft.univercity.entity.beans.univercity.ACADEMIC_CALENDAR;
 import kz.halyqsoft.univercity.entity.beans.univercity.ACADEMIC_CALENDAR_DETAIL;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ACADEMIC_CALENDAR_FACULTY;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ACADEMIC_CALENDAR_ITEM;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEPARTMENT;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
 import kz.halyqsoft.univercity.modules.academiccalendar.item.AbstractACItem;
 import kz.halyqsoft.univercity.modules.academiccalendar.item.TwoDateItem;
 import kz.halyqsoft.univercity.modules.academiccalendar.layout.AcademicCalendarLayout;
@@ -513,9 +516,6 @@ public class AcademicCalendarView extends AbstractTaskView {
                 if (acd.getDate4() != null) {
                     dates = dates + " - " + dateFormat.format(acd.getDate4());
                 }
-                if (acd.getDescr() != null) {
-                    dates = dates + " " + acd.getDescr();
-                }
                 cell = new PdfPCell(new Phrase(dates, font));
                 tableForDates.addCell(cell);
             }
@@ -796,7 +796,6 @@ public class AcademicCalendarView extends AbstractTaskView {
                     c.set(Calendar.YEAR, academicCalendar.getYear().getEndYear());
                     acd.setDate2(c.getTime());
 
-                    acd.setDescr("(���. 4-� ��������� ���������������� ��������)");
                 } else if (aci.getItemType().equals("q")) {
                     c.clear();
                     c.set(Calendar.DATE, 1);
@@ -858,7 +857,6 @@ public class AcademicCalendarView extends AbstractTaskView {
                     c.set(Calendar.YEAR, academicCalendar.getYear().getEndYear());
                     acd.setDate2(c.getTime());
 
-                    acd.setDescr("(�� ������ �������)");
                 } else if (aci.getItemType().equals("v")) {
                     c.clear();
                     c.set(Calendar.DATE, 12);
@@ -884,7 +882,6 @@ public class AcademicCalendarView extends AbstractTaskView {
                     c.set(Calendar.YEAR, academicCalendar.getYear().getEndYear());
                     acd.setDate2(c.getTime());
 
-                    acd.setDescr("(�� ������ �������)");
                 } else if (aci.getItemType().equals("x")) {
                     c.clear();
                     c.set(Calendar.DATE, 19);
@@ -1240,7 +1237,6 @@ public class AcademicCalendarView extends AbstractTaskView {
                     c.set(Calendar.YEAR, academicCalendar.getYear().getBeginYear());
                     acd.setDate1(c.getTime());
 
-                    acd.setDescr("(�� 00:00 �.���.)");
                 } else if (aci.getItemType().equals("29")) {
                     c.clear();
                     c.set(Calendar.DATE, 7);
@@ -1272,7 +1268,6 @@ public class AcademicCalendarView extends AbstractTaskView {
                     c.set(Calendar.YEAR, academicCalendar.getYear().getBeginYear());
                     acd.setDate1(c.getTime());
 
-                    acd.setDescr("(�� 00:00 �.���.)");
                 } else if (aci.getItemType().equals("32")) {
                     c.clear();
                     c.set(Calendar.DATE, 1);
@@ -1304,7 +1299,6 @@ public class AcademicCalendarView extends AbstractTaskView {
                     c.set(Calendar.YEAR, academicCalendar.getYear().getBeginYear());
                     acd.setDate1(c.getTime());
 
-                    acd.setDescr("(�� 00:00 �.���.)");
                 } else if (aci.getItemType().equals("36")) {
                     c.clear();
                     c.set(Calendar.DATE, 16);
@@ -1450,7 +1444,6 @@ public class AcademicCalendarView extends AbstractTaskView {
                     c.set(Calendar.YEAR, academicCalendar.getYear().getEndYear());
                     acd.setDate2(c.getTime());
 
-                    acd.setDescr("(�� ������ �������)");
                 } else if (aci.getItemType().equals("48")) {
                     c.clear();
                     c.set(Calendar.DATE, 30);
@@ -1482,7 +1475,6 @@ public class AcademicCalendarView extends AbstractTaskView {
                     c.set(Calendar.YEAR, academicCalendar.getYear().getEndYear());
                     acd.setDate1(c.getTime());
 
-                    acd.setDescr("(�� 00:00 �.���.)");
                 } else if (aci.getItemType().equals("51")) {
                     c.clear();
                     c.set(Calendar.DATE, 8);
@@ -1502,7 +1494,6 @@ public class AcademicCalendarView extends AbstractTaskView {
                     c.set(Calendar.YEAR, academicCalendar.getYear().getEndYear());
                     acd.setDate2(c.getTime());
 
-                    acd.setDescr("(�� ������ �������)");
                 } else if (aci.getItemType().equals("53")) {
                     c.clear();
                     c.set(Calendar.DATE, 21);
@@ -1552,7 +1543,6 @@ public class AcademicCalendarView extends AbstractTaskView {
                     c.set(Calendar.YEAR, academicCalendar.getYear().getEndYear());
                     acd.setDate1(c.getTime());
 
-                    acd.setDescr("(�� 00:00 �.���.)");
                 } else if (aci.getItemType().equals("58")) {
                     c.clear();
                     c.set(Calendar.DATE, 22);
@@ -1596,7 +1586,6 @@ public class AcademicCalendarView extends AbstractTaskView {
                     c.set(Calendar.YEAR, academicCalendar.getYear().getEndYear());
                     acd.setDate1(c.getTime());
 
-                    acd.setDescr("(�� 00:00 �.���.)");
                 } else if (aci.getItemType().equals("64")) {
                     c.clear();
                     c.set(Calendar.DATE, 22);
@@ -1771,8 +1760,6 @@ public class AcademicCalendarView extends AbstractTaskView {
                     c.set(Calendar.MONTH, Calendar.AUGUST);
                     c.set(Calendar.YEAR, academicCalendar.getYear().getEndYear());
                     acd.setDate2(c.getTime());
-
-                    acd.setDescr("(���. 4-� ��������� ���������������� ��������)");
                 }
 
                 newList.add(acd);
