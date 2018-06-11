@@ -1,5 +1,6 @@
 package kz.halyqsoft.univercity.entity.beans.univercity;
 
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_STUDENT;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
@@ -16,7 +17,7 @@ public class STUDENT_CREATIVE_EXAM extends AbstractEntity {
     @FieldInfo(type = EFieldType.FK_COMBO, order = 2)
     @ManyToOne
     @JoinColumns({@JoinColumn(name = "STUDENT_ID", referencedColumnName = "ID", nullable = false)})
-    private STUDENT student;
+    private V_STUDENT student;
 
     @FieldInfo(type = EFieldType.TEXT, order = 3, required = false, max = 128)
     @Column(name = "PLACE")
@@ -26,11 +27,11 @@ public class STUDENT_CREATIVE_EXAM extends AbstractEntity {
     @Column(name = "RATE")
     private Integer rate;
 
-    public STUDENT getStudent() {
+    public V_STUDENT getStudent() {
         return student;
     }
 
-    public void setStudent(STUDENT student) {
+    public void setStudent(V_STUDENT student) {
         this.student = student;
     }
 

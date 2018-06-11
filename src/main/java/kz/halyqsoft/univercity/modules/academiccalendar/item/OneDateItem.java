@@ -36,16 +36,12 @@ public final class OneDateItem extends AbstractACItem {
         hl.addComponent(l);
 
         df1 = new DateField();
-        df1.setWidth(80, Unit.PIXELS);
+        df1.setWidth(100, Unit.PIXELS);
         ACADEMIC_CALENDAR_DETAIL academicCalendarDetail = getAcademicCalendarDetail();
         if (academicCalendarDetail != null) {
             df1.setValue(academicCalendarDetail.getDate1());
         }
         hl.addComponent(df1);
-
-        if (isDescrVisible()) {
-            hl.addComponent(getDescrField());
-        }
 
         return hl;
     }
@@ -57,9 +53,6 @@ public final class OneDateItem extends AbstractACItem {
         ACADEMIC_CALENDAR_DETAIL acd = getAcademicCalendarDetail();
         if (!date1.equals(acd.getDate1())) {
             acd.setDate1(date1);
-            if (isDescrVisible()) {
-                acd.setDescr(getDescrField().getValue());
-            }
             SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(acd);
         }
     }

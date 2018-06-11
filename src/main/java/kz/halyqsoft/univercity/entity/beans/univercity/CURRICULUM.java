@@ -58,9 +58,6 @@ public class CURRICULUM extends AbstractEntity {
 	@Column(name = "DELETED", nullable = false)
     private boolean deleted;
 	
-	@Column(name = "OLD_ID")
-	private String oldId;
-	
 	public CURRICULUM() {
 	}
 
@@ -110,13 +107,5 @@ public class CURRICULUM extends AbstractEntity {
 
 	public void setDeleted(boolean deleted) {
 		this.deleted = deleted;
-	}
-
-	public String getOldId() {
-		return oldId;
-	}
-
-	public void setOldId(String oldId) {
-		this.oldId = oldId;
 	}
 }

@@ -2,19 +2,14 @@ package kz.halyqsoft.univercity.modules.subject;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.server.ThemeResource;
-import com.vaadin.shared.ui.combobox.FilteringMode;
-import com.vaadin.shared.ui.grid.HeightMode;
-import com.vaadin.ui.*;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.Grid.SelectionMode;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.VerticalLayout;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ACADEMIC_FORMULA;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.CREDITABILITY;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VEmployee;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.VSubjectRequisite;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.V_SUBJECT_SELECT;
-import kz.halyqsoft.univercity.filter.FSubjectFilter;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -25,11 +20,7 @@ import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.select.EAggregate;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.view.AbstractCommonView;
-import org.r3a.common.vaadin.widget.DBSelectModel;
 import org.r3a.common.vaadin.widget.ERefreshType;
-import org.r3a.common.vaadin.widget.dialog.AbstractYesButtonListener;
-import org.r3a.common.vaadin.widget.dialog.Message;
-import org.r3a.common.vaadin.widget.dialog.select.custom.grid.CustomGridSelectDialog;
 import org.r3a.common.vaadin.widget.form.AbstractFormWidget;
 import org.r3a.common.vaadin.widget.form.AbstractFormWidgetView;
 import org.r3a.common.vaadin.widget.form.CommonFormWidget;
@@ -50,17 +41,12 @@ import java.util.*;
 @SuppressWarnings("serial")
 public final class SubjectEdit extends AbstractFormWidgetView {
 
-    private final FSubjectFilter filter;
     private final AbstractFormWidget baseDataFW;
-    private Grid prerequisiteGrid;
-    private Grid postrequisiteGrid;
     private GridWidget teacherGW;
-    private CustomGridSelectDialog subjectSelectDlg;
 
-    public SubjectEdit(FormModel baseDataFM, FSubjectFilter filter) throws Exception {
+    public SubjectEdit(FormModel baseDataFM) throws Exception {
         super();
         setBackButtonVisible(false);
-        this.filter = filter;
 
         baseDataFW = new CommonFormWidget(baseDataFM);
         baseDataFW.addEntityListener(this);
@@ -152,84 +138,6 @@ public final class SubjectEdit extends AbstractFormWidgetView {
         VerticalLayout rightPanel = new VerticalLayout();
         rightPanel.setWidth("609px");
 
-        Label l = new Label();
-        l.setWidthUndefined();
-        l.addStyleName("bold");
-        l.setValue(getUILocaleUtil().getCaption("prerequisites"));
-        rightPanel.addComponent(l);
-        rightPanel.setComponentAlignment(l, Alignment.MIDDLE_LEFT);
-
-        HorizontalLayout hl = new HorizontalLayout();
-        hl.setSpacing(true);
-        hl.setWidthUndefined();
-
-        Button b = new Button();
-        b.setCaption(getUILocaleUtil().getCaption("new"));
-        b.setIcon(new ThemeResource("img/button/new.png"));
-        b.addClickListener(new RequisiteAddListener(true));
-        hl.addComponent(b);
-
-        b = new Button();
-        b.setCaption(getUILocaleUtil().getCaption("delete"));
-        b.setIcon(new ThemeResource("img/button/delete.png"));
-        b.addClickListener(new RequisiteDeleteListener(true));
-        hl.addComponent(b);
-
-        rightPanel.addComponent(hl);
-        rightPanel.setComponentAlignment(hl, Alignment.MIDDLE_LEFT);
-
-        prerequisiteGrid = new Grid();
-        prerequisiteGrid.setSizeFull();
-        prerequisiteGrid.addColumn("code").setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(VSubjectRequisite.class, "code")).setWidth(130);
-        prerequisiteGrid.addColumn("subjectName").setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(VSubjectRequisite.class, "subjectName")).setWidthUndefined();
-        prerequisiteGrid.addColumn("credit", Integer.class).setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(VSubjectRequisite.class, "credit")).setWidth(80);
-        prerequisiteGrid.addColumn("formula").setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(VSubjectRequisite.class, "formula")).setWidth(120);
-        prerequisiteGrid.addColumn("controlTypeName").setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(VSubjectRequisite.class, "controlTypeName")).setWidth(130);
-        prerequisiteGrid.setSelectionMode(SelectionMode.SINGLE);
-        prerequisiteGrid.setHeightMode(HeightMode.ROW);
-        prerequisiteGrid.setHeightByRows(6);
-        rightPanel.addComponent(prerequisiteGrid);
-        rightPanel.setComponentAlignment(prerequisiteGrid, Alignment.MIDDLE_CENTER);
-
-        l = new Label();
-        l.setWidthUndefined();
-        l.addStyleName("bold");
-        l.setValue(getUILocaleUtil().getCaption("postrequisites"));
-        rightPanel.addComponent(l);
-        rightPanel.setComponentAlignment(l, Alignment.MIDDLE_LEFT);
-
-        hl = new HorizontalLayout();
-        hl.setSpacing(true);
-        hl.setWidthUndefined();
-
-        b = new Button();
-        b.setCaption(getUILocaleUtil().getCaption("new"));
-        b.setIcon(new ThemeResource("img/button/new.png"));
-        b.addClickListener(new RequisiteAddListener(false));
-        hl.addComponent(b);
-
-        b = new Button();
-        b.setCaption(getUILocaleUtil().getCaption("delete"));
-        b.setIcon(new ThemeResource("img/button/delete.png"));
-        b.addClickListener(new RequisiteDeleteListener(false));
-        hl.addComponent(b);
-
-        rightPanel.addComponent(hl);
-        rightPanel.setComponentAlignment(hl, Alignment.MIDDLE_LEFT);
-
-        postrequisiteGrid = new Grid();
-        postrequisiteGrid.setSizeFull();
-        postrequisiteGrid.addColumn("code").setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(VSubjectRequisite.class, "code")).setWidth(130);
-        postrequisiteGrid.addColumn("subjectName").setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(VSubjectRequisite.class, "subjectName")).setWidthUndefined();
-        postrequisiteGrid.addColumn("credit", Integer.class).setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(VSubjectRequisite.class, "credit")).setWidth(80);
-        postrequisiteGrid.addColumn("formula").setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(VSubjectRequisite.class, "formula")).setWidth(120);
-        postrequisiteGrid.addColumn("controlTypeName").setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(VSubjectRequisite.class, "controlTypeName")).setWidth(130);
-        postrequisiteGrid.setSelectionMode(SelectionMode.SINGLE);
-        postrequisiteGrid.setHeightMode(HeightMode.ROW);
-        postrequisiteGrid.setHeightByRows(6);
-        rightPanel.addComponent(postrequisiteGrid);
-        rightPanel.setComponentAlignment(postrequisiteGrid, Alignment.MIDDLE_CENTER);
-
         teacherGW = new GridWidget(VEmployee.class);
         teacherGW.showToolbar(false);
         DBGridModel teacherGM = (DBGridModel) teacherGW.getWidgetModel();
@@ -241,7 +149,7 @@ public final class SubjectEdit extends AbstractFormWidgetView {
         teacherGM.getColumnModel("fall").setInGrid(true);
         teacherGM.getColumnModel("spring").setInGrid(true);
         teacherGM.setRefreshType(ERefreshType.MANUAL);
-        teacherGM.setHeightByRows(4);
+        teacherGM.setHeightByRows(20);
         teacherGM.setTitleResource("teachers");
         rightPanel.addComponent(teacherGW);
         rightPanel.setComponentAlignment(teacherGW, Alignment.MIDDLE_CENTER);
@@ -250,59 +158,10 @@ public final class SubjectEdit extends AbstractFormWidgetView {
         content.setExpandRatio(rightPanel, (float) .5);
 
         if (!baseDataFM.isCreateNew()) {
-            refreshRequisite(true);
-            refreshRequisite(false);
             refreshTeacher();
         }
 
         getTabSheet().addTab(content, getMasterTabTitle());
-    }
-
-    private void refreshRequisite(boolean preRequisite) throws Exception {
-        String sql = "SELECT " +
-                "  subj_requis.ID, " +
-                "  subj.NAME_KZ, " +
-                "  subj.NAME_EN, " +
-                "  subj.NAME_RU, " +
-                "  subj.CODE, " +
-                "  cred.CREDIT, " +
-                "  acad_formula.FORMULA, " +
-                "  control_type.TYPE_NAME CONTROL_TYPE_NAME " +
-                "FROM SUBJECT_REQUISITE subj_requis INNER JOIN SUBJECT subj ON subj_requis.REQUISITE_ID = subj.ID " +
-                "  INNER JOIN CREDITABILITY cred ON subj.CREDITABILITY_ID = cred.ID " +
-                "  INNER JOIN ACADEMIC_FORMULA acad_formula ON subj.ACADEMIC_FORMULA_ID = acad_formula.ID " +
-                "  INNER JOIN CONTROL_TYPE control_type ON subj.CONTROL_TYPE_ID = control_type.ID " +
-                "WHERE subj_requis.SUBJECT_ID = ?1 AND subj_requis.PRE_REQUISITE = ?2";
-        Map<Integer, Object> params = new HashMap<>();
-        params.put(1, baseDataFW.getWidgetModel().getEntity().getId().getId());
-        params.put(2, preRequisite);
-        try {
-            List tempList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
-            List<VSubjectRequisite> list = new ArrayList<VSubjectRequisite>(tempList.size());
-            Locale locale = getUILocaleUtil().getCurrentLocale();
-            for (Object o : tempList) {
-                Object[] oo = (Object[]) o;
-                VSubjectRequisite vsr = new VSubjectRequisite(locale);
-                vsr.setId(ID.valueOf((long) oo[0]));
-                vsr.setNameKZ((String) oo[1]);
-                vsr.setNameEN((String) oo[2]);
-                vsr.setNameRU((String) oo[3]);
-                vsr.setCode((String) oo[4]);
-                vsr.setCredit(((BigDecimal) oo[5]).intValue());
-                vsr.setFormula((String) oo[6]);
-                vsr.setControlTypeName((String) oo[7]);
-                list.add(vsr);
-            }
-
-            BeanItemContainer<VSubjectRequisite> bic = new BeanItemContainer<VSubjectRequisite>(VSubjectRequisite.class, list);
-            if (preRequisite) {
-                prerequisiteGrid.setContainerDataSource(bic);
-            } else {
-                postrequisiteGrid.setContainerDataSource(bic);
-            }
-        } catch (Exception ex) {
-            CommonUtils.showMessageAndWriteLog("Unable to refresh pre/postrequisites of the subject", ex);
-        }
     }
 
     private void refreshTeacher() throws Exception {
@@ -404,71 +263,71 @@ public final class SubjectEdit extends AbstractFormWidgetView {
 
     private boolean preSaveBaseData(Object source, Entity e, boolean isNew, int buttonId) {
         SUBJECT s = (SUBJECT) e;
-        if (isNew) {
-            if (s.getCode() == null) {
-                QueryModel<SUBJECT> qm = new QueryModel<SUBJECT>(SUBJECT.class);
-                qm.addWhere("studyDirect", ECriteria.EQUAL, s.getStudyDirect().getId());
-                qm.addSelect("id", EAggregate.COUNT);
-                try {
-                    Integer count = (Integer) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItems(qm);
-                    count++;
-                    String no = String.valueOf(count);
-                    if (count < 10) {
-                        no = "000" + no;
-                    } else if (count < 100) {
-                        no = "00" + no;
-                    } else if (count < 1000) {
-                        no = "0" + no;
-                    }
-
-                    StringBuilder sb = new StringBuilder();
-                    sb.append(s.getStudyDirect().getCode());
-                    sb.append(s.getLevel().getId().toString());
-                    sb.append(s.getSubjectCycle().getId().toString());
-                    if (s.isMandatory()) {
-                        sb.append('1');
-                    } else {
-                        sb.append('0');
-                    }
-                    sb.append(no);
-                    s.setCode(sb.toString());
-                } catch (Exception ex) {
-                    CommonUtils.showMessageAndWriteLog("Unable to create a subject", ex);
-                }
-            }
-        } else {
-            if (!s.getCode().startsWith(s.getStudyDirect().getCode())) {
-                QueryModel<SUBJECT> qm = new QueryModel<SUBJECT>(SUBJECT.class);
-                qm.addWhere("studyDirect", ECriteria.EQUAL, s.getStudyDirect().getId());
-                qm.addSelect("id", EAggregate.COUNT);
-                try {
-                    Long count = (Long) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItems(qm);
-                    count++;
-                    String no = String.valueOf(count);
-                    if (count < 10) {
-                        no = "000" + no;
-                    } else if (count < 100) {
-                        no = "00" + no;
-                    } else if (count < 1000) {
-                        no = "0" + no;
-                    }
-
-                    StringBuilder sb = new StringBuilder();
-                    sb.append(s.getStudyDirect().getCode());
-                    sb.append(s.getLevel().getId().toString());
-                    sb.append(s.getSubjectCycle().getId().toString());
-                    if (s.isMandatory()) {
-                        sb.append('1');
-                    } else {
-                        sb.append('0');
-                    }
-                    sb.append(no);
-                    s.setCode(sb.toString());
-                } catch (Exception ex) {
-                    CommonUtils.showMessageAndWriteLog("Unable to update a subject", ex);
-                }
-            }
-        }
+//        if (isNew) {
+//            if (s.getCode() == null) {
+//                QueryModel<SUBJECT> qm = new QueryModel<SUBJECT>(SUBJECT.class);
+//                qm.addWhere("studyDirect", ECriteria.EQUAL, s.getStudyDirect().getId());
+//                qm.addSelect("id", EAggregate.COUNT);
+//                try {
+//                    Integer count = (Integer) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItems(qm);
+//                    count++;
+//                    String no = String.valueOf(count);
+//                    if (count < 10) {
+//                        no = "000" + no;
+//                    } else if (count < 100) {
+//                        no = "00" + no;
+//                    } else if (count < 1000) {
+//                        no = "0" + no;
+//                    }
+//
+//                    StringBuilder sb = new StringBuilder();
+//                    sb.append(s.getStudyDirect().getCode());
+//                    sb.append(s.getLevel().getId().toString());
+//                    sb.append(s.getSubjectCycle().getId().toString());
+//                    if (s.isMandatory()) {
+//                        sb.append('1');
+//                    } else {
+//                        sb.append('0');
+//                    }
+//                    sb.append(no);
+//                    s.setCode(sb.toString());
+//                } catch (Exception ex) {
+//                    CommonUtils.showMessageAndWriteLog("Unable to create a subject", ex);
+//                }
+//            }
+//        } else {
+//            if (!s.getCode().startsWith(s.getStudyDirect().getCode())) {
+//                QueryModel<SUBJECT> qm = new QueryModel<SUBJECT>(SUBJECT.class);
+//                qm.addWhere("studyDirect", ECriteria.EQUAL, s.getStudyDirect().getId());
+//                qm.addSelect("id", EAggregate.COUNT);
+//                try {
+//                    Long count = (Long) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItems(qm);
+//                    count++;
+//                    String no = String.valueOf(count);
+//                    if (count < 10) {
+//                        no = "000" + no;
+//                    } else if (count < 100) {
+//                        no = "00" + no;
+//                    } else if (count < 1000) {
+//                        no = "0" + no;
+//                    }
+//
+//                    StringBuilder sb = new StringBuilder();
+//                    sb.append(s.getStudyDirect().getCode());
+//                    sb.append(s.getLevel().getId().toString());
+//                    sb.append(s.getSubjectCycle().getId().toString());
+//                    if (s.isMandatory()) {
+//                        sb.append('1');
+//                    } else {
+//                        sb.append('0');
+//                    }
+//                    sb.append(no);
+//                    s.setCode(sb.toString());
+//                } catch (Exception ex) {
+//                    CommonUtils.showMessageAndWriteLog("Unable to update a subject", ex);
+//                }
+//            }
+//        }
 
         return true;
     }
@@ -523,177 +382,6 @@ public final class SubjectEdit extends AbstractFormWidgetView {
                 academicFormulaFM.refresh(academicFormula);
             } catch (Exception e) {
                 e.printStackTrace();//TODO catch
-            }
-        }
-    }
-
-    private class RequisiteAddListener implements ClickListener {
-
-        private final boolean prerequisite;
-
-        public RequisiteAddListener(boolean prerequisite) {
-            this.prerequisite = prerequisite;
-        }
-
-        @Override
-        public void buttonClick(ClickEvent ev) {
-            baseDataFW.getWidgetModel().setShowFormSaveError(false);
-            if (!baseDataFW.save()) {
-                baseDataFW.getWidgetModel().setShowFormSaveError(true);
-                Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
-                return;
-            }
-            baseDataFW.getWidgetModel().setShowFormSaveError(true);
-
-            subjectSelectDlg = new CustomGridSelectDialog(new RequisiteAddYesListener(prerequisite), V_SUBJECT_SELECT.class);
-            subjectSelectDlg.getSelectModel().setMultiSelect(false);
-            subjectSelectDlg.setFilterRequired(true);
-            subjectSelectDlg.setDialogHeight(400);
-            subjectSelectDlg.setDialogWidth(600);
-            QueryModel requisiteQM = ((DBSelectModel) subjectSelectDlg.getSelectModel()).getQueryModel();
-            requisiteQM.addWhere("chair", ECriteria.EQUAL, ID.valueOf(-1));
-
-            try {
-                QueryModel<DEPARTMENT> chairQM = new QueryModel<>(DEPARTMENT.class);
-                chairQM.addWhereNotNull("parent");
-                chairQM.addWhereAnd("deleted", Boolean.FALSE);
-                chairQM.addOrder("deptName");
-                BeanItemContainer<DEPARTMENT> chairBIC = new BeanItemContainer<>(DEPARTMENT.class,
-                        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(chairQM));
-                ComboBox chairCB = new ComboBox();
-                chairCB.setContainerDataSource(chairBIC);
-                chairCB.setImmediate(true);
-                chairCB.setNullSelectionAllowed(true);
-                chairCB.setTextInputAllowed(true);
-                chairCB.setFilteringMode(FilteringMode.CONTAINS);
-                chairCB.setWidth(400, Unit.PIXELS);
-                chairCB.setPageLength(0);
-
-                QueryModel<LEVEL> levelQM = new QueryModel<>(LEVEL.class);
-                levelQM.addOrder("levelName");
-                BeanItemContainer<LEVEL> levelBIC = new BeanItemContainer<>(LEVEL.class,
-                        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(levelQM));
-                ComboBox levelCB = new ComboBox();
-                levelCB.setContainerDataSource(levelBIC);
-                levelCB.setImmediate(true);
-                levelCB.setNullSelectionAllowed(true);
-                levelCB.setTextInputAllowed(false);
-                levelCB.setFilteringMode(FilteringMode.OFF);
-
-                QueryModel<CREDITABILITY> creditabilityQM = new QueryModel<CREDITABILITY>(CREDITABILITY.class);
-                creditabilityQM.addOrder("credit");
-                BeanItemContainer<CREDITABILITY> creditabilityBIC = new BeanItemContainer<CREDITABILITY>(CREDITABILITY.class, SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(creditabilityQM));
-                ComboBox creditabilityCB = new ComboBox();
-                creditabilityCB.setContainerDataSource(creditabilityBIC);
-                creditabilityCB.setImmediate(true);
-                creditabilityCB.setNullSelectionAllowed(true);
-                creditabilityCB.setTextInputAllowed(false);
-                creditabilityCB.setFilteringMode(FilteringMode.OFF);
-                creditabilityCB.setPageLength(0);
-
-                subjectSelectDlg.getFilterModel().addFilter("chair", chairCB);
-                subjectSelectDlg.getFilterModel().addFilter("level", levelCB);
-                subjectSelectDlg.getFilterModel().addFilter("creditability", creditabilityCB);
-                subjectSelectDlg.initFilter();
-                subjectSelectDlg.open();
-            } catch (Exception ex) {
-                CommonUtils.showMessageAndWriteLog("Unable to initialize custom grid dialog", ex);
-            }
-        }
-    }
-
-    private class RequisiteDeleteListener implements ClickListener {
-
-        private final boolean prerequisite;
-
-        public RequisiteDeleteListener(boolean prerequisite) {
-            this.prerequisite = prerequisite;
-        }
-
-        @Override
-        public void buttonClick(ClickEvent ev) {
-            List<VSubjectRequisite> list = new ArrayList<VSubjectRequisite>(1);
-            if (prerequisite) {
-                Object o = prerequisiteGrid.getSelectedRow();
-                if (o != null) {
-                    list.add((VSubjectRequisite) o);
-                }
-            } else {
-                Object o = postrequisiteGrid.getSelectedRow();
-                if (o != null) {
-                    list.add((VSubjectRequisite) o);
-                }
-            }
-
-            if (!list.isEmpty()) {
-                Message.showConfirm(getUILocaleUtil().getMessage("confirm.deleterecords"), new RequisiteDelYesListener(list, prerequisite));
-            }
-        }
-    }
-
-    private class RequisiteAddYesListener extends AbstractYesButtonListener {
-
-        private final boolean prerequisite;
-
-        public RequisiteAddYesListener(boolean prerequisite) {
-            this.prerequisite = prerequisite;
-        }
-
-        @Override
-        public void buttonClick(ClickEvent ev) {
-            List<Entity> list = subjectSelectDlg.getSelectedEntities();
-            try {
-                SUBJECT subject = (SUBJECT) baseDataFW.getWidgetModel().getEntity();
-                for (Entity e : list) {
-                    SUBJECT_REQUISITE sr = new SUBJECT_REQUISITE();
-                    sr.setSubject(subject);
-                    sr.setRequisite(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(SUBJECT.class, e.getId()));
-                    sr.setPreRequisite(prerequisite);
-                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(sr);
-                }
-
-                refreshRequisite(prerequisite);
-            } catch (Exception ex) {
-                CommonUtils.showMessageAndWriteLog("Unable to add pre/postrequisite", ex);
-            }
-        }
-
-        @Override
-        protected boolean canClose() {
-            return !subjectSelectDlg.getSelectedEntities().isEmpty();
-        }
-
-        @Override
-        protected boolean canProcess() {
-            return !subjectSelectDlg.getSelectedEntities().isEmpty();
-        }
-    }
-
-    private class RequisiteDelYesListener extends AbstractYesButtonListener {
-
-        private final List<VSubjectRequisite> list;
-        private final boolean prerequisite;
-
-        public RequisiteDelYesListener(List<VSubjectRequisite> list, boolean prerequisite) {
-            this.list = list;
-            this.prerequisite = prerequisite;
-        }
-
-        @Override
-        public void buttonClick(ClickEvent ev) {
-            List<ID> idList = new ArrayList<>(list.size());
-            for (VSubjectRequisite vsr : list) {
-                idList.add(vsr.getId());
-            }
-
-            QueryModel<SUBJECT_REQUISITE> srQM = new QueryModel<>(SUBJECT_REQUISITE.class);
-            srQM.addWhereIn("id", idList);
-            try {
-                List<SUBJECT_REQUISITE> delList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(srQM);
-                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(delList);
-                refreshRequisite(prerequisite);
-            } catch (Exception ex) {
-                CommonUtils.showMessageAndWriteLog("Unable to delete pre/posrequisites", ex);
             }
         }
     }
