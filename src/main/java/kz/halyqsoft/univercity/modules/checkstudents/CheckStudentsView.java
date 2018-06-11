@@ -39,6 +39,7 @@ public class CheckStudentsView  extends AbstractTaskView implements EntityListen
         gridWidget.addEntityListener(this);
         gridWidget.setButtonVisible(IconToolbar.ADD_BUTTON , false);
         gridWidget.setButtonVisible(IconToolbar.EDIT_BUTTON, false);
+        gridWidget.setMultiSelect(true);
 
         dbGridModel = (DBGridModel) gridWidget.getWidgetModel();
         dbGridModel.setRefreshType(ERefreshType.MANUAL);
@@ -229,16 +230,18 @@ public class CheckStudentsView  extends AbstractTaskView implements EntityListen
     }
 
 
-    
+
 
     private List<USERS> getStudents(){
-        QueryModel<USERS> qm = new QueryModel<>(USERS.class);
-        qm.addJoin(EJoin.INNER_JOIN, "id", STUDENT.class, "id");
-        FromItem fi = qm.addJoin(EJoin.LEFT_JOIN, "id", STUDENT_EDUCATION.class, "student");
-        qm.addWhereNull(fi, "student" );
+
+        String sql="select usr.* from users usr " +
+                "INNER JOIN student stu on stu.id=usr.id " +
+                "where usr.id not in (select id from v_student) and usr.user_type_id=2 " +
+                "and stu.category_id=1 ";
         List<USERS> list = new ArrayList<>();
         try{
-            list = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(qm);
+            Map<Integer, Object> params = new HashMap<>();
+            list = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(sql,params,USERS.class);
         }catch (Exception e)
         {
             e.printStackTrace();
