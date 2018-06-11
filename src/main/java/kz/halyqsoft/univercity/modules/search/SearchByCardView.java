@@ -33,8 +33,6 @@
     import java.util.List;
     import java.util.Map;
 
-
-
     public  class SearchByCardView extends AbstractTaskView implements EntityListener, FilterPanelListener{
 
         private GridWidget userGW;
@@ -98,8 +96,6 @@
 
             }
 
-
-
             List<VSearchByCard> list = new ArrayList<>();
 
             sb.insert(0, " where usr.deleted = FALSE ");
@@ -134,7 +130,6 @@
                 CommonUtils.showMessageAndWriteLog("Unable to load users list", ex);
             }
 
-
           refresh(list);
 
         }
@@ -150,12 +145,6 @@
 
         @Override
         public void clearFilter() {
-
             refresh(new ArrayList<>());
         }
-
-
-
-
-
     }
