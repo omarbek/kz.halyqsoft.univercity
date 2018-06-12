@@ -56,10 +56,6 @@ public class ACADEMIC_CALENDAR_DETAIL extends AbstractEntity {
     @Temporal(TemporalType.DATE)
     private Date date4;
 	
-	@FieldInfo(type = EFieldType.TEXT, max = 64, order = 7)
-	@Column(name = "DESCR")
-	private String descr;
-	
 	public ACADEMIC_CALENDAR_DETAIL() {
 	}
 
@@ -111,11 +107,4 @@ public class ACADEMIC_CALENDAR_DETAIL extends AbstractEntity {
 		this.date4 = date4;
 	}
 
-	public String getDescr() {
-		return descr;
-	}
-
-	public void setDescr(String descr) {
-		this.descr = descr;
-	}
 }
