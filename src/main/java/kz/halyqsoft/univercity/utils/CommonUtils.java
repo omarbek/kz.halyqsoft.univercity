@@ -12,6 +12,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_DOCUMENT_FILE;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.POST;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_DATA;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.facade.CommonIDFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -35,10 +36,7 @@ import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Omarbek
@@ -248,5 +246,14 @@ public class CommonUtils {
             e.printStackTrace();//TODO catch
         }
         return code;
+    }
+
+    public static SEMESTER_DATA getCurrentSemesterData() throws NoResultException {
+        try {
+            return (SEMESTER_DATA) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class)
+                    .getEntityByNamedQuery("SEMESTER_DATA.findCurrentSemesterData", Collections.EMPTY_MAP);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

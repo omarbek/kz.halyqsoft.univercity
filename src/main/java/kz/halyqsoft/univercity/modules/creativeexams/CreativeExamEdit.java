@@ -9,6 +9,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_CREATIVE_EXAM;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_CREATIVE_EXAM_SUBJECT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.CREATIVE_EXAM_SUBJECT;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VCreativeExam;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_STUDENT;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -123,19 +124,17 @@ public class CreativeExamEdit extends AbstractDialog {
         if (!isNew) {
             studentCreativeExamFM.getFieldModel("student").setReadOnly(true);
         }
-        QueryModel<STUDENT> studentExamQM = new QueryModel<>(STUDENT.class);
+        QueryModel<V_STUDENT> studentExamQM = new QueryModel<>(V_STUDENT.class);
         studentExamQM.addJoin(EJoin.INNER_JOIN, "id", STUDENT_CREATIVE_EXAM.class,
                 "student");
-        List<STUDENT> students = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+        List<V_STUDENT> students = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
                 lookup(studentExamQM);
         List<ID> ids = new ArrayList<>();
-        for (STUDENT student : students) {
+        for (V_STUDENT student : students) {
             ids.add(student.getId());
         }
 
         QueryModel studentQM = ((FKFieldModel) studentCreativeExamFM.getFieldModel("student")).getQueryModel();
-        FromItem userFI = studentQM.addJoin(EJoin.INNER_JOIN, "id", USERS.class, "id");
-        studentQM.addWhereAnd(userFI, "deleted", Boolean.FALSE);
         studentQM.addWhereAnd("category", ECriteria.EQUAL, ID.valueOf(1));
         studentQM.addWhereNotInAnd("id", ids);
 

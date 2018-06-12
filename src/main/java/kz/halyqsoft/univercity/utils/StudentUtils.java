@@ -262,75 +262,47 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
         Map<Integer, Object> params = new HashMap<Integer, Object>();
         StringBuilder sb = new StringBuilder();
         if (sf.getCode() != null && sf.getCode().trim().length() >= 2) {
-            sb.append("lower(usr.CODE) like '");
+            sb.append(" and lower(stu.user_code) like '");
             sb.append(sf.getCode().trim().toLowerCase());
             sb.append("%'");
         }
         if (sf.getCard() != null) {
             params.put(i, sf.getCard().getId().getId());
-            if (sb.length() > 0) {
-                sb.append(" and ");
-            }
-            sb.append("usr.card_id = ?");
+            sb.append(" and stu.card_id = ?");
             sb.append(i++);
         }
         if (sf.getStudentStatus() != null) {
             params.put(i, sf.getStudentStatus().getId().getId());
-            if (sb.length() > 0) {
-                sb.append(" and ");
-            }
-            sb.append("stu_edu.STUDENT_STATUS_ID = ?" + i++);
+            sb.append(" and stu.student_status_id = ?" + i++);
         }
         if (sf.getFaculty() != null) {
             params.put(i, sf.getFaculty().getId().getId());
-            if (sb.length() > 0) {
-                sb.append(" and ");
-            }
-            sb.append("stu_edu.FACULTY_ID = ?" + i++);
+            sb.append(" and stu.faculty_id = ?" + i++);
         }
         if (sf.getSpeciality() != null) {
             params.put(i, sf.getSpeciality().getId().getId());
-            if (sb.length() > 0) {
-                sb.append(" and ");
-            }
-            sb.append("stu_edu.SPECIALITY_ID = ?" + i++);
+            sb.append(" and stu.speciality_id = ?" + i++);
         }
         if (sf.getStudyYear() != null) {
             params.put(i, sf.getStudyYear().getId().getId());
-            if (sb.length() > 0) {
-                sb.append(" and ");
-            }
-            sb.append("stu_edu.STUDY_YEAR_ID = ?" + i++);
+            sb.append(" and stu.study_year_id = ?" + i++);
         }
         if (sf.getEducationType() != null) {
             params.put(i, sf.getEducationType().getId().getId());
-            if (sb.length() > 0) {
-                sb.append(" and ");
-            }
-            sb.append("stu_edu.EDUCATION_TYPE_ID = ?" + i++);
+            sb.append(" and stu.education_type_id = ?" + i++);
         }
 
         List<VStudent> list = new ArrayList<>();
-        if (sb.length() > 0) {
-            sb.append(" and ");
-        }
-        sb.insert(0, " where ");
+        sb.insert(0, " where stu.category_id = " + categoryType);
         String sql = "SELECT " +
                 "  stu.ID, " +
-                "  usr.CODE, " +
-                "  trim(usr.LAST_NAME || ' ' || usr.FIRST_NAME || ' ' || coalesce(usr.MIDDLE_NAME, '')) FIO, " +
-                "  stu_status.STATUS_NAME, " +
-                "  dep.DEPT_SHORT_NAME                                                              FACULTY, " +
-                "  spec.SPEC_NAME " +
-                "FROM STUDENT stu INNER JOIN USERS usr ON stu.ID = usr.ID " +
-                "  INNER JOIN STUDENT_EDUCATION stu_edu ON stu.ID = stu_edu.STUDENT_ID AND stu_edu.CHILD_ID IS NULL " +
-                "  LEFT JOIN DORM_STUDENT dorm_stu ON dorm_stu.student_id = stu_edu.id" +
-                "  INNER JOIN STUDENT_STATUS stu_status ON stu_edu.STUDENT_STATUS_ID = stu_status.ID " +
-                "  INNER JOIN DEPARTMENT dep ON stu_edu.FACULTY_ID = dep.ID " +
-                "  INNER JOIN SPECIALITY spec ON stu_edu.SPECIALITY_ID = spec.ID " +
+                "  stu.user_code                                                                        CODE, " +
+                "  trim(stu.LAST_NAME || ' ' || stu.FIRST_NAME || ' ' || coalesce(stu.MIDDLE_NAME, '')) FIO, " +
+                "  stu.student_status_name                                                              STATUS_NAME, " +
+                "  stu.faculty_short_name                                                               FACULTY, " +
+                "  stu.speciality_name                                                                  SPEC_NAME " +
+                "FROM V_STUDENT stu " +
                 sb.toString() +
-                " usr.deleted = FALSE AND dep.deleted = FALSE AND spec.deleted = FALSE" +
-                " and stu.category_id = " + categoryType +
                 " ORDER BY FIO";
         try {
             List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(

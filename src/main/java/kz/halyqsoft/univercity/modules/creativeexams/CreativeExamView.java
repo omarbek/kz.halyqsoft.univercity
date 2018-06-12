@@ -86,7 +86,7 @@ public class CreativeExamView extends AbstractTaskView implements FilterPanelLis
         Map<Integer, Object> params = new HashMap<>();
         StringBuilder sb = new StringBuilder();
         if (sf.getCode() != null && sf.getCode().trim().length() >= 2) {
-            sb.append(" and lower(usr.CODE) like '");
+            sb.append(" and lower(stu.USER_CODE) like '");
             sb.append(sf.getCode().trim().toLowerCase());
             sb.append("%'");
         }
@@ -103,16 +103,16 @@ public class CreativeExamView extends AbstractTaskView implements FilterPanelLis
 
         List<VCreativeExam> list = new ArrayList<>();
         if (sb.length() > 0) {
-            sb.insert(0, " where usr.deleted = FALSE ");
+            sb.insert(0, " where stu.category_id=1 ");
             String sql = "SELECT " +
-                    " st_creat_exam.id," +
-                    " usr.code," +
-                    "  trim(usr.LAST_NAME || ' ' || usr.FIRST_NAME || ' ' || coalesce(usr.MIDDLE_NAME, '')) FIO, " +
+                    "  st_creat_exam.id, " +
+                    "  stu.USER_CODE                                                                        code, " +
+                    "  trim(stu.LAST_NAME || ' ' || stu.FIRST_NAME || ' ' || coalesce(stu.MIDDLE_NAME, '')) FIO, " +
                     "  trim(first_subj.subject_name || '-' || first_subj.rate)                              firstSubject, " +
                     "  trim(second_subj.subject_name || '-' || second_subj.rate)                            secondSubject, " +
                     "  st_creat_exam.rate                                                                   total, " +
                     "  st_creat_exam.place " +
-                    "FROM STUDENT stu INNER JOIN USERS usr ON stu.ID = usr.ID " +
+                    "FROM V_STUDENT stu " +
                     "  INNER JOIN student_creative_exam st_creat_exam ON stu.id = st_creat_exam.student_id " +
                     "  LEFT JOIN ( " +
                     "              SELECT " +
