@@ -124,7 +124,7 @@ public class SUBJECT extends AbstractEntity {
     private CONTROL_TYPE controlType;
 
 	@FieldInfo(type = EFieldType.BOOLEAN, order = 22, required = false, inEdit = false, inGrid = false, inView = false)
-	@Column(name = "DELETED", nullable = false)
+	@Column(name = "DELETED", nullable = false )
     private boolean deleted;
 
 	public SUBJECT() {

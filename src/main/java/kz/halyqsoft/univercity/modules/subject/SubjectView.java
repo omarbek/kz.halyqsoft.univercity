@@ -3,9 +3,11 @@ package kz.halyqsoft.univercity.modules.subject;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.TextField;
+import kz.halyqsoft.univercity.entity.beans.univercity.ELECTIVE_SUBJECT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VSubject;
 import kz.halyqsoft.univercity.filter.FSubjectFilter;
@@ -128,6 +130,8 @@ public class SubjectView extends AbstractTaskView implements FilterPanelListener
         subjectGW.setButtonVisible(AbstractToolbar.REFRESH_BUTTON, false);
         subjectGW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
 
+        ((DBGridModel)subjectGW.getWidgetModel()).setEntities(getEntities());
+
         DBGridModel subjectGM = (DBGridModel) subjectGW.getWidgetModel();
         subjectGM.setCrudEntityClass(SUBJECT.class);
         subjectGM.setTitleVisible(false);
@@ -241,6 +245,17 @@ public class SubjectView extends AbstractTaskView implements FilterPanelListener
         refresh(list);
     }
 
+    public List<SUBJECT> getEntities(){
+        QueryModel<SUBJECT> qm = new QueryModel<>(SUBJECT.class);
+        try{
+            List<SUBJECT> subjects = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(qm);
+            return subjects;
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
     @Override
     public void clearFilter() {
@@ -268,10 +283,13 @@ public class SubjectView extends AbstractTaskView implements FilterPanelListener
         @Override
         protected void init(Object source, Entity e, boolean isNew) throws Exception {
             FormModel fm = ((DBGridModel) subjectGW.getWidgetModel()).getFormModel();
+
             fm.setReadOnly(false);
             fm.setTitleVisible(false);
             FSubjectFilter sf = (FSubjectFilter) filterPanel.getFilterBean();
+
             SUBJECT newSubject = (SUBJECT) fm.createNew();
+
             if (sf != null) {
                 newSubject.setChair(sf.getChair());
             }

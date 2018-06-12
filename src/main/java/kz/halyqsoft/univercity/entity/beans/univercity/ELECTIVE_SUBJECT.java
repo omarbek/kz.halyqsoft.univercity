@@ -17,54 +17,47 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 @Entity
-public class ELECTIVE_SUBJECT extends AbstractEntity {
+public class ELECTIVE_SUBJECT extends SUBJECT {
 
 	private static final long serialVersionUID = 4490375778025449496L;
 
-    @ManyToOne
-    @JoinColumns({
-        @JoinColumn(name = "CURRICULUM_ID", referencedColumnName = "ID")})
-    private CURRICULUM curriculum;
-	
-    @ManyToOne
-    @JoinColumns({
-        @JoinColumn(name = "SEMESTER_ID", referencedColumnName = "ID")})
-    private SEMESTER semester;
-	
 	@ManyToOne
-    @JoinColumns({
-        @JoinColumn(name = "SEMESTER_DATA_ID", referencedColumnName = "ID", nullable = false)})
-    private SEMESTER_DATA semesterData;
+	@JoinColumns({
+			@JoinColumn(name = "CURRICULUM_ID", referencedColumnName = "ID")})
+	private CURRICULUM curriculum;
 
-    @ManyToOne
-    @JoinColumns({
-        @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
-    private SUBJECT subject;
-	
-    @ManyToOne
-    @JoinColumns({
-        @JoinColumn(name = "SUBJECT_CYCLE_ID", referencedColumnName = "ID")})
-    private SUBJECT_CYCLE subjectCycle;
-	
+	@ManyToOne
+	@JoinColumns({
+			@JoinColumn(name = "SEMESTER_ID", referencedColumnName = "ID")})
+	private SEMESTER semester;
+
+	@ManyToOne
+	@JoinColumns({
+			@JoinColumn(name = "SEMESTER_DATA_ID", referencedColumnName = "ID", nullable = false)})
+	private SEMESTER_DATA semesterData;
+
+	@ManyToOne
+	@JoinColumns({
+			@JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
+	private SUBJECT subject;
+
 	@Column(name = "CREATED")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date created;
-	
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date created;
+
 	@Column(name = "UPDATED")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updated;
-	
-	@Column(name = "DELETED", nullable = false)
-    private boolean deleted;
-	
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date updated;
+
+
 	public CURRICULUM getCurriculum() {
 		return curriculum;
 	}
-	
+
 	public void setCurriculum(CURRICULUM curriculum) {
 		this.curriculum = curriculum;
 	}
-	
+
 	public SEMESTER_DATA getSemesterData() {
 		return semesterData;
 	}
@@ -80,14 +73,7 @@ public class ELECTIVE_SUBJECT extends AbstractEntity {
 	public void setSubject(SUBJECT subject) {
 		this.subject = subject;
 	}
-	
-	public SUBJECT_CYCLE getSubjectCycle() {
-		return subjectCycle;
-	}
 
-	public void setSubjectCycle(SUBJECT_CYCLE subjectCycle) {
-		this.subjectCycle = subjectCycle;
-	}
 
 	public SEMESTER getSemester() {
 		return semester;
@@ -113,11 +99,5 @@ public class ELECTIVE_SUBJECT extends AbstractEntity {
 		this.updated = updated;
 	}
 
-	public boolean isDeleted() {
-		return deleted;
-	}
-
-	public void setDeleted(boolean deleted) {
-		this.deleted = deleted;
-	}
 }
+

@@ -112,7 +112,17 @@ public final class SubjectEdit extends AbstractFormWidgetView {
                 @Override
                 public void buttonClick(Button.ClickEvent ev) {
                     baseDataFW.save();
+                    try{
+                        baseDataFW.refresh();
+                        teacherGW.refresh();
+                    }catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+
                 }
+
+
             });
 
             buttonPanel.addComponent(save);
@@ -224,6 +234,7 @@ public final class SubjectEdit extends AbstractFormWidgetView {
     public String getViewName() {
         return "subjectEdit";
     }
+
 
     @Override
     protected String getViewTitle(Locale locale) {
