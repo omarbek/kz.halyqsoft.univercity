@@ -33,8 +33,8 @@ public class SUBJECT extends AbstractEntity {
 	@Column(name = "NAME_RU", nullable = false)
 	private String nameRU;
 
-	@FieldInfo(type = EFieldType.TEXT, max = 13, order = 4, required = false, readOnlyFixed = true, columnWidth = 100)
-	@Column(name = "CODE", nullable = false)
+	@FieldInfo(type = EFieldType.TEXT, max = 13, order = 4, required = false, inGrid = false, readOnlyFixed = true, columnWidth = 100)
+	@Column(name = "CODE")
 	private String code;
 
 	@FieldInfo(type = EFieldType.FK_DIALOG, order = 5, inGrid = false)
@@ -65,10 +65,10 @@ public class SUBJECT extends AbstractEntity {
             @JoinColumn(name = "MODULE_ID", referencedColumnName = "ID")})
     private SUBJECT_MODULE subjectModule;
 
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 10, inGrid = false)
+	@FieldInfo(type = EFieldType.FK_COMBO, order = 10, inGrid = false,required = false)
     @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "SUBJECT_CYCLE_ID", referencedColumnName = "ID")})
+        @JoinColumn(name = "SUBJECT_CYCLE_ID", referencedColumnName = "ID",nullable = true)})
     private SUBJECT_CYCLE subjectCycle;
 
 	@FieldInfo(type = EFieldType.BOOLEAN, order = 11, required = false, columnWidth = 100)

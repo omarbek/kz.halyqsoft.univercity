@@ -34,7 +34,7 @@ public final class SubjectFilterPanel extends AbstractFilterPanel {
 		}
 		
 		af = getFilterComponent("chair");
-		if (af != null) {
+		if (af != null ) {
 			hl.addComponent(af);
 		}
 		

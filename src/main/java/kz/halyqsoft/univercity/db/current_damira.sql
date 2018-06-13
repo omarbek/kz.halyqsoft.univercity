@@ -22,3 +22,6 @@ ALTER TABLE ONLY subject
   ADD CONSTRAINT fk_subject_subject_module FOREIGN KEY (module_id)
 REFERENCES subject_module (id)
 ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+ALTER TABLE subject ALTER COLUMN code DROP NOT NULL;
+ALTER TABLE subject ALTER COLUMN subject_cycle_id DROP NOT NULL;
