@@ -87,6 +87,7 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.MEDICAL_CHECKUP_TYPE</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.MILITARY_DOC_TYPE</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.MILITARY_STATUS</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT_MODULE</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.MONTH</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.NATIONALITY</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.ORDER_TYPE</class>

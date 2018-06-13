@@ -1,9 +1,6 @@
 package kz.halyqsoft.univercity.filter;
 
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.CREDITABILITY;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEPARTMENT;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.LEVEL;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT_CYCLE;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 
 /**
@@ -20,6 +17,7 @@ public final class FSubjectFilter extends AbstractFilterBean {
 	private CREDITABILITY creditability;
 	private SUBJECT_CYCLE subjectCycle;
 	private LEVEL level;
+	private SUBJECT_MODULE subjectModule;
 	
 	public FSubjectFilter() {
 	}
@@ -72,8 +70,16 @@ public final class FSubjectFilter extends AbstractFilterBean {
 		this.level = level;
 	}
 
+	public SUBJECT_MODULE getSubjectModule() {
+		return subjectModule;
+	}
+
+	public void setSubjectModule(SUBJECT_MODULE subjectModule) {
+		this.subjectModule = subjectModule;
+	}
+
 	@Override
 	public boolean hasFilter() {
-		return (!(code == null && subjectName == null && chair == null && creditability == null && subjectCycle == null && level == null));
+		return (!(code == null && subjectName == null && chair == null && creditability == null && subjectCycle == null && level == null && subjectModule == null));
 	}
 }
