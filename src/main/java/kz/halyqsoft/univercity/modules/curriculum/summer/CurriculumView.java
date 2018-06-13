@@ -1,6 +1,5 @@
 package kz.halyqsoft.univercity.modules.curriculum.summer;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanItemContainer;
@@ -761,12 +760,7 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
                 QueryModel qm = ((DBGridModel) subjectSelectDlg.getSelectModel()).getQueryModel();
                 qm.addWhere("chair", ECriteria.EQUAL, ID.valueOf(-1));
                 //				qm.addWhereAnd("mandatory", Boolean.TRUE);
-                List<ID> studyDirectIDs = new ArrayList<ID>();
-                studyDirectIDs.add(ID.valueOf(16));
-                studyDirectIDs.add(ID.valueOf(17));
-                studyDirectIDs.add(ID.valueOf(18));
-                studyDirectIDs.add(ID.valueOf(19));
-                qm.addWhereNotInAnd("studyDirect", studyDirectIDs);
+                qm.addWhere("subjectCycle", ECriteria.NOT_EQUAL, ID.valueOf(4));
                 subjectSelectDlg.setDialogWidth(600);
                 subjectSelectDlg.setDialogHeight(300);
                 subjectSelectDlg.getFilterModel().addFilter("chair", chairCB);

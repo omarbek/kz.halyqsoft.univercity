@@ -28,33 +28,33 @@ public class CURRICULUM_ADD_PROGRAM extends AbstractEntity {
     @JoinColumns({
         @JoinColumn(name = "CURRICULUM_ID", referencedColumnName = "ID")})
     private CURRICULUM curriculum;
-	
+
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "SEMESTER_ID", referencedColumnName = "ID")})
     private SEMESTER semester;
-	
+
 	@ManyToOne
     @JoinColumns({
         @JoinColumn(name = "SEMESTER_DATA_ID", referencedColumnName = "ID", nullable = false)})
     private SEMESTER_DATA semesterData;
-	
+
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
     private SUBJECT subject;
-	
+
 	@Column(name = "CREATED")
     @Temporal(TemporalType.TIMESTAMP)
     private Date created;
-	
+
 	@Column(name = "UPDATED")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updated;
-	
+
 	@Column(name = "DELETED", nullable = false)
     private boolean deleted;
-	
+
 	public CURRICULUM_ADD_PROGRAM() {
 	}
 
@@ -65,7 +65,7 @@ public class CURRICULUM_ADD_PROGRAM extends AbstractEntity {
 	public void setCurriculum(CURRICULUM curriculum) {
 		this.curriculum = curriculum;
 	}
-	
+
 	public SEMESTER_DATA getSemesterData() {
 		return semesterData;
 	}

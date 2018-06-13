@@ -498,18 +498,32 @@ CREATE UNIQUE INDEX idx_t_academic_calendar_detail
 INSERT INTO employee VALUES (1, 1, FALSE, FALSE);
 INSERT INTO employee VALUES (2, 1, FALSE, FALSE);
 
-update tasks set parent_id=26 where id in (13,15,22);
-update tasks set task_order=401 where id=13;
-update tasks set task_order=402 where id=15;
-update tasks set task_order=403 where id=22;
+UPDATE tasks
+SET parent_id = 26
+WHERE id IN (13, 15, 22);
+UPDATE tasks
+SET task_order = 401
+WHERE id = 13;
+UPDATE tasks
+SET task_order = 402
+WHERE id = 15;
+UPDATE tasks
+SET task_order = 403
+WHERE id = 22;
 
-update tasks set parent_id=29 where id in (25,28);
-update tasks set task_order=501 where id=25;
-update tasks set task_order=502 where id=28;
+UPDATE tasks
+SET parent_id = 29
+WHERE id IN (25, 28);
+UPDATE tasks
+SET task_order = 501
+WHERE id = 25;
+UPDATE tasks
+SET task_order = 502
+WHERE id = 28;
 
-insert into CURRICULUM_STATUS values (1, 'На создании');
-insert into CURRICULUM_STATUS values (2, 'На согласовании');
-insert into CURRICULUM_STATUS values (3, 'Утвержден');
+INSERT INTO CURRICULUM_STATUS VALUES (1, 'На создании');
+INSERT INTO CURRICULUM_STATUS VALUES (2, 'На согласовании');
+INSERT INTO CURRICULUM_STATUS VALUES (3, 'Утвержден');
 
 ALTER TABLE curriculum_detail
   ALTER COLUMN consider_credit TYPE BOOLEAN
@@ -606,33 +620,35 @@ INSERT INTO MONTH VALUES (10, 'Октябрь', 'October', 'Қазан');
 INSERT INTO MONTH VALUES (11, 'Ноябрь', 'November', 'Қараша');
 INSERT INTO MONTH VALUES (12, 'Декабрь', 'December', 'Желтоксан');
 
-insert into CURRICULUM_SCHEDULE_SYMBOL values (1, '+' ,'Теоретическое обучение с отрывом от производства');
-insert into CURRICULUM_SCHEDULE_SYMBOL values (2, '::' ,'Экзаменационная сессия');
-insert into CURRICULUM_SCHEDULE_SYMBOL values (3, 'о' ,'Вычислительная практика');
-insert into CURRICULUM_SCHEDULE_SYMBOL values (4, 'х' ,'Производственная, преддипломная практики');
-insert into CURRICULUM_SCHEDULE_SYMBOL values (5, 'П' ,'ПГК');
-insert into CURRICULUM_SCHEDULE_SYMBOL values (6, 'Д' ,'Подготовка дипломного проекта');
-insert into CURRICULUM_SCHEDULE_SYMBOL values (7, 'Г' ,'Государственные экзамены');
-insert into CURRICULUM_SCHEDULE_SYMBOL values (8, '=' ,'Каникулы');
-insert into CURRICULUM_SCHEDULE_SYMBOL values (9, 'З' ,'Защита дипломного проекта');
+INSERT INTO CURRICULUM_SCHEDULE_SYMBOL VALUES (1, '+', 'Теоретическое обучение с отрывом от производства');
+INSERT INTO CURRICULUM_SCHEDULE_SYMBOL VALUES (2, '::', 'Экзаменационная сессия');
+INSERT INTO CURRICULUM_SCHEDULE_SYMBOL VALUES (3, 'о', 'Вычислительная практика');
+INSERT INTO CURRICULUM_SCHEDULE_SYMBOL VALUES (4, 'х', 'Производственная, преддипломная практики');
+INSERT INTO CURRICULUM_SCHEDULE_SYMBOL VALUES (5, 'П', 'ПГК');
+INSERT INTO CURRICULUM_SCHEDULE_SYMBOL VALUES (6, 'Д', 'Подготовка дипломного проекта');
+INSERT INTO CURRICULUM_SCHEDULE_SYMBOL VALUES (7, 'Г', 'Государственные экзамены');
+INSERT INTO CURRICULUM_SCHEDULE_SYMBOL VALUES (8, '=', 'Каникулы');
+INSERT INTO CURRICULUM_SCHEDULE_SYMBOL VALUES (9, 'З', 'Защита дипломного проекта');
 
 CREATE SEQUENCE S_CURRICULUM
 MINVALUE 0
 START WITH 1
 NO CYCLE;
 
-insert into SEMESTER_PERIOD values (4, 'Летний 2');
-insert into SEMESTER_PERIOD values (5, 'Летний 3');
-update SEMESTER_PERIOD set PERIOD_NAME = 'Летний 1' where ID = 3;
+INSERT INTO SEMESTER_PERIOD VALUES (4, 'Летний 2');
+INSERT INTO SEMESTER_PERIOD VALUES (5, 'Летний 3');
+UPDATE SEMESTER_PERIOD
+SET PERIOD_NAME = 'Летний 1'
+WHERE ID = 3;
 
-insert into SEMESTER values (1, 1, 1, '1 семестр');
-insert into SEMESTER values (2, 1, 2, '2 семестр');
-insert into SEMESTER values (3, 2, 1, '3 семестр');
-insert into SEMESTER values (4, 2, 2, '4 семестр');
-insert into SEMESTER values (5, 3, 1, '5 семестр');
-insert into SEMESTER values (6, 3, 2, '6 семестр');
-insert into SEMESTER values (7, 4, 1, '7 семестр');
-insert into SEMESTER values (8, 4, 2, '8 семестр');
+INSERT INTO SEMESTER VALUES (1, 1, 1, '1 семестр');
+INSERT INTO SEMESTER VALUES (2, 1, 2, '2 семестр');
+INSERT INTO SEMESTER VALUES (3, 2, 1, '3 семестр');
+INSERT INTO SEMESTER VALUES (4, 2, 2, '4 семестр');
+INSERT INTO SEMESTER VALUES (5, 3, 1, '5 семестр');
+INSERT INTO SEMESTER VALUES (6, 3, 2, '6 семестр');
+INSERT INTO SEMESTER VALUES (7, 4, 1, '7 семестр');
+INSERT INTO SEMESTER VALUES (8, 4, 2, '8 семестр');
 
 CREATE OR REPLACE VIEW V_ELECTIVE_SUBJECT AS
   SELECT
@@ -804,8 +820,128 @@ SET ects_id = 5;
 ALTER TABLE subject
   ALTER COLUMN ects_id SET NOT NULL;
 
-alter table academic_calendar_detail drop COLUMN descr;
+ALTER TABLE academic_calendar_detail
+  DROP COLUMN descr;
 
 INSERT INTO control_type VALUES (2, 'Государственный экзамен');
 INSERT INTO control_type VALUES (3, 'Курсовая работа');
 INSERT INTO control_type VALUES (4, 'Дифференцированный зачет');
+
+CREATE SEQUENCE S_CURRICULUM_ADD_PROGRAM
+MINVALUE 0
+START WITH 1
+NO CYCLE;
+
+CREATE SEQUENCE S_ELECTIVE_SUBJECT
+MINVALUE 0
+START WITH 1
+NO CYCLE;
+
+CREATE SEQUENCE S_SEMESTER_SUBJECT
+MINVALUE 0
+START WITH 1
+NO CYCLE;
+
+ALTER TABLE exam_schedule
+  ALTER COLUMN deleted TYPE BOOLEAN
+  USING CASE WHEN deleted = 0
+  THEN FALSE
+        WHEN deleted = 1
+          THEN TRUE
+        ELSE NULL
+        END;
+
+ALTER TABLE elective_subject
+  ADD COLUMN consider_credit BOOLEAN NOT NULL DEFAULT FALSE;
+
+DROP VIEW V_ELECTIVE_SUBJECT;
+
+CREATE OR REPLACE VIEW V_ELECTIVE_SUBJECT AS
+  SELECT
+    a.ID,
+    a.CURRICULUM_ID,
+    a.SEMESTER_ID,
+    d.SEMESTER_NAME,
+    a.SUBJECT_ID,
+    c.CODE                      SUBJECT_CODE,
+    c.NAME_RU                   SUBJECT_NAME,
+    CASE WHEN c.subject_cycle_id = 4
+      THEN a.subject_cycle_id
+    ELSE c.subject_cycle_id END SUBJECT_CYCLE_ID,
+    CASE WHEN c.subject_cycle_id = 4
+      THEN i.CYCLE_SHORT_NAME
+    ELSE g.CYCLE_SHORT_NAME END CYCLE_SHORT_NAME,
+    c.CREDITABILITY_ID,
+    f.CREDIT,
+    c.ACADEMIC_FORMULA_ID,
+    e.FORMULA,
+    c.CONTROL_TYPE_ID,
+    h.TYPE_NAME                 CONTROL_TYPE_NAME,
+    a.consider_credit,
+    a.DELETED
+  FROM ELECTIVE_SUBJECT a INNER JOIN CURRICULUM b ON b.ID = a.CURRICULUM_ID
+    INNER JOIN SUBJECT c ON c.ID = a.SUBJECT_ID
+    INNER JOIN SEMESTER d ON d.ID = a.SEMESTER_ID
+    INNER JOIN ACADEMIC_FORMULA e ON c.ACADEMIC_FORMULA_ID = e.ID
+    INNER JOIN CREDITABILITY f ON c.CREDITABILITY_ID = f.ID
+    INNER JOIN SUBJECT_CYCLE g ON c.SUBJECT_CYCLE_ID = g.ID
+    INNER JOIN CONTROL_TYPE h ON c.CONTROL_TYPE_ID = h.ID
+    LEFT JOIN SUBJECT_CYCLE i ON a.SUBJECT_CYCLE_ID = i.ID;
+
+INSERT INTO WEEK VALUES (1, '1 неделя', 1);
+INSERT INTO WEEK VALUES (2, '2 неделя', 2);
+INSERT INTO WEEK VALUES (3, '3 неделя', 3);
+INSERT INTO WEEK VALUES (4, '4 неделя', 4);
+INSERT INTO WEEK VALUES (5, '5 неделя', 5);
+INSERT INTO WEEK VALUES (6, '6 неделя', 6);
+INSERT INTO WEEK VALUES (7, '7 неделя', 7);
+INSERT INTO WEEK VALUES (8, '8 неделя', 8);
+INSERT INTO WEEK VALUES (9, '9 неделя', 9);
+INSERT INTO WEEK VALUES (10, '10 неделя', 10);
+INSERT INTO WEEK VALUES (11, '11 неделя', 11);
+INSERT INTO WEEK VALUES (12, '12 неделя', 12);
+INSERT INTO WEEK VALUES (13, '13 неделя', 13);
+INSERT INTO WEEK VALUES (14, '14 неделя', 14);
+INSERT INTO WEEK VALUES (15, '15 неделя', 15);
+INSERT INTO WEEK VALUES (16, '16 неделя', 16);
+INSERT INTO WEEK VALUES (17, '17 неделя', 17);
+INSERT INTO WEEK VALUES (18, '18 неделя', 18);
+INSERT INTO WEEK VALUES (19, '19 неделя', 19);
+INSERT INTO WEEK VALUES (20, '20 неделя', 20);
+INSERT INTO WEEK VALUES (21, '21 неделя', 21);
+INSERT INTO WEEK VALUES (22, '22 неделя', 22);
+INSERT INTO WEEK VALUES (23, '23 неделя', 23);
+INSERT INTO WEEK VALUES (24, '24 неделя', 24);
+INSERT INTO WEEK VALUES (25, '25 неделя', 25);
+INSERT INTO WEEK VALUES (26, '26 неделя', 26);
+INSERT INTO WEEK VALUES (27, '27 неделя', 27);
+INSERT INTO WEEK VALUES (28, '28 неделя', 28);
+INSERT INTO WEEK VALUES (29, '29 неделя', 29);
+INSERT INTO WEEK VALUES (30, '30 неделя', 30);
+INSERT INTO WEEK VALUES (31, '31 неделя', 31);
+INSERT INTO WEEK VALUES (32, '32 неделя', 32);
+INSERT INTO WEEK VALUES (33, '33 неделя', 33);
+INSERT INTO WEEK VALUES (34, '34 неделя', 34);
+INSERT INTO WEEK VALUES (35, '35 неделя', 35);
+INSERT INTO WEEK VALUES (36, '36 неделя', 36);
+INSERT INTO WEEK VALUES (37, '37 неделя', 37);
+INSERT INTO WEEK VALUES (38, '38 неделя', 38);
+INSERT INTO WEEK VALUES (39, '39 неделя', 39);
+INSERT INTO WEEK VALUES (40, '40 неделя', 40);
+INSERT INTO WEEK VALUES (41, '41 неделя', 41);
+INSERT INTO WEEK VALUES (42, '42 неделя', 42);
+INSERT INTO WEEK VALUES (43, '43 неделя', 43);
+INSERT INTO WEEK VALUES (44, '44 неделя', 44);
+INSERT INTO WEEK VALUES (45, '45 неделя', 45);
+INSERT INTO WEEK VALUES (46, '46 неделя', 46);
+INSERT INTO WEEK VALUES (47, '47 неделя', 47);
+INSERT INTO WEEK VALUES (48, '48 неделя', 48);
+INSERT INTO WEEK VALUES (49, '49 неделя', 49);
+INSERT INTO WEEK VALUES (50, '50 неделя', 50);
+INSERT INTO WEEK VALUES (51, '51 неделя', 51);
+INSERT INTO WEEK VALUES (52, '52 неделя', 52);
+
+CREATE SEQUENCE S_CURRICULUM_SCHEDULE
+MINVALUE 0
+START WITH 1
+NO CYCLE;

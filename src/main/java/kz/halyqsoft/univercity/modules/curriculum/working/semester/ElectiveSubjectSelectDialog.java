@@ -3,6 +3,7 @@ package kz.halyqsoft.univercity.modules.curriculum.working.semester;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.Alignment;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT_CYCLE;
@@ -22,6 +23,7 @@ import org.r3a.common.vaadin.widget.dialog.select.custom.grid.CustomGridSelectDi
 @SuppressWarnings("serial")
 final class ElectiveSubjectSelectDialog extends CustomGridSelectDialog {
 
+    private CheckBox considerCreditCB;
     private ComboBox subjectCycleCB;
 
     public ElectiveSubjectSelectDialog(AbstractYesButtonListener yesListener, Class<? extends Entity> entityClass) {
@@ -31,9 +33,11 @@ final class ElectiveSubjectSelectDialog extends CustomGridSelectDialog {
     @Override
     protected void initAddContent() {
         FormLayout fl = new FormLayout();
+        considerCreditCB = new CheckBox();
+        considerCreditCB.setCaption(getUILocaleUtil().getCaption("consider.credit"));
+        fl.addComponent(considerCreditCB);
 
         QueryModel<SUBJECT_CYCLE> subjectCycleQM = new QueryModel<SUBJECT_CYCLE>(SUBJECT_CYCLE.class);
-        subjectCycleQM.addWhere("id", ECriteria.LESS, ID.valueOf(4));
         subjectCycleQM.addOrder("cycleShortName");
         try {
             BeanItemContainer<SUBJECT_CYCLE> subjectCycleBIC = new BeanItemContainer<SUBJECT_CYCLE>(SUBJECT_CYCLE.class, SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(subjectCycleQM));
@@ -52,6 +56,10 @@ final class ElectiveSubjectSelectDialog extends CustomGridSelectDialog {
 
         getContent().addComponent(fl);
         getContent().setComponentAlignment(fl, Alignment.MIDDLE_CENTER);
+    }
+
+    public boolean isConsiderCredit() {
+        return considerCreditCB.getValue();
     }
 
     public SUBJECT_CYCLE getSubjectCycle() {

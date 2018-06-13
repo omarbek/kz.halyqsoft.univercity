@@ -299,12 +299,7 @@ public class AddProgramPanel extends AbstractCurriculumPanel implements EntityLi
             subjectFM.setDialogWidth(600);
             QueryModel subjectQM = subjectFM.getQueryModel();
             subjectQM.addWhere("chair", ECriteria.EQUAL, ID.valueOf(-1));
-            List<ID> studyDirectIDs = new ArrayList<ID>();
-            studyDirectIDs.add(ID.valueOf(16));
-            studyDirectIDs.add(ID.valueOf(17));
-            studyDirectIDs.add(ID.valueOf(18));
-            studyDirectIDs.add(ID.valueOf(19));
-            subjectQM.addWhereInAnd("studyDirect", studyDirectIDs);
+            subjectQM.addWhere("subjectCycle", ECriteria.EQUAL,ID.valueOf(4));
             try {
                 QueryModel<DEPARTMENT> chairQM1 = new QueryModel<DEPARTMENT>(DEPARTMENT.class);
 //                chairQM1.addWhere("type", ECriteria.EQUAL, T_DEPARTMENT_TYPE.CHAIR_ID);//TODO
@@ -406,7 +401,7 @@ public class AddProgramPanel extends AbstractCurriculumPanel implements EntityLi
                         "      AND curr_add_pr.SUBJECT_ID = ?4";
 
                 try {
-                    Integer count = (Integer) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(sql, params);
+                    long count = (long) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(sql, params);
                     boolean can = (count == 0);
                     if (!can) {
                         Message.showError(getUILocaleUtil().getMessage("selected.subjects.already.exists"));

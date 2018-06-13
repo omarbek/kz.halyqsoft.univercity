@@ -8,6 +8,9 @@ import com.vaadin.ui.Grid.HeaderCell;
 import com.vaadin.ui.Grid.HeaderRow;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.renderers.HtmlRenderer;
+import com.vaadin.ui.renderers.NumberRenderer;
+import com.vaadin.ui.renderers.TextRenderer;
 import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM;
 import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM_SCHEDULE;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.CURRICULUM_SCHEDULE_SYMBOL;
@@ -15,8 +18,8 @@ import kz.halyqsoft.univercity.entity.beans.univercity.catalog.MONTH;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDY_YEAR;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.WEEK;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VCurriculumSchedule;
-import kz.halyqsoft.univercity.modules.curriculum.working.CurriculumView;
 import kz.halyqsoft.univercity.modules.curriculum.working.AbstractCurriculumPanel;
+import kz.halyqsoft.univercity.modules.curriculum.working.CurriculumView;
 import kz.halyqsoft.univercity.utils.excel.ExcelStyles;
 import kz.halyqsoft.univercity.utils.excel.ExcelUtil;
 import org.apache.poi.ss.usermodel.*;
@@ -27,6 +30,7 @@ import org.r3a.common.entity.ID;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.widget.dialog.Message;
+import org.r3a.common.vaadinaddon.TextAreaCellRenderer;
 import org.r3a.common.vaadinaddon.TextCellRenderer;
 
 import java.math.BigDecimal;
@@ -65,60 +69,11 @@ public class SchedulePanel extends AbstractCurriculumPanel {
         grid = new Grid();
         grid.setSizeFull();
         grid.addStyleName("curriculum-schedule");
-        grid.setColumns("studyYear", "week01Symbol", "week02Symbol", "week03Symbol", "week04Symbol", "week05Symbol", "week06Symbol", "week07Symbol", "week08Symbol", "week09Symbol", "week10Symbol", "week11Symbol", "week12Symbol", "week13Symbol", "week14Symbol", "week15Symbol", "week16Symbol", "week17Symbol", "week18Symbol", "week19Symbol", "week20Symbol", "week21Symbol", "week22Symbol", "week23Symbol", "week24Symbol", "week25Symbol", "week26Symbol", "week27Symbol", "week28Symbol", "week29Symbol", "week30Symbol", "week31Symbol", "week32Symbol", "week33Symbol", "week34Symbol", "week35Symbol", "week36Symbol", "week37Symbol", "week38Symbol", "week39Symbol", "week40Symbol", "week41Symbol", "week42Symbol", "week43Symbol", "week44Symbol", "week45Symbol", "week46Symbol", "week47Symbol", "week48Symbol", "week49Symbol", "week50Symbol", "week51Symbol", "week52Symbol");
-        grid.getColumn("studyYear").setHeaderCaption(getUILocaleUtil().getEntityLabel(STUDY_YEAR.class));
-        grid.getColumn("week01Symbol").setHeaderCaption("1").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week02Symbol").setHeaderCaption("2").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week03Symbol").setHeaderCaption("3").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week04Symbol").setHeaderCaption("4").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week05Symbol").setHeaderCaption("5").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week06Symbol").setHeaderCaption("6").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week07Symbol").setHeaderCaption("7").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week08Symbol").setHeaderCaption("8").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week09Symbol").setHeaderCaption("9").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week10Symbol").setHeaderCaption("10").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week11Symbol").setHeaderCaption("11").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week12Symbol").setHeaderCaption("12").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week13Symbol").setHeaderCaption("13").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week14Symbol").setHeaderCaption("14").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week15Symbol").setHeaderCaption("15").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week16Symbol").setHeaderCaption("16").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week17Symbol").setHeaderCaption("17").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week18Symbol").setHeaderCaption("18").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week19Symbol").setHeaderCaption("19").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week20Symbol").setHeaderCaption("20").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week21Symbol").setHeaderCaption("21").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week22Symbol").setHeaderCaption("22").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week23Symbol").setHeaderCaption("23").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week24Symbol").setHeaderCaption("24").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week25Symbol").setHeaderCaption("25").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week26Symbol").setHeaderCaption("26").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week27Symbol").setHeaderCaption("27").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week28Symbol").setHeaderCaption("28").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week29Symbol").setHeaderCaption("29").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week30Symbol").setHeaderCaption("30").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week31Symbol").setHeaderCaption("31").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week32Symbol").setHeaderCaption("32").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week33Symbol").setHeaderCaption("33").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week34Symbol").setHeaderCaption("34").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week35Symbol").setHeaderCaption("35").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week36Symbol").setHeaderCaption("36").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week37Symbol").setHeaderCaption("37").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week38Symbol").setHeaderCaption("38").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week39Symbol").setHeaderCaption("39").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week40Symbol").setHeaderCaption("40").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week41Symbol").setHeaderCaption("41").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week42Symbol").setHeaderCaption("42").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week43Symbol").setHeaderCaption("43").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week44Symbol").setHeaderCaption("44").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week45Symbol").setHeaderCaption("45").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week46Symbol").setHeaderCaption("46").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week47Symbol").setHeaderCaption("47").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week48Symbol").setHeaderCaption("48").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week49Symbol").setHeaderCaption("49").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week50Symbol").setHeaderCaption("50").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week51Symbol").setHeaderCaption("51").setWidth(50).setRenderer(new TextCellRenderer());
-        grid.getColumn("week52Symbol").setHeaderCaption("52").setWidth(50).setRenderer(new TextCellRenderer());
+        grid.addColumn("studyYear").setHeaderCaption(getUILocaleUtil().getEntityLabel(STUDY_YEAR.class)).
+                setHidable(false);
+        for (int i = 0; i < 52; i++) {
+            addColumns(i + 1);
+        }
         grid.setHeightMode(HeightMode.ROW);
         grid.setHeightByRows(5);
         grid.setFrozenColumnCount(1);
@@ -193,6 +148,14 @@ public class SchedulePanel extends AbstractCurriculumPanel {
         refresh();
 
         super.initPanel();
+    }
+
+    private void addColumns(int i) {
+        if (i < 10) {
+            grid.addColumn("week0" + i + "Symbol").setHeaderCaption(i + "").setHidable(false).setWidth(50);
+        } else {
+            grid.addColumn("week" + i + "Symbol").setHeaderCaption(i + "").setHidable(false).setWidth(50);
+        }
     }
 
     @Override
