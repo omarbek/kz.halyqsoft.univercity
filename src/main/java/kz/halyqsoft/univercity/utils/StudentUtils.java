@@ -262,58 +262,37 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
         Map<Integer, Object> params = new HashMap<Integer, Object>();
         StringBuilder sb = new StringBuilder();
         if (sf.getCode() != null && sf.getCode().trim().length() >= 2) {
-            sb.append("lower(stu.user_code) like '");
+            sb.append(" and lower(stu.user_code) like '");
             sb.append(sf.getCode().trim().toLowerCase());
             sb.append("%'");
         }
         if (sf.getCard() != null) {
             params.put(i, sf.getCard().getId().getId());
-            if (sb.length() > 0) {
-                sb.append(" and ");
-            }
-            sb.append("stu.card_id = ?");
+            sb.append(" and stu.card_id = ?");
             sb.append(i++);
         }
         if (sf.getStudentStatus() != null) {
             params.put(i, sf.getStudentStatus().getId().getId());
-            if (sb.length() > 0) {
-                sb.append(" and ");
-            }
-            sb.append("stu.student_status_id = ?" + i++);
+            sb.append(" and stu.student_status_id = ?" + i++);
         }
         if (sf.getFaculty() != null) {
             params.put(i, sf.getFaculty().getId().getId());
-            if (sb.length() > 0) {
-                sb.append(" and ");
-            }
-            sb.append("stu.faculty_id = ?" + i++);
+            sb.append(" and stu.faculty_id = ?" + i++);
         }
         if (sf.getSpeciality() != null) {
             params.put(i, sf.getSpeciality().getId().getId());
-            if (sb.length() > 0) {
-                sb.append(" and ");
-            }
-            sb.append("stu.speciality_id = ?" + i++);
+            sb.append(" and stu.speciality_id = ?" + i++);
         }
         if (sf.getStudyYear() != null) {
             params.put(i, sf.getStudyYear().getId().getId());
-            if (sb.length() > 0) {
-                sb.append(" and ");
-            }
-            sb.append("stu.study_year_id = ?" + i++);
+            sb.append(" and stu.study_year_id = ?" + i++);
         }
         if (sf.getEducationType() != null) {
             params.put(i, sf.getEducationType().getId().getId());
-            if (sb.length() > 0) {
-                sb.append(" and ");
-            }
-            sb.append("stu.education_type_id = ?" + i++);
+            sb.append(" and stu.education_type_id = ?" + i++);
         }
 
         List<VStudent> list = new ArrayList<>();
-        if (sb.length() > 0) {
-            sb.append(" and ");
-        }
         sb.insert(0, " where stu.category_id = " + categoryType);
         String sql = "SELECT " +
                 "  stu.ID, " +
