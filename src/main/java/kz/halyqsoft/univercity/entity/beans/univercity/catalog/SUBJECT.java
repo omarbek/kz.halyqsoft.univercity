@@ -87,11 +87,11 @@ public class SUBJECT extends AbstractEntity {
         @JoinColumn(name = "ACADEMIC_FORMULA_ID", referencedColumnName = "ID")})
     private ACADEMIC_FORMULA academicFormula;
 
-//	@FieldInfo(type = EFieldType.FK_COMBO, order = 13, required = false)
-//    @ManyToOne
-//    @JoinColumns({
-//        @JoinColumn(name = "ECTS_ID", referencedColumnName = "ID")})
-//    private ECTS ects;
+	@FieldInfo(type = EFieldType.FK_COMBO, order = 13)
+    @ManyToOne
+    @JoinColumns({
+        @JoinColumn(name = "ECTS_ID", referencedColumnName = "ID")})
+    private ECTS ects;
 
 	@FieldInfo(type = EFieldType.BOOLEAN, order = 15, required = false, columnWidth = 100)
 	@Column(name = "LANG_KZ", nullable = false)
@@ -233,13 +233,13 @@ public class SUBJECT extends AbstractEntity {
 		this.academicFormula = academicFormula;
 	}
 
-//	public ECTS getEcts() {
-//		return ects;
-//	}
-//
-//	public void setEcts(ECTS ects) {
-//		this.ects = ects;
-//	}
+	public ECTS getEcts() {
+		return ects;
+	}
+
+	public void setEcts(ECTS ects) {
+		this.ects = ects;
+	}
 
 	public boolean isLangKZ() {
 		return langKZ;

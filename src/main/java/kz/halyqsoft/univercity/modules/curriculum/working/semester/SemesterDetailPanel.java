@@ -877,7 +877,7 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
             try {
                 getParentView().save();
                 QueryModel<DEPARTMENT> chairQM = new QueryModel<DEPARTMENT>(DEPARTMENT.class);
-//                chairQM.addWhere("type", ECriteria.EQUAL, T_DEPARTMENT_TYPE.CHAIR_ID);//TODO
+                chairQM.addWhereNotNull("parent");
                 chairQM.addWhereAnd("deleted", Boolean.FALSE);
                 chairQM.addOrder("deptName");
                 BeanItemContainer<DEPARTMENT> chairBIC = new BeanItemContainer<DEPARTMENT>(DEPARTMENT.class,

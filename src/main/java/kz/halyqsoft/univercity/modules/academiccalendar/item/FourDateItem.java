@@ -66,7 +66,7 @@ public final class FourDateItem extends AbstractACItem {
         hl.addComponent(l);
 
         df1 = new DateField();
-        df1.setWidth(80, Unit.PIXELS);
+        df1.setWidth(100, Unit.PIXELS);
         ACADEMIC_CALENDAR_DETAIL academicCalendarDetail = getAcademicCalendarDetail();
         if (academicCalendarDetail != null) {
             df1.setValue(academicCalendarDetail.getDate1());
@@ -80,15 +80,11 @@ public final class FourDateItem extends AbstractACItem {
         hl.addComponent(l);
 
         df2 = new DateField();
-        df2.setWidth(80, Unit.PIXELS);
+        df2.setWidth(100, Unit.PIXELS);
         if (academicCalendarDetail != null) {
             df2.setValue(academicCalendarDetail.getDate2());
         }
         hl.addComponent(df2);
-
-        if (isDescrVisible()) {
-            hl.addComponent(getDescrField());
-        }
 
         vl.addComponent(hl);
 
@@ -110,7 +106,7 @@ public final class FourDateItem extends AbstractACItem {
         hl.addComponent(l);
 
         df3 = new DateField();
-        df3.setWidth(80, Unit.PIXELS);
+        df3.setWidth(100, Unit.PIXELS);
         if (academicCalendarDetail != null) {
             df3.setValue(academicCalendarDetail.getDate3());
         }
@@ -123,16 +119,11 @@ public final class FourDateItem extends AbstractACItem {
         hl.addComponent(l);
 
         df4 = new DateField();
-        df4.setWidth(80, Unit.PIXELS);
+        df4.setWidth(100, Unit.PIXELS);
         if (academicCalendarDetail != null) {
             df4.setValue(academicCalendarDetail.getDate4());
         }
         hl.addComponent(df4);
-
-        if (isDescrVisible()) {
-            hl.addComponent(getDescrField());
-        }
-
         vl.addComponent(hl);
 
         return vl;
@@ -151,9 +142,6 @@ public final class FourDateItem extends AbstractACItem {
             acd.setDate2(date2);
             acd.setDate3(date3);
             acd.setDate4(date4);
-            if (isDescrVisible()) {
-                acd.setDescr(getDescrField().getValue());
-            }
             SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(acd);
         }
     }

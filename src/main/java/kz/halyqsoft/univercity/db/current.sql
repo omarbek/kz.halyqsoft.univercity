@@ -16,8 +16,6 @@ INSERT INTO creditability VALUES (5, 5);
 INSERT INTO academic_formula VALUES (1, 3, '1/1/1', 1, 1, 1);
 
 INSERT INTO control_type VALUES (1, 'Экзамен');
-INSERT INTO control_type VALUES (2, 'Зачет');
-INSERT INTO control_type VALUES (3, 'Тест');
 
 CREATE SEQUENCE S_SUBJECT
 MINVALUE 0
@@ -794,3 +792,20 @@ CREATE OR REPLACE VIEW V_STUDENT AS
     LEFT JOIN v_coordinator coordinator ON coordinator.id = stu.coordinator_id
     LEFT JOIN CARD card ON card.id = usr.card_id
   WHERE usr.deleted = FALSE AND usr.locked = FALSE;
+
+INSERT INTO ects VALUES (1, 1);
+INSERT INTO ects VALUES (2, 2);
+INSERT INTO ects VALUES (3, 3);
+INSERT INTO ects VALUES (4, 4);
+INSERT INTO ects VALUES (5, 5);
+
+UPDATE subject
+SET ects_id = 5;
+ALTER TABLE subject
+  ALTER COLUMN ects_id SET NOT NULL;
+
+alter table academic_calendar_detail drop COLUMN descr;
+
+INSERT INTO control_type VALUES (2, 'Государственный экзамен');
+INSERT INTO control_type VALUES (3, 'Курсовая работа');
+INSERT INTO control_type VALUES (4, 'Дифференцированный зачет');

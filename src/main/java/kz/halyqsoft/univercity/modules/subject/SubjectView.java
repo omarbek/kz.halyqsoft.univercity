@@ -292,7 +292,7 @@ public class SubjectView extends AbstractTaskView implements FilterPanelListener
             if (sf != null) {
                 newSubject.setChair(sf.getChair());
             }
-            SubjectEdit se = new SubjectEdit(fm, sf);
+            SubjectEdit se = new SubjectEdit(fm);
             new SubjectDialog(se, SubjectView.this);
         }
 
@@ -501,7 +501,7 @@ public class SubjectView extends AbstractTaskView implements FilterPanelListener
                     fm.setTitleVisible(false);
                     try {
                         fm.loadEntity(e.getId());
-                        SubjectEdit se = new SubjectEdit(fm, sf);
+                        SubjectEdit se = new SubjectEdit(fm);
                         new SubjectDialog(se, SubjectView.this);
                     } catch (Exception ex) {
                         CommonUtils.showMessageAndWriteLog("Unable to edit the subject", ex);
