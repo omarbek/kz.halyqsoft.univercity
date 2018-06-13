@@ -58,6 +58,7 @@ class CatalogList {
         addCatalogEntityToList(ACADEMIC_DEGREE.class);
         addCatalogEntityToList(ORGANIZATION.class);
         addCatalogEntityToList(SEMESTER_DATA.class);
+        addCatalogEntityToList(EDUCATION_MODULE_TYPE.class);
 
         addCatalogEntityToList(ROLES.class);
         addCatalogEntityToList(TASKS.class);
