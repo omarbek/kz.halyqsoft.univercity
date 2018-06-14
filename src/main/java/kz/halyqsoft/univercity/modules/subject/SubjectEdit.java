@@ -67,7 +67,6 @@ public final class SubjectEdit extends AbstractFormWidgetView {
 
         FieldModel codeFM = baseDataFM.getFieldModel("code");
         codeFM.setReadOnlyFixed(false);
-        codeFM.setRequired(true);
 
         FKFieldModel studyDirectFM = (FKFieldModel) baseDataFM.getFieldModel("studyDirect");
         studyDirectFM.setDialogHeight(400);

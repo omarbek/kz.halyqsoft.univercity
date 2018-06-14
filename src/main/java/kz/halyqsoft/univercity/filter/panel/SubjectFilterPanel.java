@@ -34,7 +34,7 @@ public final class SubjectFilterPanel extends AbstractFilterPanel {
 		}
 		
 		af = getFilterComponent("chair");
-		if (af != null) {
+		if (af != null ) {
 			hl.addComponent(af);
 		}
 		
@@ -59,7 +59,12 @@ public final class SubjectFilterPanel extends AbstractFilterPanel {
 		if (af != null) {
 			hl.addComponent(af);
 		}
-		
+
+		af = getFilterComponent("subjectModule");
+		if (af != null) {
+			hl.addComponent(af);
+		}
+
 		getContent().addComponent(hl);
 		getContent().setComponentAlignment(hl, Alignment.MIDDLE_CENTER);
 	}

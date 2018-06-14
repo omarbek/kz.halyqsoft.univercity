@@ -33,8 +33,8 @@ public class SUBJECT extends AbstractEntity {
 	@Column(name = "NAME_RU", nullable = false)
 	private String nameRU;
 
-	@FieldInfo(type = EFieldType.TEXT, max = 13, order = 4, required = false, readOnlyFixed = true, columnWidth = 100)
-	@Column(name = "CODE", nullable = false)
+	@FieldInfo(type = EFieldType.TEXT, max = 13, order = 4, required = false, inGrid = false, readOnlyFixed = true, columnWidth = 100)
+	@Column(name = "CODE")
 	private String code;
 
 	@FieldInfo(type = EFieldType.FK_DIALOG, order = 5, inGrid = false)
@@ -68,26 +68,32 @@ public class SUBJECT extends AbstractEntity {
 	@FieldInfo(type = EFieldType.FK_COMBO, order = 10, inGrid = false)
     @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "SUBJECT_CYCLE_ID", referencedColumnName = "ID")})
+            @JoinColumn(name = "MODULE_ID", referencedColumnName = "ID")})
+    private SUBJECT_MODULE subjectModule;
+
+	@FieldInfo(type = EFieldType.FK_COMBO, order = 11, inGrid = false,required = false)
+    @ManyToOne
+    @JoinColumns({
+        @JoinColumn(name = "SUBJECT_CYCLE_ID", referencedColumnName = "ID",nullable = true)})
     private SUBJECT_CYCLE subjectCycle;
 
-	@FieldInfo(type = EFieldType.BOOLEAN, order = 11, required = false, columnWidth = 100)
+	@FieldInfo(type = EFieldType.BOOLEAN, order = 12, required = false, columnWidth = 100)
 	@Column(name = "MANDATORY", nullable = false)
     private boolean mandatory;
 
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 12, inGrid = false)
+	@FieldInfo(type = EFieldType.FK_COMBO, order = 13, inGrid = false)
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "CREDITABILITY_ID", referencedColumnName = "ID")})
     private CREDITABILITY creditability;
 
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 13, inGrid = false)
+	@FieldInfo(type = EFieldType.FK_COMBO, order = 14, inGrid = false)
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "ACADEMIC_FORMULA_ID", referencedColumnName = "ID")})
     private ACADEMIC_FORMULA academicFormula;
 
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 14)
+	@FieldInfo(type = EFieldType.FK_COMBO, order = 15)
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "ECTS_ID", referencedColumnName = "ID")})
@@ -132,9 +138,6 @@ public class SUBJECT extends AbstractEntity {
 	@FieldInfo(type = EFieldType.BOOLEAN, order = 23, required = false, inEdit = false, inGrid = false, inView = false)
 	@Column(name = "DELETED", nullable = false)
     private boolean deleted;
-
-	public SUBJECT() {
-	}
 
 	public String getNameKZ() {
 		return nameKZ;
@@ -199,6 +202,10 @@ public class SUBJECT extends AbstractEntity {
 	public void setLevel(LEVEL level) {
 		this.level = level;
 	}
+
+	public SUBJECT_MODULE getSubjectModule() { return subjectModule; }
+
+	public void setSubjectModule(SUBJECT_MODULE subjectModule) { this.subjectModule = subjectModule; }
 
 	public SUBJECT_CYCLE getSubjectCycle() {
 		return subjectCycle;
