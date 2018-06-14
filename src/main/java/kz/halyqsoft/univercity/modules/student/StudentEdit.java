@@ -49,10 +49,7 @@ import org.r3a.common.vaadin.widget.table.TableWidget;
 import org.r3a.common.vaadin.widget.table.model.DBTableModel;
 
 import javax.persistence.NoResultException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 import static kz.halyqsoft.univercity.modules.regapplicants.ApplicantsForm.createResourceStudent;
 
@@ -72,10 +69,11 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
     private CommonFormWidget grantDocFW;
     private TableWidget educationTW, languageTW, medicalCheckupTW;
     private FromItem educationUDFI;
-    private Label lockLabel, lockReasonLabel;
+    private Label lockLabel, lockReasonLabel, createdBylabel;
     private Button lockUnlockButton;
     private LockDialog lockDialog;
     private STUDENT student;
+    private USERS users;
     private VerticalLayout mainVL;
     private static Button pdfDownload, pdfDownloadDorm, pdfDownloadLetter;
     private StudentOrApplicantView studentOrApplicantView;
@@ -277,6 +275,28 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 });
                 educationFL.addComponent(moreButton);
             }
+
+            createdBylabel = new Label();
+            createdBylabel.addStyleName("bold");
+            createdBylabel.setCaption(getUILocaleUtil().getEntityFieldLabel(USERS.class, "createdBy"));
+            String sql="SELECT" +
+                    "  * " +
+                    "FROM USERS usr"+
+                    " WHERE login =" +
+                    "(SELECT created_by FROM USERS where id = ?1)";
+            Map<Integer, Object> params = new HashMap<>();
+            params.put(1, student.getId().getId());
+            USERS user;
+            try {
+                user = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(sql, params, USERS.class);
+            }catch (NoResultException e){
+                user = null;
+            }
+            if(user!=null) {
+                createdBylabel.setValue(user.toString());
+            }
+            educationFL.addComponent(createdBylabel);
+
 
             rightContent.addComponent(educationFL);
             rightContent.setComponentAlignment(educationFL, Alignment.MIDDLE_CENTER);

@@ -19,4 +19,7 @@ ALTER TABLE ONLY subject
 REFERENCES education_module_type (id)
 ON UPDATE RESTRICT ON DELETE RESTRICT;
 
+update users set created_by = 'admin' where created_by is null;
 
+alter table users
+  alter column created_by set not null;

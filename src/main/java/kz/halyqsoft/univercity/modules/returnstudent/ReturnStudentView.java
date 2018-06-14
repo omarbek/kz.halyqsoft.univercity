@@ -1,4 +1,4 @@
-package kz.halyqsoft.univercity.modules.deletestudent;
+package kz.halyqsoft.univercity.modules.returnstudent;
 
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -23,13 +23,13 @@ import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 
 import java.util.*;
 
-public class DeleteStudentView extends AbstractTaskView implements FilterPanelListener {
+public class ReturnStudentView extends AbstractTaskView implements FilterPanelListener {
 
     private GridWidget returnStudentGW;
     private StudentFilterPanel filterPanel;
     private TextField returnStudentTF;
 
-    public DeleteStudentView(AbstractTask task) throws Exception {
+    public ReturnStudentView(AbstractTask task) throws Exception {
         super(task);
         filterPanel = new StudentFilterPanel(new FStudentFilter());
     }
