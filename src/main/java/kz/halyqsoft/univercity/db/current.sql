@@ -806,6 +806,6 @@ ALTER TABLE subject
 
 alter table academic_calendar_detail drop COLUMN descr;
 
-INSERT INTO control_type VALUES (2, 'Государственный экзамен');
+INSERT INTO re VALUES (2, 'Государственный экзамен');
 INSERT INTO control_type VALUES (3, 'Курсовая работа');
 INSERT INTO control_type VALUES (4, 'Дифференцированный зачет');
