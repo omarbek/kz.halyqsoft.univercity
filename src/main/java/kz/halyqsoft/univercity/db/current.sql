@@ -945,3 +945,58 @@ CREATE SEQUENCE S_CURRICULUM_SCHEDULE
 MINVALUE 0
 START WITH 1
 NO CYCLE;
+
+CREATE TABLE education_module_type (
+  id        BIGINT       NOT NULL,
+  type_name VARCHAR(128) NOT NULL
+);
+
+ALTER TABLE education_module_type
+  ADD CONSTRAINT pk_education_module_type PRIMARY KEY (id);
+
+CREATE SEQUENCE s_education_module_type
+MINVALUE 0
+START WITH 1
+NO CYCLE;
+
+ALTER TABLE subject
+  ADD COLUMN education_module_type_id BIGINT NOT NULL;
+
+ALTER TABLE ONLY subject
+  ADD CONSTRAINT fk_subject_education_module_type FOREIGN KEY (education_module_type_id)
+REFERENCES education_module_type (id)
+ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+UPDATE users
+SET created_by = 'admin'
+WHERE created_by IS NULL;
+
+ALTER TABLE users
+  ALTER COLUMN created_by SET NOT NULL;
+
+CREATE TABLE subject_module
+(
+  id                BIGINT                NOT NULL,
+  module_name       CHARACTER VARYING(64) NOT NULL,
+  module_short_name CHAR(10)              NOT NULL
+);
+
+ALTER TABLE subject_module
+  ADD CONSTRAINT pk_subject_module PRIMARY KEY (id);
+
+INSERT INTO subject_module (id, module_name, module_short_name) VALUES (1, 'Общие модули', 'ОМ');
+INSERT INTO subject_module (id, module_name, module_short_name) VALUES (2, 'Модули специальности', 'МС');
+INSERT INTO subject_module (id, module_name, module_short_name) VALUES (3, 'Дополнительные модули ', 'ДП');
+
+ALTER TABLE subject
+  ADD module_id BIGINT NOT NULL;
+
+ALTER TABLE ONLY subject
+  ADD CONSTRAINT fk_subject_subject_module FOREIGN KEY (module_id)
+REFERENCES subject_module (id)
+ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+ALTER TABLE subject
+  ALTER COLUMN code DROP NOT NULL;
+ALTER TABLE subject
+  ALTER COLUMN subject_cycle_id DROP NOT NULL;
