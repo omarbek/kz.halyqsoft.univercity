@@ -143,7 +143,8 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                     } else if (AbstractTypeEntity.class.isAssignableFrom(entityClass)) {
                         if (!(entityClass.equals(SCHOOL_TYPE.class)
                                 || entityClass.equals(MEDICAL_CHECKUP_TYPE.class)
-                                || entityClass.equals(CONTRACT_TYPE.class))) {
+                                || entityClass.equals(CONTRACT_TYPE.class)
+                                || entityClass.equals(EDUCATION_MODULE_TYPE.class))) {
                             classASW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
                         } else {
                             classASW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
@@ -191,7 +192,8 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                         classASW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
                         classASW.setButtonVisible(IconToolbar.ADD_BUTTON, false);
                         qm.addWhere("subjectName", null, null, true);
-                    } /*else if (entityClass.equals(ACADEMIC_DEGREE.class)) {
+                    }
+                    /*else if (entityClass.equals(ACADEMIC_DEGREE.class)) {
                         FormModel fm = ((DBSelectModel) classASW.getWidgetModel()).getFormModel();
                         ((FKFieldModel) fm.getFieldModel("speciality")).setDialogWidth(500);
 //                        (fm.getFieldModel("speciality")).setWidth(500);

@@ -45,6 +45,9 @@ public class ELECTIVE_SUBJECT extends AbstractEntity {
     @JoinColumns({
         @JoinColumn(name = "SUBJECT_CYCLE_ID", referencedColumnName = "ID")})
     private SUBJECT_CYCLE subjectCycle;
+
+	@Column(name = "CONSIDER_CREDIT", nullable = false)
+	private boolean considerCredit;
 	
 	@Column(name = "CREATED")
     @Temporal(TemporalType.TIMESTAMP)
@@ -119,5 +122,13 @@ public class ELECTIVE_SUBJECT extends AbstractEntity {
 
 	public void setDeleted(boolean deleted) {
 		this.deleted = deleted;
+	}
+
+	public boolean isConsiderCredit() {
+		return considerCredit;
+	}
+
+	public void setConsiderCredit(boolean considerCredit) {
+		this.considerCredit = considerCredit;
 	}
 }

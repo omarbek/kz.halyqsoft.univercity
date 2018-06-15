@@ -1030,7 +1030,7 @@ public final class ApplicantsForm extends UsersForm {
 
                         DEPARTMENT faculty = es.getSpeciality().getDepartment().getParent();
 
-                        QueryModel<V_KBTU_ENTRANTS> qm = new QueryModel<>(V_KBTU_ENTRANTS.class);
+                        QueryModel<V_LOCAL_ENTRANTS> qm = new QueryModel<>(V_LOCAL_ENTRANTS.class);
                         qm.addSelect("id", EAggregate.COUNT);
                         qm.addWhere("level", ECriteria.EQUAL, level.getId());
                         qm.addWhereAnd("createdYear", ECriteria.EQUAL, year);

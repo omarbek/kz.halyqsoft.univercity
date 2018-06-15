@@ -23,7 +23,7 @@ import javax.persistence.TemporalType;
  * @created Jan 14, 2016 5:19:11 PM
  */
 @Entity
-public class V_KBTU_ENTRANTS extends AbstractEntity {
+public class V_LOCAL_ENTRANTS extends AbstractEntity {
 
     private static final long serialVersionUID = -6041884473983223402L;
 
@@ -69,7 +69,7 @@ public class V_KBTU_ENTRANTS extends AbstractEntity {
         @JoinColumn(name = "FACULTY_ID", referencedColumnName = "ID")})
     private DEPARTMENT faculty;
 	
-	public V_KBTU_ENTRANTS() {
+	public V_LOCAL_ENTRANTS() {
 	}
 
 	public STUDENT getStudent() {

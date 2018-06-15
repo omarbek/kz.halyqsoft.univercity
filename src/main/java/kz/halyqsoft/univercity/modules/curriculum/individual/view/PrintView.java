@@ -66,7 +66,7 @@ final class PrintView extends AbstractFormWidgetView {
         Embedded logo = new Embedded();
         logo.setHeight(79, Unit.PIXELS);
         logo.setWidth(343, Unit.PIXELS);
-        logo.setSource(new ThemeResource("img/KBTU.gif"));
+        logo.setSource(new ThemeResource("img/book.png"));//TODO
         printCL.addComponent(logo, "logo");
 
         Label l = new Label();
@@ -83,7 +83,7 @@ final class PrintView extends AbstractFormWidgetView {
         l.setWidthUndefined();
         l.setContentMode(ContentMode.HTML);
         l.addStyleName("text-center");
-        l.setValue(getUILocaleUtil().getCaption("kbtu.address"));
+        l.setValue("university address");//TODO
         printCL.addComponent(l, "address");
 
         l = new Label();
@@ -92,7 +92,7 @@ final class PrintView extends AbstractFormWidgetView {
         l.setValue(getUILocaleUtil().getCaption("individual.curriculum.print"));
         printCL.addComponent(l, "ic-title");
 
-        String sql = "select b.CODE, trim(b.LAST_NAME||' '||substr(b.FIRST_NAME, 1, 2)||'. '||(case when b.MIDDLE_NAME is null then '' else substr(b.MIDDLE_NAME, 1, 2)||'.' end)) FIO, e.STUDY_YEAR, f.DEPT_NAME FACULTY, g.SPEC_NAME from KBTU.T_STUDENT a inner join KBTU.T_USER b on a.ID = b.ID inner join KBTU.T_STUDENT_EDUCATION d on a.ID = d.STUDENT_ID and d.CHILD_ID is null inner join KBTU.STUDY_YEAR e on d.STUDY_YEAR_ID = e.ID inner join KBTU.T_DEPARTMENT f on d.FACULTY_ID = f.ID inner join KBTU.SPECIALITY g on d.SPECIALITY_ID = g.ID where a.ID = ?1";
+        String sql = "select b.CODE, trim(b.LAST_NAME||' '||substr(b.FIRST_NAME, 1, 2)||'. '||(case when b.MIDDLE_NAME is null then '' else substr(b.MIDDLE_NAME, 1, 2)||'.' end)) FIO, e.STUDY_YEAR, f.DEPT_NAME FACULTY, g.SPEC_NAME from STUDENT a inner join USER b on a.ID = b.ID inner join STUDENT_EDUCATION d on a.ID = d.STUDENT_ID and d.CHILD_ID is null inner join STUDY_YEAR e on d.STUDY_YEAR_ID = e.ID inner join DEPARTMENT f on d.FACULTY_ID = f.ID inner join SPECIALITY g on d.SPECIALITY_ID = g.ID where a.ID = ?1";
         Map<Integer, Object> params = new HashMap<Integer, Object>(1);
         params.put(1, student.getId().getId());
         Object[] o = (Object[]) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(sql, params);
@@ -177,7 +177,7 @@ final class PrintView extends AbstractFormWidgetView {
         l.setValue(((BigDecimal) o[2]).toString());
         printCL.addComponent(l, "study-year");
 
-        sql = "select distinct f.CODE SUBJECT_CODE, f.NAME_KZ SUBJECT_NAME_KZ, f.NAME_EN SUBJECT_NAME_EN, f.NAME_RU SUBJECT_NAME_RU," + " decode(f.MANDATORY, 1, 'A', 'B') SUBJECT_STATUS, g.CYCLE_SHORT_NAME, h.CREDIT," + " i.LAST_NAME||' '||substr(i.FIRST_NAME, 1, 2)||'.'||(decode(i.MIDDLE_NAME, null, '', substr(i.MIDDLE_NAME, 1, 2)||'.')) TEACHER_FIO" + " from KBTU.T_STUDENT_SCHEDULE a inner join KBTU.T_STUDENT_EDUCATION b on a.STUDENT_ID = b.ID" + " inner join KBTU.T_SCHEDULE_DETAIL c on a.SCHEDULE_DETAIL_ID = c.ID" + " inner join KBTU.T_SCHEDULE d on c.SCHEDULE_ID = d.ID" + " inner join KBTU.SEMESTER_SUBJECT e on c.SUBJECT_ID = e.ID" + " inner join KBTU.SUBJECT f on e.SUBJECT_ID = f.ID" + " inner join KBTU.SUBJECT_CYCLE g on f.SUBJECT_CYCLE_ID = g.ID" + " inner join KBTU.CREDITABILITY h on f.CREDITABILITY_ID = h.ID" + " inner join KBTU.T_USER i on c.TEACHER_ID = i.ID" + " where a.DELETED = ?1 and b.STUDENT_ID = ?2 and d.SEMESTER_DATA_ID = ?3";
+        sql = "select distinct f.CODE SUBJECT_CODE, f.NAME_KZ SUBJECT_NAME_KZ, f.NAME_EN SUBJECT_NAME_EN, f.NAME_RU SUBJECT_NAME_RU," + " decode(f.MANDATORY, 1, 'A', 'B') SUBJECT_STATUS, g.CYCLE_SHORT_NAME, h.CREDIT," + " i.LAST_NAME||' '||substr(i.FIRST_NAME, 1, 2)||'.'||(decode(i.MIDDLE_NAME, null, '', substr(i.MIDDLE_NAME, 1, 2)||'.')) TEACHER_FIO" + " from STUDENT_SCHEDULE a inner join STUDENT_EDUCATION b on a.STUDENT_ID = b.ID" + " inner join SCHEDULE_DETAIL c on a.SCHEDULE_DETAIL_ID = c.ID" + " inner join SCHEDULE d on c.SCHEDULE_ID = d.ID" + " inner join SEMESTER_SUBJECT e on c.SUBJECT_ID = e.ID" + " inner join SUBJECT f on e.SUBJECT_ID = f.ID" + " inner join SUBJECT_CYCLE g on f.SUBJECT_CYCLE_ID = g.ID" + " inner join CREDITABILITY h on f.CREDITABILITY_ID = h.ID" + " inner join USER i on c.TEACHER_ID = i.ID" + " where a.DELETED = ?1 and b.STUDENT_ID = ?2 and d.SEMESTER_DATA_ID = ?3";
         params.put(1, 0);
         params.put(2, student.getId().getId());
         params.put(3, semesterData.getId().getId());
@@ -257,7 +257,7 @@ final class PrintView extends AbstractFormWidgetView {
         printCL.addComponent(l, "status-b");
 
         params.clear();
-        sql = "select a.SIGNATURE_TYPE_ID, c.LAST_NAME||' '||substr(c.FIRST_NAME, 1, 2)||'.'||decode(c.MIDDLE_NAME, null, '', substr(c.MIDDLE_NAME, 1, 2)||'.') SIGN_FIO from KBTU.T_REGISTRATION_SIGNATURE a inner join KBTU.T_STUDENT_EDUCATION b on a.STUDENT_ID = b.ID inner join KBTU.T_USER c on a.SIGN_USER_ID = c.ID where a.SEMESTER_DATA_ID = ?1 and b.STUDENT_ID = ?2";
+        sql = "select a.SIGNATURE_TYPE_ID, c.LAST_NAME||' '||substr(c.FIRST_NAME, 1, 2)||'.'||decode(c.MIDDLE_NAME, null, '', substr(c.MIDDLE_NAME, 1, 2)||'.') SIGN_FIO from REGISTRATION_SIGNATURE a inner join STUDENT_EDUCATION b on a.STUDENT_ID = b.ID inner join USER c on a.SIGN_USER_ID = c.ID where a.SEMESTER_DATA_ID = ?1 and b.STUDENT_ID = ?2";
         params.put(1, semesterData.getId().getId());
         params.put(2, student.getId().getId());
         List<Object> signList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);

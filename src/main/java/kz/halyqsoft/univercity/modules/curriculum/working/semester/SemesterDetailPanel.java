@@ -1,6 +1,5 @@
 package kz.halyqsoft.univercity.modules.curriculum.working.semester;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.combobox.FilteringMode;
@@ -19,8 +18,8 @@ import kz.halyqsoft.univercity.entity.beans.univercity.view.V_CURRICULUM_DETAIL;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_ELECTIVE_SUBJECT;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_ELECTIVE_SUBJECT_LABEL;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_SUBJECT_SELECT;
-import kz.halyqsoft.univercity.modules.curriculum.working.CurriculumView;
 import kz.halyqsoft.univercity.modules.curriculum.working.AbstractCurriculumPanel;
+import kz.halyqsoft.univercity.modules.curriculum.working.CurriculumView;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
@@ -44,6 +43,7 @@ import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
 
 import javax.persistence.NoResultException;
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -239,7 +239,7 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
         //			params.put(1, studyYear.getId().getId());
         //			params.put(2, acfID.getId());
         //			params.put(3, itemId.getId());
-        //			String sql = "select a.DATE1 from KBTU.T_ACADEMIC_CALENDAR_DETAIL a inner join KBTU.T_ACADEMIC_CALENDAR b on a.ACADEMIC_CALENDAR_ID = b.ID where b.YEAR_ID = ?1 and b.FACULTY_ID = ?2 and a.ITEM_ID = ?3";
+        //			String sql = "select a.DATE1 from ACADEMIC_CALENDAR_DETAIL a inner join ACADEMIC_CALENDAR b on a.ACADEMIC_CALENDAR_ID = b.ID where b.YEAR_ID = ?1 and b.FACULTY_ID = ?2 and a.ITEM_ID = ?3";
         //
         //			try {
         //				Object o = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(sql, params);
@@ -255,6 +255,7 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
         //			}
         //		}
         electiveGrid.refresh();
+        getParentView().setTotalCreditSum();
     }
 
     public void setReadOnlyDetail(boolean readOnly) {
@@ -609,7 +610,7 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                             if (sum != null && sum > 0) {
                                 delList.add(cd);
                             } else {
-                                sql = "select sum(coalesce(t1.CNT, 0)) from (select count(a1.ID) CNT from EXAM_SCHEDULE a1 where a1.SUBJECT_ID = ?1 and a1.DELETED = ?2 union select count(a2.ID) CNT from SCHEDULE_DETAIL a2 where a2.SUBJECT_ID = ?3 union select count(a3.SUBJECT_ID) CNT from STUDENSUBJECT a3 where a3.SUBJECT_ID = ?4) t1";
+                                sql = "select sum(coalesce(t1.CNT, 0)) from (select count(a1.ID) CNT from EXAM_SCHEDULE a1 where a1.SUBJECT_ID = ?1 and a1.DELETED = ?2 union select count(a2.ID) CNT from SCHEDULE_DETAIL a2 where a2.SUBJECT_ID = ?3 union select count(a3.SUBJECT_ID) CNT from STUDENT_SUBJECT a3 where a3.SUBJECT_ID = ?4) t1";
                                 params = new HashMap<Integer, Object>(4);
                                 params.put(1, ss.getId().getId());
                                 params.put(2, Boolean.FALSE);
@@ -702,20 +703,20 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                         params.put(8, 3);
                         Integer sum = null;
                         try {
-                            sum = (Integer) session.lookupSingle(sql, params);
+                            sum = ((BigDecimal) session.lookupSingle(sql, params)).intValue();
                         } catch (NoResultException nrex) {
                         }
                         if (sum != null && sum > 0) {
                             delList.add(es);
                         } else {
-                            sql = "select sum(coalesce(t1.CNT, 0)) from (select count(a1.ID) CNT from EXAM_SCHEDULE a1 where a1.SUBJECT_ID = ?1 and a1.DELETED = ?2 union select count(a2.ID) CNT from SCHEDULE_DETAIL a2 where a2.SUBJECT_ID = ?3 union select count(a3.SUBJECT_ID) CNT from STUDENSUBJECT a3 where a3.SUBJECT_ID = ?4) t1";
+                            sql = "select sum(coalesce(t1.CNT, 0)) from (select count(a1.ID) CNT from EXAM_SCHEDULE a1 where a1.SUBJECT_ID = ?1 and a1.DELETED = ?2 union select count(a2.ID) CNT from SCHEDULE_DETAIL a2 where a2.SUBJECT_ID = ?3 union select count(a3.SUBJECT_ID) CNT from STUDENT_SUBJECT a3 where a3.SUBJECT_ID = ?4) t1";
                             params = new HashMap<Integer, Object>(4);
                             params.put(1, ss.getId().getId());
                             params.put(2, Boolean.FALSE);
                             params.put(3, ss.getId().getId());
                             params.put(4, ss.getId().getId());
                             try {
-                                sum = (Integer) session.lookupSingle(sql, params);
+                                sum = ((BigDecimal) session.lookupSingle(sql, params)).intValue();
                             } catch (NoResultException nrex) {
                             }
                             if (sum != null && sum > 0) {
@@ -816,10 +817,17 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                 totalCredit = totalCredit - vcd.getCredit();
             }
         }
-
         grid.setFooterValue("credit", totalCredit);
 
-        return totalCredit;
+        Integer electiveTotalCredit = (Integer) ((DBGridModel) electiveGrid.getWidgetModel()).getFooterValue("credit");
+        List<Entity> electives = electiveGrid.getAllEntities();
+        for (Entity entity : electives) {
+            V_ELECTIVE_SUBJECT electiveSubject = (V_ELECTIVE_SUBJECT) entity;
+            if (electiveSubject.getSubjectCode() != null && !electiveSubject.isConsiderCredit()) {
+                electiveTotalCredit -= electiveSubject.getCredit();
+            }
+        }
+        return totalCredit + electiveTotalCredit;
     }
 
     private List<CURRICULUM_DETAIL> getElectiveCurriculumDetailList() throws Exception {
@@ -940,12 +948,7 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                 QueryModel qm = ((DBGridModel) subjectSelectDlg.getSelectModel()).getQueryModel();
                 qm.addWhere("chair", ECriteria.EQUAL, ID.valueOf(-1));
                 //				qm.addWhereAnd("mandatory", Boolean.TRUE);
-                List<ID> studyDirectIDs = new ArrayList<ID>();
-                studyDirectIDs.add(ID.valueOf(16));
-                studyDirectIDs.add(ID.valueOf(17));
-                studyDirectIDs.add(ID.valueOf(18));
-                studyDirectIDs.add(ID.valueOf(19));
-                qm.addWhereNotInAnd("studyDirect", studyDirectIDs);
+                qm.addWhere("subjectCycle", ECriteria.NOT_EQUAL, ID.valueOf(4));
                 subjectSelectDlg.setDialogWidth(600);
                 subjectSelectDlg.setDialogHeight(300);
                 subjectSelectDlg.getFilterModel().addFilter("chair", chairCB);
@@ -973,11 +976,6 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                 if (curriculum == null || curriculum.getId() == null) {
                     Message.showInfo(message);
                     return;
-                } else {
-                    if (getElectiveCurriculumDetailList().isEmpty()) {
-                        Message.showInfo(message);
-                        return;
-                    }
                 }
 
                 QueryModel<DEPARTMENT> chairQM = new QueryModel<DEPARTMENT>(DEPARTMENT.class);
@@ -1045,12 +1043,7 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                         new AddNewElectiveSubjectListener(), V_SUBJECT_SELECT.class);
                 QueryModel qm = ((DBGridModel) electiveSubjectSelectDlg.getSelectModel()).getQueryModel();
                 qm.addWhere("chair", ECriteria.EQUAL, ID.valueOf(-1));
-                List<ID> studyDirectIDs = new ArrayList<ID>();
-                studyDirectIDs.add(ID.valueOf(16));
-                studyDirectIDs.add(ID.valueOf(17));
-                studyDirectIDs.add(ID.valueOf(18));
-                studyDirectIDs.add(ID.valueOf(19));
-                qm.addWhereNotInAnd("studyDirect", studyDirectIDs);
+                qm.addWhere("subjectCycle", ECriteria.NOT_EQUAL, ID.valueOf(4));
                 electiveSubjectSelectDlg.setDialogWidth(600);
                 electiveSubjectSelectDlg.setDialogHeight(400);
                 electiveSubjectSelectDlg.getFilterModel().addFilter("chair", chairCB);
@@ -1261,6 +1254,7 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                         if (es.getSubject().getSubjectCycle().getId().equals(MULTI_CYCLE_ID)) {
                             es.setSubjectCycle(electiveSubjectSelectDlg.getSubjectCycle());
                         }
+                        es.setConsiderCredit(electiveSubjectSelectDlg.isConsiderCredit());
                         es.setCreated(created);
                         newList.add(es);
 
@@ -1320,91 +1314,91 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                     //						Message.showInfo(message);
                     //					}
 
-                    if (can) {
-                        List<SUBJECT_CYCLE> scList = getApprovedElectiveCycleList();
-                        for (Entity e : selectedList) {
-                            V_SUBJECT_SELECT vss = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class)
-                                    .lookup(V_SUBJECT_SELECT.class, e.getId());
-                            if (!vss.getSubjectCycle().getId().equals(MULTI_CYCLE_ID)) {
-                                can = scList.contains(vss.getSubjectCycle());
-                                if (!can) {
-                                    Message.showInfo(getUILocaleUtil()
-                                            .getMessage("incorrect.elective.subject.component"));
-                                    break;
-                                }
-                            }
+//                    if (can) {
+//                        List<SUBJECT_CYCLE> scList = getApprovedElectiveCycleList();
+//                        for (Entity e : selectedList) {
+//                            V_SUBJECT_SELECT vss = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class)
+//                                    .lookup(V_SUBJECT_SELECT.class, e.getId());
+//                            if (!vss.getSubjectCycle().getId().equals(MULTI_CYCLE_ID)) {
+//                                can = scList.contains(vss.getSubjectCycle());
+//                                if (!can) {
+//                                    Message.showInfo(getUILocaleUtil()
+//                                            .getMessage("incorrect.elective.subject.component"));
+//                                    break;
+//                                }
+//                            }
+//                        }
+//                    }
+//
+//                    if (can) {
+                    Map<Integer, Object> params = new HashMap<Integer, Object>(3);
+                    params.put(1, curriculum.getId().getId());
+                    params.put(2, semester.getId().getId());
+                    params.put(3, Boolean.FALSE);
+                    String sql = "select count(a.SUBJECT_ID) from ELECTIVE_SUBJECT a where a.CURRICULUM_ID = ?1 and a.SEMESTER_ID = ?2 and a.DELETED = ?3 and a.SUBJECT_ID in (";
+                    StringBuilder sb = new StringBuilder();
+                    boolean first = true;
+                    for (Entity e : selectedList) {
+                        if (!first) {
+                            sb.append(", ");
                         }
+                        sb.append(e.getId().getId());
+                        first = false;
+                        idList.add(e.getId());
                     }
+                    sb.append(")");
+                    sql = sql + sb.toString();
 
-                    if (can) {
-                        Map<Integer, Object> params = new HashMap<Integer, Object>(3);
-                        params.put(1, curriculum.getId().getId());
-                        params.put(2, semester.getId().getId());
-                        params.put(3, Boolean.FALSE);
-                        String sql = "select count(a.SUBJECT_ID) from ELECTIVE_SUBJECT a where a.CURRICULUM_ID = ?1 and a.SEMESTER_ID = ?2 and a.DELETED = ?3 and a.SUBJECT_ID in (";
-                        StringBuilder sb = new StringBuilder();
-                        boolean first = true;
-                        for (Entity e : selectedList) {
-                            if (!first) {
-                                sb.append(", ");
+                    scQM.addWhereIn(scFI, "id", idList);
+
+                    try {
+                        List<SUBJECT_CYCLE> scList = SessionFacadeFactory
+                                .getSessionFacade(CommonEntityFacadeBean.class).lookup(scQM);
+                        for (SUBJECT_CYCLE sc1 : scList) {
+                            multi = (sc1.getId().equals(MULTI_CYCLE_ID));
+                            if (multi) {
+                                break;
                             }
-                            sb.append(e.getId().getId());
-                            first = false;
-                            idList.add(e.getId());
                         }
-                        sb.append(")");
-                        sql = sql + sb.toString();
 
-                        scQM.addWhereIn(scFI, "id", idList);
+                        can = (!multi || sc != null);
+                        if (!can) {
+                            Message.showError(getUILocaleUtil().getMessage("select.curriculum.component"));
+                            return can;
+                        }
 
-                        try {
-                            List<SUBJECT_CYCLE> scList = SessionFacadeFactory
-                                    .getSessionFacade(CommonEntityFacadeBean.class).lookup(scQM);
-                            for (SUBJECT_CYCLE sc1 : scList) {
-                                multi = (sc1.getId().equals(MULTI_CYCLE_ID));
-                                if (multi) {
-                                    break;
+                        long count = (long) SessionFacadeFactory
+                                .getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(sql, params);
+                        can = (count == 0);
+                        if (!can) {
+                            Message.showError(getUILocaleUtil().getMessage("selected.subjects.already.exists"));
+                        } else {
+                            sql = "select count(a.SUBJECT_ID) from CURRICULUM_DETAIL a where a.CURRICULUM_ID = ?1 and a.SEMESTER_ID = ?2 and a.DELETED = ?3 and a.SUBJECT_ID in (";
+                            sb = new StringBuilder();
+                            first = true;
+                            for (Entity e : selectedList) {
+                                if (!first) {
+                                    sb.append(", ");
                                 }
+                                sb.append(e.getId().getId());
+                                first = false;
+                                idList.add(e.getId());
                             }
+                            sb.append(")");
+                            sql = sql + sb.toString();
 
-                            can = (!multi || sc != null);
-                            if (!can) {
-                                Message.showError(getUILocaleUtil().getMessage("select.curriculum.component"));
-                                return can;
-                            }
-
-                            Integer count = (Integer) SessionFacadeFactory
-                                    .getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(sql, params);
+                            count = (long) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class)
+                                    .lookupSingle(sql, params);
                             can = (count == 0);
                             if (!can) {
                                 Message.showError(getUILocaleUtil().getMessage("selected.subjects.already.exists"));
-                            } else {
-                                sql = "select count(a.SUBJECT_ID) from CURRICULUM_DETAIL a where a.CURRICULUM_ID = ?1 and a.SEMESTER_ID = ?2 and a.DELETED = ?3 and a.SUBJECT_ID in (";
-                                sb = new StringBuilder();
-                                first = true;
-                                for (Entity e : selectedList) {
-                                    if (!first) {
-                                        sb.append(", ");
-                                    }
-                                    sb.append(e.getId().getId());
-                                    first = false;
-                                    idList.add(e.getId());
-                                }
-                                sb.append(")");
-                                sql = sql + sb.toString();
-
-                                count = (Integer) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class)
-                                        .lookupSingle(sql, params);
-                                can = (count == 0);
-                                if (!can) {
-                                    Message.showError(getUILocaleUtil().getMessage("selected.subjects.already.exists"));
-                                }
                             }
-                        } catch (Exception ex) {
-                            can = false;
-                            LOG.error("Unable to check subjects: ", ex);
-                            Message.showError(ex.toString());
                         }
+                    } catch (Exception ex) {
+                        can = false;
+                        LOG.error("Unable to check subjects: ", ex);
+                        Message.showError(ex.toString());
+//                        }
                     }
                 } catch (Exception ex) {
                     can = false;

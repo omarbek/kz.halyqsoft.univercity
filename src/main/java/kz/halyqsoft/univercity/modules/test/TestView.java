@@ -2,7 +2,6 @@ package kz.halyqsoft.univercity.modules.test;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.*;
-
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.USER_TYPE;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -10,7 +9,6 @@ import org.r3a.common.entity.beans.AbstractTask;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.dialog.Message;
-
 
 public class TestView extends AbstractTaskView {
 
@@ -24,7 +22,6 @@ public class TestView extends AbstractTaskView {
 
     @Override
     public void initView(boolean b) throws Exception {
-
         firstNameTF = new TextField(getUILocaleUtil().getCaption("firstNameTF"));
         firstNameTF.setImmediate(true);
         firstNameTF.setRequired(true);
@@ -33,8 +30,7 @@ public class TestView extends AbstractTaskView {
         surnameTF.setImmediate(true);
         surnameTF.setRequired(true);
 
-
-        HorizontalLayout mainHL=new HorizontalLayout();
+        HorizontalLayout mainHL = new HorizontalLayout();
         mainHL.addComponent(firstNameTF);
         mainHL.addComponent(surnameTF);
         getContent().addComponent(mainHL);
@@ -52,24 +48,23 @@ public class TestView extends AbstractTaskView {
         getContent().addComponent(saveHL);
         getContent().setComponentAlignment(saveHL, Alignment.MIDDLE_CENTER);
 
-
         Button saveBtn = new Button(getUILocaleUtil().getCaption("saveBtn"));
 
         saveBtn.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
-                String firstName =  firstNameTF.getValue();
-                String lastName =  surnameTF.getValue();
+                String firstName = firstNameTF.getValue();
+                String lastName = surnameTF.getValue();
                 USER_TYPE userType = (USER_TYPE) rolesCB.getValue();
 
 
-                if (firstName == null || firstName.isEmpty() ||lastName == null ||lastName.isEmpty()
+                if (firstName == null || firstName.isEmpty() || lastName == null || lastName.isEmpty()
                         || userType == null) {
                     Message.showError(getUILocaleUtil().getMessage("error.required.fields"));
-                }else{
-                    Message.showInfo(getUILocaleUtil().getCaption("firstNameTF")+":"+firstName
-                            + "\n" + getUILocaleUtil().getCaption("surnameTF")+":"+lastName
-                            + "\n" + getUILocaleUtil().getCaption("rolesCB")+":"+userType);
+                } else {
+                    Message.showInfo(getUILocaleUtil().getCaption("firstNameTF") + ":" + firstName
+                            + "\n" + getUILocaleUtil().getCaption("surnameTF") + ":" + lastName
+                            + "\n" + getUILocaleUtil().getCaption("rolesCB") + ":" + userType);
                 }
             }
 
