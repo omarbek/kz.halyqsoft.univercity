@@ -812,7 +812,6 @@ public final class ApplicantsForm extends UsersForm {
             inLettersEdu = accountantPrice.getPriceInLetters();
         }
             else{
-
             moneyForEducation="0";
         }
 
@@ -824,7 +823,6 @@ public final class ApplicantsForm extends UsersForm {
             inLettersDorn = accountantPriceDorm.getPriceInLetters();
         }
         else{
-
             moneyForDorm="0";
         }
         String answerDorm = String.valueOf(Double.valueOf(moneyForDorm) / 8);
