@@ -111,7 +111,7 @@ final class CycleDetailPanel extends AbstractCommonPanel {
         QueryModel<V_CURRICULUM_DETAIL> qm = new QueryModel<V_CURRICULUM_DETAIL>(V_CURRICULUM_DETAIL.class);
         qm.addWhere("curriculum", ECriteria.EQUAL, curriculumId);
         qm.addWhereAnd("subjectCycle", ECriteria.EQUAL, subjectCycle.getId());
-        qm.addWhereAnd("elective", Boolean.FALSE);
+//        qm.addWhereAnd("elective", Boolean.FALSE);
         qm.addWhereAnd("deleted", Boolean.FALSE);
 
         try {
@@ -146,30 +146,25 @@ final class CycleDetailPanel extends AbstractCommonPanel {
     }
 
     private void refreshFooter() {
-        int credit = 0;
-        int totalCredit = 0;
-        Indexed ds = grid.getContainerDataSource();
-        for (Object item : ds.getItemIds()) {
-            credit += (Integer) ds.getItem(item).getItemProperty("credit").getValue();
-        }
-
-        StringBuilder sb = new StringBuilder();
-        sb.append(totalText);
-        sb.append(" - ");
-        sb.append(credit);
-        sb.append(", ");
-
-        totalCredit = credit;
-
-        ID curriculumId = (curriculum != null && curriculum.getId() != null) ? curriculum.getId() : ID.valueOf(-1);
-        QueryModel<V_CURRICULUM_DETAIL> qm = new QueryModel<V_CURRICULUM_DETAIL>(V_CURRICULUM_DETAIL.class);
-        qm.addSelect("credit", EAggregate.SUM);
-        qm.addWhere("curriculum", ECriteria.EQUAL, curriculumId);
-        qm.addWhereAnd("subjectCycle", ECriteria.EQUAL, subjectCycle.getId());
-        qm.addWhereAnd("elective", Boolean.TRUE);
-        qm.addWhereAnd("deleted", Boolean.FALSE);
-
         try {
+            int totalCredit = 0;
+
+            ID curriculumId = (curriculum != null && curriculum.getId() != null) ? curriculum.getId() : ID.valueOf(-1);
+            QueryModel<V_CURRICULUM_DETAIL> qm = getCurriculumDetailQM(curriculumId,Boolean.FALSE);
+            BigDecimal credit = (BigDecimal) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItems(qm);
+            if (credit == null) {
+                credit = BigDecimal.ZERO;
+            }
+
+            StringBuilder sb = new StringBuilder();
+            sb.append(totalText);
+            sb.append(" - ");
+            sb.append(credit);
+            sb.append(", ");
+
+            totalCredit = credit.intValue();
+
+            qm = getCurriculumDetailQM(curriculumId,Boolean.TRUE);
             BigDecimal electiveCredit = (BigDecimal) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItems(qm);
             if (electiveCredit == null) {
                 electiveCredit = BigDecimal.ZERO;
@@ -180,14 +175,24 @@ final class CycleDetailPanel extends AbstractCommonPanel {
             sb.append(" - ");
             sb.append(electiveCredit.intValue());
             sb.append(", ");
+
+            sb.append(cycleText);
+            sb.append(" - ");
+            sb.append(totalCredit);
+            totalLabel.setValue(sb.toString());
         } catch (Exception ex) {
             LOG.error("Unable to refresh footer: ", ex);
         }
+    }
 
-        sb.append(cycleText);
-        sb.append(" - ");
-        sb.append(totalCredit);
-        totalLabel.setValue(sb.toString());
+    private QueryModel<V_CURRICULUM_DETAIL> getCurriculumDetailQM(ID curriculumId,Boolean isElective) {
+        QueryModel<V_CURRICULUM_DETAIL> qm = new QueryModel<V_CURRICULUM_DETAIL>(V_CURRICULUM_DETAIL.class);
+        qm.addSelect("credit", EAggregate.SUM);
+        qm.addWhere("curriculum", ECriteria.EQUAL, curriculumId);
+        qm.addWhereAnd("subjectCycle", ECriteria.EQUAL, subjectCycle.getId());
+        qm.addWhereAnd("elective", isElective);
+        qm.addWhereAnd("deleted", Boolean.FALSE);
+        return qm;
     }
 
     public void save() throws Exception {

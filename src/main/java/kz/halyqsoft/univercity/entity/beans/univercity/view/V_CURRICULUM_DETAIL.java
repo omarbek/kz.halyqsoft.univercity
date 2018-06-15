@@ -1,11 +1,7 @@
 package kz.halyqsoft.univercity.entity.beans.univercity.view;
 
 import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ACADEMIC_FORMULA;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.CONTROL_TYPE;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.CREDITABILITY;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT_CYCLE;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
@@ -46,7 +42,7 @@ public class V_CURRICULUM_DETAIL extends AbstractEntity {
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
-    private V_ELECTIVE_SUBJECT_LABEL subject;
+    private SUBJECT subject;
 	
 	@FieldInfo(type = EFieldType.TEXT, max = 10, order = 5, inEdit = false, inView = false, columnWidth = 120)
 	@Column(name = "SUBJECT_CODE")
@@ -143,11 +139,11 @@ public class V_CURRICULUM_DETAIL extends AbstractEntity {
 		this.semesterName = semesterName;
 	}
 
-	public V_ELECTIVE_SUBJECT_LABEL getSubject() {
+	public SUBJECT getSubject() {
 		return subject;
 	}
 
-	public void setSubject(V_ELECTIVE_SUBJECT_LABEL subject) {
+	public void setSubject(SUBJECT subject) {
 		this.subject = subject;
 	}
 

@@ -1000,3 +1000,71 @@ ALTER TABLE subject
   ALTER COLUMN code DROP NOT NULL;
 ALTER TABLE subject
   ALTER COLUMN subject_cycle_id DROP NOT NULL;
+
+CREATE TABLE curriculum_after_semester (
+  id               BIGINT    NOT NULL,
+  curriculum_id    BIGINT    NOT NULL,
+  semester_data_id BIGINT    NOT NULL,
+  subject_id       BIGINT    NOT NULL,
+  created          TIMESTAMP NOT NULL,
+  updated          TIMESTAMP,
+  deleted          BOOLEAN   NOT NULL
+);
+
+ALTER TABLE curriculum_after_semester
+  ADD CONSTRAINT pk_curriculum_after_semester PRIMARY KEY (id);
+
+CREATE INDEX idx_curriculum_after_semester
+  ON curriculum_after_semester (
+    curriculum_id ASC,
+    subject_id ASC,
+    semester_data_id ASC
+  );
+
+ALTER TABLE ONLY curriculum_after_semester
+  ADD CONSTRAINT fk_curriculum_after_semester_curriculum FOREIGN KEY (curriculum_id)
+REFERENCES curriculum (id)
+ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+ALTER TABLE ONLY curriculum_after_semester
+  ADD CONSTRAINT fk_curriculum_after_semester_semester_data FOREIGN KEY (semester_data_id)
+REFERENCES semester_data (id)
+ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+ALTER TABLE ONLY curriculum_after_semester
+  ADD CONSTRAINT fk_curriculum_after_semester_subject FOREIGN KEY (subject_id)
+REFERENCES subject (id)
+ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+CREATE VIEW V_SEMESTER_DATA AS
+  SELECT
+    sem_data.ID,
+    sem_data.YEAR_ID,
+    year.ENTRANCE_YEAR,
+    sem_data.SEMESTER_PERIOD_ID,
+    sem_period.PERIOD_NAME,
+    sem_data.BEGIN_DATE,
+    sem_data.END_DATE
+  FROM SEMESTER_DATA sem_data INNER JOIN ENTRANCE_YEAR year ON sem_data.YEAR_ID = year.ID
+    INNER JOIN SEMESTER_PERIOD sem_period ON sem_data.SEMESTER_PERIOD_ID = sem_period.ID;
+
+CREATE OR REPLACE VIEW V_CURRICULUM_AFTER_SEMESTER AS
+  SELECT
+    curr_after_sem.ID,
+    curr_after_sem.CURRICULUM_ID,
+    curr_after_sem.SUBJECT_ID,
+    subj.NAME_RU                                SUBJECT_NAME_RU,
+    subj.CODE                                   SUBJECT_CODE,
+    subj.CREDITABILITY_ID,
+    cred.CREDIT,
+    sem.id                                      semester_data_id,
+    sem.entrance_year || ' ' || sem.period_name semester_data_name,
+    curr_after_sem.DELETED
+  FROM CURRICULUM_AFTER_SEMESTER curr_after_sem INNER JOIN SUBJECT subj ON curr_after_sem.SUBJECT_ID = subj.ID
+    INNER JOIN CREDITABILITY cred ON subj.CREDITABILITY_ID = cred.ID
+    INNER JOIN V_SEMESTER_DATA sem ON curr_after_sem.semester_data_id = sem.ID;
+
+CREATE SEQUENCE S_CURRICULUM_AFTER_SEMESTER
+MINVALUE 0
+START WITH 1
+NO CYCLE;

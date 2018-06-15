@@ -83,9 +83,9 @@ public class CreditCycleSumPanel extends AbstractCurriculumPanel {
         String sql = "SELECT " +
                 "  t1.CYCLE_SHORT_NAME, " +
                 "  t1.CYCLE_NAME, " +
-                "  t1.CREDIT_SUM + coalesce(t2.CREDIT_SUM, 0) TOTAL_CREDIT_SUM, " +
-                "  t1.CREDIT_SUM                              REQUIRED_CREDIT_SUM, " +
-                "  coalesce(t2.CREDIT_SUM, 0)                 ELECTIVE_CREDIT_SUM " +
+                "  coalesce(t1.CREDIT_SUM, 0) + coalesce(t2.CREDIT_SUM, 0) TOTAL_CREDIT_SUM, " +
+                "  coalesce(t1.CREDIT_SUM, 0)                              REQUIRED_CREDIT_SUM, " +
+                "  coalesce(t2.CREDIT_SUM, 0)                              ELECTIVE_CREDIT_SUM " +
                 "FROM (SELECT " +
                 "        a.CURRICULUM_ID, " +
                 "        b.SUBJECT_CYCLE_ID, " +
@@ -95,67 +95,79 @@ public class CreditCycleSumPanel extends AbstractCurriculumPanel {
                 "      FROM CURRICULUM_DETAIL a INNER JOIN SUBJECT b ON a.SUBJECT_ID = b.ID " +
                 "        INNER JOIN SUBJECT_CYCLE c ON b.SUBJECT_CYCLE_ID = c.ID " +
                 "        INNER JOIN CREDITABILITY d ON b.CREDITABILITY_ID = d.ID " +
-                "      WHERE a.CURRICULUM_ID = ?1 AND a.DELETED = ?2 AND a.CONSIDER_CREDIT = ?3 " +
-                "      GROUP BY a.CURRICULUM_ID, b.SUBJECT_CYCLE_ID, c.CYCLE_SHORT_NAME, c.CYCLE_NAME) t1 LEFT JOIN (SELECT " +
-                "                                                                                                      a.CURRICULUM_ID, " +
-                "                                                                                                      CASE WHEN " +
-                "                                                                                                        a.subject_cycle_id " +
-                "                                                                                                        IS NULL " +
-                "                                                                                                        THEN cycle.id " +
-                "                                                                                                      ELSE a.subject_cycle_id END " +
-                "                                                                                                                         ELECTIVE_SUBJECT_CYCLE_ID, " +
-                "                                                                                                      CASE WHEN " +
-                "                                                                                                        b.CYCLE_SHORT_NAME " +
-                "                                                                                                        IS NULL " +
-                "                                                                                                        THEN cycle.cycle_short_name " +
-                "                                                                                                      ELSE b.cycle_short_name END, " +
-                "                                                                                                      CASE WHEN " +
-                "                                                                                                        b.CYCLE_NAME IS " +
-                "                                                                                                        NULL " +
-                "                                                                                                        THEN cycle.cycle_name " +
-                "                                                                                                      ELSE b.cycle_name END, " +
-                "                                                                                                      sum( " +
-                "                                                                                                          credit.credit) CREDIT_SUM " +
-                "                                                                                                    FROM " +
-                "                                                                                                      elective_subject a LEFT JOIN " +
-                "                                                                                                      SUBJECT_CYCLE b ON " +
-                "                                                                                                                        a.subject_cycle_id " +
-                "                                                                                                                        = " +
-                "                                                                                                                        b.ID " +
-                "                                                                                                      INNER JOIN " +
-                "                                                                                                      subject subject " +
-                "                                                                                                        ON subject.id = " +
-                "                                                                                                           a.subject_id " +
-                "                                                                                                      INNER JOIN " +
-                "                                                                                                      creditability credit " +
-                "                                                                                                        ON credit.id = " +
-                "                                                                                                           subject.creditability_id " +
-                "                                                                                                      INNER JOIN " +
-                "                                                                                                      subject_cycle cycle " +
-                "                                                                                                        ON cycle.id = " +
-                "                                                                                                           subject.subject_cycle_id " +
-                "                                                                                                    WHERE " +
-                "                                                                                                      a.CURRICULUM_ID = " +
-                "                                                                                                      ?4 " +
-                "                                                                                                      AND " +
-                "                                                                                                      a.DELETED = ?5 " +
-                "                                                                                                      AND " +
-                "                                                                                                      subject.deleted = " +
-                "                                                                                                      ?6 " +
-                "                                                                                                    GROUP BY " +
-                "                                                                                                      a.CURRICULUM_ID, " +
-                "                                                                                                      a.subject_cycle_id, " +
-                "                                                                                                      cycle.id, " +
-                "                                                                                                      b.CYCLE_SHORT_NAME, " +
-                "                                                                                                      b.CYCLE_NAME) t2 " +
+                "      WHERE a.CURRICULUM_ID = ?1 AND a.DELETED = FALSE AND a.CONSIDER_CREDIT = TRUE " +
+                "      GROUP BY a.CURRICULUM_ID, b.SUBJECT_CYCLE_ID, c.CYCLE_SHORT_NAME, c.CYCLE_NAME) t1 " +
+                "  LEFT JOIN (SELECT " +
+                "               a.CURRICULUM_ID, " +
+                "               CASE WHEN a.subject_cycle_id IS NULL " +
+                "                 THEN cycle.id " +
+                "               ELSE a.subject_cycle_id END ELECTIVE_SUBJECT_CYCLE_ID, " +
+                "               CASE WHEN " +
+                "                 b.CYCLE_SHORT_NAME " +
+                "                 IS NULL " +
+                "                 THEN cycle.cycle_short_name " +
+                "               ELSE b.cycle_short_name END, " +
+                "               CASE WHEN b.CYCLE_NAME IS NULL " +
+                "                 THEN cycle.cycle_name " +
+                "               ELSE b.cycle_name END, " +
+                "               sum(credit.credit)          CREDIT_SUM " +
+                "             FROM " +
+                "               elective_subject a LEFT JOIN SUBJECT_CYCLE b ON a.subject_cycle_id = b.ID " +
+                "               INNER JOIN subject subject ON subject.id = a.subject_id " +
+                "               INNER JOIN creditability credit ON credit.id = subject.creditability_id " +
+                "               INNER JOIN subject_cycle cycle ON cycle.id = subject.subject_cycle_id " +
+                "             WHERE a.CURRICULUM_ID = ?1 AND a.DELETED = FALSE AND subject.deleted = FALSE " +
+                "             GROUP BY a.CURRICULUM_ID, a.subject_cycle_id, cycle.id, b.CYCLE_SHORT_NAME, " +
+                "               b.CYCLE_NAME) t2 " +
+                "    ON t1.CURRICULUM_ID = t2.CURRICULUM_ID AND t1.SUBJECT_CYCLE_ID = t2.ELECTIVE_SUBJECT_CYCLE_ID " +
+                "UNION " +
+                "SELECT " +
+                "  t2.CYCLE_SHORT_NAME, " +
+                "  t2.CYCLE_NAME, " +
+                "  coalesce(t2.CREDIT_SUM, 0) + coalesce(t1.CREDIT_SUM, 0) TOTAL_CREDIT_SUM, " +
+                "  coalesce(t1.CREDIT_SUM, 0)                              REQUIRED_CREDIT_SUM, " +
+                "  coalesce(t2.CREDIT_SUM, 0)                              ELECTIVE_CREDIT_SUM " +
+                "FROM (SELECT " +
+                "        a.CURRICULUM_ID, " +
+                "        CASE WHEN a.subject_cycle_id IS NULL " +
+                "          THEN cycle.id " +
+                "        ELSE a.subject_cycle_id END ELECTIVE_SUBJECT_CYCLE_ID, " +
+                "        CASE WHEN " +
+                "          b.CYCLE_SHORT_NAME " +
+                "          IS NULL " +
+                "          THEN cycle.cycle_short_name " +
+                "        ELSE b.cycle_short_name END cycle_short_name, " +
+                "        CASE WHEN b.CYCLE_NAME IS NULL " +
+                "          THEN cycle.cycle_name " +
+                "        ELSE b.cycle_name END       cycle_name, " +
+                "        sum(credit.credit)          CREDIT_SUM " +
+                "      FROM " +
+                "        elective_subject a LEFT JOIN SUBJECT_CYCLE b ON a.subject_cycle_id = b.ID " +
+                "        INNER JOIN subject subject ON subject.id = a.subject_id " +
+                "        INNER JOIN creditability credit ON credit.id = subject.creditability_id " +
+                "        INNER JOIN subject_cycle cycle ON cycle.id = subject.subject_cycle_id " +
+                "      WHERE a.CURRICULUM_ID = ?1 AND a.DELETED = FALSE AND subject.deleted = FALSE " +
+                "      GROUP BY a.CURRICULUM_ID, a.subject_cycle_id, cycle.id, b.CYCLE_SHORT_NAME, " +
+                "        b.CYCLE_NAME) t2 " +
+                "  LEFT JOIN (SELECT " +
+                "               a.CURRICULUM_ID, " +
+                "               b.SUBJECT_CYCLE_ID, " +
+                "               c.CYCLE_SHORT_NAME, " +
+                "               c.CYCLE_NAME, " +
+                "               sum(d.CREDIT) CREDIT_SUM " +
+                "             FROM CURRICULUM_DETAIL a INNER JOIN SUBJECT b ON a.SUBJECT_ID = b.ID " +
+                "               INNER JOIN SUBJECT_CYCLE C ON b.SUBJECT_CYCLE_ID = C.ID " +
+                "               INNER JOIN CREDITABILITY D ON b.CREDITABILITY_ID = D.ID " +
+                "             WHERE a.CURRICULUM_ID = ?1 AND a.DELETED = FALSE AND a.CONSIDER_CREDIT = TRUE " +
+                "             GROUP BY a.CURRICULUM_ID, b.SUBJECT_CYCLE_ID, c.CYCLE_SHORT_NAME, c.CYCLE_NAME) t1 " +
                 "    ON t1.CURRICULUM_ID = t2.CURRICULUM_ID AND t1.SUBJECT_CYCLE_ID = t2.ELECTIVE_SUBJECT_CYCLE_ID";
         Map<Integer, Object> params = new HashMap<Integer, Object>(5);
         params.put(1, curriculumId);
-        params.put(2, Boolean.FALSE);
-        params.put(3, Boolean.TRUE);
-        params.put(4, curriculumId);
-        params.put(5, Boolean.FALSE);
-        params.put(6, Boolean.FALSE);
+//        params.put(2, Boolean.FALSE);
+//        params.put(3, Boolean.TRUE);
+//        params.put(4, curriculumId);
+//        params.put(5, Boolean.FALSE);
+//        params.put(6, Boolean.FALSE);
 
         try {
             List tempList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);

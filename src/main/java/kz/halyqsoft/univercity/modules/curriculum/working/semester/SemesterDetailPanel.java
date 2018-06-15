@@ -787,7 +787,7 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                     V_CURRICULUM_DETAIL vcd = (V_CURRICULUM_DETAIL) item;
                     CURRICULUM_DETAIL cd = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class)
                             .lookup(CURRICULUM_DETAIL.class, vcd.getId());
-                    if (cd.getSubject() != null && vcd.isConsiderCredit() != cd.isConsiderCredit()) {
+                    if (cd != null && cd.getSubject() != null && vcd.isConsiderCredit() != cd.isConsiderCredit()) {
                         cd.setConsiderCredit(vcd.isConsiderCredit());
                         cdList.add(cd);
                     }
@@ -947,13 +947,13 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                 subjectSelectDlg = new SubjectSelectDialog(new AddNewSubjectListener(), V_SUBJECT_SELECT.class);
                 QueryModel qm = ((DBGridModel) subjectSelectDlg.getSelectModel()).getQueryModel();
                 qm.addWhere("chair", ECriteria.EQUAL, ID.valueOf(-1));
-                //				qm.addWhereAnd("mandatory", Boolean.TRUE);
-                qm.addWhere("subjectCycle", ECriteria.NOT_EQUAL, ID.valueOf(4));
+                qm.addWhere("mandatory", Boolean.TRUE);
+                qm.addWhere("subjectCycle",ECriteria.NOT_EQUAL,ID.valueOf(4));
                 subjectSelectDlg.setDialogWidth(600);
                 subjectSelectDlg.setDialogHeight(300);
                 subjectSelectDlg.getFilterModel().addFilter("chair", chairCB);
                 subjectSelectDlg.getFilterModel().addFilter("level", levelCB);
-                subjectSelectDlg.getFilterModel().addFilter("subjectCycle", subjectCycleCB);
+//                subjectSelectDlg.getFilterModel().addFilter("subjectCycle", subjectCycleCB);
                 subjectSelectDlg.getFilterModel().addFilter("creditability", creditabilityCB);
                 subjectSelectDlg.getFilterModel().addFilter("code", subjectCodeTF);
                 subjectSelectDlg.setFilterRequired(true);
@@ -1043,12 +1043,13 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                         new AddNewElectiveSubjectListener(), V_SUBJECT_SELECT.class);
                 QueryModel qm = ((DBGridModel) electiveSubjectSelectDlg.getSelectModel()).getQueryModel();
                 qm.addWhere("chair", ECriteria.EQUAL, ID.valueOf(-1));
-                qm.addWhere("subjectCycle", ECriteria.NOT_EQUAL, ID.valueOf(4));
+                qm.addWhere("mandatory", Boolean.FALSE);
+                qm.addWhere("subjectCycle",ECriteria.NOT_EQUAL,ID.valueOf(4));
                 electiveSubjectSelectDlg.setDialogWidth(600);
                 electiveSubjectSelectDlg.setDialogHeight(400);
                 electiveSubjectSelectDlg.getFilterModel().addFilter("chair", chairCB);
                 electiveSubjectSelectDlg.getFilterModel().addFilter("level", levelCB);
-                electiveSubjectSelectDlg.getFilterModel().addFilter("subjectCycle", subjectCycleCB);
+//                electiveSubjectSelectDlg.getFilterModel().addFilter("subjectCycle", subjectCycleCB);
                 electiveSubjectSelectDlg.getFilterModel().addFilter("creditability", creditabilityCB);
                 electiveSubjectSelectDlg.getFilterModel().addFilter("code", subjectCodeTF);
                 electiveSubjectSelectDlg.setFilterRequired(true);
@@ -1091,7 +1092,7 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
 
                 V_CURRICULUM_DETAIL vcd = (V_CURRICULUM_DETAIL) fm.getEntity();
                 vcd.setSubject(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class)
-                        .lookup(V_ELECTIVE_SUBJECT_LABEL.class, ID.valueOf(999999)));
+                        .lookup(SUBJECT.class, ID.valueOf(999999)));
 
                 addElectiveFWD = new FormWidgetDialog(fm);
                 addElectiveFWD.getFormWidget().addEntityListener(SemesterDetailPanel.this);
