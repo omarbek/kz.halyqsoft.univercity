@@ -810,10 +810,8 @@ public final class ApplicantsForm extends UsersForm {
         if(accountantPrice!=null){
              moneyForEducation = String.valueOf(accountantPrice.getPrice());
             inLettersEdu = accountantPrice.getPriceInLetters();
-        }
-            else{
-
-            moneyForEducation="0";
+        }  else{
+               moneyForEducation="0";
         }
 
         String inLettersDorn="";
@@ -822,9 +820,7 @@ public final class ApplicantsForm extends UsersForm {
         if(accountantPriceDorm!=null){
             moneyForDorm = String.valueOf(accountantPriceDorm.getPrice());
             inLettersDorn = accountantPriceDorm.getPriceInLetters();
-        }
-        else{
-
+        }else{
             moneyForDorm="0";
         }
         String answerDorm = String.valueOf(Double.valueOf(moneyForDorm) / 8);
@@ -948,7 +944,6 @@ public final class ApplicantsForm extends UsersForm {
                 .replaceAll("\\$document", createdDate)
                 .replaceAll("\\$diplomaType", student.getDiplomaType().toString())
                 .replaceAll("\\$group", "")
-
                 .replaceAll("қажет, қажет емес", dorm);
     }
 
