@@ -192,6 +192,7 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_TEACHER_SUBJECT_SELECT</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_EXAM_SCHEDULE_SELECT</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_EXAM_TRANSCRIPT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_CURRICULUM_AFTER_SEMESTER</class>
 
         <class>kz.halyqsoft.univercity.entity.beans.univercity.AbstractSpiderEntity</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.AbstractStudentEntity</class>
@@ -301,6 +302,7 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.ACCOUNTANT_PRICE</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.CHAT</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.MESSAGE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM_AFTER_SEMESTER</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
