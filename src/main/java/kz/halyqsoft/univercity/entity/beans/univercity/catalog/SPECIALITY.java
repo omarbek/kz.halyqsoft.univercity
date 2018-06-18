@@ -22,7 +22,7 @@ public class SPECIALITY extends AbstractEntity {
 	@FieldInfo(type = EFieldType.TEXT, max = 128, order = 1)
 	@Column(name = "SPEC_NAME", nullable = false)
 	private String specName;
-	
+
 	@FieldInfo(type = EFieldType.TEXT, max = 10, order = 2, columnWidth = 80)
 	@Column(name = "CODE", nullable = false)
 	private String code;
@@ -85,7 +85,7 @@ public class SPECIALITY extends AbstractEntity {
 	public void setDeleted(boolean deleted) {
 		this.deleted = deleted;
 	}
-	
+
 	@Override
 	public String toString() {
 		return specName + " - " + code;

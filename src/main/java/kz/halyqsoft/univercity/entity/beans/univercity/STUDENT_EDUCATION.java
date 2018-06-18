@@ -223,4 +223,12 @@ public class STUDENT_EDUCATION extends AbstractEntity {
 	public void setStudentSchedules(Set<STUDENT_SCHEDULE> studentSchedules) {
 		this.studentSchedules = studentSchedules;
 	}
+
+	public GROUPS getGroups() {
+		return groups;
+	}
+
+	public void setGroups(GROUPS groups) {
+		this.groups = groups;
+	}
 }

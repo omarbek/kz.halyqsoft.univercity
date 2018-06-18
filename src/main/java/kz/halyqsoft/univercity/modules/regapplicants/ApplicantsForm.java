@@ -41,6 +41,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.Calendar;
 import java.util.List;
@@ -71,6 +72,7 @@ public final class ApplicantsForm extends UsersForm {
     private Contract contract;
 
     private BrowserWindowOpener contractBWO;
+    private BrowserWindowOpener masgisterContractBWO;
     private BrowserWindowOpener requestBWO;
     private BrowserWindowOpener titleBWO;
     private BrowserWindowOpener voucherBWO;
@@ -117,6 +119,9 @@ public final class ApplicantsForm extends UsersForm {
         StreamResource myResource = createResourceStudent("85", null);
         contractBWO = new BrowserWindowOpener(myResource);
         contractBWO.extend(finishButton);
+
+        masgisterContractBWO = new BrowserWindowOpener(myResource);
+        masgisterContractBWO.extend(finishButton);
 
         requestBWO = new BrowserWindowOpener(myResource);
         requestBWO.extend(finishButton);
@@ -231,7 +236,13 @@ public final class ApplicantsForm extends UsersForm {
 
             SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(studentEducation);
 
-            StreamResource myResource = createResourceStudent("85", student);
+
+            StreamResource myResource = null;
+            if(student.getLevel().getLevelName().equalsIgnoreCase("Магистратура")) {
+                myResource = createResourceStudent("82", student);
+            }else{
+                myResource = createResourceStudent("85", student);
+            }
             FileDownloader fileDownloader = new FileDownloader(myResource);
             myResource.setMIMEType("application/pdf");
             myResource.setCacheTime(0);
@@ -479,8 +490,14 @@ public final class ApplicantsForm extends UsersForm {
             e.printStackTrace();//TODO catch
         }
 
-        StreamResource myResource = createResourceStudent("85", student);
-        contractBWO.setResource(myResource);
+        StreamResource myResource = null;
+        if(student.getLevel().getLevelName().equalsIgnoreCase("Магистратура")) {
+            myResource = createResourceStudent("82", student);
+            masgisterContractBWO.setResource(myResource);
+        }else{
+            myResource = createResourceStudent("85", student);
+            contractBWO.setResource(myResource);
+        }
 
         myResource = createResourceStudent("27", student);
         requestBWO.setResource(myResource);
@@ -491,8 +508,9 @@ public final class ApplicantsForm extends UsersForm {
         myResource = createResourceStudent("32", student);
         titleBWO.setResource(myResource);
 
-        if (student != null && student.isNeedDorm() && !came) {
+        if (student != null && student.isNeedDorm() && !came ) {
             came = true;
+
             myResource = createResourceStudent("92", student);
             dormBWO = new BrowserWindowOpener(myResource);
             dormBWO.extend(finishButton);
@@ -576,6 +594,8 @@ public final class ApplicantsForm extends UsersForm {
             fileName = "Титул_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
         } else if (value.equals("33")) {
             fileName = "Қолхат_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
+        } else if (value.equals("82")) {
+            fileName = "Договор магистрант_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
         } else {
             fileName = "Өтініш_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
         }
@@ -595,6 +615,15 @@ public final class ApplicantsForm extends UsersForm {
                     ByteArrayOutputStream byteArrayOutputStream1 = new ByteArrayOutputStream();
                     PdfWriter pdfWriter = PdfWriter.getInstance(docum, byteArrayOutputStream1);
                     docum.open();
+                    PDF_DOCUMENT pdf_document = null;
+                    try {
+                        QueryModel<PDF_DOCUMENT> pdfDocumentQueryModel = new QueryModel<>(PDF_DOCUMENT.class);
+                        pdfDocumentQueryModel.addWhere("id" ,ECriteria.EQUAL ,value);
+                        pdf_document = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(pdfDocumentQueryModel);
+                    } catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
 
                     if (value.equals("32")) {
                         PdfContentByte canvas = pdfWriter.getDirectContent();
@@ -730,7 +759,7 @@ public final class ApplicantsForm extends UsersForm {
                                 getFont(12, Font.BOLD));
                         title.setAlignment(Element.ALIGN_CENTER);
                     } else {
-                        title = new Paragraph("Договор",
+                        title = new Paragraph(pdf_document.getTitle(),
                                 getFont(12, Font.BOLD));
                         title.setAlignment(Element.ALIGN_CENTER);
                     }
@@ -894,8 +923,54 @@ public final class ApplicantsForm extends UsersForm {
         String facultyName = getStringBeforeSlash(studentEducation.getFaculty().toString());
         String specialityName = getStringBeforeSlash(speciality.getSpecName());
 
+        USER_PASSPORT user_passport = null;
+        try{
+            QueryModel<USER_PASSPORT> qm = new QueryModel<>(USER_PASSPORT.class);
+            FromItem fi1 = qm.addJoin(EJoin.INNER_JOIN , "id" , USER_DOCUMENT.class , "id");
+            FromItem fi = fi1.addJoin(  EJoin.INNER_JOIN, "user", USERS.class, "id");
+            qm.addWhere(fi  ,"deleted" , ECriteria.EQUAL,false);
+            qm.addWhere(fi  ,"id" , ECriteria.EQUAL,student.getId());
+
+
+            user_passport = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(qm);
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+
+        String iin = "";
+        String passportNumber = "";
+        if(user_passport!=null)
+        {
+            iin = ((USER_PASSPORT)user_passport).getIin();
+            passportNumber = user_passport.getDocumentNo();
+        }
+        String fullAddress = "";
+        if(userAddress.getCountry()!=null)
+            fullAddress+=" "+userAddress.getCountry();
+        if(userAddress.getRegion()!=null)
+            fullAddress+=" "+userAddress.getRegion();
+        if(userAddress.getCity()!=null)
+            fullAddress+=" "+userAddress.getCity();
+        if(userAddress.getStreet()!=null)
+            fullAddress+=" "+userAddress.getStreet();
+        String firstCourseMoney = money;
+        String secondCourseMoney = money;
+
+        LocalDateTime now = LocalDateTime.now();
+
         replaced = text.replaceAll("\\$fio", student.toString())
                 .replaceAll("\\$money", money)
+                .replaceAll("\\$firstCourseMoney", firstCourseMoney)
+                .replaceAll("\\$secondCourseMoney", secondCourseMoney)
+                .replaceAll("\\$year", now.getYear()+"")
+                .replaceAll("\\$month", now.getMonth().getValue()+"")
+                .replaceAll("\\$data", now.getDayOfMonth()+"")
+
+                .replaceAll("\\$iin", iin)
+                .replaceAll("\\$passportNumber", passportNumber)
+                .replaceAll("\\$address", fullAddress)
                 .replaceAll("\\$faculty", facultyName)
                 .replaceAll("\\$DataMonthYear", today + " года")
                 .replaceAll("\\$formaobuch", ochnii)
