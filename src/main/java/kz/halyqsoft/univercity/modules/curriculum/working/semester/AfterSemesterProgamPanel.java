@@ -326,7 +326,7 @@ public class AfterSemesterProgamPanel extends AbstractCurriculumPanel implements
     }
     public final void checkForConform() throws Exception {
         if (getTotalCredit() == 0) {
-            throw new Exception("no programms after semester");//TODO
+            throw new Exception(getUILocaleUtil().getCaption("no.programs.after.semester"));
         }
     }
     @Override
@@ -347,7 +347,7 @@ public class AfterSemesterProgamPanel extends AbstractCurriculumPanel implements
                 try {
                     ss = session.lookupSingle(ssQM);
                 } catch (NoResultException nrex) {
-                    nrex.printStackTrace();//TODO catch
+                    ss=null;
                 }
                 if (ss != null) {
                     String sql = "SELECT count(curr_after_sem.ID) CNT " +
@@ -365,7 +365,7 @@ public class AfterSemesterProgamPanel extends AbstractCurriculumPanel implements
                     try {
                         sum = (Integer) session.lookupSingle(sql, params);
                     } catch (NoResultException nrex) {
-                        nrex.printStackTrace();//TODO catch
+                        sum=null;
                     }
                     if (sum != null && sum > 0) {
                         delList.add(afterSemester);

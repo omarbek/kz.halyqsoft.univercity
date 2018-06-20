@@ -254,7 +254,9 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
         //				electiveGrid.setButtonVisible(AbstractToolbar.DELETE_BUTTON, false);
         //			}
         //		}
+        electiveGrid.getWidgetModel().setReadOnly(curriculum.getCurriculumStatus().getId().equals(ID.valueOf(3)));
         electiveGrid.refresh();
+        getParentView().showErrorLabel(curriculumId.equals(ID.valueOf(-1)));
         getParentView().setTotalCreditSum();
     }
 
@@ -294,41 +296,8 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
         return semester.getId().getId().intValue() < 8;
     }
 
-    private void setSemesterData(SEMESTER_DATA sd) throws Exception {
-        //TODO: Потооом удалить этот метод вообще.
-        CommonEntityFacadeBean session = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class);
-        List<Entity> mergeList = new ArrayList<Entity>();
-        List<Entity> list = grid.getAllEntities();
-        for (Entity e : list) {
-            CURRICULUM_DETAIL cd = session.lookup(CURRICULUM_DETAIL.class, e.getId());
-            if (cd.getSemesterData() == null) {
-                cd.setSemesterData(sd);
-                mergeList.add(cd);
-            }
-        }
-
-        list = electiveGrid.getAllEntities();
-        for (Entity e : list) {
-            ELECTIVE_SUBJECT es = session.lookup(ELECTIVE_SUBJECT.class, e.getId());
-            if (es.getSemesterData() == null) {
-                es.setSemesterData(sd);
-                mergeList.add(es);
-            }
-        }
-
-        if (!mergeList.isEmpty()) {
-            session.merge(mergeList);
-        }
-    }
-
     public void approve() throws Exception {
         SEMESTER_DATA sd = getOrCreateSemesterData();
-
-        try {
-            setSemesterData(sd);
-        } catch (Exception ex) {
-            LOG.error("Unable to set semester data: ", ex);
-        }
 
 		/* Mandatory subjects only. Approve only unsaved subjects */
         String sql = "select a.* from SUBJECT a inner join CURRICULUM_DETAIL b on a.ID = b.SUBJECT_ID and b.CURRICULUM_ID = ?1 and b.SEMESTER_ID = ?2 and b.DELETED = ?3 where not exists (select 1 from SEMESTER_SUBJECT c where a.ID = c.SUBJECT_ID and c.SEMESTER_DATA_ID = ?4)";
@@ -819,7 +788,8 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
         }
         grid.setFooterValue("credit", totalCredit);
 
-        Integer electiveTotalCredit = (Integer) ((DBGridModel) electiveGrid.getWidgetModel()).getFooterValue("credit");
+        Integer electiveTotalCredit = (Integer) ((DBGridModel) electiveGrid.getWidgetModel()).
+                getFooterValue("credit");
         List<Entity> electives = electiveGrid.getAllEntities();
         for (Entity entity : electives) {
             V_ELECTIVE_SUBJECT electiveSubject = (V_ELECTIVE_SUBJECT) entity;
@@ -979,7 +949,7 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                 }
 
                 QueryModel<DEPARTMENT> chairQM = new QueryModel<DEPARTMENT>(DEPARTMENT.class);
-//                chairQM.addWhere("type", ECriteria.EQUAL, T_DEPARTMENT_TYPE.CHAIR_ID);//TODO
+                chairQM.addWhereNotNull("parent");
                 chairQM.addWhereAnd("deleted", Boolean.FALSE);
                 chairQM.addOrder("deptName");
                 BeanItemContainer<DEPARTMENT> chairBIC = new BeanItemContainer<DEPARTMENT>(DEPARTMENT.class,

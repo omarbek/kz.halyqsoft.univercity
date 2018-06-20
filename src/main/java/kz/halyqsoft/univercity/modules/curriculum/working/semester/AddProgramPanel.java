@@ -139,7 +139,6 @@ public class AddProgramPanel extends AbstractCurriculumPanel implements EntityLi
 
     public final void approve() throws Exception {
         List<SEMESTER_SUBJECT> newList = new ArrayList<SEMESTER_SUBJECT>();
-        List<CURRICULUM_ADD_PROGRAM> mergeList = new ArrayList<CURRICULUM_ADD_PROGRAM>();
         CommonEntityFacadeBean session = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class);
         // Approve only unsaved subjects
         String sql = "SELECT subj.* " +
@@ -159,32 +158,20 @@ public class AddProgramPanel extends AbstractCurriculumPanel implements EntityLi
 
         List<CURRICULUM_ADD_PROGRAM> capList = session.lookup(capQM);
         for (CURRICULUM_ADD_PROGRAM cap : capList) {
-            CURRICULUM_ADD_PROGRAM cap1 = session.lookup(CURRICULUM_ADD_PROGRAM.class, cap.getId());
-            SEMESTER_DATA sd = getOrCreateSemesterData(cap1.getSemester());
-            params.put(2, cap1.getSemester().getId().getId());
+            SEMESTER_DATA sd = getOrCreateSemesterData(cap.getSemester());
+            params.put(2, cap.getSemester().getId().getId());
             params.put(4, sd.getId().getId());
-            params.put(5, cap1.getSubject().getId().getId());
+            params.put(5, cap.getSubject().getId().getId());
             List<SUBJECT> subjectList = session.lookup(sql, params, SUBJECT.class);
             if (!subjectList.isEmpty()) {
                 SEMESTER_SUBJECT ss = new SEMESTER_SUBJECT();
                 ss.setSemesterData(sd);
-                ss.setSubject(cap1.getSubject());
+                ss.setSubject(cap.getSubject());
                 newList.add(ss);
             }
-
-            //TODO: Потооом удалить этот метод вообще.
-            if (cap1.getSemesterData() == null) {
-                cap1.setSemesterData(sd);
-                mergeList.add(cap1);
-            }
         }
-
         if (!newList.isEmpty()) {
             session.create(newList);
-        }
-
-        if (!mergeList.isEmpty()) {
-            session.merge(mergeList);
         }
     }
 
@@ -302,7 +289,7 @@ public class AddProgramPanel extends AbstractCurriculumPanel implements EntityLi
             subjectQM.addWhere("subjectCycle", ECriteria.EQUAL, ID.valueOf(4));
             try {
                 QueryModel<DEPARTMENT> chairQM1 = new QueryModel<DEPARTMENT>(DEPARTMENT.class);
-//                chairQM1.addWhere("type", ECriteria.EQUAL, T_DEPARTMENT_TYPE.CHAIR_ID);//TODO
+                chairQM1.addWhereNotNull("parent");
                 chairQM1.addWhereAnd("deleted", Boolean.FALSE);
                 chairQM1.addOrder("deptName");
                 BeanItemContainer<DEPARTMENT> chairBIC = new BeanItemContainer<DEPARTMENT>(DEPARTMENT.class, SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(chairQM1));

@@ -36,6 +36,7 @@ final class ElectiveSubjectSelectDialog extends CustomGridSelectDialog {
         considerCreditCB = new CheckBox();
         considerCreditCB.setCaption(getUILocaleUtil().getCaption("consider.credit"));
         fl.addComponent(considerCreditCB);
+        considerCreditCB.setValue(true);
 
         QueryModel<SUBJECT_CYCLE> subjectCycleQM = new QueryModel<SUBJECT_CYCLE>(SUBJECT_CYCLE.class);
         subjectCycleQM.addOrder("cycleShortName");

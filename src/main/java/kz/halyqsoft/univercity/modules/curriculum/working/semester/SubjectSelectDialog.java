@@ -36,6 +36,7 @@ final class SubjectSelectDialog extends CustomGridSelectDialog {
         considerCreditCB = new CheckBox();
         considerCreditCB.setCaption(getUILocaleUtil().getCaption("consider.credit"));
         fl.addComponent(considerCreditCB);
+        considerCreditCB.setValue(true);
 
         QueryModel<SUBJECT_CYCLE> subjectCycleQM = new QueryModel<SUBJECT_CYCLE>(SUBJECT_CYCLE.class);
         subjectCycleQM.addWhere("id", ECriteria.LESS, ID.valueOf(4));

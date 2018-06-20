@@ -319,6 +319,10 @@ public class SUBJECT extends AbstractEntity {
 		this.educationModuleType = educationModuleType;
 	}
 
+	public String toString() {
+		return nameRU;
+	}
+
 	public String toString(Locale l) {
 		String name = nameEN;
 		if (l.getLanguage().equals("kk")) {
