@@ -2,9 +2,13 @@ package kz.halyqsoft.univercity.modules.group;
 
 import com.vaadin.data.Validator;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.data.validator.IntegerRangeValidator;
+import com.vaadin.data.validator.NullValidator;
+import com.vaadin.data.validator.StringLengthValidator;
 import com.vaadin.event.MouseEvents;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.*;
+import com.vaadin.ui.declarative.FieldBinder;
 import kz.halyqsoft.univercity.entity.beans.univercity.GROUPS;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_EDUCATION;
@@ -36,6 +40,7 @@ import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 import org.r3a.common.vaadin.widget.filter2.FilterPanelListener;
 import org.r3a.common.vaadin.widget.form.FormModel;
 import org.r3a.common.vaadin.widget.form.FormWidgetDialog;
+import org.r3a.common.vaadin.widget.form.field.validator.IntegerValidator;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 import org.r3a.common.vaadin.widget.toolbar.IconToolbar;
@@ -72,139 +77,18 @@ public class GroupsView extends AbstractTaskView implements FilterPanelListener 
         initFilter();
         mainVL.addComponent(groupFilterPanel);
         TextField textField = new TextField("Student number");
-
+        textField.setValue("21");
         Button generateBtn = new Button("Generate");
         generateBtn.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
-                QueryModel<STUDENT> studentQueryModel = new QueryModel<>(STUDENT.class);
-                FromItem fi = studentQueryModel.addJoin(EJoin.INNER_JOIN , "id" , STUDENT_EDUCATION.class , "student");
-                FromItem fi2 = fi.addJoin(EJoin.INNER_JOIN, "studyYear" , STUDY_YEAR.class , "id");
-                studentQueryModel.addWhere(fi2 , "studyYear" , ECriteria.EQUAL , 1);
-
-                List students = null;
-
-                try{
-                    students = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(studentQueryModel);
-                }catch (Exception e)
-                {
-                    e.printStackTrace();
+                Integer max = new Integer(textField.getValue());
+                if(max!=null && max > 0) {
+                        generateNew(max);
+                        refreshGridWidget();
+                }else{
+                    Notification.show("Enter value:");
                 }
-
-                Set<GROUPS> set = new HashSet<>();
-                for(STUDENT student : (List<STUDENT>)students)
-                {
-                    set.addAll((Collection) student.getStudentEducations());
-                }
-
-                Map<SPECIALITY , ArrayList<STUDENT>> specialityMapKz = new HashMap<>();
-                Map<SPECIALITY , ArrayList<STUDENT>> specialityMapRu = new HashMap<>();
-                Map<SPECIALITY , ArrayList<STUDENT>> specialityMapEn = new HashMap<>();
-
-                QueryModel<SPECIALITY> specialityQueryModel = new QueryModel<>(SPECIALITY.class);
-                List<SPECIALITY> specialityList = null;
-                try {
-                    specialityList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(specialityQueryModel);
-
-                    for(SPECIALITY specialitySingle :specialityList )
-                    {
-                        specialityMapEn.put(specialitySingle, new ArrayList<STUDENT>());
-                        specialityMapRu.put(specialitySingle, new ArrayList<STUDENT>());
-                        specialityMapKz.put(specialitySingle, new ArrayList<STUDENT>());
-                    }
-
-                    Map<String , Map<SPECIALITY , ArrayList<STUDENT>>> languageMap = new HashMap<>();
-
-                    languageMap.put("kz", specialityMapKz);
-                    languageMap.put("ru", specialityMapRu);
-                    languageMap.put("en", specialityMapEn);
-
-
-                    for(STUDENT s : (List<STUDENT>)students)  {
-                        String lang = s.getEntrantSpecialities().iterator().next().getLanguage().getLangName();
-                        if(lang.equalsIgnoreCase("Казахский")){
-                            languageMap.get("kz").get(getStudentEducationByStudentId(s.getId()).getSpeciality()).add(s);
-                        }else if(lang.equalsIgnoreCase("Английский")){
-                            languageMap.get("en").get(getStudentEducationByStudentId(s.getId()).getSpeciality()).add(s);
-                        }else{
-                            languageMap.get("ru").get(getStudentEducationByStudentId(s.getId()).getSpeciality()).add(s);
-                        }
-                    }
-                    int STUDENT_MAX = 21;
-                    for(String langKey : languageMap.keySet())
-                    {
-                        for(SPECIALITY speciality : languageMap.get(langKey).keySet())
-                        {
-                            int studentCounter = 0;
-                            int groupCounter = 1;
-                            GROUPS groups = null;
-                            if(languageMap.get(langKey).get(speciality).size()>0) {
-                                if (groupCounter == 1) {
-                                    groups = new GROUPS();
-                                    groups.setName(  speciality.getCode() + "-" + ((Calendar.getInstance().get(Calendar.YEAR)-2000)*100+groupCounter+ "-" + langKey));
-                                    groups.setSpeciality(speciality);
-                                    groups.setOrders(new Long(groupCounter));
-                                    groups.setDeleted(false);
-
-                                    try {
-                                        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(groups);
-                                        QueryModel<GROUPS> qm = new QueryModel<>(GROUPS.class);
-                                        qm.addWhere("speciality", ECriteria.EQUAL, groups.getSpeciality().getId());
-                                        qm.addWhere("orders", ECriteria.EQUAL, groups.getOrders());
-                                        qm.addWhere("name", ECriteria.EQUAL, groups.getName());
-                                        qm.addWhere("deleted", ECriteria.EQUAL, false);
-
-                                        groups = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(qm);
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                                for (STUDENT student : languageMap.get(langKey).get(speciality)) {
-                                    if (studentCounter >= STUDENT_MAX) {
-                                        groups = new GROUPS();
-                                        groups.setName(speciality.getCode() + "-" + ((Calendar.getInstance().get(Calendar.YEAR)-2000)*100+groupCounter + "-" + langKey));
-                                        groups.setSpeciality(speciality);
-                                        groups.setOrders(new Long(groupCounter));
-                                        groups.setDeleted(false);
-
-                                        try {
-                                            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(groups);
-                                            QueryModel<GROUPS> qm = new QueryModel<>(GROUPS.class);
-                                            qm.addWhere("speciality", ECriteria.EQUAL, groups.getSpeciality().getId());
-                                            qm.addWhere("orders", ECriteria.EQUAL, groups.getOrders());
-                                            qm.addWhere("name", ECriteria.EQUAL, groups.getName());
-                                            qm.addWhere("deleted", ECriteria.EQUAL, false);
-
-                                            groups = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(qm);
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                        }
-                                        groupCounter++;
-                                        studentCounter = 0;
-                                    }
-                                    student.getLastEducation().setGroups(groups);
-                                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(student.getLastEducation());
-                                }
-                                groupCounter = 1;
-                            }
-                        }
-                    }
-
-                    if(set.size()>0)
-                    {
-                        List<GROUPS> list = new ArrayList<>();
-                        for(GROUPS group : set)
-                        {
-                            list.add(group);
-                        }
-                        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(list);
-                    }
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-                refreshGridWidget();
             }
         });
         mainVL.addComponent(textField);
@@ -263,7 +147,146 @@ public class GroupsView extends AbstractTaskView implements FilterPanelListener 
         dbGridModel.getColumnModel("deleted").setInGrid(false);
     }
 
+    private void generateNew(int STUDENT_MAX){
+        QueryModel<STUDENT> studentQueryModel = new QueryModel<>(STUDENT.class);
+        FromItem fi = studentQueryModel.addJoin(EJoin.INNER_JOIN , "id" , STUDENT_EDUCATION.class , "student");
+        FromItem fi2 = fi.addJoin(EJoin.INNER_JOIN, "studyYear" , STUDY_YEAR.class , "id");
+        studentQueryModel.addWhere(fi2 , "studyYear" , ECriteria.EQUAL , 1);
 
+        List students = null;
+
+        try{
+            students = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(studentQueryModel);
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        Set<GROUPS> set = new HashSet<>();
+        for(STUDENT student : (List<STUDENT>)students)
+        {
+            if(student.getStudentEducations().iterator().next().getGroups()!=null)
+            {
+                set.add(student.getStudentEducations().iterator().next().getGroups());
+            }
+        }
+
+        Map<SPECIALITY , ArrayList<STUDENT>> specialityMapKz = new HashMap<>();
+        Map<SPECIALITY , ArrayList<STUDENT>> specialityMapRu = new HashMap<>();
+        Map<SPECIALITY , ArrayList<STUDENT>> specialityMapEn = new HashMap<>();
+
+        QueryModel<SPECIALITY> specialityQueryModel = new QueryModel<>(SPECIALITY.class);
+        List<SPECIALITY> specialityList = null;
+        try {
+            specialityList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(specialityQueryModel);
+
+            for(SPECIALITY specialitySingle :specialityList )
+            {
+                specialityMapEn.put(specialitySingle, new ArrayList<STUDENT>());
+                specialityMapRu.put(specialitySingle, new ArrayList<STUDENT>());
+                specialityMapKz.put(specialitySingle, new ArrayList<STUDENT>());
+            }
+
+            Map<String , Map<SPECIALITY , ArrayList<STUDENT>>> languageMap = new HashMap<>();
+
+            languageMap.put("kz", specialityMapKz);
+            languageMap.put("ru", specialityMapRu);
+            languageMap.put("en", specialityMapEn);
+
+
+            for(STUDENT s : (List<STUDENT>)students)  {
+                String lang = s.getEntrantSpecialities().iterator().next().getLanguage().getLangName();
+                if(lang.equalsIgnoreCase("Казахский")){
+                    languageMap.get("kz").get(getStudentEducationByStudentId(s.getId()).getSpeciality()).add(s);
+                }else if(lang.equalsIgnoreCase("Английский")){
+                    languageMap.get("en").get(getStudentEducationByStudentId(s.getId()).getSpeciality()).add(s);
+                }else{
+                    languageMap.get("ru").get(getStudentEducationByStudentId(s.getId()).getSpeciality()).add(s);
+                }
+            }
+
+            for(String langKey : languageMap.keySet())
+            {
+                for(SPECIALITY speciality : languageMap.get(langKey).keySet())
+                {
+                    GROUPS groups = null;
+                    if(languageMap.get(langKey).get(speciality).size()>0) {
+                        int groupCounter = 1;
+                        int studentCounter = 1;
+
+                        if (groupCounter == 1) {
+                            groups = new GROUPS();
+                            groups.setName(  speciality.getCode() + "-" + langKey + "-" + ((Calendar.getInstance().get(Calendar.YEAR)-2000)*100+groupCounter));
+                            groups.setSpeciality(speciality);
+                            groups.setOrders(new Long(groupCounter));
+                            groups.setDeleted(false);
+                            groups.setCreated(new Date());
+                            try {
+                                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(groups);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+
+                        for (STUDENT student : languageMap.get(langKey).get(speciality)) {
+                            int aasd = 0;
+                            if (studentCounter > STUDENT_MAX) {
+                                groupCounter++;
+                                groups = new GROUPS();
+                                groups.setName(speciality.getCode() + "-" + langKey + "-" + ((Calendar.getInstance().get(Calendar.YEAR)-2000)*100+groupCounter ));
+                                groups.setSpeciality(speciality);
+                                groups.setOrders(new Long(groupCounter));
+                                groups.setDeleted(false);
+                                groups.setCreated(new Date());
+                                try {
+                                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(groups);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                studentCounter = 1;
+                            }
+                            student.getLastEducation().setGroups(groups);
+                            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(student.getLastEducation());
+                            studentCounter++;
+                        }
+                    }
+                }
+            }
+
+            if(set.size()>0)
+            {
+                List<GROUPS> list = new ArrayList<>();
+                for(GROUPS group : set)
+                {
+                    list.add(group);
+                }
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(list);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    private void deleteExtra(){
+        try{
+            Map<Integer, Object> params = new HashMap<>();
+            String sql = "select * from groups where date_trunc('year',created )= date_trunc('year' , now()) and deleted = false";
+            List<GROUPS> groupsList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(sql ,params , GROUPS.class);
+
+            for(GROUPS group : groupsList)
+            {
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(group);
+            }
+
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+    }
 
     public void initFilter() throws Exception{
         groupFilterPanel = new GroupFilterPanel(new FGroupFilter());

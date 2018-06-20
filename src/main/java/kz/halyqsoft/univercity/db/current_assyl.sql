@@ -75,6 +75,7 @@ create sequence S_GROUPS
 
 ALTER TABLE groups ADD COLUMN deleted BOOLEAN NOT NULL ;
 
+ALTER TABLE groups ADD COLUMN created TIMESTAMP DEFAULT now();
 
 ALTER TABLE student_education ADD COLUMN groups_id BIGINT;
 
@@ -85,3 +86,4 @@ ON UPDATE RESTRICT ON DELETE RESTRICT;
 
 -- SUBJECT
 
+UPDATE groups SET created = now();

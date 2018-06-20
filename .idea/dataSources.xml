@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="univerdb@localhost" uuid="0ba7330c-d439-4599-8f11-501a6f50a9db">
+    <data-source source="LOCAL" name="univerdb3@localhost" uuid="687c69a9-ae11-49c3-a8be-cf531979d934">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost:5432/univerdb</jdbc-url>
+      <jdbc-url>jdbc:postgresql://localhost:5432/univerdb3</jdbc-url>
     </data-source>
   </component>
 </project>

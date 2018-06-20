@@ -6,6 +6,7 @@ import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 public class GROUPS extends AbstractEntity {
@@ -28,6 +29,10 @@ public class GROUPS extends AbstractEntity {
     @Column(name = "deleted", nullable = false)
     private boolean deleted;
 
+    @FieldInfo(type = EFieldType.DATETIME, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false)
+    @Column(name = "created")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date created;
 
     public GROUPS() {
     }
@@ -62,5 +67,13 @@ public class GROUPS extends AbstractEntity {
 
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
+    }
+
+    public Date getCreated() {
+        return created;
+    }
+
+    public void setCreated(Date created) {
+        this.created = created;
     }
 }
