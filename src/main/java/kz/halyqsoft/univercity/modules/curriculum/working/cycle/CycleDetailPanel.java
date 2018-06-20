@@ -9,7 +9,7 @@ import com.vaadin.ui.Label;
 import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM;
 import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM_DETAIL;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT_CYCLE;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.V_CURRICULUM_DETAIL;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_CURRICULUM_SUBJECT;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.ID;
@@ -92,13 +92,13 @@ final class CycleDetailPanel extends AbstractCommonPanel {
         grid = new Grid();
         grid.setSizeFull();
         grid.setColumns("subjectCode", "subjectName", "cycleShortName", "credit", "formula", "recommendedSemester", "controlTypeName");
-        grid.getColumn("subjectCode").setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_DETAIL.class, "subjectCode"));
-        grid.getColumn("subjectName").setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_DETAIL.class, "subjectName"));
-        grid.getColumn("cycleShortName").setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_DETAIL.class, "cycleShortName"));
-        grid.getColumn("credit").setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_DETAIL.class, "credit"));
-        grid.getColumn("formula").setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_DETAIL.class, "formula"));
-        grid.getColumn("recommendedSemester").setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_DETAIL.class, "recommendedSemester"));
-        grid.getColumn("controlTypeName").setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_DETAIL.class, "controlTypeName"));
+        grid.getColumn("subjectCode").setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_SUBJECT.class, "subjectCode"));
+        grid.getColumn("subjectName").setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_SUBJECT.class, "subjectName"));
+        grid.getColumn("cycleShortName").setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_SUBJECT.class, "cycleShortName"));
+        grid.getColumn("credit").setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_SUBJECT.class, "credit"));
+        grid.getColumn("formula").setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_SUBJECT.class, "formula"));
+        grid.getColumn("recommendedSemester").setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_SUBJECT.class, "recommendedSemester"));
+        grid.getColumn("controlTypeName").setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_SUBJECT.class, "controlTypeName"));
         grid.setHeightMode(HeightMode.ROW);
         grid.setHeightByRows(10);
 
@@ -108,19 +108,19 @@ final class CycleDetailPanel extends AbstractCommonPanel {
 
     public void refresh() {
         ID curriculumId = (curriculum != null && curriculum.getId() != null) ? curriculum.getId() : ID.valueOf(-1);
-        QueryModel<V_CURRICULUM_DETAIL> qm = new QueryModel<V_CURRICULUM_DETAIL>(V_CURRICULUM_DETAIL.class);
+        QueryModel<V_CURRICULUM_SUBJECT> qm = new QueryModel<V_CURRICULUM_SUBJECT>(V_CURRICULUM_SUBJECT.class);
         qm.addWhere("curriculum", ECriteria.EQUAL, curriculumId);
         qm.addWhereAnd("subjectCycle", ECriteria.EQUAL, subjectCycle.getId());
-        qm.addWhereAnd("elective", Boolean.FALSE);
+//        qm.addWhereAnd("elective", Boolean.FALSE);
         qm.addWhereAnd("deleted", Boolean.FALSE);
 
         try {
-            List<V_CURRICULUM_DETAIL> list = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(qm);
+            List<V_CURRICULUM_SUBJECT> list = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(qm);
             QueryModel<CURRICULUM_DETAIL> cdQM = new QueryModel<CURRICULUM_DETAIL>(CURRICULUM_DETAIL.class);
             cdQM.addSelect("semester");
             cdQM.addWhere("curriculum", ECriteria.EQUAL, curriculumId);
-            for (V_CURRICULUM_DETAIL vcd : list) {
-                V_CURRICULUM_DETAIL vcd1 = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(V_CURRICULUM_DETAIL.class, vcd.getId());
+            for (V_CURRICULUM_SUBJECT vcd : list) {
+                V_CURRICULUM_SUBJECT vcd1 = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(V_CURRICULUM_SUBJECT.class, vcd.getId());
                 cdQM.addWhere("subject", ECriteria.EQUAL, vcd1.getSubject().getId());
                 List list1 = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(cdQM);
                 StringBuilder sb = new StringBuilder();
@@ -136,7 +136,7 @@ final class CycleDetailPanel extends AbstractCommonPanel {
                 vcd.setRecommendedSemester(sb.toString());
             }
 
-            BeanItemContainer<V_CURRICULUM_DETAIL> bic = new BeanItemContainer<V_CURRICULUM_DETAIL>(V_CURRICULUM_DETAIL.class, list);
+            BeanItemContainer<V_CURRICULUM_SUBJECT> bic = new BeanItemContainer<V_CURRICULUM_SUBJECT>(V_CURRICULUM_SUBJECT.class, list);
             grid.setContainerDataSource(bic);
         } catch (Exception ex) {
             LOG.error("Unable to load curriculum details: ", ex);
@@ -146,30 +146,25 @@ final class CycleDetailPanel extends AbstractCommonPanel {
     }
 
     private void refreshFooter() {
-        int credit = 0;
-        int totalCredit = 0;
-        Indexed ds = grid.getContainerDataSource();
-        for (Object item : ds.getItemIds()) {
-            credit += (Integer) ds.getItem(item).getItemProperty("credit").getValue();
-        }
-
-        StringBuilder sb = new StringBuilder();
-        sb.append(totalText);
-        sb.append(" - ");
-        sb.append(credit);
-        sb.append(", ");
-
-        totalCredit = credit;
-
-        ID curriculumId = (curriculum != null && curriculum.getId() != null) ? curriculum.getId() : ID.valueOf(-1);
-        QueryModel<V_CURRICULUM_DETAIL> qm = new QueryModel<V_CURRICULUM_DETAIL>(V_CURRICULUM_DETAIL.class);
-        qm.addSelect("credit", EAggregate.SUM);
-        qm.addWhere("curriculum", ECriteria.EQUAL, curriculumId);
-        qm.addWhereAnd("subjectCycle", ECriteria.EQUAL, subjectCycle.getId());
-        qm.addWhereAnd("elective", Boolean.TRUE);
-        qm.addWhereAnd("deleted", Boolean.FALSE);
-
         try {
+            int totalCredit = 0;
+
+            ID curriculumId = (curriculum != null && curriculum.getId() != null) ? curriculum.getId() : ID.valueOf(-1);
+            QueryModel<V_CURRICULUM_SUBJECT> qm = getCurriculumDetailQM(curriculumId,Boolean.FALSE);
+            BigDecimal credit = (BigDecimal) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItems(qm);
+            if (credit == null) {
+                credit = BigDecimal.ZERO;
+            }
+
+            StringBuilder sb = new StringBuilder();
+            sb.append(totalText);
+            sb.append(" - ");
+            sb.append(credit);
+            sb.append(", ");
+
+            totalCredit = credit.intValue();
+
+            qm = getCurriculumDetailQM(curriculumId,Boolean.TRUE);
             BigDecimal electiveCredit = (BigDecimal) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItems(qm);
             if (electiveCredit == null) {
                 electiveCredit = BigDecimal.ZERO;
@@ -180,14 +175,24 @@ final class CycleDetailPanel extends AbstractCommonPanel {
             sb.append(" - ");
             sb.append(electiveCredit.intValue());
             sb.append(", ");
+
+            sb.append(cycleText);
+            sb.append(" - ");
+            sb.append(totalCredit);
+            totalLabel.setValue(sb.toString());
         } catch (Exception ex) {
             LOG.error("Unable to refresh footer: ", ex);
         }
+    }
 
-        sb.append(cycleText);
-        sb.append(" - ");
-        sb.append(totalCredit);
-        totalLabel.setValue(sb.toString());
+    private QueryModel<V_CURRICULUM_SUBJECT> getCurriculumDetailQM(ID curriculumId,Boolean isElective) {
+        QueryModel<V_CURRICULUM_SUBJECT> qm = new QueryModel<V_CURRICULUM_SUBJECT>(V_CURRICULUM_SUBJECT.class);
+        qm.addSelect("credit", EAggregate.SUM);
+        qm.addWhere("curriculum", ECriteria.EQUAL, curriculumId);
+        qm.addWhereAnd("subjectCycle", ECriteria.EQUAL, subjectCycle.getId());
+        qm.addWhereAnd("elective", isElective);
+        qm.addWhereAnd("deleted", Boolean.FALSE);
+        return qm;
     }
 
     public void save() throws Exception {
@@ -196,7 +201,7 @@ final class CycleDetailPanel extends AbstractCommonPanel {
         //			Indexed ds = grid.getContainerDataSource();
         //			try {
         //				for (Object item : ds.getItemIds()) {
-        //					V_CURRICULUM_DETAIL vcd = (V_CURRICULUM_DETAIL)item;
+        //					V_CURRICULUM_SUBJECT vcd = (V_CURRICULUM_SUBJECT)item;
         //					CURRICULUM_DETAIL cd = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(CURRICULUM_DETAIL.class, vcd.getId());
         //					if (vcd.getRecommendedSemester() != null && !vcd.getRecommendedSemester().equals(cd.getRecommendedSemester())) {
         //						cd.setRecommendedSemester(vcd.getRecommendedSemester());
@@ -215,15 +220,15 @@ final class CycleDetailPanel extends AbstractCommonPanel {
     }
 
     public final void checkForApprove() throws Exception {
-        QueryModel<V_CURRICULUM_DETAIL> qm = new QueryModel<V_CURRICULUM_DETAIL>(V_CURRICULUM_DETAIL.class);
+        QueryModel<V_CURRICULUM_SUBJECT> qm = new QueryModel<V_CURRICULUM_SUBJECT>(V_CURRICULUM_SUBJECT.class);
         qm.addWhere("curriculum", ECriteria.EQUAL, curriculum.getId());
         qm.addWhereAnd("subjectCycle", ECriteria.EQUAL, subjectCycle.getId());
-        qm.addWhereAnd("elective", Boolean.FALSE);
+//        qm.addWhereAnd("elective", Boolean.FALSE);
         qm.addWhereAnd("deleted", Boolean.FALSE);
 
         try {
-            List<V_CURRICULUM_DETAIL> list = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(qm);
-            for (V_CURRICULUM_DETAIL vcd : list) {
+            List<V_CURRICULUM_SUBJECT> list = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(qm);
+            for (V_CURRICULUM_SUBJECT vcd : list) {
                 if (vcd.getRecommendedSemester() == null || vcd.getRecommendedSemester().trim().isEmpty()) {
                     throw new Exception(String.format(getUILocaleUtil().getMessage("cycle.recommended.semester.not.filled"), subjectCycle.getCycleShortName()));
                 }

@@ -187,7 +187,6 @@ public class SignCurriculum extends AbstractFormWidgetView {
                 VIndividualCurriculumPrint item = new VIndividualCurriculumPrint();
                 item.setRecordNo(count);
                 SUBJECT subject = scheduleDetail.getSubject().getSubject();
-                item.setSubjectCode(subject.getCode());
                 item.setSubjectNameRU(subject.getNameRU());
                 item.setSubjectStatus(subject.isMandatory() ? 'A' : 'B');
                 item.setCycleShortName(subject.getSubjectCycle().getCycleShortName());

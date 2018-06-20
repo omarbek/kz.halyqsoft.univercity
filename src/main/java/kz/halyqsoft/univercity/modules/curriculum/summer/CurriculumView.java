@@ -608,7 +608,7 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
                         } catch (NoResultException nrex) {
                         }
                         if (sum != null && sum > 0) {
-                            notDelList.add(csd.getSubject().getCode() + " " + csd.getSubject().getNameRU());
+                            notDelList.add( csd.getSubject().getNameRU());
                         } else {
                             ssDelList.add(ss);
                             delList.add(csd);

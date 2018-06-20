@@ -1,9 +1,6 @@
 package kz.halyqsoft.univercity.entity.beans.univercity;
 
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_DATA;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT_CYCLE;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import org.r3a.common.entity.AbstractEntity;
 
 import java.util.Date;
@@ -44,7 +41,13 @@ public class ELECTIVE_SUBJECT extends AbstractEntity {
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "SUBJECT_CYCLE_ID", referencedColumnName = "ID")})
-    private SUBJECT_CYCLE subjectCycle;
+    private SUBJECT_CYCLE subjectCycle;@ManyToOne
+	@JoinColumns({
+			@JoinColumn(name = "EDUCATION_MODULE_TYPE_ID", referencedColumnName = "ID")})
+	private EDUCATION_MODULE_TYPE educationModuleType;
+
+	@Column(name = "CODE")
+	private String code;
 
 	@Column(name = "CONSIDER_CREDIT", nullable = false)
 	private boolean considerCredit;
@@ -130,5 +133,21 @@ public class ELECTIVE_SUBJECT extends AbstractEntity {
 
 	public void setConsiderCredit(boolean considerCredit) {
 		this.considerCredit = considerCredit;
+	}
+
+	public EDUCATION_MODULE_TYPE getEducationModuleType() {
+		return educationModuleType;
+	}
+
+	public void setEducationModuleType(EDUCATION_MODULE_TYPE educationModuleType) {
+		this.educationModuleType = educationModuleType;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
 	}
 }

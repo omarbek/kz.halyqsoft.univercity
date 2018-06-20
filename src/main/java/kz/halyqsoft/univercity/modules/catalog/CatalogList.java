@@ -58,10 +58,12 @@ class CatalogList {
         addCatalogEntityToList(ACADEMIC_DEGREE.class);
         addCatalogEntityToList(ORGANIZATION.class);
         addCatalogEntityToList(SEMESTER_DATA.class);
-        addCatalogEntityToList(EDUCATION_MODULE_TYPE.class);
 
         addCatalogEntityToList(ROLES.class);
         addCatalogEntityToList(TASKS.class);
+        addCatalogEntityToList(EDUCATION_MODULE_TYPE.class);
+        addCatalogEntityToList(STUDY_DIRECT.class);
+        addCatalogEntityToList(ACADEMIC_FORMULA.class);
 
         return new ArrayList<>(list);
     }

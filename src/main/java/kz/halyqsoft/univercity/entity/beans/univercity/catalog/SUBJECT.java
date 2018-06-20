@@ -33,9 +33,9 @@ public class SUBJECT extends AbstractEntity {
 	@Column(name = "NAME_RU", nullable = false)
 	private String nameRU;
 
-	@FieldInfo(type = EFieldType.TEXT, max = 13, order = 4, required = false, inGrid = false, readOnlyFixed = true, columnWidth = 100)
-	@Column(name = "CODE")
-	private String code;
+//	@FieldInfo(type = EFieldType.TEXT, max = 13, order = 4, required = false, inGrid = false, readOnlyFixed = true, columnWidth = 100)
+//	@Column(name = "CODE")
+//	private String code;
 
 	@FieldInfo(type = EFieldType.FK_DIALOG, order = 5, inGrid = false)
     @ManyToOne
@@ -43,11 +43,11 @@ public class SUBJECT extends AbstractEntity {
         @JoinColumn(name = "STUDY_DIRECT_ID", referencedColumnName = "ID")})
     private STUDY_DIRECT studyDirect;
 
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 6, inGrid = false)
-	@ManyToOne
-	@JoinColumns({
-			@JoinColumn(name = "EDUCATION_MODULE_TYPE_ID", referencedColumnName = "ID")})
-	private EDUCATION_MODULE_TYPE educationModuleType;
+//	@FieldInfo(type = EFieldType.FK_COMBO, order = 6, inGrid = false)
+//	@ManyToOne
+//	@JoinColumns({
+//			@JoinColumn(name = "EDUCATION_MODULE_TYPE_ID", referencedColumnName = "ID")})
+//	private EDUCATION_MODULE_TYPE educationModuleType;
 
 	@FieldInfo(type = EFieldType.TEXT, isMemo = true, max = 4000, required = false, order = 7, inGrid = false)
 	@Column(name = "DESCR")
@@ -163,13 +163,13 @@ public class SUBJECT extends AbstractEntity {
 		this.nameRU = nameRU;
 	}
 
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
-	}
+//	public String getCode() {
+//		return code;
+//	}
+//
+//	public void setCode(String code) {
+//		this.code = code;
+//	}
 
 	public STUDY_DIRECT getStudyDirect() {
 		return studyDirect;
@@ -311,22 +311,26 @@ public class SUBJECT extends AbstractEntity {
 		this.deleted = deleted;
 	}
 
-	public EDUCATION_MODULE_TYPE getEducationModuleType() {
-		return educationModuleType;
+//	public EDUCATION_MODULE_TYPE getEducationModuleType() {
+//		return educationModuleType;
+//	}
+//
+//	public void setEducationModuleType(EDUCATION_MODULE_TYPE educationModuleType) {
+//		this.educationModuleType = educationModuleType;
+//	}
+
+	public String toString() {
+		return nameRU;
 	}
 
-	public void setEducationModuleType(EDUCATION_MODULE_TYPE educationModuleType) {
-		this.educationModuleType = educationModuleType;
-	}
-
-	public String toString(Locale l) {
-		String name = nameEN;
-		if (l.getLanguage().equals("kk")) {
-			name = nameKZ;
-		} else if (l.getLanguage().equals("ru")) {
-			name = nameRU;
-		}
-
-		return code + " " + name;
-	}
+//	public String toString(Locale l) {
+//		String name = nameEN;
+//		if (l.getLanguage().equals("kk")) {
+//			name = nameKZ;
+//		} else if (l.getLanguage().equals("ru")) {
+//			name = nameRU;
+//		}
+//
+//		return code + " " + name;
+//	}
 }

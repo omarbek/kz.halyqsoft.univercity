@@ -16,73 +16,76 @@ import javax.persistence.ManyToOne;
  */
 @Entity
 public class ACADEMIC_FORMULA extends AbstractEntity {
-	
-	private static final long serialVersionUID = -3242865292527999765L;
 
-	@FieldInfo(type = EFieldType.FK_COMBO)
+    private static final long serialVersionUID = -3242865292527999765L;
+
+    @FieldInfo(type = EFieldType.FK_COMBO)
     @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "CREDITABILITY_ID", referencedColumnName = "ID")})
+            @JoinColumn(name = "CREDITABILITY_ID", referencedColumnName = "ID")})
     private CREDITABILITY creditability;
-	
-	@FieldInfo(type = EFieldType.TEXT, min = 5, max = 5, order = 2)
-	@Column(name = "FORMULA", nullable = false)
-	private String formula;
-	
-	@Column(name = "LC_COUNT", nullable = false)
-	private Integer lcCount;
-	
-	@Column(name = "LB_COUNT", nullable = false)
-	private Integer lbCount;
-	
-	@Column(name = "PR_COUNT", nullable = false)
-	private Integer prCount;
 
-	public ACADEMIC_FORMULA() {
-	}
+    @FieldInfo(type = EFieldType.TEXT, min = 5, max = 5, order = 2, inEdit = false, inView = false)
+    @Column(name = "FORMULA", nullable = false)
+    private String formula;
 
-	public CREDITABILITY getCreditability() {
-		return creditability;
-	}
+    @FieldInfo(type = EFieldType.INTEGER, min = 1, max = 2, order = 3)
+    @Column(name = "LC_COUNT", nullable = false)
+    private Integer lcCount;
 
-	public void setCreditability(CREDITABILITY creditability) {
-		this.creditability = creditability;
-	}
+    @FieldInfo(type = EFieldType.INTEGER, min = 1, max = 2, order = 4, inView = false)
+    @Column(name = "LB_COUNT", nullable = false)
+    private Integer lbCount;
 
-	public String getFormula() {
-		return formula;
-	}
+    @FieldInfo(type = EFieldType.INTEGER, min = 1, max = 2, order = 5)
+    @Column(name = "PR_COUNT", nullable = false)
+    private Integer prCount;
 
-	public void setFormula(String formula) {
-		this.formula = formula;
-	}
-	
-	public Integer getLcCount() {
-		return lcCount;
-	}
+    public ACADEMIC_FORMULA() {
+    }
 
-	public void setLcCount(Integer lcCount) {
-		this.lcCount = lcCount;
-	}
+    public CREDITABILITY getCreditability() {
+        return creditability;
+    }
 
-	public Integer getLbCount() {
-		return lbCount;
-	}
+    public void setCreditability(CREDITABILITY creditability) {
+        this.creditability = creditability;
+    }
 
-	public void setLbCount(Integer lbCount) {
-		this.lbCount = lbCount;
-	}
+    public String getFormula() {
+        return formula;
+    }
 
-	public Integer getPrCount() {
-		return prCount;
-	}
+    public void setFormula(String formula) {
+        this.formula = formula;
+    }
 
-	public void setPrCount(Integer prCount) {
-		this.prCount = prCount;
-	}
+    public Integer getLcCount() {
+        return lcCount;
+    }
 
-	@Override
-	public String toString() {
-		return formula;
-	}
+    public void setLcCount(Integer lcCount) {
+        this.lcCount = lcCount;
+    }
+
+    public Integer getLbCount() {
+        return lbCount;
+    }
+
+    public void setLbCount(Integer lbCount) {
+        this.lbCount = lbCount;
+    }
+
+    public Integer getPrCount() {
+        return prCount;
+    }
+
+    public void setPrCount(Integer prCount) {
+        this.prCount = prCount;
+    }
+
+    @Override
+    public String toString() {
+        return formula;
+    }
 }

@@ -18,7 +18,7 @@ import javax.persistence.Transient;
  * @created Feb 22, 2016 9:38:48 AM
  */
 @Entity
-public class V_CURRICULUM_DETAIL extends AbstractEntity {
+public class V_CURRICULUM_SUBJECT extends AbstractEntity {
 
 	private static final long serialVersionUID = -526964672598850366L;
 
@@ -27,102 +27,92 @@ public class V_CURRICULUM_DETAIL extends AbstractEntity {
     @JoinColumns({
         @JoinColumn(name = "CURRICULUM_ID", referencedColumnName = "ID")})
     private CURRICULUM curriculum;
-	
+
 	@FieldInfo(type = EFieldType.FK_COMBO, order = 2, inGrid = false, inEdit = false, inView = false)
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "SEMESTER_ID", referencedColumnName = "ID")})
     private SEMESTER semester;
-	
+
 	@FieldInfo(type = EFieldType.TEXT, max = 9, order = 3, inGrid = false, inEdit = false, inView = false)
 	@Column(name = "SEMESTER_NAME")
 	private String semesterName;
-	
+
 	@FieldInfo(type = EFieldType.FK_DIALOG, order = 4, inGrid = false)
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
     private SUBJECT subject;
-	
-	@FieldInfo(type = EFieldType.TEXT, max = 10, order = 5, columnWidth = 120)
+
+	@FieldInfo(type = EFieldType.TEXT, max = 10, order = 5, inEdit = false, inView = false, columnWidth = 120)
 	@Column(name = "SUBJECT_CODE")
 	private String subjectCode;
-	
+
 	@FieldInfo(type = EFieldType.TEXT, max = 10, order = 6, inEdit = false, inView = false)
 	@Column(name = "SUBJECT_NAME")
 	private String subjectName;
-	
+
 	@FieldInfo(type = EFieldType.FK_COMBO, order = 7, inGrid = false, required = false)
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "SUBJECT_CYCLE_ID", referencedColumnName = "ID")})
     private SUBJECT_CYCLE subjectCycle;
-	
+
 	@FieldInfo(type = EFieldType.TEXT, max = 10, order = 8, inEdit = false, inView = false, columnWidth = 90)
 	@Column(name = "CYCLE_SHORT_NAME")
 	private String cycleShortName;
-	
+
 	@FieldInfo(type = EFieldType.FK_COMBO, order = 9, inGrid = false, required = true)
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "CREDITABILITY_ID", referencedColumnName = "ID")})
     private CREDITABILITY creditability;
-	
+
 	@FieldInfo(type = EFieldType.INTEGER, max = 6, order = 10, inEdit = false, inView = false, columnWidth = 80)
 	@Column(name = "CREDIT")
 	private Integer credit;
-	
+
 	@FieldInfo(type = EFieldType.FK_COMBO, order = 11, inGrid = false, readOnlyFixed = true, required = false)
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "ACADEMIC_FORMULA_ID", referencedColumnName = "ID")})
     private ACADEMIC_FORMULA academicFormula;
-	
+
 	@FieldInfo(type = EFieldType.TEXT, min = 5, max = 5, order = 12, inEdit = false, inView = false, columnWidth = 80)
 	@Column(name = "FORMULA")
 	private String formula;
-	
+
 	@FieldInfo(type = EFieldType.BOOLEAN_EDIT, order = 14, inEdit = false, inView = false, columnWidth = 170)
 	@Column(name = "CONSIDER_CREDIT", nullable = false)
     private boolean considerCredit;
-	
+
 	@FieldInfo(type = EFieldType.TEXT, order = 15, inEdit = false, inView = false, columnWidth = 130)
 	@Transient
 	private String subjectPrerequisiteCode;
-	
+
 	@FieldInfo(type = EFieldType.TEXT, max = 10, order = 17, inGrid = false, inEdit = false, inView = false)
 	@Column(name = "RECOMMENDED_SEMESTER")
 	private String recommendedSemester;
-	
+
 	@FieldInfo(type = EFieldType.FK_COMBO, order = 18, inGrid = false, inEdit = false, inView = false)
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "CONTROL_TYPE_ID", referencedColumnName = "ID")})
     private CONTROL_TYPE controlType;
-	
+
 	@FieldInfo(type = EFieldType.TEXT, max = 10, order = 19, inGrid = false, inEdit = false, inView = false)
 	@Column(name = "CONTROL_TYPE_NAME")
 	private String controlTypeName;
 
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 20, inGrid = false, inView = false)
-	@ManyToOne
-	@JoinColumns({
-			@JoinColumn(name = "EDUCATION_MODULE_TYPE_ID", referencedColumnName = "ID")})
-	private EDUCATION_MODULE_TYPE educationModuleType;
-
-	@FieldInfo(type = EFieldType.TEXT,  order = 21, inEdit = false)
-	@Column(name = "EDUCATION_MODULE_TYPE_NAME")
-	private String educationModuleTypeName;
-	
 	@FieldInfo(type = EFieldType.BOOLEAN, order = 22, required = false, inEdit = false, inGrid = false, inView = false)
 	@Column(name = "DELETED")
     private boolean deleted;
-	
+
 	@FieldInfo(type = EFieldType.BOOLEAN, order = 23, required = false, inEdit = false, inGrid = false, inView = false)
 	@Column(name = "ELECTIVE")
     private boolean elective;
-	
-	public V_CURRICULUM_DETAIL() {
+
+	public V_CURRICULUM_SUBJECT() {
 	}
 
 	public CURRICULUM getCurriculum() {
@@ -275,21 +265,5 @@ public class V_CURRICULUM_DETAIL extends AbstractEntity {
 
 	public void setElective(boolean elective) {
 		this.elective = elective;
-	}
-
-	public EDUCATION_MODULE_TYPE getEducationModuleType() {
-		return educationModuleType;
-	}
-
-	public void setEducationModuleType(EDUCATION_MODULE_TYPE educationModuleType) {
-		this.educationModuleType = educationModuleType;
-	}
-
-	public String getEducationModuleTypeName() {
-		return educationModuleTypeName;
-	}
-
-	public void setEducationModuleTypeName(String educationModuleTypeName) {
-		this.educationModuleTypeName = educationModuleTypeName;
 	}
 }

@@ -6,22 +6,15 @@ import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_DATA;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT;
 import org.r3a.common.entity.AbstractEntity;
 
+import javax.persistence.*;
 import java.util.Date;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.ManyToOne;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 /**
  * @author Omarbek
- * @created Feb 25, 2016 5:05:40 PM
+ * @created 15.06.2018
  */
 @Entity
-public class CURRICULUM_ADD_PROGRAM extends AbstractEntity {
+public class CURRICULUM_AFTER_SEMESTER extends AbstractEntity {
 
 	private static final long serialVersionUID = -1694890284738737494L;
 
@@ -29,11 +22,6 @@ public class CURRICULUM_ADD_PROGRAM extends AbstractEntity {
     @JoinColumns({
         @JoinColumn(name = "CURRICULUM_ID", referencedColumnName = "ID")})
     private CURRICULUM curriculum;
-
-    @ManyToOne
-    @JoinColumns({
-        @JoinColumn(name = "SEMESTER_ID", referencedColumnName = "ID")})
-    private SEMESTER semester;
 
 	@ManyToOne
     @JoinColumns({
@@ -45,13 +33,13 @@ public class CURRICULUM_ADD_PROGRAM extends AbstractEntity {
         @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
     private SUBJECT subject;
 
-	@Column(name = "CODE")
-	private String code;
-
 	@ManyToOne
 	@JoinColumns({
 			@JoinColumn(name = "EDUCATION_MODULE_TYPE_ID", referencedColumnName = "ID")})
 	private EDUCATION_MODULE_TYPE educationModuleType;
+
+	@Column(name = "CODE")
+	private String code;
 
 	@Column(name = "CREATED")
     @Temporal(TemporalType.TIMESTAMP)
@@ -88,14 +76,6 @@ public class CURRICULUM_ADD_PROGRAM extends AbstractEntity {
 		this.subject = subject;
 	}
 
-	public SEMESTER getSemester() {
-		return semester;
-	}
-
-	public void setSemester(SEMESTER semester) {
-		this.semester = semester;
-	}
-
 	public Date getCreated() {
 		return created;
 	}
@@ -120,19 +100,19 @@ public class CURRICULUM_ADD_PROGRAM extends AbstractEntity {
 		this.deleted = deleted;
 	}
 
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
-	}
-
 	public EDUCATION_MODULE_TYPE getEducationModuleType() {
 		return educationModuleType;
 	}
 
 	public void setEducationModuleType(EDUCATION_MODULE_TYPE educationModuleType) {
 		this.educationModuleType = educationModuleType;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
 	}
 }
