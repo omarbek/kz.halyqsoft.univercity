@@ -1,5 +1,6 @@
 package kz.halyqsoft.univercity.entity.beans.univercity;
 
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.EDUCATION_MODULE_TYPE;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_DATA;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT;
@@ -44,6 +45,14 @@ public class CURRICULUM_ADD_PROGRAM extends AbstractEntity {
         @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
     private SUBJECT subject;
 
+	@Column(name = "CODE")
+	private String code;
+
+	@ManyToOne
+	@JoinColumns({
+			@JoinColumn(name = "EDUCATION_MODULE_TYPE_ID", referencedColumnName = "ID")})
+	private EDUCATION_MODULE_TYPE educationModuleType;
+
 	@Column(name = "CREATED")
     @Temporal(TemporalType.TIMESTAMP)
     private Date created;
@@ -54,9 +63,6 @@ public class CURRICULUM_ADD_PROGRAM extends AbstractEntity {
 
 	@Column(name = "DELETED", nullable = false)
     private boolean deleted;
-
-	public CURRICULUM_ADD_PROGRAM() {
-	}
 
 	public CURRICULUM getCurriculum() {
 		return curriculum;
@@ -112,5 +118,21 @@ public class CURRICULUM_ADD_PROGRAM extends AbstractEntity {
 
 	public void setDeleted(boolean deleted) {
 		this.deleted = deleted;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+
+	public EDUCATION_MODULE_TYPE getEducationModuleType() {
+		return educationModuleType;
+	}
+
+	public void setEducationModuleType(EDUCATION_MODULE_TYPE educationModuleType) {
+		this.educationModuleType = educationModuleType;
 	}
 }

@@ -54,17 +54,6 @@ public class SubjectView extends AbstractTaskView implements FilterPanelListener
     @Override
     public void initView(boolean readOnly) throws Exception {
         filterPanel.addFilterPanelListener(this);
-        TextField tf = new TextField();
-        tf.setNullRepresentation("");
-        tf.setNullSettingAllowed(true);
-        tf.setWidth(100, Unit.PIXELS);
-        filterPanel.addFilterComponent("code", tf);
-
-        tf = new TextField();
-        tf.setNullRepresentation("");
-        tf.setNullSettingAllowed(true);
-        tf.setWidth(200, Unit.PIXELS);
-        filterPanel.addFilterComponent("subjectName", tf);
 
         ComboBox cb = new ComboBox();
         cb.setNullSelectionAllowed(true);
@@ -167,20 +156,6 @@ public class SubjectView extends AbstractTaskView implements FilterPanelListener
         int i = 1;
         Map<Integer, Object> params = new HashMap<>();
         StringBuilder sb = new StringBuilder();
-        if (sf.getCode() != null && sf.getCode().trim().length() >= 3) {
-            params.put(i, sf.getCode().trim().toLowerCase());
-            sb.append("lower(subj.CODE) like '");
-            sb.append(sf.getCode().trim().toLowerCase());
-            sb.append("%'");
-        }
-        if (sf.getSubjectName() != null && sf.getSubjectName().trim().length() >= 3) {
-            if (sb.length() > 0) {
-                sb.append(" and ");
-            }
-            sb.append("lower(subj.NAME_RU) like '");
-            sb.append(sf.getSubjectName().trim().toLowerCase());
-            sb.append("%'");
-        }
         if (sf.getChair() != null) {
             params.put(i, sf.getChair().getId().getId());
             if (sb.length() > 0) {
@@ -223,7 +198,7 @@ public class SubjectView extends AbstractTaskView implements FilterPanelListener
             sb.append(" and ");
             sb.append("subj.DELETED = ?" + i++);
             sb.insert(0, " where ");
-            String sql = "SELECT  subj.ID,subj.CODE, subj.NAME_RU  SUBJECT_NAME, dep.DEPT_NAME CHAIR_NAME,  lvl.LEVEL_NAME, mdl.MODULE_NAME,\n" +
+            String sql = "SELECT  subj.ID, subj.NAME_RU  SUBJECT_NAME, dep.DEPT_NAME CHAIR_NAME,  lvl.LEVEL_NAME, mdl.MODULE_NAME,\n" +
                     "                      cred.CREDIT,\n" +
                     "                      formula.FORMULA\n" +
                     "                    FROM SUBJECT subj INNER JOIN DEPARTMENT dep ON subj.CHAIR_ID = dep.ID\n" +
@@ -240,13 +215,12 @@ public class SubjectView extends AbstractTaskView implements FilterPanelListener
                         Object[] oo = (Object[]) o;
                         VSubject vs = new VSubject();
                         vs.setId(ID.valueOf((long) oo[0]));
-                        vs.setCode((String) oo[1]);
-                        vs.setSubjectName((String) oo[2]);
-                        vs.setChairName((String) oo[3]);
-                        vs.setLevelName((String) oo[4]);
-//                        vs.setModuleName((String) oo[5]);
-                        vs.setCredit(((BigDecimal) oo[6]).intValue());
-                        vs.setFormula((String) oo[7]);
+                        vs.setSubjectName((String) oo[1]);
+                        vs.setChairName((String) oo[2]);
+                        vs.setLevelName((String) oo[3]);
+                        vs.setModuleName((String) oo[4]);
+                        vs.setCredit(((BigDecimal) oo[5]).intValue());
+                        vs.setFormula((String) oo[6]);
                         list.add(vs);
                     }
                 }

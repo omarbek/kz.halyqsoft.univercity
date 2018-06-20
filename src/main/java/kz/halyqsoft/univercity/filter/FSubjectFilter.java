@@ -11,32 +11,29 @@ public final class FSubjectFilter extends AbstractFilterBean {
 
 	private static final long serialVersionUID = 3280308708403197770L;
 	
-	private String code;
-	private String subjectName;
+//	private String code;
+//	private String subjectName;
 	private DEPARTMENT chair;
 	private CREDITABILITY creditability;
 	private SUBJECT_CYCLE subjectCycle;
 	private LEVEL level;
 	private SUBJECT_MODULE subjectModule;
 	
-	public FSubjectFilter() {
-	}
-
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
-	}
-
-	public String getSubjectName() {
-		return subjectName;
-	}
-
-	public void setSubjectName(String subjectName) {
-		this.subjectName = subjectName;
-	}
+//	public String getCode() {
+//		return code;
+//	}
+//
+//	public void setCode(String code) {
+//		this.code = code;
+//	}
+//
+//	public String getSubjectName() {
+//		return subjectName;
+//	}
+//
+//	public void setSubjectName(String subjectName) {
+//		this.subjectName = subjectName;
+//	}
 
 	public DEPARTMENT getChair() {
 		return chair;
@@ -80,6 +77,7 @@ public final class FSubjectFilter extends AbstractFilterBean {
 
 	@Override
 	public boolean hasFilter() {
-		return (!(code == null && subjectName == null && chair == null && creditability == null && subjectCycle == null && level == null && subjectModule == null));
+		return (!(/*code == null && subjectName == null &&*/ chair == null && creditability == null
+				&& subjectCycle == null && level == null && subjectModule == null));
 	}
 }

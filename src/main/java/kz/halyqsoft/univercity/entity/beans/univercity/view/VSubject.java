@@ -12,8 +12,8 @@ public final class VSubject extends AbstractEntity {
 
 	private static final long serialVersionUID = 9078213114619790341L;
 
-	@FieldInfo(type = EFieldType.TEXT, order = 2, columnWidth = 130)
-	private String code;
+//	@FieldInfo(type = EFieldType.TEXT, order = 2, columnWidth = 130)
+//	private String code;
 	
 	@FieldInfo(type = EFieldType.TEXT, order = 3)
 	private String subjectName;
@@ -33,16 +33,13 @@ public final class VSubject extends AbstractEntity {
 	@FieldInfo(type = EFieldType.TEXT, order = 8, columnWidth = 120)
 	private String formula;
 	
-	public VSubject() {
-	}
-
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
-	}
+//	public String getCode() {
+//		return code;
+//	}
+//
+//	public void setCode(String code) {
+//		this.code = code;
+//	}
 
 	public String getSubjectName() {
 		return subjectName;

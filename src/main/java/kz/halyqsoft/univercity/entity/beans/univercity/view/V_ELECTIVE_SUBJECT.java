@@ -39,7 +39,7 @@ public class V_ELECTIVE_SUBJECT extends AbstractEntity {
             @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
     private V_SUBJECT_SELECT subject;
 
-    @FieldInfo(type = EFieldType.TEXT, order = 5, inEdit = false, inView = true, columnWidth = 120)
+    @FieldInfo(type = EFieldType.TEXT, order = 5, columnWidth = 120)
     @Column(name = "SUBJECT_CODE")
     private String subjectCode;
 
@@ -86,6 +86,16 @@ public class V_ELECTIVE_SUBJECT extends AbstractEntity {
     @FieldInfo(type = EFieldType.TEXT, order = 14, inGrid = false, inEdit = false, inView = true)
     @Column(name = "CONTROL_TYPE_NAME")
     private String controlTypeName;
+
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 20, inGrid = false, inView = false)
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "EDUCATION_MODULE_TYPE_ID", referencedColumnName = "ID")})
+    private EDUCATION_MODULE_TYPE educationModuleType;
+
+    @FieldInfo(type = EFieldType.TEXT, order = 21, inEdit = false)
+    @Column(name = "EDUCATION_MODULE_TYPE_NAME")
+    private String educationModuleTypeName;
 
     @FieldInfo(type = EFieldType.BOOLEAN_EDIT, order = 15, inEdit = false, inView = false, columnWidth = 170)
     @Column(name = "CONSIDER_CREDIT", nullable = false)
@@ -224,5 +234,21 @@ public class V_ELECTIVE_SUBJECT extends AbstractEntity {
 
     public void setConsiderCredit(boolean considerCredit) {
         this.considerCredit = considerCredit;
+    }
+
+    public EDUCATION_MODULE_TYPE getEducationModuleType() {
+        return educationModuleType;
+    }
+
+    public void setEducationModuleType(EDUCATION_MODULE_TYPE educationModuleType) {
+        this.educationModuleType = educationModuleType;
+    }
+
+    public String getEducationModuleTypeName() {
+        return educationModuleTypeName;
+    }
+
+    public void setEducationModuleTypeName(String educationModuleTypeName) {
+        this.educationModuleTypeName = educationModuleTypeName;
     }
 }

@@ -65,9 +65,6 @@ public final class SubjectEdit extends AbstractFormWidgetView {
         FormModel baseDataFM = baseDataFW.getWidgetModel();
         baseDataFM.setButtonsVisible(false);
 
-        FieldModel codeFM = baseDataFM.getFieldModel("code");
-        codeFM.setReadOnlyFixed(false);
-
         FKFieldModel studyDirectFM = (FKFieldModel) baseDataFM.getFieldModel("studyDirect");
         studyDirectFM.setDialogHeight(400);
         studyDirectFM.setDialogWidth(500);
@@ -240,8 +237,6 @@ public final class SubjectEdit extends AbstractFormWidgetView {
             sb.append(": ");
             try {
                 SUBJECT s = (SUBJECT) baseDataFW.getWidgetModel().getEntity();
-                sb.append(s.getCode());
-                sb.append(" - ");
                 sb.append(s.getNameRU());
             } catch (Exception ex) {
                 CommonUtils.showMessageAndWriteLog("Unable to create view title", ex);

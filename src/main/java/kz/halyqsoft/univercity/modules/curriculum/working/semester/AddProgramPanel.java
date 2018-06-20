@@ -100,11 +100,10 @@ public class AddProgramPanel extends AbstractCurriculumPanel implements EntityLi
         semesterQM.addWhere("id", ECriteria.LESS_EQUAL, ID.valueOf(8));
 
         FKFieldModel subjectFM = (FKFieldModel) fm.getFieldModel("subject");
-        QueryModel subjectQM = subjectFM.getQueryModel();
 
         FKFieldModel creditabilityFM = (FKFieldModel) fm.getFieldModel("creditability");
 
-        subjectFM.getListeners().add(new SubjectSelectListener(fm.getFieldModel("subjectCode"), creditabilityFM));
+        subjectFM.getListeners().add(new SubjectSelectListener(creditabilityFM));
 
         getContent().addComponent(grid);
     }
@@ -274,9 +273,6 @@ public class AddProgramPanel extends AbstractCurriculumPanel implements EntityLi
         if (source.equals(grid)) {
             FormModel fm = ((DBGridModel) grid.getWidgetModel()).getFormModel();
 
-            FieldModel subjectCodeFM = fm.getFieldModel("subjectCode");
-            subjectCodeFM.setReadOnly(true);
-
             FKFieldModel creditabilityFM = (FKFieldModel) fm.getFieldModel("creditability");
             creditabilityFM.setReadOnly(true);
 
@@ -324,18 +320,11 @@ public class AddProgramPanel extends AbstractCurriculumPanel implements EntityLi
                 creditabilityCB.setFilteringMode(FilteringMode.OFF);
                 creditabilityCB.setPageLength(0);
 
-                TextField subjectCodeTF = new TextField();
-                subjectCodeTF.setWidth(100, Unit.PIXELS);
-                subjectCodeTF.setNullRepresentation("");
-                subjectCodeTF.setNullSettingAllowed(true);
-                subjectCodeTF.setImmediate(true);
-
                 subjectSelectDlg = subjectFM.getCustomGridSelectDialog();
                 subjectSelectDlg.getSelectModel().setMultiSelect(false);
                 subjectSelectDlg.getFilterModel().addFilter("chair", chairCB);
                 subjectSelectDlg.getFilterModel().addFilter("level", levelCB);
                 subjectSelectDlg.getFilterModel().addFilter("creditability", creditabilityCB);
-                subjectSelectDlg.getFilterModel().addFilter("code", subjectCodeTF);
                 subjectSelectDlg.setFilterRequired(true);
                 subjectSelectDlg.initFilter();
             } catch (Exception ex) {
@@ -399,6 +388,8 @@ public class AddProgramPanel extends AbstractCurriculumPanel implements EntityLi
                         cap.setSemester(vcap.getSemester());
                         cap.setSemesterData(sd);
                         cap.setCreated(new Date());
+                        cap.setCode(vcap.getSubjectCode());
+                        cap.setEducationModuleType(vcap.getEducationModuleType());
                         try {
                             cap.setSubject(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(SUBJECT.class, vcap.getSubject().getId()));
                             SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(cap);
@@ -443,10 +434,11 @@ public class AddProgramPanel extends AbstractCurriculumPanel implements EntityLi
                     params.put(2, sd.getId().getId());
                     params.put(3, cap.getSubject().getId().getId());
                     params.put(4, 3);
-                    Integer sum = null;
+                    Long sum = null;
                     try {
-                        sum = (Integer) session.lookupSingle(sql, params);
+                        sum = (Long) session.lookupSingle(sql, params);
                     } catch (NoResultException nrex) {
+                        sum=null;
                     }
                     if (sum != null && sum > 0) {
                         delList.add(cap);
@@ -458,11 +450,12 @@ public class AddProgramPanel extends AbstractCurriculumPanel implements EntityLi
                         params.put(3, ss.getId().getId());
                         params.put(4, ss.getId().getId());
                         try {
-                            sum = (Integer) session.lookupSingle(sql, params);
+                            sum = (Long) session.lookupSingle(sql, params);
                         } catch (NoResultException nrex) {
+                            sum=null;
                         }
                         if (sum != null && sum > 0) {
-                            notDelList.add(cap.getSubject().getCode() + " " + cap.getSubject().getNameRU());
+                            notDelList.add(cap.getSubject().getNameRU());
                         } else {
                             ssDelList.add(ss);
                             delList.add(cap);
@@ -531,12 +524,10 @@ public class AddProgramPanel extends AbstractCurriculumPanel implements EntityLi
     }
 
     private class SubjectSelectListener implements ValueChangeListener {
-        private final FieldModel subjectCodeFM;
         private final FKFieldModel creditabilityFM;
 
-        public SubjectSelectListener(FieldModel subjectCodeFM, FKFieldModel creditabilityFM) {
+        public SubjectSelectListener(FKFieldModel creditabilityFM) {
             super();
-            this.subjectCodeFM = subjectCodeFM;
             this.creditabilityFM = creditabilityFM;
         }
 
@@ -546,10 +537,8 @@ public class AddProgramPanel extends AbstractCurriculumPanel implements EntityLi
                 V_SUBJECT_SELECT subject = (V_SUBJECT_SELECT) ev.getProperty().getValue();
                 if (subject != null) {
                     V_SUBJECT_SELECT vss = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(V_SUBJECT_SELECT.class, subject.getId());
-                    subjectCodeFM.refresh(vss.getCode());
                     creditabilityFM.refresh(vss.getCreditability());
                 } else {
-                    subjectCodeFM.refresh(null);
                     creditabilityFM.refresh(null);
                 }
             } catch (Exception ex) {

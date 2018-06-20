@@ -16,7 +16,6 @@ import kz.halyqsoft.univercity.entity.beans.univercity.SEMESTER_SUBJECT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_CURRICULUM_DETAIL;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_ELECTIVE_SUBJECT;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.V_ELECTIVE_SUBJECT_LABEL;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_SUBJECT_SELECT;
 import kz.halyqsoft.univercity.modules.curriculum.working.AbstractCurriculumPanel;
 import kz.halyqsoft.univercity.modules.curriculum.working.CurriculumView;
@@ -460,7 +459,7 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
     public void onRefresh(Object source, List<Entity> entities) {
         if (source.equals(grid) && !entities.isEmpty()) {
             StringBuilder sql = new StringBuilder();
-            sql.append("select b.ID, c.CODE from SUBJECT_REQUISITE a inner join CURRICULUM_DETAIL b on a.SUBJECT_ID = b.SUBJECT_ID inner join SUBJECT c on a.REQUISITE_ID = c.ID where a.PRE_REQUISITE = ?1 and b.DELETED = ?2 and b.ID in (");
+            sql.append("select b.ID from SUBJECT_REQUISITE a inner join CURRICULUM_DETAIL b on a.SUBJECT_ID = b.SUBJECT_ID inner join SUBJECT c on a.REQUISITE_ID = c.ID where a.PRE_REQUISITE = ?1 and b.DELETED = ?2 and b.ID in (");
             boolean first = true;
             for (Entity e : entities) {
                 if (!first) {
@@ -490,7 +489,7 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                                 if (!first) {
                                     sb.append(", ");
                                 }
-                                sb.append(oo[1]);
+                                sb.append(vcd.getSubjectCode());
                                 first = false;
                             }
                         }
@@ -590,7 +589,7 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                                 } catch (NoResultException nrex) {
                                 }
                                 if (sum != null && sum > 0) {
-                                    notDelList.add(cd.getSubject().getCode() + " " + cd.getSubject().getNameRU());
+                                    notDelList.add(cd.getSubject().getNameRU());
                                 } else {
                                     ssDelList.add(ss);
                                     delList.add(cd);
@@ -689,7 +688,7 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                             } catch (NoResultException nrex) {
                             }
                             if (sum != null && sum > 0) {
-                                notDelList.add(es.getSubject().getCode() + " " + es.getSubject().getNameRU());
+                                notDelList.add(es.getSubject().getNameRU());
                             } else {
                                 ssDelList.add(ss);
                                 delList.add(es);
@@ -908,24 +907,17 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                 creditabilityCB.setFilteringMode(FilteringMode.OFF);
                 creditabilityCB.setPageLength(0);
 
-                TextField subjectCodeTF = new TextField();
-                subjectCodeTF.setWidth(100, Unit.PIXELS);
-                subjectCodeTF.setNullRepresentation("");
-                subjectCodeTF.setNullSettingAllowed(true);
-                subjectCodeTF.setImmediate(true);
-
                 subjectSelectDlg = new SubjectSelectDialog(new AddNewSubjectListener(), V_SUBJECT_SELECT.class);
                 QueryModel qm = ((DBGridModel) subjectSelectDlg.getSelectModel()).getQueryModel();
                 qm.addWhere("chair", ECriteria.EQUAL, ID.valueOf(-1));
                 qm.addWhere("mandatory", Boolean.TRUE);
-                qm.addWhere("subjectCycle",ECriteria.NOT_EQUAL,ID.valueOf(4));
+                qm.addWhere("subjectCycle", ECriteria.NOT_EQUAL, ID.valueOf(4));
                 subjectSelectDlg.setDialogWidth(600);
                 subjectSelectDlg.setDialogHeight(300);
                 subjectSelectDlg.getFilterModel().addFilter("chair", chairCB);
                 subjectSelectDlg.getFilterModel().addFilter("level", levelCB);
 //                subjectSelectDlg.getFilterModel().addFilter("subjectCycle", subjectCycleCB);
                 subjectSelectDlg.getFilterModel().addFilter("creditability", creditabilityCB);
-                subjectSelectDlg.getFilterModel().addFilter("code", subjectCodeTF);
                 subjectSelectDlg.setFilterRequired(true);
                 subjectSelectDlg.initFilter();
                 subjectSelectDlg.open();
@@ -1003,25 +995,18 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                 creditabilityCB.setFilteringMode(FilteringMode.OFF);
                 creditabilityCB.setPageLength(0);
 
-                TextField subjectCodeTF = new TextField();
-                subjectCodeTF.setWidth(100, Unit.PIXELS);
-                subjectCodeTF.setNullRepresentation("");
-                subjectCodeTF.setNullSettingAllowed(true);
-                subjectCodeTF.setImmediate(true);
-
                 electiveSubjectSelectDlg = new ElectiveSubjectSelectDialog(
                         new AddNewElectiveSubjectListener(), V_SUBJECT_SELECT.class);
                 QueryModel qm = ((DBGridModel) electiveSubjectSelectDlg.getSelectModel()).getQueryModel();
                 qm.addWhere("chair", ECriteria.EQUAL, ID.valueOf(-1));
                 qm.addWhere("mandatory", Boolean.FALSE);
-                qm.addWhere("subjectCycle",ECriteria.NOT_EQUAL,ID.valueOf(4));
+                qm.addWhere("subjectCycle", ECriteria.NOT_EQUAL, ID.valueOf(4));
                 electiveSubjectSelectDlg.setDialogWidth(600);
                 electiveSubjectSelectDlg.setDialogHeight(400);
                 electiveSubjectSelectDlg.getFilterModel().addFilter("chair", chairCB);
                 electiveSubjectSelectDlg.getFilterModel().addFilter("level", levelCB);
 //                electiveSubjectSelectDlg.getFilterModel().addFilter("subjectCycle", subjectCycleCB);
                 electiveSubjectSelectDlg.getFilterModel().addFilter("creditability", creditabilityCB);
-                electiveSubjectSelectDlg.getFilterModel().addFilter("code", subjectCodeTF);
                 electiveSubjectSelectDlg.setFilterRequired(true);
                 electiveSubjectSelectDlg.initFilter();
                 electiveSubjectSelectDlg.open();
@@ -1082,12 +1067,17 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
         public void buttonClick(ClickEvent ev) {
             List<Entity> selectedList = subjectSelectDlg.getSelectedEntities();
             if (!selectedList.isEmpty()) {
-                List<CURRICULUM_DETAIL> newList = new ArrayList<CURRICULUM_DETAIL>();
+                List<CURRICULUM_DETAIL> newList = new ArrayList<>();
                 try {
                     SEMESTER_DATA sd = getOrCreateSemesterData();
                     CommonEntityFacadeBean session = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class);
                     Date created = new Date();
                     for (Entity e : selectedList) {
+                        if (subjectSelectDlg.getCode() == null || subjectSelectDlg.getCode().isEmpty()) {
+                            Message.showError(getUILocaleUtil().getMessage("error.required.fields"));
+                            can=false;
+                            return;
+                        }
                         CURRICULUM_DETAIL cd = new CURRICULUM_DETAIL();
                         cd.setCurriculum(curriculum);
                         cd.setSemester(semester);
@@ -1098,6 +1088,8 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                         }
                         cd.setConsiderCredit(subjectSelectDlg.isConsiderCredit());
                         cd.setCreated(created);
+                        cd.setCode(subjectSelectDlg.getCode());
+                        cd.setEducationModuleType(subjectSelectDlg.getEducationModuleType());
                         newList.add(cd);
                     }
 
@@ -1217,6 +1209,12 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                     QueryModel<SEMESTER_SUBJECT> ssQM = new QueryModel<SEMESTER_SUBJECT>(SEMESTER_SUBJECT.class);
                     ssQM.addWhere("semesterData", ECriteria.EQUAL, sd.getId());
                     for (Entity e : selectedList) {
+                        if (electiveSubjectSelectDlg.getCode() == null ||
+                                electiveSubjectSelectDlg.getCode().isEmpty()) {
+                            Message.showError(getUILocaleUtil().getMessage("error.required.fields"));
+                            can=false;
+                            return;
+                        }
                         ELECTIVE_SUBJECT es = new ELECTIVE_SUBJECT();
                         es.setCurriculum(curriculum);
                         es.setSemester(semester);
@@ -1227,6 +1225,8 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                         }
                         es.setConsiderCredit(electiveSubjectSelectDlg.isConsiderCredit());
                         es.setCreated(created);
+                        es.setCode(electiveSubjectSelectDlg.getCode());
+                        es.setEducationModuleType(electiveSubjectSelectDlg.getEducationModuleType());
                         newList.add(es);
 
                         // Create semester subject if not exists
