@@ -14,8 +14,8 @@ public class V_STUDENT_SUBJECT extends AbstractEntity {
 
 	private static final long serialVersionUID = -6630474683884352722L;
 	
-	@Column(name = "SUBJECT_CODE", nullable = false)
-	private String subjectCode;
+//	@Column(name = "SUBJECT_CODE", nullable = false)
+//	private String subjectCode;
 
 	@Column(name = "SUBJECT_NAME", nullable = false)
 	private String subjectName;
@@ -32,13 +32,13 @@ public class V_STUDENT_SUBJECT extends AbstractEntity {
 	public V_STUDENT_SUBJECT() {
 	}
 
-	public String getSubjectCode() {
-		return subjectCode;
-	}
-
-	public void setSubjectCode(String subjectCode) {
-		this.subjectCode = subjectCode;
-	}
+//	public String getSubjectCode() {
+//		return subjectCode;
+//	}
+//
+//	public void setSubjectCode(String subjectCode) {
+//		this.subjectCode = subjectCode;
+//	}
 
 	public String getSubjectName() {
 		return subjectName;

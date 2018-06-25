@@ -304,6 +304,7 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.CHAT</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.MESSAGE</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM_AFTER_SEMESTER</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.CATALOG_ELECTIVE_SUBJECTS</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.ELECTIVE_BINDED_SUBJECT</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>

@@ -7,12 +7,11 @@ import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.TextField;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEPARTMENT;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.LOCK_REASON;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SPECIALITY;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDENT_STATUS;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
+import kz.halyqsoft.univercity.entity.beans.univercity.enumeration.UserType;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VStudent;
 import kz.halyqsoft.univercity.filter.FStudentFilter;
+import kz.halyqsoft.univercity.filter.FSubjectFilter;
 import kz.halyqsoft.univercity.filter.panel.StudentFilterPanel;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -43,12 +42,12 @@ import java.util.Map;
  * @created Mar 27, 2017 4:40:23 PM
  */
 @SuppressWarnings({"serial", "unchecked"})
-public class StudentList extends AbstractTaskView implements EntityListener, FilterPanelListener {
+public class StudentListView extends AbstractTaskView implements EntityListener, FilterPanelListener {
 
     private final StudentFilterPanel filterPanel;
     private GridWidget studentGW;
 
-    public StudentList(AbstractTask task) throws Exception {
+    public StudentListView(AbstractTask task) throws Exception {
         super(task);
         filterPanel = new StudentFilterPanel(new FStudentFilter());
     }
@@ -92,9 +91,10 @@ public class StudentList extends AbstractTaskView implements EntityListener, Fil
         cb.setTextInputAllowed(false);
         cb.setFilteringMode(FilteringMode.OFF);
         QueryModel<LOCK_REASON> lrQM = new QueryModel<LOCK_REASON>(LOCK_REASON.class);
-        lrQM.addWhere("lockType", ECriteria.EQUAL, 1);
+        lrQM.addWhere("userType", ECriteria.EQUAL, USER_TYPE.STUDENT_ID);
         lrQM.addOrder("id");
-        BeanItemContainer<LOCK_REASON> lrBIC = new BeanItemContainer<LOCK_REASON>(LOCK_REASON.class, SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(lrQM));
+        BeanItemContainer<LOCK_REASON> lrBIC = new BeanItemContainer<>(LOCK_REASON.class,
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(lrQM));
         cb.setContainerDataSource(lrBIC);
         filterPanel.addFilterComponent("lockReason", cb);
 
@@ -104,8 +104,8 @@ public class StudentList extends AbstractTaskView implements EntityListener, Fil
         cb.setFilteringMode(FilteringMode.CONTAINS);
         cb.setPageLength(0);
         cb.setWidth(250, Unit.PIXELS);
-        QueryModel<DEPARTMENT> facultyQM = new QueryModel<DEPARTMENT>(DEPARTMENT.class);
-//        facultyQM.addWhere("type", ECriteria.EQUAL, DEPARMENT_TYPE.FACULTY_ID);//TODO
+        QueryModel<DEPARTMENT> facultyQM = new QueryModel<>(DEPARTMENT.class);
+        facultyQM.addWhereNull("parent");
         facultyQM.addWhereAnd("deleted", Boolean.FALSE);
         facultyQM.addOrder("deptName");
         BeanItemContainer<DEPARTMENT> facultyBIC = new BeanItemContainer<DEPARTMENT>(DEPARTMENT.class, SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(facultyQM));
@@ -202,7 +202,26 @@ public class StudentList extends AbstractTaskView implements EntityListener, Fil
         List<VStudent> list = new ArrayList<VStudent>();
         if (sb.length() > 0) {
             sb.insert(0, " where ");
-            String sql = "select a.ID, b.CODE, trim(b.LAST_NAME||' '||b.FIRST_NAME||' '||coalesce(b.MIDDLE_NAME, '')) FIO, c.CATEGORY_NAME, e.STATUS_NAME, f.DEPT_SHORT_NAME FACULTY, g.SPEC_NAME, decode(b.LOCKED, 0, null, h.REASON) LOCK_REASON from STUDENT a inner join USER b on a.ID = b.ID inner join STUDENT_CATEGORY c on a.CATEGORY_ID = c.ID inner join STUDENT_EDUCATION d on a.ID = d.STUDENT_ID and d.CHILD_ID is null inner join STUDENT_STATUS e on d.STUDENT_STATUS_ID = e.ID inner join DEPARMENT f on d.FACULTY_ID = f.ID inner join SPECIALITY g on d.SPECIALITY_ID = g.ID left join LOCK_REASON h on b.LOCK_REASON_ID = h.ID" + sb.toString() + " order by FIO";
+            String sql = "SELECT " +
+                    "  a.ID, " +
+                    "  b.CODE, " +
+                    "  trim(b.LAST_NAME || ' ' || b.FIRST_NAME || ' ' || coalesce(b.MIDDLE_NAME, '')) FIO, " +
+                    "  c.CATEGORY_NAME, " +
+                    "  e.STATUS_NAME, " +
+                    "  f.DEPT_SHORT_NAME                                                              FACULTY, " +
+                    "  g.SPEC_NAME, " +
+                    "  CASE WHEN b.locked = FALSE " +
+                    "    THEN NULL " +
+                    "  ELSE h.reason END                                                              LOCK_REASON " +
+                    "FROM STUDENT a INNER JOIN USERS b ON a.ID = b.ID " +
+                    "  INNER JOIN STUDENT_CATEGORY c ON a.CATEGORY_ID = c.ID " +
+                    "  INNER JOIN STUDENT_EDUCATION d ON a.ID = d.STUDENT_ID AND d.CHILD_ID IS NULL " +
+                    "  INNER JOIN STUDENT_STATUS e ON d.STUDENT_STATUS_ID = e.ID " +
+                    "  INNER JOIN DEPARTMENT f ON d.FACULTY_ID = f.ID " +
+                    "  INNER JOIN SPECIALITY g ON d.SPECIALITY_ID = g.ID " +
+                    "  LEFT JOIN LOCK_REASON h ON b.LOCK_REASON_ID = h.ID "
+                    + sb.toString() +
+                    " ORDER BY FIO;";
             try {
                 List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
                 if (!tmpList.isEmpty()) {
@@ -246,6 +265,13 @@ public class StudentList extends AbstractTaskView implements EntityListener, Fil
         }
     }
 
+    public void refresh() throws Exception {
+        FStudentFilter subjectFilter = (FStudentFilter) filterPanel.getFilterBean();
+        if (subjectFilter.hasFilter()) {
+            doFilter(subjectFilter);
+        }
+    }
+
     @Override
     public void beforeRefresh(Object source, int buttonId) {
     }
@@ -263,8 +289,13 @@ public class StudentList extends AbstractTaskView implements EntityListener, Fil
         if (ev.getSource().equals(studentGW)) {
             if (ev.getAction() == EntityEvent.SELECTED) {
                 VStudent student = (VStudent) ev.getEntities().get(0);
-//                PrintView pv = new PrintView(student, (FStudentFilter) filterPanel.getFilterBean());
-//                CurriculumUI.getInstance().openCommonView(pv);//TODO
+                PrintView pv = null;
+                try {
+                    pv = new PrintView(student, (FStudentFilter) filterPanel.getFilterBean());
+                } catch (Exception e) {
+                    e.printStackTrace();//TODO catch
+                }
+                new PrintDialog(pv,StudentListView.this);
             }
         }
     }

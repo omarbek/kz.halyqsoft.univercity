@@ -40,24 +40,12 @@ final class PrintView extends AbstractFormWidgetView {
     private final VStudent student;
     private final FStudentFilter filter;
 
-    public PrintView(VStudent student, FStudentFilter filter) {
+    public PrintView(VStudent student, FStudentFilter filter) throws Exception {
         super();
+        setBackButtonVisible(false);
         this.student = student;
         this.filter = filter;
-    }
 
-    @Override
-    public String getViewName() {
-        return "printView";
-    }
-
-    @Override
-    protected String getViewTitle(Locale locale) {
-        return null;
-    }
-
-    @Override
-    public void initView(boolean readOnly) throws Exception {
         addStyleName("widget-panel");
 
         CustomLayout printCL = new CustomLayout("ic-print-layout");
@@ -92,7 +80,18 @@ final class PrintView extends AbstractFormWidgetView {
         l.setValue(getUILocaleUtil().getCaption("individual.curriculum.print"));
         printCL.addComponent(l, "ic-title");
 
-        String sql = "select b.CODE, trim(b.LAST_NAME||' '||substr(b.FIRST_NAME, 1, 2)||'. '||(case when b.MIDDLE_NAME is null then '' else substr(b.MIDDLE_NAME, 1, 2)||'.' end)) FIO, e.STUDY_YEAR, f.DEPT_NAME FACULTY, g.SPEC_NAME from STUDENT a inner join USER b on a.ID = b.ID inner join STUDENT_EDUCATION d on a.ID = d.STUDENT_ID and d.CHILD_ID is null inner join STUDY_YEAR e on d.STUDY_YEAR_ID = e.ID inner join DEPARTMENT f on d.FACULTY_ID = f.ID inner join SPECIALITY g on d.SPECIALITY_ID = g.ID where a.ID = ?1";
+        String sql = "SELECT " +
+                "  usr.CODE, " +
+                "  trim(usr.LAST_NAME || ' ' || usr.FIRST_NAME || ' ' || coalesce(usr.MIDDLE_NAME, '')) FIO, " +
+                "  e.STUDY_YEAR, " +
+                "  f.DEPT_NAME                                            FACULTY, " +
+                "  g.SPEC_NAME " +
+                "FROM STUDENT a INNER JOIN USERS usr ON a.ID = usr.ID " +
+                "  INNER JOIN STUDENT_EDUCATION d ON a.ID = d.STUDENT_ID AND d.CHILD_ID IS NULL " +
+                "  INNER JOIN STUDY_YEAR e ON d.STUDY_YEAR_ID = e.ID " +
+                "  INNER JOIN DEPARTMENT f ON d.FACULTY_ID = f.ID " +
+                "  INNER JOIN SPECIALITY g ON d.SPECIALITY_ID = g.ID " +
+                "WHERE a.ID = ?1;";
         Map<Integer, Object> params = new HashMap<Integer, Object>(1);
         params.put(1, student.getId().getId());
         Object[] o = (Object[]) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(sql, params);
@@ -177,8 +176,26 @@ final class PrintView extends AbstractFormWidgetView {
         l.setValue(((BigDecimal) o[2]).toString());
         printCL.addComponent(l, "study-year");
 
-        sql = "select distinct f.CODE SUBJECT_CODE, f.NAME_KZ SUBJECT_NAME_KZ, f.NAME_EN SUBJECT_NAME_EN, f.NAME_RU SUBJECT_NAME_RU," + " decode(f.MANDATORY, 1, 'A', 'B') SUBJECT_STATUS, g.CYCLE_SHORT_NAME, h.CREDIT," + " i.LAST_NAME||' '||substr(i.FIRST_NAME, 1, 2)||'.'||(decode(i.MIDDLE_NAME, null, '', substr(i.MIDDLE_NAME, 1, 2)||'.')) TEACHER_FIO" + " from STUDENT_SCHEDULE a inner join STUDENT_EDUCATION b on a.STUDENT_ID = b.ID" + " inner join SCHEDULE_DETAIL c on a.SCHEDULE_DETAIL_ID = c.ID" + " inner join SCHEDULE d on c.SCHEDULE_ID = d.ID" + " inner join SEMESTER_SUBJECT e on c.SUBJECT_ID = e.ID" + " inner join SUBJECT f on e.SUBJECT_ID = f.ID" + " inner join SUBJECT_CYCLE g on f.SUBJECT_CYCLE_ID = g.ID" + " inner join CREDITABILITY h on f.CREDITABILITY_ID = h.ID" + " inner join USER i on c.TEACHER_ID = i.ID" + " where a.DELETED = ?1 and b.STUDENT_ID = ?2 and d.SEMESTER_DATA_ID = ?3";
-        params.put(1, 0);
+        sql = "SELECT DISTINCT " +
+                "  f.NAME_KZ                                                                            SUBJECT_NAME_KZ, " +
+                "  f.NAME_EN                                                                            SUBJECT_NAME_EN, " +
+                "  f.NAME_RU                                                                            SUBJECT_NAME_RU, " +
+                "  CASE WHEN f.MANDATORY = TRUE " +
+                "    THEN 'A' " +
+                "  ELSE 'B' END                                                                         SUBJECT_STATUS, " +
+                "  g.CYCLE_SHORT_NAME, " +
+                "  H.CREDIT, " +
+                "  TRIM(usr.LAST_NAME || ' ' || usr.FIRST_NAME || ' ' || COALESCE(usr.MIDDLE_NAME, '')) TEACHER_FIO " +
+                "FROM STUDENT_SCHEDULE a INNER JOIN STUDENT_EDUCATION b ON a.STUDENT_ID = b.ID " +
+                "  INNER JOIN SCHEDULE_DETAIL C ON a.SCHEDULE_DETAIL_ID = C.ID " +
+                "  INNER JOIN SCHEDULE D ON C.SCHEDULE_ID = D.ID " +
+                "  INNER JOIN SEMESTER_SUBJECT e ON C.SUBJECT_ID = e.ID " +
+                "  INNER JOIN SUBJECT f ON e.SUBJECT_ID = f.ID " +
+                "  INNER JOIN SUBJECT_CYCLE g ON f.SUBJECT_CYCLE_ID = g.ID " +
+                "  INNER JOIN CREDITABILITY H ON f.CREDITABILITY_ID = H.ID " +
+                "  INNER JOIN USERS usr ON C.TEACHER_ID = usr.ID " +
+                "WHERE a.DELETED = ?1 AND b.STUDENT_ID = ?2 AND D.SEMESTER_DATA_ID = ?3;";
+        params.put(1, Boolean.FALSE);
         params.put(2, student.getId().getId());
         params.put(3, semesterData.getId().getId());
         //		params.put(3, semesterData.getId().getId().subtract(BigInteger.ONE)); //TODO: debug
@@ -191,14 +208,13 @@ final class PrintView extends AbstractFormWidgetView {
             Object[] oo = (Object[]) o1;
             VIndividualCurriculumPrint icp = new VIndividualCurriculumPrint();
             icp.setRecordNo(i++);
-            icp.setSubjectCode((String) oo[0]);
-            icp.setSubjectNameKZ((String) oo[1]);
-            icp.setSubjectNameEN((String) oo[2]);
-            icp.setSubjectNameRU((String) oo[3]);
-            icp.setSubjectStatus(((String) oo[4]).charAt(0));
-            icp.setCycleShortName((String) oo[5]);
-            icp.setCredit(((BigDecimal) oo[6]).intValue());
-            icp.setTeacherFIO((String) oo[7]);
+            icp.setSubjectNameKZ((String) oo[0]);
+            icp.setSubjectNameEN((String) oo[1]);
+            icp.setSubjectNameRU((String) oo[2]);
+            icp.setSubjectStatus(((String) oo[3]).charAt(0));
+            icp.setCycleShortName((String) oo[4]);
+            icp.setCredit(((BigDecimal) oo[5]).intValue());
+            icp.setTeacherFIO((String) oo[6]);
             totalCredit += icp.getCredit();
             dataList.add(icp);
         }
@@ -216,9 +232,6 @@ final class PrintView extends AbstractFormWidgetView {
         dataTable.setColumnHeader("recordNo", getUILocaleUtil().getCaption("number"));
         dataTable.setColumnWidth("recordNo", 30);
         dataTable.setColumnAlignment("recordNo", Table.Align.RIGHT);
-        dataTable.setColumnHeader("subjectCode", getUILocaleUtil().getEntityFieldLabel(VIndividualCurriculumPrint.class, "subjectCode"));
-        dataTable.setColumnWidth("subjectCode", 120);
-        dataTable.setColumnAlignment("subjectCode", Table.Align.LEFT);
         dataTable.setColumnHeader("subjectNameRU", getUILocaleUtil().getEntityFieldLabel(VIndividualCurriculumPrint.class, "subjectName"));
         dataTable.setColumnWidth("subjectNameRU", 420);
         dataTable.setColumnAlignment("subjectNameRU", Table.Align.LEFT);
@@ -239,7 +252,7 @@ final class PrintView extends AbstractFormWidgetView {
         dataTable.addGeneratedColumn("subjectNameRU", new LineBreakTableColumn());
         BeanItemContainer<VIndividualCurriculumPrint> dataBIC = new BeanItemContainer<>(VIndividualCurriculumPrint.class, dataList);
         dataTable.setContainerDataSource(dataBIC);
-        dataTable.setVisibleColumns("recordNo", "subjectCode", "subjectNameRU", "subjectStatus", "cycleShortName", "credit", "teacherFIO");
+        dataTable.setVisibleColumns("recordNo", "subjectNameRU", "subjectStatus", "cycleShortName", "credit", "teacherFIO");
 
         printCL.addComponent(dataTable, "data-table");
 
@@ -257,7 +270,15 @@ final class PrintView extends AbstractFormWidgetView {
         printCL.addComponent(l, "status-b");
 
         params.clear();
-        sql = "select a.SIGNATURE_TYPE_ID, c.LAST_NAME||' '||substr(c.FIRST_NAME, 1, 2)||'.'||decode(c.MIDDLE_NAME, null, '', substr(c.MIDDLE_NAME, 1, 2)||'.') SIGN_FIO from REGISTRATION_SIGNATURE a inner join STUDENT_EDUCATION b on a.STUDENT_ID = b.ID inner join USER c on a.SIGN_USER_ID = c.ID where a.SEMESTER_DATA_ID = ?1 and b.STUDENT_ID = ?2";
+        sql = "SELECT " +
+                "  a.SIGNATURE_TYPE_ID, " +
+                "  c.LAST_NAME || ' ' || substr(c.FIRST_NAME, 1, 2) || '.' || " +
+                "  CASE WHEN c.MIDDLE_NAME IS NULL " +
+                "    THEN '' " +
+                "  ELSE substr(c.MIDDLE_NAME, 1, 2) || '.' END SIGN_FIO " +
+                "FROM REGISTRATION_SIGNATURE a INNER JOIN STUDENT_EDUCATION b ON a.STUDENT_ID = b.ID " +
+                "  INNER JOIN USERS c ON a.SIGN_USER_ID = c.ID " +
+                "WHERE a.SEMESTER_DATA_ID = ?1 AND b.STUDENT_ID = ?2;";
         params.put(1, semesterData.getId().getId());
         params.put(2, student.getId().getId());
         List<Object> signList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
@@ -362,7 +383,7 @@ final class PrintView extends AbstractFormWidgetView {
 
             @Override
             public void buttonClick(ClickEvent ev) {
-//				CurriculumUI.getInstance().openCommonView(new StudentList(filter));//TODO
+//				CurriculumUI.getInstance().openCommonView(new StudentListView(filter));//TODO
             }
         });
         hl.addComponent(b);
@@ -372,8 +393,22 @@ final class PrintView extends AbstractFormWidgetView {
     }
 
     @Override
+    public String getViewName() {
+        return "printView";
+    }
+
+    @Override
+    protected String getViewTitle(Locale locale) {
+        return null;
+    }
+
+    @Override
+    public void initView(boolean readOnly) throws Exception {
+    }
+
+    @Override
     protected AbstractCommonView getParentView() {
-        return null;//TODO
+        return null;
     }
 
     private static String getSign(List<Object> signList, int signType) {

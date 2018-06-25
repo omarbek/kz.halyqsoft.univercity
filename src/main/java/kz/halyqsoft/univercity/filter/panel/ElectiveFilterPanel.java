@@ -18,12 +18,12 @@ public class ElectiveFilterPanel extends AbstractFilterPanel {
         hl.setSpacing(true);
         hl.setWidthUndefined();
 
-        AbstractField af = getFilterComponent("firstSubject");
+        AbstractField af = getFilterComponent("speciality");
         if (af != null) {
             hl.addComponent(af);
         }
 
-        af = getFilterComponent("secondSubject");
+        af = getFilterComponent("entranceYear");
         if (af != null) {
             hl.addComponent(af);
         }

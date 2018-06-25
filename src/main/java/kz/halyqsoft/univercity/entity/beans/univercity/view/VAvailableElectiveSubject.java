@@ -10,21 +10,12 @@ public final class VAvailableElectiveSubject extends AbstractEntity {
 
 	private static final long serialVersionUID = 8934333134745925257L;
 	
-	private String subjectCode;
 	private String subjectName;
 	private Integer credit;
 	private String formula;
 	private String controlTypeName;
 	
 	public VAvailableElectiveSubject() {
-	}
-
-	public String getSubjectCode() {
-		return subjectCode;
-	}
-
-	public void setSubjectCode(String subjectCode) {
-		this.subjectCode = subjectCode;
 	}
 
 	public String getSubjectName() {
