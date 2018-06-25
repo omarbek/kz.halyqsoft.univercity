@@ -1,31 +1,32 @@
 package kz.halyqsoft.univercity.filter;
 
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SPECIALITY;
 import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 
 public class FElectiveFilter extends AbstractFilterBean {
 
-    private SUBJECT firstSubject;
-    private SUBJECT secondSubject;
+    private SPECIALITY speciality;
+    private ENTRANCE_YEAR entranceYear;
 
-    public SUBJECT getFirstSubject() {
-        return firstSubject;
+    public SPECIALITY getSpeciality() {
+        return speciality;
     }
 
-    public void setFirstSubject(SUBJECT firstSubject) {
-        this.firstSubject = firstSubject;
+    public void setSpeciality(SPECIALITY speciality) {
+        this.speciality = speciality;
     }
 
-    public SUBJECT getSecondSubject() {
-        return secondSubject;
+    public ENTRANCE_YEAR getEntranceYear() {
+        return entranceYear;
     }
 
-    public void setSecondSubject(SUBJECT secondSubject) {
-        this.secondSubject = secondSubject;
+    public void setEntranceYear(ENTRANCE_YEAR entranceYear) {
+        this.entranceYear = entranceYear;
     }
 
     @Override
     public boolean hasFilter() {
-        return (!(firstSubject == null && secondSubject == null));
+        return (!(speciality == null && entranceYear == null));
     }
 }

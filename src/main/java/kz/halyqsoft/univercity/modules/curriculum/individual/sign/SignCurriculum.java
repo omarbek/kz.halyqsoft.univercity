@@ -21,7 +21,7 @@ import javax.persistence.NoResultException;
 import java.util.*;
 
 /**
- * @author Dmitry Dobrin.
+ * @author Omarbek
  * @created 10.05.2017.
  */
 @SuppressWarnings("serial")
@@ -171,7 +171,7 @@ public class SignCurriculum extends AbstractFormWidgetView {
         table.addContainerProperty(Columns.TEACHER_COLUMN, String.class, null);
         table.setColumnWidth(Columns.TEACHER_COLUMN, Columns.TEACHER_COLUMN_WIDTH);
         for (VIndividualCurriculumPrint item : resultSchedule) {
-            table.addItem(new Object[]{item.getSubjectCode(), item.getSubjectNameRU(), item.getSubjectStatus(), item.getCycleShortName(), item.getCredit(), item.getTeacherFIO()}, item.getRecordNo());
+            table.addItem(new Object[]{ item.getSubjectNameRU(), item.getSubjectStatus(), item.getCycleShortName(), item.getCredit(), item.getTeacherFIO()}, item.getRecordNo());
         }
         return table;
     }
