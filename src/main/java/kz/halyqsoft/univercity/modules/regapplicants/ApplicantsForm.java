@@ -61,7 +61,7 @@ public final class ApplicantsForm extends UsersForm {
     private Button untButton, grantDocButton;
     private Button motherButton, fatherButton;
     private Button contractButton;
-    private Button specButton,moreButton;
+    private Button specButton, moreButton;
 
     private boolean saveSpec/*, saveUnt*/;
     private boolean came = false;
@@ -238,9 +238,9 @@ public final class ApplicantsForm extends UsersForm {
 
 
             StreamResource myResource = null;
-            if(student.getLevel().getLevelName().equalsIgnoreCase("Магистратура")) {
+            if (student.getLevel().getLevelName().equalsIgnoreCase("Магистратура")) {
                 myResource = createResourceStudent("82", student);
-            }else{
+            } else {
                 myResource = createResourceStudent("85", student);
             }
             FileDownloader fileDownloader = new FileDownloader(myResource);
@@ -491,10 +491,10 @@ public final class ApplicantsForm extends UsersForm {
         }
 
         StreamResource myResource = null;
-        if(student.getLevel().getLevelName().equalsIgnoreCase("Магистратура")) {
+        if (student.getLevel().getLevelName().equalsIgnoreCase("Магистратура")) {
             myResource = createResourceStudent("82", student);
             masgisterContractBWO.setResource(myResource);
-        }else{
+        } else {
             myResource = createResourceStudent("85", student);
             contractBWO.setResource(myResource);
         }
@@ -508,7 +508,7 @@ public final class ApplicantsForm extends UsersForm {
         myResource = createResourceStudent("32", student);
         titleBWO.setResource(myResource);
 
-        if (student != null && student.isNeedDorm() && !came ) {
+        if (student != null && student.isNeedDorm() && !came) {
             came = true;
 
             myResource = createResourceStudent("92", student);
@@ -594,7 +594,7 @@ public final class ApplicantsForm extends UsersForm {
             fileName = "Титул_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
         } else if (value.equals("33")) {
             fileName = "Қолхат_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
-        } else if (value.equals("82")) {
+        } else if (value.equals("82")) {//TODO Assyl check all docs, not only yours
             fileName = "Договор магистрант_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
         } else {
             fileName = "Өтініш_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
@@ -618,10 +618,9 @@ public final class ApplicantsForm extends UsersForm {
                     PDF_DOCUMENT pdf_document = null;
                     try {
                         QueryModel<PDF_DOCUMENT> pdfDocumentQueryModel = new QueryModel<>(PDF_DOCUMENT.class);
-                        pdfDocumentQueryModel.addWhere("id" ,ECriteria.EQUAL ,value);
+                        pdfDocumentQueryModel.addWhere("id", ECriteria.EQUAL, value);
                         pdf_document = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(pdfDocumentQueryModel);
-                    } catch (Exception e)
-                    {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
 
@@ -833,24 +832,24 @@ public final class ApplicantsForm extends UsersForm {
             untCertificate = null;
         }
 
-        String inLettersEdu="";
-        String moneyForEducation="";
-        ACCOUNTANT_PRICE accountantPrice = getAccountantPrice(student,2);
-        if(accountantPrice!=null){
-             moneyForEducation = String.valueOf(accountantPrice.getPrice());
+        String inLettersEdu = "";
+        String moneyForEducation = "";
+        ACCOUNTANT_PRICE accountantPrice = getAccountantPrice(student, 2);
+        if (accountantPrice != null) {
+            moneyForEducation = String.valueOf(accountantPrice.getPrice());
             inLettersEdu = accountantPrice.getPriceInLetters();
-        }  else{
-               moneyForEducation="0";
+        } else {
+            moneyForEducation = "0";
         }
 
-        String inLettersDorn="";
-        String moneyForDorm="";
-        ACCOUNTANT_PRICE accountantPriceDorm = getAccountantPrice(student,1);
-        if(accountantPriceDorm!=null){
+        String inLettersDorn = "";
+        String moneyForDorm = "";
+        ACCOUNTANT_PRICE accountantPriceDorm = getAccountantPrice(student, 1);
+        if (accountantPriceDorm != null) {
             moneyForDorm = String.valueOf(accountantPriceDorm.getPrice());
             inLettersDorn = accountantPriceDorm.getPriceInLetters();
-        }else{
-            moneyForDorm="0";
+        } else {
+            moneyForDorm = "0";
         }
         String answerDorm = String.valueOf(Double.valueOf(moneyForDorm) / 8);
         String answerEdu = String.valueOf(Double.valueOf(moneyForEducation) / 8);
@@ -929,39 +928,37 @@ public final class ApplicantsForm extends UsersForm {
         String specialityName = getStringBeforeSlash(speciality.getSpecName());
 
         USER_PASSPORT user_passport = null;
-        try{
+        try {
             QueryModel<USER_PASSPORT> qm = new QueryModel<>(USER_PASSPORT.class);
-            FromItem fi1 = qm.addJoin(EJoin.INNER_JOIN , "id" , USER_DOCUMENT.class , "id");
-            FromItem fi = fi1.addJoin(  EJoin.INNER_JOIN, "user", USERS.class, "id");
-            qm.addWhere(fi  ,"deleted" , ECriteria.EQUAL,false);
-            qm.addWhere(fi  ,"id" , ECriteria.EQUAL,student.getId());
+            FromItem fi1 = qm.addJoin(EJoin.INNER_JOIN, "id", USER_DOCUMENT.class, "id");
+            FromItem fi = fi1.addJoin(EJoin.INNER_JOIN, "user", USERS.class, "id");
+            qm.addWhere(fi, "deleted", ECriteria.EQUAL, false);
+            qm.addWhere(fi, "id", ECriteria.EQUAL, student.getId());
 
 
             user_passport = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(qm);
-        }catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
 
         String iin = "";
         String passportNumber = "";
-        if(user_passport!=null)
-        {
-            iin = ((USER_PASSPORT)user_passport).getIin();
+        if (user_passport != null) {
+            iin = ((USER_PASSPORT) user_passport).getIin();
             passportNumber = user_passport.getDocumentNo();
         }
         String fullAddress = "";
-        if(userAddress.getCountry()!=null)
-            fullAddress+=" "+userAddress.getCountry();
-        if(userAddress.getRegion()!=null)
-            fullAddress+=" "+userAddress.getRegion();
-        if(userAddress.getCity()!=null)
-            fullAddress+=" "+userAddress.getCity();
-        if(userAddress.getStreet()!=null)
-            fullAddress+=" "+userAddress.getStreet();
-        String firstCourseMoney = money;
-        String secondCourseMoney = money;
+        if (userAddress.getCountry() != null)
+            fullAddress += " " + userAddress.getCountry();
+        if (userAddress.getRegion() != null)
+            fullAddress += " " + userAddress.getRegion();
+        if (userAddress.getCity() != null)
+            fullAddress += " " + userAddress.getCity();
+        if (userAddress.getStreet() != null)
+            fullAddress += " " + userAddress.getStreet();
+        String firstCourseMoney = moneyForEducation;
+        String secondCourseMoney = moneyForEducation;
 
         LocalDateTime now = LocalDateTime.now();
 
@@ -969,13 +966,11 @@ public final class ApplicantsForm extends UsersForm {
                 .replaceAll("\\$money", moneyForEducation)
                 .replaceAll("21250", answerEdu)
                 .replaceAll("7000", answerDorm)
-                .replaceAll("\\$money", money)
                 .replaceAll("\\$firstCourseMoney", firstCourseMoney)
                 .replaceAll("\\$secondCourseMoney", secondCourseMoney)
-                .replaceAll("\\$year", now.getYear()+"")
-                .replaceAll("\\$month", now.getMonth().getValue()+"")
-                .replaceAll("\\$data", now.getDayOfMonth()+"")
-
+                .replaceAll("\\$year", now.getYear() + "")
+                .replaceAll("\\$month", now.getMonth().getValue() + "")
+                .replaceAll("\\$data", now.getDayOfMonth() + "")
                 .replaceAll("\\$iin", iin)
                 .replaceAll("\\$passportNumber", passportNumber)
                 .replaceAll("\\$address", fullAddress)
@@ -1030,13 +1025,13 @@ public final class ApplicantsForm extends UsersForm {
         accountantPriceQueryModel.addWhere("level", ECriteria.EQUAL, student.getLevel().getId());
         accountantPriceQueryModel.addWhere("contractPaymentType", ECriteria.EQUAL, ID.valueOf(contractPaymentTypeId));
         accountantPriceQueryModel.addWhere("deleted", ECriteria.EQUAL, false);
-       try {
-           accountantPrice = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(accountantPriceQueryModel);
-       }catch (NoResultException e){
-           accountantPrice = null;
-       }
+        try {
+            accountantPrice = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(accountantPriceQueryModel);
+        } catch (NoResultException e) {
+            accountantPrice = null;
+        }
 
-       return accountantPrice;
+        return accountantPrice;
     }
 
     private static String getStringBeforeSlash(String name) {
