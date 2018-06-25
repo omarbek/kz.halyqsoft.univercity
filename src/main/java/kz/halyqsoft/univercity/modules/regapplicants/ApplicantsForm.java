@@ -833,22 +833,27 @@ public final class ApplicantsForm extends UsersForm {
             untCertificate = null;
         }
 
-
-        ACCOUNTANT_PRICE accountantPrice;
-        QueryModel<ACCOUNTANT_PRICE> accountantPriceQueryModel = new QueryModel<>(ACCOUNTANT_PRICE.class);
-        accountantPriceQueryModel.addWhere("diplomaType", ECriteria.EQUAL, student.getDiplomaType().getId());
-        accountantPriceQueryModel.addWhere("level", ECriteria.EQUAL, student.getLevel().getId());
-        accountantPriceQueryModel.addWhere("contractPaymentType", ECriteria.EQUAL, ID.valueOf(2));
-        accountantPriceQueryModel.addWhere("deleted", ECriteria.EQUAL, false);
-        accountantPrice = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(accountantPriceQueryModel);
-
-
-        String money = String.valueOf(accountantPrice.getPrice());
-        String inLetters = accountantPrice.getPriceInLetters();
-        if (student.isNeedDorm()) {
-            accountantPriceQueryModel.addWhere("contractPaymentType", ECriteria.EQUAL, ID.valueOf(1));
+        String inLettersEdu="";
+        String moneyForEducation="";
+        ACCOUNTANT_PRICE accountantPrice = getAccountantPrice(student,2);
+        if(accountantPrice!=null){
+             moneyForEducation = String.valueOf(accountantPrice.getPrice());
+            inLettersEdu = accountantPrice.getPriceInLetters();
+        }  else{
+               moneyForEducation="0";
         }
-        accountantPrice = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(accountantPriceQueryModel);
+
+        String inLettersDorn="";
+        String moneyForDorm="";
+        ACCOUNTANT_PRICE accountantPriceDorm = getAccountantPrice(student,1);
+        if(accountantPriceDorm!=null){
+            moneyForDorm = String.valueOf(accountantPriceDorm.getPrice());
+            inLettersDorn = accountantPriceDorm.getPriceInLetters();
+        }else{
+            moneyForDorm="0";
+        }
+        String answerDorm = String.valueOf(Double.valueOf(moneyForDorm) / 8);
+        String answerEdu = String.valueOf(Double.valueOf(moneyForEducation) / 8);
 
         String ochnii = student.getDiplomaType().toString();
         DateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
@@ -961,6 +966,9 @@ public final class ApplicantsForm extends UsersForm {
         LocalDateTime now = LocalDateTime.now();
 
         replaced = text.replaceAll("\\$fio", student.toString())
+                .replaceAll("\\$money", moneyForEducation)
+                .replaceAll("21250", answerEdu)
+                .replaceAll("7000", answerDorm)
                 .replaceAll("\\$money", money)
                 .replaceAll("\\$firstCourseMoney", firstCourseMoney)
                 .replaceAll("\\$secondCourseMoney", secondCourseMoney)
@@ -978,9 +986,9 @@ public final class ApplicantsForm extends UsersForm {
                 .replaceAll("\\$email", userAddress.getPostalCode())
                 .replaceAll("\\$rekvizit", userAddress.getStreet())
                 .replaceAll("\\$phone", "+7" + student.getPhoneMobile())
-                .replaceAll("\\$InLetters", inLetters)
-                .replaceAll("\\$Obshaga", String.valueOf(accountantPrice.getPrice()))
-                .replaceAll("\\$Dorm", accountantPrice.getPriceInLetters())
+                .replaceAll("\\$InLetters", inLettersEdu)
+                .replaceAll("\\$Obshaga", moneyForDorm)
+                .replaceAll("\\$Dorm", inLettersDorn)
                 .replaceAll("\\$aboutMe", "-")
                 .replaceAll("\\$country", student.getCitizenship().toString())
                 .replaceAll("\\$status", student.getMaritalStatus().toString())
@@ -1012,8 +1020,23 @@ public final class ApplicantsForm extends UsersForm {
                 .replaceAll("\\$document", createdDate)
                 .replaceAll("\\$diplomaType", student.getDiplomaType().toString())
                 .replaceAll("\\$group", "")
-
                 .replaceAll("қажет, қажет емес", dorm);
+    }
+
+    private static ACCOUNTANT_PRICE getAccountantPrice(STUDENT student, int contractPaymentTypeId) throws Exception {
+        ACCOUNTANT_PRICE accountantPrice;
+        QueryModel<ACCOUNTANT_PRICE> accountantPriceQueryModel = new QueryModel<>(ACCOUNTANT_PRICE.class);
+        accountantPriceQueryModel.addWhere("diplomaType", ECriteria.EQUAL, student.getDiplomaType().getId());
+        accountantPriceQueryModel.addWhere("level", ECriteria.EQUAL, student.getLevel().getId());
+        accountantPriceQueryModel.addWhere("contractPaymentType", ECriteria.EQUAL, ID.valueOf(contractPaymentTypeId));
+        accountantPriceQueryModel.addWhere("deleted", ECriteria.EQUAL, false);
+       try {
+           accountantPrice = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(accountantPriceQueryModel);
+       }catch (NoResultException e){
+           accountantPrice = null;
+       }
+
+       return accountantPrice;
     }
 
     private static String getStringBeforeSlash(String name) {
@@ -1083,7 +1106,7 @@ public final class ApplicantsForm extends UsersForm {
 
                         DEPARTMENT faculty = es.getSpeciality().getDepartment().getParent();
 
-                        QueryModel<V_KBTU_ENTRANTS> qm = new QueryModel<>(V_KBTU_ENTRANTS.class);
+                        QueryModel<V_LOCAL_ENTRANTS> qm = new QueryModel<>(V_LOCAL_ENTRANTS.class);
                         qm.addSelect("id", EAggregate.COUNT);
                         qm.addWhere("level", ECriteria.EQUAL, level.getId());
                         qm.addWhereAnd("createdYear", ECriteria.EQUAL, year);

@@ -15,11 +15,13 @@ import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VCurriculumCreditCycleSum;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_CURRICULUM_ADD_PROGRAM;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_CURRICULUM_AFTER_SEMESTER;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_CURRICULUM_DETAIL;
 import kz.halyqsoft.univercity.modules.curriculum.working.AbstractCurriculumPanel;
 import kz.halyqsoft.univercity.modules.curriculum.working.cycle.CyclePanel;
 import kz.halyqsoft.univercity.modules.curriculum.working.schedule.SchedulePanel;
 import kz.halyqsoft.univercity.modules.curriculum.working.semester.AddProgramPanel;
+import kz.halyqsoft.univercity.modules.curriculum.working.semester.AfterSemesterProgamPanel;
 import kz.halyqsoft.univercity.modules.curriculum.working.semester.CreditCycleSumPanel;
 import kz.halyqsoft.univercity.modules.curriculum.working.semester.SemesterDetailPanel;
 import kz.halyqsoft.univercity.utils.CommonUtils;
@@ -73,6 +75,7 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
     private SchedulePanel schedulePanel;
     private List<SemesterDetailPanel> detailPanelList;
     private AddProgramPanel addProgramPanel;
+    private AfterSemesterProgamPanel afterSemesterProgamPanel;
     private CreditCycleSumPanel cycleSumPanel;
     private Button save;
     private Button conform;
@@ -288,6 +291,11 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
         addProgramPanel.initPanel();
         ts.addTab(addProgramPanel, getUILocaleUtil().getCaption("add.education.programm"));
 
+        afterSemesterProgamPanel = new AfterSemesterProgamPanel(this);
+        afterSemesterProgamPanel.setCurriculum(curriculum);
+        afterSemesterProgamPanel.initPanel();
+        ts.addTab(afterSemesterProgamPanel, getUILocaleUtil().getEntityLabel(V_CURRICULUM_AFTER_SEMESTER.class));
+
         cycleSumPanel = new CreditCycleSumPanel(this);
         cycleSumPanel.setCurriculum(curriculum);
         cycleSumPanel.initPanel();
@@ -333,6 +341,8 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
 
             addProgramPanel.setCurriculum(curriculum);
             addProgramPanel.refresh();
+            afterSemesterProgamPanel.setCurriculum(curriculum);
+            afterSemesterProgamPanel.refresh();
             cycleSumPanel.setCurriculum(curriculum);
             cycleSumPanel.refresh();
             cyclePanel.setCurriculum(curriculum);
@@ -351,7 +361,7 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
         }
         creditSumLabel.setValue(String.format(getUILocaleUtil().getCaption("credit.sum"), sum));
 
-        int totalSum = sum + addProgramPanel.getTotalCredit();
+        int totalSum = sum + addProgramPanel.getTotalCredit()+afterSemesterProgamPanel.getTotalCredit();
         totalCreditSumLabel.setValue(String.format(getUILocaleUtil().getCaption("total.credit.sum"), totalSum));
     }
 
@@ -378,6 +388,7 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
             }
 
             addProgramPanel.setCurriculum(curriculum);
+            afterSemesterProgamPanel.setCurriculum(curriculum);
             cycleSumPanel.setCurriculum(curriculum);
             cyclePanel.setCurriculum(curriculum);
             //			cyclePanel.save();
@@ -413,6 +424,7 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
         }
 
         addProgramPanel.approve();
+        afterSemesterProgamPanel.approve();
 
         curriculum.setCurriculumStatus(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(CURRICULUM_STATUS.class, ID.valueOf(3)));
         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(curriculum);
@@ -433,6 +445,7 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
         }
 
         addProgramPanel.checkForConform();
+        afterSemesterProgamPanel.checkForConform();
         schedulePanel.checkForConform();
     }
 
@@ -754,7 +767,7 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
                 sql.append(')');
 
                 Map<Integer, Object> params = new HashMap<Integer, Object>(2);
-                params.put(1, 1);
+                params.put(1, Boolean.TRUE);
                 params.put(2, Boolean.FALSE);
 
                 try {
@@ -893,13 +906,14 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
                 "    ON t1.CURRICULUM_ID = t2.CURRICULUM_ID AND t1.SUBJECT_CYCLE_ID = t2.ELECTIVE_SUBJECT_CYCLE_ID";
         Map<Integer, Object> params = new HashMap<Integer, Object>(5);
         params.put(1, curriculum.getId().getId());
-        params.put(2, 0);
-        params.put(3, 1);
+        params.put(2, Boolean.FALSE);
+        params.put(3, Boolean.TRUE);
         params.put(4, curriculum.getId().getId());
         params.put(5, Boolean.FALSE);
 
-        List tempList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
-        List<VCurriculumCreditCycleSum> vcccsList = new ArrayList<VCurriculumCreditCycleSum>(tempList.size());
+        List tempList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                lookupItemsList(sql, params);
+        List<VCurriculumCreditCycleSum> vcccsList = new ArrayList<>(tempList.size());
         for (Object o : tempList) {
             Object[] oo = (Object[]) o;
             VCurriculumCreditCycleSum vccc = new VCurriculumCreditCycleSum();
@@ -1005,10 +1019,10 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
                 "    ON t1.CURRICULUM_ID = t2.CURRICULUM_ID AND t1.SUBJECT_CYCLE_ID = t2.ELECTIVE_SUBJECT_CYCLE_ID";
         Map<Integer, Object> params = new HashMap<Integer, Object>(5);
         params.put(1, curriculum.getId().getId());
-        params.put(2, 0);
-        params.put(3, 1);
+        params.put(2, Boolean.FALSE);
+        params.put(3, Boolean.TRUE);
         params.put(4, curriculum.getId().getId());
-        params.put(5, 0);
+        params.put(5, Boolean.FALSE);
 
         List tempList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
         List<VCurriculumCreditCycleSum> vcccsList = new ArrayList<VCurriculumCreditCycleSum>(tempList.size());

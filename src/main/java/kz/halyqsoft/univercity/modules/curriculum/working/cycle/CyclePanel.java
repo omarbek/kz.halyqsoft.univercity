@@ -4,7 +4,7 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Label;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT_CYCLE;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_CURRICULUM_ADD_PROGRAM;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.V_CURRICULUM_DETAIL;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_CURRICULUM_SUBJECT;
 import kz.halyqsoft.univercity.modules.curriculum.working.CurriculumView;
 import kz.halyqsoft.univercity.modules.curriculum.working.AbstractCurriculumPanel;
 import kz.halyqsoft.univercity.utils.excel.ExcelStyles;
@@ -82,7 +82,7 @@ public class CyclePanel extends AbstractCurriculumPanel {
         addProgramPanel.setCurriculum(getCurriculum());
         addProgramPanel.refresh();
 
-        QueryModel<V_CURRICULUM_DETAIL> qm1 = new QueryModel<V_CURRICULUM_DETAIL>(V_CURRICULUM_DETAIL.class);
+        QueryModel<V_CURRICULUM_SUBJECT> qm1 = new QueryModel<>(V_CURRICULUM_SUBJECT.class);
         qm1.addSelect("credit", EAggregate.SUM);
         qm1.addWhere("curriculum", ECriteria.EQUAL, (getCurriculum() != null && getCurriculum().getId() != null) ? getCurriculum().getId() : ID.valueOf(-1));
         qm1.addWhereAnd("deleted", Boolean.FALSE);
@@ -151,31 +151,31 @@ public class CyclePanel extends AbstractCurriculumPanel {
         cell.setCellStyle(styles.get(ExcelStyles.HEADER));
 
         cell = row.createCell(1);
-        cell.setCellValue(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_DETAIL.class, "subjectCode"));
+        cell.setCellValue(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_SUBJECT.class, "subjectCode"));
         cell.setCellStyle(styles.get(ExcelStyles.HEADER));
 
         cell = row.createCell(2);
-        cell.setCellValue(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_DETAIL.class, "subjectName"));
+        cell.setCellValue(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_SUBJECT.class, "subjectName"));
         cell.setCellStyle(styles.get(ExcelStyles.HEADER));
 
         cell = row.createCell(3);
-        cell.setCellValue(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_DETAIL.class, "cycleShortName"));
+        cell.setCellValue(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_SUBJECT.class, "cycleShortName"));
         cell.setCellStyle(styles.get(ExcelStyles.HEADER_VERTICAL));
 
         cell = row.createCell(4);
-        cell.setCellValue(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_DETAIL.class, "credit"));
+        cell.setCellValue(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_SUBJECT.class, "credit"));
         cell.setCellStyle(styles.get(ExcelStyles.HEADER_VERTICAL));
 
         cell = row.createCell(5);
-        cell.setCellValue(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_DETAIL.class, "formula"));
+        cell.setCellValue(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_SUBJECT.class, "formula"));
         cell.setCellStyle(styles.get(ExcelStyles.HEADER_VERTICAL));
 
         cell = row.createCell(6);
-        cell.setCellValue(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_DETAIL.class, "recommendedSemester"));
+        cell.setCellValue(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_SUBJECT.class, "recommendedSemester"));
         cell.setCellStyle(styles.get(ExcelStyles.HEADER_VERTICAL));
 
         cell = row.createCell(7);
-        cell.setCellValue(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_DETAIL.class, "controlTypeName"));
+        cell.setCellValue(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_SUBJECT.class, "controlTypeName"));
         cell.setCellStyle(styles.get(ExcelStyles.HEADER_VERTICAL));
 
         QueryModel<SUBJECT_CYCLE> qmSubjectCycle = new QueryModel<SUBJECT_CYCLE>(SUBJECT_CYCLE.class);
@@ -183,7 +183,7 @@ public class CyclePanel extends AbstractCurriculumPanel {
         qmSubjectCycle.addOrder("id");
         List<SUBJECT_CYCLE> subjectCycleList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(qmSubjectCycle);
 
-        QueryModel<V_CURRICULUM_DETAIL> qmVCD = new QueryModel<V_CURRICULUM_DETAIL>(V_CURRICULUM_DETAIL.class);
+        QueryModel<V_CURRICULUM_SUBJECT> qmVCD = new QueryModel<V_CURRICULUM_SUBJECT>(V_CURRICULUM_SUBJECT.class);
         qmVCD.addWhere("curriculum", ECriteria.EQUAL, getCurriculum().getId());
         qmVCD.addWhere("deleted", Boolean.FALSE);
 
@@ -204,14 +204,14 @@ public class CyclePanel extends AbstractCurriculumPanel {
             cell.setCellStyle(styles.get(ExcelStyles.HEADER));
 
             qmVCD.addWhere("subjectCycle", ECriteria.EQUAL, sc.getId());
-            List<V_CURRICULUM_DETAIL> vcdList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(qmVCD);
+            List<V_CURRICULUM_SUBJECT> vcdList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(qmVCD);
 
             startRow++;
             int totalRequired = 0;
             int totalElective = 0;
             int totalCycle = 0;
             int i = 1;
-            for (V_CURRICULUM_DETAIL vcd : vcdList) {
+            for (V_CURRICULUM_SUBJECT vcd : vcdList) {
                 if (!vcd.isElective()) {
                     row = sheet.createRow(startRow);
                     cell = row.createCell(0);
@@ -302,31 +302,31 @@ public class CyclePanel extends AbstractCurriculumPanel {
         cell.setCellStyle(styles.get(ExcelStyles.HEADER));
 
         cell = row.createCell(1);
-        cell.setCellValue(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_DETAIL.class, "subjectCode"));
+        cell.setCellValue(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_SUBJECT.class, "subjectCode"));
         cell.setCellStyle(styles.get(ExcelStyles.HEADER));
 
         cell = row.createCell(2);
-        cell.setCellValue(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_DETAIL.class, "subjectName"));
+        cell.setCellValue(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_SUBJECT.class, "subjectName"));
         cell.setCellStyle(styles.get(ExcelStyles.HEADER));
 
         cell = row.createCell(3);
-        cell.setCellValue(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_DETAIL.class, "cycleShortName"));
+        cell.setCellValue(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_SUBJECT.class, "cycleShortName"));
         cell.setCellStyle(styles.get(ExcelStyles.HEADER_VERTICAL));
 
         cell = row.createCell(4);
-        cell.setCellValue(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_DETAIL.class, "credit"));
+        cell.setCellValue(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_SUBJECT.class, "credit"));
         cell.setCellStyle(styles.get(ExcelStyles.HEADER_VERTICAL));
 
         cell = row.createCell(5);
-        cell.setCellValue(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_DETAIL.class, "formula"));
+        cell.setCellValue(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_SUBJECT.class, "formula"));
         cell.setCellStyle(styles.get(ExcelStyles.HEADER_VERTICAL));
 
         cell = row.createCell(6);
-        cell.setCellValue(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_DETAIL.class, "recommendedSemester"));
+        cell.setCellValue(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_SUBJECT.class, "recommendedSemester"));
         cell.setCellStyle(styles.get(ExcelStyles.HEADER_VERTICAL));
 
         cell = row.createCell(7);
-        cell.setCellValue(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_DETAIL.class, "controlTypeName"));
+        cell.setCellValue(getUILocaleUtil().getEntityFieldLabel(V_CURRICULUM_SUBJECT.class, "controlTypeName"));
         cell.setCellStyle(styles.get(ExcelStyles.HEADER_VERTICAL));
 
         row = sheet.createRow(startRow);

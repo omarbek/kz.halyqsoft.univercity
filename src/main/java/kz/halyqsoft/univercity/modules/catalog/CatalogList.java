@@ -61,6 +61,9 @@ class CatalogList {
 
         addCatalogEntityToList(ROLES.class);
         addCatalogEntityToList(TASKS.class);
+        addCatalogEntityToList(EDUCATION_MODULE_TYPE.class);
+        addCatalogEntityToList(STUDY_DIRECT.class);
+        addCatalogEntityToList(ACADEMIC_FORMULA.class);
 
         return new ArrayList<>(list);
     }

@@ -1,5 +1,7 @@
 package kz.halyqsoft.univercity.entity.beans.univercity.catalog;
 
+import org.r3a.common.entity.ID;
+
 import javax.persistence.Entity;
 
 /**
@@ -9,8 +11,7 @@ import javax.persistence.Entity;
 @Entity
 public class USER_TYPE extends AbstractTypeEntity {
 
-	private static final long serialVersionUID = 1731316331059529087L;
+	public static final ID EMPLOYEE_ID = ID.valueOf(1);
 
-	public USER_TYPE() {
-	}
+	public static final ID STUDENT_ID = ID.valueOf(2);
 }

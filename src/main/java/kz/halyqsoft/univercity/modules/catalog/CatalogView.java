@@ -137,7 +137,8 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                     } else if (AbstractTypeEntity.class.isAssignableFrom(entityClass)) {
                         if (!(entityClass.equals(SCHOOL_TYPE.class)
                                 || entityClass.equals(MEDICAL_CHECKUP_TYPE.class)
-                                || entityClass.equals(CONTRACT_TYPE.class))) {
+                                || entityClass.equals(CONTRACT_TYPE.class)
+                                || entityClass.equals(EDUCATION_MODULE_TYPE.class))) {
                             classASW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
                         } else {
                             classASW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
@@ -185,7 +186,8 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                         classASW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
                         classASW.setButtonVisible(IconToolbar.ADD_BUTTON, false);
                         qm.addWhere("subjectName", null, null, true);
-                    } /*else if (entityClass.equals(ACADEMIC_DEGREE.class)) {
+                    }
+                    /*else if (entityClass.equals(ACADEMIC_DEGREE.class)) {
                         FormModel fm = ((DBSelectModel) classASW.getWidgetModel()).getFormModel();
                         ((FKFieldModel) fm.getFieldModel("speciality")).setDialogWidth(500);
 //                        (fm.getFieldModel("speciality")).setWidth(500);
@@ -193,10 +195,10 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                         classASW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
                         tm.getColumnModel("beginYear").setFormat(NumberUtils.INTEGER_FORMAT);
                         tm.getColumnModel("endYear").setFormat(NumberUtils.INTEGER_FORMAT);
-                    }*/ else if (entityClass.equals(ROLES.class)) {
+                    }*/
+                    else if (entityClass.equals(ROLES.class)) {
                         classASW.setButtonVisible(AbstractToolbar.FILTER_BUTTON, true);
                     }
-
                 }
                 mainHSP.addComponent(classASW);
             }
@@ -209,10 +211,14 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
         if (source.equals(classASW)) {
             if (e instanceof CommonTree) {//need for COUNTRY
                 ((CommonTree) e).setParent((CommonTree) classASW.getSelectedEntity());
+            } else if (e instanceof ACADEMIC_FORMULA) {
+                ACADEMIC_FORMULA academicFormula = (ACADEMIC_FORMULA) e;
+                academicFormula.setLcCount(0);
+                academicFormula.setPrCount(0);
+                academicFormula.setLbCount(0);
             }
         }
     }
-
 
 
     @Override
@@ -281,34 +287,30 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                         return false;
                     }
                 }
-            }else if(e instanceof TASKS)
-            {
+            } else if (e instanceof TASKS) {
                 TASKS parent = ((TASKS) e).getParent();
-                if(parent!=null) {
+                if (parent != null) {
                     Integer max = parent.getTaskOrder();
                     List<TASKS> children = parent.getChildren();
-                    if(children.size()>0)
-                    {
-                        for(TASKS task : children)
-                        {
-                            if(task.getTaskOrder() > max)
-                            {
-                                max  = task.getTaskOrder();
+                    if (children.size() > 0) {
+                        for (TASKS task : children) {
+                            if (task.getTaskOrder() > max) {
+                                max = task.getTaskOrder();
                             }
                         }
                     }
                     try {
-                            max++;
-                            ((TASKS) e).setTaskOrder(max);
+                        max++;
+                        ((TASKS) e).setTaskOrder(max);
 
                     } catch (Exception ex) {
                         CommonUtils.showMessageAndWriteLog("Unable to generate a taskOrder for TASKS", ex);
                         return false;
                     }
 
-                }else{
+                } else {
                     QueryModel<TASKS> qm = new QueryModel<>(TASKS.class);
-                    qm.addSelect("TASK_ORDER" , EAggregate.MAX);
+                    qm.addSelect("TASK_ORDER", EAggregate.MAX);
 
                     try {
                         BigDecimal bigDecimalMax = (BigDecimal) (SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItems(qm));
@@ -325,6 +327,16 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                 }
                 ((TASKS) e).setVisible(true);
 
+            } else if (e instanceof ACADEMIC_FORMULA) {
+                ACADEMIC_FORMULA academicFormula = (ACADEMIC_FORMULA) e;
+                Integer sum = academicFormula.getLcCount() + academicFormula.getPrCount()
+                        + academicFormula.getLbCount();
+                if (!sum.equals(academicFormula.getCreditability().getCredit())) {
+                    Message.showInfo(getUILocaleUtil().getCaption("sum.not.equal.credit"));
+                    return false;
+                }
+                academicFormula.setFormula(academicFormula.getLcCount() + "/" +
+                        academicFormula.getLbCount() + "/" + academicFormula.getPrCount());
             }
         }
 

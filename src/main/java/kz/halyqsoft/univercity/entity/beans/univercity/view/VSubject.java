@@ -12,8 +12,8 @@ public final class VSubject extends AbstractEntity {
 
 	private static final long serialVersionUID = 9078213114619790341L;
 
-	@FieldInfo(type = EFieldType.TEXT, order = 2, columnWidth = 130)
-	private String code;
+//	@FieldInfo(type = EFieldType.TEXT, order = 2, columnWidth = 130)
+//	private String code;
 	
 	@FieldInfo(type = EFieldType.TEXT, order = 3)
 	private String subjectName;
@@ -23,23 +23,23 @@ public final class VSubject extends AbstractEntity {
 	
 	@FieldInfo(type = EFieldType.TEXT, order = 5, columnWidth = 120)
 	private String levelName;
+
+	@FieldInfo(type = EFieldType.TEXT, order = 6, columnWidth = 120)
+	private String moduleName;
 	
-	@FieldInfo(type = EFieldType.INTEGER, order = 6, columnWidth = 100)
+	@FieldInfo(type = EFieldType.INTEGER, order = 7, columnWidth = 100)
 	private int credit;
 	
-	@FieldInfo(type = EFieldType.TEXT, order = 7, columnWidth = 120)
+	@FieldInfo(type = EFieldType.TEXT, order = 8, columnWidth = 120)
 	private String formula;
 	
-	public VSubject() {
-	}
-
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
-	}
+//	public String getCode() {
+//		return code;
+//	}
+//
+//	public void setCode(String code) {
+//		this.code = code;
+//	}
 
 	public String getSubjectName() {
 		return subjectName;
@@ -64,6 +64,10 @@ public final class VSubject extends AbstractEntity {
 	public void setLevelName(String levelName) {
 		this.levelName = levelName;
 	}
+
+	public String getModuleName() { return moduleName; }
+
+	public void setModuleName(String moduleName) { this.moduleName = moduleName; }
 
 	public int getCredit() {
 		return credit;

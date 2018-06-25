@@ -19,244 +19,257 @@ import javax.persistence.ManyToOne;
 @Entity
 public class SUBJECT extends AbstractEntity {
 
-	private static final long serialVersionUID = -648721786979090913L;
+    private static final long serialVersionUID = -648721786979090913L;
 
-	@FieldInfo(type = EFieldType.TEXT, max = 256, order = 1)
-	@Column(name = "NAME_KZ", nullable = false)
-	private String nameKZ;
+    @FieldInfo(type = EFieldType.TEXT, max = 256, order = 1)
+    @Column(name = "NAME_KZ", nullable = false)
+    private String nameKZ;
 
-	@FieldInfo(type = EFieldType.TEXT_LATIN, max = 256, order = 2)
-	@Column(name = "NAME_EN", nullable = false)
-	private String nameEN;
+    @FieldInfo(type = EFieldType.TEXT_LATIN, max = 256, order = 2)
+    @Column(name = "NAME_EN", nullable = false)
+    private String nameEN;
 
-	@FieldInfo(type = EFieldType.TEXT, max = 256, order = 3)
-	@Column(name = "NAME_RU", nullable = false)
-	private String nameRU;
+    @FieldInfo(type = EFieldType.TEXT, max = 256, order = 3)
+    @Column(name = "NAME_RU", nullable = false)
+    private String nameRU;
 
-	@FieldInfo(type = EFieldType.TEXT, max = 13, order = 4, required = false, readOnlyFixed = true, columnWidth = 100)
-	@Column(name = "CODE", nullable = false)
-	private String code;
+//	@FieldInfo(type = EFieldType.TEXT, max = 13, order = 4, required = false, inGrid = false, readOnlyFixed = true, columnWidth = 100)
+//	@Column(name = "CODE")
+//	private String code;
 
-	@FieldInfo(type = EFieldType.FK_DIALOG, order = 5, inGrid = false)
+    @FieldInfo(type = EFieldType.FK_DIALOG, order = 5, inGrid = false)
     @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "STUDY_DIRECT_ID", referencedColumnName = "ID")})
+            @JoinColumn(name = "STUDY_DIRECT_ID", referencedColumnName = "ID")})
     private STUDY_DIRECT studyDirect;
 
-	@FieldInfo(type = EFieldType.TEXT, isMemo = true, max = 4000, required = false, order = 6, inGrid = false)
-	@Column(name = "DESCR")
-	private String descr;
+//	@FieldInfo(type = EFieldType.FK_COMBO, order = 6, inGrid = false)
+//	@ManyToOne
+//	@JoinColumns({
+//			@JoinColumn(name = "EDUCATION_MODULE_TYPE_ID", referencedColumnName = "ID")})
+//	private EDUCATION_MODULE_TYPE educationModuleType;
 
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 7)
+    @FieldInfo(type = EFieldType.TEXT, isMemo = true, max = 4000, required = false, order = 7, inGrid = false)
+    @Column(name = "DESCR")
+    private String descr;
+
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 8)
     @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "CHAIR_ID", referencedColumnName = "ID")})
+            @JoinColumn(name = "CHAIR_ID", referencedColumnName = "ID")})
     private DEPARTMENT chair;
 
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 8, inGrid = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 9, inGrid = false)
     @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "LEVEL_ID", referencedColumnName = "ID")})
+            @JoinColumn(name = "LEVEL_ID", referencedColumnName = "ID")})
     private LEVEL level;
 
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 9, inGrid = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 10, inGrid = false)
     @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "SUBJECT_CYCLE_ID", referencedColumnName = "ID")})
+            @JoinColumn(name = "MODULE_ID", referencedColumnName = "ID")})
+    private SUBJECT_MODULE subjectModule;
+
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 11, inGrid = false,required = false)
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "SUBJECT_CYCLE_ID", referencedColumnName = "ID",nullable = true)})
     private SUBJECT_CYCLE subjectCycle;
 
-	@FieldInfo(type = EFieldType.BOOLEAN, order = 10, required = false, columnWidth = 100)
-	@Column(name = "MANDATORY", nullable = false)
+    @FieldInfo(type = EFieldType.BOOLEAN, order = 12, required = false, columnWidth = 100)
+    @Column(name = "MANDATORY", nullable = false)
     private boolean mandatory;
 
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 11, inGrid = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 13, inGrid = false)
     @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "CREDITABILITY_ID", referencedColumnName = "ID")})
+            @JoinColumn(name = "CREDITABILITY_ID", referencedColumnName = "ID")})
     private CREDITABILITY creditability;
 
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 12, inGrid = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 14, inGrid = false)
     @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "ACADEMIC_FORMULA_ID", referencedColumnName = "ID")})
+            @JoinColumn(name = "ACADEMIC_FORMULA_ID", referencedColumnName = "ID")})
     private ACADEMIC_FORMULA academicFormula;
 
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 13)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 15)
     @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "ECTS_ID", referencedColumnName = "ID")})
+            @JoinColumn(name = "ECTS_ID", referencedColumnName = "ID")})
     private ECTS ects;
 
-	@FieldInfo(type = EFieldType.BOOLEAN, order = 15, required = false, columnWidth = 100)
-	@Column(name = "LANG_KZ", nullable = false)
+    @FieldInfo(type = EFieldType.BOOLEAN, order = 16, required = false, columnWidth = 100)
+    @Column(name = "LANG_KZ", nullable = false)
     private boolean langKZ;
 
-	@FieldInfo(type = EFieldType.BOOLEAN, order = 16, required = false, columnWidth = 100)
-	@Column(name = "LANG_EN", nullable = false)
+    @FieldInfo(type = EFieldType.BOOLEAN, order = 17, required = false, columnWidth = 100)
+    @Column(name = "LANG_EN", nullable = false)
     private boolean langEN;
 
-	@FieldInfo(type = EFieldType.BOOLEAN, order = 17, required = false, columnWidth = 100)
-	@Column(name = "LANG_RU", nullable = false)
+    @FieldInfo(type = EFieldType.BOOLEAN, order = 18, required = false, columnWidth = 100)
+    @Column(name = "LANG_RU", nullable = false)
     private boolean langRU;
 
-//	@FieldInfo(type = EFieldType.FK_COMBO, order = 18, required = false, inGrid = false)
+//	@FieldInfo(type = EFieldType.FK_COMBO, order = 19, required = false, inGrid = false)
 //    @ManyToOne
 //    @JoinColumns({
 //        @JoinColumn(name = "GROUP_LEC_ID", referencedColumnName = "ID")})
 //    private GROUP_SIZE_LECTURE groupSizeLecture;
 //
-//	@FieldInfo(type = EFieldType.FK_COMBO, order = 19, required = false, inGrid = false)
+//	@FieldInfo(type = EFieldType.FK_COMBO, order = 20, required = false, inGrid = false)
 //    @ManyToOne
 //    @JoinColumns({
 //        @JoinColumn(name = "GROUP_PRAC_ID", referencedColumnName = "ID")})
 //    private GROUP_SIZE_PRAC groupSizePrac;
 //
-//	@FieldInfo(type = EFieldType.FK_COMBO, order = 20, required = false, inGrid = false)
+//	@FieldInfo(type = EFieldType.FK_COMBO, order = 21, required = false, inGrid = false)
 //    @ManyToOne
 //    @JoinColumns({
 //        @JoinColumn(name = "GROUP_LAB_ID", referencedColumnName = "ID")})
 //    private GROUP_SIZE_LAB groupSizeLab;
 
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 21, inGrid = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 22, inGrid = false)
     @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "CONTROL_TYPE_ID", referencedColumnName = "ID")})
+            @JoinColumn(name = "CONTROL_TYPE_ID", referencedColumnName = "ID")})
     private CONTROL_TYPE controlType;
 
-	@FieldInfo(type = EFieldType.BOOLEAN, order = 22, required = false, inEdit = false, inGrid = false, inView = false)
-	@Column(name = "DELETED", nullable = false )
+    @FieldInfo(type = EFieldType.BOOLEAN, order = 23, required = false, inEdit = false, inGrid = false, inView = false)
+    @Column(name = "DELETED", nullable = false)
     private boolean deleted;
 
-	public SUBJECT() {
-	}
+    public String getNameKZ() {
+        return nameKZ;
+    }
 
-	public String getNameKZ() {
-		return nameKZ;
-	}
+    public void setNameKZ(String nameKZ) {
+        this.nameKZ = nameKZ;
+    }
 
-	public void setNameKZ(String nameKZ) {
-		this.nameKZ = nameKZ;
-	}
+    public String getNameEN() {
+        return nameEN;
+    }
 
-	public String getNameEN() {
-		return nameEN;
-	}
+    public void setNameEN(String nameEN) {
+        this.nameEN = nameEN;
+    }
 
-	public void setNameEN(String nameEN) {
-		this.nameEN = nameEN;
-	}
+    public String getNameRU() {
+        return nameRU;
+    }
 
-	public String getNameRU() {
-		return nameRU;
-	}
+    public void setNameRU(String nameRU) {
+        this.nameRU = nameRU;
+    }
 
-	public void setNameRU(String nameRU) {
-		this.nameRU = nameRU;
-	}
+//	public String getCode() {
+//		return code;
+//	}
+//
+//	public void setCode(String code) {
+//		this.code = code;
+//	}
 
-	public String getCode() {
-		return code;
-	}
+    public STUDY_DIRECT getStudyDirect() {
+        return studyDirect;
+    }
 
-	public void setCode(String code) {
-		this.code = code;
-	}
+    public void setStudyDirect(STUDY_DIRECT studyDirect) {
+        this.studyDirect = studyDirect;
+    }
 
-	public STUDY_DIRECT getStudyDirect() {
-		return studyDirect;
-	}
+    public String getDescr() {
+        return descr;
+    }
 
-	public void setStudyDirect(STUDY_DIRECT studyDirect) {
-		this.studyDirect = studyDirect;
-	}
+    public void setDescr(String descr) {
+        this.descr = descr;
+    }
 
-	public String getDescr() {
-		return descr;
-	}
+    public DEPARTMENT getChair() {
+        return chair;
+    }
 
-	public void setDescr(String descr) {
-		this.descr = descr;
-	}
+    public void setChair(DEPARTMENT chair) {
+        this.chair = chair;
+    }
 
-	public DEPARTMENT getChair() {
-		return chair;
-	}
+    public LEVEL getLevel() {
+        return level;
+    }
 
-	public void setChair(DEPARTMENT chair) {
-		this.chair = chair;
-	}
+    public void setLevel(LEVEL level) {
+        this.level = level;
+    }
 
-	public LEVEL getLevel() {
-		return level;
-	}
+    public SUBJECT_MODULE getSubjectModule() { return subjectModule; }
 
-	public void setLevel(LEVEL level) {
-		this.level = level;
-	}
+    public void setSubjectModule(SUBJECT_MODULE subjectModule) { this.subjectModule = subjectModule; }
 
-	public SUBJECT_CYCLE getSubjectCycle() {
-		return subjectCycle;
-	}
+    public SUBJECT_CYCLE getSubjectCycle() {
+        return subjectCycle;
+    }
 
-	public void setSubjectCycle(SUBJECT_CYCLE subjectCycle) {
-		this.subjectCycle = subjectCycle;
-	}
+    public void setSubjectCycle(SUBJECT_CYCLE subjectCycle) {
+        this.subjectCycle = subjectCycle;
+    }
 
-	public boolean isMandatory() {
-		return mandatory;
-	}
+    public boolean isMandatory() {
+        return mandatory;
+    }
 
-	public void setMandatory(boolean mandatory) {
-		this.mandatory = mandatory;
-	}
+    public void setMandatory(boolean mandatory) {
+        this.mandatory = mandatory;
+    }
 
-	public CREDITABILITY getCreditability() {
-		return creditability;
-	}
+    public CREDITABILITY getCreditability() {
+        return creditability;
+    }
 
-	public void setCreditability(CREDITABILITY creditability) {
-		this.creditability = creditability;
-	}
+    public void setCreditability(CREDITABILITY creditability) {
+        this.creditability = creditability;
+    }
 
-	public ACADEMIC_FORMULA getAcademicFormula() {
-		return academicFormula;
-	}
+    public ACADEMIC_FORMULA getAcademicFormula() {
+        return academicFormula;
+    }
 
-	public void setAcademicFormula(ACADEMIC_FORMULA academicFormula) {
-		this.academicFormula = academicFormula;
-	}
+    public void setAcademicFormula(ACADEMIC_FORMULA academicFormula) {
+        this.academicFormula = academicFormula;
+    }
 
-	public ECTS getEcts() {
-		return ects;
-	}
+    public ECTS getEcts() {
+        return ects;
+    }
 
-	public void setEcts(ECTS ects) {
-		this.ects = ects;
-	}
+    public void setEcts(ECTS ects) {
+        this.ects = ects;
+    }
 
-	public boolean isLangKZ() {
-		return langKZ;
-	}
+    public boolean isLangKZ() {
+        return langKZ;
+    }
 
-	public void setLangKZ(boolean langKZ) {
-		this.langKZ = langKZ;
-	}
+    public void setLangKZ(boolean langKZ) {
+        this.langKZ = langKZ;
+    }
 
-	public boolean isLangEN() {
-		return langEN;
-	}
+    public boolean isLangEN() {
+        return langEN;
+    }
 
-	public void setLangEN(boolean langEN) {
-		this.langEN = langEN;
-	}
+    public void setLangEN(boolean langEN) {
+        this.langEN = langEN;
+    }
 
-	public boolean isLangRU() {
-		return langRU;
-	}
+    public boolean isLangRU() {
+        return langRU;
+    }
 
-	public void setLangRU(boolean langRU) {
-		this.langRU = langRU;
-	}
+    public void setLangRU(boolean langRU) {
+        this.langRU = langRU;
+    }
 
 //	public GROUP_SIZE_LECTURE getGroupSizeLecture() {
 //		return groupSizeLecture;
@@ -282,30 +295,42 @@ public class SUBJECT extends AbstractEntity {
 //		this.groupSizeLab = groupSizeLab;
 //	}
 
-	public CONTROL_TYPE getControlType() {
-		return controlType;
-	}
+    public CONTROL_TYPE getControlType() {
+        return controlType;
+    }
 
-	public void setControlType(CONTROL_TYPE controlType) {
-		this.controlType = controlType;
-	}
+    public void setControlType(CONTROL_TYPE controlType) {
+        this.controlType = controlType;
+    }
 
-	public boolean isDeleted() {
-		return deleted;
-	}
+    public boolean isDeleted() {
+        return deleted;
+    }
 
-	public void setDeleted(boolean deleted) {
-		this.deleted = deleted;
-	}
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
 
-	public String toString(Locale l) {
-		String name = nameEN;
-		if (l.getLanguage().equals("kk")) {
-			name = nameKZ;
-		} else if (l.getLanguage().equals("ru")) {
-			name = nameRU;
-		}
+//	public EDUCATION_MODULE_TYPE getEducationModuleType() {
+//		return educationModuleType;
+//	}
+//
+//	public void setEducationModuleType(EDUCATION_MODULE_TYPE educationModuleType) {
+//		this.educationModuleType = educationModuleType;
+//	}
 
-		return code + " " + name;
-	}
+    public String toString() {
+        return nameRU;
+    }
+
+//	public String toString(Locale l) {
+//		String name = nameEN;
+//		if (l.getLanguage().equals("kk")) {
+//			name = nameKZ;
+//		} else if (l.getLanguage().equals("ru")) {
+//			name = nameRU;
+//		}
+//
+//		return code + " " + name;
+//	}
 }

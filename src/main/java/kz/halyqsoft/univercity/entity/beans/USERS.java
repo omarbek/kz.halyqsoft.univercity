@@ -106,7 +106,7 @@ public class USERS extends AbstractUser implements CommonTree<USERS> {
     @Column(name = "PHONE_INTERNAL")
     private String phoneInternal;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 18, required= false)//TODO
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 18, required= false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "CARD_ID", referencedColumnName = "ID")})

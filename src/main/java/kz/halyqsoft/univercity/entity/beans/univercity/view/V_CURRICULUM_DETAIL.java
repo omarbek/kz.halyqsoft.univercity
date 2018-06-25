@@ -1,11 +1,7 @@
 package kz.halyqsoft.univercity.entity.beans.univercity.view;
 
 import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ACADEMIC_FORMULA;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.CONTROL_TYPE;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.CREDITABILITY;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT_CYCLE;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
@@ -46,9 +42,9 @@ public class V_CURRICULUM_DETAIL extends AbstractEntity {
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
-    private V_ELECTIVE_SUBJECT_LABEL subject;
+    private SUBJECT subject;
 	
-	@FieldInfo(type = EFieldType.TEXT, max = 10, order = 5, inEdit = false, inView = false, columnWidth = 120)
+	@FieldInfo(type = EFieldType.TEXT, max = 10, order = 5, columnWidth = 120)
 	@Column(name = "SUBJECT_CODE")
 	private String subjectCode;
 	
@@ -107,6 +103,16 @@ public class V_CURRICULUM_DETAIL extends AbstractEntity {
 	@FieldInfo(type = EFieldType.TEXT, max = 10, order = 19, inGrid = false, inEdit = false, inView = false)
 	@Column(name = "CONTROL_TYPE_NAME")
 	private String controlTypeName;
+
+	@FieldInfo(type = EFieldType.FK_COMBO, order = 20, inGrid = false, inView = false)
+	@ManyToOne
+	@JoinColumns({
+			@JoinColumn(name = "EDUCATION_MODULE_TYPE_ID", referencedColumnName = "ID")})
+	private EDUCATION_MODULE_TYPE educationModuleType;
+
+	@FieldInfo(type = EFieldType.TEXT,  order = 21, inEdit = false)
+	@Column(name = "EDUCATION_MODULE_TYPE_NAME")
+	private String educationModuleTypeName;
 	
 	@FieldInfo(type = EFieldType.BOOLEAN, order = 22, required = false, inEdit = false, inGrid = false, inView = false)
 	@Column(name = "DELETED")
@@ -143,11 +149,11 @@ public class V_CURRICULUM_DETAIL extends AbstractEntity {
 		this.semesterName = semesterName;
 	}
 
-	public V_ELECTIVE_SUBJECT_LABEL getSubject() {
+	public SUBJECT getSubject() {
 		return subject;
 	}
 
-	public void setSubject(V_ELECTIVE_SUBJECT_LABEL subject) {
+	public void setSubject(SUBJECT subject) {
 		this.subject = subject;
 	}
 
@@ -269,5 +275,21 @@ public class V_CURRICULUM_DETAIL extends AbstractEntity {
 
 	public void setElective(boolean elective) {
 		this.elective = elective;
+	}
+
+	public EDUCATION_MODULE_TYPE getEducationModuleType() {
+		return educationModuleType;
+	}
+
+	public void setEducationModuleType(EDUCATION_MODULE_TYPE educationModuleType) {
+		this.educationModuleType = educationModuleType;
+	}
+
+	public String getEducationModuleTypeName() {
+		return educationModuleTypeName;
+	}
+
+	public void setEducationModuleTypeName(String educationModuleTypeName) {
+		this.educationModuleTypeName = educationModuleTypeName;
 	}
 }

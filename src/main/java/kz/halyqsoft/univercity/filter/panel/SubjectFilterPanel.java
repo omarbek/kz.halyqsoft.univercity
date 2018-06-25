@@ -23,17 +23,22 @@ public final class SubjectFilterPanel extends AbstractFilterPanel {
 		hl.setSpacing(true);
 		hl.setWidthUndefined();
 		
-		AbstractField af = getFilterComponent("code");
-		if (af != null) {
+//		AbstractField af = getFilterComponent("code");
+//		if (af != null) {
+//			hl.addComponent(af);
+//		}
+//
+//		af = getFilterComponent("subjectName");
+//		if (af != null) {
+//			hl.addComponent(af);
+//		}
+
+		AbstractField af = getFilterComponent("chair");
+		if (af != null ) {
 			hl.addComponent(af);
 		}
-		
-		af = getFilterComponent("subjectName");
-		if (af != null) {
-			hl.addComponent(af);
-		}
-		
-		af = getFilterComponent("chair");
+
+		af = getFilterComponent("subjectModule");
 		if (af != null) {
 			hl.addComponent(af);
 		}
@@ -59,7 +64,7 @@ public final class SubjectFilterPanel extends AbstractFilterPanel {
 		if (af != null) {
 			hl.addComponent(af);
 		}
-		
+
 		getContent().addComponent(hl);
 		getContent().setComponentAlignment(hl, Alignment.MIDDLE_CENTER);
 	}

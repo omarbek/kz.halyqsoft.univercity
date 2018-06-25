@@ -29,9 +29,9 @@ public class V_TEACHER_SUBJECT extends AbstractEntity {
 	@Column(name = "SUBJECT_NAME", nullable = false)
 	private String subjectName;
 	
-	@FieldInfo(type = EFieldType.TEXT, max = 8, order = 4, inEdit = false, inView = false, inGrid = true, columnWidth = 120)
-	@Column(name = "SUBJECT_CODE", nullable = false)
-	private String subjectCode;
+//	@FieldInfo(type = EFieldType.TEXT, max = 8, order = 4, inEdit = false, inView = false, inGrid = true, columnWidth = 120)
+//	@Column(name = "SUBJECT_CODE", nullable = false)
+//	private String subjectCode;
 	
 	@FieldInfo(type = EFieldType.BOOLEAN, order = 11, columnWidth = 100)
 	@Column(name = "FALL", nullable = false)
@@ -67,13 +67,13 @@ public class V_TEACHER_SUBJECT extends AbstractEntity {
 		this.subjectName = subjectName;
 	}
 
-	public String getSubjectCode() {
-		return subjectCode;
-	}
-
-	public void setSubjectCode(String subjectCode) {
-		this.subjectCode = subjectCode;
-	}
+//	public String getSubjectCode() {
+//		return subjectCode;
+//	}
+//
+//	public void setSubjectCode(String subjectCode) {
+//		this.subjectCode = subjectCode;
+//	}
 
 	public boolean isFall() {
 		return fall;

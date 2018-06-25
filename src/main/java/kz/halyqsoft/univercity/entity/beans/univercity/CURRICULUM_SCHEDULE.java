@@ -94,4 +94,10 @@ public class CURRICULUM_SCHEDULE extends AbstractEntity {
 	public void setSymbol(CURRICULUM_SCHEDULE_SYMBOL symbol) {
 		this.symbol = symbol;
 	}
+
+	@Override
+	public String toString() {
+		return symbol.toString();
+	}
+
 }

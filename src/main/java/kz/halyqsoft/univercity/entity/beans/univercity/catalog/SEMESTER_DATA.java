@@ -77,4 +77,9 @@ public class SEMESTER_DATA extends AbstractEntity {
 	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
 	}
+
+	@Override
+	public String toString() {
+		return getYear().toString()+" "+getSemesterPeriod().toString();
+	}
 }
