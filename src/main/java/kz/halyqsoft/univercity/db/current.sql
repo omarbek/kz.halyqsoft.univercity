@@ -100,3 +100,40 @@ ALTER TABLE ONLY student_education
   ADD CONSTRAINT fk_student_education_groups FOREIGN KEY (groups_id)
 REFERENCES groups (id)
 ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+CREATE TABLE speciality_corpus (
+  id            BIGINT NOT NULL,
+  speciality_id BIGINT NOT NULL,
+  corpus_id     BIGINT NOT NULL
+);
+
+ALTER TABLE ONLY speciality_corpus
+  ADD CONSTRAINT pk_speciality_corpus PRIMARY KEY (id);
+
+CREATE SEQUENCE s_speciality_corpus
+MINVALUE 0
+START WITH 1
+NO CYCLE;
+
+ALTER TABLE speciality_corpus
+  ADD CONSTRAINT fk_speciality_corpus_speciality FOREIGN KEY (speciality_id)
+REFERENCES speciality (id)
+ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE speciality_corpus
+  ADD CONSTRAINT fk_speciality_corpus_corpus FOREIGN KEY (corpus_id)
+REFERENCES corpus (id)
+ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+CREATE UNIQUE INDEX idx_speciality_corpus
+  ON speciality_corpus (
+    speciality_id ASC,
+    corpus_id ASC
+  );
+
+INSERT INTO TASKS (CLASS_PATH, DESCR, ICON_NAME, NAME, TASK_ORDER, TASK_TYPE, TITLE, VISIBLE, ID, PARENT_ID)
+VALUES ('kz.halyqsoft.univercity.modules.bindingspecialitytocorpus.BindingSpecialityToCorpusView',
+        'KK=Мамандықты ғимаратқа қосу;RU=Привязка специальности корпусам;EN=Binding speciality to corpus;',
+        NULL, 'KK=Мамандықты ғимаратқа қосу;RU=Привязка специальности корпусам;EN=Binding speciality to corpus;',
+        220, FALSE, 'KK=Мамандықты ғимаратқа қосу;RU=Привязка специальности корпусам;EN=Binding speciality to corpus;',
+        TRUE, nextval('s_tasks'), 3);
