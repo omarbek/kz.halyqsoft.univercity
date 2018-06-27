@@ -767,7 +767,7 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
                 sql.append(')');
 
                 Map<Integer, Object> params = new HashMap<Integer, Object>(2);
-                params.put(1, 1);
+                params.put(1, Boolean.TRUE);
                 params.put(2, Boolean.FALSE);
 
                 try {
@@ -906,13 +906,14 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
                 "    ON t1.CURRICULUM_ID = t2.CURRICULUM_ID AND t1.SUBJECT_CYCLE_ID = t2.ELECTIVE_SUBJECT_CYCLE_ID";
         Map<Integer, Object> params = new HashMap<Integer, Object>(5);
         params.put(1, curriculum.getId().getId());
-        params.put(2, 0);
-        params.put(3, 1);
+        params.put(2, Boolean.FALSE);
+        params.put(3, Boolean.TRUE);
         params.put(4, curriculum.getId().getId());
         params.put(5, Boolean.FALSE);
 
-        List tempList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
-        List<VCurriculumCreditCycleSum> vcccsList = new ArrayList<VCurriculumCreditCycleSum>(tempList.size());
+        List tempList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                lookupItemsList(sql, params);
+        List<VCurriculumCreditCycleSum> vcccsList = new ArrayList<>(tempList.size());
         for (Object o : tempList) {
             Object[] oo = (Object[]) o;
             VCurriculumCreditCycleSum vccc = new VCurriculumCreditCycleSum();
@@ -1018,10 +1019,10 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
                 "    ON t1.CURRICULUM_ID = t2.CURRICULUM_ID AND t1.SUBJECT_CYCLE_ID = t2.ELECTIVE_SUBJECT_CYCLE_ID";
         Map<Integer, Object> params = new HashMap<Integer, Object>(5);
         params.put(1, curriculum.getId().getId());
-        params.put(2, 0);
-        params.put(3, 1);
+        params.put(2, Boolean.FALSE);
+        params.put(3, Boolean.TRUE);
         params.put(4, curriculum.getId().getId());
-        params.put(5, 0);
+        params.put(5, Boolean.FALSE);
 
         List tempList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
         List<VCurriculumCreditCycleSum> vcccsList = new ArrayList<VCurriculumCreditCycleSum>(tempList.size());

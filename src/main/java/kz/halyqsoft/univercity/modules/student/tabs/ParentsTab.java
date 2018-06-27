@@ -30,7 +30,7 @@ import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 import java.util.List;
 
 /**
- * @author Dmitry Dobrin.
+ * @author Omarbek
  * @created 17.05.2017.
  */
 @SuppressWarnings("serial")

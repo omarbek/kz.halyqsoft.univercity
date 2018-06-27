@@ -1,19 +1,15 @@
 package kz.halyqsoft.univercity.modules.catalog;
 
 import com.vaadin.ui.HorizontalSplitPanel;
-import com.vaadin.ui.TextField;
 import kz.halyqsoft.univercity.entity.beans.ROLES;
 import kz.halyqsoft.univercity.entity.beans.ROLE_TASKS;
 import kz.halyqsoft.univercity.entity.beans.TASKS;
-import kz.halyqsoft.univercity.entity.beans.univercity.USER_ADDRESS;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.changelisteners.CountryChangeListener;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
-import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.Entity;
-import org.r3a.common.entity.FieldInfo;
 import org.r3a.common.entity.ID;
 import org.r3a.common.entity.beans.AbstractTask;
 import org.r3a.common.entity.event.EntityEvent;
@@ -29,8 +25,6 @@ import org.r3a.common.vaadin.widget.AbstractSelectWidget;
 import org.r3a.common.vaadin.widget.DBSelectModel;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.form.FormModel;
-import org.r3a.common.vaadin.widget.form.GridFormWidget;
-import org.r3a.common.vaadin.widget.form.field.FieldModel;
 import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
@@ -201,10 +195,10 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                         classASW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
                         tm.getColumnModel("beginYear").setFormat(NumberUtils.INTEGER_FORMAT);
                         tm.getColumnModel("endYear").setFormat(NumberUtils.INTEGER_FORMAT);
-                    }*/ else if (entityClass.equals(ROLES.class)) {
+                    }*/
+                    else if (entityClass.equals(ROLES.class)) {
                         classASW.setButtonVisible(AbstractToolbar.FILTER_BUTTON, true);
                     }
-
                 }
                 mainHSP.addComponent(classASW);
             }
@@ -217,10 +211,14 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
         if (source.equals(classASW)) {
             if (e instanceof CommonTree) {//need for COUNTRY
                 ((CommonTree) e).setParent((CommonTree) classASW.getSelectedEntity());
+            } else if (e instanceof ACADEMIC_FORMULA) {
+                ACADEMIC_FORMULA academicFormula = (ACADEMIC_FORMULA) e;
+                academicFormula.setLcCount(0);
+                academicFormula.setPrCount(0);
+                academicFormula.setLbCount(0);
             }
         }
     }
-
 
 
     @Override
@@ -289,34 +287,30 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                         return false;
                     }
                 }
-            }else if(e instanceof TASKS)
-            {
+            } else if (e instanceof TASKS) {
                 TASKS parent = ((TASKS) e).getParent();
-                if(parent!=null) {
+                if (parent != null) {
                     Integer max = parent.getTaskOrder();
                     List<TASKS> children = parent.getChildren();
-                    if(children.size()>0)
-                    {
-                        for(TASKS task : children)
-                        {
-                            if(task.getTaskOrder() > max)
-                            {
-                                max  = task.getTaskOrder();
+                    if (children.size() > 0) {
+                        for (TASKS task : children) {
+                            if (task.getTaskOrder() > max) {
+                                max = task.getTaskOrder();
                             }
                         }
                     }
                     try {
-                            max++;
-                            ((TASKS) e).setTaskOrder(max);
+                        max++;
+                        ((TASKS) e).setTaskOrder(max);
 
                     } catch (Exception ex) {
                         CommonUtils.showMessageAndWriteLog("Unable to generate a taskOrder for TASKS", ex);
                         return false;
                     }
 
-                }else{
+                } else {
                     QueryModel<TASKS> qm = new QueryModel<>(TASKS.class);
-                    qm.addSelect("TASK_ORDER" , EAggregate.MAX);
+                    qm.addSelect("TASK_ORDER", EAggregate.MAX);
 
                     try {
                         BigDecimal bigDecimalMax = (BigDecimal) (SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItems(qm));
@@ -333,6 +327,16 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                 }
                 ((TASKS) e).setVisible(true);
 
+            } else if (e instanceof ACADEMIC_FORMULA) {
+                ACADEMIC_FORMULA academicFormula = (ACADEMIC_FORMULA) e;
+                Integer sum = academicFormula.getLcCount() + academicFormula.getPrCount()
+                        + academicFormula.getLbCount();
+                if (!sum.equals(academicFormula.getCreditability().getCredit())) {
+                    Message.showInfo(getUILocaleUtil().getCaption("sum.not.equal.credit"));
+                    return false;
+                }
+                academicFormula.setFormula(academicFormula.getLcCount() + "/" +
+                        academicFormula.getLbCount() + "/" + academicFormula.getPrCount());
             }
         }
 

@@ -1,6 +1,5 @@
 package kz.halyqsoft.univercity.modules.curriculum.working.semester;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import com.vaadin.data.Container.Indexed;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.Page;

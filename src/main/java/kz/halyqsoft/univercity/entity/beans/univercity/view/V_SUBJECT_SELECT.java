@@ -24,9 +24,9 @@ public class V_SUBJECT_SELECT extends AbstractEntity {
 
 	private static final long serialVersionUID = -1442440970696524875L;
 
-	@FieldInfo(type = EFieldType.TEXT, order = 1, columnWidth = 100)
-	@Column(name = "CODE", nullable = false)
-	private String code;
+//	@FieldInfo(type = EFieldType.TEXT, order = 1, columnWidth = 100)
+//	@Column(name = "CODE", nullable = false)
+//	private String code;
 	
 	@FieldInfo(type = EFieldType.TEXT, order = 2)
 	@Column(name = "NAME_RU", nullable = false)
@@ -77,13 +77,13 @@ public class V_SUBJECT_SELECT extends AbstractEntity {
 	public V_SUBJECT_SELECT() {
 	}
 
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
-	}
+//	public String getCode() {
+//		return code;
+//	}
+//
+//	public void setCode(String code) {
+//		this.code = code;
+//	}
 
 	public String getNameRU() {
 		return nameRU;
@@ -159,6 +159,6 @@ public class V_SUBJECT_SELECT extends AbstractEntity {
 
 	@Override
 	public String toString() {
-		return code + " " + nameRU;
+		return  nameRU;
 	}
 }

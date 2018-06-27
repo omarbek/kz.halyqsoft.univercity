@@ -41,7 +41,6 @@ import java.util.Map;
 
 /**
  * @author Omarbek Dinassil
- * @author Dmitry Dobrin.
  * @created Mar 28, 2017 9:07:22 AM
  */
 @SuppressWarnings({"serial", "unchecked"})

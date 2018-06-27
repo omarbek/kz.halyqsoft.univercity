@@ -11,7 +11,6 @@ public class VIndividualCurriculumPrint extends AbstractEntity {
 	private static final long serialVersionUID = -8177021263255783072L;
 	
 	private int recordNo;
-	private String subjectCode;
 	private String subjectNameKZ;
 	private String subjectNameEN;
 	private String subjectNameRU;
@@ -29,14 +28,6 @@ public class VIndividualCurriculumPrint extends AbstractEntity {
 
 	public void setRecordNo(int recordNo) {
 		this.recordNo = recordNo;
-	}
-
-	public String getSubjectCode() {
-		return subjectCode;
-	}
-
-	public void setSubjectCode(String subjectCode) {
-		this.subjectCode = subjectCode;
 	}
 
 	public String getSubjectNameKZ() {

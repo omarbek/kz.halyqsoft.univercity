@@ -2,6 +2,7 @@ package kz.halyqsoft.univercity.entity.beans.univercity.view;
 
 import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.CREDITABILITY;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.EDUCATION_MODULE_TYPE;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_DATA;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
@@ -30,7 +31,7 @@ public class V_CURRICULUM_AFTER_SEMESTER extends AbstractEntity {
             @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
     private V_SUBJECT_SELECT subject;
 
-    @FieldInfo(type = EFieldType.TEXT_LABEL, max = 13, order = 3, readOnlyFixed = true, required = false, columnWidth = 120)
+    @FieldInfo(type = EFieldType.TEXT, max = 13, order = 5, required = false, columnWidth = 120)
     @Column(name = "SUBJECT_CODE")
     private String subjectCode;
 
@@ -38,7 +39,7 @@ public class V_CURRICULUM_AFTER_SEMESTER extends AbstractEntity {
     @Column(name = "SUBJECT_NAME_RU")
     private String subjectNameRU;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 5, inGrid = false, readOnlyFixed = true, required = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 3, inGrid = false, readOnlyFixed = true, required = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "CREDITABILITY_ID", referencedColumnName = "ID")})
@@ -58,7 +59,17 @@ public class V_CURRICULUM_AFTER_SEMESTER extends AbstractEntity {
     @Column(name = "SEMESTER_DATA_NAME")
     private String semesterDataName;
 
-    @FieldInfo(type = EFieldType.BOOLEAN, order = 9, required = false, inEdit = false, inGrid = false, inView = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 9)
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "EDUCATION_MODULE_TYPE_ID", referencedColumnName = "ID")})
+    private EDUCATION_MODULE_TYPE educationModuleType;
+
+    @FieldInfo(type = EFieldType.TEXT, order = 10,inEdit = false,inGrid = false)
+    @Column(name = "EDUCATION_MODULE_TYPE_NAME")
+    private String educationModuleTypeName;
+
+    @FieldInfo(type = EFieldType.BOOLEAN, order = 11, required = false, inEdit = false, inGrid = false, inView = false)
     @Column(name = "DELETED")
     private boolean deleted;
 
@@ -132,5 +143,21 @@ public class V_CURRICULUM_AFTER_SEMESTER extends AbstractEntity {
 
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
+    }
+
+    public EDUCATION_MODULE_TYPE getEducationModuleType() {
+        return educationModuleType;
+    }
+
+    public void setEducationModuleType(EDUCATION_MODULE_TYPE educationModuleType) {
+        this.educationModuleType = educationModuleType;
+    }
+
+    public String getEducationModuleTypeName() {
+        return educationModuleTypeName;
+    }
+
+    public void setEducationModuleTypeName(String educationModuleTypeName) {
+        this.educationModuleTypeName = educationModuleTypeName;
     }
 }

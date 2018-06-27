@@ -97,7 +97,7 @@ public class AfterSemesterProgamPanel extends AbstractCurriculumPanel implements
 
         FKFieldModel creditabilityFM = (FKFieldModel) fm.getFieldModel("creditability");
 
-        subjectFM.getListeners().add(new SubjectSelectListener(fm.getFieldModel("subjectCode"), creditabilityFM));
+        subjectFM.getListeners().add(new SubjectSelectListener( creditabilityFM));
 
         getContent().addComponent(grid);
     }
@@ -177,9 +177,6 @@ public class AfterSemesterProgamPanel extends AbstractCurriculumPanel implements
         if (source.equals(grid)) {
             FormModel fm = ((DBGridModel) grid.getWidgetModel()).getFormModel();
 
-            FieldModel subjectCodeFM = fm.getFieldModel("subjectCode");
-            subjectCodeFM.setReadOnly(true);
-
             FKFieldModel creditabilityFM = (FKFieldModel) fm.getFieldModel("creditability");
             creditabilityFM.setReadOnly(true);
 
@@ -227,18 +224,11 @@ public class AfterSemesterProgamPanel extends AbstractCurriculumPanel implements
                 creditabilityCB.setFilteringMode(FilteringMode.OFF);
                 creditabilityCB.setPageLength(0);
 
-                TextField subjectCodeTF = new TextField();
-                subjectCodeTF.setWidth(100, Unit.PIXELS);
-                subjectCodeTF.setNullRepresentation("");
-                subjectCodeTF.setNullSettingAllowed(true);
-                subjectCodeTF.setImmediate(true);
-
                 subjectSelectDlg = subjectFM.getCustomGridSelectDialog();
                 subjectSelectDlg.getSelectModel().setMultiSelect(false);
                 subjectSelectDlg.getFilterModel().addFilter("chair", chairCB);
                 subjectSelectDlg.getFilterModel().addFilter("level", levelCB);
                 subjectSelectDlg.getFilterModel().addFilter("creditability", creditabilityCB);
-                subjectSelectDlg.getFilterModel().addFilter("code", subjectCodeTF);
                 subjectSelectDlg.setFilterRequired(true);
                 subjectSelectDlg.initFilter();
             } catch (Exception ex) {
@@ -303,6 +293,8 @@ public class AfterSemesterProgamPanel extends AbstractCurriculumPanel implements
                         afterSemester.setCurriculum(curriculum);
                         afterSemester.setSemesterData(afterSemesterView.getSemesterData());
                         afterSemester.setCreated(new Date());
+                        afterSemester.setCode(afterSemesterView.getSubjectCode());
+                        afterSemester.setEducationModuleType(afterSemesterView.getEducationModuleType());
                         try {
                             afterSemester.setSubject(SessionFacadeFactory.getSessionFacade(
                                     CommonEntityFacadeBean.class).lookup(SUBJECT.class,
@@ -326,7 +318,7 @@ public class AfterSemesterProgamPanel extends AbstractCurriculumPanel implements
     }
     public final void checkForConform() throws Exception {
         if (getTotalCredit() == 0) {
-            throw new Exception("no programms after semester");//TODO
+            throw new Exception(getUILocaleUtil().getCaption("no.programs.after.semester"));
         }
     }
     @Override
@@ -347,7 +339,7 @@ public class AfterSemesterProgamPanel extends AbstractCurriculumPanel implements
                 try {
                     ss = session.lookupSingle(ssQM);
                 } catch (NoResultException nrex) {
-                    nrex.printStackTrace();//TODO catch
+                    ss=null;
                 }
                 if (ss != null) {
                     String sql = "SELECT count(curr_after_sem.ID) CNT " +
@@ -365,7 +357,7 @@ public class AfterSemesterProgamPanel extends AbstractCurriculumPanel implements
                     try {
                         sum = (Integer) session.lookupSingle(sql, params);
                     } catch (NoResultException nrex) {
-                        nrex.printStackTrace();//TODO catch
+                        sum=null;
                     }
                     if (sum != null && sum > 0) {
                         delList.add(afterSemester);
@@ -381,8 +373,7 @@ public class AfterSemesterProgamPanel extends AbstractCurriculumPanel implements
                         } catch (NoResultException nrex) {
                         }
                         if (sum != null && sum > 0) {
-                            notDelList.add(afterSemester.getSubject().getCode() + " "
-                                    + afterSemester.getSubject().getNameRU());
+                            notDelList.add( afterSemester.getSubject().getNameRU());
                         } else {
                             ssDelList.add(ss);
                             delList.add(afterSemester);
@@ -451,12 +442,10 @@ public class AfterSemesterProgamPanel extends AbstractCurriculumPanel implements
     }
 
     private class SubjectSelectListener implements Property.ValueChangeListener {
-        private final FieldModel subjectCodeFM;
         private final FKFieldModel creditabilityFM;
 
-        public SubjectSelectListener(FieldModel subjectCodeFM, FKFieldModel creditabilityFM) {
+        public SubjectSelectListener( FKFieldModel creditabilityFM) {
             super();
-            this.subjectCodeFM = subjectCodeFM;
             this.creditabilityFM = creditabilityFM;
         }
 
@@ -466,10 +455,8 @@ public class AfterSemesterProgamPanel extends AbstractCurriculumPanel implements
                 V_SUBJECT_SELECT subject = (V_SUBJECT_SELECT) ev.getProperty().getValue();
                 if (subject != null) {
                     V_SUBJECT_SELECT vss = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(V_SUBJECT_SELECT.class, subject.getId());
-                    subjectCodeFM.refresh(vss.getCode());
                     creditabilityFM.refresh(vss.getCreditability());
                 } else {
-                    subjectCodeFM.refresh(null);
                     creditabilityFM.refresh(null);
                 }
             } catch (Exception ex) {

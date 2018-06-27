@@ -16,6 +16,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_MEDICAL_CHECKUP;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_USER_LANGUAGE;
 import kz.halyqsoft.univercity.filter.FStudentFilter;
+import kz.halyqsoft.univercity.filter.panel.StudentFilterPanel;
 import kz.halyqsoft.univercity.modules.student.tabs.*;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.changelisteners.BirthCountryChangeListener;
@@ -347,8 +348,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                             }
                         }
                         showSavedNotification();
-
-                        try {
+                        try{
                             baseDataFM.loadEntity(student.getId());
                             CommonUtils.setCards(baseDataFM);
                             hl.removeComponent(baseDataFW);
@@ -401,10 +401,18 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         getTabSheet().addTab(content, getMasterTabTitle());
 
 
-        myResource = createResourceStudent("85", student);
-        fileDownloader = new FileDownloader(myResource);
-        myResource.setMIMEType("application/pdf");
-        fileDownloader.extend(pdfDownload);
+        if(student.getLevel().getLevelName().equalsIgnoreCase("Магистратура"))
+        {
+            myResource = createResourceStudent("82", student);
+            fileDownloader = new FileDownloader(myResource);
+            myResource.setMIMEType("application/pdf");
+            fileDownloader.extend(pdfDownload);
+        }else {
+            myResource = createResourceStudent("85", student);
+            fileDownloader = new FileDownloader(myResource);
+            myResource.setMIMEType("application/pdf");
+            fileDownloader.extend(pdfDownload);
+        }
 
         myResourceLetter = createResourceStudent("33", student);
         fileDownloaderLetter = new FileDownloader(myResourceLetter);
@@ -426,10 +434,9 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
             myResourceDorm = createResourceStudent("92", student);
             fileDownloaderDorm = new FileDownloader(myResourceDorm);
             myResourceDorm.setMIMEType("application/pdf");
-            myResourceDorm.setCacheTime(0);
             fileDownloaderDorm.extend(pdfDownloadDorm);
-
         }
+
 
         boolean readOnly = baseDataFW.getWidgetModel().isReadOnly();
         createDocumentsTab(readOnly);
@@ -466,11 +473,20 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
 
         pdfDownloadDorm.setEnabled(false);
 
-        myResource = createResourceStudent("85", student);
-        fileDownloader = new FileDownloader(myResource);
-        myResource.setMIMEType("application/pdf");
-        myResource.setCacheTime(0);
-        fileDownloader.extend(pdfDownload);
+        if(student.getLevel().getLevelName().equalsIgnoreCase("Магистратура"))
+        {
+            myResource = createResourceStudent("82", student);
+            fileDownloader = new FileDownloader(myResource);
+            myResource.setMIMEType("application/pdf");
+            myResource.setCacheTime(0);
+            fileDownloader.extend(pdfDownload);
+        }else {
+            myResource = createResourceStudent("85", student);
+            fileDownloader = new FileDownloader(myResource);
+            myResource.setMIMEType("application/pdf");
+            myResource.setCacheTime(0);
+            fileDownloader.extend(pdfDownload);
+        }
 
         myResourceLetter = createResourceStudent("33", student);
         fileDownloaderLetter = new FileDownloader(myResourceLetter);
@@ -489,11 +505,9 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
 
         if (student.isNeedDorm()) {
             pdfDownloadDorm.setEnabled(true);
-
             myResourceDorm = createResourceStudent("92", student);
             fileDownloaderDorm = new FileDownloader(myResourceDorm);
             myResourceDorm.setMIMEType("application/pdf");
-            myResourceDorm.setCacheTime(0);
             fileDownloaderDorm.extend(pdfDownloadDorm);
         }
     }
@@ -504,8 +518,19 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         studentOrApplicantView.doFilter(new FStudentFilter());
         mainVL.removeComponent(this);
 //        mainVL.addComponent(studentOrApplicantView.getButtonsHL());
+
+        try {
+            StudentFilterPanel studentFilterPanel = studentOrApplicantView.createStudentFilterPanel();
+            studentOrApplicantView.setFilterPanel(studentFilterPanel);
+        }catch (Exception e)
+        {
+            Message.showError(e.getMessage());
+            e.printStackTrace();
+        }
+
         mainVL.addComponent(studentOrApplicantView.getFilterPanel());
         mainVL.addComponent(studentOrApplicantView.getStudentGW());
+
         return null;
     }
 

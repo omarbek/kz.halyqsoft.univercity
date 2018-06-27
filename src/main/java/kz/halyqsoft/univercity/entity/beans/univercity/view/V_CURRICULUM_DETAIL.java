@@ -44,7 +44,7 @@ public class V_CURRICULUM_DETAIL extends AbstractEntity {
         @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
     private SUBJECT subject;
 	
-	@FieldInfo(type = EFieldType.TEXT, max = 10, order = 5, inEdit = false, inView = false, columnWidth = 120)
+	@FieldInfo(type = EFieldType.TEXT, max = 10, order = 5, columnWidth = 120)
 	@Column(name = "SUBJECT_CODE")
 	private String subjectCode;
 	
@@ -103,6 +103,16 @@ public class V_CURRICULUM_DETAIL extends AbstractEntity {
 	@FieldInfo(type = EFieldType.TEXT, max = 10, order = 19, inGrid = false, inEdit = false, inView = false)
 	@Column(name = "CONTROL_TYPE_NAME")
 	private String controlTypeName;
+
+	@FieldInfo(type = EFieldType.FK_COMBO, order = 20, inGrid = false, inView = false)
+	@ManyToOne
+	@JoinColumns({
+			@JoinColumn(name = "EDUCATION_MODULE_TYPE_ID", referencedColumnName = "ID")})
+	private EDUCATION_MODULE_TYPE educationModuleType;
+
+	@FieldInfo(type = EFieldType.TEXT,  order = 21, inEdit = false)
+	@Column(name = "EDUCATION_MODULE_TYPE_NAME")
+	private String educationModuleTypeName;
 	
 	@FieldInfo(type = EFieldType.BOOLEAN, order = 22, required = false, inEdit = false, inGrid = false, inView = false)
 	@Column(name = "DELETED")
@@ -265,5 +275,21 @@ public class V_CURRICULUM_DETAIL extends AbstractEntity {
 
 	public void setElective(boolean elective) {
 		this.elective = elective;
+	}
+
+	public EDUCATION_MODULE_TYPE getEducationModuleType() {
+		return educationModuleType;
+	}
+
+	public void setEducationModuleType(EDUCATION_MODULE_TYPE educationModuleType) {
+		this.educationModuleType = educationModuleType;
+	}
+
+	public String getEducationModuleTypeName() {
+		return educationModuleTypeName;
+	}
+
+	public void setEducationModuleTypeName(String educationModuleTypeName) {
+		this.educationModuleTypeName = educationModuleTypeName;
 	}
 }

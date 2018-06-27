@@ -2,15 +2,11 @@ package kz.halyqsoft.univercity.modules.curriculum.working.schedule;
 
 import com.vaadin.data.Container.Indexed;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.grid.HeightMode;
-import com.vaadin.ui.Grid;
+import com.vaadin.ui.*;
 import com.vaadin.ui.Grid.HeaderCell;
 import com.vaadin.ui.Grid.HeaderRow;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.renderers.HtmlRenderer;
-import com.vaadin.ui.renderers.NumberRenderer;
-import com.vaadin.ui.renderers.TextRenderer;
 import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM;
 import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM_SCHEDULE;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.CURRICULUM_SCHEDULE_SYMBOL;
@@ -30,8 +26,6 @@ import org.r3a.common.entity.ID;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.widget.dialog.Message;
-import org.r3a.common.vaadinaddon.TextAreaCellRenderer;
-import org.r3a.common.vaadinaddon.TextCellRenderer;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -45,8 +39,11 @@ import java.util.Map;
  */
 @SuppressWarnings({"serial"})
 public class SchedulePanel extends AbstractCurriculumPanel {
-
+    static Button regButton;
+    private VerticalLayout registerVL;
+    private boolean removeAll = false;
     private Grid grid;
+
     private List<WEEK> weekList;
     private Map<String, CURRICULUM_SCHEDULE_SYMBOL> symbolMap = new HashMap<String, CURRICULUM_SCHEDULE_SYMBOL>();
 
@@ -54,8 +51,44 @@ public class SchedulePanel extends AbstractCurriculumPanel {
         super(parentView);
     }
 
+
+
+
     @Override
     public void initPanel() throws Exception {
+
+        Button editButton = new Button("Edit");
+        editButton.setCaption(getUILocaleUtil().getCaption("edit"));
+        editButton.setWidth(120, Unit.PIXELS);
+        editButton.setIcon(new ThemeResource("img/button/edit.png"));
+        getContent().addComponent(editButton);
+
+        editButton.addClickListener(
+                new Button.ClickListener() {
+                    @Override
+                    public void buttonClick(Button.ClickEvent clickEvent) {
+
+                       try{
+                           if(grid.getSelectedRow()!=null)
+                           {
+                               STUDY_YEAR study_year = ((ScheduleBean)grid.getSelectedRow()).getStudyYear();
+                               QueryModel<CURRICULUM_SCHEDULE> scheduleQueryModel = new QueryModel<>(CURRICULUM_SCHEDULE.class);
+                               scheduleQueryModel.addWhere("studyYear" , ECriteria.EQUAL , study_year.getId());
+                               scheduleQueryModel.addOrder("id");
+                               List<CURRICULUM_SCHEDULE> scheduleList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(scheduleQueryModel);
+                               SchedulePanelEdit schedulePanelEdit = new SchedulePanelEdit((scheduleList), SchedulePanel.this );
+
+                           }else{
+                               Message.showError("Choose one row");
+                           }
+                       }catch (Exception e){
+                           e.printStackTrace();
+                       }
+                    }
+                }
+        );
+
+
         QueryModel<WEEK> qmWeek = new QueryModel<WEEK>(WEEK.class);
         qmWeek.addOrder("id");
         weekList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(qmWeek);
@@ -68,6 +101,7 @@ public class SchedulePanel extends AbstractCurriculumPanel {
 
         grid = new Grid();
         grid.setSizeFull();
+
         grid.addStyleName("curriculum-schedule");
         grid.addColumn("studyYear").setHeaderCaption(getUILocaleUtil().getEntityLabel(STUDY_YEAR.class)).
                 setHidable(false);
@@ -156,8 +190,9 @@ public class SchedulePanel extends AbstractCurriculumPanel {
         } else {
             grid.addColumn("week" + i + "Symbol").setHeaderCaption(i + "").setHidable(false).setWidth(50);
         }
-    }
 
+
+    }
     @Override
     public void refresh() throws Exception {
         QueryModel<STUDY_YEAR> qmStudyYear = new QueryModel<STUDY_YEAR>(STUDY_YEAR.class);

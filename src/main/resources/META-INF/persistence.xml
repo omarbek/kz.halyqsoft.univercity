@@ -193,6 +193,7 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_EXAM_SCHEDULE_SELECT</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_EXAM_TRANSCRIPT</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_CURRICULUM_AFTER_SEMESTER</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_CURRICULUM_SUBJECT</class>
 
         <class>kz.halyqsoft.univercity.entity.beans.univercity.AbstractSpiderEntity</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.AbstractStudentEntity</class>
@@ -302,7 +303,11 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.ACCOUNTANT_PRICE</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.CHAT</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.MESSAGE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.GROUPS</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM_AFTER_SEMESTER</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.CATALOG_ELECTIVE_SUBJECTS</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.ELECTIVE_BINDED_SUBJECT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.SPECIALITY_CORPUS</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
