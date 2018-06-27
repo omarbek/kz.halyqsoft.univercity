@@ -65,3 +65,75 @@ ALTER TABLE elective_binded_subject
   ADD CONSTRAINT fk_elective_binded_subject_catalog_elective_subjects FOREIGN KEY (catalog_elective_subjects_id)
 REFERENCES catalog_elective_subjects (id)
 ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+INSERT INTO TASKS (CLASS_PATH, DESCR, ICON_NAME, NAME, TASK_ORDER, TASK_TYPE, TITLE, VISIBLE, ID, PARENT_ID)
+VALUES ('kz.halyqsoft.univercity.modules.group.GroupsView', 'KK=Группы;RU=Группы;EN=Groups;', null,
+        'KK=Группы;RU=Группы;EN=Groups;', 507, false, 'KK=Группы;RU=Группы;EN=Groups;', true, nextval('s_tasks'), 29);
+
+CREATE TABLE groups (
+  id  BIGINT  NOT NULL,
+  speciality_id BIGINT NOT NULL,
+  name CHARACTER VARYING(150) NOT NULL,
+  orders BIGINT
+);
+
+ALTER TABLE groups
+  ADD CONSTRAINT pk_group PRIMARY KEY (id);
+
+ALTER TABLE ONLY groups
+  ADD CONSTRAINT fk_group_speciality FOREIGN KEY (speciality_id)
+REFERENCES speciality (id)
+ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+create sequence S_GROUPS
+minvalue 0
+start with 1
+no cycle;
+
+ALTER TABLE groups ADD COLUMN deleted BOOLEAN NOT NULL ;
+
+ALTER TABLE groups ADD COLUMN created TIMESTAMP DEFAULT now();
+
+ALTER TABLE student_education ADD COLUMN groups_id BIGINT;
+
+ALTER TABLE ONLY student_education
+  ADD CONSTRAINT fk_student_education_groups FOREIGN KEY (groups_id)
+REFERENCES groups (id)
+ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+CREATE TABLE speciality_corpus (
+  id            BIGINT NOT NULL,
+  speciality_id BIGINT NOT NULL,
+  corpus_id     BIGINT NOT NULL
+);
+
+ALTER TABLE ONLY speciality_corpus
+  ADD CONSTRAINT pk_speciality_corpus PRIMARY KEY (id);
+
+CREATE SEQUENCE s_speciality_corpus
+MINVALUE 0
+START WITH 1
+NO CYCLE;
+
+ALTER TABLE speciality_corpus
+  ADD CONSTRAINT fk_speciality_corpus_speciality FOREIGN KEY (speciality_id)
+REFERENCES speciality (id)
+ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE speciality_corpus
+  ADD CONSTRAINT fk_speciality_corpus_corpus FOREIGN KEY (corpus_id)
+REFERENCES corpus (id)
+ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+CREATE UNIQUE INDEX idx_speciality_corpus
+  ON speciality_corpus (
+    speciality_id ASC,
+    corpus_id ASC
+  );
+
+INSERT INTO TASKS (CLASS_PATH, DESCR, ICON_NAME, NAME, TASK_ORDER, TASK_TYPE, TITLE, VISIBLE, ID, PARENT_ID)
+VALUES ('kz.halyqsoft.univercity.modules.bindingspecialitytocorpus.BindingSpecialityToCorpusView',
+        'KK=Мамандықты ғимаратқа қосу;RU=Привязка специальности корпусам;EN=Binding speciality to corpus;',
+        NULL, 'KK=Мамандықты ғимаратқа қосу;RU=Привязка специальности корпусам;EN=Binding speciality to corpus;',
+        220, FALSE, 'KK=Мамандықты ғимаратқа қосу;RU=Привязка специальности корпусам;EN=Binding speciality to corpus;',
+        TRUE, nextval('s_tasks'), 3);

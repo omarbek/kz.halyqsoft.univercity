@@ -47,7 +47,8 @@ import java.util.List;
  * @created Oct 24, 2016 6:00:17 PM
  */
 @SuppressWarnings({"serial"})
-public class AcademicCalendarView extends AbstractTaskView {
+public class
+AcademicCalendarView extends AbstractTaskView {
 
     private ACADEMIC_CALENDAR academicCalendar;
     private ComboBox facultyCB;
