@@ -120,8 +120,10 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
                                         DateFormat dateFormat = new SimpleDateFormat();
                                         ((DBGridModel) employeeGW.getWidgetModel()).
                                                 setEntities(getList(dateFormat.format(date.getValue())));
+                                        if(employeeByDepartmentGW!=null){
                                         ((DBGridModel) employeeByDepartmentGW.getWidgetModel()).
                                                 setEntities(getEmployee(dateFormat.format(date.getValue())));
+                                        }
                                     } else {
                                         Message.showError("Choose date!");
                                     }
