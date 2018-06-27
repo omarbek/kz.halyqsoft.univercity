@@ -95,7 +95,7 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
         menuTT.setPageLength(20);
         MenuColumn menuColumn = new MenuColumn();
         menuTT.addGeneratedColumn("user arrival", menuColumn);
-        menuTT.setColumnHeader("user arrival", getUILocaleUtil().getCaption("attendanceHeader"));//TODO kk,ru
+        menuTT.setColumnHeader("user arrival", getUILocaleUtil().getCaption("attendanceHeader"));
         menuTT.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
