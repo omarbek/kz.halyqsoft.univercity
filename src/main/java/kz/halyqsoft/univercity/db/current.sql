@@ -9,7 +9,7 @@ ALTER TABLE STUDENT_SCHEDULE
 
 INSERT INTO TASKS (CLASS_PATH, DESCR, ICON_NAME, NAME, TASK_ORDER, TASK_TYPE, TITLE, VISIBLE, ID,
                    PARENT_ID)
-VALUES ('kz.halyqsoft.univercity.modules.registration.student.RegistrationView',
+VALUES ('kz.halyqsoft.univercity.modules.individualeduplanuplan.student.RegistrationView',
         'KK=ИУПС;RU=ИУПС;EN=Individual educational plan of student;', null,
         'KK=ИУПС;RU=ИУПС;EN=Individual educational plan of student;', 506, false,
         'KK=ИУПС;RU=ИУПС;EN=Individual educational plan of student;', true, nextval('s_tasks'), 29);
@@ -53,9 +53,9 @@ REFERENCES entrance_year (id)
 ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 CREATE SEQUENCE s_catalog_elective_subjects
-MINVALUE 0
-START WITH 1
-NO CYCLE;
+  MINVALUE 0
+  START WITH 1
+  NO CYCLE;
 
 ALTER table elective_binded_subject drop COLUMN created;
 delete from elective_binded_subject;
