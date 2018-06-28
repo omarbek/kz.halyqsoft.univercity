@@ -179,7 +179,7 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
         }
 
         @Override
-        public void handleEntityEvent(EntityEvent entityEvent) {
+        public void handleEntityEvent(EntityEvent entityEvent) {//
         }
 
         @Override
