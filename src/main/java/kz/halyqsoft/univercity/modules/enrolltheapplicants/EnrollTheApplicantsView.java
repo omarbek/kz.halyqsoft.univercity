@@ -42,7 +42,7 @@ public class EnrollTheApplicantsView extends AbstractTaskView {
         HorizontalLayout buttonsHL = CommonUtils.createButtonPanel();
 
         Button enrollButton = new Button();
-        enrollButton.setWidth(120.0F, Sizeable.Unit.PIXELS);
+        enrollButton.setWidth(120.0F, Unit.PIXELS);
         enrollButton.setIcon(new ThemeResource("img/button/ok.png"));
         enrollButton.setCaption(getUILocaleUtil().getCaption("enroll"));
         enrollButton.addClickListener(new Button.ClickListener() {
@@ -69,7 +69,7 @@ public class EnrollTheApplicantsView extends AbstractTaskView {
         buttonsHL.setComponentAlignment(enrollButton, Alignment.MIDDLE_CENTER);
 
         Button deleteButton = new Button();
-        deleteButton.setWidth(120.0F, Sizeable.Unit.PIXELS);
+        deleteButton.setWidth(120.0F, Unit.PIXELS);
         deleteButton.setIcon(new ThemeResource("img/button/delete.png"));
         deleteButton.setCaption(getUILocaleUtil().getCaption("delete"));
         deleteButton.addClickListener(new Button.ClickListener() {

@@ -315,9 +315,9 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         if (!baseDataFM.isReadOnly()) {
             HorizontalLayout buttonPanel = createButtonPanel();
             Button save = createSaveButton();
-            save.addClickListener(new Button.ClickListener() {
+            save.addClickListener(new ClickListener() {
                 @Override
-                public void buttonClick(Button.ClickEvent ev) {
+                public void buttonClick(ClickEvent ev) {
                     if (baseDataFW.save()) {
                         try {
                             studentEditPdfDownload((STUDENT) baseDataFM.getEntity());
@@ -366,9 +366,9 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
             buttonPanel.setComponentAlignment(save, Alignment.MIDDLE_CENTER);
 
             Button cancel = createCancelButton();
-            cancel.addClickListener(new Button.ClickListener() {
+            cancel.addClickListener(new ClickListener() {
                 @Override
-                public void buttonClick(Button.ClickEvent ev) {
+                public void buttonClick(ClickEvent ev) {
                     baseDataFW.cancel();
                 }
             });

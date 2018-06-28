@@ -4,9 +4,6 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import kz.halyqsoft.univercity.entity.beans.univercity.ACCOUNTANT_PRICE;
-import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
-import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_CREATIVE_EXAM;
-import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_CREATIVE_EXAM_SUBJECT;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VAccountants;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
@@ -16,10 +13,8 @@ import org.r3a.common.entity.ID;
 import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.event.EntityListener;
 import org.r3a.common.entity.query.QueryModel;
-import org.r3a.common.entity.query.from.EJoin;
 import org.r3a.common.vaadin.AbstractWebUI;
 import org.r3a.common.vaadin.widget.dialog.AbstractDialog;
-import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.form.CommonFormWidget;
 import org.r3a.common.vaadin.widget.form.FormModel;
 
@@ -93,7 +88,7 @@ public class AccountantEdit extends AbstractDialog {
 
     private CommonFormWidget createAccountantPrice() throws Exception {
         CommonFormWidget accountantFW = new CommonFormWidget(ACCOUNTANT_PRICE.class);
-        accountantFW.addEntityListener(new AccountantEdit.AccountantPriceListener());
+        accountantFW.addEntityListener(new AccountantPriceListener());
         final FormModel accountantFM = accountantFW.getWidgetModel();
         accountantFM.setReadOnly(false);
         String errorMessage = getUILocaleUtil().getCaption("title.error").concat(": ").

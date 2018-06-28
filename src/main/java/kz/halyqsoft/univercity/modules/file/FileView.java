@@ -47,7 +47,7 @@ public class FileView extends AbstractTaskView {
 
         Button editButton = new Button();
         editButton.setCaption(getUILocaleUtil().getCaption("edit"));
-        editButton.setWidth(120.0F, Sizeable.Unit.PIXELS);
+        editButton.setWidth(120.0F, Unit.PIXELS);
         editButton.setIcon(new ThemeResource("img/button/edit.png"));
         buttonPanel.addComponent(editButton);
         editButton.addClickListener(new Button.ClickListener() {
@@ -64,7 +64,7 @@ public class FileView extends AbstractTaskView {
 
         Button deleteButton = new Button();
         deleteButton.setCaption(getUILocaleUtil().getCaption("delete"));
-        deleteButton.setWidth(120.0F, Sizeable.Unit.PIXELS);
+        deleteButton.setWidth(120.0F, Unit.PIXELS);
         deleteButton.setIcon(new ThemeResource("img/button/delete.png"));
         buttonPanel.addComponent(deleteButton);
         deleteButton.addClickListener(new Button.ClickListener() {
