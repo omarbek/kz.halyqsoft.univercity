@@ -131,7 +131,7 @@ public final class RoomEdit extends AbstractFormWidgetView {
             save.addClickListener(new Button.ClickListener() {
 
                 @Override
-                public void buttonClick(Button.ClickEvent ev) {
+                public void buttonClick(ClickEvent ev) {
                     baseDataFW.save();
                 }
             });
@@ -142,7 +142,7 @@ public final class RoomEdit extends AbstractFormWidgetView {
             cancel.addClickListener(new Button.ClickListener() {
 
                 @Override
-                public void buttonClick(Button.ClickEvent ev) {
+                public void buttonClick(ClickEvent ev) {
                     baseDataFW.cancel();
                 }
             });
@@ -258,7 +258,7 @@ public final class RoomEdit extends AbstractFormWidgetView {
             save.addClickListener(new Button.ClickListener() {
 
                 @Override
-                public void buttonClick(Button.ClickEvent ev) {
+                public void buttonClick(ClickEvent ev) {
                     List<? extends AbstractWorkHourEntity> awheList = whw.getWorkHourList();
                     boolean saved = false;
                     for (AbstractWorkHourEntity awhe : awheList) {
@@ -286,7 +286,7 @@ public final class RoomEdit extends AbstractFormWidgetView {
             cancel.addClickListener(new Button.ClickListener() {
 
                 @Override
-                public void buttonClick(Button.ClickEvent ev) {
+                public void buttonClick(ClickEvent ev) {
                     whw.cancel();
                 }
             });

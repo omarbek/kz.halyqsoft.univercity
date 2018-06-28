@@ -414,7 +414,7 @@ public class ChatView extends AbstractTaskView implements EntityListener  {
                     }else{
                         message.setFromFirst(false);
                     }
-                    java.util.Date utilDate = new java.util.Date();
+                    Date utilDate = new Date();
                     message.setCreated(new java.sql.Date(utilDate.getTime()));
 
                     try{

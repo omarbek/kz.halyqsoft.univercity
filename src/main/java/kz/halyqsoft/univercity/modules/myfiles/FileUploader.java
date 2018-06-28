@@ -15,7 +15,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 
 @SuppressWarnings("serial")
-public class FileUploader implements Upload.Receiver, Upload.SucceededListener, Upload.FailedListener {
+public class FileUploader implements Receiver, SucceededListener, Upload.FailedListener {
 
 	private File file;
 
