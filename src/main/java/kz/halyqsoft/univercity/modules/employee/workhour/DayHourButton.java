@@ -36,10 +36,10 @@ final class DayHourButton extends Button {
         setDescription(descr);
         setEnabled(!readOnly);
         addStyleName("icon-only");
-        addClickListener(new Button.ClickListener() {
+        addClickListener(new ClickListener() {
 
             @Override
-            public void buttonClick(Button.ClickEvent ev) {
+            public void buttonClick(ClickEvent ev) {
                 WORK_HOUR_STATUS whs = awhe.getWorkHourStatus();
                 try {
                     ID id = whs.getId();

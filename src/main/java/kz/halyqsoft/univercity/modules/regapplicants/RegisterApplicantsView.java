@@ -42,7 +42,7 @@ public class RegisterApplicantsView extends AbstractTaskView {
         registerVL = new VerticalLayout();
         regButton = new Button();
         regButton.setCaption(getUILocaleUtil().getCaption("sign.up"));
-        regButton.setWidth(150.0F, Sizeable.Unit.PIXELS);
+        regButton.setWidth(150.0F, Unit.PIXELS);
         regButton.setIcon(new ThemeResource("img/button/add.png"));
         regButton.addClickListener(new Button.ClickListener() {
             @Override
