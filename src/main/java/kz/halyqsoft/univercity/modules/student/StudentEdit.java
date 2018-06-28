@@ -17,6 +17,10 @@ import kz.halyqsoft.univercity.entity.beans.univercity.view.V_MEDICAL_CHECKUP;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_USER_LANGUAGE;
 import kz.halyqsoft.univercity.filter.FStudentFilter;
 import kz.halyqsoft.univercity.filter.panel.StudentFilterPanel;
+import kz.halyqsoft.univercity.modules.accountant.AccountantEdit;
+import kz.halyqsoft.univercity.modules.curriculum.working.schedule.ScheduleBean;
+import kz.halyqsoft.univercity.modules.curriculum.working.schedule.SchedulePanel;
+import kz.halyqsoft.univercity.modules.curriculum.working.schedule.SchedulePanelEdit;
 import kz.halyqsoft.univercity.modules.student.tabs.*;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.changelisteners.BirthCountryChangeListener;
@@ -41,8 +45,10 @@ import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.dialog.select.ESelectType;
 import org.r3a.common.vaadin.widget.dialog.select.custom.grid.CustomGridSelectDialog;
 import org.r3a.common.vaadin.widget.form.*;
+import org.r3a.common.vaadin.widget.form.factory.DefaultFieldGroup;
 import org.r3a.common.vaadin.widget.form.field.filelist.FileListFieldModel;
 import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
+import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.photo.PhotoWidget;
 import org.r3a.common.vaadin.widget.photo.PhotoWidgetEvent;
 import org.r3a.common.vaadin.widget.photo.PhotoWidgetListener;
@@ -83,13 +89,15 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
             fileDownloaderParent, fileDownloaderTitle, fileDownloaderLetter;
     private static StreamResource myResource, myResourceDorm, resourceParents,
             myResourceTitle, myResourceLetter;
+    private FormLayout educationFL;
+    private FormModel mainBaseDataFM;
 
     public StudentEdit(final FormModel baseDataFM, VerticalLayout mainVL, StudentOrApplicantView studentOrApplicantView)
             throws Exception {
         super();
         this.mainVL = mainVL;
         this.studentOrApplicantView = studentOrApplicantView;
-
+        mainBaseDataFM = baseDataFM;
         VerticalLayout content = new VerticalLayout();
         content.setSpacing(true);
         content.setSizeFull();
@@ -206,101 +214,16 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         rightContent.setComponentAlignment(userPW, Alignment.TOP_CENTER);
 
         /* Education info */
-        student = (STUDENT) baseDataFM.getEntity();
-        QueryModel<STUDENT_EDUCATION> seQM = new QueryModel<>(STUDENT_EDUCATION.class);
-        seQM.addWhere("student", ECriteria.EQUAL, student.getId());
-        seQM.addWhereNullAnd("child");
+
         try {
-            STUDENT_EDUCATION se = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(seQM);
-            final STUDENT_EDUCATION studentEducation = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(STUDENT_EDUCATION.class, se.getId());
 
-            FormLayout educationFL = new FormLayout();
-            educationFL.setMargin(new MarginInfo(false, false, false, true));
-            educationFL.setCaption(getUILocaleUtil().getCaption("education.info"));
-
-            Label label = new Label();
-            label.addStyleName("bold");
-            label.setCaption(getUILocaleUtil().getEntityFieldLabel(STUDENT_EDUCATION.class, "faculty"));
-            label.setValue(studentEducation.getFaculty().toString());
-            educationFL.addComponent(label);
-
-            label = new Label();
-            label.addStyleName("bold");
-            label.setCaption(getUILocaleUtil().getEntityFieldLabel(STUDENT_EDUCATION.class, "speciality"));
-            label.setValue(studentEducation.getSpeciality().toString());
-            educationFL.addComponent(label);
-
-            label = new Label();
-            label.addStyleName("bold");
-            label.setCaption(getUILocaleUtil().getEntityFieldLabel(STUDENT_EDUCATION.class, "studyYear"));
-            label.setValue(studentEducation.getStudyYear().toString());
-            educationFL.addComponent(label);
-
-            label = new Label();
-            label.addStyleName("bold");
-            label.setCaption(getUILocaleUtil().getEntityFieldLabel(STUDENT_EDUCATION.class, "status"));
-            label.setValue(studentEducation.getStatus().toString());
-            educationFL.addComponent(label);
-
-            lockLabel = new Label();
-            lockLabel.addStyleName("bold");
-            lockLabel.setCaption(getUILocaleUtil().getEntityFieldLabel(USERS.class, "locked"));
-            if (student.isLocked()) {
-                lockLabel.setValue(getUILocaleUtil().getCaption("yes"));
-            } else {
-                lockLabel.setValue(getUILocaleUtil().getCaption("no"));
+            educationFL = getFormLayout();
+            if(educationFL!=null)
+            {
+                rightContent.addComponent(educationFL);
+                rightContent.setComponentAlignment(educationFL, Alignment.MIDDLE_CENTER);
+                //educationFL
             }
-            educationFL.addComponent(lockLabel);
-
-            lockReasonLabel = new Label();
-            lockReasonLabel.addStyleName("bold");
-            lockReasonLabel.setCaption(getUILocaleUtil().getEntityFieldLabel(USERS.class, "lockReason"));
-            if (student.isLocked()) {
-                LOCK_REASON lr = student.getLockReason();
-                if (lr != null) {
-                    lockReasonLabel.setValue(lr.toString());
-                }
-            }
-            educationFL.addComponent(lockReasonLabel);
-
-            if (!baseDataFM.isReadOnly() && student.getCategory().getId().equals(STUDENT_CATEGORY.STUDENT_ID)) {
-                Button moreButton = new NativeButton();
-                moreButton.setCaption(getUILocaleUtil().getCaption("more"));
-                moreButton.addClickListener(new ClickListener() {
-                    @Override
-                    public void buttonClick(ClickEvent ev) {
-                        mainVL.removeComponent(StudentEdit.this);
-                        EducationDetailPanel edp = new EducationDetailPanel(studentEducation, mainVL, StudentEdit.this);
-                        mainVL.addComponent(edp);
-                    }
-                });
-                educationFL.addComponent(moreButton);
-            }
-
-            createdBylabel = new Label();
-            createdBylabel.addStyleName("bold");
-            createdBylabel.setCaption(getUILocaleUtil().getEntityFieldLabel(USERS.class, "createdBy"));
-            String sql="SELECT" +
-                    "  * " +
-                    "FROM USERS usr"+
-                    " WHERE login =" +
-                    "(SELECT created_by FROM USERS where id = ?1)";
-            Map<Integer, Object> params = new HashMap<>();
-            params.put(1, student.getId().getId());
-            USERS user;
-            try {
-                user = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(sql, params, USERS.class);
-            }catch (NoResultException e){
-                user = null;
-            }
-            if(user!=null) {
-                createdBylabel.setValue(user.toString());
-            }
-            educationFL.addComponent(createdBylabel);
-
-
-            rightContent.addComponent(educationFL);
-            rightContent.setComponentAlignment(educationFL, Alignment.MIDDLE_CENTER);
         } catch (Exception ex) {
             CommonUtils.showMessageAndWriteLog("Unable to load education info", ex);
         }
@@ -436,7 +359,6 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
             myResourceDorm.setMIMEType("application/pdf");
             fileDownloaderDorm.extend(pdfDownloadDorm);
         }
-
 
         boolean readOnly = baseDataFW.getWidgetModel().isReadOnly();
         createDocumentsTab(readOnly);
@@ -2194,6 +2116,143 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         }
     }
 
+    public FormLayout getEducationFL() {
+        return educationFL;
+    }
+
+    public void setEducationFL(FormLayout educationFL) {
+        this.educationFL = educationFL;
+    }
+
+    public FormLayout getFormLayout() {
+
+        try {
+            student = (STUDENT) mainBaseDataFM.getEntity();
+            QueryModel<STUDENT_EDUCATION> seQM = new QueryModel<>(STUDENT_EDUCATION.class);
+            seQM.addWhere("student", ECriteria.EQUAL, student.getId());
+            seQM.addWhereNullAnd("child");
+
+            STUDENT_EDUCATION se = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(seQM);
+            STUDENT_EDUCATION studentEducation = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(STUDENT_EDUCATION.class, se.getId());
+
+            FormLayout educationFL = new FormLayout();
+            educationFL.setMargin(new MarginInfo(false, false, false, true));
+            educationFL.setCaption(getUILocaleUtil().getCaption("education.info"));
+
+            Label label = new Label();
+            label.addStyleName("bold");
+            label.setCaption(getUILocaleUtil().getEntityFieldLabel(STUDENT_EDUCATION.class, "faculty"));
+            label.setValue(studentEducation.getFaculty().toString());
+            label.setImmediate(true);
+            educationFL.addComponent(label);
+
+            label = new Label();
+            label.addStyleName("bold");
+            label.setCaption(getUILocaleUtil().getEntityFieldLabel(STUDENT_EDUCATION.class, "speciality"));
+            label.setValue(studentEducation.getSpeciality().toString());
+            label.setImmediate(true);
+
+            educationFL.addComponent(label);
+
+            if (!mainBaseDataFM.isReadOnly()) {
+                Button editButton = new NativeButton();
+                editButton.setCaption(getUILocaleUtil().getCaption("edit"));
+                editButton.addClickListener(new ClickListener() {
+
+                    @Override
+                    public void buttonClick(ClickEvent ev) {
+                        try {
+                            StudentSpecialityEdit schedulePanelEdit = new StudentSpecialityEdit(studentEducation, StudentEdit.this);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                educationFL.addComponent(editButton);
+            }
+
+            label = new Label();
+            label.addStyleName("bold");
+            label.setCaption(getUILocaleUtil().getEntityFieldLabel(STUDENT_EDUCATION.class, "studyYear"));
+            label.setImmediate(true);
+            label.setValue(studentEducation.getStudyYear().toString());
+            educationFL.addComponent(label);
+
+            label = new Label();
+
+            label.setImmediate(true);
+            label.addStyleName("bold");
+            label.setCaption(getUILocaleUtil().getEntityFieldLabel(STUDENT_EDUCATION.class, "status"));
+            label.setValue(studentEducation.getStatus().toString());
+            educationFL.addComponent(label);
+
+            lockLabel = new Label();
+            lockLabel.addStyleName("bold");
+            lockLabel.setCaption(getUILocaleUtil().getEntityFieldLabel(USERS.class, "locked"));
+            if (student.isLocked()) {
+                lockLabel.setValue(getUILocaleUtil().getCaption("yes"));
+            } else {
+                lockLabel.setValue(getUILocaleUtil().getCaption("no"));
+            }
+            educationFL.addComponent(lockLabel);
+
+            lockReasonLabel = new Label();
+            lockReasonLabel.addStyleName("bold");
+            lockReasonLabel.setCaption(getUILocaleUtil().getEntityFieldLabel(USERS.class, "lockReason"));
+            if (student.isLocked()) {
+                LOCK_REASON lr = student.getLockReason();
+                if (lr != null) {
+                    lockReasonLabel.setValue(lr.toString());
+                }
+            }
+            educationFL.addComponent(lockReasonLabel);
+
+            if (!mainBaseDataFM.isReadOnly() && student.getCategory().getId().equals(STUDENT_CATEGORY.STUDENT_ID)) {
+                Button moreButton = new NativeButton();
+                moreButton.setCaption(getUILocaleUtil().getCaption("more"));
+                moreButton.addClickListener(new ClickListener() {
+                    @Override
+                    public void buttonClick(ClickEvent ev) {
+
+                        mainVL.removeComponent(StudentEdit.this);
+                        EducationDetailPanel edp = new EducationDetailPanel(studentEducation, mainVL, StudentEdit.this);
+                        mainVL.addComponent(edp);
+
+                    }
+                });
+                educationFL.addComponent(moreButton);
+            }
+
+            createdBylabel = new Label();
+            createdBylabel.addStyleName("bold");
+            createdBylabel.setCaption(getUILocaleUtil().getEntityFieldLabel(USERS.class, "createdBy"));
+            String sql = "SELECT" +
+                    "  * " +
+                    "FROM USERS usr" +
+                    " WHERE login =" +
+                    "(SELECT created_by FROM USERS where id = ?1)";
+            Map<Integer, Object> params = new HashMap<>();
+            params.put(1, student.getId().getId());
+            USERS user;
+            try {
+                user = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(sql, params, USERS.class);
+            } catch (NoResultException e) {
+                user = null;
+            }
+            if (user != null) {
+                createdBylabel.setValue(user.toString());
+            }
+            educationFL.addComponent(createdBylabel);
+
+        return educationFL;
+
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
     public interface StudentEditHelper {
 
         boolean isStudentNew();
