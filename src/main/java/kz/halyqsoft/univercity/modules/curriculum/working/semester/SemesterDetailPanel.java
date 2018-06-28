@@ -8,7 +8,6 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.TextField;
 import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM;
 import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM_DETAIL;
 import kz.halyqsoft.univercity.entity.beans.univercity.ELECTIVE_SUBJECT;
@@ -913,7 +912,7 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                 qm.addWhere("mandatory", Boolean.TRUE);
                 qm.addWhere("subjectCycle", ECriteria.NOT_EQUAL, ID.valueOf(4));
                 subjectSelectDlg.setDialogWidth(600);
-                subjectSelectDlg.setDialogHeight(300);
+                subjectSelectDlg.setDialogHeight(200);
                 subjectSelectDlg.getFilterModel().addFilter("chair", chairCB);
                 subjectSelectDlg.getFilterModel().addFilter("level", levelCB);
 //                subjectSelectDlg.getFilterModel().addFilter("subjectCycle", subjectCycleCB);
@@ -1002,7 +1001,7 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                 qm.addWhere("mandatory", Boolean.FALSE);
                 qm.addWhere("subjectCycle", ECriteria.NOT_EQUAL, ID.valueOf(4));
                 electiveSubjectSelectDlg.setDialogWidth(600);
-                electiveSubjectSelectDlg.setDialogHeight(400);
+                electiveSubjectSelectDlg.setDialogHeight(200);
                 electiveSubjectSelectDlg.getFilterModel().addFilter("chair", chairCB);
                 electiveSubjectSelectDlg.getFilterModel().addFilter("level", levelCB);
 //                electiveSubjectSelectDlg.getFilterModel().addFilter("subjectCycle", subjectCycleCB);

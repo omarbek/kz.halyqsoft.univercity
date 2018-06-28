@@ -2158,7 +2158,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                         try {
                             StudentSpecialityEdit schedulePanelEdit = new StudentSpecialityEdit(studentEducation, StudentEdit.this);
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            e.printStackTrace();//TODO check
                         }
                     }
                 });

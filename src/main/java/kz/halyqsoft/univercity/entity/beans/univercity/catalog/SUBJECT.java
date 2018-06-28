@@ -71,10 +71,10 @@ public class SUBJECT extends AbstractEntity {
             @JoinColumn(name = "MODULE_ID", referencedColumnName = "ID")})
     private SUBJECT_MODULE subjectModule;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 11, inGrid = false,required = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 11, inGrid = false, required = false)
     @ManyToOne
     @JoinColumns({
-            @JoinColumn(name = "SUBJECT_CYCLE_ID", referencedColumnName = "ID",nullable = true)})
+            @JoinColumn(name = "SUBJECT_CYCLE_ID", referencedColumnName = "ID", nullable = true)})
     private SUBJECT_CYCLE subjectCycle;
 
     @FieldInfo(type = EFieldType.BOOLEAN, order = 12, required = false, columnWidth = 100)
@@ -141,25 +141,29 @@ public class SUBJECT extends AbstractEntity {
     @Column(name = "LB_COUNT")
     private Integer lbCount;
 
-    @FieldInfo(type = EFieldType.INTEGER, order = 22,readOnlyFixed = true)
+    @FieldInfo(type = EFieldType.INTEGER, order = 22, readOnlyFixed = true)
     @Column(name = "WITH_TEACHER_COUNT")
     private Integer withTeacherCount;
 
-    @FieldInfo(type = EFieldType.INTEGER, order = 23,readOnlyFixed = true)
+    @FieldInfo(type = EFieldType.INTEGER, order = 23, readOnlyFixed = true)
     @Column(name = "OWN_COUNT")
     private Integer ownCount;
 
-    @FieldInfo(type = EFieldType.INTEGER, order = 24,readOnlyFixed = true)
+    @FieldInfo(type = EFieldType.INTEGER, order = 24, readOnlyFixed = true)
     @Column(name = "TOTAL_COUNT")
     private Integer totalCount;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 25, inGrid = false)
+    @FieldInfo(type = EFieldType.BOOLEAN, order = 25, required = false, columnWidth = 100)
+    @Column(name = "COURSE_WORK", nullable = false)
+    private boolean courseWork;
+
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 26, inGrid = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "CONTROL_TYPE_ID", referencedColumnName = "ID")})
     private CONTROL_TYPE controlType;
 
-    @FieldInfo(type = EFieldType.BOOLEAN, order = 26, required = false, inEdit = false, inGrid = false, inView = false)
+    @FieldInfo(type = EFieldType.BOOLEAN, order = 27, required = false, inEdit = false, inGrid = false, inView = false)
     @Column(name = "DELETED", nullable = false)
     private boolean deleted;
 
@@ -227,9 +231,13 @@ public class SUBJECT extends AbstractEntity {
         this.level = level;
     }
 
-    public SUBJECT_MODULE getSubjectModule() { return subjectModule; }
+    public SUBJECT_MODULE getSubjectModule() {
+        return subjectModule;
+    }
 
-    public void setSubjectModule(SUBJECT_MODULE subjectModule) { this.subjectModule = subjectModule; }
+    public void setSubjectModule(SUBJECT_MODULE subjectModule) {
+        this.subjectModule = subjectModule;
+    }
 
     public SUBJECT_CYCLE getSubjectCycle() {
         return subjectCycle;
@@ -394,5 +402,13 @@ public class SUBJECT extends AbstractEntity {
 
     public String toString() {
         return nameRU;
+    }
+
+    public boolean isCourseWork() {
+        return courseWork;
+    }
+
+    public void setCourseWork(boolean courseWork) {
+        this.courseWork = courseWork;
     }
 }

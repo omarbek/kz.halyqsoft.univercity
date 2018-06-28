@@ -74,7 +74,8 @@ public final class SubjectEdit extends AbstractFormWidgetView {
         chairQM.addWhereNotNull("parent");
         chairQM.addWhereAnd("deleted", Boolean.FALSE);
 
-        QueryModel subjectCycleQM = ((FKFieldModel) baseDataFM.getFieldModel("subjectCycle")).getQueryModel();
+        QueryModel subjectCycleQM = ((FKFieldModel) baseDataFM.getFieldModel("subjectCycle")).
+                getQueryModel();
         subjectCycleQM.addOrder("cycleShortName");
 
         FKFieldModel creditabilityFM = (FKFieldModel) baseDataFM.getFieldModel("creditability");
@@ -96,8 +97,8 @@ public final class SubjectEdit extends AbstractFormWidgetView {
         FieldModel ownTeacherCountFM = baseDataFM.getFieldModel("ownCount");
         FieldModel totalCountFM = baseDataFM.getFieldModel("totalCount");
 
-        creditabilityFM.getListeners().add(new CreditabilityChangeListener(academicFormula, academicFormulaFM,
-                withTeacherCountFM, ownTeacherCountFM, totalCountFM));
+        creditabilityFM.getListeners().add(new CreditabilityChangeListener(academicFormula,
+                academicFormulaFM, withTeacherCountFM, ownTeacherCountFM, totalCountFM));
 
         FieldModel lcCountFM = baseDataFM.getFieldModel("lcCount");
         FieldModel prCountFM = baseDataFM.getFieldModel("prCount");
