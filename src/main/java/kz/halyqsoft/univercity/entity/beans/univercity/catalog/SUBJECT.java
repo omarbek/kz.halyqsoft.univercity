@@ -129,13 +129,37 @@ public class SUBJECT extends AbstractEntity {
 //        @JoinColumn(name = "GROUP_LAB_ID", referencedColumnName = "ID")})
 //    private GROUP_SIZE_LAB groupSizeLab;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 22, inGrid = false)
+    @FieldInfo(type = EFieldType.INTEGER, order = 19)
+    @Column(name = "LC_COUNT")
+    private Integer lcCount;
+
+    @FieldInfo(type = EFieldType.INTEGER, order = 20)
+    @Column(name = "PR_COUNT")
+    private Integer prCount;
+
+    @FieldInfo(type = EFieldType.INTEGER, order = 21)
+    @Column(name = "LB_COUNT")
+    private Integer lbCount;
+
+    @FieldInfo(type = EFieldType.INTEGER, order = 22,readOnlyFixed = true)
+    @Column(name = "WITH_TEACHER_COUNT")
+    private Integer withTeacherCount;
+
+    @FieldInfo(type = EFieldType.INTEGER, order = 23,readOnlyFixed = true)
+    @Column(name = "OWN_COUNT")
+    private Integer ownCount;
+
+    @FieldInfo(type = EFieldType.INTEGER, order = 24,readOnlyFixed = true)
+    @Column(name = "TOTAL_COUNT")
+    private Integer totalCount;
+
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 25, inGrid = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "CONTROL_TYPE_ID", referencedColumnName = "ID")})
     private CONTROL_TYPE controlType;
 
-    @FieldInfo(type = EFieldType.BOOLEAN, order = 23, required = false, inEdit = false, inGrid = false, inView = false)
+    @FieldInfo(type = EFieldType.BOOLEAN, order = 26, required = false, inEdit = false, inGrid = false, inView = false)
     @Column(name = "DELETED", nullable = false)
     private boolean deleted;
 
@@ -319,18 +343,56 @@ public class SUBJECT extends AbstractEntity {
 //		this.educationModuleType = educationModuleType;
 //	}
 
+
+    public Integer getLcCount() {
+        return lcCount;
+    }
+
+    public void setLcCount(Integer lcCount) {
+        this.lcCount = lcCount;
+    }
+
+    public Integer getPrCount() {
+        return prCount;
+    }
+
+    public void setPrCount(Integer prCount) {
+        this.prCount = prCount;
+    }
+
+    public Integer getLbCount() {
+        return lbCount;
+    }
+
+    public void setLbCount(Integer lbCount) {
+        this.lbCount = lbCount;
+    }
+
+    public Integer getWithTeacherCount() {
+        return withTeacherCount;
+    }
+
+    public void setWithTeacherCount(Integer withTeacherCount) {
+        this.withTeacherCount = withTeacherCount;
+    }
+
+    public Integer getOwnCount() {
+        return ownCount;
+    }
+
+    public void setOwnCount(Integer ownCount) {
+        this.ownCount = ownCount;
+    }
+
+    public Integer getTotalCount() {
+        return totalCount;
+    }
+
+    public void setTotalCount(Integer totalCount) {
+        this.totalCount = totalCount;
+    }
+
     public String toString() {
         return nameRU;
     }
-
-//	public String toString(Locale l) {
-//		String name = nameEN;
-//		if (l.getLanguage().equals("kk")) {
-//			name = nameKZ;
-//		} else if (l.getLanguage().equals("ru")) {
-//			name = nameRU;
-//		}
-//
-//		return code + " " + name;
-//	}
 }

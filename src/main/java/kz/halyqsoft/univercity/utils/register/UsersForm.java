@@ -636,7 +636,7 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
         } else {
             temp.setIcon(new ThemeResource("img/button/ok.png"));
         }
-        temp.setWidth(120.0F, Sizeable.Unit.PIXELS);
+        temp.setWidth(120.0F, Unit.PIXELS);
         temp.addClickListener(new Button.ClickListener() {
 
             @Override

@@ -3,11 +3,8 @@ package kz.halyqsoft.univercity.modules.subject;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.TextField;
-import kz.halyqsoft.univercity.entity.beans.univercity.ELECTIVE_SUBJECT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VSubject;
 import kz.halyqsoft.univercity.filter.FSubjectFilter;
@@ -436,7 +433,8 @@ public class SubjectView extends AbstractTaskView implements FilterPanelListener
                     first = false;
                 }
 
-                sb.append(String.format(getUILocaleUtil().getMessage("subject.used.curriculum"), sbTmp.toString()));
+                sb.append(String.format(getUILocaleUtil().getMessage("subject.used.curriculum"),
+                        sbTmp.toString()));
                 sb.append("\n");
                 tagged = true;
             }
@@ -473,7 +471,8 @@ public class SubjectView extends AbstractTaskView implements FilterPanelListener
             if (tagged) {
                 sb.insert(0, "<b>");
                 if (delete) {
-                    Message.showError(getUILocaleUtil().getMessage("error.cannotdelentity"), sb.toString(), 450);
+                    Message.showError(getUILocaleUtil().getMessage("error.cannotdelentity"), sb.toString(),
+                            450);
                 } else {
                     sb.append("<b>");
                     sb.append(getUILocaleUtil().getMessage("confirm.editrecord"));
@@ -519,8 +518,8 @@ public class SubjectView extends AbstractTaskView implements FilterPanelListener
             fm.setTitleVisible(false);
             try {
                 fm.loadEntity(e.getId());
-//                SubjectEdit ee = new SubjectEdit(fm, (FSubjectFilter) filterPanel.getFilterBean());
-//                SubjectUI.getInstance().openCommonView(ee);//TODO
+                SubjectEdit se = new SubjectEdit(fm);
+                new SubjectDialog(se, SubjectView.this);
             } catch (Exception ex) {
                 CommonUtils.showMessageAndWriteLog("Unable to edit the subject", ex);
             }

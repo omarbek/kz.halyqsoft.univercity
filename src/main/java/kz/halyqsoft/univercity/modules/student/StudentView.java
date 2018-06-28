@@ -37,7 +37,7 @@ public class StudentView extends AbstractTaskView {
     private void setStudentOrApplicant(int categoryType, String caption) {
         Button openButton = new Button();
         openButton.setCaption(getUILocaleUtil().getCaption(caption));
-        openButton.setWidth(120.0F, Sizeable.Unit.PIXELS);
+        openButton.setWidth(120.0F, Unit.PIXELS);
         openButton.setIcon(new ThemeResource("img/button/users.png"));
         openButton.addClickListener(new Button.ClickListener() {
             @Override
