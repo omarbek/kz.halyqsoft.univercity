@@ -92,7 +92,7 @@ public final class SubjectEdit extends AbstractFormWidgetView {
                 CommonUtils.showMessageAndWriteLog("Unable to find chair or academic formula", ex);
             }
         }
-        Message.showInfo("asd");
+        Message.showInfo("zxc");
         FKFieldModel withTeacherCountFM = (FKFieldModel) baseDataFM.getFieldModel("withTeacherCount");
         FKFieldModel ownTeacherCountFM = (FKFieldModel) baseDataFM.getFieldModel("ownCount");
         FKFieldModel totalCountFM = (FKFieldModel) baseDataFM.getFieldModel("totalCount");
