@@ -12,6 +12,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SPECIALITY;
 import kz.halyqsoft.univercity.filter.FElectiveFilter;
 import kz.halyqsoft.univercity.filter.panel.ElectiveFilterPanel;
 import kz.halyqsoft.univercity.utils.CommonUtils;
+import kz.halyqsoft.univercity.utils.EntityUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
@@ -200,59 +201,95 @@ public class BindingElectiveSubjectView extends AbstractTaskView implements Filt
         }
     }
 
-    @Override
-    public boolean preSave(Object source, Entity entity, boolean isNew, int buttonId) {
-        if (source.equals(electiveSubjectsGW)) {
-            try {
-                QueryModel<CATALOG_ELECTIVE_SUBJECTS> catQM = new QueryModel<>(CATALOG_ELECTIVE_SUBJECTS.class);
-                SPECIALITY spec = (SPECIALITY) specCB.getValue();
-                ENTRANCE_YEAR year = (ENTRANCE_YEAR) yearCB.getValue();
-                catQM.addWhere("speciality", ECriteria.EQUAL, spec.getId());
-                catQM.addWhere("entranceYear", ECriteria.EQUAL, year.getId());
-                CATALOG_ELECTIVE_SUBJECTS cat = getCat(catQM, spec, year);
-                ELECTIVE_BINDED_SUBJECT electiveBindedSubject = (ELECTIVE_BINDED_SUBJECT) entity;
-                electiveBindedSubject.setCatalogElectiveSubjects(cat);
-                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(electiveBindedSubject);
-            } catch (Exception e) {
-                e.printStackTrace();//TODO catch
-            }
+    private class CreateElectiveSubjectEntity extends EntityUtils{
+
+
+        @Override
+        protected void init(Object source, Entity e, boolean isNew) throws Exception {
+            ELECTIVE_BINDED_SUBJECT electiveBinded = (ELECTIVE_BINDED_SUBJECT) e;
+            new BindingElectiveSubjectEdit(electiveBinded,isNew,BindingElectiveSubjectView.this);
+
         }
-        return false;
+
+        @Override
+        protected GridWidget getGridWidget() {
+            return null;
+        }
+
+        @Override
+        protected String getModuleName() {
+            return null;
+        }
+
+        @Override
+        protected Class<? extends Entity> getEntityClass() {
+            return null;
+        }
+
+        @Override
+        protected void removeChildrenEntity(List<Entity> delList) throws Exception {
+
+        }
+
+        @Override
+        protected void refresh() throws Exception {
+
+        }
     }
 
-    private CATALOG_ELECTIVE_SUBJECTS getCat(QueryModel<CATALOG_ELECTIVE_SUBJECTS> catQM,
-                                             SPECIALITY spec, ENTRANCE_YEAR year) throws Exception {
-        CATALOG_ELECTIVE_SUBJECTS cat;
-        try {
-            cat = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(catQM);
-        } catch (NoResultException ex) {
-            cat = new CATALOG_ELECTIVE_SUBJECTS();
-            cat.setCreated(new Date());
-            cat.setDeleted(Boolean.FALSE);
-            cat.setEntranceYear(year);
-            cat.setSpeciality(spec);
-            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(cat);
-        }
-        return cat;
-    }
-
-    @Override
-    public boolean preDelete(Object source, List<Entity> entities, int buttonId) {
-        if (source.equals(electiveSubjectsGW)) {
-            for (Entity entity : entities) {
-                try {
-                    ELECTIVE_BINDED_SUBJECT electiveBindedSubject = SessionFacadeFactory.getSessionFacade(
-                            CommonEntityFacadeBean.class).lookup(ELECTIVE_BINDED_SUBJECT.class,
-                            entity.getId());
-                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(
-                            electiveBindedSubject);
-
-                } catch (Exception e) {
-                    Message.showError(e.getMessage());
-                }
-            }
-            refresh();
-        }
-        return false;
-    }
+//    @Override
+//    public boolean preSave(Object source, Entity entity, boolean isNew, int buttonId) {
+//        if (source.equals(electiveSubjectsGW)) {
+//            try {
+//                QueryModel<CATALOG_ELECTIVE_SUBJECTS> catQM = new QueryModel<>(CATALOG_ELECTIVE_SUBJECTS.class);
+//                SPECIALITY spec = (SPECIALITY) specCB.getValue();
+//                ENTRANCE_YEAR year = (ENTRANCE_YEAR) yearCB.getValue();
+//                catQM.addWhere("speciality", ECriteria.EQUAL, spec.getId());
+//                catQM.addWhere("entranceYear", ECriteria.EQUAL, year.getId());
+//                CATALOG_ELECTIVE_SUBJECTS cat = getCat(catQM, spec, year);
+//                ELECTIVE_BINDED_SUBJECT electiveBindedSubject = (ELECTIVE_BINDED_SUBJECT) entity;
+//                electiveBindedSubject.setCatalogElectiveSubjects(cat);
+//                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(electiveBindedSubject);
+//            } catch (Exception e) {
+//                e.printStackTrace();//TODO catch
+//            }
+//        }
+//        return false;
+//    }
+//
+//    private CATALOG_ELECTIVE_SUBJECTS getCat(QueryModel<CATALOG_ELECTIVE_SUBJECTS> catQM,
+//                                             SPECIALITY spec, ENTRANCE_YEAR year) throws Exception {
+//        CATALOG_ELECTIVE_SUBJECTS cat;
+//        try {
+//            cat = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(catQM);
+//        } catch (NoResultException ex) {
+//            cat = new CATALOG_ELECTIVE_SUBJECTS();
+//            cat.setCreated(new Date());
+//            cat.setDeleted(Boolean.FALSE);
+//            cat.setEntranceYear(year);
+//            cat.setSpeciality(spec);
+//            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(cat);
+//        }
+//        return cat;
+//    }
+//
+//    @Override
+//    public boolean preDelete(Object source, List<Entity> entities, int buttonId) {
+//        if (source.equals(electiveSubjectsGW)) {
+//            for (Entity entity : entities) {
+//                try {
+//                    ELECTIVE_BINDED_SUBJECT electiveBindedSubject = SessionFacadeFactory.getSessionFacade(
+//                            CommonEntityFacadeBean.class).lookup(ELECTIVE_BINDED_SUBJECT.class,
+//                            entity.getId());
+//                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(
+//                            electiveBindedSubject);
+//
+//                } catch (Exception e) {
+//                    Message.showError(e.getMessage());
+//                }
+//            }
+//            refresh();
+//        }
+//        return false;
+//    }
 }

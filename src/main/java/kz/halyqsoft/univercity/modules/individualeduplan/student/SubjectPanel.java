@@ -41,8 +41,8 @@ public class SubjectPanel extends AbstractCommonPanel {
         List<STUDENT_SUBJECT> studentSubjects = new ArrayList<>();
         for (ELECTIVE_BINDED_SUBJECT subject : subjects) {
             OptionGroup subjectsOG = new OptionGroup();
-            subjectsOG.addItem(subject.getFirstSubject().getId());
-            subjectsOG.addItem(subject.getSecondSubject().getId());
+//            subjectsOG.addItem(subject.getFirstSubject().getId());
+//            subjectsOG.addItem(subject.getSecondSubject().getId());
             subjectsOG.addValueChangeListener(new Property.ValueChangeListener() {
                 @Override
                 public void valueChange(Property.ValueChangeEvent event) {
