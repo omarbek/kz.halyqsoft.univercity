@@ -148,34 +148,55 @@ REFERENCES users (id)
 ON UPDATE RESTRICT ON DELETE RESTRICT;
 
 
-
 CREATE TABLE stream (
-  id        BIGINT                NOT NULL,
+  id BIGINT NOT NULL,
   name VARCHAR(255 )NOT NULL,
+  language_id BIGINT NOT NULL ,
+  study_year_id BIGINT NOT NULL ,
+  semester_data_id BIGINT NOT NULL ,
+  semester_id BIGINT NOT NULL ,
   created TIMESTAMP NOT NULL,
   updated TIMESTAMP NOT NULL
 );
 
 ALTER TABLE stream ADD CONSTRAINT pk_stream PRIMARY KEY (id);
 
-CREATE TABLE stream_student (
-  id        BIGINT                NOT NULL,
-  stream_id BIGINT NOT NULL,
-  student_id BIGINT NOT NULL,
-  created TIMESTAMP NOT NULL,
-  updated TIMESTAMP NOT NULL
+ALTER TABLE ONLY stream
+  ADD CONSTRAINT fk_stream_language FOREIGN KEY (language_id)
+REFERENCES language (id)
+ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+ALTER TABLE ONLY stream
+  ADD CONSTRAINT fk_stream_study_year FOREIGN KEY (study_year_id)
+REFERENCES study_year (id)
+ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+ALTER TABLE ONLY stream
+  ADD CONSTRAINT fk_stream_semester_data FOREIGN KEY (semester_data_id)
+REFERENCES semester_data (id)
+ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+ALTER TABLE ONLY stream
+  ADD CONSTRAINT fk_stream_semester FOREIGN KEY (semester_id)
+REFERENCES semester (id)
+ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+CREATE TABLE stream_group (
+  id BIGINT NOT NULL ,
+  stream_id BIGINT NOT NULL ,
+  group_id BIGINT NOT NULL
 );
 
-ALTER TABLE stream_student ADD CONSTRAINT pk_stream_student PRIMARY KEY (id);
 
+ALTER TABLE stream_group ADD CONSTRAINT pk_stream_group PRIMARY KEY (id);
 
-ALTER TABLE ONLY stream_student
-  ADD CONSTRAINT fk_stream_student_student FOREIGN KEY (student_id)
-REFERENCES student (id)
-ON UPDATE RESTRICT ON DELETE RESTRICT;
-
-
-ALTER TABLE ONLY stream_student
-  ADD CONSTRAINT fk_stream_student_stream FOREIGN KEY (stream_id)
+ALTER TABLE ONLY stream_group
+  ADD CONSTRAINT fk_stream_group_stream FOREIGN KEY (stream_id)
 REFERENCES stream (id)
 ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+ALTER TABLE ONLY stream_group
+  ADD CONSTRAINT fk_stream_group_group FOREIGN KEY (group_id)
+REFERENCES groups (id)
+ON UPDATE RESTRICT ON DELETE RESTRICT;
+

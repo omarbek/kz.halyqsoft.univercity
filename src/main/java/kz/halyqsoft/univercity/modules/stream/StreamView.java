@@ -33,6 +33,7 @@ public class StreamView extends AbstractTaskView {
                 Message.showInfo("Raikhan!");
             }
         });
+
         vl.addComponent(button);
 
         getContent().addComponent(vl);
