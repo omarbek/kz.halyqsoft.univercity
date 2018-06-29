@@ -9,13 +9,13 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-public class STREAM_STUDENT extends AbstractEntity {
+public class STREAM_GROUP extends AbstractEntity {
 
     @FieldInfo(type = EFieldType.FK_COMBO, inGrid = false, inEdit = false, inView = false)
     @ManyToOne
     @JoinColumns({
-            @JoinColumn(name = "STUDENT_ID", referencedColumnName = "ID", nullable = false)})
-    private STUDENT student;
+            @JoinColumn(name = "GROUP_ID", referencedColumnName = "ID", nullable = false)})
+    private GROUPS group;
 
     @FieldInfo(type = EFieldType.FK_COMBO, inGrid = false, inEdit = false, inView = false)
     @ManyToOne
@@ -33,12 +33,12 @@ public class STREAM_STUDENT extends AbstractEntity {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updated;
 
-    public STUDENT getStudent() {
-        return student;
+    public GROUPS getGroup() {
+        return group;
     }
 
-    public void setStudent(STUDENT student) {
-        this.student = student;
+    public void setGroup(GROUPS group) {
+        this.group = group;
     }
 
     public STREAM getStream() {
