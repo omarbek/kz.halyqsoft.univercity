@@ -6,7 +6,6 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.shared.ui.grid.HeightMode;
 import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.TextField;
 import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM;
 import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM_ADD_PROGRAM;
 import kz.halyqsoft.univercity.entity.beans.univercity.SEMESTER_SUBJECT;
@@ -27,7 +26,6 @@ import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.dialog.select.ESelectType;
 import org.r3a.common.vaadin.widget.dialog.select.custom.grid.CustomGridSelectDialog;
 import org.r3a.common.vaadin.widget.form.FormModel;
-import org.r3a.common.vaadin.widget.form.field.FieldModel;
 import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.footer.EColumnFooterType;
@@ -425,7 +423,7 @@ public class AddProgramPanel extends AbstractCurriculumPanel implements EntityLi
                 SEMESTER_SUBJECT ss = null;
                 try {
                     ss = session.lookupSingle(ssQM);
-                } catch (NoResultException nrex) {
+                } catch (NoResultException ignored) {
                 }
                 if (ss != null) {
                     String sql = "select count(a1.ID) CNT from CURRICULUM_ADD_PROGRAM a1 inner join CURRICULUM b1 on a1.CURRICULUM_ID = b1.ID where a1.CURRICULUM_ID != ?1 and a1.SEMESTER_DATA_ID = ?2 and a1.SUBJECT_ID = ?3 and b1.STATUS_ID = ?4";

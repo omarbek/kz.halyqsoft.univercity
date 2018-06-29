@@ -42,24 +42,11 @@ public class CURRICULUM_DETAIL extends AbstractEntity {
 
     @ManyToOne
     @JoinColumns({
-            @JoinColumn(name = "ELECTIVE_SUBJECT_ID", referencedColumnName = "ID")})
-    private ELECTIVE_SUBJECT_LABEL electiveSubject;
-
-    @ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "ELECTIVE_SUBJECT_CYCLE_ID", referencedColumnName = "ID")})
-    private SUBJECT_CYCLE electiveSubjectCycle;
-
-    @ManyToOne
-    @JoinColumns({
             @JoinColumn(name = "EDUCATION_MODULE_TYPE_ID", referencedColumnName = "ID")})
     private EDUCATION_MODULE_TYPE educationModuleType;
 
     @Column(name = "CODE", nullable = false)
     private String code;
-
-    @Column(name = "ELECTIVE_SUBJECT_CREDIT")
-    private Integer electiveSubjectCredit;
 
     @Column(name = "RECOMMENDED_SEMESTER")
     private String recommendedSemester;
@@ -119,30 +106,6 @@ public class CURRICULUM_DETAIL extends AbstractEntity {
 
     public void setSubjectCycle(SUBJECT_CYCLE subjectCycle) {
         this.subjectCycle = subjectCycle;
-    }
-
-    public ELECTIVE_SUBJECT_LABEL getElectiveSubject() {
-        return electiveSubject;
-    }
-
-    public void setElectiveSubject(ELECTIVE_SUBJECT_LABEL electiveSubject) {
-        this.electiveSubject = electiveSubject;
-    }
-
-    public SUBJECT_CYCLE getElectiveSubjectCycle() {
-        return electiveSubjectCycle;
-    }
-
-    public void setElectiveSubjectCycle(SUBJECT_CYCLE electiveSubjectCycle) {
-        this.electiveSubjectCycle = electiveSubjectCycle;
-    }
-
-    public Integer getElectiveSubjectCredit() {
-        return electiveSubjectCredit;
-    }
-
-    public void setElectiveSubjectCredit(Integer electiveSubjectCredit) {
-        this.electiveSubjectCredit = electiveSubjectCredit;
     }
 
     public String getRecommendedSemester() {

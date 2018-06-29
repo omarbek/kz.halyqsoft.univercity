@@ -33,21 +33,11 @@ public class SUBJECT extends AbstractEntity {
     @Column(name = "NAME_RU", nullable = false)
     private String nameRU;
 
-//	@FieldInfo(type = EFieldType.TEXT, max = 13, order = 4, required = false, inGrid = false, readOnlyFixed = true, columnWidth = 100)
-//	@Column(name = "CODE")
-//	private String code;
-
     @FieldInfo(type = EFieldType.FK_DIALOG, order = 5, inGrid = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "STUDY_DIRECT_ID", referencedColumnName = "ID")})
     private STUDY_DIRECT studyDirect;
-
-//	@FieldInfo(type = EFieldType.FK_COMBO, order = 6, inGrid = false)
-//	@ManyToOne
-//	@JoinColumns({
-//			@JoinColumn(name = "EDUCATION_MODULE_TYPE_ID", referencedColumnName = "ID")})
-//	private EDUCATION_MODULE_TYPE educationModuleType;
 
     @FieldInfo(type = EFieldType.TEXT, isMemo = true, max = 4000, required = false, order = 7, inGrid = false)
     @Column(name = "DESCR")
@@ -111,24 +101,6 @@ public class SUBJECT extends AbstractEntity {
     @Column(name = "LANG_RU", nullable = false)
     private boolean langRU;
 
-//	@FieldInfo(type = EFieldType.FK_COMBO, order = 19, required = false, inGrid = false)
-//    @ManyToOne
-//    @JoinColumns({
-//        @JoinColumn(name = "GROUP_LEC_ID", referencedColumnName = "ID")})
-//    private GROUP_SIZE_LECTURE groupSizeLecture;
-//
-//	@FieldInfo(type = EFieldType.FK_COMBO, order = 20, required = false, inGrid = false)
-//    @ManyToOne
-//    @JoinColumns({
-//        @JoinColumn(name = "GROUP_PRAC_ID", referencedColumnName = "ID")})
-//    private GROUP_SIZE_PRAC groupSizePrac;
-//
-//	@FieldInfo(type = EFieldType.FK_COMBO, order = 21, required = false, inGrid = false)
-//    @ManyToOne
-//    @JoinColumns({
-//        @JoinColumn(name = "GROUP_LAB_ID", referencedColumnName = "ID")})
-//    private GROUP_SIZE_LAB groupSizeLab;
-
     @FieldInfo(type = EFieldType.INTEGER, order = 19)
     @Column(name = "LC_COUNT")
     private Integer lcCount;
@@ -163,7 +135,11 @@ public class SUBJECT extends AbstractEntity {
             @JoinColumn(name = "CONTROL_TYPE_ID", referencedColumnName = "ID")})
     private CONTROL_TYPE controlType;
 
-    @FieldInfo(type = EFieldType.BOOLEAN, order = 27, required = false, inEdit = false, inGrid = false, inView = false)
+    @FieldInfo(type = EFieldType.INTEGER, order = 27)
+    @Column(name = "WEEK_NUMBER")
+    private Integer weekNumber;
+
+    @FieldInfo(type = EFieldType.BOOLEAN, order = 28, required = false, inEdit = false, inGrid = false, inView = false)
     @Column(name = "DELETED", nullable = false)
     private boolean deleted;
 
@@ -190,14 +166,6 @@ public class SUBJECT extends AbstractEntity {
     public void setNameRU(String nameRU) {
         this.nameRU = nameRU;
     }
-
-//	public String getCode() {
-//		return code;
-//	}
-//
-//	public void setCode(String code) {
-//		this.code = code;
-//	}
 
     public STUDY_DIRECT getStudyDirect() {
         return studyDirect;
@@ -303,29 +271,6 @@ public class SUBJECT extends AbstractEntity {
         this.langRU = langRU;
     }
 
-//	public GROUP_SIZE_LECTURE getGroupSizeLecture() {
-//		return groupSizeLecture;
-//	}
-//
-//	public void setGroupSizeLecture(GROUP_SIZE_LECTURE groupSizeLecture) {
-//		this.groupSizeLecture = groupSizeLecture;
-//	}
-//
-//	public GROUP_SIZE_PRAC getGroupSizePrac() {
-//		return groupSizePrac;
-//	}
-//
-//	public void setGroupSizePrac(GROUP_SIZE_PRAC groupSizePrac) {
-//		this.groupSizePrac = groupSizePrac;
-//	}
-//
-//	public GROUP_SIZE_LAB getGroupSizeLab() {
-//		return groupSizeLab;
-//	}
-//
-//	public void setGroupSizeLab(GROUP_SIZE_LAB groupSizeLab) {
-//		this.groupSizeLab = groupSizeLab;
-//	}
 
     public CONTROL_TYPE getControlType() {
         return controlType;
@@ -342,15 +287,6 @@ public class SUBJECT extends AbstractEntity {
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
     }
-
-//	public EDUCATION_MODULE_TYPE getEducationModuleType() {
-//		return educationModuleType;
-//	}
-//
-//	public void setEducationModuleType(EDUCATION_MODULE_TYPE educationModuleType) {
-//		this.educationModuleType = educationModuleType;
-//	}
-
 
     public Integer getLcCount() {
         return lcCount;
@@ -410,5 +346,13 @@ public class SUBJECT extends AbstractEntity {
 
     public void setCourseWork(boolean courseWork) {
         this.courseWork = courseWork;
+    }
+
+    public Integer getWeekNumber() {
+        return weekNumber;
+    }
+
+    public void setWeekNumber(Integer weekNumber) {
+        this.weekNumber = weekNumber;
     }
 }

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataSource name="realdb@localhost">
+  <database-model serializer="dbm" rdbms="POSTGRES" format-version="4.3">
+    <root id="1"/>
+    <database id="2" parent="1" name="realdb">
+      <ObjectId>159090</ObjectId>
+      <Current>1</Current>
+      <Visible>1</Visible>
+    </database>
+    <database id="3" parent="1" name="postgres">
+      <ObjectId>12135</ObjectId>
+    </database>
+    <database id="4" parent="1" name="univerdb">
+      <ObjectId>21720</ObjectId>
+    </database>
+    <database id="5" parent="1" name="anketadb">
+      <ObjectId>126138</ObjectId>
+    </database>
+    <schema id="6" parent="2" name="public">
+      <ObjectId>2200</ObjectId>
+      <IntrospectionTimestamp>2018-06-29.10:40:28.886</IntrospectionTimestamp>
+      <Current>1</Current>
+      <Visible>1</Visible>
+    </schema>
+    <schema id="7" parent="2" name="pg_catalog">
+      <ObjectId>11</ObjectId>
+    </schema>
+    <schema id="8" parent="2" name="pg_toast">
+      <ObjectId>99</ObjectId>
+    </schema>
+    <schema id="9" parent="2" name="pg_temp_1">
+      <ObjectId>11320</ObjectId>
+    </schema>
+    <schema id="10" parent="2" name="pg_toast_temp_1">
+      <ObjectId>11321</ObjectId>
+    </schema>
+    <schema id="11" parent="2" name="information_schema">
+      <ObjectId>11585</ObjectId>
+    </schema>
+  </database-model>
+</dataSource>
