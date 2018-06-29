@@ -5,7 +5,6 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.shared.ui.grid.HeightMode;
 import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.TextField;
 import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM;
 import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM_AFTER_SEMESTER;
 import kz.halyqsoft.univercity.entity.beans.univercity.SEMESTER_SUBJECT;
@@ -26,7 +25,6 @@ import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.dialog.select.ESelectType;
 import org.r3a.common.vaadin.widget.dialog.select.custom.grid.CustomGridSelectDialog;
 import org.r3a.common.vaadin.widget.form.FormModel;
-import org.r3a.common.vaadin.widget.form.field.FieldModel;
 import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.footer.EColumnFooterType;
@@ -93,6 +91,10 @@ public class AfterSemesterProgamPanel extends AbstractCurriculumPanel implements
 
         FormModel fm = ((DBGridModel) grid.getWidgetModel()).getFormModel();
 
+        FKFieldModel semesterFM = (FKFieldModel) fm.getFieldModel("semester");
+        QueryModel semesterQM = semesterFM.getQueryModel();
+        semesterQM.addWhere("id", ECriteria.LESS_EQUAL, ID.valueOf(8));
+
         FKFieldModel subjectFM = (FKFieldModel) fm.getFieldModel("subject");
 
         FKFieldModel creditabilityFM = (FKFieldModel) fm.getFieldModel("creditability");
@@ -119,40 +121,114 @@ public class AfterSemesterProgamPanel extends AbstractCurriculumPanel implements
         CommonEntityFacadeBean session = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class);
         // Approve only unsaved subjects
         String sql = "SELECT subj.* " +
-                "FROM subject subj " +
-                "  INNER JOIN curriculum_after_semester curr_after " +
-                "    ON curr_after.subject_id = subj.id AND curr_after.curriculum_id = ?1 " +
-                "       AND curr_after.deleted = ?2 " +
+                "FROM SUBJECT subj INNER JOIN curriculum_after_semester curr_after_sem " +
+                "    ON subj.ID = curr_after_sem.SUBJECT_ID AND curr_after_sem.CURRICULUM_ID = ?1 AND curr_after_sem.SEMESTER_ID = ?2 AND " +
+                "       curr_after_sem.DELETED = ?3 " +
                 "WHERE NOT exists(SELECT 1 " +
-                "                 FROM semester_subject sem_subj " +
-                "                 WHERE subj.id = sem_subj.subject_id AND sem_subj.semester_data_id = ?3) " +
-                "      AND subj.id = ?4;";
+                "                 FROM SEMESTER_SUBJECT c " +
+                "                 WHERE subj.ID = c.SUBJECT_ID AND c.SEMESTER_DATA_ID = ?4) AND subj.ID = ?5";
         Map<Integer, Object> params = new HashMap<Integer, Object>(5);
         params.put(1, curriculum.getId().getId());
-        params.put(2, Boolean.FALSE);
+        params.put(3, Boolean.FALSE);
 
         QueryModel<CURRICULUM_AFTER_SEMESTER> capQM = new QueryModel<>(CURRICULUM_AFTER_SEMESTER.class);
         capQM.addWhere("curriculum", ECriteria.EQUAL, curriculum.getId());
         capQM.addWhereAnd("deleted", Boolean.FALSE);
 
-        List<CURRICULUM_AFTER_SEMESTER> curriculumAfterSemesters = session.lookup(capQM);
-        for (CURRICULUM_AFTER_SEMESTER afterSemester : curriculumAfterSemesters) {
-            SEMESTER_DATA semesterData = afterSemester.getSemesterData();
-            SUBJECT subject = afterSemester.getSubject();
-            params.put(3, semesterData.getId().getId());
-            params.put(4, subject.getId().getId());
+        List<CURRICULUM_AFTER_SEMESTER> curriculumAfterSemesterList = session.lookup(capQM);
+        for (CURRICULUM_AFTER_SEMESTER cas : curriculumAfterSemesterList) {
+            SEMESTER_DATA sd = getOrCreateSemesterData(cas.getSemester());
+            params.put(2, cas.getSemester().getId().getId());
+            params.put(4, sd.getId().getId());
+            params.put(5, cas.getSubject().getId().getId());
             List<SUBJECT> subjectList = session.lookup(sql, params, SUBJECT.class);
             if (!subjectList.isEmpty()) {
                 SEMESTER_SUBJECT ss = new SEMESTER_SUBJECT();
-                ss.setSemesterData(semesterData);
-                ss.setSubject(subject);
+                ss.setSemesterData(sd);
+                ss.setSubject(cas.getSubject());
                 newList.add(ss);
             }
         }
-
         if (!newList.isEmpty()) {
             session.create(newList);
         }
+    }
+
+    private SEMESTER_DATA getOrCreateSemesterData(SEMESTER semester) throws Exception {
+        SEMESTER_DATA sd = null;
+        ENTRANCE_YEAR studyYear = curriculum.getEntranceYear();
+        if (!semester.getId().equals(ID.valueOf(1)) && !semester.getId().equals(ID.valueOf(2))) {
+            int beginYear = studyYear.getBeginYear();
+            int endYear = studyYear.getEndYear();
+            if (semester.getId().equals(ID.valueOf(3)) || semester.getId().equals(ID.valueOf(4))) {
+                beginYear++;
+                endYear++;
+            } else if (semester.getId().equals(ID.valueOf(5)) || semester.getId().equals(ID.valueOf(6))) {
+                beginYear += 2;
+                endYear += 2;
+            } else if (semester.getId().equals(ID.valueOf(7)) || semester.getId().equals(ID.valueOf(8))) {
+                beginYear += 3;
+                endYear += 3;
+            }
+
+            QueryModel<ENTRANCE_YEAR> syQM = new QueryModel<>(ENTRANCE_YEAR.class);
+            syQM.addWhere("beginYear", ECriteria.EQUAL, beginYear);
+            syQM.addWhereAnd("endYear", ECriteria.EQUAL, endYear);
+
+            try {
+                studyYear = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(syQM);
+            } catch (NoResultException nrex) {
+                studyYear = new ENTRANCE_YEAR();
+                studyYear.setBeginYear(beginYear);
+                studyYear.setEndYear(endYear);
+                studyYear.setEntranceYear(beginYear + "-" + endYear);
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(studyYear);
+            }
+        }
+
+        SEMESTER_PERIOD sp = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(SEMESTER.class, semester.getId()).getSemesterPeriod();
+
+        QueryModel<SEMESTER_DATA> sdQM = new QueryModel<>(SEMESTER_DATA.class);
+        sdQM.addWhere("year", ECriteria.EQUAL, studyYear.getId());
+        sdQM.addWhereAnd("semesterPeriod", ECriteria.EQUAL, sp.getId());
+
+        try {
+            sd = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(sdQM);
+        } catch (NoResultException nrex) {
+            sd = new SEMESTER_DATA();
+            sd.setYear(studyYear);
+            sd.setSemesterPeriod(sp);
+
+            Calendar c = Calendar.getInstance();
+            c.clear();
+            if (sp.getId().equals(ID.valueOf(1))) {
+                c.set(Calendar.DAY_OF_MONTH, 20);
+                c.set(Calendar.MONTH, Calendar.AUGUST);
+                c.set(Calendar.YEAR, studyYear.getBeginYear());
+                sd.setBeginDate(c.getTime());
+
+                c.clear();
+                c.set(Calendar.DAY_OF_MONTH, 31);
+                c.set(Calendar.MONTH, Calendar.DECEMBER);
+                c.set(Calendar.YEAR, studyYear.getBeginYear());
+                sd.setEndDate(c.getTime());
+            } else if (sp.getId().equals(ID.valueOf(2))) {
+                c.set(Calendar.DAY_OF_MONTH, 10);
+                c.set(Calendar.MONTH, Calendar.JANUARY);
+                c.set(Calendar.YEAR, studyYear.getEndYear());
+                sd.setBeginDate(c.getTime());
+
+                c.clear();
+                c.set(Calendar.DAY_OF_MONTH, 25);
+                c.set(Calendar.MONTH, Calendar.MAY);
+                c.set(Calendar.YEAR, studyYear.getEndYear());
+                sd.setEndDate(c.getTime());
+            }
+
+            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(sd);
+        }
+
+        return sd;
     }
 
     @Override
@@ -272,14 +348,12 @@ public class AfterSemesterProgamPanel extends AbstractCurriculumPanel implements
 
                 Map<Integer, Object> params = new HashMap<Integer, Object>();
                 params.put(1, curriculum.getId().getId());
-                params.put(2, afterSemesterView.getSemesterData().getId().getId());
+                params.put(2, afterSemesterView.getSemester().getId().getId());
                 params.put(3, Boolean.FALSE);
                 params.put(4, afterSemesterView.getSubject().getId().getId());
                 String sql = "SELECT count(curr_after_sem.SUBJECT_ID) " +
                         "FROM curriculum_after_semester curr_after_sem " +
-                        "WHERE curr_after_sem.CURRICULUM_ID = ?1 " +
-                        "      AND curr_after_sem.semester_data_id = ?2 " +
-                        "      AND curr_after_sem.DELETED = ?3 " +
+                        "WHERE curr_after_sem.CURRICULUM_ID = ?1 AND curr_after_sem.SEMESTER_ID = ?2 AND curr_after_sem.DELETED = ?3 " +
                         "      AND curr_after_sem.SUBJECT_ID = ?4";
 
                 try {
@@ -290,8 +364,10 @@ public class AfterSemesterProgamPanel extends AbstractCurriculumPanel implements
                         Message.showError(getUILocaleUtil().getMessage("selected.subjects.already.exists"));
                     } else {
                         CURRICULUM_AFTER_SEMESTER afterSemester = new CURRICULUM_AFTER_SEMESTER();
+                        SEMESTER_DATA sd = getOrCreateSemesterData(afterSemesterView.getSemester());
                         afterSemester.setCurriculum(curriculum);
-                        afterSemester.setSemesterData(afterSemesterView.getSemesterData());
+                        afterSemester.setSemester(afterSemesterView.getSemester());
+                        afterSemester.setSemesterData(sd);
                         afterSemester.setCreated(new Date());
                         afterSemester.setCode(afterSemesterView.getSubjectCode());
                         afterSemester.setEducationModuleType(afterSemesterView.getEducationModuleType());
@@ -342,20 +418,17 @@ public class AfterSemesterProgamPanel extends AbstractCurriculumPanel implements
                     ss=null;
                 }
                 if (ss != null) {
-                    String sql = "SELECT count(curr_after_sem.ID) CNT " +
-                            "FROM curriculum_after_semester curr_after_sem " +
-                            "  INNER JOIN CURRICULUM curr ON curr_after_sem.CURRICULUM_ID = curr.ID " +
-                            "WHERE curr_after_sem.CURRICULUM_ID != ?1 " +
-                            "      AND curr_after_sem.SEMESTER_DATA_ID = ?2 " +
-                            "      AND curr_after_sem.SUBJECT_ID = ?3 AND curr.STATUS_ID = ?4";
+                    String sql = "SELECT count(a1.ID) CNT " +
+                            "FROM curriculum_after_semester a1 INNER JOIN CURRICULUM b1 ON a1.CURRICULUM_ID = b1.ID " +
+                            "WHERE a1.CURRICULUM_ID != ?1 AND a1.SEMESTER_DATA_ID = ?2 AND a1.SUBJECT_ID = ?3 AND b1.STATUS_ID = ?4;";
                     Map<Integer, Object> params = new HashMap<Integer, Object>(4);
                     params.put(1, curriculum.getId().getId());
                     params.put(2, afterSemester.getSemesterData().getId().getId());
                     params.put(3, afterSemester.getSubject().getId().getId());
                     params.put(4, 3);
-                    Integer sum = null;
+                    Long sum = null;
                     try {
-                        sum = (Integer) session.lookupSingle(sql, params);
+                        sum = (Long) session.lookupSingle(sql, params);
                     } catch (NoResultException nrex) {
                         sum=null;
                     }
@@ -369,7 +442,7 @@ public class AfterSemesterProgamPanel extends AbstractCurriculumPanel implements
                         params.put(3, ss.getId().getId());
                         params.put(4, ss.getId().getId());
                         try {
-                            sum = (Integer) session.lookupSingle(sql, params);
+                            sum = (Long) session.lookupSingle(sql, params);
                         } catch (NoResultException nrex) {
                         }
                         if (sum != null && sum > 0) {

@@ -853,6 +853,7 @@ public final class ApplicantsForm extends UsersForm {
         }
         String answerDorm = String.valueOf(Double.valueOf(moneyForDorm) / 8);
         String answerEdu = String.valueOf(Double.valueOf(moneyForEducation) / 8);
+        String answerEduZaochnii = String.valueOf(Double.valueOf(moneyForEducation)/2);
 
         String ochnii = student.getDiplomaType().toString();
         DateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
@@ -861,6 +862,10 @@ public final class ApplicantsForm extends UsersForm {
             ochnii = "очной";
         } else if (student.getDiplomaType().toString().equals("Заочный")) {
             ochnii = "заочной";
+        }else if(student.getDiplomaType().toString().equals("Заочный после колледжа")){
+            ochnii = "заочный после колледжа";
+        }else if(student.getDiplomaType().toString().equals("Заочный 2-высшее")) {
+            ochnii = "заочный 2-высшее";
         }
 
 //        DateFormat form = new SimpleDateFormat("E MMM dd HH:mm:ss Z yyyy");
@@ -890,6 +895,22 @@ public final class ApplicantsForm extends UsersForm {
         String dorm = "қажет емес";
         if (student.isNeedDorm()) {
             dorm = "қажет";
+        }
+
+        String pdfProperty = "";
+        String tableType = "до 25 сентября – 21250 тенге                     до 25 января – 21250 тенге\n" +
+                "до 25 октября – 21250 тенге                      до 25 февраля – 21250 тенге\n" +
+                "до 25 ноября – 21250 тенге                       до 25 марта – 21250 тенге\n" +
+                "до 25 декабря – 21250 тенге                      до 25 апреля – 21250 тенге";
+        if(accountantPrice!=null) {
+            if (accountantPrice.getDiplomaType().toString().equals("Заочный после колледжа")
+                    || student.getDiplomaType().toString().equals("Заочный 2-высшее")) {
+                pdfProperty ="до 1 октября – 120000 тенге                     до 1 февраля – 120000 тенге\n";
+            }else{
+                pdfProperty =  tableType;
+            }
+        }else{
+            pdfProperty = "0";
         }
 
         if (student.getMiddleName() == null) {
@@ -964,6 +985,8 @@ public final class ApplicantsForm extends UsersForm {
 
         replaced = text.replaceAll("\\$fio", student.toString())
                 .replaceAll("\\$money", moneyForEducation)
+                .replaceAll(tableType, pdfProperty)
+                .replaceAll("120000", answerEduZaochnii)
                 .replaceAll("21250", answerEdu)
                 .replaceAll("7000", answerDorm)
                 .replaceAll("\\$firstCourseMoney", firstCourseMoney)
@@ -1025,13 +1048,13 @@ public final class ApplicantsForm extends UsersForm {
         accountantPriceQueryModel.addWhere("level", ECriteria.EQUAL, student.getLevel().getId());
         accountantPriceQueryModel.addWhere("contractPaymentType", ECriteria.EQUAL, ID.valueOf(contractPaymentTypeId));
         accountantPriceQueryModel.addWhere("deleted", ECriteria.EQUAL, false);
-        try {
-            accountantPrice = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(accountantPriceQueryModel);
-        } catch (NoResultException e) {
-            accountantPrice = null;
-        }
+       try {
+           accountantPrice = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(accountantPriceQueryModel);
+       }catch (NoResultException e){
+           accountantPrice = null;
+       }
 
-        return accountantPrice;
+       return accountantPrice;
     }
 
     private static String getStringBeforeSlash(String name) {

@@ -93,7 +93,7 @@ public class AccountantEdit extends AbstractDialog {
 
     private CommonFormWidget createAccountantPrice() throws Exception {
         CommonFormWidget accountantFW = new CommonFormWidget(ACCOUNTANT_PRICE.class);
-        accountantFW.addEntityListener(new AccountantEdit.AccountantPriceListener());
+        accountantFW.addEntityListener(new AccountantPriceListener());
         final FormModel accountantFM = accountantFW.getWidgetModel();
         accountantFM.setReadOnly(false);
         String errorMessage = getUILocaleUtil().getCaption("title.error").concat(": ").

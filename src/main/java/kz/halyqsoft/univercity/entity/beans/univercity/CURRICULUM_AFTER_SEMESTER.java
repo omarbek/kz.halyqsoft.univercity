@@ -24,6 +24,11 @@ public class CURRICULUM_AFTER_SEMESTER extends AbstractEntity {
     private CURRICULUM curriculum;
 
 	@ManyToOne
+	@JoinColumns({
+			@JoinColumn(name = "SEMESTER_ID", referencedColumnName = "ID")})
+	private SEMESTER semester;
+
+	@ManyToOne
     @JoinColumns({
         @JoinColumn(name = "SEMESTER_DATA_ID", referencedColumnName = "ID", nullable = false)})
     private SEMESTER_DATA semesterData;
@@ -114,5 +119,13 @@ public class CURRICULUM_AFTER_SEMESTER extends AbstractEntity {
 
 	public void setCode(String code) {
 		this.code = code;
+	}
+
+	public SEMESTER getSemester() {
+		return semester;
+	}
+
+	public void setSemester(SEMESTER semester) {
+		this.semester = semester;
 	}
 }

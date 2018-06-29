@@ -1,4 +1,4 @@
-//package kz.halyqsoft.univercity.modules.registration.mass;
+package kz.halyqsoft.univercity.modules.registration.mass;//package kz.halyqsoft.univercity.modules.registration.mass;
 //
 //import com.r5.core.commons.Log;
 //import com.r5.core.dblink.facade.CommonEntityFacadeBean;

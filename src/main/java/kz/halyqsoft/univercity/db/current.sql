@@ -1,141 +1,37 @@
-ALTER TABLE STUDENT_SCHEDULE
-  ALTER COLUMN DELETED TYPE BOOLEAN
-  USING CASE WHEN DELETED = 0
-  THEN FALSE
-        WHEN DELETED = 1
-          THEN TRUE
-        ELSE NULL
-        END;
+ALTER TABLE subject
+  ADD COLUMN course_work BOOLEAN NOT NULL DEFAULT FALSE;
 
-INSERT INTO TASKS (CLASS_PATH, DESCR, ICON_NAME, NAME, TASK_ORDER, TASK_TYPE, TITLE, VISIBLE, ID,
-                   PARENT_ID)
-VALUES ('kz.halyqsoft.univercity.modules.registration.student.RegistrationView',
-        'KK=ИУПС;RU=ИУПС;EN=Individual educational plan of student;', null,
-        'KK=ИУПС;RU=ИУПС;EN=Individual educational plan of student;', 506, false,
-        'KK=ИУПС;RU=ИУПС;EN=Individual educational plan of student;', true, nextval('s_tasks'), 29);
+ALTER TABLE subject
+  ADD COLUMN week_number NUMERIC(2) NULL;
 
-ALTER TABLE STUDENT_SUBJECT
-  ALTER COLUMN DELETED TYPE BOOLEAN
-  USING CASE WHEN DELETED = 0
-  THEN FALSE
-        WHEN DELETED = 1
-          THEN TRUE
-        ELSE NULL
-        END;
+ALTER TABLE subject drop COLUMN group_lec_id;
+ALTER TABLE subject drop COLUMN group_prac_id;
+ALTER TABLE subject drop COLUMN group_lab_id;
 
-delete from elective_binded_subject;
-alter table elective_binded_subject add COLUMN semester_id BIGINT NOT NULL;
-alter table  elective_binded_subject
-  add constraint fk_elective_binded_subject_semester foreign key (semester_id)
-references  semester (id)
-on delete restrict on update restrict;
+ALTER TABLE curriculum_detail drop COLUMN elective_subject_id;
+ALTER TABLE curriculum_detail drop COLUMN elective_subject_credit;
+ALTER TABLE curriculum_detail drop COLUMN elective_subject_cycle_id;
 
-CREATE TABLE catalog_elective_subjects (
-  id               BIGINT    NOT NULL,
-  speciality_id    BIGINT    NOT NULL,
-  entrance_year_id BIGINT    NOT NULL,
-  created          TIMESTAMP NOT NULL,
-  updated          TIMESTAMP,
-  deleted          BOOLEAN   NOT NULL
-);
+ALTER TABLE curriculum_after_semester
+  ADD COLUMN semester_id BIGINT NOT NULL DEFAULT 1;
 
-ALTER TABLE catalog_elective_subjects
-  ADD CONSTRAINT pk_catalog_elective_subjects PRIMARY KEY (id);
+drop view V_CURRICULUM_AFTER_SEMESTER;
 
-ALTER TABLE catalog_elective_subjects
-  ADD CONSTRAINT fk_catalog_elective_subjects_speciality FOREIGN KEY (speciality_id)
-REFERENCES speciality (id)
-ON DELETE RESTRICT ON UPDATE RESTRICT;
-
-ALTER TABLE catalog_elective_subjects
-  ADD CONSTRAINT fk_catalog_elective_subjects_entrance_year FOREIGN KEY (entrance_year_id)
-REFERENCES entrance_year (id)
-ON DELETE RESTRICT ON UPDATE RESTRICT;
-
-CREATE SEQUENCE s_catalog_elective_subjects
-MINVALUE 0
-START WITH 1
-NO CYCLE;
-
-ALTER table elective_binded_subject drop COLUMN created;
-delete from elective_binded_subject;
-ALTER table elective_binded_subject add COLUMN catalog_elective_subjects_id BIGINT not null;
-
-ALTER TABLE elective_binded_subject
-  ADD CONSTRAINT fk_elective_binded_subject_catalog_elective_subjects FOREIGN KEY (catalog_elective_subjects_id)
-REFERENCES catalog_elective_subjects (id)
-ON DELETE RESTRICT ON UPDATE RESTRICT;
-
-INSERT INTO TASKS (CLASS_PATH, DESCR, ICON_NAME, NAME, TASK_ORDER, TASK_TYPE, TITLE, VISIBLE, ID, PARENT_ID)
-VALUES ('kz.halyqsoft.univercity.modules.group.GroupsView', 'KK=Группы;RU=Группы;EN=Groups;', null,
-        'KK=Группы;RU=Группы;EN=Groups;', 507, false, 'KK=Группы;RU=Группы;EN=Groups;', true, nextval('s_tasks'), 29);
-
-CREATE TABLE groups (
-  id  BIGINT  NOT NULL,
-  speciality_id BIGINT NOT NULL,
-  name CHARACTER VARYING(150) NOT NULL,
-  orders BIGINT
-);
-
-ALTER TABLE groups
-  ADD CONSTRAINT pk_group PRIMARY KEY (id);
-
-ALTER TABLE ONLY groups
-  ADD CONSTRAINT fk_group_speciality FOREIGN KEY (speciality_id)
-REFERENCES speciality (id)
-ON UPDATE RESTRICT ON DELETE RESTRICT;
-
-create sequence S_GROUPS
-minvalue 0
-start with 1
-no cycle;
-
-ALTER TABLE groups ADD COLUMN deleted BOOLEAN NOT NULL ;
-
-ALTER TABLE groups ADD COLUMN created TIMESTAMP DEFAULT now();
-
-ALTER TABLE student_education ADD COLUMN groups_id BIGINT;
-
-ALTER TABLE ONLY student_education
-  ADD CONSTRAINT fk_student_education_groups FOREIGN KEY (groups_id)
-REFERENCES groups (id)
-ON UPDATE RESTRICT ON DELETE RESTRICT;
-
-CREATE TABLE speciality_corpus (
-  id            BIGINT NOT NULL,
-  speciality_id BIGINT NOT NULL,
-  corpus_id     BIGINT NOT NULL
-);
-
-ALTER TABLE ONLY speciality_corpus
-  ADD CONSTRAINT pk_speciality_corpus PRIMARY KEY (id);
-
-CREATE SEQUENCE s_speciality_corpus
-MINVALUE 0
-START WITH 1
-NO CYCLE;
-
-ALTER TABLE speciality_corpus
-  ADD CONSTRAINT fk_speciality_corpus_speciality FOREIGN KEY (speciality_id)
-REFERENCES speciality (id)
-ON DELETE RESTRICT ON UPDATE RESTRICT;
-
-ALTER TABLE speciality_corpus
-  ADD CONSTRAINT fk_speciality_corpus_corpus FOREIGN KEY (corpus_id)
-REFERENCES corpus (id)
-ON DELETE RESTRICT ON UPDATE RESTRICT;
-
-CREATE UNIQUE INDEX idx_speciality_corpus
-  ON speciality_corpus (
-    speciality_id ASC,
-    corpus_id ASC
-  );
-
-INSERT INTO TASKS (CLASS_PATH, DESCR, ICON_NAME, NAME, TASK_ORDER, TASK_TYPE, TITLE, VISIBLE, ID, PARENT_ID)
-VALUES ('kz.halyqsoft.univercity.modules.bindingspecialitytocorpus.BindingSpecialityToCorpusView',
-        'KK=Мамандықты ғимаратқа қосу;RU=Привязка специальности корпусам;EN=Binding speciality to corpus;',
-        NULL, 'KK=Мамандықты ғимаратқа қосу;RU=Привязка специальности корпусам;EN=Binding speciality to corpus;',
-        220, FALSE, 'KK=Мамандықты ғимаратқа қосу;RU=Привязка специальности корпусам;EN=Binding speciality to corpus;',
-        TRUE, nextval('s_tasks'), 3);
-
-
+CREATE OR REPLACE VIEW V_CURRICULUM_AFTER_SEMESTER AS
+  SELECT
+    curr_after_sem.ID,
+    curr_after_sem.CURRICULUM_ID,
+    curr_after_sem.SUBJECT_ID,
+    subj.NAME_RU           SUBJECT_NAME_RU,
+    curr_after_sem.CODE    SUBJECT_CODE,
+    subj.CREDITABILITY_ID,
+    cred.CREDIT,
+    curr_after_sem.SEMESTER_ID,
+    sem.SEMESTER_NAME,
+    edu_mod_type.id        education_module_type_id,
+    edu_mod_type.type_name education_module_type_name,
+    curr_after_sem.DELETED
+  FROM CURRICULUM_AFTER_SEMESTER curr_after_sem INNER JOIN SUBJECT subj ON curr_after_sem.SUBJECT_ID = subj.ID
+    INNER JOIN CREDITABILITY cred ON subj.CREDITABILITY_ID = cred.ID
+    INNER JOIN semester sem ON curr_after_sem.semester_id = sem.ID
+    INNER JOIN education_module_type edu_mod_type ON edu_mod_type.id = curr_after_sem.education_module_type_id;

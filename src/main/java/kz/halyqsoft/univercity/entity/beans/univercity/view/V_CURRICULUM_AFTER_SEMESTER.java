@@ -3,6 +3,7 @@ package kz.halyqsoft.univercity.entity.beans.univercity.view;
 import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.CREDITABILITY;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.EDUCATION_MODULE_TYPE;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_DATA;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
@@ -52,12 +53,12 @@ public class V_CURRICULUM_AFTER_SEMESTER extends AbstractEntity {
     @FieldInfo(type = EFieldType.FK_COMBO, order = 7, inGrid = false)
     @ManyToOne
     @JoinColumns({
-            @JoinColumn(name = "SEMESTER_DATA_ID", referencedColumnName = "ID")})
-    private SEMESTER_DATA semesterData;
+            @JoinColumn(name = "SEMESTER_ID", referencedColumnName = "ID")})
+    private SEMESTER semester;
 
     @FieldInfo(type = EFieldType.TEXT, max = 64, order = 8, inEdit = false, inView = false, columnWidth = 120)
-    @Column(name = "SEMESTER_DATA_NAME")
-    private String semesterDataName;
+    @Column(name = "SEMESTER_NAME")
+    private String semesterName;
 
     @FieldInfo(type = EFieldType.FK_COMBO, order = 9)
     @ManyToOne
@@ -121,20 +122,20 @@ public class V_CURRICULUM_AFTER_SEMESTER extends AbstractEntity {
         this.credit = credit;
     }
 
-    public SEMESTER_DATA getSemesterData() {
-        return semesterData;
+    public SEMESTER getSemester() {
+        return semester;
     }
 
-    public void setSemesterData(SEMESTER_DATA semesterData) {
-        this.semesterData = semesterData;
+    public void setSemester(SEMESTER semester) {
+        this.semester = semester;
     }
 
-    public String getSemesterDataName() {
-        return semesterDataName;
+    public String getSemesterName() {
+        return semesterName;
     }
 
-    public void setSemesterDataName(String semesterDataName) {
-        this.semesterDataName = semesterDataName;
+    public void setSemesterName(String semesterName) {
+        this.semesterName = semesterName;
     }
 
     public boolean isDeleted() {
