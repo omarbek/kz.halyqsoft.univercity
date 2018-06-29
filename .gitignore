@@ -1,7 +1,5 @@
-/.idea/
-/target/
-/tmp/
-/ready_db
-/univerdb
-/kz.halyqsoft.univercity.iml
-/README.md
+.idea/dataSources.local.xml
+.idea/dataSources/61ac70b1-8ad3-4dab-82af-209e6e253f98/_staging_/
+.idea/workspace.xml
+target/
+tmp/
