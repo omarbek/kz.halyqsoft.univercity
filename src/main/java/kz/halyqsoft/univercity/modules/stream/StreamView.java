@@ -14,6 +14,7 @@ public class StreamView extends AbstractTaskView {
 
     public StreamView(AbstractTask task) throws Exception {
         super(task);
+
     }
 
     @Override
