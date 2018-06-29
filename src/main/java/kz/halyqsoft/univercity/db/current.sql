@@ -137,3 +137,5 @@ VALUES ('kz.halyqsoft.univercity.modules.bindingspecialitytocorpus.BindingSpecia
         NULL, 'KK=Мамандықты ғимаратқа қосу;RU=Привязка специальности корпусам;EN=Binding speciality to corpus;',
         220, FALSE, 'KK=Мамандықты ғимаратқа қосу;RU=Привязка специальности корпусам;EN=Binding speciality to corpus;',
         TRUE, nextval('s_tasks'), 3);
+
+

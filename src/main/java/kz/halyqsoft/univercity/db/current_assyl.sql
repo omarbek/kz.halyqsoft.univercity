@@ -146,3 +146,36 @@ ALTER TABLE ONLY DOCUMENT
   ADD CONSTRAINT fk_document_document_status FOREIGN KEY (document_status_id)
 REFERENCES users (id)
 ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+
+
+CREATE TABLE stream (
+  id        BIGINT                NOT NULL,
+  name VARCHAR(255 )NOT NULL,
+  created TIMESTAMP NOT NULL,
+  updated TIMESTAMP NOT NULL
+);
+
+ALTER TABLE stream ADD CONSTRAINT pk_stream PRIMARY KEY (id);
+
+CREATE TABLE stream_student (
+  id        BIGINT                NOT NULL,
+  stream_id BIGINT NOT NULL,
+  student_id BIGINT NOT NULL,
+  created TIMESTAMP NOT NULL,
+  updated TIMESTAMP NOT NULL
+);
+
+ALTER TABLE stream_student ADD CONSTRAINT pk_stream_student PRIMARY KEY (id);
+
+
+ALTER TABLE ONLY stream_student
+  ADD CONSTRAINT fk_stream_student_student FOREIGN KEY (student_id)
+REFERENCES student (id)
+ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+
+ALTER TABLE ONLY stream_student
+  ADD CONSTRAINT fk_stream_student_stream FOREIGN KEY (stream_id)
+REFERENCES stream (id)
+ON UPDATE RESTRICT ON DELETE RESTRICT;

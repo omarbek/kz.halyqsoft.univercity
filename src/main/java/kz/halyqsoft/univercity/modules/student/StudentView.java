@@ -35,6 +35,7 @@ public class StudentView extends AbstractTaskView {
     }
 
     private void setStudentOrApplicant(int categoryType, String caption) {
+
         Button openButton = new Button();
         openButton.setCaption(getUILocaleUtil().getCaption(caption));
         openButton.setWidth(120.0F, Sizeable.Unit.PIXELS);
