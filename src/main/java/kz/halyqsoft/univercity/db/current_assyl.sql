@@ -151,8 +151,6 @@ ON UPDATE RESTRICT ON DELETE RESTRICT;
 CREATE TABLE stream (
   id BIGINT NOT NULL,
   name VARCHAR(255 )NOT NULL,
-  language_id BIGINT NOT NULL ,
-  study_year_id BIGINT NOT NULL ,
   semester_data_id BIGINT NOT NULL ,
   semester_id BIGINT NOT NULL ,
   created TIMESTAMP NOT NULL,
@@ -160,16 +158,6 @@ CREATE TABLE stream (
 );
 
 ALTER TABLE stream ADD CONSTRAINT pk_stream PRIMARY KEY (id);
-
-ALTER TABLE ONLY stream
-  ADD CONSTRAINT fk_stream_language FOREIGN KEY (language_id)
-REFERENCES language (id)
-ON UPDATE RESTRICT ON DELETE RESTRICT;
-
-ALTER TABLE ONLY stream
-  ADD CONSTRAINT fk_stream_study_year FOREIGN KEY (study_year_id)
-REFERENCES study_year (id)
-ON UPDATE RESTRICT ON DELETE RESTRICT;
 
 ALTER TABLE ONLY stream
   ADD CONSTRAINT fk_stream_semester_data FOREIGN KEY (semester_data_id)

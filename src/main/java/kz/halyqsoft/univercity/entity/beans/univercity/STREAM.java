@@ -18,18 +18,6 @@ public class STREAM extends AbstractEntity {
     @FieldInfo(type = EFieldType.FK_COMBO, inGrid = false, required = false)
     @ManyToOne
     @JoinColumns({
-            @JoinColumn(name = "LANGUAGE_ID", referencedColumnName = "ID")})
-    private LANGUAGE language;
-
-    @FieldInfo(type = EFieldType.FK_COMBO, inGrid = false, required = false)
-    @ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "STUDY_YEAR_ID", referencedColumnName = "ID")})
-    private STUDY_YEAR studyYear;
-
-    @FieldInfo(type = EFieldType.FK_COMBO, inGrid = false, required = false)
-    @ManyToOne
-    @JoinColumns({
             @JoinColumn(name = "SEMESTER_DATA_ID", referencedColumnName = "ID")})
     private SEMESTER_DATA semesterData;
 
@@ -71,22 +59,6 @@ public class STREAM extends AbstractEntity {
 
     public void setUpdated(Date updated) {
         this.updated = updated;
-    }
-
-    public LANGUAGE getLanguage() {
-        return language;
-    }
-
-    public void setLanguage(LANGUAGE language) {
-        this.language = language;
-    }
-
-    public STUDY_YEAR getStudyYear() {
-        return studyYear;
-    }
-
-    public void setStudyYear(STUDY_YEAR studyYear) {
-        this.studyYear = studyYear;
     }
 
     public SEMESTER_DATA getSemesterData() {
