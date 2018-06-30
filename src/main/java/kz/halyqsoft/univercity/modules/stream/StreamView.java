@@ -30,7 +30,7 @@ public class StreamView extends AbstractTaskView {
         button.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
-                Message.showInfo("Raikhan!");
+                Message.showInfo("SHMASYA!");
             }
         });
 

@@ -1,8 +1,12 @@
 package kz.halyqsoft.univercity.modules.catalog;
 
-import kz.halyqsoft.univercity.entity.beans.ROLES;
 import kz.halyqsoft.univercity.entity.beans.TASKS;
+import kz.halyqsoft.univercity.entity.beans.ROLES;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_ACADEMIC_DEGREE;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_ORGANIZATION;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_SEMESTER_DATA;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_SPECIALITY;
 import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.ID;
 
@@ -31,7 +35,7 @@ class CatalogList {
         addCatalogEntityToList(ENTRANCE_YEAR.class);
         addCatalogEntityToList(RATING_SCALE.class);
         addCatalogEntityToList(LANGUAGE_LEVEL.class);
-//        addCatalogEntityToList(LANGUAGE.class);
+        addCatalogEntityToList(LANGUAGE.class);
         addCatalogEntityToList(EQUIPMENT.class);
         addCatalogEntityToList(MEDICAL_CHECKUP_TYPE.class);
         addCatalogEntityToList(MILITARY_STATUS.class);

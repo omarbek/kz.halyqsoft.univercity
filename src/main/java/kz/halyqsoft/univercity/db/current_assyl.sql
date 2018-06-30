@@ -164,6 +164,11 @@ ALTER TABLE ONLY stream
 REFERENCES semester_data (id)
 ON UPDATE RESTRICT ON DELETE RESTRICT;
 
+create sequence S_STREAM
+  minvalue 0
+  start with 1
+  no cycle;
+
 ALTER TABLE ONLY stream
   ADD CONSTRAINT fk_stream_semester FOREIGN KEY (semester_id)
 REFERENCES semester (id)
@@ -175,6 +180,10 @@ CREATE TABLE stream_group (
   group_id BIGINT NOT NULL
 );
 
+create sequence S_STREAM_GROUP
+  minvalue 0
+  start with 1
+  no cycle;
 
 ALTER TABLE stream_group ADD CONSTRAINT pk_stream_group PRIMARY KEY (id);
 
