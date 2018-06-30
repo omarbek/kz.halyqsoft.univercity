@@ -1,5 +1,6 @@
 package kz.halyqsoft.univercity.entity.beans.univercity;
 
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_COORDINATOR;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
@@ -13,6 +14,18 @@ public class STREAM extends AbstractEntity {
 
     @Column(name = "NAME", nullable = false)
     private String name;
+
+    @FieldInfo(type = EFieldType.FK_COMBO, inGrid = false, required = false)
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "SEMESTER_DATA_ID", referencedColumnName = "ID")})
+    private SEMESTER_DATA semesterData;
+
+    @FieldInfo(type = EFieldType.FK_COMBO, inGrid = false, required = false)
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "SEMESTER_ID", referencedColumnName = "ID")})
+    private SEMESTER semester;
 
     @FieldInfo(type = EFieldType.DATETIME, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false)
     @Column(name = "created")
@@ -46,5 +59,21 @@ public class STREAM extends AbstractEntity {
 
     public void setUpdated(Date updated) {
         this.updated = updated;
+    }
+
+    public SEMESTER_DATA getSemesterData() {
+        return semesterData;
+    }
+
+    public void setSemesterData(SEMESTER_DATA semesterData) {
+        this.semesterData = semesterData;
+    }
+
+    public SEMESTER getSemester() {
+        return semester;
+    }
+
+    public void setSemester(SEMESTER semester) {
+        this.semester = semester;
     }
 }

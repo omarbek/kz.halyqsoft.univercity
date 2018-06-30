@@ -1,9 +1,8 @@
 package kz.halyqsoft.univercity.modules.stream;
 
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.VerticalLayout;
-import kz.halyqsoft.univercity.entity.beans.univercity.STREAM_STUDENT;
+import kz.halyqsoft.univercity.entity.beans.univercity.STREAM_GROUP;
 import org.r3a.common.entity.beans.AbstractTask;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.dialog.Message;
@@ -15,12 +14,13 @@ public class StreamView extends AbstractTaskView {
 
     public StreamView(AbstractTask task) throws Exception {
         super(task);
+
     }
 
     @Override
     public void initView(boolean b) throws Exception {
 
-        ssGW = new GridWidget(STREAM_STUDENT.class);
+        ssGW = new GridWidget(STREAM_GROUP.class);
         ssGW.setSizeFull();
         ssGW.setMultiSelect(true);
         ssGW.setImmediate(true);
@@ -33,6 +33,7 @@ public class StreamView extends AbstractTaskView {
                 Message.showInfo("Raikhan!");
             }
         });
+
         vl.addComponent(button);
 
         getContent().addComponent(vl);
