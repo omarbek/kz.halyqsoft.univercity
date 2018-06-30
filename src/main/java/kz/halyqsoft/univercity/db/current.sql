@@ -35,3 +35,24 @@ CREATE OR REPLACE VIEW V_CURRICULUM_AFTER_SEMESTER AS
     INNER JOIN CREDITABILITY cred ON subj.CREDITABILITY_ID = cred.ID
     INNER JOIN semester sem ON curr_after_sem.semester_id = sem.ID
     INNER JOIN education_module_type edu_mod_type ON edu_mod_type.id = curr_after_sem.education_module_type_id;
+
+ALTER TABLE groups
+  ADD COLUMN language_id BIGINT NOT NULL DEFAULT 1;
+ALTER TABLE groups
+  ADD COLUMN study_year_id BIGINT NOT NULL DEFAULT 1;
+
+ALTER TABLE groups
+  ADD CONSTRAINT fk_groups_language FOREIGN KEY (language_id)
+REFERENCES language (id)
+ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE groups
+  ADD CONSTRAINT fk_groups_study_year FOREIGN KEY (study_year_id)
+REFERENCES study_year (id)
+ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+--not for real
+-- UPDATE language
+-- SET lang_name = 'Русский', lang_short_name = 'Рус'
+-- WHERE id = 2;
+-- INSERT INTO language VALUES (3, 'Английский', 'Анг');

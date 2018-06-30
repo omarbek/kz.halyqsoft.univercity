@@ -3,6 +3,7 @@ package kz.halyqsoft.univercity.entity.beans.univercity.catalog;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
+import org.r3a.common.entity.ID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,7 +15,9 @@ import javax.persistence.Entity;
 @Entity
 public class LANGUAGE extends AbstractEntity {
 
-	private static final long serialVersionUID = 7615652958181487014L;
+	public static final ID KAZAKH = ID.valueOf(1);
+	public static final ID RUSSIAN = ID.valueOf(2);
+	public static final ID ENGLISH = ID.valueOf(3);
 
 	@FieldInfo(type = EFieldType.TEXT, max = 16, order = 1)
 	@Column(name = "LANG_NAME", nullable = false)
