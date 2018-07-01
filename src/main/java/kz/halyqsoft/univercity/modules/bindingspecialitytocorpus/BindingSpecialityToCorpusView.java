@@ -24,7 +24,8 @@ import java.util.List;
  * @author Omarbek
  * @created on 26.06.2018
  */
-public class BindingSpecialityToCorpusView extends AbstractTaskView implements EntityListener {
+public class
+BindingSpecialityToCorpusView extends AbstractTaskView implements EntityListener {
 
     private GridWidget specAndCorpusGW;
 

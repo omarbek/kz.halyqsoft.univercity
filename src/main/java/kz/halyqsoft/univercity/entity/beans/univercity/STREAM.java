@@ -12,27 +12,28 @@ import java.util.Date;
 @Entity
 public class STREAM extends AbstractEntity {
 
-    @Column(name = "NAME", nullable = false)
+    @FieldInfo(order = 1)
+    @Column(name = "NAME", nullable = false )
     private String name;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, inGrid = false, required = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 2 )
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "SEMESTER_DATA_ID", referencedColumnName = "ID")})
     private SEMESTER_DATA semesterData;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, inGrid = false, required = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 3)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "SEMESTER_ID", referencedColumnName = "ID")})
     private SEMESTER semester;
 
-    @FieldInfo(type = EFieldType.DATETIME, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false)
+    @FieldInfo(type = EFieldType.DATETIME, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, order = 4)
     @Column(name = "created")
     @Temporal(TemporalType.TIMESTAMP)
     private Date created;
 
-    @FieldInfo(type = EFieldType.DATETIME, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false)
+    @FieldInfo(type = EFieldType.DATETIME, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false, order = 5)
     @Column(name = "updated")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updated;

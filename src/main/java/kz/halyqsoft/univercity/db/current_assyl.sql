@@ -157,6 +157,15 @@ CREATE TABLE stream (
   updated TIMESTAMP NOT NULL
 );
 
+create sequence S_STREAM
+  minvalue 0
+  start with 1
+  no cycle;
+
+ALTER TABLE stream ALTER COLUMN updated DROP NOT NULL ;
+ALTER TABLE stream ALTER COLUMN semester_data_id DROP NOT NULL ;
+ALTER TABLE stream ALTER COLUMN semester_id DROP NOT NULL ;
+
 ALTER TABLE stream ADD CONSTRAINT pk_stream PRIMARY KEY (id);
 
 ALTER TABLE ONLY stream
@@ -164,10 +173,6 @@ ALTER TABLE ONLY stream
 REFERENCES semester_data (id)
 ON UPDATE RESTRICT ON DELETE RESTRICT;
 
-create sequence S_STREAM
-  minvalue 0
-  start with 1
-  no cycle;
 
 ALTER TABLE ONLY stream
   ADD CONSTRAINT fk_stream_semester FOREIGN KEY (semester_id)
@@ -196,4 +201,20 @@ ALTER TABLE ONLY stream_group
   ADD CONSTRAINT fk_stream_group_group FOREIGN KEY (group_id)
 REFERENCES groups (id)
 ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+
+CREATE VIEW v_groups_creation_needed
+  as SELECT DISTINCT
+       grs.id as id , spy.id as speciality_id,
+       stt_edt.language_id, stt.entrance_year_id,
+       stt_edt.study_year_id , sc.corpus_id
+     from groups grs
+       INNER JOIN speciality spy
+         on grs.speciality_id = spy.id
+       INNER JOIN student_education stt_edt
+         on grs.id = stt_edt.groups_id
+       INNER JOIN speciality_corpus sc
+         ON spy.id = sc.speciality_id
+       INNER JOIN student stt ON stt_edt.student_id = stt.id
+     where grs.deleted = false and spy.deleted = false;
 
