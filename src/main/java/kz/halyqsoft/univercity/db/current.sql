@@ -503,3 +503,10 @@ CREATE VIEW v_groups_creation_needed
          ON spy.id = sc.speciality_id
        INNER JOIN student stt ON stt_edt.student_id = stt.id
      where grs.deleted = false and spy.deleted = false;
+
+ALTER TABLE stream
+  ALTER COLUMN semester_id DROP NOT NULL;
+ALTER TABLE stream
+  ALTER COLUMN updated DROP NOT NULL;
+ALTER TABLE stream
+  ALTER COLUMN name DROP NOT NULL;

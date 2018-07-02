@@ -1,17 +1,15 @@
 package kz.halyqsoft.univercity.utils;
 
 import com.itextpdf.text.Font;
-import com.vaadin.data.Property;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Field;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_DOCUMENT_FILE;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.POST;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_DATA;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.facade.CommonIDFacadeBean;
@@ -25,7 +23,6 @@ import org.r3a.common.vaadin.AbstractWebUI;
 import org.r3a.common.vaadin.locale.UILocaleUtil;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.form.FormModel;
-import org.r3a.common.vaadin.widget.form.field.FieldModel;
 import org.r3a.common.vaadin.widget.form.field.filelist.FileListFieldModel;
 import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 import org.slf4j.Logger;
@@ -33,9 +30,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.persistence.NoResultException;
 import java.math.BigInteger;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -255,5 +249,11 @@ public class CommonUtils {
         } catch (Exception e) {
             return null;
         }
+    }
+    public static Label getSemesterIsGoingNowLabel() {
+        Label semIsNotGoingNowLabel = new Label();
+        semIsNotGoingNowLabel.setCaption(getUILocaleUtil().getMessage("semester.not.going.now"));
+        semIsNotGoingNowLabel.setWidthUndefined();
+        return semIsNotGoingNowLabel;
     }
 }

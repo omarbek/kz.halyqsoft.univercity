@@ -3,6 +3,7 @@ package kz.halyqsoft.univercity.entity.beans.univercity.catalog;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
+import org.r3a.common.entity.ID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,25 +15,26 @@ import javax.persistence.Entity;
 @Entity
 public class SEMESTER_PERIOD extends AbstractEntity {
 
-	private static final long serialVersionUID = 8109353218081571660L;
-	
-	@FieldInfo(type = EFieldType.TEXT, order = 2)
-	@Column(name = "PERIOD_NAME", nullable = false)
-	private String periodName;
-	
-	public SEMESTER_PERIOD() {
-	}
+    public static final ID FALL_ID = ID.valueOf(1);
+    public static final ID SPRING_ID = ID.valueOf(2);
 
-	public String getPeriodName() {
-		return periodName;
-	}
+    @FieldInfo(type = EFieldType.TEXT, order = 2)
+    @Column(name = "PERIOD_NAME", nullable = false)
+    private String periodName;
 
-	public void setPeriodName(String periodName) {
-		this.periodName = periodName;
-	}
+    public SEMESTER_PERIOD() {
+    }
 
-	@Override
-	public String toString() {
-		return periodName;
-	}
+    public String getPeriodName() {
+        return periodName;
+    }
+
+    public void setPeriodName(String periodName) {
+        this.periodName = periodName;
+    }
+
+    @Override
+    public String toString() {
+        return periodName;
+    }
 }

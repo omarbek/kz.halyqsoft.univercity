@@ -150,11 +150,9 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
             getContent().addComponent(totalCountGW);
             getContent().setComponentAlignment(totalCountGW, Alignment.MIDDLE_CENTER);
         } else {
-            Label yearLabel = new Label();
-            yearLabel.setCaption(getUILocaleUtil().getMessage("semester.not.going.now"));
-            yearLabel.setWidthUndefined();
-            getContent().addComponent(yearLabel);
-            getContent().setComponentAlignment(yearLabel, Alignment.MIDDLE_CENTER);
+            Label semIsNotGoingNowLabel = CommonUtils.getSemesterIsGoingNowLabel();
+            getContent().addComponent(semIsNotGoingNowLabel);
+            getContent().setComponentAlignment(semIsNotGoingNowLabel, Alignment.MIDDLE_CENTER);
         }
     }
 
