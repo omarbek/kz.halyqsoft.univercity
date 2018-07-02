@@ -148,61 +148,6 @@ REFERENCES users (id)
 ON UPDATE RESTRICT ON DELETE RESTRICT;
 
 
-CREATE TABLE stream (
-  id BIGINT NOT NULL,
-  name VARCHAR(255 )NOT NULL,
-  semester_data_id BIGINT NOT NULL ,
-  semester_id BIGINT NOT NULL ,
-  created TIMESTAMP NOT NULL,
-  updated TIMESTAMP NOT NULL
-);
-
-create sequence S_STREAM
-  minvalue 0
-  start with 1
-  no cycle;
-
-ALTER TABLE stream ALTER COLUMN updated DROP NOT NULL ;
-ALTER TABLE stream ALTER COLUMN semester_data_id DROP NOT NULL ;
-ALTER TABLE stream ALTER COLUMN semester_id DROP NOT NULL ;
-
-ALTER TABLE stream ADD CONSTRAINT pk_stream PRIMARY KEY (id);
-
-ALTER TABLE ONLY stream
-  ADD CONSTRAINT fk_stream_semester_data FOREIGN KEY (semester_data_id)
-REFERENCES semester_data (id)
-ON UPDATE RESTRICT ON DELETE RESTRICT;
-
-
-ALTER TABLE ONLY stream
-  ADD CONSTRAINT fk_stream_semester FOREIGN KEY (semester_id)
-REFERENCES semester (id)
-ON UPDATE RESTRICT ON DELETE RESTRICT;
-
-CREATE TABLE stream_group (
-  id BIGINT NOT NULL ,
-  stream_id BIGINT NOT NULL ,
-  group_id BIGINT NOT NULL
-);
-
-create sequence S_STREAM_GROUP
-  minvalue 0
-  start with 1
-  no cycle;
-
-ALTER TABLE stream_group ADD CONSTRAINT pk_stream_group PRIMARY KEY (id);
-
-ALTER TABLE ONLY stream_group
-  ADD CONSTRAINT fk_stream_group_stream FOREIGN KEY (stream_id)
-REFERENCES stream (id)
-ON UPDATE RESTRICT ON DELETE RESTRICT;
-
-ALTER TABLE ONLY stream_group
-  ADD CONSTRAINT fk_stream_group_group FOREIGN KEY (group_id)
-REFERENCES groups (id)
-ON UPDATE RESTRICT ON DELETE RESTRICT;
-
-
 CREATE VIEW v_groups_creation_needed
   as SELECT DISTINCT
        grs.id as id , spy.id as speciality_id,
