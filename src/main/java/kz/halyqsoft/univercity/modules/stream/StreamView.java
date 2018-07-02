@@ -132,7 +132,7 @@ public class StreamView extends AbstractTaskView implements EntityListener , Fil
 
         try{
             Map<Integer, Object> params = new HashMap<>();
-            String sql = "select * from stream_group where date_trunc('year',created )= date_trunc('year' , now()) and group_id in ( select id from stream where date_trunc('year',created )= date_trunc('year' , now())  ) ";
+            String sql = "select * from stream_group sg inner join stream  s on sg.stream_id = s.id  where date_trunc('year',s.created )= date_trunc('year' , now())";
             List<STREAM_GROUP> streamList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(sql ,params , STREAM_GROUP.class);
 
             for(STREAM_GROUP group : streamList)
