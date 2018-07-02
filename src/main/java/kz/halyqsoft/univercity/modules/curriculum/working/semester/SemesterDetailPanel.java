@@ -8,6 +8,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.TextField;
 import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM;
 import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM_DETAIL;
 import kz.halyqsoft.univercity.entity.beans.univercity.ELECTIVE_SUBJECT;
@@ -516,21 +517,17 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
     @Override
     public boolean preSave(Object source, Entity e, boolean isNew, int buttonId) {
         if (source.equals(addElectiveFWD.getFormWidget())) {
-            V_ELECTIVE_SUBJECT electiveSubjectView = (V_ELECTIVE_SUBJECT) e;
-            ELECTIVE_SUBJECT electiveSubject = new ELECTIVE_SUBJECT();
-            electiveSubject.setCurriculum(curriculum);
-            electiveSubject.setSemester(semester);
+            V_CURRICULUM_DETAIL vcd = (V_CURRICULUM_DETAIL) e;
+            CURRICULUM_DETAIL cd = new CURRICULUM_DETAIL();
+            cd.setCurriculum(curriculum);
+            cd.setSemester(semester);
             try {
-                electiveSubject.setSubject(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class)
-                        .lookup(SUBJECT.class, electiveSubjectView.getSubject().getId()));
-                electiveSubject.setSubjectCycle(electiveSubjectView.getSubjectCycle());
-                electiveSubject.setCreated(new Date());
-                electiveSubject.setEducationModuleType(electiveSubjectView.getEducationModuleType());
-                electiveSubject.setCode(electiveSubjectView.getSubjectCode());
-                electiveSubject.setConsiderCredit(electiveSubjectView.isConsiderCredit());
-                electiveSubject.setSemesterData(getOrCreateSemesterData());
-                electiveSubject.setDeleted(Boolean.FALSE);
-                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(electiveSubject);
+                cd.setElectiveSubject(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class)
+                        .lookup(ELECTIVE_SUBJECT_LABEL.class, ID.valueOf(999999)));
+                cd.setElectiveSubjectCycle(vcd.getSubjectCycle());
+                cd.setElectiveSubjectCredit(vcd.getCreditability().getCredit());
+                cd.setCreated(new Date());
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(cd);
                 refreshMandatory();
             } catch (Exception ex) {
                 LOG.error("Unable to add elective subject: ", ex);
@@ -559,7 +556,7 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                         SEMESTER_SUBJECT ss = null;
                         try {
                             ss = session.lookupSingle(ssQM);
-                        } catch (NoResultException ignored) {
+                        } catch (NoResultException nrex) {
                         }
 
                         if (ss != null) {
@@ -598,6 +595,22 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                                     delList.add(cd);
                                 }
                             }
+                        } else {
+                            delList.add(cd);
+                        }
+                    } else {
+                        List<Entity> list = electiveGrid.getAllEntities();
+                        boolean found = false;
+                        for (Entity e1 : list) {
+                            V_ELECTIVE_SUBJECT ves = (V_ELECTIVE_SUBJECT) e1;
+                            if (ves.getCycleShortName().equals(cd.getElectiveSubjectCycle().getCycleShortName())) {
+                                found = true;
+                                break;
+                            }
+                        }
+
+                        if (found) {
+                            notDelList.add(cd.getElectiveSubject().getNameRU());
                         } else {
                             delList.add(cd);
                         }
@@ -642,7 +655,7 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                     SEMESTER_SUBJECT ss = null;
                     try {
                         ss = session.lookupSingle(ssQM);
-                    } catch (NoResultException ignored) {
+                    } catch (NoResultException nrex) {
                     }
 
                     if (ss != null) {
@@ -659,7 +672,7 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                         Integer sum = null;
                         try {
                             sum = ((BigDecimal) session.lookupSingle(sql, params)).intValue();
-                        } catch (NoResultException ignored) {
+                        } catch (NoResultException nrex) {
                         }
                         if (sum != null && sum > 0) {
                             delList.add(es);
@@ -786,10 +799,11 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
         return totalCredit + electiveTotalCredit;
     }
 
-    private List<V_ELECTIVE_SUBJECT> getElectiveCurriculumDetailList() throws Exception {
-        QueryModel<V_ELECTIVE_SUBJECT> cdQM = new QueryModel<>(V_ELECTIVE_SUBJECT.class);
+    private List<CURRICULUM_DETAIL> getElectiveCurriculumDetailList() throws Exception {
+        QueryModel<CURRICULUM_DETAIL> cdQM = new QueryModel<CURRICULUM_DETAIL>(CURRICULUM_DETAIL.class);
         cdQM.addWhere("curriculum", ECriteria.EQUAL, curriculum.getId());
         cdQM.addWhereAnd("semester", ECriteria.EQUAL, semester.getId());
+        cdQM.addWhereNotNullAnd("electiveSubject");
         cdQM.addWhereAnd("deleted", Boolean.FALSE);
 
         return SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(cdQM);
@@ -797,10 +811,10 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
 
     private int getTotalApprovedElectiveCredit() throws Exception {
         int total = 0;
-        List<V_ELECTIVE_SUBJECT> electiveSubjects = getElectiveCurriculumDetailList();
-        for (V_ELECTIVE_SUBJECT subject : electiveSubjects) {
-            if (subject.isConsiderCredit()) {
-                total += subject.getCredit();
+        List<CURRICULUM_DETAIL> cdList = getElectiveCurriculumDetailList();
+        for (CURRICULUM_DETAIL cd : cdList) {
+            if (cd.getElectiveSubjectCredit() != null) {
+                total += cd.getElectiveSubjectCredit();
             }
         }
 
@@ -809,10 +823,10 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
 
     private List<SUBJECT_CYCLE> getApprovedElectiveCycleList() throws Exception {
         List<SUBJECT_CYCLE> scList = new ArrayList<SUBJECT_CYCLE>();
-        List<V_ELECTIVE_SUBJECT> cdList = getElectiveCurriculumDetailList();
-        for (V_ELECTIVE_SUBJECT cd : cdList) {
+        List<CURRICULUM_DETAIL> cdList = getElectiveCurriculumDetailList();
+        for (CURRICULUM_DETAIL cd : cdList) {
             scList.add(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class)
-                    .lookup(CURRICULUM_DETAIL.class, cd.getId()).getSubjectCycle());
+                    .lookup(CURRICULUM_DETAIL.class, cd.getId()).getElectiveSubjectCycle());
         }
 
         return scList;
@@ -899,7 +913,7 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                 qm.addWhere("mandatory", Boolean.TRUE);
                 qm.addWhere("subjectCycle", ECriteria.NOT_EQUAL, ID.valueOf(4));
                 subjectSelectDlg.setDialogWidth(600);
-                subjectSelectDlg.setDialogHeight(200);
+                subjectSelectDlg.setDialogHeight(300);
                 subjectSelectDlg.getFilterModel().addFilter("chair", chairCB);
                 subjectSelectDlg.getFilterModel().addFilter("level", levelCB);
 //                subjectSelectDlg.getFilterModel().addFilter("subjectCycle", subjectCycleCB);
@@ -988,7 +1002,7 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                 qm.addWhere("mandatory", Boolean.FALSE);
                 qm.addWhere("subjectCycle", ECriteria.NOT_EQUAL, ID.valueOf(4));
                 electiveSubjectSelectDlg.setDialogWidth(600);
-                electiveSubjectSelectDlg.setDialogHeight(200);
+                electiveSubjectSelectDlg.setDialogHeight(400);
                 electiveSubjectSelectDlg.getFilterModel().addFilter("chair", chairCB);
                 electiveSubjectSelectDlg.getFilterModel().addFilter("level", levelCB);
 //                electiveSubjectSelectDlg.getFilterModel().addFilter("subjectCycle", subjectCycleCB);
@@ -1009,7 +1023,7 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
         public void buttonClick(ClickEvent ev) {
             try {
                 getParentView().save();
-                FormModel fm = new FormModel(V_ELECTIVE_SUBJECT.class, true);
+                FormModel fm = new FormModel(V_CURRICULUM_DETAIL.class, true);
                 fm.setTitleResource("semester." + semester.getId().toString());
                 fm.setDeferredCreate(false);
 
@@ -1031,9 +1045,9 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                 QueryModel creditabilityQM = creditabilityFM.getQueryModel();
                 creditabilityQM.addOrder("credit");
 
-                V_ELECTIVE_SUBJECT vcd = (V_ELECTIVE_SUBJECT) fm.getEntity();
+                V_CURRICULUM_DETAIL vcd = (V_CURRICULUM_DETAIL) fm.getEntity();
                 vcd.setSubject(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class)
-                        .lookup(V_SUBJECT_SELECT.class, ID.valueOf(999999)));
+                        .lookup(SUBJECT.class, ID.valueOf(999999)));
 
                 addElectiveFWD = new FormWidgetDialog(fm);
                 addElectiveFWD.getFormWidget().addEntityListener(SemesterDetailPanel.this);

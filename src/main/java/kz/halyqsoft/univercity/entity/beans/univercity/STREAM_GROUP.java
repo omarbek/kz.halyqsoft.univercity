@@ -11,13 +11,13 @@ import java.util.Date;
 @Entity
 public class STREAM_GROUP extends AbstractEntity {
 
-    @FieldInfo(type = EFieldType.FK_COMBO, inGrid = false, inEdit = false, inView = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 1)
     @ManyToOne
     @JoinColumns({
-            @JoinColumn(name = "GROUP_ID", referencedColumnName = "ID", nullable = false)})
+            @JoinColumn(name = "GROUP_ID",  referencedColumnName = "ID", nullable = false)})
     private GROUPS group;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, inGrid = false, inEdit = false, inView = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 2)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "STREAM_ID", referencedColumnName = "ID", nullable = false)})

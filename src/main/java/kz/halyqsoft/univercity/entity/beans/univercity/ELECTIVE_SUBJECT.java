@@ -41,9 +41,7 @@ public class ELECTIVE_SUBJECT extends AbstractEntity {
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "SUBJECT_CYCLE_ID", referencedColumnName = "ID")})
-    private SUBJECT_CYCLE subjectCycle;
-
-    @ManyToOne
+    private SUBJECT_CYCLE subjectCycle;@ManyToOne
     @JoinColumns({
             @JoinColumn(name = "EDUCATION_MODULE_TYPE_ID", referencedColumnName = "ID")})
     private EDUCATION_MODULE_TYPE educationModuleType;

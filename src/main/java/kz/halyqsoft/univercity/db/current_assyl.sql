@@ -147,3 +147,19 @@ ALTER TABLE ONLY DOCUMENT
 REFERENCES users (id)
 ON UPDATE RESTRICT ON DELETE RESTRICT;
 
+
+CREATE VIEW v_groups_creation_needed
+  as SELECT DISTINCT
+       grs.id as id , spy.id as speciality_id,
+       stt_edt.language_id, stt.entrance_year_id,
+       stt_edt.study_year_id , sc.corpus_id
+     from groups grs
+       INNER JOIN speciality spy
+         on grs.speciality_id = spy.id
+       INNER JOIN student_education stt_edt
+         on grs.id = stt_edt.groups_id
+       INNER JOIN speciality_corpus sc
+         ON spy.id = sc.speciality_id
+       INNER JOIN student stt ON stt_edt.student_id = stt.id
+     where grs.deleted = false and spy.deleted = false;
+

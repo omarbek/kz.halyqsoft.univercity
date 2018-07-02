@@ -4,13 +4,13 @@ import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.HorizontalLayout;
 import kz.halyqsoft.univercity.filter.FGroupFilter;
-import kz.halyqsoft.univercity.filter.FStudentFilter;
+import kz.halyqsoft.univercity.filter.FStreamFilter;
 import org.r3a.common.vaadin.widget.filter2.panel.AbstractFilterPanel;
 
 @SuppressWarnings("serial")
-public final class GroupFilterPanel extends AbstractFilterPanel {
+public final class StreamFilterPanel extends AbstractFilterPanel {
 
-	public GroupFilterPanel(FGroupFilter filterBean) {
+	public StreamFilterPanel(FStreamFilter filterBean) {
 		super(filterBean);
 	}
 
@@ -20,7 +20,12 @@ public final class GroupFilterPanel extends AbstractFilterPanel {
 		hl.setSpacing(true);
 		hl.setWidthUndefined();
 		
-		AbstractField af = getFilterComponent("speciality");
+		AbstractField af = getFilterComponent("semester");
+		if (af != null) {
+			hl.addComponent(af);
+		}
+
+		af = getFilterComponent("semesterData");
 		if (af != null) {
 			hl.addComponent(af);
 		}
@@ -31,12 +36,6 @@ public final class GroupFilterPanel extends AbstractFilterPanel {
 		}
 
 		af = getFilterComponent("name");
-		if (af != null) {
-			hl.addComponent(af);
-		}
-
-		
-		af = getFilterComponent("orders");
 		if (af != null) {
 			hl.addComponent(af);
 		}

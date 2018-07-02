@@ -199,6 +199,7 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_LOAD_TO_CHAIR</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_LOAD_TO_CHAIR_COUNT</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_LOAD_TO_CHAIR_COUNT_ALL</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_GROUPS_CREATION_NEEDED</class>
 
         <class>kz.halyqsoft.univercity.entity.beans.univercity.AbstractSpiderEntity</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.AbstractStudentEntity</class>

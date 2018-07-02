@@ -273,7 +273,5 @@ CREATE OR REPLACE VIEW V_CURRICULUM_SUBJECT AS
     INNER JOIN ACADEMIC_FORMULA f ON subject.ACADEMIC_FORMULA_ID = f.ID
     INNER JOIN CONTROL_TYPE h ON subject.CONTROL_TYPE_ID = h.ID;
 
---damira
-
 alter table subject drop column education_module_type_id;
 alter table subject drop column code;
