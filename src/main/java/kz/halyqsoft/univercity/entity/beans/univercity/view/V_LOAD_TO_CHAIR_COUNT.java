@@ -1,7 +1,6 @@
 package kz.halyqsoft.univercity.entity.beans.univercity.view;
 
 import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
@@ -10,16 +9,10 @@ import javax.persistence.*;
 
 /**
  * @author Omarbek
- * @created on 29.06.2018
+ * @created on 30.06.2018
  */
 @Entity
-public class V_LOAD_TO_CHAIR extends AbstractEntity{
-
-    @FieldInfo(type = EFieldType.FK_DIALOG, order = 2, inGrid = false, columnWidth = 80)
-    @ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
-    private SUBJECT subject;
+public class V_LOAD_TO_CHAIR_COUNT extends AbstractEntity{
 
     @FieldInfo(type = EFieldType.FK_DIALOG, order = 3, inGrid = false, columnWidth = 80)
     @ManyToOne
@@ -27,29 +20,9 @@ public class V_LOAD_TO_CHAIR extends AbstractEntity{
             @JoinColumn(name = "CURRICULUM_ID", referencedColumnName = "ID")})
     private CURRICULUM curriculum;
 
-    @FieldInfo(type = EFieldType.TEXT, order = 4)
-    @Column(name = "SUBJECT_NAME", nullable = false)
-    private String subjectName;
-
     @FieldInfo(type = EFieldType.INTEGER, order = 5)
     @Column(name = "STUDY_YEAR")
     private Integer studyYear;
-
-    @FieldInfo(type = EFieldType.TEXT, order = 6)
-    @Column(name = "STREAM")
-    private String stream;
-
-    @FieldInfo(type = EFieldType.TEXT, order = 7)
-    @Column(name = "SEMESTER_NAME")
-    private String semesterName;
-
-    @FieldInfo(type = EFieldType.DOUBLE, order = 8)
-    @Column(name = "STUDENT_NUMBER")
-    private Double studentNumber;
-
-    @FieldInfo(type = EFieldType.DOUBLE, order = 9)
-    @Column(name = "CREDIT")
-    private Double credit;
 
     @FieldInfo(type = EFieldType.DOUBLE, order = 10)
     @Column(name = "LC_COUNT")
@@ -103,68 +76,12 @@ public class V_LOAD_TO_CHAIR extends AbstractEntity{
     @Column(name = "TOTAL_COUNT")
     private Double totalCount;
 
-    public SUBJECT getSubject() {
-        return subject;
-    }
-
-    public void setSubject(SUBJECT subject) {
-        this.subject = subject;
-    }
-
-    public CURRICULUM getCurriculum() {
-        return curriculum;
-    }
-
-    public void setCurriculum(CURRICULUM curriculum) {
-        this.curriculum = curriculum;
-    }
-
-    public String getSubjectName() {
-        return subjectName;
-    }
-
-    public void setSubjectName(String subjectName) {
-        this.subjectName = subjectName;
-    }
-
-    public String getStream() {
-        return stream;
-    }
-
-    public void setStream(String stream) {
-        this.stream = stream;
-    }
-
-    public String getSemesterName() {
-        return semesterName;
-    }
-
-    public void setSemesterName(String semesterName) {
-        this.semesterName = semesterName;
-    }
-
     public Integer getStudyYear() {
         return studyYear;
     }
 
     public void setStudyYear(Integer studyYear) {
         this.studyYear = studyYear;
-    }
-
-    public Double getStudentNumber() {
-        return studentNumber;
-    }
-
-    public void setStudentNumber(Double studentNumber) {
-        this.studentNumber = studentNumber;
-    }
-
-    public Double getCredit() {
-        return credit;
-    }
-
-    public void setCredit(Double credit) {
-        this.credit = credit;
     }
 
     public Double getLcCount() {
@@ -269,5 +186,13 @@ public class V_LOAD_TO_CHAIR extends AbstractEntity{
 
     public void setTotalCount(Double totalCount) {
         this.totalCount = totalCount;
+    }
+
+    public CURRICULUM getCurriculum() {
+        return curriculum;
+    }
+
+    public void setCurriculum(CURRICULUM curriculum) {
+        this.curriculum = curriculum;
     }
 }

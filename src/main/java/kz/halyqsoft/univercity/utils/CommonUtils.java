@@ -246,7 +246,7 @@ public class CommonUtils {
             return (SEMESTER_DATA) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class)
                     .getEntityByNamedQuery("SEMESTER_DATA.findCurrentSemesterData", Collections.EMPTY_MAP);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            return null;
         }
     }
 }

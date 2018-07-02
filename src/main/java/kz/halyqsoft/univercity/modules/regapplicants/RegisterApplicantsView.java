@@ -1,6 +1,5 @@
 package kz.halyqsoft.univercity.modules.regapplicants;
 
-import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -90,7 +89,8 @@ public class RegisterApplicantsView extends AbstractTaskView {
             Calendar c = Calendar.getInstance();
             QueryModel<ENTRANCE_YEAR> qmEntranceYear = new QueryModel<>(ENTRANCE_YEAR.class);
             qmEntranceYear.addWhere("beginYear", ECriteria.EQUAL, c.get(Calendar.YEAR));
-            ENTRANCE_YEAR ey = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(qmEntranceYear);
+            ENTRANCE_YEAR ey = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                    lookupSingle(qmEntranceYear);
 
             ((STUDENT) studentFM.getEntity()).setEntranceYear(ey);
             ((STUDENT) studentFM.getEntity()).setLevel(SessionFacadeFactory.getSessionFacade(

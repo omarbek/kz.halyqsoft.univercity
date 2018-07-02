@@ -23,16 +23,6 @@ public class STREAM_GROUP extends AbstractEntity {
             @JoinColumn(name = "STREAM_ID", referencedColumnName = "ID", nullable = false)})
     private STREAM stream;
 
-    @FieldInfo(type = EFieldType.DATETIME, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false)
-    @Column(name = "created")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date created;
-
-    @FieldInfo(type = EFieldType.DATETIME, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false)
-    @Column(name = "updated")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updated;
-
     public GROUPS getGroup() {
         return group;
     }
@@ -47,21 +37,5 @@ public class STREAM_GROUP extends AbstractEntity {
 
     public void setStream(STREAM stream) {
         this.stream = stream;
-    }
-
-    public Date getCreated() {
-        return created;
-    }
-
-    public void setCreated(Date created) {
-        this.created = created;
-    }
-
-    public Date getUpdated() {
-        return updated;
-    }
-
-    public void setUpdated(Date updated) {
-        this.updated = updated;
     }
 }
