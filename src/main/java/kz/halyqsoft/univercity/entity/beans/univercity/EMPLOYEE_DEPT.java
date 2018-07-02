@@ -7,15 +7,8 @@ import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
 
+import javax.persistence.*;
 import java.util.Date;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.ManyToOne;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 /**
  * @author Omarbek
@@ -78,14 +71,18 @@ public class EMPLOYEE_DEPT extends AbstractEntity {
 	@FieldInfo(type = EFieldType.BOOLEAN, order = 11, required = false)
 	@Column(name = "ADVISER", nullable = false)
     private boolean adviser;
+
+	@FieldInfo(type = EFieldType.BOOLEAN, order = 12, required = false)
+	@Column(name = "LECTURER", nullable = false)
+	private boolean lecturer;
 	
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 12, required = false, inEdit = false, inGrid = false, inView = false)
+	@FieldInfo(type = EFieldType.FK_COMBO, order = 13, required = false, inEdit = false, inGrid = false, inView = false)
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "PARENT_ID", referencedColumnName = "ID")})
     private EMPLOYEE_DEPT parent;
 	
-	@FieldInfo(type = EFieldType.TEXT, max = 1000, order = 13, required = false, inGrid = false)
+	@FieldInfo(type = EFieldType.TEXT, max = 1000, order = 14, required = false, inGrid = false)
 	@Column(name = "DESCR", nullable = false)
 	private String descr;
 	
@@ -194,5 +191,13 @@ public class EMPLOYEE_DEPT extends AbstractEntity {
 
 	public void setDescr(String descr) {
 		this.descr = descr;
+	}
+
+	public boolean isLecturer() {
+		return lecturer;
+	}
+
+	public void setLecturer(boolean lecturer) {
+		this.lecturer = lecturer;
 	}
 }

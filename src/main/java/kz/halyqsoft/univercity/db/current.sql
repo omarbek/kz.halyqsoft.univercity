@@ -510,3 +510,41 @@ ALTER TABLE stream
   ALTER COLUMN updated DROP NOT NULL;
 ALTER TABLE stream
   ALTER COLUMN name DROP NOT NULL;
+
+ALTER TABLE employee_dept
+  ADD COLUMN lecturer BOOLEAN NULL;
+
+UPDATE employee_dept
+SET lecturer = TRUE
+WHERE employee_type_id = 2;
+UPDATE employee_dept
+SET lecturer = FALSE
+WHERE employee_type_id = 1;
+
+ALTER TABLE employee_dept
+  ALTER COLUMN lecturer SET NOT NULL;
+
+CREATE OR REPLACE VIEW V_EMPLOYEE_DEPT AS
+  SELECT
+    empl_dept.ID,
+    empl_dept.EMPLOYEE_ID,
+    empl_dept.EMPLOYEE_TYPE_ID,
+    empl_type.TYPE_NAME EMPLOYEE_TYPE_NAME,
+    empl_dept.DEPT_ID,
+    dep.DEPT_NAME,
+    dep.DEPT_SHORT_NAME,
+    empl_dept.POST_ID,
+    post.POST_NAME,
+    empl_dept.LIVE_LOAD,
+    empl_dept.WAGE_RATE,
+    empl_dept.RATE_LOAD,
+    empl_dept.HOUR_COUNT,
+    empl_dept.HIRE_DATE,
+    empl_dept.DISMISS_DATE,
+    empl_dept.ADVISER,
+    empl_dept.PARENT_ID,
+    empl_dept.lecturer
+  FROM EMPLOYEE_DEPT empl_dept INNER JOIN EMPLOYEE_TYPE empl_type ON empl_dept.EMPLOYEE_TYPE_ID = empl_type.ID
+    INNER JOIN DEPARTMENT dep ON empl_dept.DEPT_ID = dep.ID
+    LEFT JOIN POST post ON empl_dept.POST_ID = post.ID
+    INNER JOIN EMPLOYEE empl ON empl_dept.EMPLOYEE_ID = empl.ID;
