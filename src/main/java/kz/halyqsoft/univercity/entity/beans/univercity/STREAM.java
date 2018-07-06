@@ -1,7 +1,7 @@
 package kz.halyqsoft.univercity.entity.beans.univercity;
 
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.V_COORDINATOR;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_DATA;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
@@ -12,17 +12,17 @@ import java.util.Date;
 @Entity
 public class STREAM extends AbstractEntity {
 
-    @FieldInfo(order = 1)
-    @Column(name = "NAME", nullable = false )
+    @FieldInfo(type = EFieldType.TEXT, required = false)
+    @Column(name = "NAME")
     private String name;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 2 )
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 2)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "SEMESTER_DATA_ID", referencedColumnName = "ID")})
     private SEMESTER_DATA semesterData;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 3)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 3, required = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "SEMESTER_ID", referencedColumnName = "ID")})
@@ -33,7 +33,8 @@ public class STREAM extends AbstractEntity {
     @Temporal(TemporalType.TIMESTAMP)
     private Date created;
 
-    @FieldInfo(type = EFieldType.DATETIME, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false, order = 5)
+    @FieldInfo(type = EFieldType.DATETIME, required = false, readOnlyFixed = true, inGrid = false, inEdit = false,
+            inView = false, order = 5)
     @Column(name = "updated")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updated;
