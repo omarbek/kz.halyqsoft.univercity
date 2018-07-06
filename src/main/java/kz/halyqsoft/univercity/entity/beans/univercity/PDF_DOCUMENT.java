@@ -10,21 +10,25 @@ import javax.persistence.*;
 @Entity
 public class PDF_DOCUMENT extends AbstractEntity {
 
-    @FieldInfo(type = EFieldType.FK_COMBO, inGrid = false, inEdit = false, inView = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, inGrid = false, inEdit = false, inView = false, order = 1)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "USER_ID", referencedColumnName = "ID", nullable = false)})
     private USERS user;
 
+    @FieldInfo(order = 2)
     @Column(name = "title")
     private String title;
 
+    @FieldInfo(order = 3)
     @Column(name = "file_name", nullable = false)
     private String fileName;
 
+    @FieldInfo(inGrid = false , inView = false , inEdit = false, order = 4)
     @Column(name = "deleted", nullable = false)
     private Boolean deleted;
 
+    @FieldInfo(inGrid = false , inView = false , inEdit = false, order = 5)
     @Column(name = "file_byte")
     @Lob
     @Basic(fetch = FetchType.LAZY)

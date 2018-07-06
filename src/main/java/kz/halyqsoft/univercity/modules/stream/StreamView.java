@@ -34,9 +34,7 @@ import org.r3a.common.vaadin.widget.form.FormModel;
 import org.r3a.common.vaadin.widget.form.FormWidgetDialog;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
-import sun.misc.resources.Messages_sv;
 
-import java.math.BigInteger;
 import java.util.*;
 
 public class StreamView extends AbstractTaskView implements EntityListener , FilterPanelListener{

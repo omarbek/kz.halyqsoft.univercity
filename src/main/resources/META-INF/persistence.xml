@@ -316,6 +316,7 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.SPECIALITY_CORPUS</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.STREAM</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.STREAM_GROUP</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.PDF_DOCUMENT_SIGNER_POST</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>

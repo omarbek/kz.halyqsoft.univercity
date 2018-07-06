@@ -104,6 +104,18 @@ public class PdfEdit extends AbstractCommonView {
                     HorizontalLayout textAreaHL = new HorizontalLayout();
 
                     Button deleteHLButton = new Button("-");
+                    deleteHLButton.addClickListener(new Button.ClickListener() {
+                        @Override
+                        public void buttonClick(Button.ClickEvent clickEvent) {
+                            if(textHL.getComponentIndex(addComponentButton)==-1){
+                                customFieldList.remove(customField);
+                                itemsVL.removeComponent(textAreaHL);
+                                itemsVL.removeComponent(textHL);
+                            }else{
+                                Message.showInfo("Can not delete!");
+                            }
+                        }
+                    });
 
                     setTextArea(customField.getTextField(), textAreaHL);
 

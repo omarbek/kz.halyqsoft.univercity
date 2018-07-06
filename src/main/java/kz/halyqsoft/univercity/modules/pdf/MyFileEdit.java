@@ -1,26 +1,22 @@
-package kz.halyqsoft.univercity.modules.file;
+package kz.halyqsoft.univercity.modules.pdf;
 
-import com.vaadin.server.Sizeable;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.HorizontalLayout;
 import kz.halyqsoft.univercity.entity.beans.univercity.PDF_DOCUMENT;
-import kz.halyqsoft.univercity.modules.pdf.PdfEdit;
+import kz.halyqsoft.univercity.modules.file.FileView;
 import kz.halyqsoft.univercity.utils.CommonUtils;
-import org.r3a.common.entity.ID;
 import org.r3a.common.vaadin.AbstractWebUI;
+import org.r3a.common.vaadin.view.AbstractCommonView;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.dialog.AbstractDialog;
-import org.r3a.common.vaadin.widget.form.CommonFormWidget;
-import org.r3a.common.vaadin.widget.table.TableWidget;
 
 /**
  * @author Omarbek
  * @created on 26.04.2018
  */
-public class FileEdit extends AbstractDialog {
+public class MyFileEdit extends AbstractDialog {
 
-    public FileEdit(PDF_DOCUMENT pdfDocument, AbstractTaskView fileView)  {
+    public MyFileEdit(PDF_DOCUMENT pdfDocument, AbstractCommonView fileView)  {
         setWidth(1300,Unit.PIXELS);
         setHeight(500,Unit.PIXELS);
         center();
@@ -35,7 +31,7 @@ public class FileEdit extends AbstractDialog {
             public void buttonClick(Button.ClickEvent clickEvent) {
                 close();
                 try {
-                    ((FileView)fileView).refresh();
+                    ((SearchTabContainer)fileView).refresh();
                 } catch (Exception e) {
                    CommonUtils.showMessageAndWriteLog("Unable to refresh fileView", e);
                 }
