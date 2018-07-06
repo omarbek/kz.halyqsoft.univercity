@@ -13,7 +13,7 @@ import javax.persistence.*;
  * @created on 29.06.2018
  */
 @Entity
-public class V_LOAD_TO_CHAIR extends AbstractEntity{
+public class V_LOAD_TO_CHAIR extends AbstractEntity {
 
     @FieldInfo(type = EFieldType.FK_DIALOG, order = 2, inGrid = false, columnWidth = 80)
     @ManyToOne
@@ -43,9 +43,9 @@ public class V_LOAD_TO_CHAIR extends AbstractEntity{
     @Column(name = "SEMESTER_NAME")
     private String semesterName;
 
-    @FieldInfo(type = EFieldType.DOUBLE, order = 8)
+    @FieldInfo(type = EFieldType.INTEGER, order = 8)
     @Column(name = "STUDENT_NUMBER")
-    private Double studentNumber;
+    private Integer studentNumber;
 
     @FieldInfo(type = EFieldType.DOUBLE, order = 9)
     @Column(name = "CREDIT")
@@ -151,11 +151,11 @@ public class V_LOAD_TO_CHAIR extends AbstractEntity{
         this.studyYear = studyYear;
     }
 
-    public Double getStudentNumber() {
+    public Integer getStudentNumber() {
         return studentNumber;
     }
 
-    public void setStudentNumber(Double studentNumber) {
+    public void setStudentNumber(Integer studentNumber) {
         this.studentNumber = studentNumber;
     }
 

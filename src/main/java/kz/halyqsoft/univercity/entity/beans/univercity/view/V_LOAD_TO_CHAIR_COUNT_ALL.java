@@ -1,6 +1,7 @@
 package kz.halyqsoft.univercity.entity.beans.univercity.view;
 
 import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEPARTMENT;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
@@ -19,6 +20,12 @@ public class V_LOAD_TO_CHAIR_COUNT_ALL extends AbstractEntity{
     @JoinColumns({
             @JoinColumn(name = "CURRICULUM_ID", referencedColumnName = "ID")})
     private CURRICULUM curriculum;
+
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 4)
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "CHAIR_ID", referencedColumnName = "ID")})
+    private DEPARTMENT chair;
 
     @FieldInfo(type = EFieldType.DOUBLE, order = 10)
     @Column(name = "LC_COUNT")
@@ -182,5 +189,13 @@ public class V_LOAD_TO_CHAIR_COUNT_ALL extends AbstractEntity{
 
     public void setCurriculum(CURRICULUM curriculum) {
         this.curriculum = curriculum;
+    }
+
+    public DEPARTMENT getChair() {
+        return chair;
+    }
+
+    public void setChair(DEPARTMENT chair) {
+        this.chair = chair;
     }
 }

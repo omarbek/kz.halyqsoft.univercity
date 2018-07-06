@@ -20,10 +20,6 @@ public class V_TEACHER_LOAD_CALC_DETAIL extends AbstractEntity {
 
 	private static final long serialVersionUID = -2803415215554398352L;
 
-	@FieldInfo(type = EFieldType.TEXT, max = 10, order = 3, inEdit = false, inView = false, columnWidth = 90)
-	@Column(name = "SUBJECT_CODE")
-	private String subjectCode;
-	
 	@FieldInfo(type = EFieldType.TEXT, max = 10, order = 6, inEdit = false, inView = false)
 	@Column(name = "SUBJECT_NAME")
 	private String subjectName;
@@ -95,14 +91,6 @@ public class V_TEACHER_LOAD_CALC_DETAIL extends AbstractEntity {
 	private Double totalCredit;
 	
 	public V_TEACHER_LOAD_CALC_DETAIL() {
-	}
-
-	public String getSubjectCode() {
-		return subjectCode;
-	}
-
-	public void setSubjectCode(String subjectCode) {
-		this.subjectCode = subjectCode;
 	}
 
 	public String getSubjectName() {

@@ -176,8 +176,8 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
                                            STUDY_YEAR studyYear) {
         QueryModel<V_LOAD_TO_CHAIR> loadQM = new QueryModel<>(V_LOAD_TO_CHAIR.class);
         FromItem curriculumFI = loadQM.addJoin(EJoin.INNER_JOIN, "curriculum", CURRICULUM.class, "id");
-        FromItem specFI = curriculumFI.addJoin(EJoin.INNER_JOIN, "speciality", SPECIALITY.class, "id");
-        loadQM.addWhere(specFI, "department", ECriteria.EQUAL, chair.getId());
+        FromItem subjFI = loadQM.addJoin(EJoin.INNER_JOIN, "subject", SUBJECT.class, "id");
+        loadQM.addWhere(subjFI, "chair", ECriteria.EQUAL, chair.getId());
         loadQM.addWhere(curriculumFI, "entranceYear", ECriteria.EQUAL, currentYear.getId());
         loadQM.addWhere(curriculumFI, "diplomaType", ECriteria.EQUAL, studentDiplomaType.getId());
         loadQM.addWhere("studyYear", ECriteria.EQUAL, studyYear.getId());
@@ -194,8 +194,7 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
                                                      STUDENT_DIPLOMA_TYPE studentDiplomaType, STUDY_YEAR studyYear) {
         QueryModel<V_LOAD_TO_CHAIR_COUNT> loadQM = new QueryModel<>(V_LOAD_TO_CHAIR_COUNT.class);
         FromItem curriculumFI = loadQM.addJoin(EJoin.INNER_JOIN, "curriculum", CURRICULUM.class, "id");
-        FromItem specFI = curriculumFI.addJoin(EJoin.INNER_JOIN, "speciality", SPECIALITY.class, "id");
-        loadQM.addWhere(specFI, "department", ECriteria.EQUAL, chair.getId());
+        loadQM.addWhere("chair", ECriteria.EQUAL, chair.getId());
         loadQM.addWhere(curriculumFI, "diplomaType", ECriteria.EQUAL, studentDiplomaType.getId());
         loadQM.addWhere(curriculumFI, "entranceYear", ECriteria.EQUAL, currentYear.getId());
         loadQM.addWhere("studyYear", ECriteria.EQUAL, studyYear.getId());
@@ -204,6 +203,22 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
                     lookup(loadQM);
         } catch (Exception e) {
             CommonUtils.showMessageAndWriteLog("Unable to refresh count of loading to chair", e);
+        }
+        return new ArrayList<>();
+    }
+
+    private List<V_LOAD_TO_CHAIR_COUNT_ALL> getLoadAllCount(ENTRANCE_YEAR currentYear, DEPARTMENT chair,
+                                                            STUDENT_DIPLOMA_TYPE studentDiplomaType) {
+        QueryModel<V_LOAD_TO_CHAIR_COUNT_ALL> loadQM = new QueryModel<>(V_LOAD_TO_CHAIR_COUNT_ALL.class);
+        FromItem curriculumFI = loadQM.addJoin(EJoin.INNER_JOIN, "curriculum", CURRICULUM.class, "id");
+        loadQM.addWhere("chair", ECriteria.EQUAL, chair.getId());
+        loadQM.addWhere(curriculumFI, "diplomaType", ECriteria.EQUAL, studentDiplomaType.getId());
+        loadQM.addWhere(curriculumFI, "entranceYear", ECriteria.EQUAL, currentYear.getId());
+        try {
+            return SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                    lookup(loadQM);
+        } catch (Exception e) {
+            CommonUtils.showMessageAndWriteLog("Unable to refresh all count of loading to chair", e);
         }
         return new ArrayList<>();
     }
@@ -221,23 +236,6 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
                     chairFilter.getStudentDiplomaType());
             refresh(loads, loadCounts, loadAllCounts);
         }
-    }
-
-    private List<V_LOAD_TO_CHAIR_COUNT_ALL> getLoadAllCount(ENTRANCE_YEAR currentYear, DEPARTMENT chair,
-                                                            STUDENT_DIPLOMA_TYPE studentDiplomaType) {
-        QueryModel<V_LOAD_TO_CHAIR_COUNT_ALL> loadQM = new QueryModel<>(V_LOAD_TO_CHAIR_COUNT_ALL.class);
-        FromItem curriculumFI = loadQM.addJoin(EJoin.INNER_JOIN, "curriculum", CURRICULUM.class, "id");
-        FromItem specFI = curriculumFI.addJoin(EJoin.INNER_JOIN, "speciality", SPECIALITY.class, "id");
-        loadQM.addWhere(specFI, "department", ECriteria.EQUAL, chair.getId());
-        loadQM.addWhere(curriculumFI, "diplomaType", ECriteria.EQUAL, studentDiplomaType.getId());
-        loadQM.addWhere(curriculumFI, "entranceYear", ECriteria.EQUAL, currentYear.getId());
-        try {
-            return SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
-                    lookup(loadQM);
-        } catch (Exception e) {
-            CommonUtils.showMessageAndWriteLog("Unable to refresh all count of loading to chair", e);
-        }
-        return new ArrayList<>();
     }
 
     @Override
