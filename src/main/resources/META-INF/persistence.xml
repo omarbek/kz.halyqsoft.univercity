@@ -317,6 +317,11 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.STREAM</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.STREAM_GROUP</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.PDF_DOCUMENT_SIGNER_POST</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_IMPORTANCE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_SIGNER</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_SIGNER_STATUS</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_STATUS</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>

@@ -1,5 +1,7 @@
 package kz.halyqsoft.univercity.entity.beans.univercity;
 
+import kz.halyqsoft.univercity.entity.beans.USERS;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.POST;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
@@ -10,37 +12,35 @@ import java.util.Date;
 @Entity
 public class DOCUMENT_SIGNER extends AbstractEntity{
 
-    @FieldInfo(type = EFieldType.FK_COMBO, inGrid = false, inEdit = false, inView = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, inEdit = false, inView = false , inGrid = false , order = 1)
     @ManyToOne
     @JoinColumns({
-            @JoinColumn(name = "document_id", referencedColumnName = "ID", nullable = false)})
+            @JoinColumn(name = "document_id", referencedColumnName = "ID")})
     private DOCUMENT document;
 
-
-    @FieldInfo(type = EFieldType.FK_COMBO, inGrid = false, inEdit = false, inView = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, readOnlyFixed = true, order = 2)
     @ManyToOne
     @JoinColumns({
-            @JoinColumn(name = "employee_id", referencedColumnName = "ID", nullable = false)})
-    private EMPLOYEE signerEmployee;
+            @JoinColumn(name = "post_id", referencedColumnName = "ID")})
+    private POST post;
 
 
-    @FieldInfo(type = EFieldType.FK_COMBO, inGrid = false, inEdit = false, inView = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 3)
     @ManyToOne
     @JoinColumns({
-            @JoinColumn(name = "document_signer_status_id", referencedColumnName = "ID", nullable = false)})
+            @JoinColumn(name = "employee_id", referencedColumnName = "ID")})
+    private EMPLOYEE employee;
+
+    @FieldInfo(type = EFieldType.FK_COMBO,inGrid = false , inView = false , inEdit = false ,required = false , order = 4)
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "document_signer_status_id", referencedColumnName = "ID")})
     private DOCUMENT_SIGNER_STATUS documentSignerStatus;
 
 
-    @Column(name = "order", nullable = false)
-    private int order;
-
-    @FieldInfo(type = EFieldType.BOOLEAN, required = false, inGrid = false)
-    @Column(name = "signed", nullable = false)
-    private boolean signed;
-
-    @FieldInfo(type = EFieldType.TEXT, required = false, inGrid = false)
-    @Column(name = "comment", nullable = false)
-    private boolean comment;
+    @FieldInfo(type = EFieldType.TEXT, inEdit = false , inView = false , inGrid = false , required = false, order = 5)
+    @Column(name = "message")
+    private String message;
 
 
     @FieldInfo(type = EFieldType.DATETIME, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false)
@@ -54,20 +54,16 @@ public class DOCUMENT_SIGNER extends AbstractEntity{
     @Temporal(TemporalType.TIMESTAMP)
     private Date updated;
 
+    @FieldInfo(type = EFieldType.BOOLEAN, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false)
+    @Column(name = "deleted")
+    private boolean deleted;
+
     public DOCUMENT getDocument() {
         return document;
     }
 
     public void setDocument(DOCUMENT document) {
         this.document = document;
-    }
-
-    public EMPLOYEE getSignerEmployee() {
-        return signerEmployee;
-    }
-
-    public void setSignerEmployee(EMPLOYEE signerEmployee) {
-        this.signerEmployee = signerEmployee;
     }
 
     public DOCUMENT_SIGNER_STATUS getDocumentSignerStatus() {
@@ -78,28 +74,12 @@ public class DOCUMENT_SIGNER extends AbstractEntity{
         this.documentSignerStatus = documentSignerStatus;
     }
 
-    public boolean isSigned() {
-        return signed;
+    public String getMessage() {
+        return message;
     }
 
-    public void setSigned(boolean signed) {
-        this.signed = signed;
-    }
-
-    public int getOrder() {
-        return order;
-    }
-
-    public void setOrder(int order) {
-        this.order = order;
-    }
-
-    public boolean isComment() {
-        return comment;
-    }
-
-    public void setComment(boolean comment) {
-        this.comment = comment;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     public Date getCreated() {
@@ -116,6 +96,30 @@ public class DOCUMENT_SIGNER extends AbstractEntity{
 
     public void setUpdated(Date updated) {
         this.updated = updated;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    public USERS getEmployee() {
+        return employee;
+    }
+
+    public void setEmployee(EMPLOYEE employee) {
+        this.employee = employee;
+    }
+
+    public POST getPost() {
+        return post;
+    }
+
+    public void setPost(POST post) {
+        this.post = post;
     }
 
     public DOCUMENT_SIGNER() {

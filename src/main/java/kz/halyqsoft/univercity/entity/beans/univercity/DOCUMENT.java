@@ -11,42 +11,39 @@ import java.util.Date;
 @Entity
 public class DOCUMENT extends AbstractEntity{
 
-    @FieldInfo(type = EFieldType.FK_COMBO, inGrid = false, inEdit = false, inView = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, inGrid = false, inEdit = false, inView = false ,order = 1)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "creator_employee_id", referencedColumnName = "ID", nullable = false)})
     private EMPLOYEE creatorEmployee;
 
 
-    @FieldInfo(type = EFieldType.FK_COMBO, inGrid = false, inEdit = false, inView = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 2)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "document_status_id", referencedColumnName = "ID", nullable = false)})
     private DOCUMENT_STATUS documentStatus;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, inGrid = false, inEdit = false, inView = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 3)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "document_importance_id", referencedColumnName = "ID", nullable = false)})
     private DOCUMENT_IMPORTANCE documentImportance;
 
 
-    @FieldInfo(type = EFieldType.FK_COMBO, inGrid = false, inEdit = false, inView = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, inGrid = false, inEdit = false, inView = false )
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "pdf_document_id", referencedColumnName = "ID", nullable = false)})
     private PDF_DOCUMENT pdfDocument;
 
 
-    @FieldInfo(type = EFieldType.TEXT, inGrid = false, inEdit = false, inView = false)
+    @FieldInfo(type = EFieldType.TEXT, order = 4)
     @Column(name = "message")
     private String message;
 
-    @FieldInfo(type = EFieldType.TEXT, inGrid = false, inEdit = false, inView = false)
-    @Column(name = "note")
-    private String note;
 
-    @FieldInfo(type = EFieldType.DATETIME, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false)
+    @FieldInfo(type = EFieldType.DATETIME, required = false, readOnlyFixed = true, order = 5)
     @Column(name = "deadline_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date deadlineDate;
@@ -69,7 +66,7 @@ public class DOCUMENT extends AbstractEntity{
     @Column(name = "deleted")
     private boolean deleted;
 
-    public EMPLOYEE getCreatorEmployee() {
+    public USERS getCreatorEmployee() {
         return creatorEmployee;
     }
 
@@ -99,14 +96,6 @@ public class DOCUMENT extends AbstractEntity{
 
     public void setMessage(String message) {
         this.message = message;
-    }
-
-    public String getNote() {
-        return note;
-    }
-
-    public void setNote(String note) {
-        this.note = note;
     }
 
     public boolean isDeleted() {

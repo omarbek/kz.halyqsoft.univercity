@@ -4,7 +4,6 @@ import com.vaadin.data.Property;
 import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.modules.reports.MenuColumn;
-import kz.halyqsoft.univercity.modules.workflow.views.MainView;
 import org.r3a.common.entity.beans.AbstractTask;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.dialog.Message;
@@ -15,7 +14,7 @@ public class WorkflowView extends AbstractTaskView {
     VerticalLayout mainVL;
     VerticalLayout tab2MainVL;
     HorizontalSplitPanel mainHSP;
-    HorizontalLayout mainHL;
+    VerticalLayout secondMainVL;
 
     public static String MY_DOCUMENTS ;
     public static String MY_SAVES ;
@@ -65,7 +64,10 @@ public class WorkflowView extends AbstractTaskView {
 
     public void initTab1(){
         mainHSP = new HorizontalSplitPanel();
-        mainHL = new HorizontalLayout();
+        secondMainVL = new VerticalLayout();
+        secondMainVL.setSizeFull();
+        secondMainVL.setImmediate(true);
+        secondMainVL.setResponsive(true);
 
         mainHSP.setSizeFull();
         mainHSP.setSplitPosition(15);
@@ -120,13 +122,13 @@ public class WorkflowView extends AbstractTaskView {
 
                         if(!optionHC.hasChildren(valueChangeEvent.getProperty().getValue())){
                             if(mainHSP.getSecondComponent()!=null){
-                                mainHSP.removeComponent(mainHL);
+                                mainHSP.removeComponent(secondMainVL);
                             }
 
-                            mainHL.removeAllComponents();
+                            secondMainVL.removeAllComponents();
                             ViewResolver view = new ViewResolver();
-                            mainHL.addComponent(view.getViewByTitle((String) valueChangeEvent.getProperty().getValue()));
-                            mainHSP.addComponent(mainHL);
+                            secondMainVL.addComponent(view.getViewByTitle((String) valueChangeEvent.getProperty().getValue()));
+                            mainHSP.addComponent(secondMainVL);
                         }
                     }
                 }catch (IllegalArgumentException iea){

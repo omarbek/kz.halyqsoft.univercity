@@ -35,7 +35,7 @@ public class PDF_DOCUMENT extends AbstractEntity {
     private byte[] fileByte;
 
 
-    @FieldInfo(inGrid = false , inView = false , inEdit = false, order = 6)
+    @FieldInfo( inEdit = false, order = 6)
     @Column(name = "period")
     private int period;
 
@@ -88,5 +88,10 @@ public class PDF_DOCUMENT extends AbstractEntity {
 
     public void setPeriod(int period) {
         this.period = period;
+    }
+
+    @Override
+    public String toString() {
+        return fileName ;
     }
 }

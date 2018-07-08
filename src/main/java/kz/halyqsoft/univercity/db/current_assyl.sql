@@ -51,20 +51,6 @@ create sequence S_MESSAGE
   start with 1
   no cycle;
 
--- DOCUMENT_ACTIVITY
-
-CREATE TABLE DOCUMENT_ACTIVITY (
-  id        BIGINT                NOT NULL,
-  activity_name VARCHAR(50)
-);
-
-ALTER TABLE DOCUMENT_ACTIVITY
-  ADD CONSTRAINT pk_document_activity PRIMARY KEY (id);
-
-create sequence S_DOCUMENT_ACTIVITY
-  minvalue 0
-  start with 1
-  no cycle;
 
 -- DOCUMENT_STATUS
 
@@ -174,3 +160,77 @@ ON DELETE RESTRICT;
 --PDF DOCUMENT SIGNER LIST END
 
 ALTER TABLE pdf_document ADD COLUMN period INTEGER NOT NULL DEFAULT 0;
+
+ALTER TABLE DOCUMENT ALTER COLUMN updated DROP NOT NULL ;
+
+
+--DOCUMENT SIGNERS
+
+CREATE TABLE DOCUMENT_SIGNER(
+  id        BIGINT                NOT NULL,
+  employee_id BIGINT,
+  document_id BIGINT NOT NULL,
+  post_id BIGINT NOT NULL ,
+  document_signer_status_id BIGINT ,
+  message TEXT,
+  created TIMESTAMP NOT NULL,
+  updated TIMESTAMP,
+  deleted BOOLEAN DEFAULT FALSE
+);
+
+CREATE SEQUENCE s_document_signer
+  MINVALUE 0
+  START WITH 1
+  NO CYCLE ;
+
+ALTER TABLE ONLY DOCUMENT_SIGNER
+  ADD CONSTRAINT pk_document_signer PRIMARY KEY (id);
+
+ALTER TABLE ONLY DOCUMENT_SIGNER
+  ADD CONSTRAINT fk_document_signer_document
+FOREIGN KEY (document_id) REFERENCES DOCUMENT(id);
+
+
+ALTER TABLE ONLY DOCUMENT_SIGNER
+  ADD CONSTRAINT fk_document_signer_post
+FOREIGN KEY (post_id) REFERENCES post(id);
+
+ALTER TABLE ONLY DOCUMENT_SIGNER
+  ADD CONSTRAINT fk_document_signer_document_signer_status
+FOREIGN KEY (document_signer_status_id) REFERENCES DOCUMENT_SIGNER(id);
+
+--DOCUMENT SIGNERS END
+
+ALTER TABLE DOCUMENT DROP COLUMN note;
+
+ALTER TABLE DOCUMENT_IMPORTANCE DROP COLUMN importance_name;
+ALTER TABLE DOCUMENT_IMPORTANCE ADD COLUMN importance_value INTEGER NOT NULL;
+
+
+ALTER TABLE ONLY DOCUMENT
+  ADD CONSTRAINT fk_document_document_importance FOREIGN KEY (document_importance_id)
+REFERENCES DOCUMENT_IMPORTANCE(id)
+ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+ALTER TABLE ONLY DOCUMENT
+  ADD CONSTRAINT fk_document_pdf_document FOREIGN KEY (pdf_document_id)
+REFERENCES pdf_document(id)
+ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+
+insert into document_status (id, status_name) values (nextval('s_document_status') , 'создано');
+insert into document_status (id, status_name) values (nextval('s_document_status') , 'в процессе');
+insert into document_status (id, status_name) values (nextval('s_document_status') , 'отказано на доработку');
+insert into document_status (id, status_name) values (nextval('s_document_status') , 'отказано окончательно');
+insert into document_status (id, status_name) values (nextval('s_document_status') , 'принято');
+
+insert into document_importance (id, importance_value) values (nextval('s_document_importance') , 1);
+insert into document_importance (id, importance_value) values (nextval('s_document_importance') , 2);
+insert into document_importance (id, importance_value) values (nextval('s_document_importance') , 3);
+insert into document_importance (id, importance_value) values (nextval('s_document_importance') , 4);
+insert into document_importance (id, importance_value) values (nextval('s_document_importance') , 5);
+
+insert into document_signer_status (id, status_name) values (nextval('s_document_signer_status') , 'создано');
+insert into document_signer_status (id, status_name) values (nextval('s_document_signer_status') , 'подписано');
+insert into document_signer_status (id, status_name) values (nextval('s_document_signer_status') , 'отказано на доработку');
+insert into document_signer_status (id, status_name) values (nextval('s_document_signer_status') , 'отказано окончательно');
