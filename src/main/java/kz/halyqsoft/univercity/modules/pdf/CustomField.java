@@ -1,10 +1,12 @@
 package kz.halyqsoft.univercity.modules.pdf;
+import com.vaadin.data.Property;
 import com.vaadin.server.Sizeable;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.CheckBox;
 import kz.halyqsoft.univercity.utils.CommonUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.r3a.common.entity.ID;
 
 public class CustomField {
@@ -18,6 +20,7 @@ public class CustomField {
     CheckBox centerCheckBox;
     TextField pdfTitle;
     TextField title;
+    TextField deadlineDays;
     TextField order;
 
     static final String BOLD = "Bold";
@@ -34,6 +37,18 @@ public class CustomField {
         this.pdfTitle = new TextField();
         this.title = new TextField();
         this.order = new TextField();
+        this.deadlineDays = new TextField();
+        deadlineDays.setConverter(Integer.class);
+        deadlineDays.setValue("0");
+        deadlineDays.addValueChangeListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
+                if(!NumberUtils.isDigits(deadlineDays.getValue()))
+                {
+                    deadlineDays.setValue("0");
+                }
+            }
+        });
         this.centerCheckBox = new CheckBox();
 
         this.textField = new TextArea(CommonUtils.getUILocaleUtil().getCaption("text") + ":");
@@ -44,6 +59,7 @@ public class CustomField {
         this.title.setCaption(CommonUtils.getUILocaleUtil().getCaption("title") + ":");
         this.pdfTitle.setCaption(CommonUtils.getUILocaleUtil().getCaption("file.name") + ":");
         this.order.setCaption(CommonUtils.getUILocaleUtil().getCaption("text.order") + ":");
+        this.deadlineDays.setCaption(CommonUtils.getUILocaleUtil().getCaption("pdf.period") + ":");
         this.centerCheckBox.setCaption(CommonUtils.getUILocaleUtil().getCaption("text.center") + ":");
 
         this.textField.setRequired(true);
@@ -54,6 +70,7 @@ public class CustomField {
         this.title.setRequired(true);
         this.pdfTitle.setRequired(true);
         this.order.setRequired(true);
+        this.deadlineDays.setRequired(true);
 
         this.textField.setImmediate(true);
         this.xComboBox.setImmediate(true);
@@ -63,6 +80,7 @@ public class CustomField {
         this.title.setImmediate(true);
         this.pdfTitle.setImmediate(true);
         this.order.setImmediate(true);
+        this.deadlineDays.setImmediate(true);
         this.centerCheckBox.setImmediate(true);
 
         this.fontComboBox.addItem(BOLD);
@@ -162,5 +180,13 @@ public class CustomField {
 
     public void setCenterCheckBox(CheckBox centerCheckBox) {
         this.centerCheckBox = centerCheckBox;
+    }
+
+    public TextField getDeadlineDays() {
+        return deadlineDays;
+    }
+
+    public void setDeadlineDays(TextField deadlineDays) {
+        this.deadlineDays = deadlineDays;
     }
 }

@@ -81,8 +81,8 @@ public class PdfView extends AbstractTaskView implements EntityListener {
         TreeTable sideBarGenerateTT = new TreeTable();
         HierarchicalContainer optionHC = new HierarchicalContainer();
 
-        String firstOption = "Свойства";
-        String secondOption = "Доступ";
+        String firstOption = getUILocaleUtil().getCaption("property");
+        String secondOption = getUILocaleUtil().getCaption("access");
         optionHC.addItem(firstOption);
         optionHC.setChildrenAllowed(firstOption , false);
         optionHC.addItem(secondOption);
@@ -98,7 +98,7 @@ public class PdfView extends AbstractTaskView implements EntityListener {
 
         MenuColumn firstColumn = new MenuColumn();
         sideBarGenerateTT.addGeneratedColumn("first" , firstColumn);
-        sideBarGenerateTT.setColumnHeader("first" , "Данные");
+        sideBarGenerateTT.setColumnHeader("first" , getUILocaleUtil().getCaption("menu"));
         sideBarGenerateTT.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
