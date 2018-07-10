@@ -49,7 +49,7 @@ public class CreateView extends BaseView implements EntityListener{
     public void initView(boolean b) throws Exception {
         super.initView(b);
         mainHSP = new HorizontalSplitPanel();
-        mainHSP.setSplitPosition(50);
+        mainHSP.setSplitPosition(72);
         mainHSP.setSizeFull();
         mainHSP.setResponsive(true);
         mainHSP.setImmediate(true);

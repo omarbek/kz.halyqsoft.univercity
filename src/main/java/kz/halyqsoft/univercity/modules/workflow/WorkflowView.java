@@ -142,10 +142,4 @@ public class WorkflowView extends AbstractTaskView {
         mainHSP.addComponent(sideBarTT);
         mainVL.addComponent(mainHSP);
     }
-
-    public void initTab2(){
-
-    }
-
-
 }
