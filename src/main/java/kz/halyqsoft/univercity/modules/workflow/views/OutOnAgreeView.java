@@ -9,6 +9,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_SIGNER;
 import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_STATUS;
 import kz.halyqsoft.univercity.modules.workflow.WorkflowCommonUtils;
 import org.r3a.common.entity.ID;
+import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.widget.dialog.AbstractDialog;
 import org.r3a.common.vaadin.widget.dialog.Message;
@@ -46,6 +47,7 @@ public class OutOnAgreeView extends BaseView{
                     public void init(){
                         setWidth(50, Unit.PERCENTAGE);
                         GridWidget myDocsSignerGW = new GridWidget(DOCUMENT_SIGNER.class);
+
                         myDocsSignerGW.setSizeFull();
                         myDocsSignerGW.setImmediate(true);
 
@@ -90,10 +92,13 @@ public class OutOnAgreeView extends BaseView{
         myDocsGW.setButtonVisible(IconToolbar.ADD_BUTTON , false);
         myDocsGW.setButtonVisible(IconToolbar.EDIT_BUTTON, false);
 
+        List<ID> ids = new ArrayList<>();
+        ids.add(WorkflowCommonUtils.getDocumentStatusByName(DOCUMENT_STATUS.IN_PROCESS).getId());
+        ids.add(WorkflowCommonUtils.getDocumentStatusByName(DOCUMENT_STATUS.CREATED).getId());
         DBGridModel dbGridModel = (DBGridModel) myDocsGW.getWidgetModel();
-        dbGridModel.getQueryModel().addWhere("documentStatus" , ECriteria.EQUAL, WorkflowCommonUtils.getDocumentStatusByName(DOCUMENT_STATUS.IN_PROCESS).getId());
-        dbGridModel.getQueryModel().addWhereAnd("creatorEmployee" , ECriteria.EQUAL , currentUser.getId());
-        dbGridModel.getQueryModel().addWhereAnd("documentStatus" , ECriteria.EQUAL, WorkflowCommonUtils.getDocumentStatusByName(DOCUMENT_STATUS.CREATED).getId());
+        QueryModel myDocsQM = dbGridModel.getQueryModel();
+        myDocsQM.addWhere("creatorEmployee" , ECriteria.EQUAL , currentUser.getId());
+        myDocsQM.addWhereInAnd("documentStatus" ,  ids);
 
         getContent().addComponent(linkedTables);
         getContent().setComponentAlignment(linkedTables, Alignment.MIDDLE_CENTER);

@@ -26,4 +26,8 @@
     <inherits name="org.r3a.common.vaadinaddon.WidgetSet" />
 
     <inherits name="com.vaadin.DefaultWidgetSet" />
+
+    
+
+    
 </module>
