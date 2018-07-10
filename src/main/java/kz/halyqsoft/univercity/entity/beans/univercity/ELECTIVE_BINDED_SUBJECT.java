@@ -21,7 +21,7 @@ public class ELECTIVE_BINDED_SUBJECT extends AbstractEntity {
             @JoinColumn(name = "CATALOG_ELECTIVE_SUBJECTS_ID", referencedColumnName = "ID")})
     private CATALOG_ELECTIVE_SUBJECTS catalogElectiveSubjects;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 3)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 2)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "SEMESTER_ID", referencedColumnName = "ID")})
