@@ -1,13 +1,15 @@
 package kz.halyqsoft.univercity.modules.individualeduplan.student;
 
-import com.vaadin.data.Property;
-import com.vaadin.ui.Button;
 import com.vaadin.ui.OptionGroup;
+import javafx.scene.control.ComboBox;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
-import kz.halyqsoft.univercity.utils.CommonUtils;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDY_YEAR;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
+import org.r3a.common.entity.Entity;
+import org.r3a.common.entity.event.EntityEvent;
+import org.r3a.common.entity.event.EntityListener;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.from.EJoin;
 import org.r3a.common.entity.query.from.FromItem;
@@ -24,21 +26,29 @@ import java.util.Map;
  * @created Mar 1, 2016 1:30:03 PMx
  */
 @SuppressWarnings({"serial"})
-public class SemesterPanel extends AbstractCommonPanel {
+public class SemesterPanel extends AbstractCommonPanel implements EntityListener {
 
+    private SEMESTER semester;
+    private CURRICULUM curriculum;
     private RegistrationView registrationView;
     private List<STUDENT_EDUCATION> studentEducation;
-    int semesterId;
+    private ComboBox specialityCB;
 
-    public SemesterPanel(RegistrationView registrationView, int i) throws Exception {
-        this.registrationView = registrationView;
-        QueryModel<STUDENT_EDUCATION> studentEducationQM = new QueryModel<>(STUDENT_EDUCATION.class);
-        studentEducationQM.addWhere("student", ECriteria.EQUAL, CommonUtils.getCurrentUser().getId());
-        studentEducationQM.addWhereNull("child");
-        studentEducation = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(studentEducationQM);
+    public CURRICULUM getCurriculum() {
+        return curriculum;
     }
 
+    public void setCurriculum(CURRICULUM curriculum) {
+        this.curriculum = curriculum;
+    }
+
+    public SemesterPanel(RegistrationView registrationView, SEMESTER semester) {
+        this.registrationView = registrationView;
+        this.semester = semester;
+         }
+
     public void initPanel() throws Exception {
+        String titleResource = "semester." + semester.getId().toString();
 
         QueryModel<ELECTIVE_BINDED_SUBJECT> subjectsQM = new QueryModel<>(ELECTIVE_BINDED_SUBJECT.class);
         for (STUDENT_EDUCATION st : studentEducation) {
@@ -53,56 +63,117 @@ public class SemesterPanel extends AbstractCommonPanel {
             electiveBindedSubjectQM.addWhere(catFI, "speciality", ECriteria.EQUAL, st.getSpeciality().
                     getId());
 
-//            String sql = "select * from elective_binded_subject where semester_id IN (Select id from semester where study_year_id= " + st.getStudyYear() + ")";
-//            Map<Integer, Object> params = new HashMap<Integer, Object>();
-//            params.put(1, st.getStudyYear().getId().getId());
-
-            String sql = "select * from elective_binded_subject where semester_id= ?1";
+           String sql = "select * " +
+                   "from elective_binded_subject " +
+                   "where semester_id " +
+                   "IN " +
+                   "(Select id " +
+                   "from semester " +
+                   "where study_year_id= " + st.getStudyYear() + ")";
             Map<Integer, Object> params = new HashMap<Integer, Object>();
             params.put(1, st.getStudyYear().getId().getId());
-            STUDENT_EDUCATION sedu;
 
             List<ELECTIVE_BINDED_SUBJECT> subjects = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
                     lookup(electiveBindedSubjectQM);
             List tempList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
 
             List<STUDENT_SUBJECT> studentSubjects = new ArrayList<>();
-         //   sub = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(sql, params, ELECTIVE_BINDED_SUBJECT.class);
+            //   sub = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(sql, params, ELECTIVE_BINDED_SUBJECT.class);
 
 //
             List sub = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
 //
 //            List<STUDENT_SUBJECT> studentSubjects = new ArrayList<>();
-            //for (ELECTIVE_BINDED_SUBJECT subject : subjects) {
-                OptionGroup subjectsOG = new OptionGroup();
+            for (ELECTIVE_BINDED_SUBJECT subject : subjects) {
+            OptionGroup subjectsOG = new OptionGroup();
 
-//                    subjectsOG.addItem(e.getFirstSubject());
-//                    subjectsOG.addItem(e.getSecondSubject());
+                    subjectsOG.addItem(subject);
 
-
-                subjectsOG.addValueChangeListener(new Property.ValueChangeListener() {
-
-                    @Override
-                    public void valueChange(Property.ValueChangeEvent event) {
-                        STUDENT_SUBJECT studentSubject = new STUDENT_SUBJECT();
-                        //studentSubject.setStudentEducation(studentSubject);
-                    }
-
-                });
-                getContent().addComponent(subjectsOG);
-
-            //}
-
-
-        Button saveButton = CommonUtils.createSaveButton();
-        saveButton.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
+            getContent().addComponent(subjectsOG);
 
             }
-        });
-        getContent().addComponent(saveButton);
+        }
+    }
+
+    @Override
+    public void handleEntityEvent(EntityEvent entityEvent) {
+
+    }
+
+    @Override
+    public void onCreate(Object o, Entity entity, int i) {
+
+    }
+
+    @Override
+    public boolean preCreate(Object o, int i) {
+        return false;
+    }
+
+
+    @Override
+    public boolean onEdit(Object o, Entity entity, int i) {
+        return false;
+    }
+
+    @Override
+    public boolean onPreview(Object o, Entity entity, int i) {
+        return false;
+    }
+
+    @Override
+    public boolean preSave(Object o, Entity entity, boolean b, int i) throws Exception {
+        return false;
+    }
+
+    @Override
+    public boolean preDelete(Object o, List<Entity> list, int i) {
+        return false;
+    }
+
+    @Override
+    public void onDelete(Object o, List<Entity> list, int i) {
+
+    }
+
+    @Override
+    public void onException(Object o, Throwable throwable) {
+
+    }
+
+    protected SemesterPanel() {
+        super();
+    }
+
+    @Override
+    public void beforeRefresh(Object o, int i) {
+
+    }
+
+    @Override
+    public void onRefresh(Object o, List<Entity> list) {
+
+    }
+
+    @Override
+    public void onFilter(Object o, QueryModel queryModel, int i) {
+
+    }
+
+    @Override
+    public void onAccept(Object o, List<Entity> list, int i) {
+
+    }
+
+    @Override
+    public void deferredCreate(Object o, Entity entity) {
+
+    }
+
+    @Override
+    public void deferredDelete(Object o, List<Entity> list) {
+
     }
 }
-}
+
 
