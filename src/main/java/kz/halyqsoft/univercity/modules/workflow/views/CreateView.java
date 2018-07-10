@@ -78,8 +78,8 @@ public class CreateView extends BaseView implements EntityListener{
                 PDF_DOCUMENT pdfDocument= (PDF_DOCUMENT) pdfDocumentGW.getSelectedEntity();
                 if(pdfDocument!=null){
                     USERS user = WorkflowCommonUtils.getCurrentUser();
-                    DOCUMENT_STATUS documentStatus = getDocumentStatusByName(DOCUMENT_STATUS.CREATED);
-                    DOCUMENT_IMPORTANCE documentImportance = getDocumentImportanceByValue(DOCUMENT_IMPORTANCE.IMPORTANCE_1);
+                    DOCUMENT_STATUS documentStatus = WorkflowCommonUtils.getDocumentStatusByName(DOCUMENT_STATUS.CREATED);
+                    DOCUMENT_IMPORTANCE documentImportance = WorkflowCommonUtils.getDocumentImportanceByValue(DOCUMENT_IMPORTANCE.IMPORTANCE_1);
                     DOCUMENT document = new DOCUMENT();
 
                     Calendar deadlineDate = Calendar.getInstance();
@@ -116,8 +116,8 @@ public class CreateView extends BaseView implements EntityListener{
                                     documentSigner.setDeleted(false);
                                     documentSigner.setPost(pdfDocumentSignerPost.getPost());
                                     documentSigner.setDocument(document);
-//                                    DOCUMENT_SIGNER_STATUS documentSignerStatus = getDocumentSignerStatusByName(DOCUMENT_SIGNER_STATUS.CREATED);
-//                                    documentSigner.setDocumentSignerStatus(documentSignerStatus);
+                                    DOCUMENT_SIGNER_STATUS documentSignerStatus = WorkflowCommonUtils.getDocumentSignerStatusByName(DOCUMENT_SIGNER_STATUS.CREATED);
+                                    documentSigner.setDocumentSignerStatus(documentSignerStatus);
                                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(documentSigner);
                                 }
                             }
@@ -163,44 +163,6 @@ public class CreateView extends BaseView implements EntityListener{
                 secondVL.addComponent(pdfDocSignerPostGW);
             }
         }
-    }
-
-
-
-    private DOCUMENT_STATUS getDocumentStatusByName(String name){
-        DOCUMENT_STATUS documentStatus = null;
-        try{
-            QueryModel<DOCUMENT_STATUS> documentStatusQM = new QueryModel<>(DOCUMENT_STATUS.class);
-            documentStatusQM.addWhere("statusName" ,ECriteria.EQUAL , name);
-            documentStatus = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(documentStatusQM);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return documentStatus;
-    }
-
-    private DOCUMENT_SIGNER_STATUS getDocumentSignerStatusByName(String name){
-        DOCUMENT_SIGNER_STATUS documentSignerStatus= null;
-        try{
-            QueryModel<DOCUMENT_SIGNER_STATUS> documentSignerStatusQM = new QueryModel<>(DOCUMENT_SIGNER_STATUS.class);
-            documentSignerStatusQM.addWhere("statusName" ,ECriteria.EQUAL , name);
-            documentSignerStatus = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(documentSignerStatusQM);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return documentSignerStatus;
-    }
-
-    private DOCUMENT_IMPORTANCE getDocumentImportanceByValue(Integer value){
-        DOCUMENT_IMPORTANCE documentImportance= null;
-        try{
-            QueryModel<DOCUMENT_IMPORTANCE> documentImportanceQM = new QueryModel<>(DOCUMENT_IMPORTANCE.class);
-            documentImportanceQM.addWhere("importanceValue" ,ECriteria.EQUAL , value);
-            documentImportance = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(documentImportanceQM);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return documentImportance;
     }
 
     @Override

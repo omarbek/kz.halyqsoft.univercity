@@ -31,38 +31,38 @@ public class DOCUMENT extends AbstractEntity{
     private DOCUMENT_IMPORTANCE documentImportance;
 
 
-    @FieldInfo(type = EFieldType.FK_COMBO, inGrid = false, inEdit = false, inView = false )
+    @FieldInfo(type = EFieldType.FK_COMBO, inGrid = false, inEdit = false, inView = false , order = 4 )
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "pdf_document_id", referencedColumnName = "ID", nullable = false)})
     private PDF_DOCUMENT pdfDocument;
 
 
-    @FieldInfo(type = EFieldType.TEXT, order = 4)
+    @FieldInfo(type = EFieldType.TEXT, order = 5)
     @Column(name = "message")
     private String message;
 
 
-    @FieldInfo(type = EFieldType.DATETIME, required = false, readOnlyFixed = true, order = 5)
+    @FieldInfo(type = EFieldType.DATETIME, required = false, readOnlyFixed = true, order = 6)
     @Column(name = "deadline_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date deadlineDate;
 
 
 
-    @FieldInfo(type = EFieldType.DATETIME, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false)
+    @FieldInfo(type = EFieldType.DATETIME, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false, order = 7)
     @Column(name = "created")
     @Temporal(TemporalType.TIMESTAMP)
     private Date created;
 
 
-    @FieldInfo(type = EFieldType.DATETIME, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false)
+    @FieldInfo(type = EFieldType.DATETIME, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false, order=8)
     @Column(name = "updated")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updated;
 
 
-    @FieldInfo(type = EFieldType.BOOLEAN, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false)
+    @FieldInfo(type = EFieldType.BOOLEAN, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false, order = 9)
     @Column(name = "deleted")
     private boolean deleted;
 

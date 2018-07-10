@@ -1,5 +1,6 @@
 package kz.halyqsoft.univercity.modules.workflow.views;
 
+import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import kz.halyqsoft.univercity.entity.beans.USERS;
@@ -36,12 +37,17 @@ public class MyDocumentsView extends BaseView {
         super.initView(b);
 
         linkedTables = new Button(getUILocaleUtil().getCaption("employeesPanel"));
+        linkedTables.setIcon(new ThemeResource("img/button/preview.png"));
+        linkedTables.setData(12);
+        linkedTables.setStyleName("preview");
+
         linkedTables.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
                 AbstractDialog abstractDialog = new AbstractDialog() {
 
                     public void init(){
+                        setWidth(50, Unit.PERCENTAGE);
                         GridWidget myDocsSignerGW = new GridWidget(DOCUMENT_SIGNER.class);
                         myDocsSignerGW.setSizeFull();
                         myDocsSignerGW.setImmediate(true);
@@ -52,6 +58,8 @@ public class MyDocumentsView extends BaseView {
                         myDocsSignerGW.setButtonVisible(IconToolbar.EDIT_BUTTON, false);
 
                         DBGridModel dbGridModel = (DBGridModel) myDocsSignerGW.getWidgetModel();
+                        dbGridModel.getFormModel().getFieldModel("documentSignerStatus").setInView(true);
+
                         dbGridModel.getQueryModel().addWhere("document" , ECriteria.EQUAL , myDocsGW.getSelectedEntity().getId());
 
                         getContent().addComponent(myDocsSignerGW);

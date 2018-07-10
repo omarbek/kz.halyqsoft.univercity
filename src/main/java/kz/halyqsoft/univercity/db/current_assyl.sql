@@ -197,7 +197,7 @@ FOREIGN KEY (post_id) REFERENCES post(id);
 
 ALTER TABLE ONLY DOCUMENT_SIGNER
   ADD CONSTRAINT fk_document_signer_document_signer_status
-FOREIGN KEY (document_signer_status_id) REFERENCES DOCUMENT_SIGNER(id);
+FOREIGN KEY (document_signer_status_id) REFERENCES DOCUMENT_SIGNER_STATUS(id);
 
 --DOCUMENT SIGNERS END
 
@@ -234,3 +234,4 @@ insert into document_signer_status (id, status_name) values (nextval('s_document
 insert into document_signer_status (id, status_name) values (nextval('s_document_signer_status') , 'подписано');
 insert into document_signer_status (id, status_name) values (nextval('s_document_signer_status') , 'отказано на доработку');
 insert into document_signer_status (id, status_name) values (nextval('s_document_signer_status') , 'отказано окончательно');
+insert into document_signer_status (id, status_name) values (nextval('s_document_signer_status') , 'в процессе');

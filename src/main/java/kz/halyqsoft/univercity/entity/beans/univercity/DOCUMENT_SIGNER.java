@@ -31,7 +31,7 @@ public class DOCUMENT_SIGNER extends AbstractEntity{
             @JoinColumn(name = "employee_id", referencedColumnName = "ID")})
     private EMPLOYEE employee;
 
-    @FieldInfo(type = EFieldType.FK_COMBO,inGrid = false , inView = false , inEdit = false ,required = false , order = 4)
+    @FieldInfo(type = EFieldType.FK_COMBO,inGrid = false, inEdit = false ,required = false , order = 4)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "document_signer_status_id", referencedColumnName = "ID")})
@@ -43,18 +43,18 @@ public class DOCUMENT_SIGNER extends AbstractEntity{
     private String message;
 
 
-    @FieldInfo(type = EFieldType.DATETIME, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false)
+    @FieldInfo(type = EFieldType.DATETIME, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false, order=6)
     @Column(name = "created")
     @Temporal(TemporalType.TIMESTAMP)
     private Date created;
 
 
-    @FieldInfo(type = EFieldType.DATETIME, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false)
+    @FieldInfo(type = EFieldType.DATETIME, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false, order=7)
     @Column(name = "updated")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updated;
 
-    @FieldInfo(type = EFieldType.BOOLEAN, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false)
+    @FieldInfo(type = EFieldType.BOOLEAN, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false, order = 8)
     @Column(name = "deleted")
     private boolean deleted;
 

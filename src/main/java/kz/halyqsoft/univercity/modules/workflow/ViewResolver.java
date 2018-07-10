@@ -18,13 +18,13 @@ public class ViewResolver {
         }else if(title.equals(WorkflowView.SEARCH)){
             return new SearchView(title);
         }else if(title.equals(WorkflowView.I_ON_AGREE)){
-            return new InOnAgreeView(title);
-        }else if(title.equals(WorkflowView.I_ON_SIGN)){
-            return new InOnSignView(title);
-        }else if(title.equals(WorkflowView.O_ON_AGREE)){
             return new OutOnAgreeView(title);
-        }else if(title.equals(WorkflowView.O_ON_SIGN)){
+        }else if(title.equals(WorkflowView.I_ON_SIGN)){
             return new OutOnSignView(title);
+        }else if(title.equals(WorkflowView.O_ON_AGREE)){
+            return new InOnAgreeView(title);
+        }else if(title.equals(WorkflowView.O_ON_SIGN)){
+            return new InOnSignView(title);
         }else{
             throw new IllegalArgumentException("No such view:" + title );
         }

@@ -10,6 +10,7 @@ public class DOCUMENT_SIGNER_STATUS extends AbstractStatusEntity{
     public static String SIGNED = "ПОДПИСАНО";
     public static String REFUSED_FOR_CORRECTION = "ОТКАЗАНО НА ДОРАБОТКУ";
     public static String FINALLY_REFUSED = "ОТКАЗАНО ОКОНЧАТЕЛЬНО";
+    public static String IN_PROCESS = "В ПРОЦЕССЕ";
 
     public DOCUMENT_SIGNER_STATUS() {
     }
