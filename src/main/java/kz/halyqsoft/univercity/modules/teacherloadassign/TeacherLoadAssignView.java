@@ -28,6 +28,7 @@ import org.r3a.common.vaadinaddon.IntegerCellRenderer;
 import org.r3a.common.vaadinaddon.converter.IntegerCellConverter;
 
 import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import java.util.*;
 
 
@@ -100,7 +101,6 @@ public class TeacherLoadAssignView extends AbstractTaskView {
             yearLabel.setWidthUndefined();
             yearLabel.setValue(getUILocaleUtil().getEntityFieldLabel(TEACHER_LOAD_CALC.class, "year"));
             filterHL.addComponent(yearLabel);
-
 
             currentYear = currentSemesterData.getYear();
             QueryModel<ENTRANCE_YEAR> entranceYearQM = new QueryModel<>(ENTRANCE_YEAR.class);
@@ -288,23 +288,10 @@ public class TeacherLoadAssignView extends AbstractTaskView {
         ID teachLoadAssignId = (teacherLoadAssign != null && teacherLoadAssign.getId() != null) ?
                 teacherLoadAssign.getId() : ID.valueOf(-1);
 
-        String sql = "SELECT " +
-                "  a.ID, " +
-                "  b.NAME_RU     SUBJECT_NAME, " +
-                "  c.CREDIT, " +
-                "  e.FORMULA, " +
-                "  a.SEMESTER_PERIOD_ID, " +
-                "  d.PERIOD_NAME SEMESTER_PERIOD_NAME, " +
-                "  a.STUDENT_COUNT, " +
-                "  a.LC_HOUR, " +
-                "  a.LB_HOUR, " +
-                "  a.PR_HOUR, " +
-                "  a.TOTAL_HOUR " +
-                "FROM TEACHER_LOAD_ASSIGN_DETAIL a INNER JOIN SUBJECT b ON a.SUBJECT_ID = b.ID " +
-                "  INNER JOIN CREDITABILITY c ON b.CREDITABILITY_ID = c.ID " +
-                "  INNER JOIN SEMESTER_PERIOD d ON a.SEMESTER_PERIOD_ID = d.ID " +
-                "  INNER JOIN ACADEMIC_FORMULA e ON b.ACADEMIC_FORMULA_ID = e.ID " +
-                "WHERE a.TEACHER_LOAD_ASSIGN_ID = ?1 AND a.TEACHER_ID = ?2";
+        String sql = "SELECT loadView.* " +
+                "FROM v_TEACHER_LOAD_ASSIGN_DETAIL loadView " +
+                "  INNER JOIN teacher_load_assign_detail load ON load.id = loadView.id " +
+                "WHERE load.teacher_load_assign_id = ?1 AND load.teacher_id = ?2";
         Map<Integer, Object> params = new HashMap<>();
         params.put(1, teachLoadAssignId.getId());
         params.put(2, ved.getEmployee().getId().getId());
@@ -438,83 +425,135 @@ public class TeacherLoadAssignView extends AbstractTaskView {
             Map<Integer, Object> params = new HashMap<>();
             params.put(2, DOES_NOT_WORK);
             for (V_LOAD_TO_CHAIR loadToChair : getLoads()) {
-                params.put(1, loadToChair.getSubject().getId().getId());
+                SUBJECT subject = loadToChair.getSubject();
+                params.put(1, subject.getId().getId());
 
-                Double totalCount = loadToChair.getTotalCount();
-                if (totalCount > 0) {
+                Double subjectHours = loadToChair.getTotalCount();
+                if (subjectHours > 0) {
                     List<TEACHER_SUBJECT> subjectPpsList = SessionFacadeFactory.getSessionFacade(
                             CommonEntityFacadeBean.class).lookup(sql, params, TEACHER_SUBJECT.class);
                     int ppsCount = subjectPpsList.size();
                     if (ppsCount > 0) {
                         boolean calculated = false;
-                        Integer employeeHours;
+                        Double employeeHours = 0.0;
                         for (TEACHER_SUBJECT teacherSubject : subjectPpsList) {
                             EMPLOYEE employee = teacherSubject.getEmployee();
-                            QueryModel<EMPLOYEE_DEPT> employeeDeptQM = new QueryModel<>(EMPLOYEE_DEPT.class);
-                            FromItem postFI = employeeDeptQM.addJoin(EJoin.INNER_JOIN, "post", POST.class, "id");
-                            employeeDeptQM.addWhere("employee", ECriteria.EQUAL, employee.getId());
-                            employeeDeptQM.addWhereNull("dismissDate");
-                            employeeDeptQM.addOrderDesc(postFI, "studyLoad");
-                            EMPLOYEE_DEPT employeeDept = SessionFacadeFactory.getSessionFacade(
-                                    CommonEntityFacadeBean.class).lookupSingle(employeeDeptQM);
+
+                            String employeeSql = "SELECT empl_dept.* " +
+                                    "FROM employee_dept empl_dept INNER JOIN post post ON empl_dept.post_id = post.id " +
+                                    "WHERE empl_dept.employee_id = ?1 AND empl_dept.dismiss_date IS NULL " +
+                                    "      AND post.tp = TRUE " +
+                                    "ORDER BY post.study_load DESC;";
+                            Map<Integer, Object> employeeParams = new HashMap<>();
+                            employeeParams.put(1, employee.getId().getId());
+                            EMPLOYEE_DEPT employeeDept = null;
+                            try {
+                                employeeDept = SessionFacadeFactory.getSessionFacade(
+                                        CommonEntityFacadeBean.class).lookupSingle(employeeSql, employeeParams,
+                                        EMPLOYEE_DEPT.class);
+                            } catch (NonUniqueResultException e) {
+                                e.printStackTrace();//TODO catch
+                            }
                             if (!calculated) {
-                                employeeHours = employeeDept.getPost().getStudyLoad();
+                                employeeHours = employeeDept.getPost().getStudyLoad().doubleValue();
                                 calculated = true;
                             }
-//                            if (employeeHours>) {//TODO
-//                                if (employeeDept.isLecturer()) {
-//                                    //TODO
-//                                }
-//                                SEMESTER_PERIOD semesterPeriod = currentSemesterData.getSemesterPeriod();
-//                                QueryModel<SEMESTER> semesterQM = new QueryModel<>(SEMESTER.class);
-//                                FromItem yearFI = semesterQM.addJoin(EJoin.INNER_JOIN, "id", STUDY_YEAR.class, "studyYear");
-//                                semesterQM.addWhere("semesterPeriod", ECriteria.EQUAL, semesterPeriod);
-//                                semesterQM.addWhere(yearFI, "studyYear", ECriteria.EQUAL, loadToChair.getStudyYear());
-//                                SEMESTER semester = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
-//                                        lookupSingle(semesterQM);
-//
-//                                String streams = loadToChair.getStream();
-//                                StringTokenizer stringTokenizer = new StringTokenizer(streams, ",");
-//                                STREAM stream = null;
-//                                while (stringTokenizer.hasMoreElements()) {
-//                                    String groupName = stringTokenizer.nextElement().toString();
-//                                    QueryModel<STREAM> streamQM = new QueryModel<>(STREAM.class);
-//                                    FromItem streamGroupFI = streamQM.addJoin(EJoin.INNER_JOIN, "id", STREAM_GROUP.class,
-//                                            "stream");
-//                                    FromItem groupFI = streamGroupFI.addJoin(EJoin.INNER_JOIN, "group", GROUPS.class, "id");
-//                                    streamQM.addWhere(groupFI, "name", ECriteria.EQUAL, groupName);
-//                                    streamQM.addWhereNotNull("name");
-//                                    try {
-//                                        stream = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
-//                                                lookupSingle(streamQM);
-//                                    } catch (NoResultException e) {
-//                                        stream = null;
-//                                    }
-//                                    if (stream != null) {
-//                                        break;
-//                                    }
-//                                }
-//
-//                                TEACHER_LOAD_ASSIGN_DETAIL loadAssignDetail = new TEACHER_LOAD_ASSIGN_DETAIL();
-//                                loadAssignDetail.setTeacherLoadAssign(teacherLoadAssign);
-//                                loadAssignDetail.setTeacher(employee);
-//                                loadAssignDetail.setSubject(loadToChair.getSubject());
-//                                loadAssignDetail.setSemesterPeriod(semesterPeriod);
-//                                loadAssignDetail.setStream(stream);
-//                                loadAssignDetail.setLcHour(loadToChair.getLcCount());
-//                                loadAssignDetail.setLbHour(loadToChair.getLbCount());
-//                                loadAssignDetail.setPrHour(loadToChair.getPrCount());
-//                                loadAssignDetail.setSemester(semester);
-//                                loadAssignDetail.setStudentDiplomaType(loadToChair.getCurriculum().getDiplomaType());
-//
-//                                V_TEACHER_LOAD_ASSIGN_DETAIL loadAssignDetailView = SessionFacadeFactory.getSessionFacade(
-//                                        CommonEntityFacadeBean.class).lookup(V_TEACHER_LOAD_ASSIGN_DETAIL.class,
-//                                        loadAssignDetail.getId());
-//                                totalCount -= loadAssignDetailView.getTotalHour();
-//
-//
-//                                newList.add(loadAssignDetail);
-//                            }
+
+                            SEMESTER_PERIOD semesterPeriod = currentSemesterData.getSemesterPeriod();
+                            QueryModel<SEMESTER> semesterQM = new QueryModel<>(SEMESTER.class);
+                            FromItem yearFI = semesterQM.addJoin(EJoin.INNER_JOIN, "studyYear", STUDY_YEAR.class, "id");
+                            semesterQM.addWhere("semesterPeriod", ECriteria.EQUAL, semesterPeriod.getId());
+                            semesterQM.addWhere(yearFI, "studyYear", ECriteria.EQUAL, loadToChair.getStudyYear());
+                            SEMESTER semester = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                                    lookupSingle(semesterQM);
+
+                            String streams = loadToChair.getStream();
+                            StringTokenizer stringTokenizer = new StringTokenizer(streams, ",");
+                            STREAM stream = null;
+                            while (stringTokenizer.hasMoreElements()) {
+                                String groupName = stringTokenizer.nextElement().toString();
+                                String streamSql = "SELECT " +
+                                        "  t0.* " +
+                                        "FROM STREAM t0 INNER JOIN STREAM_GROUP t1 ON t0.ID = t1.STREAM_ID " +
+                                        "  INNER JOIN GROUPS t2 ON t1.GROUP_ID = t2.ID " +
+                                        "WHERE t2.name = ?1 AND t0.NAME IS NOT NULL";
+                                Map<Integer, Object> streamParams = new HashMap<>();
+                                streamParams.put(1, groupName);
+                                try {
+                                    stream = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                                            lookupSingle(streamSql, streamParams, STREAM.class);
+                                } catch (NoResultException e) {
+                                    stream = null;
+                                }
+                                if (stream != null) {
+                                    break;
+                                }
+                            }
+
+                            if (stream != null) {
+                                if (employeeDept.isLecturer()) {
+                                    TEACHER_LOAD_ASSIGN_DETAIL loadAssignDetail = getLoadAssignDetail(loadToChair,
+                                            employee, semesterPeriod, semester, stream, null);
+
+                                    V_TEACHER_LOAD_ASSIGN_DETAIL loadAssignDetailView = SessionFacadeFactory.
+                                            getSessionFacade(CommonEntityFacadeBean.class).lookup(
+                                            V_TEACHER_LOAD_ASSIGN_DETAIL.class,
+                                            loadAssignDetail.getId());
+                                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                                            delete(loadAssignDetail);
+
+                                    Double currentHour = loadAssignDetailView.getTotalHour();
+                                    if (employeeHours >= currentHour) {
+                                        subjectHours -= currentHour;
+                                        employeeHours -= currentHour;
+
+                                        newList.add(loadAssignDetail);
+                                    } else {
+                                        Double onlyLectureHour = loadToChair.getLcCount();
+                                        if (employeeHours >= onlyLectureHour) {
+                                            subjectHours -= onlyLectureHour;
+                                            employeeHours -= onlyLectureHour;
+
+                                            loadAssignDetail.setLbHour(0.0);
+                                            loadAssignDetail.setPrHour(0.0);
+                                            newList.add(loadAssignDetail);
+                                        }
+                                    }
+                                } else {
+                                    QueryModel<GROUPS> groupsQM = new QueryModel<>(GROUPS.class);
+                                    FromItem streamGroupFI = groupsQM.addJoin(EJoin.INNER_JOIN, "id", STREAM_GROUP.class,
+                                            "group");
+                                    groupsQM.addWhere(streamGroupFI, "stream", ECriteria.EQUAL, stream.getId());
+                                    List<GROUPS> groups = SessionFacadeFactory.getSessionFacade(
+                                            CommonEntityFacadeBean.class).
+                                            lookup(groupsQM);
+                                    for (GROUPS group : groups) {
+                                        TEACHER_LOAD_ASSIGN_DETAIL loadAssignDetail = getLoadAssignDetail(loadToChair,
+                                                employee, semesterPeriod, semester, null, group);
+
+                                        V_TEACHER_LOAD_ASSIGN_DETAIL loadAssignDetailView = SessionFacadeFactory.
+                                                getSessionFacade(CommonEntityFacadeBean.class).lookup(
+                                                V_TEACHER_LOAD_ASSIGN_DETAIL.class, loadAssignDetail.getId());
+                                        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                                                delete(loadAssignDetail);
+
+                                        Double withoutLectureHour = loadAssignDetailView.getTotalHour() -
+                                                loadToChair.getLcCount();
+                                        if (employeeHours >= withoutLectureHour) {
+                                            subjectHours -= withoutLectureHour;
+                                            employeeHours -= withoutLectureHour;
+
+                                            loadAssignDetail.setLcHour(0.0);
+                                            newList.add(loadAssignDetail);
+                                        }
+                                    }
+                                }
+                            } else {
+                                LOG.info("No stream in chair:" + chairCB.getValue().toString()
+                                        + ", year:" + entranceYearCB.getValue().toString()
+                                        + ", teacher:" + employee.toString()
+                                        + ", subject:" + subject.toString());
+                            }
                         }
                     } else {
                         hasUnassignedSubjects = true;
@@ -550,6 +589,26 @@ public class TeacherLoadAssignView extends AbstractTaskView {
         }
     }
 
+    private TEACHER_LOAD_ASSIGN_DETAIL getLoadAssignDetail(V_LOAD_TO_CHAIR loadToChair, EMPLOYEE employee,
+                                                           SEMESTER_PERIOD semesterPeriod, SEMESTER semester,
+                                                           STREAM stream, GROUPS group) throws Exception {
+        TEACHER_LOAD_ASSIGN_DETAIL loadAssignDetail = new TEACHER_LOAD_ASSIGN_DETAIL();
+        loadAssignDetail.setTeacherLoadAssign(teacherLoadAssign);
+        loadAssignDetail.setTeacher(employee);
+        loadAssignDetail.setSubject(loadToChair.getSubject());
+        loadAssignDetail.setSemesterPeriod(semesterPeriod);
+        loadAssignDetail.setStream(stream);
+        loadAssignDetail.setLcHour(loadToChair.getLcCount());
+        loadAssignDetail.setLbHour(loadToChair.getLbCount());
+        loadAssignDetail.setPrHour(loadToChair.getPrCount());
+        loadAssignDetail.setSemester(semester);
+        loadAssignDetail.setStudentDiplomaType(loadToChair.getCurriculum().getDiplomaType());
+        loadAssignDetail.setStream(stream);
+        loadAssignDetail.setGroup(group);
+        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(loadAssignDetail);
+        return loadAssignDetail;
+    }
+
     private void save() throws Exception {
         if (showMessageIfLoadIsEmpty()) return;
 
@@ -563,14 +622,18 @@ public class TeacherLoadAssignView extends AbstractTaskView {
                         TEACHER_LOAD_ASSIGN_DETAIL loadAssignDetail = SessionFacadeFactory.getSessionFacade(
                                 CommonEntityFacadeBean.class).lookup(TEACHER_LOAD_ASSIGN_DETAIL.class,
                                 loadAssignDetailView.getId());
-//                        if (loadAssignDetailView.getStudentCount() != null &&//TODO
-//                                !loadAssignDetailView.getStudentCount().equals(loadAssignDetail.getStudentCount())) {
-//                            loadAssignDetail.setStudentCount(loadAssignDetailView.getStudentCount());
-//                            loadAssignDetail.setLcHour(loadAssignDetailView.getLcHour());
-//                            loadAssignDetail.setLbHour(loadAssignDetailView.getLbHour());
-//                            loadAssignDetail.setPrHour(loadAssignDetailView.getPrHour());
-//                            mergeList.add(loadAssignDetail);
-//                        }
+                        loadAssignDetail.setLbHour(loadAssignDetailView.getLbHour());
+                        loadAssignDetail.setLcHour(loadAssignDetailView.getLcHour());
+                        loadAssignDetail.setStudentDiplomaType(loadAssignDetailView.getStudentDiplomaType());
+                        loadAssignDetail.setSemester(loadAssignDetailView.getSemester());
+                        loadAssignDetail.setStream(loadAssignDetailView.getStream());
+                        loadAssignDetail.setSemesterPeriod(loadAssignDetailView.getSemesterPeriod());
+                        loadAssignDetail.setSubject(loadAssignDetailView.getSubject());
+                        loadAssignDetail.setPrHour(loadAssignDetailView.getPrHour());
+                        loadAssignDetail.setTeacher(loadAssignDetailView.getTeacher());
+                        loadAssignDetail.setTeacherLoadAssign(loadAssignDetailView.getTeacherLoadAssign());
+                        loadAssignDetail.setGroup(loadAssignDetailView.getGroup());
+                        mergeList.add(loadAssignDetail);
                     }
 
                     if (!mergeList.isEmpty()) {

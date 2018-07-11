@@ -172,7 +172,7 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
         }
     }
 
-    private List<V_LOAD_TO_CHAIR> getLoads(ENTRANCE_YEAR currentYear, DEPARTMENT chair, STUDENT_DIPLOMA_TYPE studentDiplomaType,
+    private List<V_LOAD_TO_CHAIR> getLoads(DEPARTMENT chair, STUDENT_DIPLOMA_TYPE studentDiplomaType,
                                            STUDY_YEAR studyYear) {
         QueryModel<V_LOAD_TO_CHAIR> loadQM = new QueryModel<>(V_LOAD_TO_CHAIR.class);
         FromItem curriculumFI = loadQM.addJoin(EJoin.INNER_JOIN, "curriculum", CURRICULUM.class, "id");
@@ -190,7 +190,7 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
         return new ArrayList<>();
     }
 
-    private List<V_LOAD_TO_CHAIR_COUNT> getLoadCount(ENTRANCE_YEAR currentYear, DEPARTMENT chair,
+    private List<V_LOAD_TO_CHAIR_COUNT> getLoadCount(DEPARTMENT chair,
                                                      STUDENT_DIPLOMA_TYPE studentDiplomaType, STUDY_YEAR studyYear) {
         QueryModel<V_LOAD_TO_CHAIR_COUNT> loadQM = new QueryModel<>(V_LOAD_TO_CHAIR_COUNT.class);
         FromItem curriculumFI = loadQM.addJoin(EJoin.INNER_JOIN, "curriculum", CURRICULUM.class, "id");
@@ -207,7 +207,7 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
         return new ArrayList<>();
     }
 
-    private List<V_LOAD_TO_CHAIR_COUNT_ALL> getLoadAllCount(ENTRANCE_YEAR currentYear, DEPARTMENT chair,
+    private List<V_LOAD_TO_CHAIR_COUNT_ALL> getLoadAllCount(DEPARTMENT chair,
                                                             STUDENT_DIPLOMA_TYPE studentDiplomaType) {
         QueryModel<V_LOAD_TO_CHAIR_COUNT_ALL> loadQM = new QueryModel<>(V_LOAD_TO_CHAIR_COUNT_ALL.class);
         FromItem curriculumFI = loadQM.addJoin(EJoin.INNER_JOIN, "curriculum", CURRICULUM.class, "id");
@@ -228,11 +228,11 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
         FChairFilter chairFilter = (FChairFilter) abstractFilterBean;
         if (chairFilter.getChair() != null && chairFilter.getStudentDiplomaType() != null
                 && chairFilter.getStudyYear() != null) {
-            List<V_LOAD_TO_CHAIR> loads = getLoads(currentYear, chairFilter.getChair(), chairFilter.getStudentDiplomaType(),
+            List<V_LOAD_TO_CHAIR> loads = getLoads(chairFilter.getChair(), chairFilter.getStudentDiplomaType(),
                     chairFilter.getStudyYear());
-            List<V_LOAD_TO_CHAIR_COUNT> loadCounts = getLoadCount(currentYear, chairFilter.getChair(),
+            List<V_LOAD_TO_CHAIR_COUNT> loadCounts = getLoadCount(chairFilter.getChair(),
                     chairFilter.getStudentDiplomaType(), chairFilter.getStudyYear());
-            List<V_LOAD_TO_CHAIR_COUNT_ALL> loadAllCounts = getLoadAllCount(currentYear, chairFilter.getChair(),
+            List<V_LOAD_TO_CHAIR_COUNT_ALL> loadAllCounts = getLoadAllCount(chairFilter.getChair(),
                     chairFilter.getStudentDiplomaType());
             refresh(loads, loadCounts, loadAllCounts);
         }

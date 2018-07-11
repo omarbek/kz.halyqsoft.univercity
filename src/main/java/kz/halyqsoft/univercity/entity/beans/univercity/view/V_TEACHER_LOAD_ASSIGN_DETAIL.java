@@ -1,8 +1,12 @@
 package kz.halyqsoft.univercity.entity.beans.univercity.view;
 
+import kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE;
+import kz.halyqsoft.univercity.entity.beans.univercity.GROUPS;
 import kz.halyqsoft.univercity.entity.beans.univercity.STREAM;
+import kz.halyqsoft.univercity.entity.beans.univercity.TEACHER_LOAD_ASSIGN;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_PERIOD;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDENT_DIPLOMA_TYPE;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
@@ -97,7 +101,7 @@ public class V_TEACHER_LOAD_ASSIGN_DETAIL extends AbstractEntity {
 	private Double ratingHour;
 
 	@FieldInfo(type = EFieldType.DOUBLE, order = 17)
-	@Column(name = "EXAMHOUR")
+	@Column(name = "EXAM_HOUR")
 	private Double examHour;
 
 	@FieldInfo(type = EFieldType.DOUBLE, order = 18)
@@ -127,6 +131,30 @@ public class V_TEACHER_LOAD_ASSIGN_DETAIL extends AbstractEntity {
 	@FieldInfo(type = EFieldType.DOUBLE, order = 24)
 	@Column(name = "TOTAL_HOUR")
 	private Double totalHour;
+
+	@FieldInfo(type = EFieldType.FK_COMBO,order = 25)
+	@ManyToOne
+	@JoinColumns({
+			@JoinColumn(name = "TEACHER_LOAD_ASSIGN_ID", referencedColumnName = "ID")})
+	private TEACHER_LOAD_ASSIGN teacherLoadAssign;
+
+	@FieldInfo(type = EFieldType.FK_COMBO, order = 26)
+	@ManyToOne
+	@JoinColumns({
+			@JoinColumn(name = "TEACHER_ID", referencedColumnName = "ID")})
+	private EMPLOYEE teacher;
+
+	@FieldInfo(type = EFieldType.FK_COMBO, order = 27)
+	@ManyToOne
+	@JoinColumns({
+			@JoinColumn(name = "STUDENT_DIPLOMA_TYPE_ID", referencedColumnName = "ID")})
+	private STUDENT_DIPLOMA_TYPE studentDiplomaType;
+
+	@FieldInfo(type = EFieldType.FK_DIALOG, order = 28)
+	@ManyToOne
+	@JoinColumns({
+			@JoinColumn(name = "GROUP_ID", referencedColumnName = "ID")})
+	private GROUPS group;
 
 	@Transient
 	private String speciality;
@@ -354,5 +382,37 @@ public class V_TEACHER_LOAD_ASSIGN_DETAIL extends AbstractEntity {
 
 	public void setProtectDiplomaHour(Double protectDiplomaHour) {
 		this.protectDiplomaHour = protectDiplomaHour;
+	}
+
+	public TEACHER_LOAD_ASSIGN getTeacherLoadAssign() {
+		return teacherLoadAssign;
+	}
+
+	public void setTeacherLoadAssign(TEACHER_LOAD_ASSIGN teacherLoadAssign) {
+		this.teacherLoadAssign = teacherLoadAssign;
+	}
+
+	public EMPLOYEE getTeacher() {
+		return teacher;
+	}
+
+	public void setTeacher(EMPLOYEE teacher) {
+		this.teacher = teacher;
+	}
+
+	public STUDENT_DIPLOMA_TYPE getStudentDiplomaType() {
+		return studentDiplomaType;
+	}
+
+	public void setStudentDiplomaType(STUDENT_DIPLOMA_TYPE studentDiplomaType) {
+		this.studentDiplomaType = studentDiplomaType;
+	}
+
+	public GROUPS getGroup() {
+		return group;
+	}
+
+	public void setGroup(GROUPS group) {
+		this.group = group;
 	}
 }
