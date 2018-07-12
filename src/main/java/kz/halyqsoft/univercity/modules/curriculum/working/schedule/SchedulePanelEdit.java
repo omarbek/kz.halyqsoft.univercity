@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.Map;
 
 
-public class SchedulePanelEdit extends AbstractDialog {
+public class SchedulePanelEdit extends AbstractDialog{
 
-    SchedulePanelEdit(List<CURRICULUM_SCHEDULE> schedule, SchedulePanel scheduleView) throws Exception {
+    SchedulePanelEdit(List<CURRICULUM_SCHEDULE> schedule,  SchedulePanel scheduleView) throws Exception {
 
         Map<ID, ComboBox> comboBoxMap = new HashMap<>();
 
@@ -27,19 +27,19 @@ public class SchedulePanelEdit extends AbstractDialog {
         setHeight(1000, Unit.PIXELS);
         center();
 
-        for (CURRICULUM_SCHEDULE c : schedule) {
+        for (CURRICULUM_SCHEDULE c : schedule){
 
-            HorizontalLayout scheduleHL = new HorizontalLayout();
+            HorizontalLayout scheduleHL=new HorizontalLayout();
             scheduleHL.setSizeFull();
 
-            Label weekLabel = new Label();
+            Label weekLabel=new Label();
             weekLabel.setValue(c.getWeek().toString());
             scheduleHL.addComponent(weekLabel);
             getContent().addComponent(scheduleHL);
             scheduleHL.setSpacing(true);
             weekLabel.setWidth(100, Unit.PIXELS);
 
-            if (c.getMonth() != null) {
+            if(c.getMonth()!=null){
                 Label monthLabel = new Label();
                 monthLabel.setValue(c.getMonth().toString());
                 scheduleHL.addComponent(monthLabel);
@@ -50,7 +50,7 @@ public class SchedulePanelEdit extends AbstractDialog {
 
             ComboBox scheduleCB = new ComboBox();
             QueryModel<CURRICULUM_SCHEDULE_SYMBOL> curriculumScheduleSymbolQM = new QueryModel<>(CURRICULUM_SCHEDULE_SYMBOL.class);
-            BeanItemContainer<CURRICULUM_SCHEDULE_SYMBOL> curriculumScheduleSymbolBIC = new BeanItemContainer<>(CURRICULUM_SCHEDULE_SYMBOL.class,
+            BeanItemContainer<CURRICULUM_SCHEDULE_SYMBOL>  curriculumScheduleSymbolBIC = new BeanItemContainer<>(CURRICULUM_SCHEDULE_SYMBOL.class,
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(curriculumScheduleSymbolQM));
 
             scheduleCB.setContainerDataSource(curriculumScheduleSymbolBIC);
@@ -67,13 +67,14 @@ public class SchedulePanelEdit extends AbstractDialog {
         Button saveButton = CommonUtils.createSaveButton();
         saveButton.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent ev) {
+            public void buttonClick(Button.ClickEvent ev)
+            {
                 try {
                     for (CURRICULUM_SCHEDULE entry : schedule) {
                         ComboBox comboBox = comboBoxMap.get(entry.getId());
                         if (!entry.getSymbol().equals(comboBox.getValue())) {
                             entry.setSymbol((CURRICULUM_SCHEDULE_SYMBOL) comboBox.getValue());
-                            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(entry);
+                             SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(entry);
                             CommonUtils.showSavedNotification();
                         }
                     }

@@ -5,6 +5,7 @@ import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
@@ -72,7 +73,7 @@ public class CommonUtils {
         return null;
     }
 
-    private static EMPLOYEE getEmployee(Map<String, Object> params) {
+    public static EMPLOYEE getEmployee(Map<String, Object> params) {
         try {
             return (EMPLOYEE) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
                     getEntityByNamedQuery("EMPLOYEE.getEmployeeByLogin", params);
@@ -246,7 +247,13 @@ public class CommonUtils {
             return (SEMESTER_DATA) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class)
                     .getEntityByNamedQuery("SEMESTER_DATA.findCurrentSemesterData", Collections.EMPTY_MAP);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            return null;
         }
+    }
+    public static Label getSemesterIsGoingNowLabel() {
+        Label semIsNotGoingNowLabel = new Label();
+        semIsNotGoingNowLabel.setCaption(getUILocaleUtil().getMessage("semester.not.going.now"));
+        semIsNotGoingNowLabel.setWidthUndefined();
+        return semIsNotGoingNowLabel;
     }
 }

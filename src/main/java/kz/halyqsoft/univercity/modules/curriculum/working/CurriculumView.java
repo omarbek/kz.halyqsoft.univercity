@@ -17,7 +17,6 @@ import kz.halyqsoft.univercity.entity.beans.univercity.view.VCurriculumCreditCyc
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_CURRICULUM_ADD_PROGRAM;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_CURRICULUM_AFTER_SEMESTER;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_CURRICULUM_DETAIL;
-import kz.halyqsoft.univercity.modules.curriculum.working.AbstractCurriculumPanel;
 import kz.halyqsoft.univercity.modules.curriculum.working.cycle.CyclePanel;
 import kz.halyqsoft.univercity.modules.curriculum.working.schedule.SchedulePanel;
 import kz.halyqsoft.univercity.modules.curriculum.working.semester.AddProgramPanel;
@@ -64,6 +63,7 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
     private CURRICULUM curriculum;
     private ComboBox specialityCB;
     private ComboBox entranceYearCB;
+    private ComboBox diplomaTypeCB;
     private Label statusLabel;
     private String createStatus;
     private final Label errorLabel = new Label();
@@ -137,6 +137,26 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
         entranceYearCB.setFilteringMode(FilteringMode.STARTSWITH);
         filterHL.addComponent(entranceYearCB);
 
+        Label diplomaTypeLabel = new Label();
+        diplomaTypeLabel.addStyleName("bold");
+        diplomaTypeLabel.setWidthUndefined();
+        diplomaTypeLabel.setValue(getUILocaleUtil().getCaption("diploma.type"));
+        filterHL.addComponent(diplomaTypeLabel);
+
+        QueryModel<STUDENT_DIPLOMA_TYPE> diplomaTypeQM = new QueryModel<>(STUDENT_DIPLOMA_TYPE.class);
+        BeanItemContainer<STUDENT_DIPLOMA_TYPE> diplomaTypeBIC = new BeanItemContainer<>(
+                STUDENT_DIPLOMA_TYPE.class, SessionFacadeFactory.getSessionFacade(
+                CommonEntityFacadeBean.class).lookup(diplomaTypeQM));
+        diplomaTypeCB = new ComboBox();
+        diplomaTypeCB.setContainerDataSource(diplomaTypeBIC);
+        diplomaTypeCB.setImmediate(true);
+        diplomaTypeCB.setNullSelectionAllowed(true);
+        diplomaTypeCB.setTextInputAllowed(true);
+        diplomaTypeCB.setFilteringMode(FilteringMode.STARTSWITH);
+        diplomaTypeCB.setWidth(200, Unit.PIXELS);
+        diplomaTypeCB.setPageLength(0);
+        filterHL.addComponent(diplomaTypeCB);
+
         statusLabel = new Label();
         statusLabel.addStyleName("bold");
         statusLabel.setWidthUndefined();
@@ -147,6 +167,7 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
 
         specialityCB.addValueChangeListener(new SpecialityChangeListener());
         entranceYearCB.addValueChangeListener(new EntranceYearChangeListener());
+        diplomaTypeCB.addValueChangeListener(new DiplomaTypeChangeListener());
 
         getContent().addComponent(filterHL);
         getContent().setComponentAlignment(filterHL, Alignment.TOP_CENTER);
@@ -361,7 +382,7 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
         }
         creditSumLabel.setValue(String.format(getUILocaleUtil().getCaption("credit.sum"), sum));
 
-        int totalSum = sum + addProgramPanel.getTotalCredit()+afterSemesterProgamPanel.getTotalCredit();
+        int totalSum = sum + addProgramPanel.getTotalCredit() + afterSemesterProgamPanel.getTotalCredit();
         totalCreditSumLabel.setValue(String.format(getUILocaleUtil().getCaption("total.credit.sum"), totalSum));
     }
 
@@ -1172,8 +1193,9 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
             SPECIALITY s = (SPECIALITY) ev.getProperty().getValue();
             if (s != null) {
                 ENTRANCE_YEAR ey = (ENTRANCE_YEAR) entranceYearCB.getValue();
-                if (ey != null) {
-                    findCurriculum(s, ey);
+                STUDENT_DIPLOMA_TYPE type = (STUDENT_DIPLOMA_TYPE) diplomaTypeCB.getValue();
+                if (ey != null && type != null) {
+                    findCurriculum(s, ey, type);
                 }
 
                 QueryModel<ACADEMIC_DEGREE> qmAcademicDegree = new QueryModel<ACADEMIC_DEGREE>(ACADEMIC_DEGREE.class);
@@ -1194,10 +1216,11 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
 
     }
 
-    private void findCurriculum(SPECIALITY s, ENTRANCE_YEAR ey) {
+    private void findCurriculum(SPECIALITY s, ENTRANCE_YEAR ey, STUDENT_DIPLOMA_TYPE type) {
         QueryModel<CURRICULUM> qm = new QueryModel<CURRICULUM>(CURRICULUM.class);
         qm.addWhere("speciality", ECriteria.EQUAL, s.getId());
         qm.addWhereAnd("entranceYear", ECriteria.EQUAL, ey.getId());
+        qm.addWhereAnd("diplomaType", ECriteria.EQUAL, type.getId());
         qm.addWhere("deleted", Boolean.FALSE);
         try {
             curriculum = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(qm);
@@ -1208,6 +1231,7 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
             curriculum = new CURRICULUM();
             curriculum.setSpeciality(s);
             curriculum.setEntranceYear(ey);
+            curriculum.setDiplomaType(type);
             try {
                 curriculum.setCurriculumStatus(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(CURRICULUM_STATUS.class, ID.valueOf(IN_CREATING)));
                 statusLabel.setValue(getUILocaleUtil().getEntityFieldLabel(CURRICULUM.class, "curriculumStatus") + ": " + createStatus);
@@ -1224,6 +1248,21 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
         }
     }
 
+    private class DiplomaTypeChangeListener implements ValueChangeListener {
+
+        @Override
+        public void valueChange(ValueChangeEvent ev) {
+            STUDENT_DIPLOMA_TYPE type = (STUDENT_DIPLOMA_TYPE) ev.getProperty().getValue();
+            if (type != null) {
+                SPECIALITY s = (SPECIALITY) specialityCB.getValue();
+                ENTRANCE_YEAR ey = (ENTRANCE_YEAR) entranceYearCB.getValue();
+                if (s != null && ey != null) {
+                    findCurriculum(s, ey, type);
+                }
+            }
+        }
+    }
+
     private class EntranceYearChangeListener implements ValueChangeListener {
 
         @Override
@@ -1231,8 +1270,9 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
             ENTRANCE_YEAR ey = (ENTRANCE_YEAR) ev.getProperty().getValue();
             if (ey != null) {
                 SPECIALITY s = (SPECIALITY) specialityCB.getValue();
-                if (s != null) {
-                    findCurriculum(s, ey);
+                STUDENT_DIPLOMA_TYPE type = (STUDENT_DIPLOMA_TYPE) diplomaTypeCB.getValue();
+                if (s != null && type != null) {
+                    findCurriculum(s, ey, type);
                 }
             }
         }

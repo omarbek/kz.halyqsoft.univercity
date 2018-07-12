@@ -4,13 +4,7 @@ import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
 
-import java.util.Locale;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 /**
  * @author Omarbek
@@ -33,21 +27,11 @@ public class SUBJECT extends AbstractEntity {
     @Column(name = "NAME_RU", nullable = false)
     private String nameRU;
 
-//	@FieldInfo(type = EFieldType.TEXT, max = 13, order = 4, required = false, inGrid = false, readOnlyFixed = true, columnWidth = 100)
-//	@Column(name = "CODE")
-//	private String code;
-
     @FieldInfo(type = EFieldType.FK_DIALOG, order = 5, inGrid = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "STUDY_DIRECT_ID", referencedColumnName = "ID")})
     private STUDY_DIRECT studyDirect;
-
-//	@FieldInfo(type = EFieldType.FK_COMBO, order = 6, inGrid = false)
-//	@ManyToOne
-//	@JoinColumns({
-//			@JoinColumn(name = "EDUCATION_MODULE_TYPE_ID", referencedColumnName = "ID")})
-//	private EDUCATION_MODULE_TYPE educationModuleType;
 
     @FieldInfo(type = EFieldType.TEXT, isMemo = true, max = 4000, required = false, order = 7, inGrid = false)
     @Column(name = "DESCR")
@@ -111,31 +95,45 @@ public class SUBJECT extends AbstractEntity {
     @Column(name = "LANG_RU", nullable = false)
     private boolean langRU;
 
-//	@FieldInfo(type = EFieldType.FK_COMBO, order = 19, required = false, inGrid = false)
-//    @ManyToOne
-//    @JoinColumns({
-//        @JoinColumn(name = "GROUP_LEC_ID", referencedColumnName = "ID")})
-//    private GROUP_SIZE_LECTURE groupSizeLecture;
-//
-//	@FieldInfo(type = EFieldType.FK_COMBO, order = 20, required = false, inGrid = false)
-//    @ManyToOne
-//    @JoinColumns({
-//        @JoinColumn(name = "GROUP_PRAC_ID", referencedColumnName = "ID")})
-//    private GROUP_SIZE_PRAC groupSizePrac;
-//
-//	@FieldInfo(type = EFieldType.FK_COMBO, order = 21, required = false, inGrid = false)
-//    @ManyToOne
-//    @JoinColumns({
-//        @JoinColumn(name = "GROUP_LAB_ID", referencedColumnName = "ID")})
-//    private GROUP_SIZE_LAB groupSizeLab;
+    @FieldInfo(type = EFieldType.INTEGER, order = 19)
+    @Column(name = "LC_COUNT")
+    private Integer lcCount;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 22, inGrid = false)
+    @FieldInfo(type = EFieldType.INTEGER, order = 20)
+    @Column(name = "PR_COUNT")
+    private Integer prCount;
+
+    @FieldInfo(type = EFieldType.INTEGER, order = 21)
+    @Column(name = "LB_COUNT")
+    private Integer lbCount;
+
+    @FieldInfo(type = EFieldType.INTEGER, order = 22, readOnlyFixed = true)
+    @Column(name = "WITH_TEACHER_COUNT")
+    private Integer withTeacherCount;
+
+    @FieldInfo(type = EFieldType.INTEGER, order = 23, readOnlyFixed = true)
+    @Column(name = "OWN_COUNT")
+    private Integer ownCount;
+
+    @FieldInfo(type = EFieldType.INTEGER, order = 24, readOnlyFixed = true)
+    @Column(name = "TOTAL_COUNT")
+    private Integer totalCount;
+
+    @FieldInfo(type = EFieldType.BOOLEAN, order = 25, required = false, columnWidth = 100)
+    @Column(name = "COURSE_WORK", nullable = false)
+    private boolean courseWork;
+
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 26, inGrid = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "CONTROL_TYPE_ID", referencedColumnName = "ID")})
     private CONTROL_TYPE controlType;
 
-    @FieldInfo(type = EFieldType.BOOLEAN, order = 23, required = false, inEdit = false, inGrid = false, inView = false)
+    @FieldInfo(type = EFieldType.INTEGER, order = 27,required = false)
+    @Column(name = "WEEK_NUMBER")
+    private Integer weekNumber;
+
+    @FieldInfo(type = EFieldType.BOOLEAN, order = 28, required = false, inEdit = false, inGrid = false, inView = false)
     @Column(name = "DELETED", nullable = false)
     private boolean deleted;
 
@@ -162,14 +160,6 @@ public class SUBJECT extends AbstractEntity {
     public void setNameRU(String nameRU) {
         this.nameRU = nameRU;
     }
-
-//	public String getCode() {
-//		return code;
-//	}
-//
-//	public void setCode(String code) {
-//		this.code = code;
-//	}
 
     public STUDY_DIRECT getStudyDirect() {
         return studyDirect;
@@ -203,9 +193,13 @@ public class SUBJECT extends AbstractEntity {
         this.level = level;
     }
 
-    public SUBJECT_MODULE getSubjectModule() { return subjectModule; }
+    public SUBJECT_MODULE getSubjectModule() {
+        return subjectModule;
+    }
 
-    public void setSubjectModule(SUBJECT_MODULE subjectModule) { this.subjectModule = subjectModule; }
+    public void setSubjectModule(SUBJECT_MODULE subjectModule) {
+        this.subjectModule = subjectModule;
+    }
 
     public SUBJECT_CYCLE getSubjectCycle() {
         return subjectCycle;
@@ -271,29 +265,6 @@ public class SUBJECT extends AbstractEntity {
         this.langRU = langRU;
     }
 
-//	public GROUP_SIZE_LECTURE getGroupSizeLecture() {
-//		return groupSizeLecture;
-//	}
-//
-//	public void setGroupSizeLecture(GROUP_SIZE_LECTURE groupSizeLecture) {
-//		this.groupSizeLecture = groupSizeLecture;
-//	}
-//
-//	public GROUP_SIZE_PRAC getGroupSizePrac() {
-//		return groupSizePrac;
-//	}
-//
-//	public void setGroupSizePrac(GROUP_SIZE_PRAC groupSizePrac) {
-//		this.groupSizePrac = groupSizePrac;
-//	}
-//
-//	public GROUP_SIZE_LAB getGroupSizeLab() {
-//		return groupSizeLab;
-//	}
-//
-//	public void setGroupSizeLab(GROUP_SIZE_LAB groupSizeLab) {
-//		this.groupSizeLab = groupSizeLab;
-//	}
 
     public CONTROL_TYPE getControlType() {
         return controlType;
@@ -311,26 +282,71 @@ public class SUBJECT extends AbstractEntity {
         this.deleted = deleted;
     }
 
-//	public EDUCATION_MODULE_TYPE getEducationModuleType() {
-//		return educationModuleType;
-//	}
-//
-//	public void setEducationModuleType(EDUCATION_MODULE_TYPE educationModuleType) {
-//		this.educationModuleType = educationModuleType;
-//	}
+    public Integer getLcCount() {
+        return lcCount;
+    }
+
+    public void setLcCount(Integer lcCount) {
+        this.lcCount = lcCount;
+    }
+
+    public Integer getPrCount() {
+        return prCount;
+    }
+
+    public void setPrCount(Integer prCount) {
+        this.prCount = prCount;
+    }
+
+    public Integer getLbCount() {
+        return lbCount;
+    }
+
+    public void setLbCount(Integer lbCount) {
+        this.lbCount = lbCount;
+    }
+
+    public Integer getWithTeacherCount() {
+        return withTeacherCount;
+    }
+
+    public void setWithTeacherCount(Integer withTeacherCount) {
+        this.withTeacherCount = withTeacherCount;
+    }
+
+    public Integer getOwnCount() {
+        return ownCount;
+    }
+
+    public void setOwnCount(Integer ownCount) {
+        this.ownCount = ownCount;
+    }
+
+    public Integer getTotalCount() {
+        return totalCount;
+    }
+
+    public void setTotalCount(Integer totalCount) {
+        this.totalCount = totalCount;
+    }
 
     public String toString() {
         return nameRU;
     }
 
-//	public String toString(Locale l) {
-//		String name = nameEN;
-//		if (l.getLanguage().equals("kk")) {
-//			name = nameKZ;
-//		} else if (l.getLanguage().equals("ru")) {
-//			name = nameRU;
-//		}
-//
-//		return code + " " + name;
-//	}
+    public boolean isCourseWork() {
+        return courseWork;
+    }
+
+    public void setCourseWork(boolean courseWork) {
+        this.courseWork = courseWork;
+    }
+
+    public Integer getWeekNumber() {
+        return weekNumber;
+    }
+
+    public void setWeekNumber(Integer weekNumber) {
+        this.weekNumber = weekNumber;
+    }
 }

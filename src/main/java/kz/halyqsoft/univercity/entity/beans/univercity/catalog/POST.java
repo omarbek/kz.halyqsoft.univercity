@@ -16,21 +16,21 @@ public class POST extends AbstractEntity {
 
 	private static final long serialVersionUID = -5128853767511513443L;
 
-	@FieldInfo(type = EFieldType.TEXT, max = 64, order = 1)
+	@FieldInfo(type = EFieldType.TEXT, max = 64)
 	@Column(name = "POST_NAME", nullable = false)
 	private String postName;
 	
-	@FieldInfo(type = EFieldType.INTEGER, order = 2, required = false, columnWidth = 120)
+	@FieldInfo(type = EFieldType.INTEGER, order = 2, required = false)
 	@Column(name = "STUDY_LOAD", nullable = false)
 	private Integer studyLoad;
-	
-	@FieldInfo(type = EFieldType.BOOLEAN, order = 3, required = false, inGrid = false)
-	@Column(name = "TP", nullable = false)
-    private boolean tp;//teacher post
-	
-	@FieldInfo(type = EFieldType.INTEGER, order = 4)
+
+	@FieldInfo(type = EFieldType.INTEGER, order = 3)
 	@Column(name = "PRIORITY", nullable = false)
 	private Integer priority;
+	
+	@FieldInfo(type = EFieldType.BOOLEAN, order = 4, required = false, columnWidth = 100)
+	@Column(name = "TP", nullable = false)
+    private boolean tp;//teacher post
 
 	public POST() {
 	}
