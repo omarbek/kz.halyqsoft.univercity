@@ -73,7 +73,7 @@ public class CommonUtils {
         return null;
     }
 
-    private static EMPLOYEE getEmployee(Map<String, Object> params) {
+    public static EMPLOYEE getEmployee(Map<String, Object> params) {
         try {
             return (EMPLOYEE) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
                     getEntityByNamedQuery("EMPLOYEE.getEmployeeByLogin", params);

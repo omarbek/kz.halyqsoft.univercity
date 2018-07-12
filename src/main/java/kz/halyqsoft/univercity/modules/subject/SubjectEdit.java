@@ -28,7 +28,6 @@ import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 
-import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -217,8 +216,8 @@ public final class SubjectEdit extends AbstractFormWidgetView {
                 emp.setLecture((int) oo[4] == 1);
                 emp.setLaboratory((int) oo[5] == 1);
                 emp.setPractice((int) oo[6] == 1);
-                emp.setFall(((BigDecimal) oo[7]).intValue() == 1);
-                emp.setSpring(((BigDecimal) oo[8]).intValue() == 1);
+                emp.setFall((Boolean) oo[7]);
+                emp.setSpring((Boolean) oo[8]);
                 list.add(emp);
             }
 

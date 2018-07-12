@@ -58,7 +58,7 @@ public class V_TEACHER_LOAD_ASSIGN_DETAIL extends AbstractEntity {
 	@Column(name = "SEMESTER_NAME")
 	private String semesterName;
 
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 7)
+	@FieldInfo(type = EFieldType.FK_COMBO, order = 7,inGrid = false)
 	@ManyToOne
 	@JoinColumns({
 			@JoinColumn(name = "SEMESTER_PERIOD_ID", referencedColumnName = "ID")})
@@ -132,7 +132,7 @@ public class V_TEACHER_LOAD_ASSIGN_DETAIL extends AbstractEntity {
 	@Column(name = "TOTAL_HOUR")
 	private Double totalHour;
 
-	@FieldInfo(type = EFieldType.FK_COMBO,order = 25)
+	@FieldInfo(type = EFieldType.FK_COMBO,order = 25,inGrid = false)
 	@ManyToOne
 	@JoinColumns({
 			@JoinColumn(name = "TEACHER_LOAD_ASSIGN_ID", referencedColumnName = "ID")})

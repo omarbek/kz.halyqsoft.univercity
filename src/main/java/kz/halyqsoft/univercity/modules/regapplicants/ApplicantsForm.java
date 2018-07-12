@@ -962,6 +962,10 @@ public final class ApplicantsForm extends UsersForm {
 
         LocalDateTime now = LocalDateTime.now();
 
+        Map<String, Object> params = new HashMap<>();
+        String createdBy = student.getCreatedBy();
+        params.put("login", createdBy);
+        USERS tecnhik=CommonUtils.getEmployee(params);
         replaced = text.replaceAll("\\$fio", student.toString())
                 .replaceAll("\\$money", moneyForEducation)
                 .replaceAll("21250", answerEdu)
@@ -1008,7 +1012,7 @@ public final class ApplicantsForm extends UsersForm {
                 .replaceAll("\\$surname", student.getLastName())
                 .replaceAll("\\$firstName", student.getMiddleName())
                 .replaceAll("\\$education", educationDoc.getEducationType().toString())
-                .replaceAll("\\$technic", student.getCoordinator().toString())
+                .replaceAll("\\$technic", tecnhik.toString())
                 .replaceAll("\\$attestat", attestationDate)
                 .replaceAll("\\$nomer", educationDoc.getDocumentNo())
                 .replaceAll("\\$ent", untCertificate == null ? "" : untCertificate.getDocumentNo())

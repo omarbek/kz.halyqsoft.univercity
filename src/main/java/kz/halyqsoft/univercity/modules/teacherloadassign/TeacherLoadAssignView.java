@@ -1,11 +1,9 @@
 package kz.halyqsoft.univercity.modules.teacherloadassign;
 
-import com.vaadin.data.Container;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.combobox.FilteringMode;
-import com.vaadin.shared.ui.grid.HeightMode;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
@@ -15,6 +13,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.view.V_TEACHER_LOAD_ASSIG
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
+import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.ID;
 import org.r3a.common.entity.beans.AbstractTask;
 import org.r3a.common.entity.query.QueryModel;
@@ -22,10 +21,11 @@ import org.r3a.common.entity.query.from.EJoin;
 import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.view.AbstractTaskView;
+import org.r3a.common.vaadin.widget.ERefreshType;
 import org.r3a.common.vaadin.widget.dialog.AbstractYesButtonListener;
 import org.r3a.common.vaadin.widget.dialog.Message;
-import org.r3a.common.vaadinaddon.IntegerCellRenderer;
-import org.r3a.common.vaadinaddon.converter.IntegerCellConverter;
+import org.r3a.common.vaadin.widget.grid.GridWidget;
+import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
@@ -49,7 +49,7 @@ public class TeacherLoadAssignView extends AbstractTaskView {
     private CheckBox acceptedCB;
 
     private double totalHour = 0;
-    private final List<Grid> gridList = new ArrayList<>();
+    private final List<GridWidget> gridList = new ArrayList<>();
 
     private ENTRANCE_YEAR currentYear;
     private SEMESTER_DATA currentSemesterData;
@@ -229,7 +229,7 @@ public class TeacherLoadAssignView extends AbstractTaskView {
     }
 
     public void refresh() {
-        for (Grid grid : gridList) {
+        for (GridWidget grid : gridList) {
             getContent().removeComponent(grid);
         }
 
@@ -319,71 +319,20 @@ public class TeacherLoadAssignView extends AbstractTaskView {
                 sb.append(", ");
                 sb.append(ved.getPostName());
 
-                Grid grid = new Grid();
-                grid.setSizeFull();
-                grid.setCaption(sb.toString());
-                grid.addStyleName("header-center");
-                grid.addColumn("subjectName").setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(
-                        V_TEACHER_LOAD_ASSIGN_DETAIL.class, "subjectName"));
-                grid.addColumn("speciality").setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(
-                        CURRICULUM.class, "speciality"));
-                grid.addColumn("language").setHeaderCaption(getUILocaleUtil().getCaption("language"));
-                grid.addColumn("studyYear").setHeaderCaption(getUILocaleUtil().getCaption("study.year.1"));
-                grid.addColumn("credit").setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(
-                        V_TEACHER_LOAD_ASSIGN_DETAIL.class, "credit")).setWidth(79);
-                grid.addColumn("formula").setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(
-                        V_TEACHER_LOAD_ASSIGN_DETAIL.class, "formula")).setWidth(80);
-                grid.addColumn("semesterPeriodName").setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(
-                        V_TEACHER_LOAD_ASSIGN_DETAIL.class, "semesterPeriodName")).setWidth(84);
-                grid.addColumn("studentCount", Integer.class).setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(
-                        V_TEACHER_LOAD_ASSIGN_DETAIL.class, "studentCount")).setWidth(92).setRenderer(
-                        new IntegerCellRenderer()).setConverter(new IntegerCellConverter());
-                grid.addColumn("lcHour").setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(
-                        V_TEACHER_LOAD_ASSIGN_DETAIL.class, "lcHour"));
-                grid.addColumn("lbHour").setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(
-                        V_TEACHER_LOAD_ASSIGN_DETAIL.class, "lbHour"));
-                grid.addColumn("prHour").setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(
-                        V_TEACHER_LOAD_ASSIGN_DETAIL.class, "prHour"));
-                grid.addColumn("totalHour").setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(
-                        V_TEACHER_LOAD_ASSIGN_DETAIL.class, "totalHour"));
-                grid.setSelectionMode(Grid.SelectionMode.NONE);
-                grid.setHeightMode(HeightMode.ROW);
-                if (list.size() < 5) {
-                    grid.setHeightByRows(list.size() + 1);
-                } else {
-                    grid.setHeightByRows(5);
-                }
-                Grid.HeaderRow hr = grid.prependHeaderRow();
-                Grid.HeaderCell hc = hr.join(hr.getCell("lcHour"));
-                hc.setText(getUILocaleUtil().getCaption("lecture"));
-                hc = hr.join(hr.getCell("lbHour"));
-                hc.setText(getUILocaleUtil().getCaption("laboratory"));
-                hc = hr.join(hr.getCell("prHour"));
-                hc.setText(getUILocaleUtil().getCaption("seminar"));
+                GridWidget loadGW=new GridWidget(V_TEACHER_LOAD_ASSIGN_DETAIL.class);
+                loadGW.showToolbar(false);
 
-                hr = grid.prependHeaderRow();
-                hc = hr.join(hr.getCell("lcHour"), hr.getCell("lbHour"), hr.getCell("prHour"));
-                hc.setText(getUILocaleUtil().getCaption("class.type.hour"));
+                DBGridModel loadGM = (DBGridModel) loadGW.getWidgetModel();
+                loadGM.setTitleVisible(false);
+                loadGM.setMultiSelect(false);
+                loadGM.setRefreshType(ERefreshType.MANUAL);
 
-                Grid.FooterRow fr = grid.addFooterRowAt(0);
-                fr.getCell("subjectName").setText(getUILocaleUtil().getCaption("in.total"));
+                loadGM.setEntities(list);
+                loadGW.refresh();
 
-                BeanItemContainer<V_TEACHER_LOAD_ASSIGN_DETAIL> bic = new BeanItemContainer<>(
-                        V_TEACHER_LOAD_ASSIGN_DETAIL.class, list);
-                grid.setContainerDataSource(bic);
-                grid.setFrozenColumnCount(1);
-
-                double totalHourTeacher = 0.0;
-                for (V_TEACHER_LOAD_ASSIGN_DETAIL vtlad : list) {
-                    totalHourTeacher += vtlad.getTotalHour();
-                    totalHour += totalHourTeacher;
-                }
-
-                fr.getCell("totalHour").setText(String.valueOf(totalHourTeacher));
-
-                getContent().addComponent(grid);
-                getContent().setComponentAlignment(grid, Alignment.MIDDLE_CENTER);
-                gridList.add(grid);
+                getContent().addComponent(loadGW);
+                getContent().setComponentAlignment(loadGW, Alignment.MIDDLE_CENTER);
+                gridList.add(loadGW);
             }
         } catch (Exception ex) {
             LOG.error("Unable to load teacher load assign: ", ex);
@@ -614,10 +563,10 @@ public class TeacherLoadAssignView extends AbstractTaskView {
 
         if (!teacherLoadAssign.isAccepted()) {
             List<TEACHER_LOAD_ASSIGN_DETAIL> mergeList = new ArrayList<>();
-            for (Grid grid : gridList) {
-                Container.Indexed gridData = grid.getContainerDataSource();
+            for (GridWidget grid : gridList) {
+                List<Entity> allEntities = grid.getAllEntities();
                 try {
-                    for (Object item : gridData.getItemIds()) {
+                    for (Entity item : allEntities) {
                         V_TEACHER_LOAD_ASSIGN_DETAIL loadAssignDetailView = (V_TEACHER_LOAD_ASSIGN_DETAIL) item;
                         TEACHER_LOAD_ASSIGN_DETAIL loadAssignDetail = SessionFacadeFactory.getSessionFacade(
                                 CommonEntityFacadeBean.class).lookup(TEACHER_LOAD_ASSIGN_DETAIL.class,
