@@ -7,10 +7,6 @@ import kz.halyqsoft.univercity.filter.FGroupFilter;
 import kz.halyqsoft.univercity.filter.FStudentFilter;
 import org.r3a.common.vaadin.widget.filter2.panel.AbstractFilterPanel;
 
-/**
- * @author Omarbek
- * @created Mar 28, 2017 9:40:44 AM
- */
 @SuppressWarnings("serial")
 public final class GroupFilterPanel extends AbstractFilterPanel {
 

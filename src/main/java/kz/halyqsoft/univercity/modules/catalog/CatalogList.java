@@ -1,12 +1,8 @@
 package kz.halyqsoft.univercity.modules.catalog;
 
-import kz.halyqsoft.univercity.entity.beans.TASKS;
 import kz.halyqsoft.univercity.entity.beans.ROLES;
+import kz.halyqsoft.univercity.entity.beans.TASKS;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.V_ACADEMIC_DEGREE;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.V_ORGANIZATION;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.V_SEMESTER_DATA;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.V_SPECIALITY;
 import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.ID;
 
@@ -57,7 +53,7 @@ class CatalogList {
         addCatalogEntityToList(SPECIALITY.class);
         addCatalogEntityToList(ACADEMIC_DEGREE.class);
         addCatalogEntityToList(ORGANIZATION.class);
-        addCatalogEntityToList(SEMESTER_DATA.class);
+//        addCatalogEntityToList(SEMESTER_DATA.class);
 
         addCatalogEntityToList(ROLES.class);
         addCatalogEntityToList(TASKS.class);

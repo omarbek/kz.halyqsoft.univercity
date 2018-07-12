@@ -77,162 +77,164 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
 
     @Override
     public void initView(boolean readOnly) throws Exception {
-        HorizontalLayout hl = new HorizontalLayout();
-        hl.setWidthUndefined();
-        hl.setSpacing(true);
-        hl.setMargin(true);
-        hl.addStyleName("form-panel");
-
-        Label l = new Label();
-        l.addStyleName("bold");
-        l.setWidthUndefined();
-        l.setValue(getUILocaleUtil().getCaption("study.year.1"));
-        hl.addComponent(l);
-
         SEMESTER_DATA sd = CommonUtils.getCurrentSemesterData();
-        QueryModel<ENTRANCE_YEAR> academicYearQM = new QueryModel<ENTRANCE_YEAR>(ENTRANCE_YEAR.class);
-        academicYearQM.addWhere("beginYear", ECriteria.LESS_EQUAL, sd.getYear().getBeginYear() + 1);
-        academicYearQM.addWhereAnd("endYear", ECriteria.LESS_EQUAL, sd.getYear().getEndYear() + 1);
-        academicYearQM.addOrderDesc("beginYear");
-        BeanItemContainer<ENTRANCE_YEAR> academicYearBIC = new BeanItemContainer<ENTRANCE_YEAR>(ENTRANCE_YEAR.class, SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(academicYearQM));
-        academicYearCB = new ComboBox();
-        academicYearCB.setContainerDataSource(academicYearBIC);
-        academicYearCB.setImmediate(true);
-        academicYearCB.setNullSelectionAllowed(true);
-        academicYearCB.setTextInputAllowed(false);
-        academicYearCB.setFilteringMode(FilteringMode.OFF);
-        academicYearCB.setWidth(100, Unit.PIXELS);
-        academicYearCB.addValueChangeListener(new AcademicYearChangeListener());
-        hl.addComponent(academicYearCB);
+        if (sd != null) {//TODO check
+            HorizontalLayout hl = new HorizontalLayout();
+            hl.setWidthUndefined();
+            hl.setSpacing(true);
+            hl.setMargin(true);
+            hl.addStyleName("form-panel");
 
-        l = new Label();
-        l.addStyleName("bold");
-        l.setWidthUndefined();
-        l.setValue(getUILocaleUtil().getCaption("semester"));
-        hl.addComponent(l);
+            Label l = new Label();
+            l.addStyleName("bold");
+            l.setWidthUndefined();
+            l.setValue(getUILocaleUtil().getCaption("study.year.1"));
+            hl.addComponent(l);
 
-        QueryModel<SEMESTER_PERIOD> semesterPeriodQM = new QueryModel<SEMESTER_PERIOD>(SEMESTER_PERIOD.class);
-        semesterPeriodQM.addWhere("id", ECriteria.MORE_EQUAL, 3);
-        semesterPeriodQM.addOrder("id");
-        BeanItemContainer<SEMESTER_PERIOD> semesterPeriodBIC = new BeanItemContainer<SEMESTER_PERIOD>(SEMESTER_PERIOD.class, SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(semesterPeriodQM));
-        semesterPeriodCB = new ComboBox();
-        semesterPeriodCB.setContainerDataSource(semesterPeriodBIC);
-        semesterPeriodCB.setImmediate(true);
-        semesterPeriodCB.setNullSelectionAllowed(true);
-        semesterPeriodCB.setTextInputAllowed(false);
-        semesterPeriodCB.setFilteringMode(FilteringMode.OFF);
-        semesterPeriodCB.setPageLength(0);
-        semesterPeriodCB.setWidth(100, Unit.PIXELS);
-        semesterPeriodCB.addValueChangeListener(new SemesterPeriodChangeListener());
-        hl.addComponent(semesterPeriodCB);
+            QueryModel<ENTRANCE_YEAR> academicYearQM = new QueryModel<ENTRANCE_YEAR>(ENTRANCE_YEAR.class);
+            academicYearQM.addWhere("beginYear", ECriteria.LESS_EQUAL, sd.getYear().getBeginYear() + 1);
+            academicYearQM.addWhereAnd("endYear", ECriteria.LESS_EQUAL, sd.getYear().getEndYear() + 1);
+            academicYearQM.addOrderDesc("beginYear");
+            BeanItemContainer<ENTRANCE_YEAR> academicYearBIC = new BeanItemContainer<ENTRANCE_YEAR>(ENTRANCE_YEAR.class, SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(academicYearQM));
+            academicYearCB = new ComboBox();
+            academicYearCB.setContainerDataSource(academicYearBIC);
+            academicYearCB.setImmediate(true);
+            academicYearCB.setNullSelectionAllowed(true);
+            academicYearCB.setTextInputAllowed(false);
+            academicYearCB.setFilteringMode(FilteringMode.OFF);
+            academicYearCB.setWidth(100, Unit.PIXELS);
+            academicYearCB.addValueChangeListener(new AcademicYearChangeListener());
+            hl.addComponent(academicYearCB);
 
-        statusLabel = new Label();
-        statusLabel.addStyleName("bold");
-        statusLabel.setWidthUndefined();
-        statusLabel.setValue(getUILocaleUtil().getCaption("status"));
-        hl.addComponent(statusLabel);
+            l = new Label();
+            l.addStyleName("bold");
+            l.setWidthUndefined();
+            l.setValue(getUILocaleUtil().getCaption("semester"));
+            hl.addComponent(l);
 
-        createStatus = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(CURRICULUM_STATUS.class, ID.valueOf(1)).getStatusName();
+            QueryModel<SEMESTER_PERIOD> semesterPeriodQM = new QueryModel<SEMESTER_PERIOD>(SEMESTER_PERIOD.class);
+            semesterPeriodQM.addWhere("id", ECriteria.MORE_EQUAL, 3);
+            semesterPeriodQM.addOrder("id");
+            BeanItemContainer<SEMESTER_PERIOD> semesterPeriodBIC = new BeanItemContainer<SEMESTER_PERIOD>(SEMESTER_PERIOD.class, SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(semesterPeriodQM));
+            semesterPeriodCB = new ComboBox();
+            semesterPeriodCB.setContainerDataSource(semesterPeriodBIC);
+            semesterPeriodCB.setImmediate(true);
+            semesterPeriodCB.setNullSelectionAllowed(true);
+            semesterPeriodCB.setTextInputAllowed(false);
+            semesterPeriodCB.setFilteringMode(FilteringMode.OFF);
+            semesterPeriodCB.setPageLength(0);
+            semesterPeriodCB.setWidth(100, Unit.PIXELS);
+            semesterPeriodCB.addValueChangeListener(new SemesterPeriodChangeListener());
+            hl.addComponent(semesterPeriodCB);
 
-        getContent().addComponent(hl);
-        getContent().setComponentAlignment(hl, Alignment.TOP_CENTER);
+            statusLabel = new Label();
+            statusLabel.addStyleName("bold");
+            statusLabel.setWidthUndefined();
+            statusLabel.setValue(getUILocaleUtil().getCaption("status"));
+            hl.addComponent(statusLabel);
 
-        hl = new HorizontalLayout();
-        hl.setWidthUndefined();
-        hl.setSpacing(true);
+            createStatus = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(CURRICULUM_STATUS.class, ID.valueOf(1)).getStatusName();
 
-        conform = new Button();
-        conform.setCaption(getUILocaleUtil().getCaption("conform"));
-        conform.setWidth(120, Unit.PIXELS);
-        conform.addStyleName("conform");
-        conform.addClickListener(new ClickListener() {
+            getContent().addComponent(hl);
+            getContent().setComponentAlignment(hl, Alignment.TOP_CENTER);
 
-            @Override
-            public void buttonClick(ClickEvent ev) {
-                try {
-                    conform();
-                } catch (Exception ex) {
-                    LOG.error("Unable to conform curriculum: ", ex);
-                    Message.showInfo(ex.getMessage());
-                }
-            }
-        });
-        hl.addComponent(conform);
+            hl = new HorizontalLayout();
+            hl.setWidthUndefined();
+            hl.setSpacing(true);
 
-        approve = new Button();
-        approve.setCaption(getUILocaleUtil().getCaption("approve"));
-        approve.setWidth(120, Unit.PIXELS);
-        approve.addStyleName("approve");
-        approve.addClickListener(new ClickListener() {
+            conform = new Button();
+            conform.setCaption(getUILocaleUtil().getCaption("conform"));
+            conform.setWidth(120, Unit.PIXELS);
+            conform.addStyleName("conform");
+            conform.addClickListener(new ClickListener() {
 
-            @Override
-            public void buttonClick(ClickEvent ev) {
-                try {
-                    approve();
-                } catch (Exception ex) {
-                    LOG.error("Unable to approve curriculum: ", ex);
-                    String message = ex.getMessage();
-                    if (message != null) {
-                        Message.showInfo(message);
-                    } else {
-                        Message.showError(ex.toString());
+                @Override
+                public void buttonClick(ClickEvent ev) {
+                    try {
+                        conform();
+                    } catch (Exception ex) {
+                        LOG.error("Unable to conform curriculum: ", ex);
+                        Message.showInfo(ex.getMessage());
                     }
                 }
-            }
-        });
-        hl.addComponent(approve);
+            });
+            hl.addComponent(conform);
 
-        Button print = new Button();
-        print.setCaption(getUILocaleUtil().getCaption("print"));
-        print.setWidth(120, Unit.PIXELS);
-        print.setIcon(new ThemeResource("img/button/printer.png"));
-        print.addStyleName("print");
-        hl.addComponent(print);
+            approve = new Button();
+            approve.setCaption(getUILocaleUtil().getCaption("approve"));
+            approve.setWidth(120, Unit.PIXELS);
+            approve.addStyleName("approve");
+            approve.addClickListener(new ClickListener() {
 
-        FileDownloader fd = new CurriculumDownloader(new StreamResource(new StreamSource() {
+                @Override
+                public void buttonClick(ClickEvent ev) {
+                    try {
+                        approve();
+                    } catch (Exception ex) {
+                        LOG.error("Unable to approve curriculum: ", ex);
+                        String message = ex.getMessage();
+                        if (message != null) {
+                            Message.showInfo(message);
+                        } else {
+                            Message.showError(ex.toString());
+                        }
+                    }
+                }
+            });
+            hl.addComponent(approve);
 
-            @Override
-            public InputStream getStream() {
-                return getDownloadInputStream();
-            }
-        }, getFilename()));
-        fd.extend(print);
+            Button print = new Button();
+            print.setCaption(getUILocaleUtil().getCaption("print"));
+            print.setWidth(120, Unit.PIXELS);
+            print.setIcon(new ThemeResource("img/button/printer.png"));
+            print.addStyleName("print");
+            hl.addComponent(print);
 
-        getContent().addComponent(hl);
-        getContent().setComponentAlignment(hl, Alignment.TOP_CENTER);
+            FileDownloader fd = new CurriculumDownloader(new StreamResource(new StreamSource() {
 
-        grid = new GridWidget(VCurriculumDetail.class);
-        grid.addEntityListener(this);
-        grid.setButtonVisible(AbstractToolbar.ADD_BUTTON, false);
-        grid.setButtonVisible(AbstractToolbar.EDIT_BUTTON, false);
-        grid.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
-        grid.setButtonVisible(AbstractToolbar.REFRESH_BUTTON, false);
-        DBGridModel gridGM = (DBGridModel) grid.getWidgetModel();
-        gridGM.setMultiSelect(false);
-        gridGM.setRefreshType(ERefreshType.MANUAL);
-        gridGM.setHeightByRows(15);
-        gridGM.setFooterVisible(true);
+                @Override
+                public InputStream getStream() {
+                    return getDownloadInputStream();
+                }
+            }, getFilename()));
+            fd.extend(print);
 
-        StringColumnFooterModel nameFooter = new StringColumnFooterModel();
-        nameFooter.setFooterType(EColumnFooterType.CAPTION);
-        nameFooter.setColumnName("subjectName");
-        nameFooter.setValue(getUILocaleUtil().getCaption("total"));
-        gridGM.addFooterModel(nameFooter);
+            getContent().addComponent(hl);
+            getContent().setComponentAlignment(hl, Alignment.TOP_CENTER);
 
-        IntegerColumnFooterModel creditFooter = new IntegerColumnFooterModel();
-        creditFooter.setFooterType(EColumnFooterType.SUM);
-        creditFooter.setColumnName("credit");
-        gridGM.addFooterModel(creditFooter);
+            grid = new GridWidget(VCurriculumDetail.class);
+            grid.addEntityListener(this);
+            grid.setButtonVisible(AbstractToolbar.ADD_BUTTON, false);
+            grid.setButtonVisible(AbstractToolbar.EDIT_BUTTON, false);
+            grid.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
+            grid.setButtonVisible(AbstractToolbar.REFRESH_BUTTON, false);
+            DBGridModel gridGM = (DBGridModel) grid.getWidgetModel();
+            gridGM.setMultiSelect(false);
+            gridGM.setRefreshType(ERefreshType.MANUAL);
+            gridGM.setHeightByRows(15);
+            gridGM.setFooterVisible(true);
 
-        Button add = new Button();
-        add.setWidth(120, Unit.PIXELS);
-        add.setIcon(new ThemeResource("img/button/new.png"));
-        add.addClickListener(new AddListener());
-        int i = grid.addButtonFirst(add);
-        grid.setButtonDescription(i, "new");
+            StringColumnFooterModel nameFooter = new StringColumnFooterModel();
+            nameFooter.setFooterType(EColumnFooterType.CAPTION);
+            nameFooter.setColumnName("subjectName");
+            nameFooter.setValue(getUILocaleUtil().getCaption("total"));
+            gridGM.addFooterModel(nameFooter);
 
-        getContent().addComponent(grid);
-        getContent().setComponentAlignment(grid, Alignment.MIDDLE_CENTER);
+            IntegerColumnFooterModel creditFooter = new IntegerColumnFooterModel();
+            creditFooter.setFooterType(EColumnFooterType.SUM);
+            creditFooter.setColumnName("credit");
+            gridGM.addFooterModel(creditFooter);
+
+            Button add = new Button();
+            add.setWidth(120, Unit.PIXELS);
+            add.setIcon(new ThemeResource("img/button/new.png"));
+            add.addClickListener(new AddListener());
+            int i = grid.addButtonFirst(add);
+            grid.setButtonDescription(i, "new");
+
+            getContent().addComponent(grid);
+            getContent().setComponentAlignment(grid, Alignment.MIDDLE_CENTER);
+        }
     }
 
     private void refresh() {
@@ -608,7 +610,7 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
                         } catch (NoResultException nrex) {
                         }
                         if (sum != null && sum > 0) {
-                            notDelList.add( csd.getSubject().getNameRU());
+                            notDelList.add(csd.getSubject().getNameRU());
                         } else {
                             ssDelList.add(ss);
                             delList.add(csd);

@@ -194,6 +194,12 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_EXAM_TRANSCRIPT</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_CURRICULUM_AFTER_SEMESTER</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_CURRICULUM_SUBJECT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_GROUP</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_STREAM</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_LOAD_TO_CHAIR</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_LOAD_TO_CHAIR_COUNT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_LOAD_TO_CHAIR_COUNT_ALL</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_GROUPS_CREATION_NEEDED</class>
 
         <class>kz.halyqsoft.univercity.entity.beans.univercity.AbstractSpiderEntity</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.AbstractStudentEntity</class>
@@ -308,12 +314,14 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.CATALOG_ELECTIVE_SUBJECTS</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.ELECTIVE_BINDED_SUBJECT</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.SPECIALITY_CORPUS</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.STREAM</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.STREAM_GROUP</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
         <properties>
             <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
-            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/univerdb"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:1818/univerdb"/>
             <property name="javax.persistence.jdbc.user" value="univer"/>
             <property name="javax.persistence.jdbc.password" value="univer"/>
             <!--<property name="javax.persistence.jdbc.user" value="${javax.persistence.jdbc.user}"/>-->

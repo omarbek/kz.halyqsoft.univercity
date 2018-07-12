@@ -19,16 +19,15 @@ import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.view.AbstractCommonView;
 import org.r3a.common.vaadin.widget.ERefreshType;
-import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.form.AbstractFormWidget;
 import org.r3a.common.vaadin.widget.form.AbstractFormWidgetView;
 import org.r3a.common.vaadin.widget.form.CommonFormWidget;
 import org.r3a.common.vaadin.widget.form.FormModel;
+import org.r3a.common.vaadin.widget.form.field.FieldModel;
 import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 
-import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -48,7 +47,6 @@ public final class SubjectEdit extends AbstractFormWidgetView {
 
         baseDataFW = new CommonFormWidget(baseDataFM);
         baseDataFW.addEntityListener(this);
-
         init();
     }
 
@@ -74,7 +72,8 @@ public final class SubjectEdit extends AbstractFormWidgetView {
         chairQM.addWhereNotNull("parent");
         chairQM.addWhereAnd("deleted", Boolean.FALSE);
 
-        QueryModel subjectCycleQM = ((FKFieldModel) baseDataFM.getFieldModel("subjectCycle")).getQueryModel();
+        QueryModel subjectCycleQM = ((FKFieldModel) baseDataFM.getFieldModel("subjectCycle")).
+                getQueryModel();
         subjectCycleQM.addOrder("cycleShortName");
 
         FKFieldModel creditabilityFM = (FKFieldModel) baseDataFM.getFieldModel("creditability");
@@ -92,19 +91,19 @@ public final class SubjectEdit extends AbstractFormWidgetView {
                 CommonUtils.showMessageAndWriteLog("Unable to find chair or academic formula", ex);
             }
         }
-        Message.showInfo("asd");
-        FKFieldModel withTeacherCountFM = (FKFieldModel) baseDataFM.getFieldModel("withTeacherCount");
-        FKFieldModel ownTeacherCountFM = (FKFieldModel) baseDataFM.getFieldModel("ownCount");
-        FKFieldModel totalCountFM = (FKFieldModel) baseDataFM.getFieldModel("totalCount");
+        FieldModel withTeacherCountFM = baseDataFM.getFieldModel("withTeacherCount");
+        FieldModel ownTeacherCountFM = baseDataFM.getFieldModel("ownCount");
+        FieldModel totalCountFM = baseDataFM.getFieldModel("totalCount");
 
-        creditabilityFM.getListeners().add(new CreditabilityChangeListener(academicFormula, academicFormulaFM,
-                withTeacherCountFM, ownTeacherCountFM, totalCountFM));
+        creditabilityFM.getListeners().add(new CreditabilityChangeListener(academicFormula,
+                academicFormulaFM, withTeacherCountFM, ownTeacherCountFM, totalCountFM));
 
-        FKFieldModel lcCountFM = (FKFieldModel) baseDataFM.getFieldModel("lcCount");
-        FKFieldModel prCountFM = (FKFieldModel) baseDataFM.getFieldModel("prCount");
-        FKFieldModel lbCountFM = (FKFieldModel) baseDataFM.getFieldModel("lbCount");
+        FieldModel lcCountFM = baseDataFM.getFieldModel("lcCount");
+        FieldModel prCountFM = baseDataFM.getFieldModel("prCount");
+        FieldModel lbCountFM = baseDataFM.getFieldModel("lbCount");
 
-        academicFormulaFM.getListeners().add(new AcademicFormulaChangeListener(lcCountFM, prCountFM, lbCountFM));
+        academicFormulaFM.getListeners().add(new AcademicFormulaChangeListener(lcCountFM, prCountFM,
+                lbCountFM));
 
         leftPanel.addComponent(baseDataFW);
         leftPanel.setComponentAlignment(baseDataFW, Alignment.MIDDLE_CENTER);
@@ -217,8 +216,8 @@ public final class SubjectEdit extends AbstractFormWidgetView {
                 emp.setLecture((int) oo[4] == 1);
                 emp.setLaboratory((int) oo[5] == 1);
                 emp.setPractice((int) oo[6] == 1);
-                emp.setFall(((BigDecimal) oo[7]).intValue() == 1);
-                emp.setSpring(((BigDecimal) oo[8]).intValue() == 1);
+                emp.setFall((Boolean) oo[7]);
+                emp.setSpring((Boolean) oo[8]);
                 list.add(emp);
             }
 
@@ -283,13 +282,13 @@ public final class SubjectEdit extends AbstractFormWidgetView {
 
         private final ACADEMIC_FORMULA academicFormula;
         private final FKFieldModel academicFormulaFM;
-        private final FKFieldModel withTeacherCountFM;
-        private final FKFieldModel ownTeacherCountFM;
-        private final FKFieldModel totalCountFM;
+        private final FieldModel withTeacherCountFM;
+        private final FieldModel ownTeacherCountFM;
+        private final FieldModel totalCountFM;
 
         CreditabilityChangeListener(ACADEMIC_FORMULA academicFormula, FKFieldModel academicFormulaFM,
-                                    FKFieldModel withTeacherCountFM, FKFieldModel ownTeacherCountFM,
-                                    FKFieldModel totalCountFM) {
+                                    FieldModel withTeacherCountFM, FieldModel ownTeacherCountFM,
+                                    FieldModel totalCountFM) {
             this.academicFormula = academicFormula;
             this.academicFormulaFM = academicFormulaFM;
             this.withTeacherCountFM = withTeacherCountFM;
@@ -301,17 +300,17 @@ public final class SubjectEdit extends AbstractFormWidgetView {
         public void valueChange(ValueChangeEvent ev) {
             Object value = ev.getProperty().getValue();
             QueryModel qm = academicFormulaFM.getQueryModel();
-            Integer count;
-            Integer totalCount;
+            String count;
+            String totalCount;
             if (value != null) {
                 CREDITABILITY creditability = (CREDITABILITY) value;
                 qm.addWhere("creditability", ECriteria.EQUAL, creditability.getId());
-                count = creditability.getCredit() * 15;
-                totalCount = creditability.getCredit() * 15 * 3;
+                count = creditability.getCredit() * 15 + "";
+                totalCount = creditability.getCredit() * 15 * 3 + "";
             } else {
                 qm.addWhere("creditability", ECriteria.EQUAL, ID.valueOf(-1));
-                count = 0;
-                totalCount = 0;
+                count = "0";
+                totalCount = "0";
             }
             try {
                 academicFormulaFM.refresh(academicFormula);
@@ -326,12 +325,12 @@ public final class SubjectEdit extends AbstractFormWidgetView {
 
     private class AcademicFormulaChangeListener implements Property.ValueChangeListener {
 
-        private final FKFieldModel lcCountFM;
-        private final FKFieldModel prCountFM;
-        private final FKFieldModel lbCountFM;
+        private final FieldModel lcCountFM;
+        private final FieldModel prCountFM;
+        private final FieldModel lbCountFM;
 
-        AcademicFormulaChangeListener(FKFieldModel lcCountFM, FKFieldModel prCountFM,
-                                      FKFieldModel lbCountFM) {
+        AcademicFormulaChangeListener(FieldModel lcCountFM, FieldModel prCountFM,
+                                      FieldModel lbCountFM) {
             this.lcCountFM = lcCountFM;
             this.prCountFM = prCountFM;
             this.lbCountFM = lbCountFM;
@@ -340,18 +339,18 @@ public final class SubjectEdit extends AbstractFormWidgetView {
         @Override
         public void valueChange(ValueChangeEvent ev) {
             Object value = ev.getProperty().getValue();
-            Integer lcCount;
-            Integer prCount;
-            Integer lbCount;
+            String lcCount;
+            String prCount;
+            String lbCount;
             if (value != null) {
                 ACADEMIC_FORMULA academicFormula = (ACADEMIC_FORMULA) value;
-                lcCount = academicFormula.getLcCount() * 15;
-                prCount = academicFormula.getPrCount() * 15;
-                lbCount = academicFormula.getLbCount() * 15;
+                lcCount = academicFormula.getLcCount() * 15 + "";
+                prCount = academicFormula.getPrCount() * 15 + "";
+                lbCount = academicFormula.getLbCount() * 15 + "";
             } else {
-                lcCount = 0;
-                prCount = 0;
-                lbCount = 0;
+                lcCount = "0";
+                prCount = "0";
+                lbCount = "0";
             }
             try {
                 lcCountFM.refresh(lcCount);

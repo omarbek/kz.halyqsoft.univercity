@@ -1,5 +1,6 @@
 package kz.halyqsoft.univercity.entity.beans.univercity.view;
 
+import kz.halyqsoft.univercity.entity.beans.univercity.GROUPS;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
@@ -250,16 +251,26 @@ public class V_STUDENT extends AbstractEntity {
     @Column(name = "CARD_NAME", nullable = false)
     private String cardName;
 
-    @FieldInfo(type = EFieldType.BOOLEAN, order = 51, required = false, inEdit = false, inGrid = false, inView = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 51, inGrid = false, required = false)
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "GROUPS_ID", referencedColumnName = "ID")})
+    private GROUPS group;
+
+    @FieldInfo(type = EFieldType.TEXT, order = 52, inEdit = false, inView = false)
+    @Column(name = "GROUP_NAME", nullable = false)
+    private String groupName;
+
+    @FieldInfo(type = EFieldType.BOOLEAN, order = 53, required = false, inEdit = false, inGrid = false, inView = false)
     @Column(name = "DELETED", nullable = false)
     private boolean deleted;
 
-    @FieldInfo(type = EFieldType.DATETIME, order = 52, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false)
+    @FieldInfo(type = EFieldType.DATETIME, order = 54, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false)
     @Column(name = "CREATED")
     @Temporal(TemporalType.TIMESTAMP)
     private Date created;
 
-    @FieldInfo(type = EFieldType.DATETIME, order = 53, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false)
+    @FieldInfo(type = EFieldType.DATETIME, order = 55, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false)
     @Column(name = "UPDATED")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updated;
@@ -675,12 +686,36 @@ public class V_STUDENT extends AbstractEntity {
         this.updated = updated;
     }
 
+    public CARD getCard() {
+        return card;
+    }
+
+    public void setCard(CARD card) {
+        this.card = card;
+    }
+
     public String getCardName() {
         return cardName;
     }
 
     public void setCardName(String cardName) {
         this.cardName = cardName;
+    }
+
+    public GROUPS getGroup() {
+        return group;
+    }
+
+    public void setGroup(GROUPS group) {
+        this.group = group;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
 
     @Override

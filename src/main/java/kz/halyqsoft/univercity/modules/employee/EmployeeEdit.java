@@ -1,6 +1,5 @@
 package kz.halyqsoft.univercity.modules.employee;
 
-import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.*;
@@ -51,9 +50,6 @@ import org.r3a.common.vaadinaddon.IntegerField;
 
 import javax.persistence.NoResultException;
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.ParseException;
 import java.util.*;
 import java.util.Calendar;
 
@@ -324,17 +320,10 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
             creditabilityCB.setFilteringMode(FilteringMode.OFF);
             creditabilityCB.setPageLength(0);
 
-            TextField subjectCodeTF = new TextField();
-            subjectCodeTF.setWidth(100, Unit.PIXELS);
-            subjectCodeTF.setNullRepresentation("");
-            subjectCodeTF.setNullSettingAllowed(true);
-            subjectCodeTF.setImmediate(true);
-
             CustomGridSelectDialog cgsd = subjectFM.getCustomGridSelectDialog();
             QueryModel qm = ((DBGridModel) cgsd.getSelectModel()).getQueryModel();
             qm.addWhere("chair", ECriteria.EQUAL, ID.valueOf(-1));
             cgsd.getSelectModel().setMultiSelect(false);
-            cgsd.getFilterModel().addFilter("code", subjectCodeTF);
             cgsd.getFilterModel().addFilter("chair", chairCB);
             cgsd.getFilterModel().addFilter("level", levelCB);
             cgsd.getFilterModel().addFilter("creditability", creditabilityCB);
