@@ -1,8 +1,8 @@
 package kz.halyqsoft.univercity.modules.bindingelectivesubject;
 
-import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Alignment;
 import kz.halyqsoft.univercity.entity.beans.univercity.CATALOG_ELECTIVE_SUBJECTS;
 import kz.halyqsoft.univercity.entity.beans.univercity.ELECTIVE_BINDED_SUBJECT;
 import kz.halyqsoft.univercity.entity.beans.univercity.PAIR_SUBJECT;
@@ -35,10 +35,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
- * @author Omarbek
- * @created on 23.04.2018
- */
 public class BindingElectiveSubjectEdit extends AbstractDialog {
 
     private CommonFormWidget studentBindingElectiveCFW;
@@ -375,7 +371,7 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
 
         @Override
         public void onCreate(Object o, Entity entity, int i) {
-         }
+        }
 
         @Override
         public boolean onEdit(Object o, Entity entity, int i) {
@@ -420,7 +416,7 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
         }
     }
     private CATALOG_ELECTIVE_SUBJECTS getCat(QueryModel<CATALOG_ELECTIVE_SUBJECTS> catQM,
-                                               SPECIALITY spec, ENTRANCE_YEAR year) throws Exception {
+                                             SPECIALITY spec, ENTRANCE_YEAR year) throws Exception {
         CATALOG_ELECTIVE_SUBJECTS cat;
         try {
             cat = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(catQM);

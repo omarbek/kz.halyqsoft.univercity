@@ -316,12 +316,14 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.SPECIALITY_CORPUS</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.STREAM</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.STREAM_GROUP</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.PAIR_SUBJECT</class>
+
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
         <properties>
             <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
-            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:1818/univerdb"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:1818/"/>
             <property name="javax.persistence.jdbc.user" value="univer"/>
             <property name="javax.persistence.jdbc.password" value="univer"/>
             <!--<property name="javax.persistence.jdbc.user" value="${javax.persistence.jdbc.user}"/>-->
