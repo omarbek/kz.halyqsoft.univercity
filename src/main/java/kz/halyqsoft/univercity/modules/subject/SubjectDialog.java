@@ -15,7 +15,7 @@ public class SubjectDialog extends WindowUtils {
     SubjectDialog(SubjectEdit subjectEdit, SubjectView subjectView) {
         this.subjectEdit = subjectEdit;
         this.subjectView = subjectView;
-        init(1300, 500);
+        init();
     }
 
     @Override
