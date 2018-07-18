@@ -48,9 +48,6 @@ public class PdfView extends AbstractTaskView {
         title.setImmediate(true);
         title.setRequired(true);
 
-
-
-
         StreamResource myResource = createResource();
         FileDownloader fileDownloader = new FileDownloader(myResource);
         fileDownloader.extend(generateButton);
