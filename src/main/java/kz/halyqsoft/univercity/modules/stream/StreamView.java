@@ -13,6 +13,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDY_YEAR;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_GROUPS_CREATION_NEEDED;
 import kz.halyqsoft.univercity.filter.FStreamFilter;
 import kz.halyqsoft.univercity.filter.panel.StreamFilterPanel;
+import kz.halyqsoft.univercity.modules.catalog.CatalogEntity;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -33,6 +34,7 @@ import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 
 import java.util.*;
+import java.util.zip.ZipEntry;
 
 public class StreamView extends AbstractTaskView implements EntityListener, FilterPanelListener {
 
@@ -41,8 +43,7 @@ public class StreamView extends AbstractTaskView implements EntityListener, Filt
 
     public StreamView(AbstractTask task) throws Exception {
         super(task);
-
-    }
+     }
 
     @Override
     public void initView(boolean b) throws Exception {
@@ -306,7 +307,6 @@ public class StreamView extends AbstractTaskView implements EntityListener, Filt
         List list = new ArrayList<>();
 
         sb.insert(0, " where TRUE ");
-
         String sql = "SELECT * from stream "
                 + sb.toString();
         try {
@@ -386,6 +386,7 @@ public class StreamView extends AbstractTaskView implements EntityListener, Filt
         if (ev.getAction() == EntityEvent.CREATED) {
             refresh();
         }
+
         super.handleEntityEvent(ev);
     }
 

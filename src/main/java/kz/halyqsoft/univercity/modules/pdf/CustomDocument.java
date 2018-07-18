@@ -2,7 +2,6 @@ package kz.halyqsoft.univercity.modules.pdf;
 
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.BaseFont;
-import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.vaadin.server.VaadinService;
 import kz.halyqsoft.univercity.entity.beans.univercity.PDF_PROPERTY;

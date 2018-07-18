@@ -652,8 +652,8 @@ public final class ApplicantsForm extends UsersForm {
                             image.rotate();
                             Rectangle rectImage = new Rectangle(86, 685, 187, 790);
 
-                            image.scaleAbsolute(rectImage);
                             image.setAbsolutePosition(86, 685);
+                            image.scaleAbsolute(rectImage.getWidth(),rectImage.getHeight());
                             canvas.addImage(image);
                         }
 
