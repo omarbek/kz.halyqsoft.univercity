@@ -60,6 +60,9 @@ class CatalogList {
         addCatalogEntityToList(EDUCATION_MODULE_TYPE.class);
         addCatalogEntityToList(STUDY_DIRECT.class);
         addCatalogEntityToList(ACADEMIC_FORMULA.class);
+        addCatalogEntityToList(SHIFT_STUDY_YEAR.class);
+        addCatalogEntityToList(LESSON_TIME.class);
+        addCatalogEntityToList(TIME.class);
 
         return new ArrayList<>(list);
     }

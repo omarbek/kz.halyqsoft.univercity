@@ -142,6 +142,9 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.CARD</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT_MODULE</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.EDUCATION_MODULE_TYPE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.SHIFT_STUDY_YEAR</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.LESSON_TIME</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.SHIFT</class>
 
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_SPECIALITY</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_ORGANIZATION</class>
@@ -253,7 +256,6 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.TEACHER_LOAD_CALC_DETAIL</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.TEACHER_LOAD_ASSIGN</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.TEACHER_LOAD_ASSIGN_DETAIL</class>
-        <class>kz.halyqsoft.univercity.entity.beans.univercity.SCHEDULE</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.SCHEDULE_DETAIL</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.SCHEDULE_LOG</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.TESTING_SUBJECT</class>
@@ -320,8 +322,6 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.STREAM_GROUP</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.PAIR_SUBJECT</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.GRADUATE_EMPLOYMENT</class>
-
-
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>

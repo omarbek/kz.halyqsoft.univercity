@@ -70,7 +70,8 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
     public void handleEntityEvent(EntityEvent ev) {
         if (ev.getAction() == EntityEvent.SELECTED) {
             if (ev.getSource().equals(entitiesCTW)) {
-                Class<? extends Entity> entityClass = ((CatalogEntity) ev.getEntities().get(0)).getEntityClass();
+                Class<? extends Entity> entityClass = ((CatalogEntity) ev.getEntities().get(0)).
+                        getEntityClass();
                 if (classASW != null) {
                     mainHSP.removeComponent(classASW);
                 }
@@ -174,7 +175,8 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                         qm.addWhere("reason", null, null, true);//for filter button
                     } else if (entityClass.equals(SPECIALITY.class)) {
                         qm.addWhere("deleted", Boolean.FALSE);
-                        FromItem departmentFI = qm.addJoin(EJoin.INNER_JOIN, "department", DEPARTMENT.class, "id");
+                        FromItem departmentFI = qm.addJoin(EJoin.INNER_JOIN, "department", DEPARTMENT.class,
+                                "id");
                         qm.addWhere(departmentFI, "deleted", Boolean.FALSE);
                         qm.addWhereNotNull(departmentFI, "parent");
 
@@ -254,6 +256,16 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
             if (onEdit(e, ids)) {
                 return false;
             }
+        } else if (e instanceof STUDY_DIRECT) {
+            Integer[] ids = {9};
+            if (onEdit(e, ids)) {
+                return false;
+            }
+        } else if (e instanceof EQUIPMENT) {
+            Integer[] ids = {3};
+            if (onEdit(e, ids)) {
+                return false;
+            }
         }
 
         return true;
@@ -279,7 +291,8 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                     QueryModel<DEPARTMENT> qm = new QueryModel<>(DEPARTMENT.class);
                     qm.addSelect("id", EAggregate.COUNT);
                     try {
-                        Integer count = ((Long) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItems(qm)).intValue();
+                        Integer count = ((Long) SessionFacadeFactory.getSessionFacade(
+                                CommonEntityFacadeBean.class).lookupItems(qm)).intValue();
                         count++;
                         ((DEPARTMENT) e).setCode(CommonUtils.getCode(count));
                     } catch (Exception ex) {
@@ -313,7 +326,8 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                     qm.addSelect("TASK_ORDER", EAggregate.MAX);
 
                     try {
-                        BigDecimal bigDecimalMax = (BigDecimal) (SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItems(qm));
+                        BigDecimal bigDecimalMax = (BigDecimal) (SessionFacadeFactory.getSessionFacade(
+                                CommonEntityFacadeBean.class).lookupItems(qm));
                         Integer max = bigDecimalMax.intValue();
                         max = max / 100;
                         max++;
@@ -337,6 +351,35 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                 }
                 academicFormula.setFormula(academicFormula.getLcCount() + "/" +
                         academicFormula.getLbCount() + "/" + academicFormula.getPrCount());
+            } else if (e instanceof TIME) {
+                TIME time = (TIME) e;
+                String timeName = time.getTimeName();
+                String symbol = timeName.substring(timeName.length() - 3, timeName.length() - 2);
+                if (!(symbol.equals(":") || symbol.equals("-"))) {
+                    Message.showInfo("please fill time with definite format");//TODO
+                    return false;
+                }
+                if (timeName.length() == 4) {
+                    timeName = "0" + timeName;
+                }
+                String minutes = timeName.substring(timeName.lastIndexOf(symbol) + 1);
+                Double hours = Double.valueOf(timeName.substring(0, timeName.lastIndexOf(symbol)));
+                if ("00".equals(minutes)) {
+                    time.setTimeValue(hours);
+                } else if ("10".equals(minutes)) {
+                    time.setTimeValue(hours + 0.17);
+                } else if ("20".equals(minutes)) {
+                    time.setTimeValue(hours + 0.33);
+                } else if ("30".equals(minutes)) {
+                    time.setTimeValue(hours + 0.5);
+                } else if ("40".equals(minutes)) {
+                    time.setTimeValue(hours + 0.67);
+                } else if ("50".equals(minutes)) {
+                    time.setTimeValue(hours + 0.83);
+                } else {
+                    Message.showError("you should choose minutes with interval of 10 mins");//TODO
+                    return false;
+                }
             }
         }
 
@@ -358,7 +401,8 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
 
                         QueryModel<DEPARTMENT> chairQM = new QueryModel<>(DEPARTMENT.class);
                         chairQM.addWhere("parent", ECriteria.EQUAL, faculty.getId());
-                        List<DEPARTMENT> chairs = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                        List<DEPARTMENT> chairs = SessionFacadeFactory.getSessionFacade(
+                                CommonEntityFacadeBean.class).
                                 lookup(chairQM);
                         for (DEPARTMENT chair : chairs) {
                             chair.setDeleted(true);
@@ -381,7 +425,8 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                         //1 role tasks
                         QueryModel<ROLE_TASKS> queryModel = new QueryModel<>(ROLE_TASKS.class);
                         queryModel.addWhere("task", ECriteria.EQUAL, e.getId());
-                        List<ROLE_TASKS> roleTasks = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(queryModel);
+                        List<ROLE_TASKS> roleTasks = SessionFacadeFactory.getSessionFacade(
+                                CommonEntityFacadeBean.class).lookup(queryModel);
                         if (roleTasks != null) {
                             if (roleTasks.size() > 0) {
                                 Message.showError(getUILocaleUtil().getMessage("error.binded"));
@@ -389,7 +434,8 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                             }
                         }
                         //2
-                        TASKS task = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(TASKS.class, e.getId());
+                        TASKS task = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                                lookup(TASKS.class, e.getId());
                         if (task != null) {
                             if (task.getChildren() != null) {
                                 if (task.getChildren().size() > 0) {
@@ -401,6 +447,18 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
 
                     } catch (Exception ex) {
                         Message.showError(ex.getMessage());
+                    }
+                } else if (e instanceof STUDY_DIRECT) {
+                    ID entityId = e.getId();
+                    if (entityId.equals(ID.valueOf(9))) {
+                        Message.showInfo(getUILocaleUtil().getMessage("cannot.delete"));
+                        return true;
+                    }
+                } else if (e instanceof EQUIPMENT) {
+                    ID entityId = e.getId();
+                    if (entityId.equals(ID.valueOf(3))) {
+                        Message.showInfo(getUILocaleUtil().getMessage("cannot.delete"));
+                        return true;
                     }
                 }
             }

@@ -47,6 +47,7 @@ public class IndividualEducationPlanView extends AbstractTaskView {
         }
 
         ts.addSelectedTabChangeListener(new IndividualEducationPlanView.SemesterChangeListener());
+        ts.addSelectedTabChangeListener(new SemesterChangeListener());
 
         getContent().addComponent(ts);
         getContent().setComponentAlignment(ts, Alignment.MIDDLE_CENTER);
