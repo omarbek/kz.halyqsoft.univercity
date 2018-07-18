@@ -3,6 +3,7 @@ package kz.halyqsoft.univercity.modules.schedule;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
+import kz.halyqsoft.univercity.entity.beans.univercity.GROUPS;
 import kz.halyqsoft.univercity.entity.beans.univercity.SCHEDULE_DETAIL;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.utils.CommonUtils;
@@ -28,19 +29,22 @@ final class ScheduleWidget extends AbstractWidgetPanel {
 
     private final SEMESTER_DATA semesterData;
     private ROOM room;
+    private GROUPS group;
     private List<WEEK_DAY> weekDays;
     private List<TIME> times = new ArrayList<>();
     private GridLayout matrixGL;
     private boolean addComponent = true;
 
-    private int cols = 8;
-    private int rows = 0;
-
-    ScheduleWidget(SEMESTER_DATA semesterData) {
+    ScheduleWidget(SEMESTER_DATA semesterData, GROUPS group) {
         super();
         this.semesterData = semesterData;
+        this.group = group;
 
         QueryModel<LESSON_TIME> lessonTimeQM = new QueryModel<>(LESSON_TIME.class);
+        if (group != null) {
+            FromItem shiftStudyYearFI = lessonTimeQM.addJoin(EJoin.INNER_JOIN, "shift", SHIFT_STUDY_YEAR.class, "shift");
+            lessonTimeQM.addWhere(shiftStudyYearFI, "studyYear", ECriteria.EQUAL, group.getStudyYear().getId());
+        }
         lessonTimeQM.addOrder("shift");
         QueryModel<WEEK_DAY> weekDayQM = new QueryModel<>(WEEK_DAY.class);
         weekDayQM.addOrder("id");
@@ -56,7 +60,8 @@ final class ScheduleWidget extends AbstractWidgetPanel {
             }
             weekDays = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(weekDayQM);
 
-            rows = times.size() + 1;
+            int cols = 8;
+            int rows = times.size() + 1;
 
             matrixGL = new GridLayout();
             matrixGL.setHeight(100, Unit.PERCENTAGE);
@@ -108,37 +113,39 @@ final class ScheduleWidget extends AbstractWidgetPanel {
 
     @Override
     public void refresh() throws Exception {
-        QueryModel<SCHEDULE_DETAIL> sdQM = new QueryModel<>(SCHEDULE_DETAIL.class);
-        FromItem lessonTimeFI = sdQM.addJoin(EJoin.INNER_JOIN, "lessonTime", LESSON_TIME.class, "id");
-        sdQM.addWhereAnd("semesterData", ECriteria.EQUAL, semesterData.getId());
-        for (WEEK_DAY wd : weekDays) {
-            sdQM.addWhere("weekDay", ECriteria.EQUAL, wd.getId());
-            for (TIME st : times) {
-                sdQM.addWhere(lessonTimeFI, "beginTime", ECriteria.EQUAL, st.getId());
-                try {
-                    SCHEDULE_DETAIL scheduleDetail = null;
-                    List<SCHEDULE_DETAIL> list = SessionFacadeFactory.getSessionFacade(
-                            CommonEntityFacadeBean.class).lookup(sdQM);
-                    if (!list.isEmpty()) {
-                        scheduleDetail = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
-                                lookup(SCHEDULE_DETAIL.class, list.get(0).getId());
-                    }
+        if (group != null) {
+            QueryModel<SCHEDULE_DETAIL> sdQM = new QueryModel<>(SCHEDULE_DETAIL.class);
+            FromItem lessonTimeFI = sdQM.addJoin(EJoin.INNER_JOIN, "lessonTime", LESSON_TIME.class, "id");
+            sdQM.addWhere("group", ECriteria.EQUAL, group.getId());
+            sdQM.addWhereAnd("semesterData", ECriteria.EQUAL, semesterData.getId());
+            for (WEEK_DAY wd : weekDays) {
+                sdQM.addWhere("weekDay", ECriteria.EQUAL, wd.getId());
+                for (TIME st : times) {
+                    sdQM.addWhere(lessonTimeFI, "beginTime", ECriteria.EQUAL, st.getId());
+                    try {
+                        SCHEDULE_DETAIL scheduleDetail = null;
+                        List<SCHEDULE_DETAIL> list = SessionFacadeFactory.getSessionFacade(
+                                CommonEntityFacadeBean.class).lookup(sdQM);
+                        if (!list.isEmpty()) {
+                            scheduleDetail = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                                    lookup(SCHEDULE_DETAIL.class, list.get(0).getId());
+                        }
 
-                    ScheduleCell sc = new ScheduleCell(scheduleDetail);
-                    int col = wd.getId().getId().intValue();
-                    int row = st.getId().getId().intValue();
+                        ScheduleCell sc = new ScheduleCell(scheduleDetail);
+                        int col = wd.getId().getId().intValue();
+                        int row = st.getId().getId().intValue();
 
-                    matrixGL.removeComponent(col, row);
-                    if (scheduleDetail != null && (scheduleDetail.getLessonTime().getEndTime().getTimeValue()
-                            - scheduleDetail.getLessonTime().getBeginTime().getTimeValue() == 2)) {
-                        matrixGL.removeComponent(col, row + 1);
-                        matrixGL.addComponent(sc, col, row, col, row + 1);
-                        addComponent = false;
-                    } else if (addComponent) {
-                        matrixGL.addComponent(sc, col, row);
-                    } else {
-                        addComponent = true;
-                    }
+                        matrixGL.removeComponent(col, row);
+                        if (scheduleDetail != null && (scheduleDetail.getLessonTime().getEndTime().getTimeValue()
+                                - scheduleDetail.getLessonTime().getBeginTime().getTimeValue() == 2)) {
+                            matrixGL.removeComponent(col, row + 1);
+                            matrixGL.addComponent(sc, col, row, col, row + 1);
+                            addComponent = false;
+                        } else if (addComponent) {
+                            matrixGL.addComponent(sc, col, row);
+                        } else {
+                            addComponent = true;
+                        }
 
 //                    if (col < cols && row < rows) {
 //                        matrixGL.removeComponent(col, row);
@@ -152,8 +159,9 @@ final class ScheduleWidget extends AbstractWidgetPanel {
 //                            addComponent = true;
 //                        }
 //                    }
-                } catch (Exception ex) {
-                    CommonUtils.showMessageAndWriteLog("Unable to load schedule detail", ex);
+                    } catch (Exception ex) {
+                        CommonUtils.showMessageAndWriteLog("Unable to load schedule detail", ex);
+                    }
                 }
             }
         }

@@ -1,7 +1,12 @@
 package kz.halyqsoft.univercity.modules.schedule;
 
+import com.vaadin.data.Property;
+import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.VerticalLayout;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_GROUP;
@@ -18,7 +23,6 @@ import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.dialog.Message;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +35,8 @@ import java.util.Map;
 public class ScheduleView extends AbstractTaskView {
 
     private SEMESTER_DATA currentSemesterData;
-    private ScheduleWidget scheduleWidget;
+    private VerticalLayout tablesVL=new VerticalLayout();
+    private ComboBox groupCB;
 
     private static final int LECTURE = 1;
     private static final int PRACTICE = 3;
@@ -51,18 +56,46 @@ public class ScheduleView extends AbstractTaskView {
             public void buttonClick(Button.ClickEvent event) {
                 try {
                     generate();
-                    scheduleWidget.refresh();
+                    refresh(groupCB);
                 } catch (Exception e) {
                     e.printStackTrace();//TODO catch
                 }
             }
         });
         getContent().addComponent(generateButton);
+        getContent().setComponentAlignment(generateButton, Alignment.MIDDLE_CENTER);
 
-        scheduleWidget = new ScheduleWidget(currentSemesterData);
+        groupCB = new ComboBox();
+        groupCB.setTextInputAllowed(true);
+        groupCB.setFilteringMode(FilteringMode.CONTAINS);
+        groupCB.setCaption(getUILocaleUtil().getEntityLabel(GROUPS.class));
+        QueryModel<GROUPS> groupQM = new QueryModel<>(GROUPS.class);
+        groupQM.addWhere("deleted", Boolean.FALSE);
+        BeanItemContainer<GROUPS> groupBIC = new BeanItemContainer<>(GROUPS.class,
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(groupQM));
+        groupCB.setContainerDataSource(groupBIC);
+        groupCB.addValueChangeListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
+                try {
+                    refresh(groupCB);
+                } catch (Exception e) {
+                    e.printStackTrace();//TODO catch
+                }
+            }
+        });
+        getContent().addComponent(groupCB);
+        getContent().setComponentAlignment(groupCB, Alignment.MIDDLE_CENTER);
+
+        getContent().addComponent(tablesVL);
+        getContent().setComponentAlignment(tablesVL, Alignment.MIDDLE_CENTER);
+    }
+
+    private void refresh(ComboBox groupCB) throws Exception {
+        ScheduleWidget scheduleWidget = new ScheduleWidget(currentSemesterData,(GROUPS)groupCB.getValue());
         scheduleWidget.refresh();
-        getContent().addComponent(scheduleWidget);
-        getContent().setComponentAlignment(scheduleWidget, Alignment.MIDDLE_CENTER);
+        tablesVL.removeAllComponents();
+        tablesVL.addComponent(scheduleWidget);
     }
 
     private void generate() throws Exception {
@@ -310,7 +343,7 @@ public class ScheduleView extends AbstractTaskView {
         params.put(1, weekDay.getId().getId());
         params.put(2, group.getId().getId());
         params.put(3, LECTURE);
-        BigInteger size = (BigInteger) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+        Long size = (Long) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
                 lookupSingle(sql, params);
         return size.intValue() == lectureCount;
     }

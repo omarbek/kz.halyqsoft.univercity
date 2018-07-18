@@ -106,4 +106,9 @@ public class GROUPS extends AbstractEntity {
     public void setStudyYear(STUDY_YEAR studyYear) {
         this.studyYear = studyYear;
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }
