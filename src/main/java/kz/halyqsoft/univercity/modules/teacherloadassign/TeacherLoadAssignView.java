@@ -469,13 +469,7 @@ public class TeacherLoadAssignView extends AbstractTaskView {
                                         }
                                     }
                                 } else {
-                                    QueryModel<GROUPS> groupsQM = new QueryModel<>(GROUPS.class);
-                                    FromItem streamGroupFI = groupsQM.addJoin(EJoin.INNER_JOIN, "id", STREAM_GROUP.class,
-                                            "group");
-                                    groupsQM.addWhere(streamGroupFI, "stream", ECriteria.EQUAL, stream.getId());
-                                    List<GROUPS> groups = SessionFacadeFactory.getSessionFacade(
-                                            CommonEntityFacadeBean.class).
-                                            lookup(groupsQM);
+                                    List<GROUPS> groups = CommonUtils.getGroupsByStream(stream);
                                     for (GROUPS group : groups) {
                                         TEACHER_LOAD_ASSIGN_DETAIL loadAssignDetail = getLoadAssignDetail(loadToChair,
                                                 employee, semesterPeriod, semester, null, group);
