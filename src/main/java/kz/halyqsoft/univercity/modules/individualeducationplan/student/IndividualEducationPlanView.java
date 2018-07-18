@@ -46,7 +46,6 @@ public class IndividualEducationPlanView extends AbstractTaskView {
             ts.addTab(subjectPanel, getUILocaleUtil().getCaption("semester." + s.getId()));
         }
 
-        ts.addSelectedTabChangeListener(new IndividualEducationPlanView.SemesterChangeListener());
         ts.addSelectedTabChangeListener(new SemesterChangeListener());
 
         getContent().addComponent(ts);
