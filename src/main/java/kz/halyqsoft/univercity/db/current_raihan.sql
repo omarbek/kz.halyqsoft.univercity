@@ -23,3 +23,11 @@ CREATE SEQUENCE s_graduate_employment
 
 CREATE UNIQUE index idx_graduate_employment
   ON graduate_employment (student_id);
+
+  ALTER TABLE pair_subject
+ADD COLUMN description varchar(8000) DEFAULT '';
+
+ALTER TABLE subject DROP COLUMN descr ;
+
+ALTER TABLE pair_subject
+    ALTER COLUMN description SET NOT NULL ;

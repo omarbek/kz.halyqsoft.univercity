@@ -26,6 +26,10 @@ public class PAIR_SUBJECT extends AbstractEntity {
     @Column(name = "PAIR_NUMBER")
     private Integer pairNumber;
 
+    @FieldInfo(type = EFieldType.TEXT, isMemo = true, max = 4000, required = false, order = 4, inGrid = false)
+    @Column(name = "DESCRIPTION")
+    private String description;
+
     public PAIR_SUBJECT() {
     }
 
@@ -53,5 +57,19 @@ public class PAIR_SUBJECT extends AbstractEntity {
         this.pairNumber = pairNumber;
     }
 
+    public ELECTIVE_BINDED_SUBJECT getElectiveBindedSubject() {
+        return electiveBindedSubject;
+    }
 
+    public void setElectiveBindedSubject(ELECTIVE_BINDED_SUBJECT electiveBindedSubject) {
+        this.electiveBindedSubject = electiveBindedSubject;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 }

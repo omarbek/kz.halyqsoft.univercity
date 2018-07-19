@@ -33,10 +33,6 @@ public class SUBJECT extends AbstractEntity {
             @JoinColumn(name = "STUDY_DIRECT_ID", referencedColumnName = "ID")})
     private STUDY_DIRECT studyDirect;
 
-    @FieldInfo(type = EFieldType.TEXT, isMemo = true, max = 4000, required = false, order = 7, inGrid = false)
-    @Column(name = "DESCR")
-    private String descr;
-
     @FieldInfo(type = EFieldType.FK_COMBO, order = 8)
     @ManyToOne
     @JoinColumns({
@@ -167,14 +163,6 @@ public class SUBJECT extends AbstractEntity {
 
     public void setStudyDirect(STUDY_DIRECT studyDirect) {
         this.studyDirect = studyDirect;
-    }
-
-    public String getDescr() {
-        return descr;
-    }
-
-    public void setDescr(String descr) {
-        this.descr = descr;
     }
 
     public DEPARTMENT getChair() {
