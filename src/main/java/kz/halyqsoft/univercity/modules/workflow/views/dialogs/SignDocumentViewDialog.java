@@ -1,6 +1,5 @@
 package kz.halyqsoft.univercity.modules.workflow.views.dialogs;
 
-import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfReader;
@@ -9,28 +8,25 @@ import com.itextpdf.text.pdf.PdfStamper;
 import com.itextpdf.text.pdf.security.*;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.server.FileResource;
 import com.vaadin.server.Page;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
+import kz.halyqsoft.univercity.modules.workflow.WorkflowCommonUtils;
+import kz.halyqsoft.univercity.modules.workflow.views.InOnSignView;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.event.EntityListener;
 import org.r3a.common.entity.query.QueryModel;
-import org.r3a.common.entity.query.where.ECriteria;
-import org.r3a.common.vaadin.view.AbstractCommonView;
 import org.r3a.common.vaadin.widget.dialog.AbstractDialog;
-import org.r3a.common.vaadin.widget.dialog.AbstractYesButtonListener;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
-import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
-import org.r3a.common.vaadin.widget.toolbar.IconToolbar;
 
-import javax.swing.*;
-import java.awt.*;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.PrivateKey;
@@ -40,12 +36,11 @@ import java.util.List;
 
 public class SignDocumentViewDialog extends AbstractDialog implements EntityListener{
     private final String title;
-    private AbstractCommonView prevView;
+    private InOnSignView prevView;
     private GridWidget documentSignerGW;
     private DOCUMENT document;
 
     private File keyFile;
-    private File pdfFile;
 
 
     private static String FORM = "";
@@ -53,7 +48,7 @@ public class SignDocumentViewDialog extends AbstractDialog implements EntityList
     private static String DEST = "signed_by_%s.pdf";
 
 
-    public SignDocumentViewDialog(AbstractCommonView prevView , String title, DOCUMENT document){
+    public SignDocumentViewDialog(InOnSignView prevView , String title, DOCUMENT document){
         this.title = title;
         this.prevView = prevView;
         this.document = document;
@@ -82,10 +77,10 @@ public class SignDocumentViewDialog extends AbstractDialog implements EntityList
 
                 if(dss.getStatusName().equalsIgnoreCase(DOCUMENT_SIGNER_STATUS.SIGNED)){
 
-                    class ImageUploader implements Upload.Receiver, Upload.SucceededListener {
+                    class FileUploader implements Upload.Receiver, Upload.SucceededListener {
                         private File file;
 
-                        public ImageUploader(File file){
+                        public FileUploader(File file){
                             this.file = file;
                         }
 
@@ -116,48 +111,24 @@ public class SignDocumentViewDialog extends AbstractDialog implements EntityList
                         }
                     }
 
-                    ImageUploader receiver = new ImageUploader(keyFile);
+                    FileUploader receiver = new FileUploader(keyFile);
 
                     Upload upload = new Upload("Upload certificate here", receiver);
                     upload.addFinishedListener(new Upload.FinishedListener() {
                         @Override
                         public void uploadFinished(Upload.FinishedEvent finishedEvent) {
-                            ImageUploader r = new ImageUploader(pdfFile);
-                            Upload upload1 = new Upload("Upload document", r);
-                            upload1.setImmediate(true);
-                            upload1.setButtonCaption("Start upload pdf");
-
-                            upload1.addFinishedListener(new Upload.FinishedListener() {
-                                @Override
-                                public void uploadFinished(Upload.FinishedEvent finishedEvent) {
-                                    File newFile = null;
-                                    try{
-                                        newFile = sign(receiver.getFile(), "123456", r.getFile());
-
-                                    }catch (Exception e){
-                                        e.printStackTrace();
-                                    }
-
-                                    if(receiver.getFile().exists() ){
-                                        receiver.getFile().delete();
-                                    }
-                                    if(r.getFile().exists()){
-                                        r.getFile().delete();
-                                    }
-
-                                    if(newFile!=null){
-                                        if(newFile.exists()){
-                                            try{
-                                                Desktop.getDesktop().open(newFile);
-                                            }catch (Exception e){
-                                                e.printStackTrace();
-                                            }
-                                        }
-                                    }
-                                }
-                            });
-
-                            getContent().addComponent(upload1);
+                            try{
+                                document.setFileByte(sign(receiver.getFile(), "123456", document));
+                                DOCUMENT_STATUS documentStatus = WorkflowCommonUtils.getDocumentStatusByName(DOCUMENT_STATUS.ACCEPTED);
+                                document.setDocumentStatus(documentStatus);
+                                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(document);
+                                Message.showInfo("Document is signed!");
+                                prevView.getInOnSignDocsGW().refresh();
+                                close();
+                            }catch (Exception e){
+                                Message.showError(e.getMessage());
+                                e.printStackTrace();
+                            }
                         }
                     });
                     upload.setImmediate(true);
@@ -173,7 +144,7 @@ public class SignDocumentViewDialog extends AbstractDialog implements EntityList
 
     }
 
-    public File sign(File keyFile, String password , File pdfDocFile) throws IOException, DocumentException, GeneralSecurityException {
+    public byte[] sign(File keyFile, String password , DOCUMENT document) throws IOException, DocumentException, GeneralSecurityException {
 
         KeyStore keyStore = KeyStore.getInstance("PKCS12");
         keyStore.load(new FileInputStream(keyFile.getAbsolutePath()) , password.toCharArray());
@@ -182,9 +153,8 @@ public class SignDocumentViewDialog extends AbstractDialog implements EntityList
         PrivateKey privateKey = (PrivateKey) keyStore.getKey(alias, password.toCharArray());
         Certificate[] certificateChain = keyStore.getCertificateChain(alias);
 
-        PdfReader reader = new PdfReader(pdfDocFile.getAbsolutePath());
+        PdfReader reader = new PdfReader(document.getFileByte());
         FileOutputStream os = new FileOutputStream(String.format(DEST,keyFile.getName()));
-        File newFile = new File(String.format(DEST,keyFile.getName()));
         PdfStamper stamper = PdfStamper.createSignature(reader,os,'\0');
 
         PdfSignatureAppearance appearance = stamper.getSignatureAppearance();
@@ -194,7 +164,16 @@ public class SignDocumentViewDialog extends AbstractDialog implements EntityList
         ExternalSignature externalSignature = new PrivateKeySignature(privateKey, "SHA-256", null);
         ExternalDigest externalDigest = new BouncyCastleDigest();
         MakeSignature.signDetached(appearance, externalDigest , externalSignature, certificateChain , null ,null, null, 0 , MakeSignature.CryptoStandard.CMS);
-        return newFile;
+
+        File newFile = new File(String.format(DEST,keyFile.getName()));
+        Path path = Paths.get(String.format(DEST,keyFile.getName()));
+        byte[] data = Files.readAllBytes(path);
+
+        if(newFile.exists()){
+            newFile.delete();
+        }
+
+        return data;
     }
 
     public String getTitle() {

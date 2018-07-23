@@ -6,8 +6,10 @@ import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.VerticalLayout;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
+import kz.halyqsoft.univercity.modules.regapplicants.ApplicantsForm;
 import kz.halyqsoft.univercity.modules.workflow.WorkflowCommonUtils;
 import kz.halyqsoft.univercity.modules.workflow.views.dialogs.CreateViewDialog;
+import kz.halyqsoft.univercity.modules.workflow.views.utils.EmployeePdfCreator;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -93,8 +95,8 @@ public class CreateView extends BaseView implements EntityListener{
                     document.setDocumentStatus(documentStatus);
                     document.setDeadlineDate(deadlineDate.getTime());
                     document.setDeleted(false);
-                    //document.getPdfDocument();
-                    //document.setFileByte();
+                    EmployeePdfCreator.createResourceStudent(document).getStreamSource().getStream();
+
                     try{
                         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(document);
                     }catch (Exception e)

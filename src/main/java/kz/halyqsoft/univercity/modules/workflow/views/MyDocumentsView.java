@@ -1,5 +1,7 @@
 package kz.halyqsoft.univercity.modules.workflow.views;
 
+import com.vaadin.server.FileDownloader;
+import com.vaadin.server.StreamResource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -8,7 +10,9 @@ import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_SIGNER;
 import kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE;
 import kz.halyqsoft.univercity.entity.beans.univercity.PDF_DOCUMENT_SIGNER_POST;
+import kz.halyqsoft.univercity.modules.regapplicants.ApplicantsForm;
 import kz.halyqsoft.univercity.modules.workflow.WorkflowCommonUtils;
+import kz.halyqsoft.univercity.modules.workflow.views.utils.EmployeePdfCreator;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
@@ -25,6 +29,7 @@ import org.r3a.common.vaadin.widget.toolbar.IconToolbar;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class MyDocumentsView extends BaseView implements EntityListener{
     private USERS currentUser;
@@ -125,8 +130,32 @@ public class MyDocumentsView extends BaseView implements EntityListener{
 
     @Override
     public boolean onPreview(Object o, Entity entity, int i) {
+        DOCUMENT document = (DOCUMENT)entity;
+
+        AbstractDialog abstractDialog = new AbstractDialog() {
+            @Override
+            protected String createTitle() {
+                init();
+                return getViewName();
+            }
+
+            private void init(){
+
+                Button downloadBtn = new Button(getUILocaleUtil().getCaption("download"));
+                document.getFileByte();
+                StreamResource sr = EmployeePdfCreator.getStreamResourceFromByte(document.getFileByte(), document.getPdfDocument().getFileName());
+                FileDownloader fileDownloader = new FileDownloader(sr);
+                sr.setMIMEType("application/pdf");
+                sr.setCacheTime(0);
+                fileDownloader.extend(downloadBtn);
+                getContent().addComponent(downloadBtn);
+            }
+        };
+
+        abstractDialog.open();
         return false;
     }
+
 
     @Override
     public void beforeRefresh(Object o, int i) {

@@ -1,7 +1,6 @@
 package kz.halyqsoft.univercity.modules.workflow.views.dialogs;
 
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.Button.ClickEvent;
@@ -47,8 +46,8 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
 
         try {
             importanceBIC = new BeanItemContainer(DOCUMENT_IMPORTANCE.class, SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(importanceQM));
-        } catch (Exception var8) {
-            var8.printStackTrace();
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
 
         this.importanceCB = new ComboBox();
@@ -150,13 +149,13 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
 
     @Override
     public boolean onEdit(Object o, Entity entity, int i) {
-        Object var4 = null;
+        Object object = null;
 
         try {
             new AddEmployeeDialog(this, this.prevView.getViewName(), entity);
             this.documentSignerGW.refresh();
-        } catch (Exception var6) {
-            var6.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         return false;
