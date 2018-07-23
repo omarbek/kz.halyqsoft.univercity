@@ -6,10 +6,7 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.shared.ui.grid.HeightMode;
 import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.TextField;
-import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM;
-import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM_ADD_PROGRAM;
-import kz.halyqsoft.univercity.entity.beans.univercity.SEMESTER_SUBJECT;
+import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_CURRICULUM_ADD_PROGRAM;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_SUBJECT_SELECT;
@@ -27,7 +24,6 @@ import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.dialog.select.ESelectType;
 import org.r3a.common.vaadin.widget.dialog.select.custom.grid.CustomGridSelectDialog;
 import org.r3a.common.vaadin.widget.form.FormModel;
-import org.r3a.common.vaadin.widget.form.field.FieldModel;
 import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.footer.EColumnFooterType;
@@ -138,6 +134,7 @@ public class AddProgramPanel extends AbstractCurriculumPanel implements EntityLi
 
     public final void approve() throws Exception {
         List<SEMESTER_SUBJECT> newList = new ArrayList<SEMESTER_SUBJECT>();
+        List<STUDENT_SUBJECT> ssList = new ArrayList<>();
         CommonEntityFacadeBean session = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class);
         // Approve only unsaved subjects
         String sql = "SELECT subj.* " +
@@ -172,6 +169,70 @@ public class AddProgramPanel extends AbstractCurriculumPanel implements EntityLi
         if (!newList.isEmpty()) {
             session.create(newList);
         }
+        List<STUDENT_SUBJECT> list = new ArrayList<>();
+
+        QueryModel<CURRICULUM_DETAIL> cdQM = new QueryModel<CURRICULUM_DETAIL>(CURRICULUM_DETAIL.class);
+        cdQM.addWhere("curriculum", ECriteria.EQUAL, curriculum.getId());
+        cdQM.addWhereAnd("deleted", Boolean.FALSE);
+
+        List<CURRICULUM_DETAIL> detailList = session.lookup(cdQM);
+        for (CURRICULUM_DETAIL cd : detailList) {
+            SEMESTER_DATA sd = getOrCreateSemesterData(cd.getSemester());
+            params.put(2, cd.getSemester().getId().getId());
+            params.put(4, sd.getId().getId());
+            params.put(5, cd.getSubject().getId().getId());
+
+            STUDENT_SUBJECT studentSubject = new STUDENT_SUBJECT();
+            studentSubject.setSemesterData(sd);
+            QueryModel<SEMESTER_SUBJECT> semesterSubjectQM = new QueryModel<>(SEMESTER_SUBJECT.class);
+            semesterSubjectQM.addWhere("subject", ECriteria.EQUAL, cd.getSubject().getId());
+            List<SEMESTER_SUBJECT> semesterSubjects = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(semesterSubjectQM);
+            for (SEMESTER_SUBJECT s : semesterSubjects) {
+                studentSubject.setSubject(s);
+                studentSubject.setRegDate(new Date());
+                QueryModel<STUDENT_EDUCATION> studentEducationQM = new QueryModel<>(STUDENT_EDUCATION.class);
+                studentEducationQM.addWhere("speciality", ECriteria.EQUAL, curriculum.getSpeciality().getId());
+                studentEducationQM.addWhereNull("child");
+                List<STUDENT_EDUCATION> studentEducation = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(studentEducationQM);
+                for (STUDENT_EDUCATION se : studentEducation) {
+                    studentSubject.setStudentEducation(se);
+                }
+                list.add(studentSubject);
+            }
+        }
+        if (!list.isEmpty()) {
+            session.create(list);
+        }
+
+        List<CURRICULUM_ADD_PROGRAM> programList = session.lookup(capQM);
+        for (CURRICULUM_ADD_PROGRAM cap : programList) {
+            SEMESTER_DATA sd = getOrCreateSemesterData(cap.getSemester());
+            params.put(2, cap.getSemester().getId().getId());
+            params.put(4, sd.getId().getId());
+            params.put(5, cap.getSubject().getId().getId());
+            List<SUBJECT> subjectList = session.lookup(sql, params, SUBJECT.class);
+            STUDENT_SUBJECT studentSubject = new STUDENT_SUBJECT();
+            studentSubject.setSemesterData(sd);
+            QueryModel<SEMESTER_SUBJECT> semesterSubjectQM = new QueryModel<>(SEMESTER_SUBJECT.class);
+            semesterSubjectQM.addWhere("subject", ECriteria.EQUAL, cap.getSubject().getId());
+            List<SEMESTER_SUBJECT> semesterSubjects = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(semesterSubjectQM);
+            for (SEMESTER_SUBJECT s : semesterSubjects) {
+                studentSubject.setSubject(s);
+                studentSubject.setRegDate(new Date());
+                QueryModel<STUDENT_EDUCATION> studentEducationQM = new QueryModel<>(STUDENT_EDUCATION.class);
+                studentEducationQM.addWhere("speciality", ECriteria.EQUAL, curriculum.getSpeciality().getId());
+                studentEducationQM.addWhereNull("child");
+                List<STUDENT_EDUCATION> studentEducation = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(studentEducationQM);
+                for (STUDENT_EDUCATION se : studentEducation) {
+                    studentSubject.setStudentEducation(se);
+                }
+                ssList.add(studentSubject);
+            }
+        }
+        if (!ssList.isEmpty()) {
+            session.create(ssList);
+        }
+
     }
 
     private SEMESTER_DATA getOrCreateSemesterData(SEMESTER semester) throws Exception {

@@ -5,10 +5,7 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.shared.ui.grid.HeightMode;
 import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.TextField;
-import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM;
-import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM_AFTER_SEMESTER;
-import kz.halyqsoft.univercity.entity.beans.univercity.SEMESTER_SUBJECT;
+import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_CURRICULUM_AFTER_SEMESTER;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_SUBJECT_SELECT;
@@ -26,7 +23,6 @@ import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.dialog.select.ESelectType;
 import org.r3a.common.vaadin.widget.dialog.select.custom.grid.CustomGridSelectDialog;
 import org.r3a.common.vaadin.widget.form.FormModel;
-import org.r3a.common.vaadin.widget.form.field.FieldModel;
 import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.footer.EColumnFooterType;
@@ -116,6 +112,7 @@ public class AfterSemesterProgamPanel extends AbstractCurriculumPanel implements
 
     public final void approve() throws Exception {
         List<SEMESTER_SUBJECT> newList = new ArrayList<SEMESTER_SUBJECT>();
+        List<STUDENT_SUBJECT> subList = new ArrayList<>();
         CommonEntityFacadeBean session = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class);
         // Approve only unsaved subjects
         String sql = "SELECT subj.* " +
@@ -152,6 +149,36 @@ public class AfterSemesterProgamPanel extends AbstractCurriculumPanel implements
 
         if (!newList.isEmpty()) {
             session.create(newList);
+        }
+
+        List<CURRICULUM_AFTER_SEMESTER> casList = session.lookup(capQM);
+        for (CURRICULUM_AFTER_SEMESTER afterSemester : casList) {
+            SEMESTER_DATA semesterData = afterSemester.getSemesterData();
+            SUBJECT subject = afterSemester.getSubject();
+            params.put(3, semesterData.getId().getId());
+            params.put(4, subject.getId().getId());
+
+            STUDENT_SUBJECT studentSubject = new STUDENT_SUBJECT();
+            studentSubject.setSemesterData(semesterData);
+            QueryModel<SEMESTER_SUBJECT> semesterSubjectQM = new QueryModel<>(SEMESTER_SUBJECT.class);
+            semesterSubjectQM.addWhere("subject", ECriteria.EQUAL, afterSemester.getSubject().getId());
+            List<SEMESTER_SUBJECT> semesterSubjects = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(semesterSubjectQM);
+            for (SEMESTER_SUBJECT s : semesterSubjects) {
+                studentSubject.setSubject(s);
+                studentSubject.setRegDate(new Date());
+                QueryModel<STUDENT_EDUCATION> studentEducationQM = new QueryModel<>(STUDENT_EDUCATION.class);
+                studentEducationQM.addWhere("speciality", ECriteria.EQUAL, curriculum.getSpeciality().getId());
+                studentEducationQM.addWhereNull("child");
+                List<STUDENT_EDUCATION> studentEducation = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(studentEducationQM);
+                for (STUDENT_EDUCATION se : studentEducation) {
+                    studentSubject.setStudentEducation(se);
+                }
+                subList.add(studentSubject);
+            }
+        }
+
+        if (!subList.isEmpty()) {
+            session.create(subList);
         }
     }
 
