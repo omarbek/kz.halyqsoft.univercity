@@ -93,7 +93,8 @@ public class CreateView extends BaseView implements EntityListener{
                     document.setDocumentStatus(documentStatus);
                     document.setDeadlineDate(deadlineDate.getTime());
                     document.setDeleted(false);
-
+                    //document.getPdfDocument();
+                    //document.setFileByte();
                     try{
                         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(document);
                     }catch (Exception e)

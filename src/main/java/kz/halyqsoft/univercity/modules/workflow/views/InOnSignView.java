@@ -13,6 +13,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_SIGNER;
 import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_STATUS;
 import kz.halyqsoft.univercity.modules.workflow.WorkflowCommonUtils;
+import kz.halyqsoft.univercity.modules.workflow.views.dialogs.SignDocumentViewDialog;
 import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.ID;
 import org.r3a.common.entity.event.EntityEvent;
@@ -21,6 +22,7 @@ import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.from.EJoin;
 import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
+import org.r3a.common.vaadin.view.AbstractCommonView;
 import org.r3a.common.vaadin.widget.dialog.AbstractDialog;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
@@ -42,11 +44,6 @@ public class InOnSignView extends BaseView implements EntityListener{
     private USERS currentUser;
     private GridWidget myDocsGW;
 
-    private static String FORM = "";
-    private static String CERTIFICATE = "";
-    private static char[] PASSWORD ;
-    private static String DEST = "signed_by_%s.pdf";
-
     public InOnSignView(String title){
         super(title);
     }
@@ -64,6 +61,7 @@ public class InOnSignView extends BaseView implements EntityListener{
         myDocsGW.setButtonVisible(IconToolbar.EDIT_BUTTON, false);
         myDocsGW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
         myDocsGW.setButtonVisible(IconToolbar.PREVIEW_BUTTON, false);
+        myDocsGW.addEntityListener(this);
 
         List<ID> ids = new ArrayList<>();
         ids.add(WorkflowCommonUtils.getDocumentStatusByName(DOCUMENT_STATUS.IN_PROCESS).getId());
@@ -76,30 +74,12 @@ public class InOnSignView extends BaseView implements EntityListener{
     }
 
 
-    public void sign() throws IOException , DocumentException , GeneralSecurityException{
-        KeyStore keyStore = KeyStore.getInstance("PKCS12");
-        keyStore.load(new FileInputStream(CERTIFICATE) , PASSWORD);
-        String alias = keyStore.aliases().nextElement();
-        PrivateKey privateKey = (PrivateKey) keyStore.getKey(alias, PASSWORD);
-        Certificate[] certificateChain = keyStore.getCertificateChain(alias);
-
-        PdfReader reader = new PdfReader(FORM);
-        FileOutputStream os = new FileOutputStream(String.format(DEST,"kuanysh"));
-        PdfStamper stamper = PdfStamper.createSignature(reader,os,'\0');
-
-        PdfSignatureAppearance appearance = stamper.getSignatureAppearance();
-        appearance.setCertificate(certificateChain[0]);
-
-        ExternalSignature externalSignature = new PrivateKeySignature(privateKey, "SHA-256", null);
-        ExternalDigest externalDigest = new BouncyCastleDigest();
-        MakeSignature.signDetached(appearance, externalDigest , externalSignature, certificateChain , null ,null, null, 0 , MakeSignature.CryptoStandard.CMS);
-    }
-
     @Override
     public void handleEntityEvent(EntityEvent entityEvent) {
         if(entityEvent.getSource().equals(myDocsGW)){
             if(entityEvent.getAction() == EntityEvent.SELECTED){
-                Message.showError("asdasdasdasd");
+                SignDocumentViewDialog signDocumentViewDialog = new SignDocumentViewDialog( this, getViewName(), (DOCUMENT) entityEvent.getEntities().iterator().next());
+                signDocumentViewDialog.open();
             }
         }
     }

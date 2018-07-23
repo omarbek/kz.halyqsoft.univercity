@@ -56,6 +56,7 @@ public class AddEmployeeDialog extends AbstractDialog{
                         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(documentSigner);
                         CommonUtils.showSavedNotification();
                         createViewDialog.getDocumentSignerGW().refresh();
+                        close();
                     }catch (Exception e){
                         e.printStackTrace();
                     }

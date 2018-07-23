@@ -1,7 +1,7 @@
 package kz.halyqsoft.univercity.modules.pdf;
 
+import com.itextpdf.text.Element;
 import com.vaadin.data.Property;
-import com.vaadin.sass.internal.util.StringUtil;
 import com.vaadin.server.BrowserWindowOpener;
 import com.vaadin.server.StreamResource;
 import com.vaadin.ui.*;
@@ -9,7 +9,6 @@ import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.PDF_DOCUMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.PDF_PROPERTY;
 import kz.halyqsoft.univercity.utils.CommonUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.query.QueryModel;
@@ -75,8 +74,7 @@ public class PdfEdit extends AbstractCommonView {
         }
 
         else{
-            order[0] = 1;
-        }
+            order[0] = 1;}
 
 
         cf.pdfTitle.addValueChangeListener(new Property.ValueChangeListener() {
@@ -86,7 +84,6 @@ public class PdfEdit extends AbstractCommonView {
             }
         });
         mainHL.addComponent(cf.pdfTitle);
-
         cf.title.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
@@ -94,15 +91,6 @@ public class PdfEdit extends AbstractCommonView {
             }
         });
         mainHL.addComponent(cf.title);
-
-        cf.deadlineDays.addValueChangeListener(new Property.ValueChangeListener() {
-            @Override
-            public void valueChange(Property.ValueChangeEvent event) {
-                refresh(cf);
-            }
-        });
-        mainHL.addComponent(cf.deadlineDays);
-
         itemsVL.addComponent(mainHL);
         itemsVL.setComponentAlignment(mainHL, Alignment.MIDDLE_CENTER);
 
@@ -116,18 +104,6 @@ public class PdfEdit extends AbstractCommonView {
                     HorizontalLayout textAreaHL = new HorizontalLayout();
 
                     Button deleteHLButton = new Button("-");
-                    deleteHLButton.addClickListener(new Button.ClickListener() {
-                        @Override
-                        public void buttonClick(Button.ClickEvent clickEvent) {
-                            if(textHL.getComponentIndex(addComponentButton)==-1){
-                                customFieldList.remove(customField);
-                                itemsVL.removeComponent(textAreaHL);
-                                itemsVL.removeComponent(textHL);
-                            }else{
-                                Message.showInfo("Can not delete!");
-                            }
-                        }
-                    });
 
                     setTextArea(customField.getTextField(), textAreaHL);
 
@@ -243,9 +219,8 @@ public class PdfEdit extends AbstractCommonView {
                     CustomDocument dc = new CustomDocument();
                     if(checkForEmpty(cf)){
                         Message.showError(getUILocaleUtil().getMessage("pdf.field.empty"));
-                    }else if(!NumberUtils.isDigits(cf.deadlineDays.getValue())){
-                        Message.showError(getUILocaleUtil().getMessage("pdf.fields.correct"));
-                    }else{
+                    }
+                    else{
                     dc.initialize(customFieldList, cf.getTitle().getValue());
 
                     ByteArrayOutputStream byteArrayOutputStream = dc.getByteArrayOutputStream();
@@ -271,8 +246,8 @@ public class PdfEdit extends AbstractCommonView {
 
                             pdfDocument.setFileName(cf.pdfTitle.getValue() + ".pdf");
                             pdfDocument.setTitle(cf.title.getValue());
-                            pdfDocument.setPeriod(Integer.parseInt(cf.deadlineDays.getValue()));
-                            pdfDocument.setFileByte(file);
+
+                            //pdfDocument.setFileByte(file);
                             pdfDocument.setUser(user);
                             pdfDocument.setDeleted(false);
 
@@ -288,8 +263,7 @@ public class PdfEdit extends AbstractCommonView {
                             pdfDocument.setId(fileDoc.getId());
                             pdfDocument.setFileName(cf.pdfTitle.getValue());
                             pdfDocument.setTitle(cf.title.getValue());
-                            pdfDocument.setPeriod(Integer.parseInt(cf.deadlineDays.getValue()));
-                            pdfDocument.setFileByte(file);
+                            //pdfDocument.setFileByte(file);
                             pdfDocument.setUser(user);
                             pdfDocument.setDeleted(false);
 
@@ -421,7 +395,6 @@ public class PdfEdit extends AbstractCommonView {
             }
             cf.pdfTitle.setValue(fileDoc.getFileName());
             cf.title.setValue(fileDoc.getTitle());
-            cf.deadlineDays.setValue(fileDoc.getPeriod()+"");
         }
         else {
 
@@ -515,15 +488,11 @@ public class PdfEdit extends AbstractCommonView {
 
     private boolean checkForEmpty(CustomField cf) {
         for(CustomField customField: customFieldList){
-            if(customField.getTextSizeComboBox().getValue() == null
-                    || customField.getTextField().isEmpty()
-                    || cf.getTitle().isEmpty()
-                    || cf.getPdfTitle().isEmpty()
-                    || cf.getDeadlineDays().isEmpty()
+            if(customField.getTextSizeComboBox().getValue() == null || customField.getTextField().isEmpty()
+                    || cf.getTitle().isEmpty() || cf.getPdfTitle().isEmpty()
                     || customField.getFontComboBox().getValue() == null
-                    || customField.getxComboBox().getValue() == null
-                    || customField.getyComboBox().getValue() == null
-                    || customField.getOrder().isEmpty()){
+                    || customField.getxComboBox().getValue() == null || customField.getyComboBox().getValue() == null ||
+                    customField.getOrder().isEmpty()){
                 return true;
             }
 
@@ -533,14 +502,11 @@ public class PdfEdit extends AbstractCommonView {
 
     private boolean checkForEmpty(CustomField customField, CustomField cf) {
 
-        return customField.getTextSizeComboBox().getValue() == null
-                || customField.getTextField().isEmpty()
+        return customField.getTextSizeComboBox().getValue() == null || customField.getTextField().isEmpty()
                 || cf.getTitle().isEmpty() || cf.getPdfTitle().isEmpty()
                 || customField.getFontComboBox().getValue() == null
-                || customField.getxComboBox().getValue() == null
-                || customField.getyComboBox().getValue() == null
-                || customField.getOrder().isEmpty()
-                || customField.getDeadlineDays().isEmpty() ;
+                || customField.getxComboBox().getValue() == null || customField.getyComboBox().getValue() == null ||
+        customField.getOrder().isEmpty();
     }
 
 
@@ -597,12 +563,6 @@ public class PdfEdit extends AbstractCommonView {
 
     private StreamResource createResource(CustomField cf) {
         return new StreamResource(streamSource, getFileName(cf));
-    }
-
-    public void check(CustomField customField){
-        if(customField.getTitle() == null){
-
-        }
     }
 
     @Override

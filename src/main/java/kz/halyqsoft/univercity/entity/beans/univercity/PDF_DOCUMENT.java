@@ -28,13 +28,6 @@ public class PDF_DOCUMENT extends AbstractEntity {
     @Column(name = "deleted", nullable = false)
     private Boolean deleted;
 
-    @FieldInfo(inGrid = false , inView = false , inEdit = false, order = 5)
-    @Column(name = "file_byte")
-    @Lob
-    @Basic(fetch = FetchType.LAZY)
-    private byte[] fileByte;
-
-
     @FieldInfo( inEdit = false, order = 6)
     @Column(name = "period")
     private int period;
@@ -64,14 +57,6 @@ public class PDF_DOCUMENT extends AbstractEntity {
 
     public void setFileName(String fileName) {
         this.fileName = fileName;
-    }
-
-    public byte[] getFileByte() {
-        return fileByte;
-    }
-
-    public void setFileByte(byte[] fileByte) {
-        this.fileByte = fileByte;
     }
 
     public Boolean getDeleted() {

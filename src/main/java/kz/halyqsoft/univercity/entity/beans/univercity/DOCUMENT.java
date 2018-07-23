@@ -38,7 +38,7 @@ public class DOCUMENT extends AbstractEntity{
     private PDF_DOCUMENT pdfDocument;
 
 
-    @FieldInfo(type = EFieldType.TEXT, order = 5)
+    @FieldInfo(type = EFieldType.TEXT, inGrid = true, inEdit = false, inView = true ,  order = 5)
     @Column(name = "message")
     private String message;
 
@@ -65,6 +65,13 @@ public class DOCUMENT extends AbstractEntity{
     @FieldInfo(type = EFieldType.BOOLEAN, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false, order = 9)
     @Column(name = "deleted")
     private boolean deleted;
+
+
+    @FieldInfo(inGrid = false , inView = false , inEdit = false, order = 5)
+    @Column(name = "file_byte")
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    private byte[] fileByte;
 
     public USERS getCreatorEmployee() {
         return creatorEmployee;
@@ -120,6 +127,14 @@ public class DOCUMENT extends AbstractEntity{
 
     public void setDocumentImportance(DOCUMENT_IMPORTANCE documentImportance) {
         this.documentImportance = documentImportance;
+    }
+
+    public byte[] getFileByte() {
+        return fileByte;
+    }
+
+    public void setFileByte(byte[] fileByte) {
+        this.fileByte = fileByte;
     }
 
     public Date getCreated() {
