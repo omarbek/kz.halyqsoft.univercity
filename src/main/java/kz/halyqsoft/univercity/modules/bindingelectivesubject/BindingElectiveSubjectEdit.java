@@ -120,8 +120,8 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
                 "  credit.credit, " +
                 "  ects.ects, " +
                 "  sem.semester_name semesterName, " +
-                "  'descr'           description," +
-                "  pair.pair_number pairNumber " +
+                "  pair.description   description, " +
+                "  pair.pair_number    pairNumber  " +
                 "FROM pair_subject pair " +
                 "  INNER JOIN subject subj ON subj.id = pair.subject_id " +
                 "  INNER JOIN creditability credit ON credit.id = subj.creditability_id " +

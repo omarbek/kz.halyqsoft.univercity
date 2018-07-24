@@ -62,7 +62,8 @@ public class BindingElectiveSubjectDialog extends WindowUtils {
 //                }
 //            }
 
-            ComboBox subjectCB = new ComboBox("subject");//TODO
+            ComboBox subjectCB = new ComboBox();
+            subjectCB.setCaption(getUILocaleUtil().getEntityFieldLabel(PAIR_SUBJECT.class,"subject"));
             subjectCB.setNullSelectionAllowed(true);
             subjectCB.setTextInputAllowed(true);
             subjectCB.setFilteringMode(FilteringMode.CONTAINS);
@@ -80,13 +81,19 @@ public class BindingElectiveSubjectDialog extends WindowUtils {
             mainVL.setComponentAlignment(subjectCB, Alignment.MIDDLE_CENTER);
 
             TextField pairTF = new TextField();
-            pairTF.setCaption("pair");//TODO
+            pairTF.setCaption(getUILocaleUtil().getEntityFieldLabel(PAIR_SUBJECT.class,"pairNumber"));
             mainVL.addComponent(pairTF);
             mainVL.setComponentAlignment(pairTF, Alignment.MIDDLE_CENTER);
+
+            TextField descriptionTF = new TextField();
+            descriptionTF.setCaption(getUILocaleUtil().getEntityFieldLabel(PAIR_SUBJECT.class,"description"));
+            mainVL.addComponent(descriptionTF);
+            mainVL.setComponentAlignment(descriptionTF, Alignment.MIDDLE_CENTER);
 
             if (pairSubject != null) {
                 subjectCB.setValue(pairSubject.getSubject());
                 pairTF.setValue(pairSubject.getPairNumber().toString());
+                descriptionTF.setValue(pairSubject.getDescription());
             }
 
             Button saveButton = CommonUtils.createSaveButton();
@@ -99,6 +106,7 @@ public class BindingElectiveSubjectDialog extends WindowUtils {
                             modifiedPairSubject.setElectveBindedSubject(electiveBindedSubject);
                             modifiedPairSubject.setSubject((SUBJECT) subjectCB.getValue());
                             modifiedPairSubject.setPairNumber(Integer.parseInt(pairTF.getValue()));
+                            modifiedPairSubject.setDescription(descriptionTF.getValue());
                             if (isEdit) {
                                 modifiedPairSubject.setId(pairSubject.getId());
                                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(
@@ -111,7 +119,7 @@ public class BindingElectiveSubjectDialog extends WindowUtils {
                             close();
                             refresh();
                         } else {
-                            Message.showError("pair is not number");//TODO
+                            Message.showError(getUILocaleUtil().getMessage("write.number"));
                         }
                     } catch (Exception e) {
                         e.printStackTrace();//TODO catch
