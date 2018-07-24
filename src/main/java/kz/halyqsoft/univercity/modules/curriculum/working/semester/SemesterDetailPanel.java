@@ -8,6 +8,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.TextField;
 import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM;
 import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM_DETAIL;
 import kz.halyqsoft.univercity.entity.beans.univercity.ELECTIVE_SUBJECT;
@@ -893,6 +894,10 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                 creditabilityCB.setFilteringMode(FilteringMode.OFF);
                 creditabilityCB.setPageLength(0);
 
+                TextField nameTF = new TextField();
+                nameTF.setNullRepresentation("");
+                nameTF.setNullSettingAllowed(true);
+
                 subjectSelectDlg = new SubjectSelectDialog(new AddNewSubjectListener(), V_SUBJECT_SELECT.class);
                 QueryModel qm = ((DBGridModel) subjectSelectDlg.getSelectModel()).getQueryModel();
                 qm.addWhere("chair", ECriteria.EQUAL, ID.valueOf(-1));
@@ -902,8 +907,8 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                 subjectSelectDlg.setDialogHeight(200);
                 subjectSelectDlg.getFilterModel().addFilter("chair", chairCB);
                 subjectSelectDlg.getFilterModel().addFilter("level", levelCB);
-//                subjectSelectDlg.getFilterModel().addFilter("subjectCycle", subjectCycleCB);
                 subjectSelectDlg.getFilterModel().addFilter("creditability", creditabilityCB);
+                subjectSelectDlg.getFilterModel().addFilter("nameRU", nameTF);
                 subjectSelectDlg.setFilterRequired(true);
                 subjectSelectDlg.initFilter();
                 subjectSelectDlg.open();
@@ -981,6 +986,10 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                 creditabilityCB.setFilteringMode(FilteringMode.OFF);
                 creditabilityCB.setPageLength(0);
 
+                TextField nameTF = new TextField();
+                nameTF.setNullRepresentation("");
+                nameTF.setNullSettingAllowed(true);
+
                 electiveSubjectSelectDlg = new ElectiveSubjectSelectDialog(
                         new AddNewElectiveSubjectListener(), V_SUBJECT_SELECT.class);
                 QueryModel qm = ((DBGridModel) electiveSubjectSelectDlg.getSelectModel()).getQueryModel();
@@ -991,8 +1000,8 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                 electiveSubjectSelectDlg.setDialogHeight(200);
                 electiveSubjectSelectDlg.getFilterModel().addFilter("chair", chairCB);
                 electiveSubjectSelectDlg.getFilterModel().addFilter("level", levelCB);
-//                electiveSubjectSelectDlg.getFilterModel().addFilter("subjectCycle", subjectCycleCB);
                 electiveSubjectSelectDlg.getFilterModel().addFilter("creditability", creditabilityCB);
+                electiveSubjectSelectDlg.getFilterModel().addFilter("nameRU", nameTF);
                 electiveSubjectSelectDlg.setFilterRequired(true);
                 electiveSubjectSelectDlg.initFilter();
                 electiveSubjectSelectDlg.open();

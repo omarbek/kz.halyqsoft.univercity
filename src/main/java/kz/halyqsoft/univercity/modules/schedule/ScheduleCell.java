@@ -26,9 +26,9 @@ final class ScheduleCell extends VerticalLayout {
 
         if (scheduleDetail != null && (scheduleDetail.getLessonTime().getEndTime().getTimeValue()
                 - scheduleDetail.getLessonTime().getBeginTime().getTimeValue() == 2)) {
-            setHeight(120, Unit.PIXELS);
+            setHeight(200, Unit.PIXELS);
         } else {
-            setHeight(60, Unit.PIXELS);
+            setHeight(100, Unit.PIXELS);
         }
         addStyleName("bordered");
         addStyleName("schedule-cell");

@@ -1,7 +1,11 @@
 package kz.halyqsoft.univercity.modules.student;
 
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.ui.*;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.HorizontalLayout;
+import kz.halyqsoft.univercity.entity.beans.univercity.ENTRANT_SPECIALITY;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_EDUCATION;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SPECIALITY;
 import kz.halyqsoft.univercity.utils.CommonUtils;
@@ -55,10 +59,19 @@ public class StudentSpecialityEdit extends AbstractDialog {
                 try {
                     if (!mainStudentEducation.getSpeciality().getSpecName().equals(comboBox.getValue())) {
 
-                        mainStudentEducation.setFaculty(((SPECIALITY) comboBox.getValue()).getDepartment().getParent());
-                        mainStudentEducation.setChair(((SPECIALITY) comboBox.getValue()).getDepartment());
-                        mainStudentEducation.setSpeciality((SPECIALITY) comboBox.getValue());
+                        SPECIALITY speciality = (SPECIALITY) comboBox.getValue();
+                        mainStudentEducation.setFaculty((speciality).getDepartment().getParent());
+                        mainStudentEducation.setChair((speciality).getDepartment());
+                        mainStudentEducation.setSpeciality(speciality);
                         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(mainStudentEducation);
+
+                        QueryModel<ENTRANT_SPECIALITY> specialityQM=new QueryModel<>(ENTRANT_SPECIALITY.class);
+                        specialityQM.addWhere("student",ECriteria.EQUAL,mainStudentEducation.getStudent().getId());
+                        ENTRANT_SPECIALITY entrantSpeciality=SessionFacadeFactory.getSessionFacade(
+                                CommonEntityFacadeBean.class).lookupSingle(specialityQM);
+                        entrantSpeciality.setSpeciality(speciality);
+                        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(entrantSpeciality);
+
                         CommonUtils.showSavedNotification();
                         specialityView.setImmediate(true);
                         //specialityView.getFormLayout().setImmediate(true);

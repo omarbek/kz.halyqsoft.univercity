@@ -159,6 +159,6 @@ public class V_SUBJECT_SELECT extends AbstractEntity {
 
 	@Override
 	public String toString() {
-		return  nameRU;
+		return nameRU;
 	}
 }

@@ -766,14 +766,15 @@ public final class ApplicantsForm extends UsersForm {
 
                     for (PDF_PROPERTY property : properties) {
 
-                        String text = new String(property.getText());
+                        String text = property.getText();
                         if (student != null) {
                             setReplaced(text, student);
                         }
                         Paragraph paragraph = new Paragraph(replaced,
-                                getFont(Integer.parseInt(property.getSize().toString()), CommonUtils.getFontMap(property.getFont().toString())));
+                                getFont(Integer.parseInt(property.getSize().toString()),
+                                        CommonUtils.getFontMap(property.getFont())));
 
-                        if (property.isCenter() == true) {
+                        if (property.isCenter()) {
                             paragraph.setAlignment(Element.ALIGN_CENTER);
                         }
                         paragraph.setSpacingBefore(property.getY());
@@ -802,7 +803,7 @@ public final class ApplicantsForm extends UsersForm {
         STUDENT_EDUCATION studentEducation = new STUDENT_EDUCATION();
         studentEducation.setStudent(student);
 
-        SPECIALITY speciality = (student).getEntrantSpecialities().iterator().next().getSpeciality();
+        SPECIALITY speciality = student.getEntrantSpecialities().iterator().next().getSpeciality();
         studentEducation.setFaculty(speciality.getDepartment().getParent());
 
         STUDENT_RELATIVE studentRelativeMother = getStudent_relative(student, MOTHER);
@@ -965,16 +966,19 @@ public final class ApplicantsForm extends UsersForm {
         Map<String, Object> params = new HashMap<>();
         String createdBy = student.getCreatedBy();
         params.put("login", createdBy);
-        USERS tecnhik=CommonUtils.getEmployee(params);
+        USERS tecnhik = CommonUtils.getEmployee(params);
         replaced = text.replaceAll("\\$fio", student.toString())
                 .replaceAll("\\$money", moneyForEducation)
-                .replaceAll("21250", answerEdu)
-                .replaceAll("7000", answerDorm)
+                .replaceAll("\\$ansEdu", answerEdu)
+                .replaceAll("\\$ansDorm", answerDorm)
                 .replaceAll("\\$firstCourseMoney", firstCourseMoney)
                 .replaceAll("\\$secondCourseMoney", secondCourseMoney)
-                .replaceAll("\\$year", now.getYear() + "")
-                .replaceAll("\\$month", now.getMonth().getValue() + "")
-                .replaceAll("\\$data", now.getDayOfMonth() + "")
+//                .replaceAll("\\$year", now.getYear() + "")
+//                .replaceAll("\\$month", now.getMonth().getValue() + "")
+//                .replaceAll("\\$data", now.getDayOfMonth() + "")
+                .replaceAll("\\$year", "_______")
+                .replaceAll("\\$month", "")
+                .replaceAll("\\$data", "")
                 .replaceAll("\\$iin", iin)
                 .replaceAll("\\$passportNumber", passportNumber)
                 .replaceAll("\\$address", fullAddress)
@@ -1016,7 +1020,8 @@ public final class ApplicantsForm extends UsersForm {
                 .replaceAll("\\$attestat", attestationDate)
                 .replaceAll("\\$nomer", educationDoc.getDocumentNo())
                 .replaceAll("\\$ent", untCertificate == null ? "" : untCertificate.getDocumentNo())
-                .replaceAll("\\$document", createdDate)
+//                .replaceAll("\\$document", createdDate)
+                .replaceAll("\\$document", "_______")
                 .replaceAll("\\$diplomaType", student.getDiplomaType().toString())
                 .replaceAll("\\$group", "")
                 .replaceAll("қажет, қажет емес", dorm);

@@ -12,8 +12,8 @@ public final class FStudentFilter extends AbstractFilterBean {
     private static final long serialVersionUID = 5338142998400760891L;
 
     private String code;
-//    private String firstname;
-//    private String lastname;
+    private String firstname;
+    private String lastname;
     private STUDENT_STATUS studentStatus;
     private LOCK_REASON lockReason;
     private DEPARTMENT faculty;
@@ -34,21 +34,21 @@ public final class FStudentFilter extends AbstractFilterBean {
         this.code = code;
     }
 
-//    public String getFirstname() {
-//        return firstname;
-//    }
-//
-//    public void setFirstname(String firstname) {
-//        this.firstname = firstname;
-//    }
-//
-//    public String getLastname() {
-//        return lastname;
-//    }
-//
-//    public void setLastname(String lastname) {
-//        this.lastname = lastname;
-//    }
+    public String getFirstname() {
+        return firstname;
+    }
+
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
+    }
+
+    public String getLastname() {
+        return lastname;
+    }
+
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
+    }
 
     public STUDENT_STATUS getStudentStatus() {
         return studentStatus;
@@ -116,7 +116,7 @@ public final class FStudentFilter extends AbstractFilterBean {
 
     @Override
     public boolean hasFilter() {
-        return !(code == null /*&& firstname == null && lastname == null */&& studentStatus == null
+        return !(code == null && firstname == null && lastname == null && studentStatus == null
                 && lockReason == null && faculty == null && speciality == null && studyYear == null
                 && educationType == null && dormStatus == null && card == null);
     }

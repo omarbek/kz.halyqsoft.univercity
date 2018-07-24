@@ -8,9 +8,4 @@ import javax.persistence.Entity;
  */
 @Entity
 public class ROOM_TYPE extends AbstractTypeEntity {
-
-	private static final long serialVersionUID = 4597247838265802587L;
-
-	public ROOM_TYPE() {
-	}
 }

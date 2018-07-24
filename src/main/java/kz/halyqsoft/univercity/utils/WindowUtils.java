@@ -23,8 +23,13 @@ public abstract class WindowUtils extends AbstractDialog {
         center();
     }
 
-    protected void init() {
-        setSizeFull();//1300-500
+    protected void init(Integer width, Integer height) {
+        if (width != null && height != null) {
+            setWidth(width, Unit.PIXELS);
+            setHeight(height, Unit.PIXELS);
+        }else{
+            setSizeFull();//1300-500
+        }
 
         VerticalLayout mainVL = getVerticalLayout();
         getContent().addComponent(mainVL);

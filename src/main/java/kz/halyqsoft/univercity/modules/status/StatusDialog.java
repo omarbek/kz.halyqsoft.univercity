@@ -15,7 +15,7 @@ public class StatusDialog extends WindowUtils {
     StatusDialog(StatusEdit statusEdit, StatusView statusView) {
         this.statusEdit = statusEdit;
         this.statusView = statusView;
-        init();
+        init(null,null);
     }
 
     @Override
