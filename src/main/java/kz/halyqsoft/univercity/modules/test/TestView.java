@@ -2,6 +2,7 @@ package kz.halyqsoft.univercity.modules.test;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.*;
+import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.USER_TYPE;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -114,7 +115,14 @@ public class TestView extends AbstractTaskView {
         getContent().addComponent(componentHL);
         getContent().setComponentAlignment(componentHL, Alignment.MIDDLE_CENTER);
 
-
+        Button usersToLower=new Button("to Lower");
+        usersToLower.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                QueryModel<USERS> usersQM=new QueryModel<>(USERS.class);
+//                usersQM.addWhere();
+            }
+        });
+        getContent().addComponent(usersToLower);
     }
-
 }

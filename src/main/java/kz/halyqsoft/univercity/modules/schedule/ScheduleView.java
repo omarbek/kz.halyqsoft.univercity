@@ -19,6 +19,7 @@ import org.r3a.common.entity.beans.AbstractTask;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.from.EJoin;
 import org.r3a.common.entity.query.from.FromItem;
+import org.r3a.common.entity.query.select.EAggregate;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.dialog.Message;
@@ -35,13 +36,17 @@ import java.util.Map;
 public class ScheduleView extends AbstractTaskView {
 
     private SEMESTER_DATA currentSemesterData;
-    private VerticalLayout tablesVL=new VerticalLayout();
+    private VerticalLayout tablesVL = new VerticalLayout();
     private ComboBox groupCB;
+
+    private static final int INFORMATIONAL_STUDY_DIRECT = 9;
+    private static final String COMPUTER = "Компьютер";
 
     private static final int LECTURE = 1;
     private static final int PRACTICE = 3;
-    private static final int INFORMATIONAL_STUDY_DIRECT = 9;
-    private static final String COMPUTER = "Компьютер";
+
+    private static final int LECTURE_COUNT = 2;
+    private static final int PRACTICE_COUNT = 2;
 
     public ScheduleView(AbstractTask task) throws Exception {
         super(task);
@@ -71,6 +76,7 @@ public class ScheduleView extends AbstractTaskView {
         groupCB.setCaption(getUILocaleUtil().getEntityLabel(GROUPS.class));
         QueryModel<GROUPS> groupQM = new QueryModel<>(GROUPS.class);
         groupQM.addWhere("deleted", Boolean.FALSE);
+        groupQM.addOrderDesc("id");
         BeanItemContainer<GROUPS> groupBIC = new BeanItemContainer<>(GROUPS.class,
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(groupQM));
         groupCB.setContainerDataSource(groupBIC);
@@ -92,7 +98,7 @@ public class ScheduleView extends AbstractTaskView {
     }
 
     private void refresh(ComboBox groupCB) throws Exception {
-        ScheduleWidget scheduleWidget = new ScheduleWidget(currentSemesterData,(GROUPS)groupCB.getValue());
+        ScheduleWidget scheduleWidget = new ScheduleWidget(currentSemesterData, (GROUPS) groupCB.getValue());
         scheduleWidget.refresh();
         tablesVL.removeAllComponents();
         tablesVL.addComponent(scheduleWidget);
@@ -194,8 +200,12 @@ public class ScheduleView extends AbstractTaskView {
                         return true;
                     }
                 } else {
-                    groups = new ArrayList<>();
-                    groups.add(group);
+                    if ((loadAssignDetail.getPrHour() + loadAssignDetail.getLbHour()) / 15 /
+                            (loadAssignDetail.getSubject().getAcademicFormula().getPrCount() +
+                                    loadAssignDetail.getSubject().getAcademicFormula().getLbCount()) != 1) {
+                        groups = new ArrayList<>();
+                        groups.add(group);
+                    }
                     V_GROUP groupView = SessionFacadeFactory.getSessionFacade(
                             CommonEntityFacadeBean.class).
                             lookup(V_GROUP.class, group.getId());
@@ -205,6 +215,7 @@ public class ScheduleView extends AbstractTaskView {
                         return true;
                     }
                 }
+
             }
         }
         return false;
@@ -214,13 +225,18 @@ public class ScheduleView extends AbstractTaskView {
                           LESSON_TIME time, int roomType, Integer studentCount, boolean notComputer)
             throws Exception {
         for (GROUPS group : groups) {
-            if (scheduleAlreadyHas(teacher, group, weekDay, time, subject)) {
+            if (scheduleAlreadyHas(teacher, group, weekDay, time)) {
                 return false;
             }
-            if (roomType == LECTURE && groupAlreadyHasNLectures(weekDay, group, 2)) {
-                return false;
+            if (subject.getLcCount() > 0) {
+                if (LECTURE == roomType && groupAlreadyHasNLessons(weekDay, group, null)) {
+                    return false;
+                }
+                if (PRACTICE == roomType && lectureAfterThisTime(group, subject, weekDay, time)) {
+                    return false;
+                }
             }
-            if (roomType == PRACTICE && lectureAfterThisTime(group, subject, weekDay, time)) {
+            if (groupAlreadyHasNLessons(weekDay, group, subject)) {
                 return false;
             }
         }
@@ -236,14 +252,27 @@ public class ScheduleView extends AbstractTaskView {
             scheduleDetail.setSubject(subject);
             scheduleDetail.setTeacher(teacher);
             scheduleDetail.setWeekDay(weekDay);
-            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(scheduleDetail);
+            if (!groupHasEnoughSubjects(group, subject)) {
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(scheduleDetail);
+            }
         }
         return true;
     }
 
+    private boolean groupHasEnoughSubjects(GROUPS group, SUBJECT subject) throws Exception {
+        QueryModel<SCHEDULE_DETAIL> scheduleDetailQM = new QueryModel<>(SCHEDULE_DETAIL.class);
+        scheduleDetailQM.addSelect("id", EAggregate.COUNT);
+        scheduleDetailQM.addWhere("subject", ECriteria.EQUAL, subject.getId());
+        scheduleDetailQM.addWhere("group", ECriteria.EQUAL, group.getId());
+        scheduleDetailQM.addWhere("semesterData", ECriteria.EQUAL, currentSemesterData.getId());
+        long countOfLessons = (long) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                lookupItems(scheduleDetailQM);
+        return subject.getCreditability().getCredit() == countOfLessons;
+    }
+
     private ROOM getRoom(WEEK_DAY weekDay, LESSON_TIME time, int roomType, int numberOfStudents,
                          boolean notComputer) throws Exception {
-        if (roomType == LECTURE) {
+        if (LECTURE == roomType) {
             List<ROOM> lectureRooms = getLectureRooms(numberOfStudents);
             for (ROOM room : lectureRooms) {
                 if (!scheduleAlreadyHas(room, weekDay, time)) {
@@ -280,22 +309,27 @@ public class ScheduleView extends AbstractTaskView {
     }
 
     private List<ROOM> getLectureRooms(int numberOfStudents) throws Exception {
-        return getRooms(numberOfStudents, PRACTICE);
-    }
-
-    private List<ROOM> getPracticeRooms(int numberOfStudents) throws Exception {
         return getRooms(numberOfStudents, LECTURE);
     }
 
-    private List<ROOM> getRooms(int numberOfStudents, int roomTypeId) throws Exception {
-        String sql = "SELECT * " +
+    private List<ROOM> getPracticeRooms(int numberOfStudents) throws Exception {
+        return getRooms(numberOfStudents, PRACTICE);
+    }
+
+    private List<ROOM> getRooms(int numberOfStudents, int roomType) throws Exception {
+        StringBuilder sqlSB = new StringBuilder("SELECT * " +
                 "FROM room " +
-                "WHERE room_type_id != ?1 AND capacity >= ?2 " +
-                "ORDER BY capacity;";
+                "WHERE room_type_id ");
+        if (LECTURE == roomType) {
+            sqlSB.append("not in (2,3,6)");
+        } else {
+            sqlSB.append("!=1");
+        }
+        sqlSB.append(" AND capacity >= ?1 " +
+                "ORDER BY capacity, room_type_id, room_no");
         Map<Integer, Object> params = new HashMap<>();
-        params.put(1, roomTypeId);
-        params.put(2, numberOfStudents);
-        return SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(sql, params,
+        params.put(1, numberOfStudents);
+        return SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(sqlSB.toString(), params,
                 ROOM.class);
     }
 
@@ -304,62 +338,75 @@ public class ScheduleView extends AbstractTaskView {
         String sql = "SELECT sched.* " +
                 "FROM schedule_detail sched " +
                 "  INNER JOIN room ON room.id = sched.room_id " +
-                "WHERE sched.group_id = ?1 AND sched.subject_id = ?2 AND room.room_type_id = ?3";
+                "WHERE sched.group_id = ?1 AND sched.subject_id = ?2 AND room.room_type_id not in (2,3,6)";
         Map<Integer, Object> params = new HashMap<>();
         params.put(1, group.getId().getId());
         params.put(2, subject.getId().getId());
-        params.put(3, LECTURE);
         List<SCHEDULE_DETAIL> scheduleDetails = SessionFacadeFactory.getSessionFacade(
                 CommonEntityFacadeBean.class).lookup(sql, params, SCHEDULE_DETAIL.class);
-        int weekDayOfLecture = getMin(scheduleDetails, true);
-        int timeOfLecture = getMin(scheduleDetails, false);
+        List<Integer> mins = getMins(scheduleDetails);
+        int weekDayOfLecture = mins.get(0);
+        int timeOfLecture = mins.get(1);
         int resLecture = Integer.valueOf(weekDayOfLecture + "" + timeOfLecture);
         int res = Integer.valueOf(weekDay.getId() + "" + time.getLessonNumber());
         return res < resLecture;
     }
 
-    private int getMin(List<SCHEDULE_DETAIL> schedules, boolean isDay) {
-        int min = 5;
+    private List<Integer> getMins(List<SCHEDULE_DETAIL> schedules) {
+        List<Integer> mins = new ArrayList<>(2);
+        int week = 5;
+        int time = 5;
         for (SCHEDULE_DETAIL schedule : schedules) {
-            if (isDay) {
-                if (schedule.getWeekDay().getId().getId().intValue() < min) {
-                    min = schedule.getWeekDay().getId().getId().intValue();
-                }
-            } else {
-                if (schedule.getLessonTime().getLessonNumber() < min) {
-                    min = schedule.getLessonTime().getLessonNumber();
+            if (schedule.getWeekDay().getId().getId().intValue() < week) {
+                week = schedule.getWeekDay().getId().getId().intValue();
+            }
+        }
+        for (SCHEDULE_DETAIL schedule : schedules) {
+            if (schedule.getWeekDay().getId().getId().intValue() == week) {
+                if (schedule.getLessonTime().getLessonNumber() < time) {
+                    time = schedule.getLessonTime().getLessonNumber();
                 }
             }
         }
-        return min;
+        mins.add(week);
+        mins.add(time);
+        return mins;
     }
 
-    private boolean groupAlreadyHasNLectures(WEEK_DAY weekDay, GROUPS group, int lectureCount) throws Exception {
-        String sql = "SELECT count(1) " +
+    private boolean groupAlreadyHasNLessons(WEEK_DAY weekDay, GROUPS group, SUBJECT subject) throws Exception {
+        int count;
+        StringBuilder sqlSB = new StringBuilder("SELECT count(1) " +
                 "FROM schedule_detail sched " +
                 "  INNER JOIN room ON room.id = sched.room_id " +
-                "WHERE sched.week_day_id = ?1 AND sched.group_id = ?2 AND room.room_type_id = ?3";
+                "WHERE sched.week_day_id = ?1 AND sched.group_id = ?2");
+        if (subject == null) {
+            count = LECTURE_COUNT;
+            sqlSB.append(" AND room.room_type_id not in (2,3,6)");
+        } else {
+            count = PRACTICE_COUNT;
+            sqlSB.append(" AND room.room_type_id != 1");
+            sqlSB.append(" and sched.subject_id = ");
+            sqlSB.append(subject.getId().getId());
+            sqlSB.append(" and lesson_type_id != 1");
+        }
         Map<Integer, Object> params = new HashMap<>();
         params.put(1, weekDay.getId().getId());
         params.put(2, group.getId().getId());
-        params.put(3, LECTURE);
         Long size = (Long) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
-                lookupSingle(sql, params);
-        return size.intValue() == lectureCount;
+                lookupSingle(sqlSB.toString(), params);
+        return size.intValue() == count;
     }
 
-    private boolean scheduleAlreadyHas(EMPLOYEE teacher, GROUPS group, WEEK_DAY weekDay, LESSON_TIME time,
-                                       SUBJECT subject) throws Exception {
+    private boolean scheduleAlreadyHas(EMPLOYEE teacher, GROUPS group, WEEK_DAY weekDay, LESSON_TIME time)
+            throws Exception {
         String sql = "SELECT 1 FROM schedule_detail WHERE  " +
-                "(teacher_id=?1 and week_day_id=?2 and lesson_time_id=?5) or " +
-                "(group_id=?3 and week_day_id=?2 and lesson_time_id=?5) or " +
-                "(subject_id=?4 and week_day_id=?2 and lesson_time_id=?5)";
+                "(teacher_id=?1 and week_day_id=?2 and lesson_time_id=?4) or " +
+                "(group_id=?3 and week_day_id=?2 and lesson_time_id=?4)";
         Map<Integer, Object> params = new HashMap<>();
         params.put(1, teacher.getId().getId());
         params.put(2, weekDay.getId().getId());
         params.put(3, group.getId().getId());
-        params.put(4, subject.getId().getId());
-        params.put(5, time.getId().getId());
+        params.put(4, time.getId().getId());
         List results = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(
                 sql, params);
         return results.size() > 0;

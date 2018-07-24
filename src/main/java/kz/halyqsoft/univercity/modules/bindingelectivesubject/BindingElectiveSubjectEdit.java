@@ -1,14 +1,15 @@
 package kz.halyqsoft.univercity.modules.bindingelectivesubject;
 
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Alignment;
 import kz.halyqsoft.univercity.entity.beans.univercity.CATALOG_ELECTIVE_SUBJECTS;
 import kz.halyqsoft.univercity.entity.beans.univercity.ELECTIVE_BINDED_SUBJECT;
 import kz.halyqsoft.univercity.entity.beans.univercity.PAIR_SUBJECT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SPECIALITY;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.VPairSubject;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -18,40 +19,43 @@ import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.event.EntityListener;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.from.EJoin;
-import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.AbstractWebUI;
+import org.r3a.common.vaadin.widget.ERefreshType;
 import org.r3a.common.vaadin.widget.dialog.AbstractDialog;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.form.CommonFormWidget;
 import org.r3a.common.vaadin.widget.form.FormModel;
 import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
-import org.r3a.common.vaadin.widget.table.TableWidget;
+import org.r3a.common.vaadin.widget.grid.GridWidget;
+import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 import org.r3a.common.vaadin.widget.table.model.DBTableModel;
 import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
 
 import javax.persistence.NoResultException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.math.BigDecimal;
+import java.util.*;
 
 public class BindingElectiveSubjectEdit extends AbstractDialog {
 
     private CommonFormWidget studentBindingElectiveCFW;
-    private TableWidget studentBindingElectiveSubjectTW;
-    private ID studentbindingElectiveId;
+    private GridWidget pairSubjectGW;
+    private ID studentBindingElectiveId;
     private BindingElectiveSubjectView bindingElectiveSubjectView;
+    private ELECTIVE_BINDED_SUBJECT electiveBindedSubject;
     private final boolean isNew;
 
-    BindingElectiveSubjectEdit(ELECTIVE_BINDED_SUBJECT electiveBindedSubject, boolean isNew, BindingElectiveSubjectView electiveSubjectView) throws Exception {
+    BindingElectiveSubjectEdit(ELECTIVE_BINDED_SUBJECT electiveBindedSubject, boolean isNew,
+                               BindingElectiveSubjectView electiveSubjectView) throws Exception {
         this.isNew = isNew;
         this.bindingElectiveSubjectView = electiveSubjectView;
+        this.electiveBindedSubject = electiveBindedSubject;
 
         if (electiveBindedSubject != null) {
-            studentbindingElectiveId = electiveBindedSubject.getId();
+            studentBindingElectiveId = electiveBindedSubject.getId();
         }
 
-        setWidth(500, Unit.PIXELS);
+        setWidth(700, Unit.PIXELS);
         setHeight(500, Unit.PIXELS);
         center();
 
@@ -65,7 +69,7 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
             public void buttonClick(Button.ClickEvent ev) {
                 if (studentBindingElectiveCFW.getWidgetModel().isModified()) {
                     studentBindingElectiveCFW.save();
-                    studentBindingElectiveSubjectTW.setVisible(true);
+                    pairSubjectGW.setVisible(true);
                 }
             }
         });
@@ -85,9 +89,10 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
         getContent().addComponent(buttonsHL);
         getContent().setComponentAlignment(buttonsHL, Alignment.BOTTOM_CENTER);
 
-        studentBindingElectiveSubjectTW = createStudentElectiveBindedSubjectTable();
-        getContent().addComponent(studentBindingElectiveSubjectTW);
-        getContent().setComponentAlignment(studentBindingElectiveSubjectTW, Alignment.MIDDLE_CENTER);
+        pairSubjectGW = pairSubjectGridWidget();
+        refresh(electiveBindedSubject);
+        getContent().addComponent(pairSubjectGW);
+        getContent().setComponentAlignment(pairSubjectGW, Alignment.MIDDLE_CENTER);
 
         Button closeButton = new Button(getUILocaleUtil().getCaption("close"));
         closeButton.addClickListener(new Button.ClickListener() {
@@ -105,6 +110,59 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
         getContent().setComponentAlignment(closeButton, Alignment.MIDDLE_CENTER);
 
         AbstractWebUI.getInstance().addWindow(this);
+    }
+
+    public void refresh(ELECTIVE_BINDED_SUBJECT electiveBindedSubject) {
+        List<VPairSubject> list = new ArrayList<>();
+        String sql = "SELECT " +
+                "  pair.id," +
+                "  subj.name_ru      subjectName, " +
+                "  credit.credit, " +
+                "  ects.ects, " +
+                "  sem.semester_name semesterName, " +
+                "  'descr'           description," +
+                "  pair.pair_number pairNumber " +
+                "FROM pair_subject pair " +
+                "  INNER JOIN subject subj ON subj.id = pair.subject_id " +
+                "  INNER JOIN creditability credit ON credit.id = subj.creditability_id " +
+                "  INNER JOIN ects ects ON ects.id = subj.ects_id " +
+                "  INNER JOIN elective_binded_subject elect_bind ON elect_bind.id = pair.elective_binded_subject_id " +
+                "  INNER JOIN semester sem ON sem.id = elect_bind.semester_id " +
+                "WHERE pair.elective_binded_subject_id = ?1 AND subj.mandatory = FALSE AND subj.subject_cycle_id " +
+                "IS NOT NULL";
+        Map<Integer, Object> params = new HashMap<>();
+        if (electiveBindedSubject != null) {
+            params.put(1, electiveBindedSubject.getId().getId());
+        } else {
+            params.put(1, -1);
+        }
+        try {
+            List tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                    lookupItemsList(sql, params);
+            if (!tmpList.isEmpty()) {
+                for (Object o : tmpList) {
+                    Object[] oo = (Object[]) o;
+                    VPairSubject pairSubject = new VPairSubject();
+                    pairSubject.setId(ID.valueOf((long) oo[0]));
+                    pairSubject.setSubjectName((String) oo[1]);
+                    pairSubject.setCredit(((BigDecimal) oo[2]).intValue());
+                    pairSubject.setEcts(((BigDecimal) oo[3]).intValue());
+                    pairSubject.setSemesterName((String) oo[4]);
+                    pairSubject.setDescription(((String) oo[5]));
+                    pairSubject.setPairNumber((Long) oo[6]);
+                    list.add(pairSubject);
+                }
+            }
+        } catch (Exception ex) {
+            CommonUtils.showMessageAndWriteLog("Unable to load subjects table", ex);
+        }
+
+        ((DBGridModel) pairSubjectGW.getWidgetModel()).setEntities(list);
+        try {
+            pairSubjectGW.refresh();
+        } catch (Exception ex) {
+            CommonUtils.showMessageAndWriteLog("Unable to refresh subjects table", ex);
+        }
     }
 
     private CommonFormWidget createStudentElectiveBindedSubject() throws Exception {
@@ -137,7 +195,7 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
         } else {
             try {
                 ELECTIVE_BINDED_SUBJECT studentCreativeExam = SessionFacadeFactory.getSessionFacade(
-                        CommonEntityFacadeBean.class).lookup(ELECTIVE_BINDED_SUBJECT.class, studentbindingElectiveId);
+                        CommonEntityFacadeBean.class).lookup(ELECTIVE_BINDED_SUBJECT.class, studentBindingElectiveId);
                 if (studentCreativeExam != null) {
                     studentBindingElectiveFM.loadEntity(studentCreativeExam.getId());
                 }
@@ -149,54 +207,30 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
         return studentBindingElectiveFW;
     }
 
-    private TableWidget createStudentElectiveBindedSubjectTable() throws Exception {
-        if (studentbindingElectiveId == null && !studentBindingElectiveCFW.getWidgetModel().isCreateNew()) {
+    private GridWidget pairSubjectGridWidget() throws Exception {
+        if (studentBindingElectiveId == null && !studentBindingElectiveCFW.getWidgetModel().isCreateNew()) {
             ELECTIVE_BINDED_SUBJECT electiveBindedSubject = (ELECTIVE_BINDED_SUBJECT) studentBindingElectiveCFW.
                     getWidgetModel().getEntity();
             if (electiveBindedSubject != null) {
-                studentbindingElectiveId = electiveBindedSubject.getId();
+                studentBindingElectiveId = electiveBindedSubject.getId();
             }
         }
 
-        TableWidget studentElectiveSubjectTW = new TableWidget(PAIR_SUBJECT.class);
+        GridWidget studentElectiveSubjectGW = new GridWidget(VPairSubject.class);
         if (isNew) {
-            studentElectiveSubjectTW.setVisible(false);
+            studentElectiveSubjectGW.setVisible(false);
+            studentBindingElectiveId = ID.valueOf(-1);
         }
-        studentElectiveSubjectTW.setButtonVisible(AbstractToolbar.REFRESH_BUTTON, false);
-        studentElectiveSubjectTW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
-        studentElectiveSubjectTW.addEntityListener(new StudentCreativeExamSubjectListener());
+        studentElectiveSubjectGW.setButtonVisible(AbstractToolbar.REFRESH_BUTTON, false);
+        studentElectiveSubjectGW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
+        studentElectiveSubjectGW.addEntityListener(new StudentCreativeExamSubjectListener());
 
-        DBTableModel studentCreativeExamSubjectTM = (DBTableModel) studentElectiveSubjectTW.getWidgetModel();
-        FKFieldModel fieldModel = (FKFieldModel) studentCreativeExamSubjectTM.getFormModel().getFieldModel("subject");
-        fieldModel.getQueryModel().addWhere("mandatory",ECriteria.EQUAL,false);
-        fieldModel.getQueryModel().addWhereNotNull("subjectCycle");
+        DBGridModel studentElectiveSubjectGM = (DBGridModel) studentElectiveSubjectGW.getWidgetModel();
+        studentElectiveSubjectGM.setTitleVisible(false);
+        studentElectiveSubjectGM.setMultiSelect(false);
+        studentElectiveSubjectGM.setRefreshType(ERefreshType.MANUAL);
 
-        studentCreativeExamSubjectTM.setReadOnly(false);
-
-        if (isNew) {
-            studentbindingElectiveId = ID.valueOf(-1);
-        }
-        QueryModel studentCreativeExamSubjectQM = studentCreativeExamSubjectTM.getQueryModel();
-        studentCreativeExamSubjectQM.addWhere("electiveBindedSubject", ECriteria.EQUAL, studentbindingElectiveId);
-
-        refreshSubjects(studentElectiveSubjectTW);
-        return studentElectiveSubjectTW;
-    }
-
-    private void refreshSubjects(TableWidget studentCreativeExamSubjectTW) throws Exception {
-        QueryModel<ELECTIVE_BINDED_SUBJECT> subjectQM = new QueryModel<>(ELECTIVE_BINDED_SUBJECT.class);
-        FromItem examFI = subjectQM.addJoin(EJoin.INNER_JOIN, "id", PAIR_SUBJECT.class,
-                "subject");
-        subjectQM.addWhere(examFI, "electiveBindedSubject", ECriteria.EQUAL, studentbindingElectiveId);
-        List<ELECTIVE_BINDED_SUBJECT> writtenSubjects = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
-                lookup(subjectQM);
-        List<ID> ids = new ArrayList<>();
-        for (ELECTIVE_BINDED_SUBJECT  subject : writtenSubjects) {
-            ids.add(subject.getId());
-        }
-        FormModel subjectFM = ((DBTableModel) studentCreativeExamSubjectTW.getWidgetModel()).getFormModel();
-        QueryModel electiveSubjectQM = ((FKFieldModel) subjectFM.getFieldModel("subject")).getQueryModel();
-        electiveSubjectQM.addWhereNotIn("id", ids);
+        return studentElectiveSubjectGW;
     }
 
     private class StudentCreativeExamListener implements EntityListener {
@@ -217,6 +251,9 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(electiveBindedSubject);
                     studentBindingElectiveCFW.getWidgetModel().loadEntity(electiveBindedSubject.getId());
                     studentBindingElectiveCFW.refresh();
+
+                    BindingElectiveSubjectEdit.this.electiveBindedSubject=electiveBindedSubject;
+
                     CommonUtils.showSavedNotification();
 
                 } catch (Exception ex) {
@@ -243,7 +280,7 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
                 Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
                 return false;
             }
-            return  true;
+            return true;
         }
 
         @Override
@@ -307,16 +344,15 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
             if (isNew) {
                 try {
                     ELECTIVE_BINDED_SUBJECT studentCreativeExam = (ELECTIVE_BINDED_SUBJECT) fm.getEntity();
-                    studentbindingElectiveId = studentCreativeExam.getId();
+                    studentBindingElectiveId = studentCreativeExam.getId();
                     studentCreativeExamSubject.setElectveBindedSubject(studentCreativeExam);
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(studentCreativeExamSubject);
 
-                    QueryModel studentCreativeExamSubjectQM = ((DBTableModel) studentBindingElectiveSubjectTW.
+                    QueryModel studentCreativeExamSubjectQM = ((DBTableModel) pairSubjectGW.
                             getWidgetModel()).getQueryModel();
                     studentCreativeExamSubjectQM.addWhere("electiveBindedSubject", ECriteria.EQUAL, fm.getEntity().getId());
 
-                    studentBindingElectiveSubjectTW.refresh();
-                    refreshSubjects(studentBindingElectiveSubjectTW);
+                    pairSubjectGW.refresh();
                     CommonUtils.showSavedNotification();
                 } catch (Exception ex) {
                     CommonUtils.showMessageAndWriteLog("Unable to create student binding elective subject", ex);
@@ -324,8 +360,7 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
             } else {
                 try {
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(studentCreativeExamSubject);
-                    studentBindingElectiveSubjectTW.refresh();
-                    refreshSubjects(studentBindingElectiveSubjectTW);
+                    pairSubjectGW.refresh();
                     CommonUtils.showSavedNotification();
                 } catch (Exception ex) {
                     CommonUtils.showMessageAndWriteLog("Unable to merge student binding elective subject", ex);
@@ -347,8 +382,7 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
             }
             try {
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(delList);
-                studentBindingElectiveSubjectTW.refresh();
-                refreshSubjects(studentBindingElectiveSubjectTW);
+                refresh(electiveBindedSubject);
             } catch (Exception ex) {
                 CommonUtils.LOG.error("Unable to delete student binding elective subject: ", ex);
                 Message.showError(getUILocaleUtil().getMessage("error.cannotdelentity"));
@@ -366,7 +400,8 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
                 Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
                 return false;
             }
-            return true;
+            new BindingElectiveSubjectDialog(electiveBindedSubject, BindingElectiveSubjectEdit.this, null, false);
+            return false;
         }
 
         @Override
@@ -375,7 +410,15 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
 
         @Override
         public boolean onEdit(Object o, Entity entity, int i) {
-            return true;
+            try {
+                PAIR_SUBJECT pairSubject = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                        lookup(PAIR_SUBJECT.class, entity.getId());
+                new BindingElectiveSubjectDialog(electiveBindedSubject, BindingElectiveSubjectEdit.this,
+                        pairSubject, true);
+            } catch (Exception e) {
+                e.printStackTrace();//TODO catch
+            }
+            return false;
         }
 
         @Override
@@ -415,6 +458,7 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
         public void onException(Object o, Throwable throwable) {
         }
     }
+
     private CATALOG_ELECTIVE_SUBJECTS getCat(QueryModel<CATALOG_ELECTIVE_SUBJECTS> catQM,
                                              SPECIALITY spec, ENTRANCE_YEAR year) throws Exception {
         CATALOG_ELECTIVE_SUBJECTS cat;

@@ -15,7 +15,7 @@ public class RoomDialog extends WindowUtils {
     RoomDialog(RoomEdit roomEdit, RoomView roomView) {
         this.roomEdit = roomEdit;
         this.roomView = roomView;
-        init();
+        init(null,null);
     }
 
     @Override
