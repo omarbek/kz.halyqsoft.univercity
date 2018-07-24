@@ -13,6 +13,8 @@ import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.modules.workflow.WorkflowCommonUtils;
 import kz.halyqsoft.univercity.modules.workflow.views.InOnSignView;
+import kz.halyqsoft.univercity.utils.WindowUtils;
+import org.bouncycastle.openssl.PasswordException;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
@@ -103,14 +105,15 @@ public class SignDocumentViewDialog extends AbstractDialog implements EntityList
 
                         @Override
                         public void uploadSucceeded(Upload.SucceededEvent event) {
-                            Message.showInfo(file.getAbsolutePath());
+
                         }
 
                         public File getFile() {
                             return file;
                         }
                     }
-
+                    PasswordField passwordField = new PasswordField(getUILocaleUtil().getCaption("enter.password"));
+                    passwordField.setRequired(true);
                     FileUploader receiver = new FileUploader(keyFile);
 
                     Upload upload = new Upload("Upload certificate here", receiver);
@@ -118,13 +121,16 @@ public class SignDocumentViewDialog extends AbstractDialog implements EntityList
                         @Override
                         public void uploadFinished(Upload.FinishedEvent finishedEvent) {
                             try{
-                                document.setFileByte(sign(receiver.getFile(), "123456", document));
+                                document.setFileByte(sign(receiver.getFile(), passwordField.getValue(), document));
                                 DOCUMENT_STATUS documentStatus = WorkflowCommonUtils.getDocumentStatusByName(DOCUMENT_STATUS.ACCEPTED);
                                 document.setDocumentStatus(documentStatus);
                                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(document);
-                                Message.showInfo("Document is signed!");
-                                prevView.getInOnSignDocsGW().refresh();
+                                Message.showInfo(getUILocaleUtil().getCaption("signed"));
                                 close();
+                                prevView.getInOnSignDocsGW().refresh();
+                            }catch (PasswordException pe){
+                                Message.showError(pe.toString());
+                                pe.printStackTrace();
                             }catch (Exception e){
                                 Message.showError(e.getMessage());
                                 e.printStackTrace();
@@ -134,6 +140,7 @@ public class SignDocumentViewDialog extends AbstractDialog implements EntityList
                     upload.setImmediate(true);
                     upload.setButtonCaption("Start Upload");
 
+                    getContent().addComponent(passwordField);
                     upload.addSucceededListener(receiver);
                     getContent().addComponent(upload);
 

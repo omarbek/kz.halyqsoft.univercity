@@ -90,7 +90,15 @@ public class PdfEdit extends AbstractCommonView {
                 refresh(cf);
             }
         });
+
+        cf.deadlineDays.addValueChangeListener(new Property.ValueChangeListener() {
+                @Override
+                public void valueChange(Property.ValueChangeEvent event) {
+                refresh(cf);
+            }
+        });
         mainHL.addComponent(cf.title);
+        mainHL.addComponent(cf.deadlineDays);
         itemsVL.addComponent(mainHL);
         itemsVL.setComponentAlignment(mainHL, Alignment.MIDDLE_CENTER);
 
@@ -246,7 +254,7 @@ public class PdfEdit extends AbstractCommonView {
 
                             pdfDocument.setFileName(cf.pdfTitle.getValue() + ".pdf");
                             pdfDocument.setTitle(cf.title.getValue());
-
+                            pdfDocument.setPeriod(Integer.parseInt(cf.deadlineDays.getValue()));
                             //pdfDocument.setFileByte(file);
                             pdfDocument.setUser(user);
                             pdfDocument.setDeleted(false);
@@ -262,8 +270,8 @@ public class PdfEdit extends AbstractCommonView {
                         else {
                             pdfDocument.setId(fileDoc.getId());
                             pdfDocument.setFileName(cf.pdfTitle.getValue());
+                            pdfDocument.setPeriod(Integer.parseInt(cf.deadlineDays.getValue()));
                             pdfDocument.setTitle(cf.title.getValue());
-                            //pdfDocument.setFileByte(file);
                             pdfDocument.setUser(user);
                             pdfDocument.setDeleted(false);
 
@@ -376,7 +384,6 @@ public class PdfEdit extends AbstractCommonView {
                             xComboBox.setReadOnly(false);}
                     }
                 });
-
                 textHL.addComponent(centerCheckBox);
 
                 customFieldList.add(customFieldProp);
@@ -394,6 +401,7 @@ public class PdfEdit extends AbstractCommonView {
 
             }
             cf.pdfTitle.setValue(fileDoc.getFileName());
+            cf.deadlineDays.setValue(fileDoc.getPeriod()+"");
             cf.title.setValue(fileDoc.getTitle());
         }
         else {
@@ -491,8 +499,8 @@ public class PdfEdit extends AbstractCommonView {
             if(customField.getTextSizeComboBox().getValue() == null || customField.getTextField().isEmpty()
                     || cf.getTitle().isEmpty() || cf.getPdfTitle().isEmpty()
                     || customField.getFontComboBox().getValue() == null
-                    || customField.getxComboBox().getValue() == null || customField.getyComboBox().getValue() == null ||
-                    customField.getOrder().isEmpty()){
+                    || customField.getxComboBox().getValue() == null || customField.getyComboBox().getValue() == null
+                    || customField.getOrder().isEmpty() || cf.getDeadlineDays().isEmpty()){
                 return true;
             }
 
@@ -506,7 +514,7 @@ public class PdfEdit extends AbstractCommonView {
                 || cf.getTitle().isEmpty() || cf.getPdfTitle().isEmpty()
                 || customField.getFontComboBox().getValue() == null
                 || customField.getxComboBox().getValue() == null || customField.getyComboBox().getValue() == null ||
-        customField.getOrder().isEmpty();
+        customField.getOrder().isEmpty()|| cf.getDeadlineDays().isEmpty();
     }
 
 
