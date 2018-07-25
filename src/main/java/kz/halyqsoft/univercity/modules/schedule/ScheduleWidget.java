@@ -1,6 +1,7 @@
 package kz.halyqsoft.univercity.modules.schedule;
 
 import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
 import kz.halyqsoft.univercity.entity.beans.univercity.GROUPS;
@@ -60,7 +61,7 @@ final class ScheduleWidget extends AbstractWidgetPanel {
             }
             weekDays = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(weekDayQM);
 
-            int cols = 8;
+            int cols = 9;
             int rows = times.size() + 1;
 
             matrixGL = new GridLayout();
@@ -118,10 +119,10 @@ final class ScheduleWidget extends AbstractWidgetPanel {
             FromItem lessonTimeFI = sdQM.addJoin(EJoin.INNER_JOIN, "lessonTime", LESSON_TIME.class, "id");
             sdQM.addWhere("group", ECriteria.EQUAL, group.getId());
             sdQM.addWhereAnd("semesterData", ECriteria.EQUAL, semesterData.getId());
-            for (WEEK_DAY wd : weekDays) {
-                sdQM.addWhere("weekDay", ECriteria.EQUAL, wd.getId());
-                for (TIME st : times) {
-                    sdQM.addWhere(lessonTimeFI, "beginTime", ECriteria.EQUAL, st.getId());
+            for (int i = 0; i < weekDays.size(); i++) {
+                sdQM.addWhere("weekDay", ECriteria.EQUAL, weekDays.get(i).getId());
+                for (int j = 0; j < times.size(); j++) {
+                    sdQM.addWhere(lessonTimeFI, "beginTime", ECriteria.EQUAL, times.get(j).getId());
                     try {
                         SCHEDULE_DETAIL scheduleDetail = null;
                         List<SCHEDULE_DETAIL> list = SessionFacadeFactory.getSessionFacade(
@@ -132,8 +133,10 @@ final class ScheduleWidget extends AbstractWidgetPanel {
                         }
 
                         ScheduleCell sc = new ScheduleCell(scheduleDetail);
-                        int col = wd.getId().getId().intValue();
-                        int row = st.getId().getId().intValue();
+//                        int col = weekDays.get(i).getId().getId().intValue();
+//                        int row = times.get(j).getId().getId().intValue();
+                        int col = i + 1;
+                        int row = j + 1;
 
                         matrixGL.removeComponent(col, row);
                         if (scheduleDetail != null && (scheduleDetail.getLessonTime().getEndTime().getTimeValue()
@@ -147,22 +150,35 @@ final class ScheduleWidget extends AbstractWidgetPanel {
                             addComponent = true;
                         }
 
-//                    if (col < cols && row < rows) {
-//                        matrixGL.removeComponent(col, row);
-//                        if (scheduleDetail != null && (scheduleDetail.getLessonTime().getEndTime().getTimeValue()
-//                                - scheduleDetail.getLessonTime().getBeginTime().getTimeValue() == 2)) {
-//                            matrixGL.addComponent(sc, col, row, col, row + 1);
-//                            addComponent = false;
-//                        } else if (addComponent) {
-//                            matrixGL.addComponent(sc, col, row);
-//                        } else {
-//                            addComponent = true;
-//                        }
-//                    }
+//                            if (col < cols && row < rows) {
+//                                matrixGL.removeComponent(col, row);
+//                                if (scheduleDetail != null && (scheduleDetail.getLessonTime().getEndTime().getTimeValue()
+//                                        - scheduleDetail.getLessonTime().getBeginTime().getTimeValue() == 2)) {
+//                                    matrixGL.addComponent(sc, col, row, col, row + 1);
+//                                    addComponent = false;
+//                                } else if (addComponent) {
+//                                    matrixGL.addComponent(sc, col, row);
+//                                } else {
+//                                    addComponent = true;
+//                                }
+//                            }
                     } catch (Exception ex) {
                         CommonUtils.showMessageAndWriteLog("Unable to load schedule detail", ex);
                     }
+                    matrixGL.removeComponent(weekDays.size() + 1, j + 1);
                 }
+            }
+            for (int j = 0; j < times.size(); j++) {
+                Button editButton = new Button("edit");//TODO
+                editButton.setHeight(100, Unit.PIXELS);
+                editButton.setData(times.get(j));
+                editButton.addClickListener(new Button.ClickListener() {
+                    @Override
+                    public void buttonClick(Button.ClickEvent event) {
+                        new ScheduleDialog(ScheduleWidget.this, (TIME) editButton.getData(), semesterData, group);
+                    }
+                });
+                matrixGL.addComponent(editButton, weekDays.size() + 1, j + 1);
             }
         }
     }

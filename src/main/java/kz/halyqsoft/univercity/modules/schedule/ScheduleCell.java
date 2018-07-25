@@ -20,7 +20,7 @@ final class ScheduleCell extends VerticalLayout {
     private final SCHEDULE_DETAIL scheduleDetail;
     private final Label text;
 
-    public ScheduleCell(SCHEDULE_DETAIL scheduleDetail) {
+    ScheduleCell(SCHEDULE_DETAIL scheduleDetail) {
         super();
         this.scheduleDetail = scheduleDetail;
 

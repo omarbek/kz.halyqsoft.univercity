@@ -66,4 +66,9 @@ public class LESSON_TIME extends AbstractEntity {
     public void setShift(SHIFT shift) {
         this.shift = shift;
     }
+
+    @Override
+    public String toString() {
+        return beginTime.toString() + "-" + endTime.toString();
+    }
 }

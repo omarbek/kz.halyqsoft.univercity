@@ -14,9 +14,9 @@ import javax.persistence.Entity;
 @Entity
 public class LESSON_TYPE extends AbstractTypeEntity {
 
-    private static final ID LECTURE_ID = ID.valueOf(1);
-    private static final ID LABORATORY_ID = ID.valueOf(2);
-    private static final ID PRACTICE_ID = ID.valueOf(3);
+    public static final ID LECTURE_ID = ID.valueOf(1);
+    public static final ID LABORATORY_ID = ID.valueOf(2);
+    public static final ID PRACTICE_ID = ID.valueOf(3);
 
     @FieldInfo(type = EFieldType.TEXT, max = 4, order = 2)
     @Column(name = "TYPE_SHORT_NAME", nullable = false)

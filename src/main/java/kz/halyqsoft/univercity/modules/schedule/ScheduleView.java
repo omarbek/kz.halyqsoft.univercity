@@ -35,9 +35,10 @@ import java.util.Map;
  */
 public class ScheduleView extends AbstractTaskView {
 
-    private SEMESTER_DATA currentSemesterData;
     private VerticalLayout tablesVL = new VerticalLayout();
     private ComboBox groupCB;
+
+    private static SEMESTER_DATA currentSemesterData;
 
     private static final int INFORMATIONAL_STUDY_DIRECT = 9;
     private static final String COMPUTER = "Компьютер";
@@ -252,14 +253,14 @@ public class ScheduleView extends AbstractTaskView {
             scheduleDetail.setSubject(subject);
             scheduleDetail.setTeacher(teacher);
             scheduleDetail.setWeekDay(weekDay);
-            if (!groupHasEnoughSubjects(group, subject)) {
+            if (!groupHasEnoughLessons(group, subject)) {
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(scheduleDetail);
             }
         }
         return true;
     }
 
-    private boolean groupHasEnoughSubjects(GROUPS group, SUBJECT subject) throws Exception {
+    static boolean groupHasEnoughLessons(GROUPS group, SUBJECT subject) throws Exception {
         QueryModel<SCHEDULE_DETAIL> scheduleDetailQM = new QueryModel<>(SCHEDULE_DETAIL.class);
         scheduleDetailQM.addSelect("id", EAggregate.COUNT);
         scheduleDetailQM.addWhere("subject", ECriteria.EQUAL, subject.getId());
@@ -397,18 +398,17 @@ public class ScheduleView extends AbstractTaskView {
         return size.intValue() == count;
     }
 
-    private boolean scheduleAlreadyHas(EMPLOYEE teacher, GROUPS group, WEEK_DAY weekDay, LESSON_TIME time)
+    static boolean scheduleAlreadyHas(EMPLOYEE teacher, GROUPS group, WEEK_DAY weekDay, LESSON_TIME time)
             throws Exception {
         String sql = "SELECT 1 FROM schedule_detail WHERE  " +
-                "(teacher_id=?1 and week_day_id=?2 and lesson_time_id=?4) or " +
-                "(group_id=?3 and week_day_id=?2 and lesson_time_id=?4)";
+                "((teacher_id=?1 and week_day_id=?2 and lesson_time_id=?4) or " +
+                "(group_id=?3 and week_day_id=?2 and lesson_time_id=?4))";
         Map<Integer, Object> params = new HashMap<>();
         params.put(1, teacher.getId().getId());
         params.put(2, weekDay.getId().getId());
         params.put(3, group.getId().getId());
         params.put(4, time.getId().getId());
-        List results = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(
-                sql, params);
+        List results = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
         return results.size() > 0;
     }
 
