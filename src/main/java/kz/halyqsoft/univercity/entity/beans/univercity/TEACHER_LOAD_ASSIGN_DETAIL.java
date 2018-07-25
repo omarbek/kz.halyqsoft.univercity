@@ -1,16 +1,14 @@
 package kz.halyqsoft.univercity.entity.beans.univercity;
 
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_PERIOD;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDENT_DIPLOMA_TYPE;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 /**
  * @author Omarbek
@@ -19,244 +17,156 @@ import javax.persistence.ManyToOne;
 @Entity
 public class TEACHER_LOAD_ASSIGN_DETAIL extends AbstractEntity {
 
-	private static final long serialVersionUID = -1179682577968099408L;
+    private static final long serialVersionUID = -1179682577968099408L;
 
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 1)
+    @FieldInfo(type = EFieldType.FK_COMBO)
     @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "TEACHER_LOAD_ASSIGN_ID", referencedColumnName = "ID")})
+            @JoinColumn(name = "TEACHER_LOAD_ASSIGN_ID", referencedColumnName = "ID")})
     private TEACHER_LOAD_ASSIGN teacherLoadAssign;
-	
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 2)
+
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 2)
     @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "TEACHER_ID", referencedColumnName = "ID")})
+            @JoinColumn(name = "TEACHER_ID", referencedColumnName = "ID")})
     private EMPLOYEE teacher;
-	
-	@FieldInfo(type = EFieldType.FK_DIALOG, order = 3)
+
+    @FieldInfo(type = EFieldType.FK_DIALOG, order = 3)
     @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
+            @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
     private SUBJECT subject;
-	
-	@FieldInfo(type = EFieldType.INTEGER, order = 4)
-	@Column(name = "LC_CREDIT")
-	private Integer lcCredit;
-	
-	@FieldInfo(type = EFieldType.INTEGER, order = 5)
-	@Column(name = "LB_CREDIT")
-	private Integer lbCredit;
-	
-	@FieldInfo(type = EFieldType.INTEGER, order = 6)
-	@Column(name = "PR_CREDIT")
-	private Integer prCredit;
-	
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 7)
-	@ManyToOne
+
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 4)
+    @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "SEMESTER_PERIOD_ID", referencedColumnName = "ID")})
-	private SEMESTER_PERIOD semesterPeriod;
-	
-	@FieldInfo(type = EFieldType.INTEGER, order = 9)
-	@Column(name = "STUDENT_COUNT")
-	private Integer studentCount;
-	
-	@FieldInfo(type = EFieldType.INTEGER, order = 10)
-	@Column(name = "LC_COUNT")
-	private Integer lcCount;
-	
-	@FieldInfo(type = EFieldType.INTEGER, order = 11)
-	@Column(name = "LB_COUNT")
-	private Integer lbCount;
-	
-	@FieldInfo(type = EFieldType.INTEGER, order = 12)
-	@Column(name = "PR_COUNT")
-	private Integer prCount;
-	
-	@FieldInfo(type = EFieldType.DOUBLE, order = 13)
-	@Column(name = "LC_HOUR")
-	private Double lcHour;
-	
-	@FieldInfo(type = EFieldType.DOUBLE, order = 14)
-	@Column(name = "LC_HOUR_TOTAL")
-	private Double lcHourTotal;
-	
-	@FieldInfo(type = EFieldType.DOUBLE, order = 15)
-	@Column(name = "LB_HOUR")
-	private Double lbHour;
-	
-	@FieldInfo(type = EFieldType.DOUBLE, order = 16)
-	@Column(name = "LB_HOUR_TOTAL")
-	private Double lbHourTotal;
-	
-	@FieldInfo(type = EFieldType.DOUBLE, order = 17)
-	@Column(name = "PR_HOUR")
-	private Double prHour;
-	
-	@FieldInfo(type = EFieldType.DOUBLE, order = 18)
-	@Column(name = "PR_HOUR_TOTAL")
-	private Double prHourTotal;
-	
-	@FieldInfo(type = EFieldType.DOUBLE, order = 19)
-	@Column(name = "TOTAL_HOUR")
-	private Double totalHour;
-	
-	@FieldInfo(type = EFieldType.DOUBLE, order = 20)
-	@Column(name = "TOTAL_CREDIT")
-	private Double totalCredit;
-	
-	public TEACHER_LOAD_ASSIGN_DETAIL() {
-	}
+            @JoinColumn(name = "SEMESTER_PERIOD_ID", referencedColumnName = "ID")})
+    private SEMESTER_PERIOD semesterPeriod;
 
-	public TEACHER_LOAD_ASSIGN getTeacherLoadAssign() {
-		return teacherLoadAssign;
-	}
+    @FieldInfo(type = EFieldType.FK_DIALOG, order = 5)
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "STREAM_ID", referencedColumnName = "ID")})
+    private STREAM stream;
 
-	public void setTeacherLoadAssign(TEACHER_LOAD_ASSIGN teacherLoadAssign) {
-		this.teacherLoadAssign = teacherLoadAssign;
-	}
+    @FieldInfo(type = EFieldType.FK_DIALOG, order = 6)
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "GROUP_ID", referencedColumnName = "ID")})
+    private GROUPS group;
 
-	public EMPLOYEE getTeacher() {
-		return teacher;
-	}
+    @FieldInfo(type = EFieldType.DOUBLE, order = 7)
+    @Column(name = "LC_HOUR")
+    private Double lcHour;
 
-	public void setTeacher(EMPLOYEE teacher) {
-		this.teacher = teacher;
-	}
+    @FieldInfo(type = EFieldType.DOUBLE, order = 8)
+    @Column(name = "LB_HOUR")
+    private Double lbHour;
 
-	public SUBJECT getSubject() {
-		return subject;
-	}
+    @FieldInfo(type = EFieldType.DOUBLE, order = 9)
+    @Column(name = "PR_HOUR")
+    private Double prHour;
 
-	public void setSubject(SUBJECT subject) {
-		this.subject = subject;
-	}
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 10)
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "SEMESTER_ID", referencedColumnName = "ID")})
+    private SEMESTER semester;
 
-	public Integer getLcCredit() {
-		return lcCredit;
-	}
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 11)
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "STUDENT_DIPLOMA_TYPE_ID", referencedColumnName = "ID")})
+    private STUDENT_DIPLOMA_TYPE studentDiplomaType;
 
-	public void setLcCredit(Integer lcCredit) {
-		this.lcCredit = lcCredit;
-	}
+    public TEACHER_LOAD_ASSIGN_DETAIL() {
+    }
 
-	public Integer getLbCredit() {
-		return lbCredit;
-	}
+    public TEACHER_LOAD_ASSIGN getTeacherLoadAssign() {
+        return teacherLoadAssign;
+    }
 
-	public void setLbCredit(Integer lbCredit) {
-		this.lbCredit = lbCredit;
-	}
+    public void setTeacherLoadAssign(TEACHER_LOAD_ASSIGN teacherLoadAssign) {
+        this.teacherLoadAssign = teacherLoadAssign;
+    }
 
-	public Integer getPrCredit() {
-		return prCredit;
-	}
+    public EMPLOYEE getTeacher() {
+        return teacher;
+    }
 
-	public void setPrCredit(Integer prCredit) {
-		this.prCredit = prCredit;
-	}
-	
-	public SEMESTER_PERIOD getSemesterPeriod() {
-		return semesterPeriod;
-	}
+    public void setTeacher(EMPLOYEE teacher) {
+        this.teacher = teacher;
+    }
 
-	public void setSemesterPeriod(SEMESTER_PERIOD semesterPeriod) {
-		this.semesterPeriod = semesterPeriod;
-	}
+    public SUBJECT getSubject() {
+        return subject;
+    }
 
-	public Integer getStudentCount() {
-		return studentCount;
-	}
+    public void setSubject(SUBJECT subject) {
+        this.subject = subject;
+    }
 
-	public void setStudentCount(Integer studentCount) {
-		this.studentCount = studentCount;
-	}
+    public SEMESTER_PERIOD getSemesterPeriod() {
+        return semesterPeriod;
+    }
 
-	public Integer getLcCount() {
-		return lcCount;
-	}
+    public void setSemesterPeriod(SEMESTER_PERIOD semesterPeriod) {
+        this.semesterPeriod = semesterPeriod;
+    }
 
-	public void setLcCount(Integer lcCount) {
-		this.lcCount = lcCount;
-	}
+    public STREAM getStream() {
+        return stream;
+    }
 
-	public Integer getLbCount() {
-		return lbCount;
-	}
+    public void setStream(STREAM stream) {
+        this.stream = stream;
+    }
 
-	public void setLbCount(Integer lbCount) {
-		this.lbCount = lbCount;
-	}
+    public Double getLcHour() {
+        return lcHour;
+    }
 
-	public Integer getPrCount() {
-		return prCount;
-	}
+    public void setLcHour(Double lcHour) {
+        this.lcHour = lcHour;
+    }
 
-	public void setPrCount(Integer prCount) {
-		this.prCount = prCount;
-	}
+    public Double getLbHour() {
+        return lbHour;
+    }
 
-	public Double getLcHour() {
-		return lcHour;
-	}
+    public void setLbHour(Double lbHour) {
+        this.lbHour = lbHour;
+    }
 
-	public void setLcHour(Double lcHour) {
-		this.lcHour = lcHour;
-	}
+    public Double getPrHour() {
+        return prHour;
+    }
 
-	public Double getLcHourTotal() {
-		return lcHourTotal;
-	}
+    public void setPrHour(Double prHour) {
+        this.prHour = prHour;
+    }
 
-	public void setLcHourTotal(Double lcHourTotal) {
-		this.lcHourTotal = lcHourTotal;
-	}
+    public SEMESTER getSemester() {
+        return semester;
+    }
 
-	public Double getLbHour() {
-		return lbHour;
-	}
+    public void setSemester(SEMESTER semester) {
+        this.semester = semester;
+    }
 
-	public void setLbHour(Double lbHour) {
-		this.lbHour = lbHour;
-	}
+    public STUDENT_DIPLOMA_TYPE getStudentDiplomaType() {
+        return studentDiplomaType;
+    }
 
-	public Double getLbHourTotal() {
-		return lbHourTotal;
-	}
+    public void setStudentDiplomaType(STUDENT_DIPLOMA_TYPE studentDiplomaType) {
+        this.studentDiplomaType = studentDiplomaType;
+    }
 
-	public void setLbHourTotal(Double lbHourTotal) {
-		this.lbHourTotal = lbHourTotal;
-	}
+    public GROUPS getGroup() {
+        return group;
+    }
 
-	public Double getPrHour() {
-		return prHour;
-	}
-
-	public void setPrHour(Double prHour) {
-		this.prHour = prHour;
-	}
-
-	public Double getPrHourTotal() {
-		return prHourTotal;
-	}
-
-	public void setPrHourTotal(Double prHourTotal) {
-		this.prHourTotal = prHourTotal;
-	}
-
-	public Double getTotalHour() {
-		return totalHour;
-	}
-
-	public void setTotalHour(Double totalHour) {
-		this.totalHour = totalHour;
-	}
-
-	public Double getTotalCredit() {
-		return totalCredit;
-	}
-
-	public void setTotalCredit(Double totalCredit) {
-		this.totalCredit = totalCredit;
-	}
+    public void setGroup(GROUPS group) {
+        this.group = group;
+    }
 }

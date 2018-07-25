@@ -33,10 +33,6 @@ public class SUBJECT extends AbstractEntity {
             @JoinColumn(name = "STUDY_DIRECT_ID", referencedColumnName = "ID")})
     private STUDY_DIRECT studyDirect;
 
-    @FieldInfo(type = EFieldType.TEXT, isMemo = true, max = 4000, required = false, order = 7, inGrid = false)
-    @Column(name = "DESCR")
-    private String descr;
-
     @FieldInfo(type = EFieldType.FK_COMBO, order = 8)
     @ManyToOne
     @JoinColumns({
@@ -55,10 +51,10 @@ public class SUBJECT extends AbstractEntity {
             @JoinColumn(name = "MODULE_ID", referencedColumnName = "ID")})
     private SUBJECT_MODULE subjectModule;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 11, inGrid = false,required = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 11, inGrid = false, required = false)
     @ManyToOne
     @JoinColumns({
-            @JoinColumn(name = "SUBJECT_CYCLE_ID", referencedColumnName = "ID",nullable = true)})
+            @JoinColumn(name = "SUBJECT_CYCLE_ID", referencedColumnName = "ID", nullable = true)})
     private SUBJECT_CYCLE subjectCycle;
 
     @FieldInfo(type = EFieldType.BOOLEAN, order = 12, required = false, columnWidth = 100)
@@ -129,7 +125,7 @@ public class SUBJECT extends AbstractEntity {
             @JoinColumn(name = "CONTROL_TYPE_ID", referencedColumnName = "ID")})
     private CONTROL_TYPE controlType;
 
-    @FieldInfo(type = EFieldType.INTEGER, order = 27,required = false)
+    @FieldInfo(type = EFieldType.INTEGER, order = 27, required = false)
     @Column(name = "WEEK_NUMBER")
     private Integer weekNumber;
 
@@ -167,14 +163,6 @@ public class SUBJECT extends AbstractEntity {
 
     public void setStudyDirect(STUDY_DIRECT studyDirect) {
         this.studyDirect = studyDirect;
-    }
-
-    public String getDescr() {
-        return descr;
-    }
-
-    public void setDescr(String descr) {
-        this.descr = descr;
     }
 
     public DEPARTMENT getChair() {

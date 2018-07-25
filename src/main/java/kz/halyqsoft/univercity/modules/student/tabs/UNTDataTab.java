@@ -154,23 +154,22 @@ public class UNTDataTab extends VerticalLayout {
     }
 
     private TableWidget createUntRates() throws Exception {
-        ID untCertificateId = null;
-        if (!untCertificateFW.getWidgetModel().isCreateNew()) {
-            UNT_CERTIFICATE untCertificate = (UNT_CERTIFICATE) untCertificateFW.getWidgetModel().getEntity();
-            if (untCertificate != null) {
+
+            TableWidget untRatesTW = new TableWidget(V_UNT_CERT_SUBJECT.class);
+            untRatesTW.addEntityListener(new UntRatesListener());
+            DBTableModel untRatesTM = (DBTableModel) untRatesTW.getWidgetModel();
+
+            untRatesTM.setReadOnly(readOnly);
+            QueryModel untRatesQM = untRatesTM.getQueryModel();
+            ID untCertificateId = ID.valueOf(-1);
+            if (!untCertificateFW.getWidgetModel().isCreateNew()) {
+                UNT_CERTIFICATE untCertificate = (UNT_CERTIFICATE) untCertificateFW.getWidgetModel().getEntity();
                 untCertificateId = untCertificate.getId();
             }
-        }
+            untRatesQM.addWhere("untCertificate", ECriteria.EQUAL, untCertificateId);
 
-        TableWidget untRatesTW = new TableWidget(V_UNT_CERT_SUBJECT.class);
-        untRatesTW.addEntityListener(new UntRatesListener());
-        DBTableModel untRatesTM = (DBTableModel) untRatesTW.getWidgetModel();
+            FormModel untRatesFM = ((DBTableModel) untRatesTW.getWidgetModel()).getFormModel();
 
-        untRatesTM.setReadOnly(readOnly);
-        QueryModel untRatesQM = untRatesTM.getQueryModel();
-        untRatesQM.addWhere("untCertificate", ECriteria.EQUAL, untCertificateId);
-
-        FormModel untRatesFM = ((DBTableModel) untRatesTW.getWidgetModel()).getFormModel();
         return untRatesTW;
     }
 

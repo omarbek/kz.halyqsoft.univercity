@@ -7,9 +7,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import kz.halyqsoft.univercity.entity.beans.USERS;
-import kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE;
-import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
-import kz.halyqsoft.univercity.entity.beans.univercity.USER_DOCUMENT_FILE;
+import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_DATA;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.facade.CommonIDFacadeBean;
@@ -17,6 +15,8 @@ import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.ID;
 import org.r3a.common.entity.file.FileBean;
 import org.r3a.common.entity.query.QueryModel;
+import org.r3a.common.entity.query.from.EJoin;
+import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.AbstractSecureWebUI;
 import org.r3a.common.vaadin.AbstractWebUI;
@@ -73,7 +73,7 @@ public class CommonUtils {
         return null;
     }
 
-    private static EMPLOYEE getEmployee(Map<String, Object> params) {
+    public static EMPLOYEE getEmployee(Map<String, Object> params) {
         try {
             return (EMPLOYEE) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
                     getEntityByNamedQuery("EMPLOYEE.getEmployeeByLogin", params);
@@ -255,5 +255,15 @@ public class CommonUtils {
         semIsNotGoingNowLabel.setCaption(getUILocaleUtil().getMessage("semester.not.going.now"));
         semIsNotGoingNowLabel.setWidthUndefined();
         return semIsNotGoingNowLabel;
+    }
+    public static List<GROUPS> getGroupsByStream(STREAM stream) throws Exception {
+        QueryModel<GROUPS> groupsQM = new QueryModel<>(GROUPS.class);
+        FromItem streamGroupFI = groupsQM.addJoin(EJoin.INNER_JOIN, "id", STREAM_GROUP.class,
+                "group");
+        groupsQM.addWhere(streamGroupFI, "stream", ECriteria.EQUAL, stream.getId());
+        groupsQM.addWhere("deleted",Boolean.FALSE);
+        return SessionFacadeFactory.getSessionFacade(
+                CommonEntityFacadeBean.class).
+                lookup(groupsQM);
     }
 }

@@ -8,9 +8,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT_CYCLE;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
-import org.r3a.common.entity.ID;
 import org.r3a.common.entity.query.QueryModel;
-import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.widget.dialog.AbstractYesButtonListener;
 import org.r3a.common.vaadin.widget.dialog.select.custom.grid.CustomGridSelectDialog;
 
@@ -66,7 +64,8 @@ final class ElectiveSubjectSelectDialog extends CustomGridSelectDialog {
         QueryModel<SUBJECT_CYCLE> subjectCycleQM = new QueryModel<SUBJECT_CYCLE>(SUBJECT_CYCLE.class);
         subjectCycleQM.addOrder("cycleShortName");
         try {
-            BeanItemContainer<SUBJECT_CYCLE> subjectCycleBIC = new BeanItemContainer<SUBJECT_CYCLE>(SUBJECT_CYCLE.class, SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(subjectCycleQM));
+            BeanItemContainer<SUBJECT_CYCLE> subjectCycleBIC = new BeanItemContainer<SUBJECT_CYCLE>(SUBJECT_CYCLE.class,
+                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(subjectCycleQM));
             subjectCycleCB = new ComboBox();
             subjectCycleCB.setCaption(getUILocaleUtil().getCaption("curriculum.component"));
             subjectCycleCB.setContainerDataSource(subjectCycleBIC);

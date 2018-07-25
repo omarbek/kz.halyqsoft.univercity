@@ -33,15 +33,15 @@ public final class StudentFilterPanel extends AbstractFilterPanel {
 			hl.addComponent(af);
 		}
 		
-//		af = getFilterComponent("firstname");
-//		if (af != null) {
-//			hl.addComponent(af);
-//		}
-//
-//		af = getFilterComponent("lastname");
-//		if (af != null) {
-//			hl.addComponent(af);
-//		}
+		af = getFilterComponent("firstname");
+		if (af != null) {
+			hl.addComponent(af);
+		}
+
+		af = getFilterComponent("lastname");
+		if (af != null) {
+			hl.addComponent(af);
+		}
 		
 		af = getFilterComponent("studentStatus");
 		if (af != null) {

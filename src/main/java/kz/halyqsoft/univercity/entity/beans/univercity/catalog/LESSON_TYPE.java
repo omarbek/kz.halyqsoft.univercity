@@ -2,6 +2,7 @@ package kz.halyqsoft.univercity.entity.beans.univercity.catalog;
 
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
+import org.r3a.common.entity.ID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,25 +14,24 @@ import javax.persistence.Entity;
 @Entity
 public class LESSON_TYPE extends AbstractTypeEntity {
 
-	private static final long serialVersionUID = 7789577289166763610L;
-	
-	@FieldInfo(type = EFieldType.TEXT, max = 4, order = 2)
-	@Column(name = "TYPE_SHORT_NAME", nullable = false)
-	private String typeShortName;
-	
-	public LESSON_TYPE() {
-	}
+    public static final ID LECTURE_ID = ID.valueOf(1);
+    public static final ID LABORATORY_ID = ID.valueOf(2);
+    public static final ID PRACTICE_ID = ID.valueOf(3);
 
-	public String getTypeShortName() {
-		return typeShortName;
-	}
+    @FieldInfo(type = EFieldType.TEXT, max = 4, order = 2)
+    @Column(name = "TYPE_SHORT_NAME", nullable = false)
+    private String typeShortName;
 
-	public void setTypeShortName(String typeShortName) {
-		this.typeShortName = typeShortName;
-	}
+    public String getTypeShortName() {
+        return typeShortName;
+    }
 
-	@Override
-	public String toString() {
-		return typeShortName;
-	}
+    public void setTypeShortName(String typeShortName) {
+        this.typeShortName = typeShortName;
+    }
+
+    @Override
+    public String toString() {
+        return typeShortName;
+    }
 }
