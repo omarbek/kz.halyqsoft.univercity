@@ -103,6 +103,58 @@ public class EmployeePdfCreator {
         return new Font(timesNewRoman, fontSize, font);
     }
 
+    public  static StreamResource getStreamResourceFromPdfDocument(PDF_DOCUMENT pdfDocument){
+        String fileName = pdfDocument.getFileName()+"_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
+
+        return new StreamResource(new StreamResource.StreamSource() {
+            @Override
+            public InputStream getStream() {
+                Document docum = new Document();
+
+                QueryModel<PDF_PROPERTY> propertyQM = new QueryModel<>(PDF_PROPERTY.class);
+                FromItem doc = propertyQM.addJoin(EJoin.INNER_JOIN, "pdfDocument", PDF_DOCUMENT.class, "id");
+
+                propertyQM.addWhere(doc, "id", ECriteria.EQUAL, pdfDocument.getId());
+                propertyQM.addOrder("orderNumber");
+                List<PDF_PROPERTY> properties = null;
+                try {
+                    properties = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(propertyQM);
+                    ByteArrayOutputStream byteArrayOutputStream1 = new ByteArrayOutputStream();
+                    PdfWriter pdfWriter = PdfWriter.getInstance(docum, byteArrayOutputStream1);
+
+                    docum.open();
+
+                    Paragraph title = new Paragraph(pdfDocument.getTitle(),
+                            getFont(12, Font.BOLD));
+                    title.setAlignment(Element.ALIGN_CENTER);
+
+                    docum.add(title);
+
+                    for (PDF_PROPERTY property : properties) {
+                        Paragraph paragraph = new Paragraph(property.getText(),
+                                getFont(Integer.parseInt(property.getSize().toString()), CommonUtils.getFontMap(property.getFont().toString())));
+
+                        if (property.isCenter() == true) {
+                            paragraph.setAlignment(Element.ALIGN_CENTER);
+                        }
+                        paragraph.setSpacingBefore(property.getY());
+                        paragraph.setIndentationLeft(property.getX());
+
+                        docum.add(paragraph);
+                    }
+
+                    pdfWriter.close();
+                    docum.close();
+                    return new ByteArrayInputStream(byteArrayOutputStream1.toByteArray());
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+        }, fileName);
+    }
+
     public static StreamResource getStreamResourceFromByte(byte[] file, String fileName){
          return new StreamResource(new StreamResource.StreamSource() {
              @Override

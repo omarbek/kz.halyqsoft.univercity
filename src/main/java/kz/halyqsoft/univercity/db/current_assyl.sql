@@ -235,3 +235,5 @@ insert into document_signer_status (id, status_name) values (nextval('s_document
 insert into document_signer_status (id, status_name) values (nextval('s_document_signer_status') , 'отказано на доработку');
 insert into document_signer_status (id, status_name) values (nextval('s_document_signer_status') , 'отказано окончательно');
 insert into document_signer_status (id, status_name) values (nextval('s_document_signer_status') , 'в процессе');
+
+

@@ -2,10 +2,7 @@ package kz.halyqsoft.univercity.utils;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.combobox.FilteringMode;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.TextField;
+import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
@@ -141,6 +138,9 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
         cb.setContainerDataSource(educationTypeBIC);
         studentFilterPanel.addFilterComponent("educationType", cb);
 
+
+
+
         return studentFilterPanel;
     }
 
@@ -152,6 +152,12 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
 
         getContent().addComponent(filterPanel);
         getContent().setComponentAlignment(filterPanel, Alignment.TOP_CENTER);
+
+        Button saveToTable = new Button();
+
+
+
+        getContent().addComponent(saveToTable);
 
         studentGW = new GridWidget(VStudent.class);
         studentGW.addEntityListener(this);

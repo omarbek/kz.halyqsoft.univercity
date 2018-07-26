@@ -6,13 +6,16 @@ import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfSignatureAppearance;
 import com.itextpdf.text.pdf.PdfStamper;
 import com.itextpdf.text.pdf.security.*;
+import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.server.FileResource;
 import com.vaadin.server.Page;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.modules.workflow.WorkflowCommonUtils;
 import kz.halyqsoft.univercity.modules.workflow.views.InOnSignView;
+import kz.halyqsoft.univercity.modules.workflow.views.utils.EmployeePdfCreator;
 import kz.halyqsoft.univercity.utils.WindowUtils;
 import org.bouncycastle.openssl.PasswordException;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
@@ -21,10 +24,10 @@ import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.event.EntityListener;
 import org.r3a.common.entity.query.QueryModel;
+import org.r3a.common.vaadin.AbstractWebUI;
 import org.r3a.common.vaadin.widget.dialog.AbstractDialog;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
-
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -36,6 +39,8 @@ import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
+
+@VaadinServletConfiguration(productionMode = false, ui = AbstractWebUI.class, widgetset="com.example.tester.widgetset.TesterWidgetset")
 public class SignDocumentViewDialog extends AbstractDialog implements EntityListener{
     private final String title;
     private InOnSignView prevView;
@@ -43,10 +48,6 @@ public class SignDocumentViewDialog extends AbstractDialog implements EntityList
     private DOCUMENT document;
 
     private File keyFile;
-
-
-    private static String FORM = "";
-    private static String CERTIFICATE = "";
     private static String DEST = "signed_by_%s.pdf";
 
 
@@ -147,6 +148,16 @@ public class SignDocumentViewDialog extends AbstractDialog implements EntityList
                 }
             }
         });
+
+        Embedded pdf = new Embedded(null, EmployeePdfCreator.createResourceStudent(document));
+        pdf.setSizeFull();
+        pdf.setMimeType("application/pdf");
+        pdf.setType(2);
+        pdf.setSizeFull();
+        pdf.setHeight(700, Unit.PIXELS);
+        getContent().removeAllComponents();
+        getContent().addComponent(pdf);
+
         getContent().addComponent(documentSignerStatusCB);
 
     }
