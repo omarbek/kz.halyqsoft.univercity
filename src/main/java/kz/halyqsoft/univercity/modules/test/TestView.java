@@ -2,6 +2,7 @@ package kz.halyqsoft.univercity.modules.test;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.*;
+import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.USER_TYPE;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -9,6 +10,11 @@ import org.r3a.common.entity.beans.AbstractTask;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.dialog.Message;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class TestView extends AbstractTaskView {
 
@@ -18,6 +24,26 @@ public class TestView extends AbstractTaskView {
 
     public TestView(AbstractTask task) throws Exception {
         super(task);
+    }
+
+    public static void main(String[] args) {
+        List<Integer> repeatedIds=new ArrayList<>();
+        repeatedIds.add(1);
+        repeatedIds.add(2);
+        repeatedIds.add(1);
+        Set<Integer> ids = new HashSet<>();
+        for (Integer repeatedId : repeatedIds) {
+            Integer id = getId(ids, repeatedId);
+            System.out.println(id);
+        }
+    }
+    private static Integer getId(Set<Integer> ids, Integer id) {
+        if (ids.contains(id)) {
+            id = getId(ids, ++id);
+        } else {
+            ids.add(id);
+        }
+        return id;
     }
 
     @Override
@@ -89,7 +115,14 @@ public class TestView extends AbstractTaskView {
         getContent().addComponent(componentHL);
         getContent().setComponentAlignment(componentHL, Alignment.MIDDLE_CENTER);
 
-
+        Button usersToLower=new Button("to Lower");
+        usersToLower.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                QueryModel<USERS> usersQM=new QueryModel<>(USERS.class);
+//                usersQM.addWhere();
+            }
+        });
+        getContent().addComponent(usersToLower);
     }
-
 }

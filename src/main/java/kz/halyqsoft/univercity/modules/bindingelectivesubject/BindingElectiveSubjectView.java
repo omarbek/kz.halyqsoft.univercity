@@ -7,45 +7,57 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
 import kz.halyqsoft.univercity.entity.beans.univercity.CATALOG_ELECTIVE_SUBJECTS;
 import kz.halyqsoft.univercity.entity.beans.univercity.ELECTIVE_BINDED_SUBJECT;
+import kz.halyqsoft.univercity.entity.beans.univercity.PAIR_SUBJECT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SPECIALITY;
 import kz.halyqsoft.univercity.filter.FElectiveFilter;
 import kz.halyqsoft.univercity.filter.panel.ElectiveFilterPanel;
 import kz.halyqsoft.univercity.utils.CommonUtils;
+import kz.halyqsoft.univercity.utils.EntityUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.beans.AbstractTask;
-import org.r3a.common.entity.event.EntityListener;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.from.EJoin;
 import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.ERefreshType;
-import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 import org.r3a.common.vaadin.widget.filter2.FilterPanelListener;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 import org.r3a.common.vaadin.widget.toolbar.IconToolbar;
 
-import javax.persistence.NoResultException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
  * @author Omarbek
  * @created on 19.06.2018
  */
-public class BindingElectiveSubjectView extends AbstractTaskView implements FilterPanelListener, EntityListener {
-
+public class BindingElectiveSubjectView extends AbstractTaskView implements FilterPanelListener {
     private ElectiveFilterPanel filterPanel;
-
     private ComboBox specCB;
     private ComboBox yearCB;
     private GridWidget electiveSubjectsGW;
+
+    public ComboBox getSpecCB() {
+        return specCB;
+    }
+
+    public void setSpecCB(ComboBox specCB) {
+        this.specCB = specCB;
+    }
+
+    public ComboBox getYearCB() {
+        return yearCB;
+    }
+
+    public void setYearCB(ComboBox yearCB) {
+        this.yearCB = yearCB;
+    }
 
     public BindingElectiveSubjectView(AbstractTask task) throws Exception {
         super(task);
@@ -56,43 +68,6 @@ public class BindingElectiveSubjectView extends AbstractTaskView implements Filt
     public void initView(boolean b) throws Exception {
         filterPanel.addFilterPanelListener(this);
         HorizontalLayout componentHL = new HorizontalLayout();
-
-//        Button bindButton = new Button(getUILocaleUtil().getCaption("creation.bind"));
-//        bindButton.addClickListener(new Button.ClickListener() {
-//            @Override
-//            public void buttonClick(Button.ClickEvent clickEvent) {
-//                SUBJECT firstSubject = (SUBJECT) specCB.getValue();
-//                SUBJECT secondSubject = (SUBJECT) yearCB.getValue();
-//                SEMESTER semester = (SEMESTER) semesterCB.getValue();
-//
-//                if (secondSubject == null || firstSubject == null || semester == null) {
-//                    Message.showError(getUILocaleUtil().getMessage("error.required.fields"));
-//                    return;
-//                }
-//                if (firstSubject.equals(secondSubject)) {
-//                    Message.showError("equals");//TODO
-//                    return;
-//                }
-//
-//                ELECTIVE_BINDED_SUBJECT bindedSubject = new ELECTIVE_BINDED_SUBJECT();
-//                bindedSubject.setSecondSubject(secondSubject);
-//                bindedSubject.setFirstSubject(firstSubject);
-//                bindedSubject.setSemester(semester);
-//                bindedSubject.setCreated(new Date());
-//                Message.showConfirm(getUILocaleUtil().getMessage("confirmation.save"), new AbstractYesButtonListener() {
-//                    @Override
-//                    public void buttonClick(Button.ClickEvent clickEvent) {
-//                        try {
-//                            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
-//                                    create(bindedSubject);
-//                        } catch (Exception e) {
-//                            CommonUtils.showMessageAndWriteLog("Unable to bind subjects", e);
-//                        }
-//                        refresh();
-//                    }
-//                });
-//            }
-//        });
 
         specCB = new ComboBox();
         specCB.setNullSelectionAllowed(true);
@@ -124,22 +99,17 @@ public class BindingElectiveSubjectView extends AbstractTaskView implements Filt
         getContent().setComponentAlignment(componentHL, Alignment.MIDDLE_CENTER);
 
         electiveSubjectsGW = new GridWidget(ELECTIVE_BINDED_SUBJECT.class);
-        electiveSubjectsGW.addEntityListener(this);
-        electiveSubjectsGW.setButtonVisible(IconToolbar.EDIT_BUTTON, false);
+        electiveSubjectsGW.addEntityListener(new CreateElectiveSubjectEntity());
         electiveSubjectsGW.setButtonVisible(IconToolbar.PREVIEW_BUTTON, false);
         electiveSubjectsGW.setButtonVisible(IconToolbar.REFRESH_BUTTON, false);
         electiveSubjectsGW.setButtonEnabled(IconToolbar.ADD_BUTTON, false);
+        electiveSubjectsGW.setButtonEnabled(IconToolbar.EDIT_BUTTON, false);
 
         DBGridModel electiveSubjectGM = (DBGridModel) electiveSubjectsGW.getWidgetModel();
-        electiveSubjectGM.setRowNumberVisible(true);
-        electiveSubjectGM.setTitleVisible(false);
         electiveSubjectGM.setMultiSelect(true);
         electiveSubjectGM.setRefreshType(ERefreshType.MANUAL);
+        refresh();
 
-        FElectiveFilter ef = (FElectiveFilter) filterPanel.getFilterBean();
-        if (ef.hasFilter()) {
-            doFilter(ef);
-        }
         getContent().addComponent(electiveSubjectsGW);
         getContent().setComponentAlignment(electiveSubjectsGW, Alignment.MIDDLE_CENTER);
 
@@ -161,19 +131,14 @@ public class BindingElectiveSubjectView extends AbstractTaskView implements Filt
                         getId());
                 list = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(electiveBindedSubjectQM);
                 electiveSubjectsGW.setButtonEnabled(IconToolbar.ADD_BUTTON, true);
+                electiveSubjectsGW.setButtonEnabled(IconToolbar.EDIT_BUTTON,true);
             } catch (Exception ex) {
                 CommonUtils.showMessageAndWriteLog("Unable to load elective subject list", ex);
             }
         } else {
             electiveSubjectsGW.setButtonEnabled(IconToolbar.ADD_BUTTON, false);
         }
-
-        ((DBGridModel) electiveSubjectsGW.getWidgetModel()).setEntities(list);
-        try {
-            electiveSubjectsGW.refresh();
-        } catch (Exception ex) {
-            CommonUtils.showMessageAndWriteLog("Unable to refresh elective subject grid", ex);
-        }
+        refresh(list);
     }
 
     @Override
@@ -192,67 +157,49 @@ public class BindingElectiveSubjectView extends AbstractTaskView implements Filt
     }
 
     public void refresh() {
-        try {
-            electiveSubjectsGW.refresh();
-            doFilter(filterPanel.getFilterBean());
-        } catch (Exception e) {
-            Message.showError(e.getMessage());
+        FElectiveFilter ef = (FElectiveFilter) filterPanel.getFilterBean();
+        if (ef.hasFilter()) {
+            doFilter(ef);
         }
     }
 
-    @Override
-    public boolean preSave(Object source, Entity entity, boolean isNew, int buttonId) {
-        if (source.equals(electiveSubjectsGW)) {
-            try {
-                QueryModel<CATALOG_ELECTIVE_SUBJECTS> catQM = new QueryModel<>(CATALOG_ELECTIVE_SUBJECTS.class);
-                SPECIALITY spec = (SPECIALITY) specCB.getValue();
-                ENTRANCE_YEAR year = (ENTRANCE_YEAR) yearCB.getValue();
-                catQM.addWhere("speciality", ECriteria.EQUAL, spec.getId());
-                catQM.addWhere("entranceYear", ECriteria.EQUAL, year.getId());
-                CATALOG_ELECTIVE_SUBJECTS cat = getCat(catQM, spec, year);
-                ELECTIVE_BINDED_SUBJECT electiveBindedSubject = (ELECTIVE_BINDED_SUBJECT) entity;
-                electiveBindedSubject.setCatalogElectiveSubjects(cat);
-                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(electiveBindedSubject);
-            } catch (Exception e) {
-                e.printStackTrace();//TODO catch
+    private class CreateElectiveSubjectEntity extends EntityUtils {
+
+        @Override
+        protected void init(Object source, Entity e, boolean isNew) throws Exception {
+            ELECTIVE_BINDED_SUBJECT electiveBinded = (ELECTIVE_BINDED_SUBJECT) e;
+            new BindingElectiveSubjectEdit(electiveBinded, isNew,BindingElectiveSubjectView.this);
+        }
+
+        @Override
+        protected GridWidget getGridWidget() {
+            return electiveSubjectsGW;
+        }
+
+        @Override
+        protected String getModuleName() {
+            return "binded elective subject";
+        }
+
+        @Override
+        protected Class<? extends Entity> getEntityClass() {
+            return ELECTIVE_BINDED_SUBJECT.class;
+        }
+
+        @Override
+        protected void refresh() throws Exception {
+            BindingElectiveSubjectView.this.refresh();
+        }
+
+        @Override
+        protected void removeChildrenEntity(List<Entity> delList) throws Exception {
+            for (Entity entity : delList) {
+                QueryModel<PAIR_SUBJECT> pairSubjectQM = new QueryModel<>(PAIR_SUBJECT.class);
+                pairSubjectQM.addWhere("electiveBindedSubject", ECriteria.EQUAL, entity.getId());
+                List<PAIR_SUBJECT> subjects = SessionFacadeFactory.getSessionFacade(
+                        CommonEntityFacadeBean.class).lookup(pairSubjectQM);
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(subjects);
             }
         }
-        return false;
-    }
-
-    private CATALOG_ELECTIVE_SUBJECTS getCat(QueryModel<CATALOG_ELECTIVE_SUBJECTS> catQM,
-                                             SPECIALITY spec, ENTRANCE_YEAR year) throws Exception {
-        CATALOG_ELECTIVE_SUBJECTS cat;
-        try {
-            cat = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(catQM);
-        } catch (NoResultException ex) {
-            cat = new CATALOG_ELECTIVE_SUBJECTS();
-            cat.setCreated(new Date());
-            cat.setDeleted(Boolean.FALSE);
-            cat.setEntranceYear(year);
-            cat.setSpeciality(spec);
-            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(cat);
-        }
-        return cat;
-    }
-
-    @Override
-    public boolean preDelete(Object source, List<Entity> entities, int buttonId) {
-        if (source.equals(electiveSubjectsGW)) {
-            for (Entity entity : entities) {
-                try {
-                    ELECTIVE_BINDED_SUBJECT electiveBindedSubject = SessionFacadeFactory.getSessionFacade(
-                            CommonEntityFacadeBean.class).lookup(ELECTIVE_BINDED_SUBJECT.class,
-                            entity.getId());
-                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(
-                            electiveBindedSubject);
-
-                } catch (Exception e) {
-                    Message.showError(e.getMessage());
-                }
-            }
-            refresh();
-        }
-        return false;
     }
 }

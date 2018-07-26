@@ -142,6 +142,9 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.CARD</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT_MODULE</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.EDUCATION_MODULE_TYPE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.SHIFT_STUDY_YEAR</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.LESSON_TIME</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.SHIFT</class>
 
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_SPECIALITY</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_ORGANIZATION</class>
@@ -200,6 +203,8 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_LOAD_TO_CHAIR_COUNT</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_LOAD_TO_CHAIR_COUNT_ALL</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_GROUPS_CREATION_NEEDED</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.VGraduateEmployment</class>
+
 
         <class>kz.halyqsoft.univercity.entity.beans.univercity.AbstractSpiderEntity</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.AbstractStudentEntity</class>
@@ -251,7 +256,6 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.TEACHER_LOAD_CALC_DETAIL</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.TEACHER_LOAD_ASSIGN</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.TEACHER_LOAD_ASSIGN_DETAIL</class>
-        <class>kz.halyqsoft.univercity.entity.beans.univercity.SCHEDULE</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.SCHEDULE_DETAIL</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.SCHEDULE_LOG</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.TESTING_SUBJECT</class>
@@ -316,6 +320,8 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.SPECIALITY_CORPUS</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.STREAM</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.STREAM_GROUP</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.PAIR_SUBJECT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.GRADUATE_EMPLOYMENT</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.PDF_DOCUMENT_SIGNER_POST</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_IMPORTANCE</class>
@@ -327,9 +333,9 @@
         <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
         <properties>
             <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
-            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/univer"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/realdb"/>
             <property name="javax.persistence.jdbc.user" value="postgres"/>
-            <property name="javax.persistence.jdbc.password" value="admin"/>
+            <property name="javax.persistence.jdbc.password" value="ukpu18!"/>
             <!--<property name="javax.persistence.jdbc.user" value="${javax.persistence.jdbc.user}"/>-->
             <!--<property name="javax.persistence.jdbc.password" value="${javax.persistence.jdbc.password}"/>-->
             <property name="eclipselink.connection-pool.default.initial" value="1"/>

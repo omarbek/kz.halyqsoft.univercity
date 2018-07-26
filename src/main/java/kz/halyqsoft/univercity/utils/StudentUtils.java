@@ -54,11 +54,23 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
         studentFilterPanel = new StudentFilterPanel(new FStudentFilter());
         studentFilterPanel.addFilterPanelListener(this);
         studentFilterPanel.setImmediate(true);
+
         setBackButtonVisible(false);
+
         TextField tf = new TextField();
         tf.setNullRepresentation("");
         tf.setNullSettingAllowed(true);
         studentFilterPanel.addFilterComponent("code", tf);
+
+        tf = new TextField();
+        tf.setNullRepresentation("");
+        tf.setNullSettingAllowed(true);
+        studentFilterPanel.addFilterComponent("firstname", tf);
+
+        tf = new TextField();
+        tf.setNullRepresentation("");
+        tf.setNullSettingAllowed(true);
+        studentFilterPanel.addFilterComponent("lastname", tf);
 
         ComboBox cb = new ComboBox();
         cb.setNullSelectionAllowed(true);
@@ -284,6 +296,22 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
         if (sf.getCode() != null && sf.getCode().trim().length() >= 2) {
             sb.append(" and lower(stu.user_code) like '");
             sb.append(sf.getCode().trim().toLowerCase());
+            sb.append("%'");
+        }
+        if (sf.getFirstname() != null && sf.getFirstname().trim().length() >= 3) {
+            if (sb.length() > 0) {
+                sb.append(" and ");
+            }
+            sb.append(" and stu.FIRST_NAME ilike '");
+            sb.append(sf.getFirstname().trim());
+            sb.append("%'");
+        }
+        if (sf.getLastname() != null && sf.getLastname().trim().length() >= 3) {
+            if (sb.length() > 0) {
+                sb.append(" and ");
+            }
+            sb.append(" and stu.LAST_NAME ilike '");
+            sb.append(sf.getLastname().trim());
             sb.append("%'");
         }
         if (sf.getCard() != null) {

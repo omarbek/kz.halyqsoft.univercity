@@ -9,15 +9,8 @@ import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
 
+import javax.persistence.*;
 import java.util.Date;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.ManyToOne;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 /**
  * @author Omarbek
@@ -94,11 +87,15 @@ public class V_EMPLOYEE_DEPT extends AbstractEntity {
     @Temporal(TemporalType.DATE)
     private Date dismissDate;
 	
-	@FieldInfo(type = EFieldType.BOOLEAN, order = 15, required = false, inGrid = false)
+	@FieldInfo(type = EFieldType.BOOLEAN, order = 15, required = false)
 	@Column(name = "ADVISER", nullable = false)
     private boolean adviser;
+
+	@FieldInfo(type = EFieldType.BOOLEAN, order = 16, required = false)
+	@Column(name = "LECTURER", nullable = false)
+	private boolean lecturer;
 	
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 16, required = false, inEdit = false, inGrid = false, inView = false)
+	@FieldInfo(type = EFieldType.FK_COMBO, order = 17, required = false, inEdit = false, inGrid = false, inView = false)
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "PARENT_ID", referencedColumnName = "ID")})
@@ -233,5 +230,13 @@ public class V_EMPLOYEE_DEPT extends AbstractEntity {
 
 	public void setParent(EMPLOYEE_DEPT parent) {
 		this.parent = parent;
+	}
+
+	public boolean isLecturer() {
+		return lecturer;
+	}
+
+	public void setLecturer(boolean lecturer) {
+		this.lecturer = lecturer;
 	}
 }

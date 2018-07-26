@@ -1,18 +1,12 @@
 package kz.halyqsoft.univercity.modules.checkstudents;
 
-import com.vaadin.ui.Button;
 import kz.halyqsoft.univercity.entity.beans.USERS;
-import kz.halyqsoft.univercity.entity.beans.USER_ROLES;
-import kz.halyqsoft.univercity.entity.beans.univercity.*;
-import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.beans.AbstractTask;
 import org.r3a.common.entity.event.EntityListener;
 import org.r3a.common.entity.query.QueryModel;
-import org.r3a.common.entity.query.from.EJoin;
-import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.ERefreshType;
@@ -22,12 +16,16 @@ import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 import org.r3a.common.vaadin.widget.toolbar.IconToolbar;
 
 import javax.persistence.NoResultException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public class CheckStudentsView  extends AbstractTaskView implements EntityListener{
+public class CheckStudentsView extends AbstractTaskView implements EntityListener {
 
     private GridWidget gridWidget;
     private DBGridModel dbGridModel;
+
     public CheckStudentsView(AbstractTask task) throws Exception {
         super(task);
     }
@@ -37,7 +35,7 @@ public class CheckStudentsView  extends AbstractTaskView implements EntityListen
         gridWidget = new GridWidget(USERS.class);
         gridWidget.setImmediate(true);
         gridWidget.addEntityListener(this);
-        gridWidget.setButtonVisible(IconToolbar.ADD_BUTTON , false);
+        gridWidget.setButtonVisible(IconToolbar.ADD_BUTTON, false);
         gridWidget.setButtonVisible(IconToolbar.EDIT_BUTTON, false);
         gridWidget.setMultiSelect(true);
 
@@ -48,11 +46,11 @@ public class CheckStudentsView  extends AbstractTaskView implements EntityListen
         getContent().addComponent(gridWidget);
     }
 
-    public class EntityStore{
+    public class EntityStore {
         public String fieldName;
         public Class<? extends Entity> className;
 
-        public EntityStore(Class<? extends Entity> className , String fieldName) {
+        public EntityStore(Class<? extends Entity> className, String fieldName) {
             this.fieldName = fieldName;
             this.className = className;
         }
@@ -170,55 +168,48 @@ public class CheckStudentsView  extends AbstractTaskView implements EntityListen
         }
     }
 
-    public Entity getFromDB(Entity entity ,Class<? extends Entity> className , String fieldName){
+    public Entity getFromDB(Entity entity, Class<? extends Entity> className, String fieldName) {
         QueryModel queryModel = new QueryModel(className);
-        queryModel.addWhere(fieldName ,ECriteria.EQUAL , entity.getId());
-        try{
+        queryModel.addWhere(fieldName, ECriteria.EQUAL, entity.getId());
+        try {
             return SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(queryModel);
-        }catch (NoResultException noe)
-        {
+        } catch (NoResultException noe) {
             System.out.println("No result : " + noe.getMessage());
-        }catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
         return null;
     }
 
-    public List<Entity> getAllFromDB(Entity entity ,Class<? extends Entity> className , String fieldName){
+    public List<Entity> getAllFromDB(Entity entity, Class<? extends Entity> className, String fieldName) {
         QueryModel queryModel = new QueryModel(className);
-        queryModel.addWhere(fieldName ,ECriteria.EQUAL , entity.getId());
-        try{
+        queryModel.addWhere(fieldName, ECriteria.EQUAL, entity.getId());
+        try {
             return SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(queryModel);
-        }catch (NoResultException noe)
-        {
+        } catch (NoResultException noe) {
             System.out.println("No result : " + noe.getMessage());
-        }catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
         return null;
     }
 
-    public void delete(Entity entity ){
-        try{
+    public void delete(Entity entity) {
+        try {
             SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(entity);
-        }catch (Exception e)
-        {
+        } catch (Exception e) {
             Message.showError(e.getMessage());
             e.printStackTrace();
         }
     }
 
 
-
-    public void refresh(){
-        try{
+    public void refresh() {
+        try {
             dbGridModel.setEntities(getStudents());
-        }catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -230,20 +221,17 @@ public class CheckStudentsView  extends AbstractTaskView implements EntityListen
     }
 
 
+    private List<USERS> getStudents() {
 
-
-    private List<USERS> getStudents(){
-
-        String sql="select usr.* from users usr " +
+        String sql = "select usr.* from users usr " +
                 "INNER JOIN student stu on stu.id=usr.id " +
                 "where usr.id not in (select id from v_student) and usr.user_type_id=2 " +
                 "and stu.category_id=1 ";
         List<USERS> list = new ArrayList<>();
-        try{
+        try {
             Map<Integer, Object> params = new HashMap<>();
-            list = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(sql,params,USERS.class);
-        }catch (Exception e)
-        {
+            list = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(sql, params, USERS.class);
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return list;

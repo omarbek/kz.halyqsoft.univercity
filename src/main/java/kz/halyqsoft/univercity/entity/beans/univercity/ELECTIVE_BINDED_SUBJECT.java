@@ -24,36 +24,8 @@ public class ELECTIVE_BINDED_SUBJECT extends AbstractEntity {
     @FieldInfo(type = EFieldType.FK_COMBO, order = 2)
     @ManyToOne
     @JoinColumns({
-            @JoinColumn(name = "FIRST_SUBJECT_ID", referencedColumnName = "ID")})
-    private SUBJECT firstSubject;
-
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 3)
-    @ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "SECOND_SUBJECT_ID", referencedColumnName = "ID")})
-    private SUBJECT secondSubject;
-
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 4)
-    @ManyToOne
-    @JoinColumns({
             @JoinColumn(name = "SEMESTER_ID", referencedColumnName = "ID")})
     private SEMESTER semester;
-
-    public SUBJECT getFirstSubject() {
-        return firstSubject;
-    }
-
-    public void setFirstSubject(SUBJECT firstSubject) {
-        this.firstSubject = firstSubject;
-    }
-
-    public SUBJECT getSecondSubject() {
-        return secondSubject;
-    }
-
-    public void setSecondSubject(SUBJECT secondSubject) {
-        this.secondSubject = secondSubject;
-    }
 
     public SEMESTER getSemester() {
         return semester;

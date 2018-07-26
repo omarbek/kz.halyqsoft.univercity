@@ -47,8 +47,4 @@ public class SEMESTER_SUBJECT extends AbstractEntity {
 		this.subject = subject;
 	}
 
-	@Override
-	public String toString() {
-		return subject.getNameRU();
-	}
 }

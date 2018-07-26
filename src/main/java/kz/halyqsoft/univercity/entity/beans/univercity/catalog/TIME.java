@@ -1,6 +1,8 @@
 package kz.halyqsoft.univercity.entity.beans.univercity.catalog;
 
 import org.r3a.common.entity.AbstractEntity;
+import org.r3a.common.entity.EFieldType;
+import org.r3a.common.entity.FieldInfo;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,36 +13,37 @@ import javax.persistence.Entity;
  */
 @Entity
 public class TIME extends AbstractEntity {
-	
-	private static final long serialVersionUID = 1026235979423190728L;
 
-	@Column(name = "TIME_VALUE", nullable = false)
+    private static final long serialVersionUID = 1026235979423190728L;
+
+    @Column(name = "TIME_VALUE", nullable = false)
     private double timeValue;
-	
-	@Column(name = "TIME_NAME", nullable = false)
-	private String timeName;
 
-	public TIME() {
-	}
+    @FieldInfo(type = EFieldType.TEXT, min = 4, max = 5)
+    @Column(name = "TIME_NAME", nullable = false)
+    private String timeName;
 
-	public double getTimeValue() {
-		return timeValue;
-	}
+    public TIME() {
+    }
 
-	public void setTimeValue(double timeValue) {
-		this.timeValue = timeValue;
-	}
+    public double getTimeValue() {
+        return timeValue;
+    }
 
-	public String getTimeName() {
-		return timeName;
-	}
+    public void setTimeValue(double timeValue) {
+        this.timeValue = timeValue;
+    }
 
-	public void setTimeName(String timeName) {
-		this.timeName = timeName;
-	}
+    public String getTimeName() {
+        return timeName;
+    }
 
-	@Override
-	public String toString() {
-		return timeName;
-	}
+    public void setTimeName(String timeName) {
+        this.timeName = timeName;
+    }
+
+    @Override
+    public String toString() {
+        return timeName;
+    }
 }
