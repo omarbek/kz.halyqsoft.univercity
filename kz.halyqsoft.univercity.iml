@@ -43,6 +43,10 @@
     <orderEntry type="library" name="Maven: org.bouncycastle:bcprov-jdk15on:1.47" level="project" />
     <orderEntry type="library" name="Maven: org.bouncycastle:bcmail-jdk15on:1.47" level="project" />
     <orderEntry type="library" name="Maven: org.bouncycastle:bcpkix-jdk15on:1.47" level="project" />
+    <orderEntry type="library" name="Maven: com.itextpdf:itextpdf:5.3.2" level="project" />
+    <orderEntry type="library" name="Maven: org.bouncycastle:bcprov-jdk15on:1.47" level="project" />
+    <orderEntry type="library" name="Maven: org.bouncycastle:bcmail-jdk15on:1.47" level="project" />
+    <orderEntry type="library" name="Maven: org.bouncycastle:bcpkix-jdk15on:1.47" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: javax.servlet:javax.servlet-api:4.0.0" level="project" />
     <orderEntry type="library" name="Maven: com.vaadin:vaadin-server:7.7.9" level="project" />
     <orderEntry type="library" name="Maven: com.vaadin:vaadin-sass-compiler:0.9.13" level="project" />
