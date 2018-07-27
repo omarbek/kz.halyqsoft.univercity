@@ -59,7 +59,7 @@ public class EmployeePdfCreator {
 
                     for (PDF_PROPERTY property : properties) {
 
-                        Map<String,List<String>>map = new HashMap();
+                        Map<String,List>map = new HashMap();
                         String jsonText = "";
                         if(property.getText().toCharArray()[0]=='$'){
 
@@ -74,30 +74,38 @@ public class EmployeePdfCreator {
                             if(!jsonText.equals("")){
                                 try {
 
-                                    String[]json = jsonText.split("(?<=})");
+                                    String[]json = jsonText.split(",");
                                     for(String js : json){
-                                        Map tempMap = JsonUtils.toMap(new JSONObject(json));
-                                        /*for(String key : tempMap.keySet()){
-
-                                        }*/
+                                        Map<String,Object> tempMap = JsonUtils.toMap(new JSONObject(js));
+                                        for(String key : tempMap.keySet()){
+                                            if(map.get(key)==null){
+                                                map.put(key,new ArrayList<>());
+                                            }
+                                            map.get(key).add(tempMap.get(key));
+                                        }
                                     }
+
+                                    System.out.println(map);
                                 }catch (JSONException e){
                                     e.printStackTrace();
                                 }
                             }
                         }
+                        if(map.keySet().size()>0){
 
-                        String text = setReplaced(property.getText(), document.getCreatorEmployee());
-                        Paragraph paragraph = new Paragraph(text,
-                                getFont(Integer.parseInt(property.getSize().toString()), CommonUtils.getFontMap(property.getFont().toString())));
+                        }else{
+                            String text = setReplaced(property.getText(), document.getCreatorEmployee());
+                            Paragraph paragraph = new Paragraph(text,
+                                    getFont(Integer.parseInt(property.getSize().toString()), CommonUtils.getFontMap(property.getFont().toString())));
 
-                        if (property.isCenter() == true) {
-                            paragraph.setAlignment(Element.ALIGN_CENTER);
+                            if (property.isCenter() == true) {
+                                paragraph.setAlignment(Element.ALIGN_CENTER);
+                            }
+                            paragraph.setSpacingBefore(property.getY());
+                            paragraph.setIndentationLeft(property.getX());
+
+                            docum.add(paragraph);
                         }
-                        paragraph.setSpacingBefore(property.getY());
-                        paragraph.setIndentationLeft(property.getX());
-
-                        docum.add(paragraph);
                     }
 
                     pdfWriter.close();
