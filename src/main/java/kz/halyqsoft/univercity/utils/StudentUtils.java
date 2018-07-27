@@ -43,10 +43,11 @@ import java.util.*;
 public abstract class StudentUtils extends AbstractFormWidgetView implements EntityListener, FilterPanelListener {
 
     private StudentFilterPanel filterPanel;
-    private GridWidget studentGW;
     private StudentOrApplicantView studentOrApplicantView;
     private HorizontalLayout buttonsHL;
     private int categoryType;
+
+    protected GridWidget studentGW;
 
     public void setFilterPanel(StudentFilterPanel filterPanel) {
         this.filterPanel = filterPanel;

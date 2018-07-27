@@ -8,9 +8,4 @@ import javax.persistence.Entity;
  */
 @Entity
 public class DORM_RULE_VIOLATION_TYPE extends AbstractTypeEntity {
-
-	private static final long serialVersionUID = -6258068589386732193L;
-
-	public DORM_RULE_VIOLATION_TYPE() {
-	}
 }
