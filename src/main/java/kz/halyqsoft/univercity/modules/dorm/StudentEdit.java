@@ -494,7 +494,8 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         });
         inFL.addComponent(costL);
 
-        inOrMoveDF = new DateField(getUILocaleUtil().getCaption("date") + " " + getUILocaleUtil().getCaption("dorm.in.or.move"));
+        inOrMoveDF = new DateField(getUILocaleUtil().getCaption("date") + "\n<br>" + getUILocaleUtil().getCaption("dorm.in.or.move"));
+        inOrMoveDF.setCaptionAsHtml(true);
         inOrMoveDF.setRequired(true);
         inOrMoveDF.setValue(new Date());
         inOrMoveDF.setWidth(245, Unit.PIXELS);
@@ -854,17 +855,19 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
 
             @Override
             public void buttonClick(ClickEvent event) {
-                if ((violationDF.getValue() != null && violationTypeCB.getValue() != null) || (outDF.getValue() != null && outTypeCB.getValue() != null)) {
+                if ((violationDF.getValue() != null && violationTypeCB.getValue() != null)
+                        || (outDF.getValue() != null && outTypeCB.getValue() != null)) {
                     try {
-                        QueryModel<DORM_STUDENT> studentQM = new QueryModel<DORM_STUDENT>(DORM_STUDENT.class);
-                        FromItem studentFI = studentQM.addJoin(EJoin.INNER_JOIN, "student", STUDENT_EDUCATION.class, "id");
-                        studentQM.addWhere(studentFI, "student", ECriteria.EQUAL, student.getId());
-                        studentQM.addWhereNull(studentFI, "child");
-                        studentQM.addWhereNull("checkOutDate");
-                        studentQM.addWhere("deleted", Boolean.FALSE);
-                        DORM_STUDENT dormStudent = null;
+                        DORM_STUDENT dormStudent;
                         try {
-                            dormStudent = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(studentQM);
+                            String sql="SELECT t0.* " +
+                                    "FROM DORM_STUDENT t0 INNER JOIN STUDENT_EDUCATION t1 ON t0.STUDENT_ID = t1.ID " +
+                                    "WHERE t1.STUDENT_ID = ?1 AND t1.CHILD_ID IS NULL AND t0.CHECK_OUT_DATE IS NULL " +
+                                    "AND t0.DELETED = FALSE;";
+                            Map<Integer, Object> params=new HashMap<>();
+                            params.put(1,student.getId().getId());
+                            dormStudent = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(
+                                    sql,params,DORM_STUDENT.class);
                         } catch (NoResultException e) {
                             dormStudent = null;
                         }
