@@ -1,8 +1,10 @@
 package kz.halyqsoft.univercity.entity.beans.univercity.view;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
+import org.r3a.common.entity.ID;
 
 /**
  * @author Omarbek
@@ -11,35 +13,49 @@ import org.r3a.common.entity.FieldInfo;
 public final class VStudent extends AbstractEntity {
 
 	private static final long serialVersionUID = -1387856179967027804L;
-	
+
+	@JsonIgnore
 	@FieldInfo(type = EFieldType.TEXT, order = 2)
 	private String code;
 	
 	@FieldInfo(type = EFieldType.TEXT, order = 3)
 	private String fio;
-	
+
+	@JsonIgnore
 	@FieldInfo(type = EFieldType.TEXT, order = 4)
 	private String category;
-	
+
+	@JsonIgnore
 	@FieldInfo(type = EFieldType.TEXT, order = 5)
 	private String status;
-	
+
+	@JsonIgnore
 	@FieldInfo(type = EFieldType.TEXT, order = 6)
 	private String faculty;
-	
+
+	@JsonIgnore
 	@FieldInfo(type = EFieldType.TEXT, order = 7)
 	private String specialty;
-	
+
+	@JsonIgnore
 	@FieldInfo(type = EFieldType.TEXT, order = 8)
 	private String lockReason;
-	
+
+	@JsonIgnore
 	@FieldInfo(type = EFieldType.INTEGER, order = 9, inGrid = false)
 	private int studyYear;
-	
+
+	@JsonIgnore
 	@FieldInfo(type = EFieldType.TEXT, order = 10, inGrid = false)
 	private String languageName;
 	
 	public VStudent() {
+	}
+
+	@JsonIgnore
+	@Override
+	public ID getId() {
+		return super.getId();
 	}
 
 	public String getCode() {

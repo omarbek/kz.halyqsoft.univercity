@@ -2,6 +2,7 @@ package kz.halyqsoft.univercity.utils;
 
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
 import org.r3a.common.vaadin.AbstractWebUI;
 import org.r3a.common.vaadin.widget.dialog.AbstractDialog;
@@ -19,14 +20,22 @@ public abstract class WindowUtils extends AbstractDialog {
 
     protected abstract VerticalLayout getVerticalLayout();
 
+    private Button closeButton;
+
     public WindowUtils() {
         center();
     }
 
+    private Unit defaultUnit = Unit.PIXELS;
+
+    public void setDefaultUnit(Unit defaultUnit) {
+        this.defaultUnit = defaultUnit;
+    }
+
     protected void init(Integer width, Integer height) {
         if (width != null && height != null) {
-            setWidth(width, Unit.PIXELS);
-            setHeight(height, Unit.PIXELS);
+            setWidth(width, defaultUnit);
+            setHeight(height, defaultUnit);
         }else{
             setSizeFull();//1300-500
         }
@@ -35,7 +44,8 @@ public abstract class WindowUtils extends AbstractDialog {
         getContent().addComponent(mainVL);
         getContent().setComponentAlignment(mainVL, Alignment.MIDDLE_CENTER);
 
-        Button closeButton = new Button(getUILocaleUtil().getCaption("close"));
+        closeButton = new Button(getUILocaleUtil().getCaption("close"));
+        closeButton.setImmediate(true);
         closeButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
@@ -47,9 +57,15 @@ public abstract class WindowUtils extends AbstractDialog {
                 }
             }
         });
+
+
         getContent().addComponent(closeButton);
-        getContent().setComponentAlignment(closeButton, Alignment.MIDDLE_CENTER);
+        getContent().setComponentAlignment(closeButton, Alignment.BOTTOM_CENTER);
 
         AbstractWebUI.getInstance().addWindow(this);
+    }
+
+    public Button getCloseButton() {
+        return closeButton;
     }
 }

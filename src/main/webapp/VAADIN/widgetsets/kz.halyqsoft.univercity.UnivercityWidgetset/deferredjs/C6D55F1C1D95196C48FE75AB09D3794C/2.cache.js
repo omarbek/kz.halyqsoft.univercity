@@ -1,1 +1,0 @@
-$wnd.kz_halyqsoft_univercity_UnivercityWidgetset.runAsyncCallback2('vhb(1737,1,Mee);_.vc=function opc(){h7b((!a7b&&(a7b=new m7b),a7b),this.a.d)};e8d(Th)(2);\n//# sourceURL=kz.halyqsoft.univercity.UnivercityWidgetset-2.js\n');

@@ -37,5 +37,5 @@
 
     
 
-    <inherits name="pl.pdfviewer.PdfViewerWidgetSet" />
+    
 </module>

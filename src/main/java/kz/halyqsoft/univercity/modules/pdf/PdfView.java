@@ -3,6 +3,7 @@ package kz.halyqsoft.univercity.modules.pdf;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.ui.*;
+import kz.halyqsoft.univercity.entity.beans.univercity.CATALOG;
 import kz.halyqsoft.univercity.entity.beans.univercity.PDF_DOCUMENT;
 import kz.halyqsoft.univercity.modules.reports.MenuColumn;
 import org.r3a.common.entity.Entity;
@@ -29,26 +30,25 @@ public class PdfView extends AbstractTaskView implements EntityListener {
 
         mainTS = new TabSheet();
         mainTS.addTab(initAndGetGenerationTab(), getUILocaleUtil().getCaption("generate"));
-        mainTS.addSelectedTabChangeListener(new TabSheet.SelectedTabChangeListener() {
-            @Override
-            public void selectedTabChange(TabSheet.SelectedTabChangeEvent selectedTabChangeEvent) {
-                if(sideBarGenerateTT!=null){
-                    sideBarGenerateTT.select(null);
-                    sideBarGenerateTT.select(FIRST_OPTION);
-                }
-            }
-        });
+
         VerticalLayout mainVL = new VerticalLayout();
 
         searchComponent = initAndGetSearchTab();
-
         mainVL.addComponent(searchComponent);
         mainTS.addTab(mainVL, getUILocaleUtil().getCaption("search"));
+
+        mainTS.addTab(initAndGetCatalogTab(),getUILocaleUtil().getEntityLabel(CATALOG.class));
 
         mainTS.addSelectedTabChangeListener(new TabSheet.SelectedTabChangeListener() {
             @Override
             public void selectedTabChange(TabSheet.SelectedTabChangeEvent selectedTabChangeEvent) {
                 if(selectedTabChangeEvent.getTabSheet().getTab(mainVL)!=null){
+
+                    if(sideBarGenerateTT!=null){
+                        sideBarGenerateTT.select(null);
+                        sideBarGenerateTT.select(FIRST_OPTION);
+                    }
+
                     mainVL.removeComponent(searchComponent);
                     try{
                         searchComponent = initAndGetSearchTab();
@@ -56,6 +56,7 @@ public class PdfView extends AbstractTaskView implements EntityListener {
                         e.printStackTrace();
                     }
                     mainVL.addComponent(searchComponent);
+
                 }
             }
         });
@@ -64,13 +65,25 @@ public class PdfView extends AbstractTaskView implements EntityListener {
 
     }
 
+    public Component initAndGetCatalogTab(){
+        CatalogTabContainer catalogTabContainer = null;
+        try{
+            catalogTabContainer = new CatalogTabContainer();
+        }catch (Exception e)
+        {
+            LOG.error("Unable to run catalog tab container");
+            e.printStackTrace();
+        }
+        return catalogTabContainer;
+    }
+
     public Component initAndGetSearchTab(){
         SearchTabContainer searchTabContainer = null;
         try{
             searchTabContainer = new SearchTabContainer();
         }catch (Exception e)
         {
-            LOG.error("Unable to run search tab conatiner");
+            LOG.error("Unable to run search tab container");
             e.printStackTrace();
         }
         return searchTabContainer;
