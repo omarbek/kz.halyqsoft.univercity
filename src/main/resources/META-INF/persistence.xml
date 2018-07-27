@@ -328,6 +328,8 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_SIGNER</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_SIGNER_STATUS</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_STATUS</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.COMPLAINT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.CATALOG</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>

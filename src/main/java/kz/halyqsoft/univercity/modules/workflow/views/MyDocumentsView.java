@@ -8,11 +8,8 @@ import com.vaadin.ui.Button;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_SIGNER;
-import kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE;
-import kz.halyqsoft.univercity.entity.beans.univercity.PDF_DOCUMENT_SIGNER_POST;
-import kz.halyqsoft.univercity.modules.regapplicants.ApplicantsForm;
 import kz.halyqsoft.univercity.modules.workflow.WorkflowCommonUtils;
-import kz.halyqsoft.univercity.modules.workflow.views.utils.EmployeePdfCreator;
+import kz.halyqsoft.univercity.utils.EmployeePdfCreator;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
@@ -20,7 +17,6 @@ import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.event.EntityListener;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.where.ECriteria;
-import org.r3a.common.vaadin.AbstractWebUI;
 import org.r3a.common.vaadin.widget.dialog.AbstractDialog;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
@@ -29,7 +25,6 @@ import org.r3a.common.vaadin.widget.toolbar.IconToolbar;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 public class MyDocumentsView extends BaseView implements EntityListener{
     private USERS currentUser;

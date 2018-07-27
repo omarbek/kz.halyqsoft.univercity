@@ -3,24 +3,25 @@ package kz.halyqsoft.univercity.modules.pdf;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.ui.*;
+import kz.halyqsoft.univercity.entity.beans.univercity.CATALOG;
 import kz.halyqsoft.univercity.entity.beans.univercity.PDF_DOCUMENT;
 import kz.halyqsoft.univercity.modules.reports.MenuColumn;
 import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.beans.AbstractTask;
-import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.event.EntityListener;
-import org.r3a.common.entity.query.where.ECriteria;
-import org.r3a.common.vaadin.view.AbstractCommonView;
 import org.r3a.common.vaadin.view.AbstractTaskView;
-import org.r3a.common.vaadin.widget.dialog.Message;
-import org.r3a.common.vaadin.widget.grid.GridWidget;
-import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
-import org.r3a.common.vaadin.widget.toolbar.IconToolbar;
 
 public class PdfView extends AbstractTaskView implements EntityListener {
 
+
+    private final String FIRST_OPTION = getUILocaleUtil().getCaption("property");
+    private final String SECOND_OPTION = getUILocaleUtil().getCaption("access");
+
+
     private TabSheet mainTS;
     private Component searchComponent;
+    private TreeTable sideBarGenerateTT;
+
     public PdfView(AbstractTask task) throws Exception {
         super(task);
     }
@@ -33,14 +34,21 @@ public class PdfView extends AbstractTaskView implements EntityListener {
         VerticalLayout mainVL = new VerticalLayout();
 
         searchComponent = initAndGetSearchTab();
-
         mainVL.addComponent(searchComponent);
         mainTS.addTab(mainVL, getUILocaleUtil().getCaption("search"));
+
+        mainTS.addTab(initAndGetCatalogTab(),getUILocaleUtil().getEntityLabel(CATALOG.class));
 
         mainTS.addSelectedTabChangeListener(new TabSheet.SelectedTabChangeListener() {
             @Override
             public void selectedTabChange(TabSheet.SelectedTabChangeEvent selectedTabChangeEvent) {
                 if(selectedTabChangeEvent.getTabSheet().getTab(mainVL)!=null){
+
+                    if(sideBarGenerateTT!=null){
+                        sideBarGenerateTT.select(null);
+                        sideBarGenerateTT.select(FIRST_OPTION);
+                    }
+
                     mainVL.removeComponent(searchComponent);
                     try{
                         searchComponent = initAndGetSearchTab();
@@ -48,6 +56,7 @@ public class PdfView extends AbstractTaskView implements EntityListener {
                         e.printStackTrace();
                     }
                     mainVL.addComponent(searchComponent);
+
                 }
             }
         });
@@ -56,13 +65,25 @@ public class PdfView extends AbstractTaskView implements EntityListener {
 
     }
 
+    public Component initAndGetCatalogTab(){
+        CatalogTabContainer catalogTabContainer = null;
+        try{
+            catalogTabContainer = new CatalogTabContainer();
+        }catch (Exception e)
+        {
+            LOG.error("Unable to run catalog tab container");
+            e.printStackTrace();
+        }
+        return catalogTabContainer;
+    }
+
     public Component initAndGetSearchTab(){
         SearchTabContainer searchTabContainer = null;
         try{
             searchTabContainer = new SearchTabContainer();
         }catch (Exception e)
         {
-            LOG.error("Unable to run search tab conatiner");
+            LOG.error("Unable to run search tab container");
             e.printStackTrace();
         }
         return searchTabContainer;
@@ -78,15 +99,13 @@ public class PdfView extends AbstractTaskView implements EntityListener {
         generateTabHSP.setSizeFull();
         generateTabHSP.setSplitPosition(10);
 
-        TreeTable sideBarGenerateTT = new TreeTable();
+        sideBarGenerateTT = new TreeTable();
         HierarchicalContainer optionHC = new HierarchicalContainer();
 
-        String firstOption = getUILocaleUtil().getCaption("property");
-        String secondOption = getUILocaleUtil().getCaption("access");
-        optionHC.addItem(firstOption);
-        optionHC.setChildrenAllowed(firstOption , false);
-        optionHC.addItem(secondOption);
-        optionHC.setChildrenAllowed(secondOption , false);
+        optionHC.addItem(FIRST_OPTION);
+        optionHC.setChildrenAllowed(FIRST_OPTION, false);
+        optionHC.addItem(SECOND_OPTION);
+        optionHC.setChildrenAllowed(SECOND_OPTION, false);
 
         sideBarGenerateTT.setContainerDataSource(optionHC);
         sideBarGenerateTT.setColumnReorderingAllowed(false);
@@ -110,12 +129,11 @@ public class PdfView extends AbstractTaskView implements EntityListener {
                         }
 
                         leftVl.removeAllComponents();
-                        if(valueChangeEvent.getProperty().getValue().toString().equals(firstOption))
+                        if(valueChangeEvent.getProperty().getValue().toString().equals(FIRST_OPTION))
                         {
                             PDF_DOCUMENT file = new PDF_DOCUMENT();
-                            PdfEdit pdfEdit = new PdfEdit(file);
-
-                            leftVl.addComponent(pdfEdit);
+                            PdfGenerationPart pdfGenerationPart = new PdfGenerationPart(file, getUILocaleUtil().getCaption("loading"));
+                            leftVl.addComponent(pdfGenerationPart.getPdfHSP());
                         }else{
                             PdfAccess pdfAccess = new PdfAccess();
                             leftVl.addComponent(pdfAccess);

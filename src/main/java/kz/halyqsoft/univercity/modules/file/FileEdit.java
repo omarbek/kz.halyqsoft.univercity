@@ -25,7 +25,7 @@ public class FileEdit extends AbstractDialog {
         setHeight(500,Unit.PIXELS);
         center();
 
-        PdfEdit pdfEdit = new PdfEdit(pdfDocument);
+        PdfEdit pdfEdit = new PdfEdit(pdfDocument,  null);
         getContent().addComponent(pdfEdit);
         getContent().setComponentAlignment(pdfEdit, Alignment.MIDDLE_CENTER);
 
