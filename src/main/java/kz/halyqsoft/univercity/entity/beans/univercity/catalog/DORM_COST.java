@@ -18,29 +18,24 @@ public class DORM_COST extends AbstractEntity {
 	private static final long serialVersionUID = 1951020717584408461L;
 
 	@ManyToOne
-    @JoinColumns({
-        @JoinColumn(name = "DORM_ID", referencedColumnName = "ID", nullable = false)})
-    private DORM dorm;
-	
+	@JoinColumns({@JoinColumn(name = "DORM_ID", referencedColumnName = "ID", nullable = false)})
+	private DORM dorm;
+
 	@Column(name = "BED_COUNT", nullable = false)
 	private Integer bedCount;
-	
+
 	@Column(name = "GPA_MIN", nullable = false)
 	private Double gpaMin;
-	
+
 	@Column(name = "GPA_MAX", nullable = false)
 	private Double gpaMax;
-	
+
 	@ManyToOne
-    @JoinColumns({
-        @JoinColumn(name = "STUDY_YEAR_ID", referencedColumnName = "ID", nullable = false)})
-    private STUDY_YEAR studyYear;
-	
+	@JoinColumns({@JoinColumn(name = "STUDY_YEAR_ID", referencedColumnName = "ID", nullable = false)})
+	private STUDY_YEAR studyYear;
+
 	@Column(name = "COST", nullable = false)
 	private Double cost;
-	
-	public DORM_COST() {
-	}
 
 	public DORM getDorm() {
 		return dorm;
