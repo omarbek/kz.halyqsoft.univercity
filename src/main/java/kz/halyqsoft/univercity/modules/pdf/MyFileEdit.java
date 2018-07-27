@@ -10,10 +10,9 @@ import org.r3a.common.vaadin.view.AbstractCommonView;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.dialog.AbstractDialog;
 
-/**
- * @author Omarbek
- * @created on 26.04.2018
- */
+
+
+
 public class MyFileEdit extends AbstractDialog {
 
     public MyFileEdit(PDF_DOCUMENT pdfDocument, AbstractCommonView fileView)  {

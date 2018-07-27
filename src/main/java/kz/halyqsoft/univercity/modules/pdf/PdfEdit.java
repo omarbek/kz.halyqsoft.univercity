@@ -50,7 +50,12 @@ public class PdfEdit extends AbstractCommonView {
         Button addComponentButton = new Button("+");
         Button createDbButton = CommonUtils.createSaveButton();
         HorizontalLayout mainHL = new HorizontalLayout();
+        mainHL.setResponsive(true);
+        mainHL.setImmediate(true);
+
         VerticalLayout itemsVL = new VerticalLayout();
+        itemsVL.setResponsive(true);
+        itemsVL.setImmediate(true);
 
         CustomField customField = new CustomField();
         HorizontalLayout activityHL = new HorizontalLayout();
@@ -77,7 +82,8 @@ public class PdfEdit extends AbstractCommonView {
         }
 
         else{
-            order[0] = 1;}
+            order[0] = 1;
+        }
 
 
         cf.pdfTitle.addValueChangeListener(new Property.ValueChangeListener() {
@@ -177,24 +183,42 @@ public class PdfEdit extends AbstractCommonView {
                     }
                 });
 
-                    textHL.addComponent(centerCheckBox);
+                deleteHLButton.addClickListener(new Button.ClickListener() {
+                    @Override
+                    public void buttonClick(Button.ClickEvent clickEvent) {
+                        if(customFieldList.size()>1){
+                            itemsVL.removeComponent(textHL);
+                            itemsVL.removeComponent(textAreaHL);
+                            customFieldList.remove(customField);
+                            HorizontalLayout tempHL = (HorizontalLayout) itemsVL.getComponent(itemsVL.getComponentCount()-1);
+                            if(tempHL.getComponentIndex(addComponentButton)<0){
+                                tempHL.addComponent(addComponentButton);
+                                tempHL.setComponentAlignment(addComponentButton,Alignment.BOTTOM_CENTER);
+                            }
+                        }
+
+                    }
+                });
 
 
+                textHL.addComponent(centerCheckBox);
+                textHL.setComponentAlignment(centerCheckBox,Alignment.BOTTOM_RIGHT);
 
-                    order[0]++;
-                customField.getOrder().setValue(Double.toString(order[0]));
-
-                customFieldList.add(customField);
-                textHL.addComponent(addComponentButton);
-
-                itemsVL.addComponent(textAreaHL);
-                itemsVL.addComponent(textHL);
-
-                textHL.setComponentAlignment(addComponentButton,Alignment.BOTTOM_CENTER);
                 textHL.addComponent(deleteHLButton);
                 textHL.setData(textHL);
                 textHL.setComponentAlignment(deleteHLButton,Alignment.BOTTOM_CENTER);
-                textHL.setComponentAlignment(centerCheckBox,Alignment.BOTTOM_RIGHT);
+
+                textHL.addComponent(addComponentButton);
+                textHL.setComponentAlignment(addComponentButton,Alignment.BOTTOM_CENTER);
+
+
+                order[0]++;
+                customField.getOrder().setValue(Double.toString(order[0]));
+
+                customFieldList.add(customField);
+
+                itemsVL.addComponent(textAreaHL);
+                itemsVL.addComponent(textHL);
 
                 itemsVL.setComponentAlignment(textHL, Alignment.MIDDLE_CENTER);
                 itemsVL.setComponentAlignment(textAreaHL, Alignment.MIDDLE_CENTER);
@@ -395,16 +419,38 @@ public class PdfEdit extends AbstractCommonView {
                             xComboBox.setReadOnly(false);}
                     }
                 });
-                textHL.addComponent(centerCheckBox);
+
+
+                deleteHLButton.addClickListener(new Button.ClickListener() {
+                    @Override
+                    public void buttonClick(Button.ClickEvent clickEvent) {
+                        if(customFieldList.size()>1){
+                            itemsVL.removeComponent(textHL);
+                            itemsVL.removeComponent(textAreaHL);
+                            customFieldList.remove(customField);
+                            HorizontalLayout tempHL = (HorizontalLayout) itemsVL.getComponent(itemsVL.getComponentCount()-1);
+                            if(tempHL.getComponentIndex(addComponentButton)<0){
+                                tempHL.addComponent(addComponentButton);
+                                tempHL.setComponentAlignment(addComponentButton,Alignment.BOTTOM_CENTER);
+                            }
+                        }
+
+                    }
+                });
 
                 customFieldList.add(customFieldProp);
-                textHL.addComponent(addComponentButton);
-                textHL.setComponentAlignment(addComponentButton,Alignment.BOTTOM_CENTER);
+
+                textHL.addComponent(centerCheckBox);
+                textHL.setComponentAlignment(centerCheckBox,Alignment.BOTTOM_RIGHT);
+
                 textHL.addComponent(deleteHLButton);
                 textHL.setData(textHL);
                 textHL.setComponentAlignment(deleteHLButton,Alignment.BOTTOM_CENTER);
-                textHL.setComponentAlignment(centerCheckBox,Alignment.BOTTOM_RIGHT);
 
+                textHL.addComponent(addComponentButton);
+                textHL.setComponentAlignment(addComponentButton,Alignment.BOTTOM_CENTER);
+
+                textHL.setData(textHL);
                 itemsVL.addComponent(textAreaHL);
                 itemsVL.addComponent(textHL);
                 itemsVL.setComponentAlignment(textHL, Alignment.MIDDLE_CENTER);
