@@ -50,3 +50,4 @@ create sequence S_MESSAGE
   minvalue 0
   start with 1
   no cycle;
+

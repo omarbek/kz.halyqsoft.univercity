@@ -303,6 +303,11 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
             buttonPanel.addComponent(lockUnlock);
             buttonPanel.setComponentAlignment(lockUnlock, Alignment.MIDDLE_CENTER);
 
+            CheckBox considerCreditCB = new CheckBox();
+            considerCreditCB.setCaption(getUILocaleUtil().getCaption("consider.credit"));
+            buttonPanel.addComponent(considerCreditCB);
+            considerCreditCB.setValue(true);
+
             //  USERS user = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(USERS.class,student.getId());
             pdfDownload = createDownloadButton();
             buttonPanel.addComponent(pdfDownload);
@@ -322,6 +327,8 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
             content.setComponentAlignment(buttonPanel, Alignment.BOTTOM_CENTER);
         }
         getTabSheet().addTab(content, getMasterTabTitle());
+
+
 
 
         if(student.getLevel().getLevelName().equalsIgnoreCase("Магистратура"))
@@ -375,7 +382,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         }
     }
 
-    public static void studentEditPdfDownload(STUDENT student) throws Exception {
+    public static void studentEditPdfDownload(STUDENT student) {
 
         if (pdfDownload.getExtensions().size() > 0) {
 
@@ -531,7 +538,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
     }
 
     @Override
-    public void initView(boolean readOnly) throws Exception {
+    public void initView(boolean readOnly) {
     }
 
     private void createDiplomaTab(boolean readOnly) {
@@ -2164,7 +2171,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                         try {
                             StudentSpecialityEdit schedulePanelEdit = new StudentSpecialityEdit(studentEducation, StudentEdit.this);
                         } catch (Exception e) {
-                            e.printStackTrace();//TODO
+                            e.printStackTrace();
                         }
                     }
                 });
@@ -2220,7 +2227,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
 
                     }
                 });
-                educationFL.addComponent(moreButton);
+                 educationFL.addComponent(moreButton);
             }
 
             createdBylabel = new Label();

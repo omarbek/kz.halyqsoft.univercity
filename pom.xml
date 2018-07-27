@@ -63,9 +63,9 @@
 			<artifactId>vaadin-themes</artifactId>
 		</dependency>
 		<dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-            <version>2.10.0</version>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>2.10.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
@@ -123,6 +123,7 @@
 			<artifactId>itextpdf</artifactId>
 			<version>5.3.2</version>
 		</dependency>
+
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcprov-jdk15on</artifactId>
@@ -133,6 +134,7 @@
 			<artifactId>bcmail-jdk15on</artifactId>
 			<version>1.47</version>
 		</dependency>
+
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
@@ -158,8 +160,6 @@
 			<artifactId>vaadin-push</artifactId>
 			<version>8.4.2</version>
 		</dependency>
-
-
 		<!--<dependency>-->
 		<!--<groupId>javax.json</groupId>-->
 		<!--<artifactId>javax.json-api</artifactId>-->
