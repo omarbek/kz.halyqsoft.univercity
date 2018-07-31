@@ -15,7 +15,6 @@ import kz.halyqsoft.univercity.filter.panel.StudentFilterPanel;
 import kz.halyqsoft.univercity.modules.student.StudentEdit;
 import kz.halyqsoft.univercity.modules.student.StudentOrApplicantView;
 import kz.halyqsoft.univercity.utils.changelisteners.FacultyChangeListener;
-import org.json.JSONObject;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
@@ -26,10 +25,8 @@ import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.from.EJoin;
 import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
-import org.r3a.common.vaadin.AbstractWebUI;
 import org.r3a.common.vaadin.view.AbstractCommonView;
 import org.r3a.common.vaadin.widget.ERefreshType;
-import org.r3a.common.vaadin.widget.dialog.AbstractDialog;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 import org.r3a.common.vaadin.widget.filter2.FilterPanelListener;
@@ -50,6 +47,7 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
     private StudentOrApplicantView studentOrApplicantView;
     private HorizontalLayout buttonsHL;
     private int categoryType;
+    private boolean forDorm;
 
     protected GridWidget studentGW;
 
@@ -57,7 +55,7 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
         this.filterPanel = filterPanel;
     }
 
-    public StudentFilterPanel createStudentFilterPanel() throws Exception{
+    public StudentFilterPanel createStudentFilterPanel() throws Exception {
         StudentFilterPanel studentFilterPanel = new StudentFilterPanel(new FStudentFilter());
         studentFilterPanel = new StudentFilterPanel(new FStudentFilter());
         studentFilterPanel.addFilterPanelListener(this);
@@ -159,14 +157,13 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
         studentFilterPanel.addFilterComponent("educationType", cb);
 
 
-
-
         return studentFilterPanel;
     }
 
-    public StudentUtils(int categoryType) throws Exception {
+    public StudentUtils(int categoryType,boolean forDorm) throws Exception {
         super();
         this.categoryType = categoryType;
+        this.forDorm = forDorm;
 
         filterPanel = createStudentFilterPanel();
 
@@ -178,12 +175,12 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
 
-                List<VStudent> students =  new ArrayList<>();
+                List<VStudent> students = new ArrayList<>();
 
-                for(Entity s: studentGW.getAllEntities()){
+                for (Entity s : studentGW.getAllEntities()) {
                     students.add((VStudent) s);
                 }
-                if(students.size()>0){
+                if (students.size() > 0) {
                     WindowUtils saveDialog = new WindowUtils() {
                         @Override
                         protected String createTitle() {
@@ -219,46 +216,44 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
                                     String jsonInString = "";
 
 
+                                    if (FieldValidator.checkForEmpty(name) && FieldValidator.checkForEmpty(description)) {
 
-                                    if(FieldValidator.checkForEmpty(name) && FieldValidator.checkForEmpty(description)){
-
-                                            if(nameTF.getValue().toCharArray()[0]!='$')
-                                            {
-                                                name = "$" + name;
-                                            }
-
-                                            ObjectMapper mapper = new ObjectMapper();
-                                            try{
-                                                jsonInString = mapper.writeValueAsString(students);
-                                            }catch (JsonProcessingException e){
-                                                e.printStackTrace();
-                                                Message.showError(e.getMessage());
-                                                return;
-                                            }
-
-                                            CATALOG catalog = new CATALOG();
-                                            catalog.setCreated(new Date());
-                                            catalog.setDescription(description);
-                                            catalog.setName(name);
-                                            if(jsonInString.toCharArray()[0]=='[' && jsonInString.toCharArray()[jsonInString.toCharArray().length-1]==']' ){
-                                                jsonInString = jsonInString.substring(1 , jsonInString.length()-1);
-                                            }
-                                            catalog.setValue(jsonInString);
-
-
-                                            try{
-                                                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(catalog);
-                                            }catch (Exception e){
-                                                e.printStackTrace();
-                                                Message.showError(e.getMessage());
-                                                return;
-                                            }
-
-                                            CommonUtils.showSavedNotification();
-                                            close();
-                                        }else{
-                                            Message.showError(getUILocaleUtil().getMessage("fill.all.fields"));
+                                        if (nameTF.getValue().toCharArray()[0] != '$') {
+                                            name = "$" + name;
                                         }
+
+                                        ObjectMapper mapper = new ObjectMapper();
+                                        try {
+                                            jsonInString = mapper.writeValueAsString(students);
+                                        } catch (JsonProcessingException e) {
+                                            e.printStackTrace();
+                                            Message.showError(e.getMessage());
+                                            return;
+                                        }
+
+                                        CATALOG catalog = new CATALOG();
+                                        catalog.setCreated(new Date());
+                                        catalog.setDescription(description);
+                                        catalog.setName(name);
+                                        if (jsonInString.toCharArray()[0] == '[' && jsonInString.toCharArray()[jsonInString.toCharArray().length - 1] == ']') {
+                                            jsonInString = jsonInString.substring(1, jsonInString.length() - 1);
+                                        }
+                                        catalog.setValue(jsonInString);
+
+
+                                        try {
+                                            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(catalog);
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                            Message.showError(e.getMessage());
+                                            return;
+                                        }
+
+                                        CommonUtils.showSavedNotification();
+                                        close();
+                                    } else {
+                                        Message.showError(getUILocaleUtil().getMessage("fill.all.fields"));
+                                    }
 
                                 }
                             });
@@ -273,11 +268,11 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
                             return vl;
                         }
                     };
-                    saveDialog.init(400,300);
+                    saveDialog.init(400, 300);
                     saveDialog.setHeightUndefined();
                     saveDialog.getCloseButton().setVisible(false);
 
-                }else{
+                } else {
                     Message.showError(getUILocaleUtil().getMessage("no.data"));
                 }
             }
@@ -368,7 +363,6 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
     }
 
 
-
     @Override
     public boolean onPreview(Object source, Entity e, int buttonId) {
         return openStudentEdit(source, e, true);
@@ -455,7 +449,7 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
         }
 
         List<VStudent> list = new ArrayList<>();
-        sb.insert(0, " where stu.category_id = " + categoryType);
+        sb.insert(0, " where stu.category_id = " + categoryType + " and stu.need_dorm = " + forDorm);
         String sql = "SELECT " +
                 "  stu.ID, " +
                 "  stu.user_code                                                                        CODE, " +

@@ -17,7 +17,7 @@ import java.util.List;
 public class StudentView extends StudentOrApplicantView {
 
     StudentView(int categoryType, HorizontalLayout buttonsHL) throws Exception {
-        super(categoryType, new HorizontalLayout());
+        super(categoryType, new HorizontalLayout(),true);
     }
 
     @Override

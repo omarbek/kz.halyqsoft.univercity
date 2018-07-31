@@ -145,6 +145,7 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.SHIFT_STUDY_YEAR</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.LESSON_TIME</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.SHIFT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEVICE</class>
 
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_SPECIALITY</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_ORGANIZATION</class>
