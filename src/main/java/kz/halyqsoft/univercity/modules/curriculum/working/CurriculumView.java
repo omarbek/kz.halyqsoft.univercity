@@ -292,6 +292,7 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
         getContent().setComponentAlignment(totalCreditSumLabel, Alignment.TOP_LEFT);
 
         detailPanelList = new ArrayList<SemesterDetailPanel>();
+        detailPanelList = new ArrayList<SemesterDetailPanel>();
         TabSheet ts = new TabSheet();
 
         QueryModel<SEMESTER> semesterQM = new QueryModel<SEMESTER>(SEMESTER.class);

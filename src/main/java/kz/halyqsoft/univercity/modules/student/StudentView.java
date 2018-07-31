@@ -1,6 +1,6 @@
 package kz.halyqsoft.univercity.modules.student;
 
-import com.vaadin.server.Sizeable;
+
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -9,6 +9,7 @@ import com.vaadin.ui.VerticalLayout;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.entity.beans.AbstractTask;
 import org.r3a.common.vaadin.view.AbstractTaskView;
+
 
 /**
  * @author Omarbek
@@ -45,7 +46,7 @@ public class StudentView extends AbstractTaskView {
             public void buttonClick(Button.ClickEvent event) {
                 try {
                     mainVL.removeAllComponents();
-                    mainVL.addComponent(new StudentOrApplicantView(categoryType, buttonsHL));
+                    mainVL.addComponent(new StudentOrApplicantView(categoryType, buttonsHL, false));
                 } catch (Exception e) {
                     e.printStackTrace();//TODO catch
                 }

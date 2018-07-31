@@ -118,7 +118,7 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
                                                     setEntities(getEmployee(dateFormat.format(date.getValue())));
                                         }
                                     } else {
-                                        Message.showError("Choose date!");
+                                        Message.showInfo(getUILocaleUtil().getMessage("error.date"));
                                     }
                                 }
                             });

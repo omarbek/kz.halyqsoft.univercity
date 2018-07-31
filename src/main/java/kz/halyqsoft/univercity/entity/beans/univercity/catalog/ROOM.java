@@ -5,15 +5,8 @@ import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
 
+import javax.persistence.*;
 import java.util.Date;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.ManyToOne;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 /**
  * @author Omarbek
@@ -57,17 +50,23 @@ public class ROOM extends AbstractEntity {
 	@FieldInfo(type = EFieldType.TEXT, isMemo = true, max = 128, order = 8, required = false)
 	@Column(name = "DESCR")
 	private String descr;
+
+	@FieldInfo(type = EFieldType.FK_COMBO, order = 9, required = false)
+	@ManyToOne
+	@JoinColumns({
+			@JoinColumn(name = "DEVICE_ID", referencedColumnName = "ID")})
+	private DEVICE device;
 	
-	@FieldInfo(type = EFieldType.BOOLEAN, order = 9, required = false, inEdit = false, inGrid = false, inView = false)
+	@FieldInfo(type = EFieldType.BOOLEAN, order = 10, required = false, inEdit = false, inGrid = false, inView = false)
 	@Column(name = "DELETED", nullable = false)
     private boolean deleted;
 	
-	@FieldInfo(type = EFieldType.DATETIME, order = 10, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false)
+	@FieldInfo(type = EFieldType.DATETIME, order = 11, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false)
 	@Column(name = "CREATED")
     @Temporal(TemporalType.TIMESTAMP)
     private Date created;
 	
-	@FieldInfo(type = EFieldType.DATETIME, order = 11, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false)
+	@FieldInfo(type = EFieldType.DATETIME, order = 12, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false)
 	@Column(name = "UPDATED")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updated;
@@ -153,6 +152,14 @@ public class ROOM extends AbstractEntity {
 
 	public void setUpdated(Date updated) {
 		this.updated = updated;
+	}
+
+	public DEVICE getDevice() {
+		return device;
+	}
+
+	public void setDevice(DEVICE device) {
+		this.device = device;
 	}
 
 	@Override
