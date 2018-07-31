@@ -311,3 +311,22 @@ INSERT INTO public.pdf_property (text, x, y, font, size, pdf_document_id, order_
 INSERT INTO public.pdf_property (text, x, y, font, size, pdf_document_id, order_number, center) VALUES ('$data$month$year', 399, 0, 'Normal', 12, 90, 225.00, false);
 
 INSERT INTO public.pdf_document (id, user_id, title, file_name, deleted, period) VALUES (90, 2, 'КЕЛІСІМ-ШАРТ', 'Келісім_шарт', false, 0);
+
+-- CATALOG
+
+CREATE TABLE CATALOG (
+  id BIGINT NOT NULL ,
+  name VARCHAR(255) NOT NULL UNIQUE ,
+  value text NOT NULL,
+  description text NOT NULL ,
+  created TIMESTAMP NOT NULL
+);
+
+create sequence S_CATALOG
+  minvalue 0
+  start with 1
+  no cycle;
+
+
+ALTER TABLE groups ADD COLUMN curator_id BIGINT NULL ;
+ALTER TABLE groups ADD CONSTRAINT fk_groups_employee FOREIGN KEY (curator_id) REFERENCES employee(id)
