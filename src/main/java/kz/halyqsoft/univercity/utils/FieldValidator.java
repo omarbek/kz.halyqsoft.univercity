@@ -4,7 +4,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 
 public class FieldValidator {
 
-    public static boolean checkForEmpty(String value){
+    public static boolean isNotEmpty(String value){
         if(value!=null){
             return !value.trim().equals("");
         }

@@ -58,10 +58,14 @@ CREATE TABLE CATALOG (
   name VARCHAR(255) NOT NULL UNIQUE ,
   value text NOT NULL,
   description text NOT NULL ,
-  created TIMESTAMP NOT NULL 
+  created TIMESTAMP NOT NULL
 );
 
 create sequence S_CATALOG
   minvalue 0
   start with 1
   no cycle;
+
+
+ALTER TABLE groups ADD COLUMN curator_id BIGINT NULL ;
+ALTER TABLE groups ADD CONSTRAINT fk_groups_employee FOREIGN KEY (curator_id) REFERENCES employee(id)

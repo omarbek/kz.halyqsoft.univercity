@@ -1,4 +1,4 @@
-package kz.halyqsoft.univercity.modules.workflow;
+package kz.halyqsoft.univercity.utils;
 
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_IMPORTANCE;
@@ -32,7 +32,7 @@ public class WorkflowCommonUtils {
             {
                 Message.showError(e.getMessage());
                 e.printStackTrace();
-            };
+            }
         }
         return null;
     }

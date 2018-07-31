@@ -44,7 +44,9 @@ public class EmployeePdfCreator {
                 propertyQM.addWhere(doc, "id", ECriteria.EQUAL, document.getPdfDocument().getId());
                 propertyQM.addOrder("orderNumber");
                 List<PDF_PROPERTY> properties = null;
+
                 try {
+                    Font font = getFont(12, Font.BOLD);
                     properties = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(propertyQM);
                     ByteArrayOutputStream byteArrayOutputStream1 = new ByteArrayOutputStream();
                     PdfWriter pdfWriter = PdfWriter.getInstance(docum, byteArrayOutputStream1);
@@ -68,7 +70,7 @@ public class EmployeePdfCreator {
                             try{
                                 jsonText = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(catalogQM).getValue();
                             }catch (Exception e){
-                                e.printStackTrace();
+                                System.out.println(e.getMessage());
                             }
 
                             if(!jsonText.equals("")){
@@ -93,6 +95,33 @@ public class EmployeePdfCreator {
                         }
                         if(map.keySet().size()>0){
 
+                            PdfPTable pdfPTable = new PdfPTable(map.keySet().size());
+                            for(String key : map.keySet()){
+
+                                PdfPCell cell = new PdfPCell();
+                                Paragraph paragraph = new Paragraph(key);
+                                paragraph.setFont(font);
+                                cell.addElement(paragraph);
+
+                                pdfPTable.addCell(cell);
+
+
+                            }
+                            pdfPTable.setHeaderRows(1);
+
+                            for(String key : map.keySet()){
+                                for(Object value : map.get(key)){
+
+                                    PdfPCell cell = new PdfPCell();
+                                    Paragraph paragraph = new Paragraph((String)value);
+                                    paragraph.setFont(font);
+                                    cell.addElement(paragraph);
+
+                                    pdfPTable.addCell(cell);
+                                }
+                            }
+
+                            docum.add(pdfPTable);
                         }else{
                             String text = setReplaced(property.getText(), document.getCreatorEmployee());
                             Paragraph paragraph = new Paragraph(text,

@@ -5,10 +5,12 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_SIGNER;
+import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_SIGNER_STATUS;
 import kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE;
 import kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE_DEPT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.POST;
 import kz.halyqsoft.univercity.utils.CommonUtils;
+import kz.halyqsoft.univercity.utils.WorkflowCommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
@@ -22,6 +24,7 @@ import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class AddEmployeeDialog extends AbstractDialog{
@@ -53,6 +56,8 @@ public class AddEmployeeDialog extends AbstractDialog{
                 if(usersCB.getValue()!=null){
                     documentSigner.setEmployee((EMPLOYEE) usersCB.getValue());
                     try{
+                        documentSigner.setDocumentSignerStatus(WorkflowCommonUtils.getDocumentSignerStatusByName(DOCUMENT_SIGNER_STATUS.IN_PROCESS));
+                        documentSigner.setUpdated(new Date());
                         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(documentSigner);
                         CommonUtils.showSavedNotification();
                         createViewDialog.getDocumentSignerGW().refresh();

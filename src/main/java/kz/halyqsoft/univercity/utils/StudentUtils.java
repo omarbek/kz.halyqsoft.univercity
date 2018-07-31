@@ -15,7 +15,6 @@ import kz.halyqsoft.univercity.filter.panel.StudentFilterPanel;
 import kz.halyqsoft.univercity.modules.student.StudentEdit;
 import kz.halyqsoft.univercity.modules.student.StudentOrApplicantView;
 import kz.halyqsoft.univercity.utils.changelisteners.FacultyChangeListener;
-import org.json.JSONObject;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
@@ -26,10 +25,8 @@ import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.from.EJoin;
 import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
-import org.r3a.common.vaadin.AbstractWebUI;
 import org.r3a.common.vaadin.view.AbstractCommonView;
 import org.r3a.common.vaadin.widget.ERefreshType;
-import org.r3a.common.vaadin.widget.dialog.AbstractDialog;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 import org.r3a.common.vaadin.widget.filter2.FilterPanelListener;
@@ -220,7 +217,7 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
 
 
 
-                                    if(FieldValidator.checkForEmpty(name) && FieldValidator.checkForEmpty(description)){
+                                    if(FieldValidator.isNotEmpty(name) && FieldValidator.isNotEmpty(description)){
 
                                             if(nameTF.getValue().toCharArray()[0]!='$')
                                             {

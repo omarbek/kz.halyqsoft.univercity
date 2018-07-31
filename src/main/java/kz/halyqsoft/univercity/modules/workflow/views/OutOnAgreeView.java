@@ -7,7 +7,7 @@ import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_SIGNER;
 import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_STATUS;
-import kz.halyqsoft.univercity.modules.workflow.WorkflowCommonUtils;
+import kz.halyqsoft.univercity.utils.WorkflowCommonUtils;
 import org.r3a.common.entity.ID;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.where.ECriteria;
