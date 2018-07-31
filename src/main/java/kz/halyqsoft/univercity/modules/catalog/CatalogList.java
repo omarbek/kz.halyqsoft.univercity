@@ -64,6 +64,7 @@ class CatalogList {
         addCatalogEntityToList(LESSON_TIME.class);
         addCatalogEntityToList(TIME.class);
         addCatalogEntityToList(DORM_RULE_VIOLATION_TYPE.class);
+        addCatalogEntityToList(DEVICE.class);
 
         return new ArrayList<>(list);
     }

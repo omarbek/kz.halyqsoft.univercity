@@ -109,3 +109,72 @@ ALTER TABLE DORM_STUDENT_VIOLATION
           THEN TRUE
         ELSE NULL
         END;
+
+INSERT INTO TASKS (CLASS_PATH, DESCR, ICON_NAME, NAME, TASK_ORDER, TASK_TYPE, TITLE, VISIBLE, ID, PARENT_ID)
+VALUES ('kz.halyqsoft.univercity.modules.finance.FinanceView', 'KK=Биллинг;RU=Биллинг;EN=Billing;', NULL,
+        'KK=Биллинг;RU=Биллинг;EN=Billing;', 222, FALSE, 'KK=Биллинг;RU=Биллинг;EN=Billing;', TRUE, nextval('s_tasks'),
+        3);
+
+ALTER TABLE student_fin_debt
+  ALTER COLUMN retake TYPE BOOLEAN
+  USING CASE WHEN retake = 0
+  THEN FALSE
+        WHEN retake = 1
+          THEN TRUE
+        ELSE NULL
+        END;
+
+CREATE SEQUENCE s_student_payment
+MINVALUE 0
+START WITH 1
+NO CYCLE;
+
+CREATE SEQUENCE s_student_fin_debt
+MINVALUE 0
+START WITH 1
+NO CYCLE;
+
+CREATE TABLE device (
+  id      BIGINT                NOT NULL,
+  name    CHARACTER VARYING(64) NOT NULL
+);
+
+ALTER TABLE device
+  ADD CONSTRAINT pk_device PRIMARY KEY (id);
+
+CREATE SEQUENCE S_DEVICE
+MINVALUE 0
+START WITH 1
+NO CYCLE;
+
+ALTER TABLE room
+  ADD device_id BIGINT;
+
+ALTER TABLE room
+  ADD CONSTRAINT fk_room_device FOREIGN KEY (device_id)
+REFERENCES device (id)
+ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+CREATE UNIQUE INDEX idx_room_device
+  ON room (
+    device_id ASC
+  );
+
+CREATE SEQUENCE S_LESSON
+MINVALUE 0
+START WITH 1
+NO CYCLE;
+
+ALTER TABLE lesson
+  ALTER COLUMN canceled TYPE BOOLEAN
+  USING CASE WHEN canceled = 0
+  THEN FALSE
+        WHEN canceled = 1
+          THEN TRUE
+        ELSE NULL
+        END;
+
+CREATE SEQUENCE S_LESSON_DETAIL
+MINVALUE 0
+START WITH 1
+NO CYCLE;
