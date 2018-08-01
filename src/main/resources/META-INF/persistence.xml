@@ -205,7 +205,6 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_GROUPS_CREATION_NEEDED</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.VGraduateEmployment</class>
 
-
         <class>kz.halyqsoft.univercity.entity.beans.univercity.AbstractSpiderEntity</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.AbstractStudentEntity</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.AbstractWorkHourEntity</class>
@@ -330,12 +329,13 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_STATUS</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.COMPLAINT</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.CATALOG</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.REQUEST_TYPE_STATUS</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
         <properties>
             <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
-            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/realdb"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:1818/univerdata"/>
             <property name="javax.persistence.jdbc.user" value="univer"/>
             <property name="javax.persistence.jdbc.password" value="univer"/>
             <!--<property name="javax.persistence.jdbc.user" value="${javax.persistence.jdbc.user}"/>-->

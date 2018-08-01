@@ -52,6 +52,15 @@ public class DormView extends AbstractTaskView {
             }
         }).setIcon(new ThemeResource("img/button/speaker.png"));
 
+        menu.addItem(getUILocaleUtil().getCaption("requests"), new MenuBar.Command() {
+
+            @Override
+            public void menuSelected(MenuBar.MenuItem selectedItem) {
+                AcceptRequest buildingsEdit = new AcceptRequest();
+                new DormDialog(buildingsEdit);
+            }
+        }).setIcon(new ThemeResource("img/users.png"));
+
         getContent().addComponent(menu);
         getContent().setComponentAlignment(menu, Alignment.TOP_CENTER);
     }
