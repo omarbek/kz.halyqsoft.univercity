@@ -206,7 +206,6 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_GROUPS_CREATION_NEEDED</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.VGraduateEmployment</class>
 
-
         <class>kz.halyqsoft.univercity.entity.beans.univercity.AbstractSpiderEntity</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.AbstractStudentEntity</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.AbstractWorkHourEntity</class>

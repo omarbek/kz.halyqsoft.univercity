@@ -403,7 +403,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         createParentsTab(readOnly);
         createAwardsTab(readOnly);
         createSocialCategoriesTab(readOnly);
-//        createDebtAndPaymentTab(readOnly);//TODO add later
+        createDebtAndPaymentTab(readOnly);
         if (student.getCategory().getId().equals(STUDENT_CATEGORY.STUDENT_ID)) {
             createDiplomaTab(readOnly);
         }

@@ -138,6 +138,9 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
                 userPhotoBytes = userPhoto.getPhoto();
                 userPhotoFilename = userPhoto.getFileName();
             }
+        } else {
+            baseDataFM.getFieldModel("login").setInEdit(false);
+            baseDataFM.getFieldModel("login").setInView(false);
         }
         PhotoWidget userPW = new PhotoWidget(userPhotoBytes, baseDataFM.isReadOnly());
         userPW.setPhotoHeight(290, Unit.PIXELS);
@@ -3032,8 +3035,6 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
     public void onException(Object source, Throwable ex) {
         Message.showError(ex.toString());
     }
-
-
 
 
     private class AddNewRoomListener extends AbstractYesButtonListener {

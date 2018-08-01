@@ -21,13 +21,13 @@ public class VStudentFinDebt extends AbstractEntity {
 	private String fio;
 
 	@FieldInfo(type = EFieldType.DATETIME, order = 4)
-	private Date reportDate;
+	private Date created;
 
 	@FieldInfo(type = EFieldType.DOUBLE, order = 5)
 	private Double debtSum;
 
-	@FieldInfo(type = EFieldType.BOOLEAN, order = 6)
-	private boolean retake;
+	@FieldInfo(type = EFieldType.TEXT, order = 6)
+	private String retake;
 
 	public VStudentFinDebt() {
 	}
@@ -48,12 +48,12 @@ public class VStudentFinDebt extends AbstractEntity {
 		this.code = code;
 	}
 
-	public Date getReportDate() {
-		return reportDate;
+	public Date getCreated() {
+		return created;
 	}
 
-	public void setReportDate(Date reportDate) {
-		this.reportDate = reportDate;
+	public void setCreated(Date created) {
+		this.created = created;
 	}
 
 	public Double getDebtSum() {
@@ -64,11 +64,11 @@ public class VStudentFinDebt extends AbstractEntity {
 		this.debtSum = debtSum;
 	}
 
-	public boolean isRetake() {
+	public String getRetake() {
 		return retake;
 	}
 
-	public void setRetake(boolean retake) {
+	public void setRetake(String retake) {
 		this.retake = retake;
 	}
 }
