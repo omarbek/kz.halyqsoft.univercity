@@ -186,6 +186,7 @@ public class PdfEdit extends AbstractCommonView {
                 deleteHLButton.addClickListener(new Button.ClickListener() {
                     @Override
                     public void buttonClick(Button.ClickEvent clickEvent) {
+
                         if(customFieldList.size()>1){
                             itemsVL.removeComponent(textHL);
                             itemsVL.removeComponent(textAreaHL);
@@ -196,7 +197,7 @@ public class PdfEdit extends AbstractCommonView {
                                 tempHL.setComponentAlignment(addComponentButton,Alignment.BOTTOM_CENTER);
                             }
                         }
-
+                        refresh(cf);
                     }
                 });
 

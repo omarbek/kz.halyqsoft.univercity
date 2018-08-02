@@ -6,7 +6,7 @@ import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.VerticalLayout;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
-import kz.halyqsoft.univercity.modules.workflow.WorkflowCommonUtils;
+import kz.halyqsoft.univercity.utils.WorkflowCommonUtils;
 import kz.halyqsoft.univercity.modules.workflow.views.dialogs.CreateViewDialog;
 import kz.halyqsoft.univercity.utils.EmployeePdfCreator;
 import kz.halyqsoft.univercity.utils.CommonUtils;

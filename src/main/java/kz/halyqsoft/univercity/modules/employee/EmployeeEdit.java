@@ -138,6 +138,9 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
                 userPhotoBytes = userPhoto.getPhoto();
                 userPhotoFilename = userPhoto.getFileName();
             }
+        } else {
+            baseDataFM.getFieldModel("login").setInEdit(false);
+            baseDataFM.getFieldModel("login").setInView(false);
         }
         PhotoWidget userPW = new PhotoWidget(userPhotoBytes, baseDataFM.isReadOnly());
         userPW.setPhotoHeight(290, Unit.PIXELS);
@@ -257,7 +260,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         content.setSpacing(true);
         content.setSizeFull();
 
-		/* Subject PPS */
+        /* Subject PPS */
         subjectPPSTW = new TableWidget(V_TEACHER_SUBJECT.class);
         subjectPPSTW.setButtonVisible(AbstractToolbar.REFRESH_BUTTON, false);
         subjectPPSTW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
@@ -336,7 +339,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         content.addComponent(subjectPPSTW);
         content.setComponentAlignment(subjectPPSTW, Alignment.MIDDLE_CENTER);
 
-		/* Load By Hours */
+        /* Load By Hours */
         loadByHourTW = new TableWidget(V_TEACHER_SUBJECT.class);
         loadByHourTW.setButtonVisible(AbstractToolbar.REFRESH_BUTTON, false);
         loadByHourTW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
@@ -418,7 +421,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         content.addComponent(loadByHourTW);
         content.setComponentAlignment(loadByHourTW, Alignment.MIDDLE_CENTER);
 
-		/* Graduate Student Load */
+        /* Graduate Student Load */
         graduateStudentLoadGW = new GridWidget(VGraduateStudentLoad.class);
         graduateStudentLoadGW.setButtonVisible(AbstractToolbar.REFRESH_BUTTON, false);
         graduateStudentLoadGW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
@@ -565,7 +568,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         udfQM.addWhere("userDocument", ECriteria.EQUAL, null);
         udfQM.addWhereAnd("deleted", Boolean.FALSE);
 
-		/* Passport */
+        /* Passport */
         StringBuilder sb = new StringBuilder();
         sb.append(getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
@@ -629,7 +632,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         birthCountryFieldModel.getListeners().add(new BirthCountryChangeListener(birthRegionFieldModel, birthRegion));
         forms.addComponent(userPassportFW);
 
-		/* Military doc */
+        /* Military doc */
         sb = new StringBuilder();
         sb.append(getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
@@ -677,7 +680,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         }
         forms.addComponent(militaryDocFW);
 
-		/* Disability doc */
+        /* Disability doc */
         sb = new StringBuilder();
         sb.append(getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
@@ -725,7 +728,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         }
         forms.addComponent(disabilityDocFW);
 
-		/* Repatriate doc */
+        /* Repatriate doc */
         sb = new StringBuilder();
         sb.append(getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
@@ -827,7 +830,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         content.setSpacing(true);
         content.setSizeFull();
 
-		/* Education doc */
+        /* Education doc */
         educationTW = new TableWidget(EDUCATION_DOC.class);
         educationTW.addEntityListener(this);
         DBTableModel educationTM = (DBTableModel) educationTW.getWidgetModel();
@@ -845,7 +848,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         content.addComponent(educationTW);
         content.setComponentAlignment(educationTW, Alignment.TOP_CENTER);
 
-		/* Languages */
+        /* Languages */
         languageTW = new TableWidget(V_USER_LANGUAGE.class);
         languageTW.addEntityListener(this);
         DBTableModel languageTM = (DBTableModel) languageTW.getWidgetModel();
@@ -874,7 +877,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         content.setSpacing(true);
         content.setSizeFull();
 
-		/* Medical checkup */
+        /* Medical checkup */
         medicalCheckupTW = new TableWidget(V_MEDICAL_CHECKUP.class);
         medicalCheckupTW.addEntityListener(this);
         DBTableModel medicalCheckupTM = (DBTableModel) medicalCheckupTW.getWidgetModel();
@@ -907,7 +910,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         formsGL.setSizeFull();
         formsGL.setSpacing(true);
 
-		/* Address registration */
+        /* Address registration */
         StringBuilder sb = new StringBuilder();
         sb.append(getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
@@ -973,7 +976,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
 
         formsGL.addComponent(addressRegFW);
 
-		/* Address residential */
+        /* Address residential */
         sb = new StringBuilder();
         sb.append(getUILocaleUtil().getCaption("title.error"));
         sb.append(": ");
@@ -1082,7 +1085,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         content.setSpacing(true);
         content.setSizeFull();
 
-		/* Scientific degree */
+        /* Scientific degree */
         scientificDegreeTW = new TableWidget(V_EMPLOYEE_DEGREE.class);
         scientificDegreeTW.addEntityListener(this);
         DBTableModel scientificDegreeTM = (DBTableModel) scientificDegreeTW.getWidgetModel();
@@ -1111,7 +1114,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
             employeeId = baseDataFW.getWidgetModel().getEntity().getId();
         }
 
-		/* Publications */
+        /* Publications */
         publicationTW = new TableWidget(V_PUBLICATION.class);
         publicationTW.addEntityListener(this);
         DBTableModel publicationTM = (DBTableModel) publicationTW.getWidgetModel();
@@ -1124,7 +1127,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         content.addComponent(publicationTW);
         content.setComponentAlignment(publicationTW, Alignment.TOP_CENTER);
 
-		/* Scientific activity */
+        /* Scientific activity */
         scientificActivityTW = new TableWidget(V_SCIENTIFIC_ACTIVITY.class);
         scientificActivityTW.addEntityListener(this);
         DBTableModel scientificActivityTM = (DBTableModel) scientificActivityTW.getWidgetModel();
@@ -1137,7 +1140,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         content.addComponent(scientificActivityTW);
         content.setComponentAlignment(scientificActivityTW, Alignment.MIDDLE_CENTER);
 
-		/* Scientific management */
+        /* Scientific management */
         scientificManagementTW = new TableWidget(V_SCIENTIFIC_MANAGEMENT.class);
         scientificManagementTW.addEntityListener(this);
         DBTableModel scientificManagementTM = (DBTableModel) scientificManagementTW.getWidgetModel();
@@ -1160,7 +1163,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
             employeeId = baseDataFW.getWidgetModel().getEntity().getId();
         }
 
-		/* Experiences */
+        /* Experiences */
         experienceTW = new TableWidget(PREVIOUS_EXPERIENCE.class);
         experienceTW.addEntityListener(this);
         DBTableModel experienceTM = (DBTableModel) experienceTW.getWidgetModel();
@@ -1237,7 +1240,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         content.setSpacing(true);
         content.setSizeFull();
 
-		/* Work days */
+        /* Work days */
         ID employeeId = ID.valueOf(-1);
         if (!baseDataFW.getWidgetModel().isCreateNew()) {
             employeeId = baseDataFW.getWidgetModel().getEntity().getId();
@@ -3032,8 +3035,6 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
     public void onException(Object source, Throwable ex) {
         Message.showError(ex.toString());
     }
-
-
 
 
     private class AddNewRoomListener extends AbstractYesButtonListener {

@@ -33,7 +33,7 @@ public class USERS extends AbstractUser implements CommonTree<USERS> {
     @OneToMany(mappedBy = "user")
     private List<USER_ROLES> userRoles;
 
-    @FieldInfo(type = EFieldType.TEXT_LABEL, max = 32, order = 14, required = false, readOnlyFixed = true, inGrid = false, inEdit = false)
+    @FieldInfo(type = EFieldType.TEXT_LABEL, max = 32, required = false, readOnlyFixed = true)
     @Column(name = "LOGIN")
     private String login;
 
@@ -106,7 +106,7 @@ public class USERS extends AbstractUser implements CommonTree<USERS> {
     @Column(name = "PHONE_INTERNAL")
     private String phoneInternal;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 18, required= false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 18, required = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "CARD_ID", referencedColumnName = "ID")})

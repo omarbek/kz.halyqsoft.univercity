@@ -261,38 +261,6 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
             buttonsHL.setComponentAlignment(orderAndSkipB, Alignment.MIDDLE_RIGHT);
         }
 
-        Button transcriptB = new Button(getUILocaleUtil().getCaption("profile.transcript"));
-        transcriptB.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent ev) {
-                FormModel fm = new FormModel(STUDENT.class);
-                fm.setReadOnly(true);
-                fm.setTitleVisible(false);
-                try {
-                    fm.loadEntity(student.getId());
-                } catch (Exception ex) {
-                    LOG.error("Unable to edit the student: ", ex);
-                    Message.showError(ex.toString());
-                }
-//                goToView(new TranscriptView(student, StudentEdit.this));//TODO
-            }
-        });
-
-        buttonsHL.addComponent(transcriptB);
-        buttonsHL.setComponentAlignment(transcriptB, Alignment.MIDDLE_CENTER);
-
-        Button scheduleB = new Button(getUILocaleUtil().getCaption("schedule"));
-        scheduleB.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent ev) {
-                //TODO заменить на новое расписание
-                //DormUI.getInstance().openCommonView(new StudentScheduleView(student.getId(), true));
-            }
-        });
-
-        buttonsHL.addComponent(scheduleB);
-        buttonsHL.setComponentAlignment(scheduleB, Alignment.MIDDLE_CENTER);
-
         content.addComponent(buttonsHL);
         content.setComponentAlignment(buttonsHL, Alignment.BOTTOM_CENTER);
         //
@@ -332,7 +300,8 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
     private Button createOrderAndSkipButton(final STUDENT student) {
         orderAndSkipB = new Button(getUILocaleUtil().getCaption("warrant.and.skip"));
 
-        String filename = student.getFirstNameEN() + student.getLastNameEN() + uriDateFormat.format(Calendar.getInstance().getTime()) + ".pdf";
+        String filename = student.getFirstNameEN() + student.getLastNameEN() +
+                uriDateFormat.format(Calendar.getInstance().getTime()) + ".pdf";
         final StreamResource resource = new StreamResource(orderAndSkipSource, filename);
         resource.setMIMEType("application/pdf");
         final BrowserWindowOpener opener = new BrowserWindowOpener(resource);

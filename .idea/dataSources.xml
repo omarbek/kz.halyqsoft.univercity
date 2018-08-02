@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="realdb@localhost" uuid="7e82bbfb-cedf-4de6-a1c1-a8ec99f0ddec">
+    <data-source source="LOCAL" name="realdb@localhost" uuid="0de19e1c-82d7-4a58-9194-a5513d14da5c">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://localhost:5432/realdb</jdbc-url>
+      <driver-properties>
+        <property name="ApplicationName" value="DataGrip" />
+      </driver-properties>
     </data-source>
   </component>
 </project>

@@ -8,7 +8,7 @@ import com.vaadin.ui.Button;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_SIGNER;
-import kz.halyqsoft.univercity.modules.workflow.WorkflowCommonUtils;
+import kz.halyqsoft.univercity.utils.WorkflowCommonUtils;
 import kz.halyqsoft.univercity.utils.EmployeePdfCreator;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -21,6 +21,8 @@ import org.r3a.common.vaadin.widget.dialog.AbstractDialog;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
+import org.r3a.common.vaadin.widget.table.TableWidget;
+import org.r3a.common.vaadin.widget.table.model.DBTableModel;
 import org.r3a.common.vaadin.widget.toolbar.IconToolbar;
 
 import java.util.ArrayList;
@@ -28,7 +30,7 @@ import java.util.List;
 
 public class MyDocumentsView extends BaseView implements EntityListener{
     private USERS currentUser;
-    private GridWidget myDocsGW;
+    private TableWidget myDocsTW;
     private Button linkedTables;
     public MyDocumentsView(String title){
         super(title);
@@ -63,10 +65,10 @@ public class MyDocumentsView extends BaseView implements EntityListener{
                         DBGridModel dbGridModel = (DBGridModel) myDocsSignerGW.getWidgetModel();
                         dbGridModel.getFormModel().getFieldModel("documentSignerStatus").setInView(true);
 
-                        dbGridModel.getQueryModel().addWhere("document" , ECriteria.EQUAL , myDocsGW.getSelectedEntity().getId());
+                        dbGridModel.getQueryModel().addWhere("document" , ECriteria.EQUAL , myDocsTW.getSelectedEntity().getId());
 
                         getContent().addComponent(myDocsSignerGW);
-
+                    
 
                     }
 
@@ -76,7 +78,7 @@ public class MyDocumentsView extends BaseView implements EntityListener{
                         return getViewName();
                     }
                 };
-                if(myDocsGW.getSelectedEntity()!=null){
+                if(myDocsTW.getSelectedEntity()!=null){
                     abstractDialog.open();
                 }else{
                     Message.showError(getUILocaleUtil().getCaption("chooseARecord"));
@@ -85,22 +87,22 @@ public class MyDocumentsView extends BaseView implements EntityListener{
         });
 
         currentUser = WorkflowCommonUtils.getCurrentUser();
-        myDocsGW = new GridWidget(DOCUMENT.class);
-        myDocsGW.setSizeFull();
-        myDocsGW.setImmediate(true);
-        myDocsGW.setResponsive(true);
-        myDocsGW.setButtonVisible(IconToolbar.ADD_BUTTON , false);
-        myDocsGW.setButtonVisible(IconToolbar.EDIT_BUTTON, false);
-        myDocsGW.addEntityListener(this);
+        myDocsTW = new TableWidget(DOCUMENT.class);
+        myDocsTW.setSizeFull();
+        myDocsTW.setImmediate(true);
+        myDocsTW.setResponsive(true);
+        myDocsTW.setButtonVisible(IconToolbar.ADD_BUTTON , false);
+        myDocsTW.setButtonVisible(IconToolbar.EDIT_BUTTON, false);
+        myDocsTW.addEntityListener(this);
 
 
-        DBGridModel dbGridModel = (DBGridModel) myDocsGW.getWidgetModel();
-        dbGridModel.setDeferredDelete(true);
-        dbGridModel.getQueryModel().addWhere("creatorEmployee" , ECriteria.EQUAL , currentUser.getId());
+        DBTableModel dbTableModel = (DBTableModel) myDocsTW.getWidgetModel();
+        dbTableModel.setDeferredDelete(true);
+        dbTableModel.getQueryModel().addWhere("creatorEmployee" , ECriteria.EQUAL , currentUser.getId());
 
         getContent().addComponent(linkedTables);
         getContent().setComponentAlignment(linkedTables, Alignment.MIDDLE_CENTER);
-        getContent().addComponent(myDocsGW);
+        getContent().addComponent(myDocsTW);
     }
 
     @Override

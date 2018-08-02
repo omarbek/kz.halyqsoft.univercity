@@ -60,8 +60,9 @@ public class WarrantAndSkipOfStudents implements StreamSource {
             PdfPTable orderTable = new PdfPTable(tableColspan);
             PdfPCell orderCell;
 
-            Image kbtuI = Image.getInstance(VaadinService.getCurrent().getBaseDirectory().getAbsolutePath() + "/WEB-INF/classes/img/KBTU.gif");
-            orderCell = new PdfPCell(kbtuI);
+            Image univerImage = Image.getInstance(VaadinService.getCurrent().getBaseDirectory().getAbsolutePath()
+                    + "/VAADIN/themes/univercity/img/info.png");
+            orderCell = new PdfPCell(univerImage);
             orderCell.setBorder(PdfPCell.NO_BORDER);
             orderTable.addCell(orderCell);
             addSpaceCell(orderTable, tableColspan);

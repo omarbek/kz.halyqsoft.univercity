@@ -1,18 +1,12 @@
 package kz.halyqsoft.univercity.entity.beans.univercity;
 
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_STUDENT;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
 
+import javax.persistence.*;
 import java.util.Date;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.ManyToOne;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 /**
  * @author Omarbek
@@ -23,20 +17,16 @@ public class STUDENT_FIN_DEBT extends AbstractEntity {
 
 	private static final long serialVersionUID = -2348574322994827920L;
 
+	@FieldInfo(type = EFieldType.FK_COMBO)
 	@ManyToOne
 	@JoinColumns({ @JoinColumn(name = "STUDENT_ID", referencedColumnName = "ID", nullable = false) })
-	private STUDENT student;
+	private V_STUDENT student;
 
-	@FieldInfo(type = EFieldType.DATETIME, order = 2)
-	@Column(name = "REPORT_DATE", nullable = false)
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date reportDate;
-
-	@FieldInfo(type = EFieldType.DOUBLE, order = 3)
+	@FieldInfo(type = EFieldType.DOUBLE, order = 2)
 	@Column(name = "DEBT_SUM", nullable = false)
 	private Double debtSum;
 
-	@FieldInfo(type = EFieldType.BOOLEAN, order = 4)
+	@FieldInfo(type = EFieldType.BOOLEAN, order = 3,required = false)
 	@Column(name = "RETAKE", nullable = false)
 	private boolean retake;
 
@@ -50,20 +40,12 @@ public class STUDENT_FIN_DEBT extends AbstractEntity {
 	public STUDENT_FIN_DEBT() {
 	}
 
-	public STUDENT getStudent() {
+	public V_STUDENT getStudent() {
 		return student;
 	}
 
-	public void setStudent(STUDENT student) {
+	public void setStudent(V_STUDENT student) {
 		this.student = student;
-	}
-
-	public Date getReportDate() {
-		return reportDate;
-	}
-
-	public void setReportDate(Date reportDate) {
-		this.reportDate = reportDate;
 	}
 
 	public Double getDebtSum() {

@@ -1,5 +1,6 @@
 package kz.halyqsoft.univercity.modules.student;
 
+import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.FileDownloader;
 import com.vaadin.server.StreamResource;
@@ -17,10 +18,6 @@ import kz.halyqsoft.univercity.entity.beans.univercity.view.V_MEDICAL_CHECKUP;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_USER_LANGUAGE;
 import kz.halyqsoft.univercity.filter.FStudentFilter;
 import kz.halyqsoft.univercity.filter.panel.StudentFilterPanel;
-import kz.halyqsoft.univercity.modules.accountant.AccountantEdit;
-import kz.halyqsoft.univercity.modules.curriculum.working.schedule.ScheduleBean;
-import kz.halyqsoft.univercity.modules.curriculum.working.schedule.SchedulePanel;
-import kz.halyqsoft.univercity.modules.curriculum.working.schedule.SchedulePanelEdit;
 import kz.halyqsoft.univercity.modules.student.tabs.*;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.changelisteners.BirthCountryChangeListener;
@@ -45,10 +42,8 @@ import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.dialog.select.ESelectType;
 import org.r3a.common.vaadin.widget.dialog.select.custom.grid.CustomGridSelectDialog;
 import org.r3a.common.vaadin.widget.form.*;
-import org.r3a.common.vaadin.widget.form.factory.DefaultFieldGroup;
 import org.r3a.common.vaadin.widget.form.field.filelist.FileListFieldModel;
 import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
-import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.photo.PhotoWidget;
 import org.r3a.common.vaadin.widget.photo.PhotoWidgetEvent;
 import org.r3a.common.vaadin.widget.photo.PhotoWidgetListener;
@@ -66,7 +61,6 @@ import static kz.halyqsoft.univercity.modules.regapplicants.ApplicantsForm.creat
  */
 @SuppressWarnings({"serial", "unchecked"})
 public final class StudentEdit extends AbstractFormWidgetView implements PhotoWidgetListener {
-
     private AbstractFormWidget baseDataFW;
     private USER_PHOTO userPhoto;
     private String userPhotoFilename;
@@ -84,13 +78,14 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
     private VerticalLayout mainVL;
     private static Button pdfDownload, pdfDownloadDorm, pdfDownloadLetter;
     private StudentOrApplicantView studentOrApplicantView;
-    private HorizontalLayout hl;
+    private HorizontalLayout downloadHL;
     private static FileDownloader fileDownloaderDorm, fileDownloader,
             fileDownloaderParent, fileDownloaderTitle, fileDownloaderLetter;
     private static StreamResource myResource, myResourceDorm, resourceParents,
             myResourceTitle, myResourceLetter;
     private FormLayout educationFL;
     private FormModel mainBaseDataFM;
+    private CheckBox kazCheckBox, rusCheckBox;
 
     public StudentEdit(final FormModel baseDataFM, VerticalLayout mainVL, StudentOrApplicantView studentOrApplicantView)
             throws Exception {
@@ -102,8 +97,8 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         content.setSpacing(true);
         content.setSizeFull();
 
-        hl = new HorizontalLayout();
-        hl.setSpacing(true);
+        downloadHL = new HorizontalLayout();
+        downloadHL.setSpacing(true);
         // hl.setSizeFull();
 
         baseDataFM.setButtonsVisible(false);
@@ -178,8 +173,8 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         baseDataFW = new CommonFormWidget(baseDataFM);
         baseDataFW.setImmediate(true);
         baseDataFW.addEntityListener(this);
-        hl.addComponent(baseDataFW);
-        hl.setComponentAlignment(baseDataFW, Alignment.TOP_LEFT);
+        downloadHL.addComponent(baseDataFW);
+        downloadHL.setComponentAlignment(baseDataFW, Alignment.TOP_LEFT);
 
         if (!baseDataFM.isCreateNew()) {
             QueryModel<USER_PHOTO> qmUserPhoto = new QueryModel<>(USER_PHOTO.class);
@@ -218,8 +213,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         try {
 
             educationFL = getFormLayout();
-            if(educationFL!=null)
-            {
+            if (educationFL != null) {
                 rightContent.addComponent(educationFL);
                 rightContent.setComponentAlignment(educationFL, Alignment.MIDDLE_CENTER);
                 //educationFL
@@ -228,12 +222,12 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
             CommonUtils.showMessageAndWriteLog("Unable to load education info", ex);
         }
 
-        hl.addComponent(rightContent);
-        hl.setComponentAlignment(rightContent, Alignment.TOP_RIGHT);
-        hl.setExpandRatio(rightContent, 1);
-        content.addComponent(hl);
-        content.setComponentAlignment(hl, Alignment.MIDDLE_CENTER);
-        content.setExpandRatio(hl, 1);
+        downloadHL.addComponent(rightContent);
+        downloadHL.setComponentAlignment(rightContent, Alignment.TOP_RIGHT);
+        downloadHL.setExpandRatio(rightContent, 1);
+        content.addComponent(downloadHL);
+        content.setComponentAlignment(downloadHL, Alignment.MIDDLE_CENTER);
+        content.setExpandRatio(downloadHL, 1);
 
         if (!baseDataFM.isReadOnly()) {
             HorizontalLayout buttonPanel = createButtonPanel();
@@ -271,13 +265,13 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                             }
                         }
                         showSavedNotification();
-                        try{
+                        try {
                             baseDataFM.loadEntity(student.getId());
                             CommonUtils.setCards(baseDataFM);
-                            hl.removeComponent(baseDataFW);
+                            downloadHL.removeComponent(baseDataFW);
                             baseDataFW.getWidgetModel().loadEntity(student.getId());
                             baseDataFW.refresh();
-                            hl.addComponentAsFirst(baseDataFW);
+                            downloadHL.addComponentAsFirst(baseDataFW);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -303,16 +297,6 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
             buttonPanel.addComponent(lockUnlock);
             buttonPanel.setComponentAlignment(lockUnlock, Alignment.MIDDLE_CENTER);
 
-            CheckBox considerCreditCB = new CheckBox();
-            considerCreditCB.setCaption(getUILocaleUtil().getCaption("consider.credit"));
-            buttonPanel.addComponent(considerCreditCB);
-            considerCreditCB.setValue(true);
-
-            //  USERS user = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(USERS.class,student.getId());
-            pdfDownload = createDownloadButton();
-            buttonPanel.addComponent(pdfDownload);
-            buttonPanel.setComponentAlignment(pdfDownload, Alignment.MIDDLE_CENTER);
-
             pdfDownloadDorm = createDownloadButtonDorm();
             buttonPanel.addComponent(pdfDownloadDorm);
             buttonPanel.setComponentAlignment(pdfDownloadDorm, Alignment.MIDDLE_CENTER);
@@ -322,26 +306,69 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
             buttonPanel.addComponent(pdfDownloadLetter);
             buttonPanel.setComponentAlignment(pdfDownloadLetter, Alignment.MIDDLE_CENTER);
 
-
             content.addComponent(buttonPanel);
             content.setComponentAlignment(buttonPanel, Alignment.BOTTOM_CENTER);
+
+
         }
         getTabSheet().addTab(content, getMasterTabTitle());
 
+        HorizontalLayout hl = new HorizontalLayout();
+        hl.setWidth(15,Unit.PERCENTAGE);
+        kazCheckBox = new CheckBox();
+        rusCheckBox = new CheckBox();
+        rusCheckBox.setCaption(getUILocaleUtil().getCaption("ru.short"));
+        kazCheckBox.setCaption(getUILocaleUtil().getCaption("kk.short"));
+        kazCheckBox.setValue(false);
+        rusCheckBox.setValue(false);
+
+        hl.addComponents(kazCheckBox, rusCheckBox);
+        hl.setComponentAlignment(kazCheckBox,Alignment.MIDDLE_LEFT);
+        hl.setComponentAlignment(rusCheckBox,Alignment.MIDDLE_LEFT);
 
 
 
-        if(student.getLevel().getLevelName().equalsIgnoreCase("Магистратура"))
-        {
+        pdfDownload = createDownloadButton();
+        hl.addComponent(pdfDownload);
+        hl.setComponentAlignment(pdfDownload, Alignment.MIDDLE_RIGHT);
+
+        content.addComponent(hl);
+        content.setComponentAlignment(hl, Alignment.BOTTOM_CENTER);
+
+
+        if (student.getLevel().getLevelName().equalsIgnoreCase("Магистратура")) {
             myResource = createResourceStudent("82", student);
             fileDownloader = new FileDownloader(myResource);
             myResource.setMIMEType("application/pdf");
             fileDownloader.extend(pdfDownload);
-        }else {
-            myResource = createResourceStudent("85", student);
-            fileDownloader = new FileDownloader(myResource);
-            myResource.setMIMEType("application/pdf");
-            fileDownloader.extend(pdfDownload);
+
+        } else {
+
+            kazCheckBox.addValueChangeListener(new Property.ValueChangeListener() {
+                @Override
+                public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
+
+                    if (valueChangeEvent != null && valueChangeEvent.getProperty() != null && valueChangeEvent.getProperty().getValue() != null) {
+                        myResource = createResourceStudent("90", student);
+                        fileDownloader = new FileDownloader(myResource);
+                        myResource.setMIMEType("application/pdf");
+                        fileDownloader.extend(pdfDownload);
+
+                    }
+                }
+            });
+
+            rusCheckBox.addValueChangeListener(new Property.ValueChangeListener() {
+                @Override
+                public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
+
+                    myResource = createResourceStudent("85", student);
+                    fileDownloader = new FileDownloader(myResource);
+                    myResource.setMIMEType("application/pdf");
+                    fileDownloader.extend(pdfDownload);
+
+                }
+            });
         }
 
         myResourceLetter = createResourceStudent("33", student);
@@ -376,7 +403,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         createParentsTab(readOnly);
         createAwardsTab(readOnly);
         createSocialCategoriesTab(readOnly);
-//        createDebtAndPaymentTab(readOnly);//TODO add later
+        createDebtAndPaymentTab(readOnly);
         if (student.getCategory().getId().equals(STUDENT_CATEGORY.STUDENT_ID)) {
             createDiplomaTab(readOnly);
         }
@@ -402,14 +429,13 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
 
         pdfDownloadDorm.setEnabled(false);
 
-        if(student.getLevel().getLevelName().equalsIgnoreCase("Магистратура"))
-        {
+        if (student.getLevel().getLevelName().equalsIgnoreCase("Магистратура")) {
             myResource = createResourceStudent("82", student);
             fileDownloader = new FileDownloader(myResource);
             myResource.setMIMEType("application/pdf");
             myResource.setCacheTime(0);
             fileDownloader.extend(pdfDownload);
-        }else {
+        } else {
             myResource = createResourceStudent("85", student);
             fileDownloader = new FileDownloader(myResource);
             myResource.setMIMEType("application/pdf");
@@ -451,8 +477,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         try {
             StudentFilterPanel studentFilterPanel = studentOrApplicantView.createStudentFilterPanel();
             studentOrApplicantView.setFilterPanel(studentFilterPanel);
-        }catch (Exception e)
-        {
+        } catch (Exception e) {
             Message.showError(e.getMessage());
             e.printStackTrace();
         }
@@ -514,6 +539,22 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         downloadButton.setData(11);
         downloadButton.setCaption(getUILocaleUtil().getCaption("download.contract"));
         downloadButton.setWidth(130, Unit.PIXELS);
+
+        downloadButton.addClickListener(
+                new Button.ClickListener() {
+                    @Override
+                    public void buttonClick(Button.ClickEvent clickEvent) {
+
+                        try {
+                            if (kazCheckBox.isEmpty() && rusCheckBox.isEmpty()) {
+                                Message.showInfo(getUILocaleUtil().getMessage("error.student"));
+
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
 
         return downloadButton;
     }
@@ -2227,7 +2268,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
 
                     }
                 });
-                 educationFL.addComponent(moreButton);
+                educationFL.addComponent(moreButton);
             }
 
             createdBylabel = new Label();
@@ -2253,13 +2294,13 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
 
             return educationFL;
 
-        }catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
         return null;
     }
+
     public interface StudentEditHelper {
 
         boolean isStudentNew();

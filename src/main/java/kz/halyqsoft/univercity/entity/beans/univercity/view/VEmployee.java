@@ -1,5 +1,6 @@
 package kz.halyqsoft.univercity.entity.beans.univercity.view;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
@@ -12,33 +13,41 @@ public final class VEmployee extends AbstractEntity {
 
 	private static final long serialVersionUID = -5652828598742599696L;
 
+	@JsonIgnore
 	@FieldInfo(type = EFieldType.TEXT, order = 2)
 	private String code;
 	
 	@FieldInfo(type = EFieldType.TEXT, order = 3)
 	private String fio;
-	
+
+	@JsonIgnore
 	@FieldInfo(type = EFieldType.TEXT, order = 4)
 	private String deptName;
-	
+
+	@JsonIgnore
 	@FieldInfo(type = EFieldType.TEXT, order = 5)
 	private String postName;
-	
+
+	@JsonIgnore
 	@FieldInfo(type = EFieldType.BOOLEAN, order = 6, inGrid = false)
 	private boolean lecture;
-	
+
+	@JsonIgnore
 	@FieldInfo(type = EFieldType.BOOLEAN, order = 7, inGrid = false)
 	private boolean laboratory;
-	
+
+	@JsonIgnore
 	@FieldInfo(type = EFieldType.BOOLEAN, order = 8, inGrid = false)
 	private boolean practice;
-	
+
+	@JsonIgnore
 	@FieldInfo(type = EFieldType.BOOLEAN, order = 9, inGrid = false)
 	private boolean fall;
-	
+
+	@JsonIgnore
 	@FieldInfo(type = EFieldType.BOOLEAN, order = 10, inGrid = false)
 	private boolean spring;
-	
+
 	public VEmployee() {
 	}
 	

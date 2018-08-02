@@ -6,6 +6,7 @@ import kz.halyqsoft.univercity.entity.beans.ROLE_TASKS;
 import kz.halyqsoft.univercity.entity.beans.TASKS;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.utils.CommonUtils;
+import kz.halyqsoft.univercity.utils.TimeUtils;
 import kz.halyqsoft.univercity.utils.changelisteners.CountryChangeListener;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -353,29 +354,23 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                         academicFormula.getLbCount() + "/" + academicFormula.getPrCount());
             } else if (e instanceof TIME) {
                 TIME time = (TIME) e;
-                String timeName = time.getTimeName();
-                String symbol = timeName.substring(timeName.length() - 3, timeName.length() - 2);
-                if (!(symbol.equals(":") || symbol.equals("-"))) {
-                    Message.showInfo("please fill time with definite format");//TODO
-                    return false;
-                }
-                if (timeName.length() == 4) {
-                    timeName = "0" + timeName;
-                }
-                String minutes = timeName.substring(timeName.lastIndexOf(symbol) + 1);
-                Double hours = Double.valueOf(timeName.substring(0, timeName.lastIndexOf(symbol)));
+                TimeUtils clock = new TimeUtils(time);
+                if (clock.isError()) return false;
+                String hours = clock.getHours();
+                String minutes = clock.getMinutes();
+                Double hoursInDouble = Double.valueOf(hours);
                 if ("00".equals(minutes)) {
-                    time.setTimeValue(hours);
+                    time.setTimeValue(hoursInDouble);
                 } else if ("10".equals(minutes)) {
-                    time.setTimeValue(hours + 0.17);
+                    time.setTimeValue(hoursInDouble + 0.17);
                 } else if ("20".equals(minutes)) {
-                    time.setTimeValue(hours + 0.33);
+                    time.setTimeValue(hoursInDouble + 0.33);
                 } else if ("30".equals(minutes)) {
-                    time.setTimeValue(hours + 0.5);
+                    time.setTimeValue(hoursInDouble + 0.5);
                 } else if ("40".equals(minutes)) {
-                    time.setTimeValue(hours + 0.67);
+                    time.setTimeValue(hoursInDouble + 0.67);
                 } else if ("50".equals(minutes)) {
-                    time.setTimeValue(hours + 0.83);
+                    time.setTimeValue(hoursInDouble + 0.83);
                 } else {
                     Message.showError("you should choose minutes with interval of 10 mins");//TODO
                     return false;

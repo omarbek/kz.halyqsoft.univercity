@@ -46,7 +46,7 @@ public class StudentView extends AbstractTaskView {
             public void buttonClick(Button.ClickEvent event) {
                 try {
                     mainVL.removeAllComponents();
-                    mainVL.addComponent(new StudentOrApplicantView(categoryType, buttonsHL));
+                    mainVL.addComponent(new StudentOrApplicantView(categoryType, buttonsHL, false));
                 } catch (Exception e) {
                     e.printStackTrace();//TODO catch
                 }

@@ -9,8 +9,8 @@ import kz.halyqsoft.univercity.utils.StudentUtils;
  */
 public class StudentOrApplicantView extends StudentUtils {
 
-    public StudentOrApplicantView(int categoryType, HorizontalLayout buttonsHL) throws Exception {
-        super(categoryType);
+    public StudentOrApplicantView(int categoryType, HorizontalLayout buttonsHL, boolean forDorm) throws Exception {
+        super(categoryType,forDorm);
 
         setStudentOrApplicantView(this);
         setButtonsHL(buttonsHL);

@@ -1,16 +1,21 @@
 package kz.halyqsoft.univercity.modules.workflow.views.dialogs;
 
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.TextArea;
+import com.vaadin.server.Page;
+import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
+
+import java.io.*;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT;
-import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_IMPORTANCE;
-import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_SIGNER;
-import kz.halyqsoft.univercity.entity.beans.univercity.PDF_DOCUMENT_SIGNER_POST;
+
+import kz.halyqsoft.univercity.entity.beans.univercity.*;
+import kz.halyqsoft.univercity.utils.CommonUtils;
+import kz.halyqsoft.univercity.utils.WorkflowCommonUtils;
+import org.apache.commons.io.IOUtils;
+import org.bouncycastle.openssl.PasswordException;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
@@ -32,6 +37,7 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
     private DOCUMENT document;
     private ComboBox importanceCB;
     private TextArea messageTA;
+    private File customFile;
 
     public CreateViewDialog(AbstractCommonView prevView, String title, final DOCUMENT document, List<PDF_DOCUMENT_SIGNER_POST> pdfDocumentSignerPosts) {
         this.title = title;
@@ -50,14 +56,42 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
             ex.printStackTrace();
         }
 
+
         this.importanceCB = new ComboBox();
         this.importanceCB.setCaption(this.getUILocaleUtil().getEntityLabel(DOCUMENT_IMPORTANCE.class));
         this.importanceCB.setSizeFull();
         this.importanceCB.setContainerDataSource(importanceBIC);
         this.getContent().addComponent(this.importanceCB);
+
         this.messageTA = new TextArea(this.getUILocaleUtil().getCaption("message"));
-        this.messageTA.setWidth(90.0F, Unit.PERCENTAGE);
+        this.messageTA.setWidth(100, Unit.PERCENTAGE);
         this.getContent().addComponent(this.messageTA);
+
+        FileUploader receiver = new FileUploader(customFile);
+        Upload upload = new Upload(getUILocaleUtil().getMessage("upload.custom"), receiver);
+
+        upload.addFinishedListener(new Upload.FinishedListener() {
+            @Override
+            public void uploadFinished(Upload.FinishedEvent finishedEvent) {
+                try{
+                    document.setFileByte( IOUtils.toByteArray(new FileInputStream(receiver.getFile())));
+                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(document);
+                    CommonUtils.showSavedNotification();
+                }catch (Exception e){
+                    Message.showError(e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+        });
+        upload.setImmediate(true);
+        upload.setButtonCaption(getUILocaleUtil().getMessage("start.to.upload"));
+
+        upload.addSucceededListener(receiver);
+        this.getContent().addComponent(upload);
+        this.getContent().setComponentAlignment(upload, Alignment.MIDDLE_CENTER);
+
+
+
         if (pdfDocumentSignerPosts != null) {
             this.documentSignerGW = new GridWidget(DOCUMENT_SIGNER.class);
             this.documentSignerGW.setImmediate(true);
@@ -128,6 +162,41 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
     public GridWidget getDocumentSignerGW() {
         return this.documentSignerGW;
     }
+
+    class FileUploader implements Upload.Receiver, Upload.SucceededListener {
+        private File file;
+
+        public FileUploader(File file){
+            this.file = file;
+        }
+
+        @Override
+        public OutputStream receiveUpload(String filename, String mimeType) {
+            FileOutputStream fos = null; // Stream to write to
+            try {
+                file = new File(filename);
+                fos = new FileOutputStream(file);
+
+            } catch (final java.io.FileNotFoundException e) {
+                new Notification("Could not open file",
+                        e.getMessage(),
+                        Notification.Type.ERROR_MESSAGE)
+                        .show(Page.getCurrent());
+                return null;
+            }
+            return fos;
+        }
+
+        @Override
+        public void uploadSucceeded(Upload.SucceededEvent event) {
+
+        }
+
+        public File getFile() {
+            return file;
+        }
+    }
+
 
     @Override
     protected String createTitle() {

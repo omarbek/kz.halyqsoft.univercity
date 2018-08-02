@@ -31,14 +31,14 @@ public class DOCUMENT_SIGNER extends AbstractEntity{
             @JoinColumn(name = "employee_id", referencedColumnName = "ID")})
     private EMPLOYEE employee;
 
-    @FieldInfo(type = EFieldType.FK_COMBO,inGrid = false, inEdit = false ,required = false , order = 4)
+    @FieldInfo(type = EFieldType.FK_COMBO,inEdit = false ,order = 4)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "document_signer_status_id", referencedColumnName = "ID")})
     private DOCUMENT_SIGNER_STATUS documentSignerStatus;
 
 
-    @FieldInfo(type = EFieldType.TEXT, inEdit = false , inView = false , inGrid = false , required = false, order = 5)
+    @FieldInfo(type = EFieldType.TEXT, inEdit = false ,required = false, order = 5)
     @Column(name = "message")
     private String message;
 
@@ -49,7 +49,7 @@ public class DOCUMENT_SIGNER extends AbstractEntity{
     private Date created;
 
 
-    @FieldInfo(type = EFieldType.DATETIME, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false, order=7)
+    @FieldInfo(type = EFieldType.DATETIME, required = false, readOnlyFixed = true, inEdit = false, order=7)
     @Column(name = "updated")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updated;

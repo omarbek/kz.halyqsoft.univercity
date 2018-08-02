@@ -7,11 +7,9 @@ import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.USER_TYPE;
 import kz.halyqsoft.univercity.entity.beans.univercity.enumeration.UserType;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.VDepartmentInfo;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.VEmployeeInfo;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.V_EMPLOYEE;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.V_STUDENT;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.*;
 import kz.halyqsoft.univercity.modules.reports.MenuColumn;
+import kz.halyqsoft.univercity.modules.userarrival.subview.GroupAttendance;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -105,8 +103,7 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
                             setLaters();
                             setEmployees();
                             setNoCards();
-                        }
-                        if (employeeAttendance.equals(event.getProperty().getValue().toString())) {
+                        }else if (employeeAttendance.equals(event.getProperty().getValue().toString())) {
                             date = new DateField();
                             Date currentDate = new Date();
                             date.setValue(currentDate);
@@ -115,18 +112,21 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
                                 public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
                                     if (date.getValue() != null) {
                                         DateFormat dateFormat = new SimpleDateFormat();
-                                        ((DBGridModel) employeeGW.getWidgetModel()).
-                                                setEntities(getList(dateFormat.format(date.getValue())));
+                                        ((DBGridModel) employeeGW.getWidgetModel()).setEntities(getList(dateFormat.format(date.getValue())));
                                         if(employeeByDepartmentGW!=null){
                                             ((DBGridModel) employeeByDepartmentGW.getWidgetModel()).
                                                     setEntities(getEmployee(dateFormat.format(date.getValue())));
                                         }
                                     } else {
-                                        Message.showError("Choose date!");
+                                        Message.showInfo(getUILocaleUtil().getMessage("error.date"));
                                     }
                                 }
                             });
                             setDepartmentInfo();
+                        }else if(studentAttendance.equalsIgnoreCase(event.getProperty().getValue().toString())){
+                            GroupAttendance groupAttendance = new GroupAttendance();
+
+                            mainHL.addComponent(groupAttendance.getMainVL());
                         }
                         mainHSP.addComponent(mainHL);
                     }
@@ -235,6 +235,8 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
         mainHSP.addComponent(menuTT);
         getContent().addComponent(mainHSP);
     }
+
+
 
     private void setDepartmentInfo() {
 

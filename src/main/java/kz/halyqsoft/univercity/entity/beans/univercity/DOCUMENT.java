@@ -38,7 +38,7 @@ public class DOCUMENT extends AbstractEntity{
     private PDF_DOCUMENT pdfDocument;
 
 
-    @FieldInfo(type = EFieldType.TEXT, inGrid = true, inEdit = false, inView = true ,  order = 5)
+    @FieldInfo(type = EFieldType.TEXT,inEdit = false,  order = 5)
     @Column(name = "message")
     private String message;
 
@@ -50,7 +50,7 @@ public class DOCUMENT extends AbstractEntity{
 
 
 
-    @FieldInfo(type = EFieldType.DATETIME, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false, order = 7)
+    @FieldInfo(type = EFieldType.DATETIME, required = false, readOnlyFixed = true,  inEdit = false,  order = 7)
     @Column(name = "created")
     @Temporal(TemporalType.TIMESTAMP)
     private Date created;
