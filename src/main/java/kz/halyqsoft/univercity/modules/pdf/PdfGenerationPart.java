@@ -20,7 +20,7 @@ public class PdfGenerationPart {
         pdfHSP.setSizeFull();
         pdfHSP.setResponsive(true);
         pdfHSP.setImmediate(true);
-        pdfHSP.setSplitPosition(70);
+        pdfHSP.setSplitPosition(80);
         init();
     }
 
@@ -35,7 +35,6 @@ public class PdfGenerationPart {
 
     public void createEmbedded(){
         pdfEmbedded = new Embedded();
-        pdfEmbedded.setStandby(loading);
         pdfEmbedded.setImmediate(true);
         pdfEmbedded.setMimeType("application/pdf");
         pdfEmbedded.setType(2);

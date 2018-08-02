@@ -1,22 +1,54 @@
 package kz.halyqsoft.univercity.modules.workflow.views.dialogs;
 
-import com.vaadin.ui.Embedded;
-import com.vaadin.ui.TextArea;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT;
+import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_SIGNER;
+import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_SIGNER_STATUS;
 import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_STATUS;
+import kz.halyqsoft.univercity.modules.workflow.views.BaseView;
+import kz.halyqsoft.univercity.modules.workflow.views.InOnAgreeView;
+import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.EmployeePdfCreator;
 import kz.halyqsoft.univercity.utils.WindowUtils;
 import kz.halyqsoft.univercity.utils.WorkflowCommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
+import org.r3a.common.entity.query.QueryModel;
+import org.r3a.common.entity.query.where.ECriteria;
+import org.r3a.common.vaadin.widget.grid.GridWidget;
+
+import java.util.Date;
 
 public class OpenPdfDialog extends WindowUtils{
 
     private VerticalLayout mainVL;
 
-    public OpenPdfDialog(DOCUMENT document, Integer width, Integer height){
+    public OpenPdfDialog(DOCUMENT document, BaseView baseView, Integer width, Integer height){
         super();
+        Button sendToSign = new Button(getUILocaleUtil().getCaption("send.to.sign"));
+        sendToSign.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                QueryModel<DOCUMENT_SIGNER> documentSignerQM = new QueryModel<>(DOCUMENT_SIGNER.class);
+                documentSignerQM.addWhere("document" , ECriteria.EQUAL, document.getId());
+                documentSignerQM.addWhereAnd("employee" , ECriteria.EQUAL, CommonUtils.getCurrentUser().getId());
+                try{
+                    DOCUMENT_SIGNER documentSigner = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(documentSignerQM);
+                    documentSigner.setDocumentSignerStatus(WorkflowCommonUtils.getDocumentSignerStatusByName(DOCUMENT_SIGNER_STATUS.IN_PROCESS));
+                    documentSigner.setUpdated(new Date());
+                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(documentSigner);
+
+
+                    if(baseView instanceof InOnAgreeView){
+                        ((InOnAgreeView)baseView).getDbGridModel().setEntities(((InOnAgreeView) baseView).getList());
+                    }
+
+                    close();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        });
         document.setDocumentStatus(WorkflowCommonUtils.getDocumentStatusByName(DOCUMENT_STATUS.IN_PROCESS));
         try{
             SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(document);
@@ -26,6 +58,8 @@ public class OpenPdfDialog extends WindowUtils{
         mainVL = new VerticalLayout();
         mainVL.setSizeFull();
         mainVL.setImmediate(true);
+        mainVL.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
+
         Embedded pdf = new Embedded(null, EmployeePdfCreator.createResourceStudent( document));
 
         pdf.setImmediate(true);
@@ -43,6 +77,7 @@ public class OpenPdfDialog extends WindowUtils{
         mainVL.setHeight(100, Unit.PERCENTAGE);
         mainVL.addComponent(pdf);
         mainVL.addComponent(textArea);
+        mainVL.addComponent(sendToSign);
 
         init(width,height);
     }

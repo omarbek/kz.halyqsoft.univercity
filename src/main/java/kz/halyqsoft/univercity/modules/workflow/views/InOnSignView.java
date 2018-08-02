@@ -4,6 +4,7 @@ import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_SIGNER;
+import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_SIGNER_STATUS;
 import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_STATUS;
 import kz.halyqsoft.univercity.utils.WorkflowCommonUtils;
 import kz.halyqsoft.univercity.modules.workflow.views.dialogs.OpenPdfDialog;
@@ -48,11 +49,13 @@ public class InOnSignView extends BaseView {
         List<ID> ids = new ArrayList<>();
         ids.add(WorkflowCommonUtils.getDocumentStatusByName(DOCUMENT_STATUS.IN_PROCESS).getId());
         ids.add(WorkflowCommonUtils.getDocumentStatusByName(DOCUMENT_STATUS.CREATED).getId());
+
         DBGridModel dbGridModel = (DBGridModel) inOnSignDocsGW.getWidgetModel();
         QueryModel inOnSignDocsQM = dbGridModel.getQueryModel();
         FromItem fi = inOnSignDocsQM.addJoin(EJoin.INNER_JOIN, "id", DOCUMENT_SIGNER.class , "document");
         inOnSignDocsQM.addWhereIn("documentStatus" , ids);
         inOnSignDocsQM.addWhereAnd(fi , "employee", ECriteria.EQUAL , CommonUtils.getCurrentUser().getId());
+        inOnSignDocsQM.addWhereAnd(fi , "documentSignerStatus", ECriteria.EQUAL, WorkflowCommonUtils.getDocumentSignerStatusByName(DOCUMENT_SIGNER_STATUS.IN_PROCESS).getId());
 
         HorizontalLayout buttonsPanel = new HorizontalLayout();
         Button previewBtn = new Button(getUILocaleUtil().getCaption("preview"));
@@ -60,7 +63,7 @@ public class InOnSignView extends BaseView {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
                 if(inOnSignDocsGW.getSelectedEntity()!=null){
-                    OpenPdfDialog openPdfDialog = new OpenPdfDialog((DOCUMENT) inOnSignDocsGW.getSelectedEntity(),700,700);
+                    OpenPdfDialog openPdfDialog = new OpenPdfDialog((DOCUMENT) inOnSignDocsGW.getSelectedEntity(), InOnSignView.this,700,700);
                     openPdfDialog.addCloseListener(new Window.CloseListener() {
                         @Override
                         public void windowClose(Window.CloseEvent closeEvent) {
@@ -97,7 +100,7 @@ public class InOnSignView extends BaseView {
                 }
             }
         });
-        buttonsPanel.addComponent(previewBtn);
+        //buttonsPanel.addComponent(previewBtn);
         buttonsPanel.addComponent(signBtn);
         buttonsPanel.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
 

@@ -8,12 +8,16 @@ import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_SIGNER;
 import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_STATUS;
 import kz.halyqsoft.univercity.utils.WorkflowCommonUtils;
+import org.r3a.common.entity.ID;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.widget.dialog.AbstractDialog;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 import org.r3a.common.vaadin.widget.toolbar.IconToolbar;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class OutOnSignView extends BaseView{
 
@@ -87,9 +91,15 @@ public class OutOnSignView extends BaseView{
         myDocsGW.setButtonVisible(IconToolbar.ADD_BUTTON , false);
         myDocsGW.setButtonVisible(IconToolbar.EDIT_BUTTON, false);
 
+        List<ID> ids = new ArrayList<>();
+        ids.add(WorkflowCommonUtils.getDocumentStatusByName(DOCUMENT_STATUS.FINALLY_REFUSED).getId());
+        ids.add(WorkflowCommonUtils.getDocumentStatusByName(DOCUMENT_STATUS.REFUSED_FOR_CORRECTION).getId());
+        ids.add(WorkflowCommonUtils.getDocumentStatusByName(DOCUMENT_STATUS.IN_PROCESS).getId());
+
         DBGridModel dbGridModel = (DBGridModel) myDocsGW.getWidgetModel();
+        dbGridModel.getColumnModel("creatorEmployee").setInGrid(false);
         dbGridModel.getQueryModel().addWhere("creatorEmployee" , ECriteria.EQUAL , currentUser.getId());
-        dbGridModel.getQueryModel().addWhereAnd("documentStatus" , ECriteria.EQUAL, WorkflowCommonUtils.getDocumentStatusByName(DOCUMENT_STATUS.ACCEPTED).getId());
+        dbGridModel.getQueryModel().addWhereInAnd("documentStatus" , ids);
 
         getContent().addComponent(linkedTables);
         getContent().setComponentAlignment(linkedTables, Alignment.MIDDLE_CENTER);

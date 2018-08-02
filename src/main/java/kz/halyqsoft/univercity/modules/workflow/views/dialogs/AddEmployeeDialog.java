@@ -56,7 +56,7 @@ public class AddEmployeeDialog extends AbstractDialog{
                 if(usersCB.getValue()!=null){
                     documentSigner.setEmployee((EMPLOYEE) usersCB.getValue());
                     try{
-                        documentSigner.setDocumentSignerStatus(WorkflowCommonUtils.getDocumentSignerStatusByName(DOCUMENT_SIGNER_STATUS.IN_PROCESS));
+                        documentSigner.setDocumentSignerStatus(WorkflowCommonUtils.getDocumentSignerStatusByName(DOCUMENT_SIGNER_STATUS.CREATED));
                         documentSigner.setUpdated(new Date());
                         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(documentSigner);
                         CommonUtils.showSavedNotification();

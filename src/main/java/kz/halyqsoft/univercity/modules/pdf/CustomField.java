@@ -18,6 +18,8 @@ public class CustomField {
     ComboBox fontComboBox;
     ComboBox textSizeComboBox;
     CheckBox centerCheckBox;
+    CheckBox rightCheckBox;
+    CheckBox customCheckBox;
     TextField pdfTitle;
     TextField title;
     TextField deadlineDays;
@@ -50,6 +52,8 @@ public class CustomField {
             }
         });
         this.centerCheckBox = new CheckBox();
+        this.rightCheckBox = new CheckBox();
+        this.customCheckBox = new CheckBox();
 
         this.textField = new TextArea(CommonUtils.getUILocaleUtil().getCaption("text") + ":");
         this.yComboBox.setCaption(CommonUtils.getUILocaleUtil().getCaption("space.top") + ":");
@@ -61,6 +65,8 @@ public class CustomField {
         this.order.setCaption(CommonUtils.getUILocaleUtil().getCaption("text.order") + ":");
         this.deadlineDays.setCaption(CommonUtils.getUILocaleUtil().getCaption("pdf.period") + ":");
         this.centerCheckBox.setCaption(CommonUtils.getUILocaleUtil().getCaption("text.center") + ":");
+        this.rightCheckBox.setCaption(CommonUtils.getUILocaleUtil().getCaption("text.right") + ":");
+        this.customCheckBox.setCaption(CommonUtils.getUILocaleUtil().getCaption("text.custom") + ":");
 
         this.textField.setRequired(true);
         this.xComboBox.setRequired(true);
@@ -82,6 +88,8 @@ public class CustomField {
         this.order.setImmediate(true);
         this.deadlineDays.setImmediate(true);
         this.centerCheckBox.setImmediate(true);
+        this.rightCheckBox.setImmediate(true);
+        this.customCheckBox.setImmediate(true);
 
         this.fontComboBox.addItem(BOLD);
         this.fontComboBox.addItem(ITALIC);
@@ -188,5 +196,21 @@ public class CustomField {
 
     public void setDeadlineDays(TextField deadlineDays) {
         this.deadlineDays = deadlineDays;
+    }
+
+    public CheckBox getRightCheckBox() {
+        return rightCheckBox;
+    }
+
+    public void setRightCheckBox(CheckBox rightCheckBox) {
+        this.rightCheckBox = rightCheckBox;
+    }
+
+    public CheckBox getCustomCheckBox() {
+        return customCheckBox;
+    }
+
+    public void setCustomCheckBox(CheckBox customCheckBox) {
+        this.customCheckBox = customCheckBox;
     }
 }

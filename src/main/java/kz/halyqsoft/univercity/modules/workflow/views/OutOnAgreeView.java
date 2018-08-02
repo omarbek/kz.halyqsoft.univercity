@@ -87,15 +87,16 @@ public class OutOnAgreeView extends BaseView{
         currentUser = WorkflowCommonUtils.getCurrentUser();
         myDocsGW = new GridWidget(DOCUMENT.class);
         myDocsGW.setSizeFull();
+
         myDocsGW.setImmediate(true);
         myDocsGW.setResponsive(true);
         myDocsGW.setButtonVisible(IconToolbar.ADD_BUTTON , false);
         myDocsGW.setButtonVisible(IconToolbar.EDIT_BUTTON, false);
 
         List<ID> ids = new ArrayList<>();
-        ids.add(WorkflowCommonUtils.getDocumentStatusByName(DOCUMENT_STATUS.IN_PROCESS).getId());
         ids.add(WorkflowCommonUtils.getDocumentStatusByName(DOCUMENT_STATUS.CREATED).getId());
         DBGridModel dbGridModel = (DBGridModel) myDocsGW.getWidgetModel();
+        dbGridModel.getColumnModel("creatorEmployee").setInGrid(false);
         QueryModel myDocsQM = dbGridModel.getQueryModel();
         myDocsQM.addWhere("creatorEmployee" , ECriteria.EQUAL , currentUser.getId());
         myDocsQM.addWhereInAnd("documentStatus" ,  ids);

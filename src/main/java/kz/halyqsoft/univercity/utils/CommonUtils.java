@@ -7,6 +7,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import kz.halyqsoft.univercity.entity.beans.USERS;
+import kz.halyqsoft.univercity.entity.beans.USER_ROLES;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_DATA;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
@@ -31,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import javax.persistence.NoResultException;
 import java.math.BigInteger;
 import java.util.*;
+import kz.halyqsoft.univercity.entity.beans.ROLES;
 
 /**
  * @author Omarbek
@@ -62,6 +64,25 @@ public class CommonUtils {
             CommonUtils.showMessageAndWriteLog("Unable to get user", e);
         }
         return null;
+    }
+
+    public static List<ROLES> getCurrentUserRolesList(){
+        ArrayList<ROLES> roles = new ArrayList<>();
+        QueryModel<USER_ROLES> userRolesQM = new QueryModel<>(USER_ROLES.class);
+        userRolesQM.addWhere("user", ECriteria.EQUAL , getCurrentUser().getId());
+
+        List<USER_ROLES> userRoles = new ArrayList<>();
+        try{
+            userRoles.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(userRolesQM));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        for(USER_ROLES ur : userRoles){
+            roles.add(ur.getRole());
+        }
+
+        return roles;
     }
 
     private static STUDENT getStudent(Map<String, Object> params) {

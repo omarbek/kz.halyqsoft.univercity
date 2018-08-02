@@ -7,12 +7,16 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
+import kz.halyqsoft.univercity.modules.workflow.views.fields.CustomComponentHL;
 import kz.halyqsoft.univercity.utils.CommonUtils;
+import kz.halyqsoft.univercity.utils.EmployeePdfCreator;
+import kz.halyqsoft.univercity.utils.FieldValidator;
 import kz.halyqsoft.univercity.utils.WorkflowCommonUtils;
 import org.apache.commons.io.IOUtils;
 import org.bouncycastle.openssl.PasswordException;
@@ -90,7 +94,24 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
         this.getContent().addComponent(upload);
         this.getContent().setComponentAlignment(upload, Alignment.MIDDLE_CENTER);
 
+        QueryModel<DOCUMENT_USER_INPUT> documentUserInputQM = new QueryModel<>(DOCUMENT_USER_INPUT.class);
+        documentUserInputQM.addWhere("pdfDocument" ,ECriteria.EQUAL , document.getPdfDocument().getId());
+        documentUserInputQM.addOrder("value");
 
+        List<DOCUMENT_USER_INPUT> documentUserInputList = new ArrayList<>();
+
+        try{
+                documentUserInputList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(documentUserInputQM));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        List<CustomComponentHL> customComponentHLS = new ArrayList<>();
+        for(DOCUMENT_USER_INPUT documentUserInput : documentUserInputList){
+            CustomComponentHL component = new CustomComponentHL(documentUserInput);
+            getContent().addComponent(component);
+            customComponentHLS.add(component);
+        }
 
         if (pdfDocumentSignerPosts != null) {
             this.documentSignerGW = new GridWidget(DOCUMENT_SIGNER.class);
@@ -117,14 +138,40 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
                     }
                 }
 
+                for(CustomComponentHL componentt : customComponentHLS){
+                    if(!FieldValidator.isNotEmpty(componentt.getValueTA().getValue())){
+                        Message.showError(CreateViewDialog.this.getUILocaleUtil().getMessage("pdf.field.empty"));
+                        return;
+                    }
+                }
+
+                List<DOCUMENT_USER_REAL_INPUT> documentUserRealInputList = new ArrayList<>();
+                for(CustomComponentHL componentt : customComponentHLS){
+                    DOCUMENT_USER_REAL_INPUT documentUserRealInput = new DOCUMENT_USER_REAL_INPUT();
+                    documentUserRealInput.setCreated(new Date());
+                    documentUserRealInput.setDocument(document);
+                    documentUserRealInput.setValue(componentt.getValueTA().getValue());
+                    documentUserRealInput.setDocumentUserInput(componentt.getDocumentUserInput());
+                    documentUserRealInputList.add(documentUserRealInput);
+                }
+
+                try{
+                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(documentUserRealInputList);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
                 document.setMessage(CreateViewDialog.this.messageTA.getValue());
                 document.setDocumentImportance((DOCUMENT_IMPORTANCE)CreateViewDialog.this.importanceCB.getValue());
+
+                EmployeePdfCreator.createResourceStudent(document).getStreamSource().getStream();
 
                 try {
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(document);
                 } catch (Exception var4) {
                     var4.printStackTrace();
                 }
+
 
                 CreateViewDialog.this.close();
             }

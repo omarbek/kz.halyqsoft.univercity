@@ -3,12 +3,15 @@ package kz.halyqsoft.univercity.modules.pdf;
 import com.vaadin.data.Property;
 import com.vaadin.server.BrowserWindowOpener;
 import com.vaadin.server.StreamResource;
+import com.vaadin.shared.ui.window.WindowMode;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.PDF_DOCUMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.PDF_PROPERTY;
+import kz.halyqsoft.univercity.modules.pdf.dialogs.CustomFieldsView;
 import kz.halyqsoft.univercity.utils.EmployeePdfCreator;
 import kz.halyqsoft.univercity.utils.CommonUtils;
+import kz.halyqsoft.univercity.utils.FieldValidator;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.query.QueryModel;
@@ -19,10 +22,8 @@ import org.r3a.common.vaadin.widget.dialog.Message;
 
 import javax.persistence.NoResultException;
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.Calendar;
-import java.util.List;
-import java.util.Locale;
 
 public class PdfEdit extends AbstractCommonView {
 
@@ -33,6 +34,7 @@ public class PdfEdit extends AbstractCommonView {
     private Button openPdfButton = new Button(getUILocaleUtil().getCaption("open"));
     private Embedded pdfEmbedded;
     private Object prevClassWithEmbedded;
+    private PDF_DOCUMENT mainFile;
     public PdfEdit(PDF_DOCUMENT file, Object prevClassWithEmbedded) {
         openPdfButton.setEnabled(false);
         this.pdfEmbedded = pdfEmbedded;
@@ -45,7 +47,7 @@ public class PdfEdit extends AbstractCommonView {
     }
 
     private void addOrEdit(PDF_DOCUMENT fileDoc) throws Exception {
-
+        mainFile = fileDoc;
         CustomField cf = new CustomField();
         Button addComponentButton = new Button("+");
         Button createDbButton = CommonUtils.createSaveButton();
@@ -118,11 +120,13 @@ public class PdfEdit extends AbstractCommonView {
                 CustomField customField = new CustomField();
 
                 HorizontalLayout textHL = new HorizontalLayout();
+                textHL.setImmediate(true);
                 HorizontalLayout textAreaHL = new HorizontalLayout();
+                textAreaHL.setImmediate(true);
 
                 Button deleteHLButton = new Button("-");
-
-                setTextArea(customField.getTextField(), textAreaHL);
+                TextArea textArea = customField.getTextField();
+                setTextArea(textArea, textAreaHL);
 
                 ComboBox fontComboBox = customField.getFontComboBox();
                 fontComboBox.addValueChangeListener(new Property.ValueChangeListener() {
@@ -168,6 +172,29 @@ public class PdfEdit extends AbstractCommonView {
                 setTextField(customField.getOrder(),textHL);
 
                 CheckBox centerCheckBox = customField.getCenterCheckBox();
+                CheckBox rightCheckBox = customField.getRightCheckBox();
+                CheckBox customCheckBox = customField.getCustomCheckBox();
+
+                customCheckBox.addValueChangeListener(new Property.ValueChangeListener() {
+                    @Override
+                    public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
+                        if(customCheckBox.getValue()){
+                            if(FieldValidator.isNotEmpty(textArea.getValue()))
+                            {
+                                if(!textArea.getValue().toLowerCase().startsWith("$userinput")){
+                                    textArea.setValue("userinput");
+                                }
+                            }else{
+                                textArea.setValue("userinput");
+                            }
+                            textArea.setEnabled(false);
+                        }else{
+                            textArea.setValue("");
+                            textArea.setEnabled(true);
+                        }
+                    }
+                });
+
                 centerCheckBox.addValueChangeListener(new Property.ValueChangeListener() {
                     @Override
                     public void valueChange(Property.ValueChangeEvent event) {
@@ -175,11 +202,27 @@ public class PdfEdit extends AbstractCommonView {
                         if(centerCheckBox.getValue()){
                             xComboBox.setValue(0);
                             xComboBox.setEnabled(false);
+                            rightCheckBox.setValue(false);
                         }
                         else{
                             xComboBox.setValue(6);
                             xComboBox.setEnabled(true);}
 
+                    }
+                });
+
+                rightCheckBox.addValueChangeListener(new Property.ValueChangeListener() {
+                    @Override
+                    public void valueChange(Property.ValueChangeEvent event) {
+                        refresh(cf);
+                        if(rightCheckBox.getValue()){
+                            xComboBox.setValue(0);
+                            xComboBox.setEnabled(false);
+                            centerCheckBox.setValue(false);
+                        }
+                        else{
+                            xComboBox.setValue(6);
+                            xComboBox.setEnabled(true);}
                     }
                 });
 
@@ -203,7 +246,12 @@ public class PdfEdit extends AbstractCommonView {
 
 
                 textHL.addComponent(centerCheckBox);
+                textHL.addComponent(rightCheckBox);
+                textHL.addComponent(customCheckBox);
+
                 textHL.setComponentAlignment(centerCheckBox,Alignment.BOTTOM_RIGHT);
+                textHL.setComponentAlignment(rightCheckBox,Alignment.BOTTOM_RIGHT);
+                textHL.setComponentAlignment(customCheckBox,Alignment.BOTTOM_RIGHT);
 
                 textHL.addComponent(deleteHLButton);
                 textHL.setData(textHL);
@@ -253,47 +301,65 @@ public class PdfEdit extends AbstractCommonView {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
             CustomDocument dc = new CustomDocument();
+
             if(checkForEmpty(cf)){
                 Message.showError(getUILocaleUtil().getMessage("pdf.field.empty"));
             }
             else{
-                dc.initialize(customFieldList, cf.getTitle().getValue());
 
                 ByteArrayOutputStream byteArrayOutputStream = dc.getByteArrayOutputStream();
 
-                QueryModel<USERS> userQM = new QueryModel<>(USERS.class);
-                String currentUserLogin = CommonUtils.getCurrentUserLogin();
-                userQM.addWhere("login", ECriteria.EQUAL, currentUserLogin);
-                USERS user = null;
+                USERS user = CommonUtils.getCurrentUser();
 
-                try {
-                    user = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(userQM);
-                } catch (NoResultException e) {
-                    user = null;
-                } catch (Exception e) {
-                    //todo
-                }
                 if (user != null) {
                     try {
                            if (fileDoc.getId() == null) {
 
-                               fileDoc.setFileName(cf.pdfTitle.getValue() + ".pdf");
+                                if(!cf.pdfTitle.getValue().endsWith(".pdf"))
+                                {
+                                    fileDoc.setFileName(cf.pdfTitle.getValue() + ".pdf");
+                                }else{
+                                    fileDoc.setFileName(cf.pdfTitle.getValue());
+                                }
                                fileDoc.setTitle(cf.title.getValue());
                                fileDoc.setPeriod(Integer.parseInt(cf.deadlineDays.getValue()));
                                fileDoc.setUser(user);
                                fileDoc.setDeleted(false);
+                               fileDoc.setCreated(new Date());
 
-                            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(fileDoc);
-                            if (dc.getPdfProperties() != null) {
-                                for (PDF_PROPERTY pdfProperty : dc.getPdfProperties()) {
+
+
+                           SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(fileDoc);
+
+
+                           List<CustomField> customFields = new ArrayList<>();
+                           for(CustomField singleCF : customFieldList){
+                               if(singleCF.getCustomCheckBox().getValue()){
+                                   customFields.add(singleCF);
+                               }
+                           }
+
+                           if(customFields.size()>0){
+                               CustomFieldsView view = new CustomFieldsView(getUILocaleUtil().getCaption("text.custom"), customFields, fileDoc);
+                           }
+                           dc.initialize(customFieldList, cf.getTitle().getValue());
+
+
+                               if (dc.getPdfProperties() != null) {
+                               for (PDF_PROPERTY pdfProperty : dc.getPdfProperties()) {
                                     pdfProperty.setPdfDocument(fileDoc);
                                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(pdfProperty);
-                                }
-                            }
+                               }
+                           }
                         }
                         else {
 
-                           fileDoc.setFileName(cf.pdfTitle.getValue());
+                               if(!cf.pdfTitle.getValue().endsWith(".pdf"))
+                               {
+                                   fileDoc.setFileName(cf.pdfTitle.getValue() + ".pdf");
+                               }else{
+                                   fileDoc.setFileName(cf.pdfTitle.getValue());
+                               }
                            fileDoc.setPeriod(Integer.parseInt(cf.deadlineDays.getValue()));
                            fileDoc.setTitle(cf.title.getValue());
 
@@ -303,7 +369,21 @@ public class PdfEdit extends AbstractCommonView {
                            List<PDF_PROPERTY> pdfProperties = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(pdfPropertyQM);
                            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(pdfProperties);
 
-                           SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(fileDoc);
+                           List<CustomField> customFields = new ArrayList<>();
+                           for(CustomField singleCF : customFieldList){
+                               if(singleCF.getCustomCheckBox().getValue()){
+                                   customFields.add(singleCF);
+                               }
+                           }
+
+                           if(customFields.size()>0){
+                               CustomFieldsView view = new CustomFieldsView(getUILocaleUtil().getCaption("text.custom"), customFields, fileDoc);
+                           }
+
+                           dc.initialize(customFieldList, cf.getTitle().getValue());
+
+
+                               SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(fileDoc);
                            if (dc.getPdfProperties() != null) {
                                for (PDF_PROPERTY pdfProperty : dc.getPdfProperties()) {
                                    pdfProperty.setPdfDocument(fileDoc);
@@ -321,14 +401,8 @@ public class PdfEdit extends AbstractCommonView {
                         e.printStackTrace();
                     }}
                         CommonUtils.showSavedNotification();
-                    if(prevClassWithEmbedded instanceof PdfGenerationPart){
-                        ((PdfGenerationPart) prevClassWithEmbedded).createEmbedded();
-                        pdfEmbedded = ((PdfGenerationPart) prevClassWithEmbedded).getPdfEmbedded();
-                            if(pdfEmbedded!=null){
-                                pdfEmbedded.setSource(EmployeePdfCreator.getStreamResourceFromPdfDocument(fileDoc));
-                            }
-                    }
 
+                    refreshEmbedded();
             }
         }
 
@@ -346,13 +420,16 @@ public class PdfEdit extends AbstractCommonView {
 
                 CustomField customFieldProp = new CustomField();
                 HorizontalLayout textAreaHL = new HorizontalLayout();
+                textAreaHL.setImmediate(true);
                 HorizontalLayout textHL = new HorizontalLayout();
+                textHL.setImmediate(true);
                 Button deleteHLButton = new Button("-");
 
                 customFieldProp.getTextField().setValue(property.getText());
                 customFieldProp.setId(property.getId());
 
-                setTextArea(customFieldProp.getTextField(), textAreaHL,cf);
+                TextArea textArea = customFieldProp.getTextField();
+                setTextArea(textArea, textAreaHL,cf);
 
                 ComboBox fontComboBox = customFieldProp.getFontComboBox();
                 fontComboBox.addValueChangeListener(new Property.ValueChangeListener() {
@@ -400,13 +477,38 @@ public class PdfEdit extends AbstractCommonView {
                 setTextField(customFieldProp.getOrder(),textHL,cf);
 
                 CheckBox centerCheckBox = customFieldProp.getCenterCheckBox();
-                centerCheckBox.setValue(property.isCenter());
+
+                CheckBox rightCheckBox = customFieldProp.getRightCheckBox();
+
+                CheckBox customCheckBox = customFieldProp.getCustomCheckBox();
+                customCheckBox.addValueChangeListener(new Property.ValueChangeListener() {
+                    @Override
+                    public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
+                        if(customCheckBox.getValue()){
+                            if(FieldValidator.isNotEmpty(textArea.getValue()))
+                            {
+                                if(!textArea.getValue().toLowerCase().startsWith("$userinput")){
+                                    textArea.setValue("userinput");
+                                }
+                            }else{
+                                textArea.setValue("userinput");
+                            }
+                            textArea.setEnabled(false);
+                        }else{
+                            textArea.setValue("");
+                            textArea.setEnabled(true);
+                        }
+                    }
+                });
+
                 if(centerCheckBox.getValue()){
                     xComboBox.setValue(0);
                     xComboBox.setReadOnly(true);
+                    rightCheckBox.setValue(false);
                 }
                 else{
-                    xComboBox.setReadOnly(false);}
+                    xComboBox.setReadOnly(false);
+                }
                 centerCheckBox.addValueChangeListener(new Property.ValueChangeListener() {
                     @Override
                     public void valueChange(Property.ValueChangeEvent event) {
@@ -414,10 +516,37 @@ public class PdfEdit extends AbstractCommonView {
                         if(centerCheckBox.getValue()){
                             xComboBox.setValue(0);
                             xComboBox.setEnabled(false);
+                            rightCheckBox.setValue(false);
                         }
                         else{
                             xComboBox.setEnabled(true);
-                            xComboBox.setReadOnly(false);}
+                            xComboBox.setReadOnly(false);
+                        }
+                    }
+                });
+
+
+                if(rightCheckBox.getValue()){
+                    xComboBox.setValue(0);
+                    xComboBox.setReadOnly(true);
+                    centerCheckBox.setValue(false);
+                }
+                else{
+                    xComboBox.setReadOnly(false);
+                }
+                rightCheckBox.addValueChangeListener(new Property.ValueChangeListener() {
+                    @Override
+                    public void valueChange(Property.ValueChangeEvent event) {
+                        refresh(cf);
+                        if(rightCheckBox.getValue()){
+                            xComboBox.setValue(0);
+                            xComboBox.setEnabled(false);
+                            centerCheckBox.setValue(false);
+                        }
+                        else{
+                            xComboBox.setEnabled(true);
+                            xComboBox.setReadOnly(false);
+                        }
                     }
                 });
 
@@ -439,10 +568,20 @@ public class PdfEdit extends AbstractCommonView {
                     }
                 });
 
+                customCheckBox.setValue(property.isCustom());
+                centerCheckBox.setValue(property.isCenter());
+                rightCheckBox.setValue(property.isRight());
+
                 customFieldList.add(customFieldProp);
 
                 textHL.addComponent(centerCheckBox);
                 textHL.setComponentAlignment(centerCheckBox,Alignment.BOTTOM_RIGHT);
+
+                textHL.addComponent(rightCheckBox);
+                textHL.setComponentAlignment(rightCheckBox,Alignment.BOTTOM_RIGHT);
+
+                textHL.addComponent(customCheckBox);
+                textHL.setComponentAlignment(customCheckBox,Alignment.BOTTOM_RIGHT);
 
                 textHL.addComponent(deleteHLButton);
                 textHL.setData(textHL);
@@ -465,9 +604,13 @@ public class PdfEdit extends AbstractCommonView {
         else {
 
             HorizontalLayout textAreaHL = new HorizontalLayout();
+            textAreaHL.setImmediate(true);
             HorizontalLayout textHL = new HorizontalLayout();
+            textHL.setImmediate(true);
 
-            setTextArea(customField.getTextField(), textAreaHL,cf);
+
+            TextArea textArea =customField.getTextField();
+            setTextArea(textArea, textAreaHL,cf);
 
             ComboBox fontComboBox = customField.getFontComboBox();
             fontComboBox.addValueChangeListener(new Property.ValueChangeListener() {
@@ -512,6 +655,29 @@ public class PdfEdit extends AbstractCommonView {
             customField.getOrder().setValue(Double.toString(1));
 
             CheckBox centerCheckBox = customField.getCenterCheckBox();
+            CheckBox rightCheckBox = customField.getRightCheckBox();
+            CheckBox customCheckBox = customField.getCustomCheckBox();
+
+            customCheckBox.addValueChangeListener(new Property.ValueChangeListener() {
+                @Override
+                public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
+                    if(customCheckBox.getValue()){
+                        if(FieldValidator.isNotEmpty(textArea.getValue()))
+                        {
+                            if(!textArea.getValue().toLowerCase().startsWith("$userinput")){
+                                textArea.setValue("userinput");
+                            }
+                        }else{
+                            textArea.setValue("userinput");
+                        }
+                        textArea.setEnabled(false);
+                    }else{
+                        textArea.setValue("");
+                        textArea.setEnabled(true);
+                    }
+                }
+            });
+
             centerCheckBox.addValueChangeListener(new Property.ValueChangeListener() {
                 @Override
                 public void valueChange(Property.ValueChangeEvent event) {
@@ -519,19 +685,40 @@ public class PdfEdit extends AbstractCommonView {
                     if(centerCheckBox.getValue()){
                         xComboBox.setValue(0);
                         xComboBox.setEnabled(false);
+                        rightCheckBox.setValue(false);
                     }
                     else{
                         xComboBox.setValue(6);
                         xComboBox.setEnabled(true);}
                 }
             });
+
+            rightCheckBox.addValueChangeListener(new Property.ValueChangeListener() {
+                @Override
+                public void valueChange(Property.ValueChangeEvent event) {
+                    refresh(cf);
+                    if(rightCheckBox.getValue()){
+                        xComboBox.setValue(0);
+                        xComboBox.setEnabled(false);
+                        centerCheckBox.setValue(false);
+                    }
+                    else{
+                        xComboBox.setValue(6);
+                        xComboBox.setEnabled(true);}
+                }
+            });
+
             textHL.addComponent(centerCheckBox);
+            textHL.addComponent(rightCheckBox);
+            textHL.addComponent(customCheckBox);
 
             customFieldList.add(customField);
 
             textHL.addComponent(addComponentButton);
             textHL.setComponentAlignment(addComponentButton,Alignment.BOTTOM_CENTER);
             textHL.setComponentAlignment(centerCheckBox,Alignment.BOTTOM_RIGHT);
+            textHL.setComponentAlignment(rightCheckBox,Alignment.BOTTOM_RIGHT);
+            textHL.setComponentAlignment(customCheckBox,Alignment.BOTTOM_RIGHT);
 
             itemsVL.addComponent(textAreaHL);
             itemsVL.addComponent(textHL);
@@ -577,6 +764,7 @@ public class PdfEdit extends AbstractCommonView {
 
 
     private void refresh(CustomField cf) {
+
         if (customFieldList.isEmpty()) {
             return;
         }
@@ -587,13 +775,27 @@ public class PdfEdit extends AbstractCommonView {
         }
         openPdfButton.setEnabled(true);
         CustomDocument dc = new CustomDocument();
-        dc.initialize(customFieldList, cf.getTitle().getValue());
+        String fileName = cf.getTitle().getValue();
+        dc.initialize(customFieldList, fileName);
         ByteArrayOutputStream byteArrayOutputStream = dc.getByteArrayOutputStream();
         streamSource = new CustomSource(byteArrayOutputStream);
         myResource.setStreamSource(streamSource);
+
         String filename = getFileName(cf);
         myResource.setFilename(filename);
         opener.setResource(myResource);
+    }
+
+    private void refreshEmbedded(){
+        if(mainFile.getId()!=null){
+            if(prevClassWithEmbedded instanceof PdfGenerationPart){
+                ((PdfGenerationPart) prevClassWithEmbedded).createEmbedded();
+                pdfEmbedded = ((PdfGenerationPart) prevClassWithEmbedded).getPdfEmbedded();
+                if(pdfEmbedded!=null){
+                    pdfEmbedded.setSource(EmployeePdfCreator.getStreamResourceFromPdfDocument(mainFile));
+                }
+            }
+        }
     }
 
     private void setTextArea(TextArea mainTF, HorizontalLayout textHL, CustomField cf) {

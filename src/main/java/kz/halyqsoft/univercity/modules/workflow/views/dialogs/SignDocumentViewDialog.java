@@ -41,7 +41,6 @@ import java.util.List;
 
 public class SignDocumentViewDialog extends AbstractDialog implements EntityListener{
     private final String title;
-    private GridWidget documentSignerGW;
     private DOCUMENT document;
 
     private File keyFile;
@@ -49,6 +48,8 @@ public class SignDocumentViewDialog extends AbstractDialog implements EntityList
 
 
     public SignDocumentViewDialog( String title, DOCUMENT document){
+        checkIfAllSignersSignedDocument(document);
+
         this.title = title;
         this.document = document;
 
@@ -58,9 +59,13 @@ public class SignDocumentViewDialog extends AbstractDialog implements EntityList
         setClosable(true);
 
         VerticalLayout content = new VerticalLayout();
-        content.setImmediate(true)
-        ;
+        content.setImmediate(true);
+        //FOR COMBOBOX
         QueryModel<DOCUMENT_SIGNER_STATUS> documentSignerStatusQM = new QueryModel<>(DOCUMENT_SIGNER_STATUS.class);
+        documentSignerStatusQM.addWhereAnd("id", ECriteria.NOT_EQUAL , WorkflowCommonUtils.getDocumentSignerStatusByName(DOCUMENT_SIGNER_STATUS.IN_PROCESS).getId());
+        documentSignerStatusQM.addWhereAnd("id", ECriteria.NOT_EQUAL , WorkflowCommonUtils.getDocumentSignerStatusByName(DOCUMENT_SIGNER_STATUS.CREATED).getId());
+        //FOR COMBOBOX
+
         List<DOCUMENT_SIGNER_STATUS> documentSignerStatusList = new ArrayList<>();
         try{
             documentSignerStatusList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(documentSignerStatusQM));
@@ -154,9 +159,8 @@ public class SignDocumentViewDialog extends AbstractDialog implements EntityList
                                     documentSignerss.get(0).setUpdated(new Date());
                                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(documentSignerss.get(0));
                                 }
-
+                                checkIfAllSignersSignedDocument(document);
                                 Message.showInfo(getUILocaleUtil().getCaption("signed"));
-
                                 close();
 
                             }catch (PasswordException pe){
@@ -244,6 +248,34 @@ public class SignDocumentViewDialog extends AbstractDialog implements EntityList
 
 
         AbstractWebUI.getInstance().addWindow(this);
+    }
+
+    public static void checkIfAllSignersSignedDocument(DOCUMENT document){
+        List<DOCUMENT_SIGNER> documentSigners = new ArrayList<>();
+        QueryModel<DOCUMENT_SIGNER> documentSignerQM = new QueryModel<>(DOCUMENT_SIGNER.class);
+        documentSignerQM.addWhere("document" ,ECriteria.EQUAL, document.getId());
+        try{
+            documentSigners.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(documentSignerQM));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        boolean flag = true;
+        for(DOCUMENT_SIGNER ds :documentSigners){
+            if(!ds.getDocumentSignerStatus().getStatusName().equalsIgnoreCase(WorkflowCommonUtils.getDocumentSignerStatusByName(DOCUMENT_SIGNER_STATUS.SIGNED).getStatusName())){
+                flag = false;
+                break;
+            }
+        }
+
+        if(flag){
+            document.setUpdated(new Date());
+            document.setDocumentStatus(WorkflowCommonUtils.getDocumentStatusByName(DOCUMENT_STATUS.ACCEPTED));
+            try{
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(document);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
     }
 
     public byte[] sign(File keyFile, String password , DOCUMENT document) throws IOException, DocumentException, GeneralSecurityException {

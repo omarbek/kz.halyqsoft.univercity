@@ -6,6 +6,7 @@ import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 public class PDF_DOCUMENT extends AbstractEntity {
@@ -16,11 +17,11 @@ public class PDF_DOCUMENT extends AbstractEntity {
             @JoinColumn(name = "USER_ID", referencedColumnName = "ID", nullable = false)})
     private USERS user;
 
-    @FieldInfo(order = 2)
+    @FieldInfo(type = EFieldType.TEXT, order = 2, inGrid = false , inEdit = false , inView = false)
     @Column(name = "title")
     private String title;
 
-    @FieldInfo(order = 3)
+    @FieldInfo(type = EFieldType.TEXT, order = 3)
     @Column(name = "file_name", nullable = false)
     private String fileName;
 
@@ -28,9 +29,15 @@ public class PDF_DOCUMENT extends AbstractEntity {
     @Column(name = "deleted", nullable = false)
     private Boolean deleted;
 
+    @FieldInfo(type = EFieldType.DATETIME, inView = true ,inEdit = false , inGrid = true , order = 5)
+    @Column(name = "created")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date created;
+
     @FieldInfo( inEdit = false, order = 6)
     @Column(name = "period")
     private int period;
+
 
     public PDF_DOCUMENT() {
     }
@@ -78,5 +85,13 @@ public class PDF_DOCUMENT extends AbstractEntity {
     @Override
     public String toString() {
         return fileName ;
+    }
+
+    public Date getCreated() {
+        return created;
+    }
+
+    public void setCreated(Date created) {
+        this.created = created;
     }
 }

@@ -21,6 +21,7 @@ import org.r3a.common.entity.query.from.EJoin;
 import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
 
+import javax.persistence.NoResultException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -44,6 +45,18 @@ public class EmployeePdfCreator {
                 propertyQM.addWhere(doc, "id", ECriteria.EQUAL, document.getPdfDocument().getId());
                 propertyQM.addOrder("orderNumber");
                 List<PDF_PROPERTY> properties = null;
+
+                QueryModel<DOCUMENT_USER_INPUT> documentUserInputQM = new QueryModel<>(DOCUMENT_USER_INPUT.class);
+                documentUserInputQM.addWhere("pdfDocument", ECriteria.EQUAL, document.getPdfDocument().getId());
+                documentUserInputQM.addOrder("value");
+
+                List<DOCUMENT_USER_INPUT> documentUserInputList = new ArrayList<>();
+                try{
+                    documentUserInputList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(documentUserInputQM));
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
 
                 try {
                     Font font = getFont(12, Font.BOLD);
@@ -93,6 +106,8 @@ public class EmployeePdfCreator {
                                 }
                             }
                         }
+
+
                         if(map.keySet().size()>0){
 
                             PdfPTable pdfPTable = new PdfPTable(map.keySet().size());
@@ -123,13 +138,48 @@ public class EmployeePdfCreator {
 
                             docum.add(pdfPTable);
                         }else{
-                            String text = setReplaced(property.getText(), document.getCreatorEmployee());
+
+                            String text = "";
+                            boolean flag = true;
+
+                            DOCUMENT_USER_REAL_INPUT documentUserRealInput = null;
+                            try{
+
+                                if(documentUserInputList.size()>0) {
+
+
+                                    for(DOCUMENT_USER_INPUT documentUserInput : documentUserInputList){
+                                        QueryModel<DOCUMENT_USER_REAL_INPUT> documentUserRealInputQM = new QueryModel<>(DOCUMENT_USER_REAL_INPUT.class);
+                                        documentUserRealInputQM.addWhere("document", ECriteria.EQUAL, document.getId());
+                                        documentUserRealInputQM.addWhereAnd("documentUserInput", ECriteria.EQUAL, documentUserInput.getId());
+                                        try{
+                                            documentUserRealInput = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(documentUserRealInputQM);
+                                            if(documentUserRealInput!=null && property.getText().trim().toLowerCase().equals(documentUserRealInput.getDocumentUserInput().getValue().toLowerCase().trim())){
+                                                text = documentUserRealInput.getValue();
+                                                flag = false;
+                                            }
+                                        }catch (NoResultException nre){
+                                            System.out.println(nre.getMessage());
+                                        }
+                                    }
+                                }
+                            }catch (Exception e){
+                                e.printStackTrace();
+                            }
+
+                            if(flag){
+                                    text = setReplaced(property.getText(), document.getCreatorEmployee());
+                            }
+
                             Paragraph paragraph = new Paragraph(text,
                                     getFont(Integer.parseInt(property.getSize().toString()), CommonUtils.getFontMap(property.getFont().toString())));
 
-                            if (property.isCenter() == true) {
+                            if (property.isCenter()) {
                                 paragraph.setAlignment(Element.ALIGN_CENTER);
+                            }else if (property.isRight()) {
+                                paragraph.setAlignment(Element.ALIGN_RIGHT);
                             }
+
                             paragraph.setSpacingBefore(property.getY());
                             paragraph.setIndentationLeft(property.getX());
 
@@ -226,8 +276,10 @@ public class EmployeePdfCreator {
                         Paragraph paragraph = new Paragraph(property.getText(),
                                 getFont(Integer.parseInt(property.getSize().toString()), CommonUtils.getFontMap(property.getFont().toString())));
 
-                        if (property.isCenter() == true) {
+                        if (property.isCenter()) {
                             paragraph.setAlignment(Element.ALIGN_CENTER);
+                        }else if (property.isRight()) {
+                            paragraph.setAlignment(Element.ALIGN_RIGHT);
                         }
                         paragraph.setSpacingBefore(property.getY());
                         paragraph.setIndentationLeft(property.getX());

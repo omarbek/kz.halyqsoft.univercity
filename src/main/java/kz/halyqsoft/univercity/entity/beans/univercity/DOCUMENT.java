@@ -11,7 +11,7 @@ import java.util.Date;
 @Entity
 public class DOCUMENT extends AbstractEntity{
 
-    @FieldInfo(type = EFieldType.FK_COMBO, inGrid = false, inEdit = false, inView = false ,order = 1)
+    @FieldInfo(type = EFieldType.FK_COMBO, inGrid = true, inEdit = false, inView = true ,order = 1)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "creator_employee_id", referencedColumnName = "ID", nullable = false)})
@@ -56,7 +56,7 @@ public class DOCUMENT extends AbstractEntity{
     private Date created;
 
 
-    @FieldInfo(type = EFieldType.DATETIME, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false, order=8)
+    @FieldInfo(type = EFieldType.DATETIME, required = false, readOnlyFixed = true,  inEdit = false, order=8)
     @Column(name = "updated")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updated;
