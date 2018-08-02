@@ -76,7 +76,7 @@ public class DORM_ROOM extends AbstractEntity {
         if (busyBedCount == null) {
             busyBedCount = 0;
             for (DORM_STUDENT dormStudent : residence) {
-                if (dormStudent.getCheckOutDate() == null) {
+                if (dormStudent.getCheckOutDate() == null && dormStudent.getRequestStatus() == 1) {
                     busyBedCount++;
                 }
             }

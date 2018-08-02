@@ -215,6 +215,8 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
                                     String description = descriptionTA.getValue();
                                     String jsonInString = "";
 
+
+
                                     if(FieldValidator.isNotEmpty(name) && FieldValidator.isNotEmpty(description)){
 
                                         if (nameTF.getValue().toCharArray()[0] != '$') {

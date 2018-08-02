@@ -68,6 +68,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
 
     public StudentEdit(final FormModel baseDataFM) throws Exception {
         super();
+        setBackButtonVisible(false);
 
         orderAndSkipSource = new WarrantAndSkipOfStudents();
 
@@ -282,7 +283,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
             String sql = "SELECT t0.* " +
                     "FROM DORM_STUDENT t0 INNER JOIN STUDENT_EDUCATION t1 ON t0.STUDENT_ID = t1.ID " +
                     "WHERE t1.STUDENT_ID = ?1 AND t1.CHILD_ID IS NULL AND t0.CHECK_OUT_DATE IS NULL AND " +
-                    "t0.CHECK_IN_DATE IS NOT NULL AND " +
+                    "t0.CHECK_IN_DATE IS NOT NULL AND t0.request_status_id = 1" +
                     "      t0.DELETED = FALSE;";
             Map<Integer, Object> params = new HashMap<>();
             params.put(1, student.getId().getId());
@@ -449,9 +450,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                     }
                     if (dormRooms != null && dormRooms.size() > 0 && dormRooms.get(0) != null &&
                             (dormRooms.get(0).getBedCount() - dormRooms.get(0).getBusyBedCount()) > 0) {
-                        if ("Казахстанская морская академия".equals(faculty)) {
-                            costL.setValue("0.00");
-                        } else if (dormRooms.get(0).getCost() != null) {
+                        if (dormRooms.get(0).getCost() != null) {
                             costL.setValue(dormRooms.get(0).getCost().toString());
                         }
                     } else {
@@ -505,7 +504,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                             STUDENT_EDUCATION = null;
                         }
                         if (STUDENT_EDUCATION != null && dormRoom != null) {
-                            DORM_STUDENT DORM_STUDENT = null;
+                            DORM_STUDENT dormStudent = null;
                             if (!isInDorm) {
                                 // delete previuos info
                                 QueryModel<DORM_STUDENT> deleteQM = new QueryModel<DORM_STUDENT>(DORM_STUDENT.class);
@@ -517,15 +516,16 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                                 }
                                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(dormStudentList);
                                 //
-                                DORM_STUDENT = new DORM_STUDENT();
-                                DORM_STUDENT.setCheckInDate(inOrMoveDF.getValue());
-                                DORM_STUDENT.setCost(Double.parseDouble(costL.getValue()));
-                                DORM_STUDENT.setCreated(new Date());
-                                DORM_STUDENT.setDeleted(false);
-                                DORM_STUDENT.setStudent(STUDENT_EDUCATION);
-                                DORM_STUDENT.setRoom(dormRoom);
+                                dormStudent = new DORM_STUDENT();
+                                dormStudent.setCheckInDate(inOrMoveDF.getValue());
+                                dormStudent.setCost(Double.parseDouble(costL.getValue()));
+                                dormStudent.setCreated(new Date());
+                                dormStudent.setDeleted(false);
+                                dormStudent.setStudent(STUDENT_EDUCATION);
+                                dormStudent.setRoom(dormRoom);
+                                dormStudent.setRequestStatus(1);
 
-                                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(DORM_STUDENT);
+                                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(dormStudent);
                                 AbstractWebUI.getInstance().showNotificationInfo(getUILocaleUtil().getMessage("info.record.saved"));
 //                                DormUI.getInstance().openCommonView(new StudentView(filter));//TODO
                             } else {
@@ -533,17 +533,17 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                                 dormStudentQM.addWhere("student", ECriteria.EQUAL, STUDENT_EDUCATION.getId());
                                 dormStudentQM.addWhere("deleted", Boolean.FALSE);
                                 try {
-                                    DORM_STUDENT = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(dormStudentQM);
+                                    dormStudent = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(dormStudentQM);
                                 } catch (NoResultException e) {
-                                    DORM_STUDENT = null;
+                                    dormStudent = null;
                                 }
-                                if (DORM_STUDENT != null) {
-                                    DORM_STUDENT.setCheckInDate(inOrMoveDF.getValue());
-                                    DORM_STUDENT.setCost(Double.parseDouble(costL.getValue()));
-                                    DORM_STUDENT.setCreated(new Date());
-                                    DORM_STUDENT.setRoom(dormRoom);
+                                if (dormStudent != null) {
+                                    dormStudent.setCheckInDate(inOrMoveDF.getValue());
+                                    dormStudent.setCost(Double.parseDouble(costL.getValue()));
+                                    dormStudent.setCreated(new Date());
+                                    dormStudent.setRoom(dormRoom);
 
-                                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(DORM_STUDENT);
+                                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(dormStudent);
                                     AbstractWebUI.getInstance().showNotificationInfo(getUILocaleUtil().getMessage("info.record.saved"));
                                     clearIn();
                                 }

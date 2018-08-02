@@ -32,6 +32,7 @@ public class AcceptRequest extends AbstractFormWidgetView {
     private GridWidget dormStudentGW;
 
     AcceptRequest() {
+        setBackButtonVisible(false);
         dormStudentGW = new GridWidget(VDormStudent.class);
         dormStudentGW.addEntityListener(this);
 

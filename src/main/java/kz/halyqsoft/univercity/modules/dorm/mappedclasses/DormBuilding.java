@@ -25,6 +25,7 @@ public class DormBuilding implements Entity {
 			"          dormStudent.ROOM_ID = dormRoom.ID AND " +
 			"          dormStudent.ROOM_ID = room.ID AND " +
 			"          dormStudent.CHECK_OUT_DATE IS NULL AND " +
+			"          dormStudent.request_status_id = 1 AND " +
 			"          dormStudent.DELETED = FALSE " +
 			"        GROUP BY dormRoom.BED_COUNT " +
 			"  )), 0), " +
