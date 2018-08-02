@@ -4,15 +4,8 @@ import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
 
+import javax.persistence.*;
 import java.util.Date;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.ManyToOne;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 /**
  * @author Omarbek
@@ -23,7 +16,7 @@ public class LESSON_DETAIL extends AbstractEntity {
 
 	private static final long serialVersionUID = 8727135395953597153L;
 
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 1)
+	@FieldInfo(type = EFieldType.FK_COMBO)
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "LESSON_ID", referencedColumnName = "ID")})
@@ -35,33 +28,23 @@ public class LESSON_DETAIL extends AbstractEntity {
         @JoinColumn(name = "STUDENT_ID", referencedColumnName = "ID")})
     private STUDENT_EDUCATION studentEducation;
     
-	@FieldInfo(type = EFieldType.INTEGER, min = 1, max = 3, order = 4)
+	@FieldInfo(type = EFieldType.INTEGER, min = 1, max = 3, order = 3)
 	@Column(name = "ATTENDANCE_MARK", nullable = false)
     private Integer attendanceMark;
 	
-    @FieldInfo(type = EFieldType.DOUBLE, min = 0, max = 99, order = 4)
-	@Column(name = "GRADE", nullable = false)
-	private Double grade;
-    
-    @FieldInfo(type = EFieldType.TEXT, max = 256, order = 5)
+    @FieldInfo(type = EFieldType.TEXT, max = 256, order = 4)
 	@Column(name = "COMMENTS")
 	private String comments;
     
-    @FieldInfo(type = EFieldType.DATETIME, order = 6)
+    @FieldInfo(type = EFieldType.DATETIME, order = 5)
 	@Column(name = "UPDATED")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updated;
     
-    @FieldInfo(type = EFieldType.TEXT, max = 32, order = 7)
+    @FieldInfo(type = EFieldType.TEXT, max = 32, order = 6)
 	@Column(name = "UPDATED_BY")
 	private String updatedBy;
     
-    @Column(name = "OLD_ID")
-	private Integer oldId;
-    
-	public LESSON_DETAIL() {
-	}
-
 	public LESSON getLesson() {
 		return lesson;
 	}
@@ -86,14 +69,6 @@ public class LESSON_DETAIL extends AbstractEntity {
 		this.attendanceMark = attendanceMark;
 	}
 
-	public Double getGrade() {
-		return grade;
-	}
-
-	public void setGrade(Double grade) {
-		this.grade = grade;
-	}
-
 	public String getComments() {
 		return comments;
 	}
@@ -116,13 +91,5 @@ public class LESSON_DETAIL extends AbstractEntity {
 
 	public void setUpdatedBy(String updatedBy) {
 		this.updatedBy = updatedBy;
-	}
-
-	public Integer getOldId() {
-		return oldId;
-	}
-
-	public void setOldId(Integer oldId) {
-		this.oldId = oldId;
 	}
 }

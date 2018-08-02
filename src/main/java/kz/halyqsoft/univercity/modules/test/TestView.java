@@ -11,9 +11,8 @@ import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.dialog.Message;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Set;
 
 public class TestView extends AbstractTaskView {
@@ -27,16 +26,45 @@ public class TestView extends AbstractTaskView {
     }
 
     public static void main(String[] args) {
-        List<Integer> repeatedIds=new ArrayList<>();
-        repeatedIds.add(1);
-        repeatedIds.add(2);
-        repeatedIds.add(1);
-        Set<Integer> ids = new HashSet<>();
-        for (Integer repeatedId : repeatedIds) {
-            Integer id = getId(ids, repeatedId);
-            System.out.println(id);
-        }
+//        List<Integer> repeatedIds=new ArrayList<>();
+//        repeatedIds.add(1);
+//        repeatedIds.add(2);
+//        repeatedIds.add(1);
+//        Set<Integer> ids = new HashSet<>();
+//        for (Integer repeatedId : repeatedIds) {
+//            Integer id = getId(ids, repeatedId);
+//            System.out.println(id);
+//        }
+
+        Date date = new Date();
+//        Calendar cal = Calendar.getInstance();
+//        cal.set(Calendar.HOUR_OF_DAY,17);
+//        cal.set(Calendar.MINUTE,30);
+//        cal.set(Calendar.SECOND,0);
+//        cal.set(Calendar.MILLISECOND,0);
+//
+//        Date d = cal.getTime();
+//        System.out.println(d);
+
+//        LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+//        System.out.println(localDate);
+//        localDate = localDate.with(TemporalAdjusters.next(DayOfWeek.of(1)));
+//        localDate = localDate.with(TemporalAdjusters.next(DayOfWeek.of(1)));
+//        System.out.println(localDate);
+//        Date date1 = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+//        System.out.println(date1);
+//        System.out.println(getFirstMonday(2018, Calendar.AUGUST));
     }
+
+    private static int getFirstMonday(int year, int month) {
+        Calendar cacheCalendar = Calendar.getInstance();
+        cacheCalendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        cacheCalendar.set(Calendar.DAY_OF_WEEK_IN_MONTH, 1);
+        cacheCalendar.set(Calendar.MONTH, month);
+        cacheCalendar.set(Calendar.YEAR, year);
+        return cacheCalendar.get(Calendar.DATE);
+    }
+
     private static Integer getId(Set<Integer> ids, Integer id) {
         if (ids.contains(id)) {
             id = getId(ids, ++id);
@@ -115,11 +143,11 @@ public class TestView extends AbstractTaskView {
         getContent().addComponent(componentHL);
         getContent().setComponentAlignment(componentHL, Alignment.MIDDLE_CENTER);
 
-        Button usersToLower=new Button("to Lower");
+        Button usersToLower = new Button("to Lower");
         usersToLower.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                QueryModel<USERS> usersQM=new QueryModel<>(USERS.class);
+                QueryModel<USERS> usersQM = new QueryModel<>(USERS.class);
 //                usersQM.addWhere();
             }
         });
