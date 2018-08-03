@@ -1,5 +1,7 @@
 package kz.halyqsoft.univercity.modules.workflow.views.dialogs;
 
+import com.vaadin.server.FileDownloader;
+import com.vaadin.server.StreamResource;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_SIGNER;
@@ -17,6 +19,7 @@ import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 
+import java.io.File;
 import java.util.Date;
 
 public class OpenPdfDialog extends WindowUtils{
@@ -25,6 +28,14 @@ public class OpenPdfDialog extends WindowUtils{
 
     public OpenPdfDialog(DOCUMENT document, BaseView baseView, Integer width, Integer height){
         super();
+
+        HorizontalLayout mainHL = new HorizontalLayout();
+        mainHL.setSizeFull();
+        mainHL.setImmediate(true);
+        mainHL.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
+
+        Button downloadRelatedDocs = new Button(getUILocaleUtil().getCaption("download"));
+
         Button sendToSign = new Button(getUILocaleUtil().getCaption("send.to.sign"));
         sendToSign.addClickListener(new Button.ClickListener() {
             @Override
@@ -77,7 +88,22 @@ public class OpenPdfDialog extends WindowUtils{
         mainVL.setHeight(100, Unit.PERCENTAGE);
         mainVL.addComponent(pdf);
         mainVL.addComponent(textArea);
-        mainVL.addComponent(sendToSign);
+
+        if(document.getRelatedDocumentFilePath()!=null){
+
+            File file = new File(document.getRelatedDocumentFilePath());
+            StreamResource sr = EmployeePdfCreator.getResource(document.getRelatedDocumentFilePath(),file);
+            FileDownloader fileDownloader = new FileDownloader(sr);
+            sr.setCacheTime(0);
+            fileDownloader.extend(downloadRelatedDocs);
+
+
+            mainHL.addComponent(downloadRelatedDocs);
+        }
+
+        mainHL.addComponent(sendToSign);
+
+        mainVL.addComponent(mainHL);
 
         init(width,height);
     }

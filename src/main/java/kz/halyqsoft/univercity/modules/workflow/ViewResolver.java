@@ -9,14 +9,8 @@ public class ViewResolver {
             return new MainView(title);
         }else if(title.equals(WorkflowView.CREATE)){
             return new CreateView(title);
-        }else if(title.equals(WorkflowView.COMMON_DOCUMENTS)){
-            return new CommonDocumentsView(title);
         }else if(title.equals(WorkflowView.MY_DOCUMENTS)){
             return new MyDocumentsView(title);
-        }else if(title.equals(WorkflowView.MY_SAVES)){
-            return new MySavesView(title);
-        }else if(title.equals(WorkflowView.SEARCH)){
-            return new SearchView(title);
         }else if(title.equals(WorkflowView.I_ON_AGREE)){
             return new OutOnAgreeView(title);
         }else if(title.equals(WorkflowView.I_ON_SIGN)){

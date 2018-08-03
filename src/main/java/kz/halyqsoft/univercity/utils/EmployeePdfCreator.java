@@ -22,10 +22,7 @@ import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
 
 import javax.persistence.NoResultException;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.*;
 import java.util.List;
 
@@ -308,4 +305,41 @@ public class EmployeePdfCreator {
          }, fileName);
     }
 
+
+    public static StreamResource getResource(String filePath , File file) {
+        return new StreamResource(new StreamResource.StreamSource() {
+
+            @Override
+            public InputStream getStream() {
+
+                if (filePath != null && file != null) {
+
+                    if (file.exists() && !file.isDirectory()) {
+                        try {
+                            return new FileInputStream(file);
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                            return null;
+                        }
+                    } else {
+                        return null;
+                    }
+
+                }
+                return null;
+            }
+
+        }, file.getName());
+    }
+
+    public static boolean deleteRelatedDoc(DOCUMENT document){
+        if(document.getRelatedDocumentFilePath()!=null){
+            File file = new File(document.getRelatedDocumentFilePath());
+            if(file.exists()){
+                file.delete();
+                return true;
+            }
+        }
+        return false;
+    }
 }

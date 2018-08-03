@@ -36,6 +36,7 @@ public class CustomComponentHL extends HorizontalLayout{
         valueTF.setEnabled(false);
         valueTF.setImmediate(true);
         valueTF.setSizeFull();
+        valueTF.setVisible(false);
 
         descriptionTA = new TextArea();
         descriptionTA.setCaption(CommonUtils.getUILocaleUtil().getEntityFieldLabel(DOCUMENT_USER_INPUT.class, "description"));

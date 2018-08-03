@@ -25,12 +25,14 @@ import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.event.EntityListener;
+import org.r3a.common.entity.file.FileBean;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.view.AbstractCommonView;
 import org.r3a.common.vaadin.widget.dialog.AbstractDialog;
 import org.r3a.common.vaadin.widget.dialog.AbstractYesButtonListener;
 import org.r3a.common.vaadin.widget.dialog.Message;
+import org.r3a.common.vaadin.widget.form.field.filelist.FileListFieldModel;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 
@@ -42,8 +44,12 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
     private ComboBox importanceCB;
     private TextArea messageTA;
     private File customFile;
+    private Upload uploadRelatedFile;
+    private File relatedFile;
+    private String relatedFilePath;
 
     public CreateViewDialog(AbstractCommonView prevView, String title, final DOCUMENT document, List<PDF_DOCUMENT_SIGNER_POST> pdfDocumentSignerPosts) {
+        getContent().setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
         this.title = title;
         this.prevView = prevView;
         this.document = document;
@@ -51,6 +57,11 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
         this.setImmediate(true);
         this.setResponsive(true);
         this.setClosable(false);
+
+        HorizontalLayout mainHL = new HorizontalLayout();
+        mainHL.setSizeFull();
+        mainHL.setImmediate(true);
+
         QueryModel<DOCUMENT_IMPORTANCE> importanceQM = new QueryModel(DOCUMENT_IMPORTANCE.class);
         BeanItemContainer importanceBIC = null;
 
@@ -72,6 +83,7 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
         this.getContent().addComponent(this.messageTA);
 
         FileUploader receiver = new FileUploader(customFile);
+
         Upload upload = new Upload(getUILocaleUtil().getMessage("upload.custom"), receiver);
 
         upload.addFinishedListener(new Upload.FinishedListener() {
@@ -87,12 +99,28 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
                 }
             }
         });
+
         upload.setImmediate(true);
         upload.setButtonCaption(getUILocaleUtil().getMessage("start.to.upload"));
-
         upload.addSucceededListener(receiver);
-        this.getContent().addComponent(upload);
-        this.getContent().setComponentAlignment(upload, Alignment.MIDDLE_CENTER);
+
+
+        FileReceiver fr = new FileReceiver();
+        uploadRelatedFile = new Upload(getUILocaleUtil().getCaption("attach.related.file") , fr);
+        uploadRelatedFile.setButtonCaption(getUILocaleUtil().getMessage("start.to.upload"));
+        uploadRelatedFile.setImmediate(true);
+        uploadRelatedFile.addSucceededListener(fr);
+        uploadRelatedFile.addStartedListener(fr);
+        uploadRelatedFile.addFailedListener(fr);
+
+
+        mainHL.addComponent(uploadRelatedFile);
+        mainHL.setComponentAlignment(uploadRelatedFile, Alignment.MIDDLE_CENTER);
+
+        mainHL.addComponent(upload);
+        mainHL.setComponentAlignment(upload, Alignment.MIDDLE_CENTER);
+
+        getContent().addComponent(mainHL);
 
         QueryModel<DOCUMENT_USER_INPUT> documentUserInputQM = new QueryModel<>(DOCUMENT_USER_INPUT.class);
         documentUserInputQM.addWhere("pdfDocument" ,ECriteria.EQUAL , document.getPdfDocument().getId());
@@ -197,7 +225,8 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
                         CreateViewDialog.this.close();
                     }
                 });
-                CreateViewDialog.this.open();
+                    CreateViewDialog.this.open();
+
             }
         });
     }
@@ -244,6 +273,77 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
         }
     }
 
+
+    private class FileReceiver implements Upload.Receiver, Upload.SucceededListener, Upload.FailedListener, Upload.StartedListener {
+
+
+        @Override
+        public void uploadFailed(Upload.FailedEvent ev) {
+            relatedFilePath = null;
+            CommonUtils.LOG.error("Order files: Unable to upload the file: " + ev.getFilename());
+            CommonUtils.LOG.error(String.valueOf(ev.getReason()));
+        }
+
+        @Override
+        public void uploadSucceeded(Upload.SucceededEvent ev) {
+            FileInputStream fis = null;
+            try {
+                fis = new FileInputStream(relatedFile);
+                byte[] bytes = new byte[(int) relatedFile.length()];
+                fis.read(bytes);
+            } catch (Exception ex) {
+                CommonUtils.showMessageAndWriteLog("FileListWidget: Unable to read temp file", ex);
+            } finally {
+                if (fis != null) {
+                    try {
+                        fis.close();
+                        document.setRelatedDocumentFilePath(relatedFilePath);
+                        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(document);
+
+                    } catch (Exception ex) {
+                    }
+                }
+            }
+        }
+
+        @Override
+        public OutputStream receiveUpload(String filename, String mimeType) {
+            FileOutputStream fos = null;
+            try {
+                relatedFilePath = "/tmp/files/"  + document.getId().getId().longValue()+ "-"+ filename;
+                relatedFile = new File(relatedFilePath);
+
+                if(document.getRelatedDocumentFilePath()!=null){
+                    File file = new File(document.getRelatedDocumentFilePath());
+                    if(file.exists()){
+                        file.delete();
+                    }
+                }
+
+                if (relatedFile.exists()) {
+                    relatedFile.delete();
+                }
+                fos = new FileOutputStream(relatedFile);
+
+            } catch (Exception ex) {
+                CommonUtils.showMessageAndWriteLog("Cannot upload file: " + relatedFilePath, ex);
+            }
+
+            return fos;
+        }
+
+        @Override
+        public void uploadStarted(Upload.StartedEvent ev) {
+            long size = ev.getContentLength();
+            long maxSize = FileListFieldModel.MAX_FILE_SIZE;
+            if (size > maxSize) {
+                CommonUtils.LOG.error("Trying to upload a big file: Filename = " + ev.getFilename() + ", size = " + size);
+                uploadRelatedFile.interruptUpload();
+                String message = getUILocaleUtil().getMessage("error.filetoobig");
+                Message.showError(String.format(message, maxSize / 1024));
+            }
+        }
+    }
 
     @Override
     protected String createTitle() {

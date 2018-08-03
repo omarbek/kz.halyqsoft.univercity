@@ -235,6 +235,13 @@ public class MyDocumentsView extends BaseView implements EntityListener{
 
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(documentUserRealInputList);
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(documentSigners);
+
+                try{
+                    EmployeePdfCreator.deleteRelatedDoc((DOCUMENT) document);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(document);
                 myDocsTW.refresh();
             }catch (Exception e){

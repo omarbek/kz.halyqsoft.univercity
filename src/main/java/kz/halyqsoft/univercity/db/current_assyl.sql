@@ -110,3 +110,6 @@ ALTER TABLE ONLY document_user_real_input
 FOREIGN KEY (document_user_input_id)
 REFERENCES  document_user_input(id)
 ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+-- DOCUMENT
+ALTER TABLE document ADD COLUMN related_document_file_path  text;

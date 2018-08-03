@@ -66,17 +66,6 @@ public class InOnAgreeView extends BaseView implements EntityListener{
 
         QueryModel inOnAgreeDocsQM = dbGridModel.getQueryModel();
 
-
-
-//        FromItem fi = inOnAgreeDocsQM.addJoin(EJoin.INNER_JOIN, "id", DOCUMENT_SIGNER.class , "document");
-//        inOnAgreeDocsQM.addWhereIn("documentStatus" , ids);
-//        inOnAgreeDocsQM.addWhereAnd(fi , "employee", ECriteria.EQUAL , CommonUtils.getCurrentUser().getId());
-//        inOnAgreeDocsQM.addWhereAnd(fi , "documentSignerStatus", ECriteria.EQUAL, WorkflowCommonUtils.getDocumentSignerStatusByName(DOCUMENT_SIGNER_STATUS.CREATED).getId());
-//        FromItem fi2 = inOnAgreeDocsQM.addJoin(EJoin.INNER_JOIN, "pdfDocument" , PDF_DOCUMENT.class , "id");
-//        FromItem fi3 = fi2.addJoin( EJoin.INNER_JOIN, "id" , PDF_DOCUMENT_SIGNER_POST.class , "pdfDocument");
-//        FromItem fi4 = fi3.addJoin(EJoin.INNER_JOIN, "post" , POST.class , "id");
-//        inOnAgreeDocsQM.addWhereAnd(fi4 , "created" ,EC)
-
         HorizontalLayout buttonsPanel = new HorizontalLayout();
         Button previewBtn = new Button(getUILocaleUtil().getCaption("preview"));
         previewBtn.addClickListener(new Button.ClickListener() {
