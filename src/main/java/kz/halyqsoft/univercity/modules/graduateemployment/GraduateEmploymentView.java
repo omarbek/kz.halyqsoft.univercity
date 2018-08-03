@@ -2,9 +2,8 @@ package kz.halyqsoft.univercity.modules.graduateemployment;
 
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.TabSheet;
-import kz.halyqsoft.univercity.entity.beans.univercity.GRADUATE_EMPLOYMENT;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.VGraduate;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VGraduateEmployment;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.V_STUDENT;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.EntityUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
@@ -12,8 +11,6 @@ import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.ID;
 import org.r3a.common.entity.beans.AbstractTask;
-import org.r3a.common.entity.query.QueryModel;
-import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.ERefreshType;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
@@ -27,16 +24,16 @@ import java.util.List;
 import java.util.Map;
 
     public class GraduateEmploymentView extends AbstractTaskView {
+        private GridWidget sumOfGraduateGW;
         private GridWidget graduateEmploymentGW;
-        private GridWidget newGraduateEmploymentGW;
         private TabSheet tabSheet;
 
-        public GridWidget getNewGraduateEmploymentGW() {
-            return newGraduateEmploymentGW;
+        public GridWidget getGraduateEmploymentGW() {
+            return graduateEmploymentGW;
         }
 
-        public void setNewGraduateEmploymentGW(GridWidget newGraduateEmploymentGW) {
-            this.newGraduateEmploymentGW = newGraduateEmploymentGW;
+        public void setGraduateEmploymentGW(GridWidget graduateEmploymentGW) {
+            this.graduateEmploymentGW = graduateEmploymentGW;
         }
 
         public GraduateEmploymentView(AbstractTask task)throws Exception{
@@ -46,32 +43,33 @@ import java.util.Map;
         @Override
         public void initView(boolean b) throws Exception {
 
-            newGraduateEmploymentGW = new GridWidget(GRADUATE_EMPLOYMENT.class);
-            newGraduateEmploymentGW.setImmediate(true);
-            newGraduateEmploymentGW.showToolbar(true);
-            newGraduateEmploymentGW.setButtonVisible(IconToolbar.PREVIEW_BUTTON, false);
-            newGraduateEmploymentGW.setButtonVisible(IconToolbar.REFRESH_BUTTON, false);
-            newGraduateEmploymentGW.addEntityListener(new GraduateEmploymentEntity());
-
-            DBGridModel newGraduateEmploymentGM = (DBGridModel) newGraduateEmploymentGW.getWidgetModel();
-            newGraduateEmploymentGM.setEntities(getEntities());
-            newGraduateEmploymentGM.setRowNumberVisible(true);
-            newGraduateEmploymentGM.setMultiSelect(true);
-
-            graduateEmploymentGW = new GridWidget(VGraduateEmployment.class);
+            graduateEmploymentGW = new GridWidget(VGraduate.class);
+            graduateEmploymentGW.addEntityListener(new GraduateEmploymentEntity());
             graduateEmploymentGW.setImmediate(true);
-            graduateEmploymentGW.showToolbar(false);
-            graduateEmploymentGW.setButtonVisible (AbstractToolbar.REFRESH_BUTTON, true);
+            graduateEmploymentGW.showToolbar(true);
+            graduateEmploymentGW.setButtonVisible(IconToolbar.PREVIEW_BUTTON, false);
+            graduateEmploymentGW.setButtonVisible(IconToolbar.REFRESH_BUTTON, false);
 
             DBGridModel graduateEmploymentGM = (DBGridModel) graduateEmploymentGW.getWidgetModel();
-            graduateEmploymentGM.setEntities(getList());
+            graduateEmploymentGM.setRowNumberVisible(true);
+            graduateEmploymentGM.setMultiSelect(true);
             graduateEmploymentGM.setRefreshType(ERefreshType.MANUAL);
+            graduateEmploymentGM.setEntities(getEntities());
 
-            getContent().addComponent(newGraduateEmploymentGW);
-            getContent().setComponentAlignment(newGraduateEmploymentGW,Alignment.MIDDLE_CENTER);
+            sumOfGraduateGW = new GridWidget(VGraduateEmployment.class);
+            sumOfGraduateGW.setImmediate(true);
+            sumOfGraduateGW.showToolbar(false);
+            sumOfGraduateGW.setButtonVisible (AbstractToolbar.REFRESH_BUTTON, true);
+
+            DBGridModel sumOfGraduateGM = (DBGridModel) sumOfGraduateGW.getWidgetModel();
+            sumOfGraduateGM.setEntities(getList());
+            sumOfGraduateGM.setRefreshType(ERefreshType.MANUAL);
 
             getContent().addComponent(graduateEmploymentGW);
-            getContent().setComponentAlignment(graduateEmploymentGW, Alignment.MIDDLE_CENTER);
+            getContent().setComponentAlignment(graduateEmploymentGW,Alignment.MIDDLE_CENTER);
+
+            getContent().addComponent(sumOfGraduateGW);
+            getContent().setComponentAlignment(sumOfGraduateGW, Alignment.MIDDLE_CENTER);
         }
 
         public List<VGraduateEmployment> getList() {
@@ -114,28 +112,33 @@ import java.util.Map;
             return list;
         }
 
-        public List<GRADUATE_EMPLOYMENT> getEntities() {
+        public List<VGraduate> getEntities() {
 
-            List<GRADUATE_EMPLOYMENT> getList = new ArrayList<>();
+            List<VGraduate> getList = new ArrayList<>();
                 Map<Integer, Object> params = new HashMap<>();
-                String sql = "SELECT * from graduate_employment ";
+                String sql = "SELECT ge.id,\n" +
+                        "                           trim(vs.LAST_NAME || ' ' || vs.FIRST_NAME || ' ' || coalesce(vs.MIDDLE_NAME, '')) FIO,\n" +
+                        "                          case when ge.employed = true then '+' else '-' end employed,\n" +
+                        "                          case when ge.by_speciality = true then '+' else '-' end bySpeciality,\n" +
+                        "                          case when ge.master = true then '+' else '-' end master,\n" +
+                        "                          case when ge.decree = true then '+' else '-' end decree,\n" +
+                        "                          case when ge.army = true then '+' else '-' end army\n" +
+                        "                        from graduate_employment ge\n" +
+                        " INNER JOIN v_student vs on vs.id=ge.student_id;";
 
                 try {
                     List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
                     if (!tmpList.isEmpty()) {
                         for (Object o : tmpList) {
                             Object[] oo = (Object[]) o;
-                            GRADUATE_EMPLOYMENT ve = new GRADUATE_EMPLOYMENT();
+                            VGraduate ve = new VGraduate();
                             ve.setId(ID.valueOf((long)oo[0]));
-                            QueryModel<V_STUDENT> queryModel = new QueryModel<>(V_STUDENT.class);
-                            queryModel.addWhere("id" , ECriteria.EQUAL, ID.valueOf((long)oo[1]));
-                            V_STUDENT vStudent = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(queryModel);
-                            ve.setStudent(vStudent);
-                            ve.setEmployed((boolean) oo[2]);
-                            ve.setBySpeciality((boolean) oo[3]);
-                            ve.setMaster((boolean) oo[4]);
-                            ve.setDecree((boolean) oo[5]);
-                            ve.setArmy((boolean) oo[6]);
+                            ve.setFIO((String)oo[1]);
+                            ve.setEmployed((String) oo[2]);
+                            ve.setBySpeciality((String) oo[3]);
+                            ve.setMaster((String) oo[4]);
+                            ve.setDecree((String) oo[5]);
+                            ve.setArmy((String) oo[6]);
                             getList.add(ve);
                         }
                     }
@@ -147,18 +150,18 @@ import java.util.Map;
         }
 
         private void refreshList(List<VGraduateEmployment> list) {
-            ((DBGridModel) graduateEmploymentGW.getWidgetModel()).setEntities(list);
+            ((DBGridModel) sumOfGraduateGW.getWidgetModel()).setEntities(list);
             try {
-                graduateEmploymentGW.refresh();
+                sumOfGraduateGW.refresh();
             } catch (Exception ex) {
                 CommonUtils.showMessageAndWriteLog("Unable to refresh employment list", ex);
             }
         }
 
-        private void refreshGWList (List<GRADUATE_EMPLOYMENT> getList) {
-            ((DBGridModel) newGraduateEmploymentGW.getWidgetModel()).setEntities(getList);
+        private void refreshGWList (List<VGraduate> getList) {
+            ((DBGridModel) graduateEmploymentGW.getWidgetModel()).setEntities(getList);
             try {
-                newGraduateEmploymentGW.refresh();
+                graduateEmploymentGW.refresh();
             } catch (Exception ex) {
                 CommonUtils.showMessageAndWriteLog("Unable to refresh employment list", ex);
             }
@@ -166,25 +169,23 @@ import java.util.Map;
 
         public void refresh() {
             try {
-                newGraduateEmploymentGW.refresh();
                 graduateEmploymentGW.refresh();
+                sumOfGraduateGW.refresh();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
-
        private class GraduateEmploymentEntity  extends EntityUtils {
-
            @Override
            protected void init(Object source, Entity e, boolean isNew) throws Exception {
-               GRADUATE_EMPLOYMENT graduateEmployment = (GRADUATE_EMPLOYMENT) e;
+               VGraduate graduateEmployment = (VGraduate) e;
                new GraduateEmploymentEdit(graduateEmployment, isNew, GraduateEmploymentView.this);
            }
 
            @Override
            protected GridWidget getGridWidget() {
-               return newGraduateEmploymentGW;
+               return graduateEmploymentGW;
            }
 
            @Override
@@ -194,7 +195,7 @@ import java.util.Map;
 
            @Override
            protected Class<? extends Entity> getEntityClass() {
-               return GRADUATE_EMPLOYMENT.class;
+               return VGraduate.class;
            }
 
            @Override
@@ -203,7 +204,7 @@ import java.util.Map;
 
            @Override
            protected void refresh() throws Exception {
-                   newGraduateEmploymentGW.refresh();
+                   graduateEmploymentGW.refresh();
            }
        }
     }
