@@ -283,7 +283,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
             String sql = "SELECT t0.* " +
                     "FROM DORM_STUDENT t0 INNER JOIN STUDENT_EDUCATION t1 ON t0.STUDENT_ID = t1.ID " +
                     "WHERE t1.STUDENT_ID = ?1 AND t1.CHILD_ID IS NULL AND t0.CHECK_OUT_DATE IS NULL AND " +
-                    "t0.CHECK_IN_DATE IS NOT NULL AND t0.request_status_id = 1" +
+                    "t0.CHECK_IN_DATE IS NOT NULL AND t0.request_status_id = 1 and " +
                     "      t0.DELETED = FALSE;";
             Map<Integer, Object> params = new HashMap<>();
             params.put(1, student.getId().getId());

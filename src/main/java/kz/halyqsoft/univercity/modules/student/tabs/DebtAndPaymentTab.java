@@ -31,7 +31,6 @@ public class DebtAndPaymentTab extends VerticalLayout {
         QueryModel debtQM = debtTM.getQueryModel();
         debtQM.addWhere("student", ECriteria.EQUAL, studentId);
         debtQM.addWhere("deleted", Boolean.FALSE);
-        debtQM.addOrder("reportDate");
 
         addComponent(debtTW);
         setComponentAlignment(debtTW, Alignment.MIDDLE_CENTER);
@@ -44,7 +43,6 @@ public class DebtAndPaymentTab extends VerticalLayout {
         paymentTM.setReadOnly(true);
         QueryModel paymentQM = paymentTM.getQueryModel();
         paymentQM.addWhere("student", ECriteria.EQUAL, studentId);
-        paymentQM.addOrder("paymentDate");
 
         addComponent(paymentTW);
         setComponentAlignment(paymentTW, Alignment.MIDDLE_CENTER);

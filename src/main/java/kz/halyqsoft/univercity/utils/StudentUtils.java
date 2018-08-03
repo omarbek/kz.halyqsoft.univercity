@@ -160,7 +160,7 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
         return studentFilterPanel;
     }
 
-    public StudentUtils(int categoryType,boolean forDorm) throws Exception {
+    public StudentUtils(int categoryType, boolean forDorm) throws Exception {
         super();
         this.categoryType = categoryType;
         this.forDorm = forDorm;
@@ -216,8 +216,7 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
                                     String jsonInString = "";
 
 
-
-                                    if(FieldValidator.isNotEmpty(name) && FieldValidator.isNotEmpty(description)){
+                                    if (FieldValidator.isNotEmpty(name) && FieldValidator.isNotEmpty(description)) {
 
                                         if (nameTF.getValue().toCharArray()[0] != '$') {
                                             name = "$" + name;
@@ -402,6 +401,9 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
         int i = 1;
         Map<Integer, Object> params = new HashMap<Integer, Object>();
         StringBuilder sb = new StringBuilder();
+        if (forDorm) {
+            sb.append(" and stu.need_dorm = true ");
+        }
         if (sf.getCode() != null && sf.getCode().trim().length() >= 2) {
             sb.append(" and lower(stu.user_code) like '");
             sb.append(sf.getCode().trim().toLowerCase());
@@ -450,7 +452,7 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
         }
 
         List<VStudent> list = new ArrayList<>();
-        sb.insert(0, " where stu.category_id = " + categoryType + " and stu.need_dorm = " + forDorm);
+        sb.insert(0, " where stu.category_id = " + categoryType);
         String sql = "SELECT " +
                 "  stu.ID, " +
                 "  stu.user_code                                                                        CODE, " +
