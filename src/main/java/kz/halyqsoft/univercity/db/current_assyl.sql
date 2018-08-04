@@ -52,7 +52,7 @@ create sequence S_MESSAGE
   no cycle;
 
 -- DOCUMENT ADDITION
-
+--added to real
 CREATE TABLE document_user_input(
   id BIGINT NOT NULL,
   pdf_document_id BIGINT NOT NULL,
