@@ -87,7 +87,8 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
     private FormModel mainBaseDataFM;
     private CheckBox kazCheckBox, rusCheckBox;
 
-    public StudentEdit(final FormModel baseDataFM, VerticalLayout mainVL, StudentOrApplicantView studentOrApplicantView)
+    public StudentEdit(final FormModel baseDataFM, VerticalLayout mainVL,
+                       StudentOrApplicantView studentOrApplicantView)
             throws Exception {
         super();
         this.mainVL = mainVL;
@@ -403,7 +404,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         createParentsTab(readOnly);
         createAwardsTab(readOnly);
         createSocialCategoriesTab(readOnly);
-//        createDebtAndPaymentTab(readOnly);//TODO add later
+        createDebtAndPaymentTab(readOnly);
         if (student.getCategory().getId().equals(STUDENT_CATEGORY.STUDENT_ID)) {
             createDiplomaTab(readOnly);
         }

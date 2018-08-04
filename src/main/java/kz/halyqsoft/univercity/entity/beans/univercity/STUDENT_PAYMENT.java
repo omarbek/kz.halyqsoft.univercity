@@ -1,18 +1,12 @@
 package kz.halyqsoft.univercity.entity.beans.univercity;
 
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_STUDENT;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
 
+import javax.persistence.*;
 import java.util.Date;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.ManyToOne;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 /**
  * @author Omarbek
@@ -23,16 +17,12 @@ public class STUDENT_PAYMENT extends AbstractEntity {
 
 	private static final long serialVersionUID = -7691848287100727089L;
 
+	@FieldInfo(type = EFieldType.FK_COMBO)
 	@ManyToOne
 	@JoinColumns({ @JoinColumn(name = "STUDENT_ID", referencedColumnName = "ID", nullable = false) })
-	private STUDENT student;
+	private V_STUDENT student;
 
-	@FieldInfo(type = EFieldType.DATETIME, order = 2)
-	@Column(name = "PAYMENT_DATE", nullable = false)
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date paymentDate;
-
-	@FieldInfo(type = EFieldType.DOUBLE, order = 3)
+	@FieldInfo(type = EFieldType.DOUBLE, order = 2)
 	@Column(name = "PAYMENT_SUM", nullable = false)
 	private Double paymentSum;
 
@@ -43,20 +33,12 @@ public class STUDENT_PAYMENT extends AbstractEntity {
 	public STUDENT_PAYMENT() {
 	}
 
-	public STUDENT getStudent() {
+	public V_STUDENT getStudent() {
 		return student;
 	}
 
-	public void setStudent(STUDENT student) {
+	public void setStudent(V_STUDENT student) {
 		this.student = student;
-	}
-
-	public Date getPaymentDate() {
-		return paymentDate;
-	}
-
-	public void setPaymentDate(Date paymentDate) {
-		this.paymentDate = paymentDate;
 	}
 
 	public Double getPaymentSum() {

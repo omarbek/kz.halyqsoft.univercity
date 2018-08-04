@@ -53,15 +53,15 @@ public class CreativeExamView extends AbstractTaskView implements FilterPanelLis
         tf.setNullSettingAllowed(true);
         filterPanel.addFilterComponent("code", tf);
 
-//        tf = new TextField();
-//        tf.setNullRepresentation("");
-//        tf.setNullSettingAllowed(true);
-//        filterPanel.addFilterComponent("firstname", tf);
-//
-//        tf = new TextField();
-//        tf.setNullRepresentation("");
-//        tf.setNullSettingAllowed(true);
-//        filterPanel.addFilterComponent("lastname", tf);
+        tf = new TextField();
+        tf.setNullRepresentation("");
+        tf.setNullSettingAllowed(true);
+        filterPanel.addFilterComponent("firstname", tf);
+
+        tf = new TextField();
+        tf.setNullRepresentation("");
+        tf.setNullSettingAllowed(true);
+        filterPanel.addFilterComponent("lastname", tf);
 
         getContent().addComponent(filterPanel);
         getContent().setComponentAlignment(filterPanel, Alignment.TOP_CENTER);
@@ -90,16 +90,16 @@ public class CreativeExamView extends AbstractTaskView implements FilterPanelLis
             sb.append(sf.getCode().trim().toLowerCase());
             sb.append("%'");
         }
-//        if (sf.getFirstname() != null && sf.getFirstname().trim().length() >= 3) {
-//            sb.append(" and lower(usr.FIRST_NAME) like '");
-//            sb.append(sf.getFirstname().trim().toLowerCase());
-//            sb.append("%'");
-//        }
-//        if (sf.getLastname() != null && sf.getLastname().trim().length() >= 3) {
-//            sb.append(" and lower(usr.LAST_NAME) like '");
-//            sb.append(sf.getLastname().trim().toLowerCase());
-//            sb.append("%'");
-//        }
+        if (sf.getFirstname() != null && sf.getFirstname().trim().length() >= 3) {
+            sb.append(" and usr.FIRST_NAME ilike '");
+            sb.append(sf.getFirstname().trim().toLowerCase());
+            sb.append("%'");
+        }
+        if (sf.getLastname() != null && sf.getLastname().trim().length() >= 3) {
+            sb.append(" and usr.LAST_NAME ilike '");
+            sb.append(sf.getLastname().trim().toLowerCase());
+            sb.append("%'");
+        }
 
         List<VCreativeExam> list = new ArrayList<>();
         if (sb.length() > 0) {

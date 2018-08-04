@@ -43,7 +43,7 @@ public class WorkflowCommonUtils {
         DOCUMENT_STATUS documentStatus = null;
         try{
             QueryModel<DOCUMENT_STATUS> documentStatusQM = new QueryModel<>(DOCUMENT_STATUS.class);
-            documentStatusQM.addWhere("statusName" ,ECriteria.EQUAL , name);
+            documentStatusQM.addWhere("statusName" ,ECriteria.EQUAL , name.toLowerCase());
             documentStatus = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(documentStatusQM);
         }catch (Exception e){
             e.printStackTrace();
@@ -55,7 +55,7 @@ public class WorkflowCommonUtils {
         DOCUMENT_SIGNER_STATUS documentSignerStatus= null;
         try{
             QueryModel<DOCUMENT_SIGNER_STATUS> documentSignerStatusQM = new QueryModel<>(DOCUMENT_SIGNER_STATUS.class);
-            documentSignerStatusQM.addWhere("statusName" ,ECriteria.EQUAL , name);
+            documentSignerStatusQM.addWhere("statusName" ,ECriteria.EQUAL , name.toLowerCase());
             documentSignerStatus = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(documentSignerStatusQM);
         }catch (Exception e){
             e.printStackTrace();
