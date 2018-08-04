@@ -146,6 +146,9 @@ public class USERS extends AbstractUser implements CommonTree<USERS> {
     @Column(name = "CREATED_BY")
     private String createdBy;
 
+    @Column(name="PUSH_ID")
+    private String pushId;
+
     public USERS() {
     }
 
@@ -441,5 +444,13 @@ public class USERS extends AbstractUser implements CommonTree<USERS> {
 
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
+    }
+
+    public String getPushId() {
+        return pushId;
+    }
+
+    public void setPushId(String pushId) {
+        this.pushId = pushId;
     }
 }
