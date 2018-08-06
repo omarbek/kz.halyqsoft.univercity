@@ -5,6 +5,8 @@ import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
 
+import javax.persistence.Column;
+
 public class VGroup extends AbstractEntity {
 
     @FieldInfo(type=EFieldType.TEXT, order = 1)
@@ -25,7 +27,7 @@ public class VGroup extends AbstractEntity {
     @FieldInfo(type = EFieldType.DOUBLE, order = 6)
     private double percantage;
 
-    @FieldInfo(type = EFieldType.INTEGER, order = 7, inGrid = false)
+    @FieldInfo(type = EFieldType.INTEGER, order = 7, inGrid = false, inView = false, inEdit = false)
     private Long groupID;
 
     public String getGroupName() {

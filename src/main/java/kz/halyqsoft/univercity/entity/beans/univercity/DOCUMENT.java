@@ -11,7 +11,7 @@ import java.util.Date;
 @Entity
 public class DOCUMENT extends AbstractEntity{
 
-    @FieldInfo(type = EFieldType.FK_COMBO, inGrid = false, inEdit = false, inView = false ,order = 1)
+    @FieldInfo(type = EFieldType.FK_COMBO, inGrid = true, inEdit = false, inView = true ,order = 1)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "creator_employee_id", referencedColumnName = "ID", nullable = false)})
@@ -56,7 +56,7 @@ public class DOCUMENT extends AbstractEntity{
     private Date created;
 
 
-    @FieldInfo(type = EFieldType.DATETIME, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false, order=8)
+    @FieldInfo(type = EFieldType.DATETIME, required = false, readOnlyFixed = true,  inEdit = false, order=8)
     @Column(name = "updated")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updated;
@@ -67,11 +67,15 @@ public class DOCUMENT extends AbstractEntity{
     private boolean deleted;
 
 
-    @FieldInfo(inGrid = false , inView = false , inEdit = false, order = 5)
+    @FieldInfo(inGrid = false , inView = false , inEdit = false, order = 10)
     @Column(name = "file_byte")
     @Lob
     @Basic(fetch = FetchType.LAZY)
     private byte[] fileByte;
+
+    @FieldInfo(type = EFieldType.TEXT,inEdit = false, inView = false , inGrid = false, order = 11)
+    @Column(name = "related_document_file_path")
+    private String relatedDocumentFilePath;
 
     public USERS getCreatorEmployee() {
         return creatorEmployee;
@@ -127,6 +131,14 @@ public class DOCUMENT extends AbstractEntity{
 
     public void setDocumentImportance(DOCUMENT_IMPORTANCE documentImportance) {
         this.documentImportance = documentImportance;
+    }
+
+    public String getRelatedDocumentFilePath() {
+        return relatedDocumentFilePath;
+    }
+
+    public void setRelatedDocumentFilePath(String relatedDocumentFilePath) {
+        this.relatedDocumentFilePath = relatedDocumentFilePath;
     }
 
     public byte[] getFileByte() {

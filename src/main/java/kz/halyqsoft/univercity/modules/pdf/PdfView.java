@@ -97,7 +97,7 @@ public class PdfView extends AbstractTaskView implements EntityListener {
         VerticalLayout leftVl = new VerticalLayout();
 
         generateTabHSP.setSizeFull();
-        generateTabHSP.setSplitPosition(10);
+        generateTabHSP.setSplitPosition(8);
 
         sideBarGenerateTT = new TreeTable();
         HierarchicalContainer optionHC = new HierarchicalContainer();

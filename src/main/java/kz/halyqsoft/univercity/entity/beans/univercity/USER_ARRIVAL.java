@@ -22,8 +22,7 @@ public class USER_ARRIVAL extends AbstractEntity {
             @JoinColumn(name = "USER_ID", referencedColumnName = "ID")})
     private USERS user;
 
-    @FieldInfo(type = EFieldType.DATETIME, order = 3, required = false, readOnlyFixed = true, inGrid = false,
-            inEdit = false, inView = false)
+    @FieldInfo(type = EFieldType.DATETIME, order = 3, required = false, readOnlyFixed = true, inEdit = false)
     @Column(name = "CREATED")
     @Temporal(TemporalType.TIMESTAMP)
     private Date created;

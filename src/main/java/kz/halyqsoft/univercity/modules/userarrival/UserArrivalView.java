@@ -91,6 +91,7 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
         MenuColumn menuColumn = new MenuColumn();
         menuTT.addGeneratedColumn("user arrival", menuColumn);
         menuTT.setColumnHeader("user arrival", getUILocaleUtil().getCaption("attendanceHeader"));
+
         menuTT.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
@@ -283,6 +284,8 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
                 " GROUP BY  dep.dept_name,dep.id";
 
         try {
+
+
             List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
             if (!tmpList.isEmpty()) {
                 for (Object o : tmpList) {
@@ -327,6 +330,7 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
 
     @Override
     public void handleEntityEvent(EntityEvent ev) {
+
         if (ev.getSource().equals(employeeGW)) {
             if (ev.getAction() == EntityEvent.SELECTED) {
 

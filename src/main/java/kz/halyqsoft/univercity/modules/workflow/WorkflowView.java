@@ -17,11 +17,8 @@ public class WorkflowView extends AbstractTaskView {
     VerticalLayout secondMainVL;
 
     public static String MY_DOCUMENTS ;
-    public static String MY_SAVES ;
-    public static String COMMON_DOCUMENTS ;
     public static String MAIN ;
     public static String CREATE ;
-    public static String SEARCH ;
 
     public static String INCOMING ;
     public static String OUTCOMING ;
@@ -41,11 +38,8 @@ public class WorkflowView extends AbstractTaskView {
     @Override
     public void initView(boolean b) throws Exception {
         MY_DOCUMENTS = getUILocaleUtil().getCaption("my_documents");
-        MY_SAVES = getUILocaleUtil().getCaption("my_saves");
-        COMMON_DOCUMENTS = getUILocaleUtil().getCaption("common_documents");
         MAIN = getUILocaleUtil().getCaption("main");
         CREATE = getUILocaleUtil().getCaption("create");
-        SEARCH = getUILocaleUtil().getCaption("search");
 
         INCOMING = getUILocaleUtil().getCaption("incoming");
         OUTCOMING = getUILocaleUtil().getCaption("outcoming");
@@ -78,12 +72,9 @@ public class WorkflowView extends AbstractTaskView {
 
         myItems.add(new MyItem(optionHC.addItem(MAIN) ,MAIN , null));
         myItems.add(new MyItem(optionHC.addItem(CREATE) ,CREATE, null));
-        myItems.add(new MyItem(optionHC.addItem(SEARCH) ,SEARCH, null));
         myItems.add(new MyItem(optionHC.addItem(INCOMING), INCOMING , null));
         myItems.add(new MyItem(optionHC.addItem(OUTCOMING) , OUTCOMING, null));
-        myItems.add(new MyItem(optionHC.addItem(MY_SAVES), MY_SAVES , null));
         myItems.add(new MyItem(optionHC.addItem(MY_DOCUMENTS),MY_DOCUMENTS , null));
-        myItems.add(new MyItem(optionHC.addItem(COMMON_DOCUMENTS),COMMON_DOCUMENTS , null));
 
         myItems.add(new MyItem(optionHC.addItem(O_ON_AGREE), O_ON_AGREE, INCOMING));
         myItems.add(new MyItem(optionHC.addItem(O_ON_SIGN), O_ON_SIGN, INCOMING));
