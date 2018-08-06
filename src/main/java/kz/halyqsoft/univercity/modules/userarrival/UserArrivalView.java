@@ -285,7 +285,7 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
 
         try {
 
-            
+
             List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
             if (!tmpList.isEmpty()) {
                 for (Object o : tmpList) {
@@ -330,7 +330,7 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
 
     @Override
     public void handleEntityEvent(EntityEvent ev) {
-        
+
         if (ev.getSource().equals(employeeGW)) {
             if (ev.getAction() == EntityEvent.SELECTED) {
 
