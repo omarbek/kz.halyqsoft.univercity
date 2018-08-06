@@ -284,6 +284,8 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
                 " GROUP BY  dep.dept_name,dep.id";
 
         try {
+
+            
             List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
             if (!tmpList.isEmpty()) {
                 for (Object o : tmpList) {
