@@ -130,9 +130,7 @@ public class StudentDormView extends AbstractTaskView {
                     }
                     if (dormRooms != null && dormRooms.size() > 0 && dormRooms.get(0) != null &&
                             (dormRooms.get(0).getBedCount() - dormRooms.get(0).getBusyBedCount()) > 0) {
-                        if ("Казахстанская морская академия".equals(faculty)) {
-                            costL.setValue("0.00");
-                        } else if (dormRooms.get(0).getCost() != null) {
+                        if (dormRooms.get(0).getCost() != null) {
                             costL.setValue(dormRooms.get(0).getCost().toString());
                         }
                     } else {

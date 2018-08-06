@@ -21,6 +21,7 @@ public class DormRoom implements Entity {
 			"    WHERE " +
 			"      dormStudent.ROOM_ID = room.ID AND " +
 			"      dormStudent.CHECK_OUT_DATE IS NULL AND " +
+			"      dormStudent.request_status_id = 1 AND " +
 			"      dormStudent.DELETED = FALSE " +
 			"  ), " +
 			"  CAST(room.COST AS INT) " +

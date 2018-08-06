@@ -34,6 +34,7 @@ public class DormRoomEdit extends AbstractFormWidgetView {
     private final DORM dormBuilding;
 
     DormRoomEdit(DORM dormBuilding) {
+        setBackButtonVisible(false);
         this.dormBuilding = dormBuilding;
 
         dormRoomGrid.addEntityListener(this);

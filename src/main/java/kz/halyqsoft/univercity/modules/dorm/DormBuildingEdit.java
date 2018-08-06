@@ -36,6 +36,7 @@ public class DormBuildingEdit extends AbstractFormWidgetView {
     private GridWidget dormBuildingsGrid = new GridWidget(DormBuilding.class);
 
     DormBuildingEdit() {
+        setBackButtonVisible(false);
         dormBuildingsGrid.addEntityListener(this);
         dormBuildingsGrid.setWidth(GRID_WIDTH, Unit.PERCENTAGE);
 
