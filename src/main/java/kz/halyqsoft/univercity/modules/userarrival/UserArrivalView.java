@@ -128,6 +128,8 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
                             GroupAttendance groupAttendance = new GroupAttendance();
 
                             mainHL.addComponent(groupAttendance.getMainVL());
+                        }else if(studentAttendance.equalsIgnoreCase(event.getProperty().getValue().toString())){
+
                         }
                         mainHSP.addComponent(mainHL);
                     }
