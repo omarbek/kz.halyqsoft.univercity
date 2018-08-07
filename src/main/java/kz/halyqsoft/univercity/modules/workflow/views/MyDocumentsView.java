@@ -97,6 +97,7 @@ public class MyDocumentsView extends BaseView implements EntityListener{
         myDocsTW.setImmediate(true);
         myDocsTW.setResponsive(true);
         myDocsTW.setButtonVisible(IconToolbar.ADD_BUTTON , false);
+        myDocsTW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
         myDocsTW.setButtonVisible(IconToolbar.EDIT_BUTTON, false);
         myDocsTW.addEntityListener(this);
 

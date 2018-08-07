@@ -3,11 +3,10 @@ package kz.halyqsoft.univercity.modules.pdf;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import kz.halyqsoft.univercity.entity.beans.univercity.PDF_DOCUMENT;
-import kz.halyqsoft.univercity.modules.file.FileView;
+import kz.halyqsoft.univercity.modules.pdf.tabs.SearchTabContainer;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.vaadin.AbstractWebUI;
 import org.r3a.common.vaadin.view.AbstractCommonView;
-import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.dialog.AbstractDialog;
 
 

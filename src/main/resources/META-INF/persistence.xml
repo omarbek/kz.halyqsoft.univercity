@@ -333,6 +333,9 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.REQUEST_TYPE_STATUS</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_USER_INPUT</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_USER_REAL_INPUT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.PRACTICE_INFORMATION</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.PRACTICE_STUDENT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.SUBSTITUTION</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>

@@ -49,7 +49,7 @@ public class STUDENT_EDUCATION extends AbstractEntity {
     private SPECIALITY speciality;
 
 
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 5)
+	@FieldInfo(type = EFieldType.FK_COMBO, order = 5 )
 	@ManyToOne
 	@JoinColumns({
 			@JoinColumn(name = "GROUPS_ID", referencedColumnName = "ID")})

@@ -113,6 +113,14 @@ public class GROUPS extends AbstractEntity {
         this.studyYear = studyYear;
     }
 
+    public EMPLOYEE getCurator() {
+        return curator;
+    }
+
+    public void setCurator(EMPLOYEE curator) {
+        this.curator = curator;
+    }
+
     @Override
     public String toString() {
         return name;

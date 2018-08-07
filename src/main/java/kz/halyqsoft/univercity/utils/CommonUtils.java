@@ -31,6 +31,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.persistence.NoResultException;
 import java.math.BigInteger;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import kz.halyqsoft.univercity.entity.beans.ROLES;
 
@@ -39,6 +41,10 @@ import kz.halyqsoft.univercity.entity.beans.ROLES;
  * @created on 15.03.2018
  */
 public class CommonUtils {
+
+
+    public static final String DATETIME = "yyyy-MM-dd' 'HH:mm:ss.SSS";
+    public static final String DATE = "dd.MM.yyyy";
 
     public static final Logger LOG = LoggerFactory.getLogger("ROOT");
     public static int currentYear = Calendar.getInstance().get(Calendar.YEAR);
@@ -238,6 +244,11 @@ public class CommonUtils {
             login = getLogin(login + sequenceForEmployee++);
         }
         return login;
+    }
+
+    public static String getFormattedDate(Date date){
+        DateFormat formatter = new SimpleDateFormat(DATETIME);
+        return  formatter.format(date);
     }
 
     public static String getCode(String beginYear) {

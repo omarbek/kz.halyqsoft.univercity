@@ -5,6 +5,10 @@ import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.CATALOG;
 import kz.halyqsoft.univercity.entity.beans.univercity.PDF_DOCUMENT;
+import kz.halyqsoft.univercity.entity.beans.univercity.SUBSTITUTION;
+import kz.halyqsoft.univercity.modules.pdf.tabs.CatalogTabContainer;
+import kz.halyqsoft.univercity.modules.pdf.tabs.SearchTabContainer;
+import kz.halyqsoft.univercity.modules.pdf.tabs.SubstituitionTabContainer;
 import kz.halyqsoft.univercity.modules.reports.MenuColumn;
 import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.beans.AbstractTask;
@@ -13,10 +17,8 @@ import org.r3a.common.vaadin.view.AbstractTaskView;
 
 public class PdfView extends AbstractTaskView implements EntityListener {
 
-
     private final String FIRST_OPTION = getUILocaleUtil().getCaption("property");
     private final String SECOND_OPTION = getUILocaleUtil().getCaption("access");
-
 
     private TabSheet mainTS;
     private Component searchComponent;
@@ -27,17 +29,19 @@ public class PdfView extends AbstractTaskView implements EntityListener {
     }
     @Override
     public void initView(boolean b) throws Exception {
+        VerticalLayout mainVL = new VerticalLayout();
 
         mainTS = new TabSheet();
         mainTS.addTab(initAndGetGenerationTab(), getUILocaleUtil().getCaption("generate"));
-
-        VerticalLayout mainVL = new VerticalLayout();
 
         searchComponent = initAndGetSearchTab();
         mainVL.addComponent(searchComponent);
         mainTS.addTab(mainVL, getUILocaleUtil().getCaption("search"));
 
         mainTS.addTab(initAndGetCatalogTab(),getUILocaleUtil().getEntityLabel(CATALOG.class));
+
+        mainTS.addTab(initAndGetSubstitutionTab(),getUILocaleUtil().getEntityLabel(SUBSTITUTION.class));
+
 
         mainTS.addSelectedTabChangeListener(new TabSheet.SelectedTabChangeListener() {
             @Override
@@ -75,6 +79,18 @@ public class PdfView extends AbstractTaskView implements EntityListener {
             e.printStackTrace();
         }
         return catalogTabContainer;
+    }
+
+    public Component initAndGetSubstitutionTab(){
+        SubstituitionTabContainer substituitionTabContainer = null;
+        try{
+            substituitionTabContainer = new SubstituitionTabContainer();
+        }catch (Exception e)
+        {
+            LOG.error("Unable to run substitution tab container");
+            e.printStackTrace();
+        }
+        return substituitionTabContainer;
     }
 
     public Component initAndGetSearchTab(){
