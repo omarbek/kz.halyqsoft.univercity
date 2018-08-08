@@ -4,6 +4,7 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.USER_TYPE;
+import org.json.JSONObject;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.beans.AbstractTask;
@@ -11,8 +12,13 @@ import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.dialog.Message;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Set;
 
 public class TestView extends AbstractTaskView {
@@ -23,6 +29,55 @@ public class TestView extends AbstractTaskView {
 
     public TestView(AbstractTask task) throws Exception {
         super(task);
+    }
+
+    private final static String AUTH_KEY_FCM = "";//TODO
+    private final static String API_URL_FCM = "https://fcm.googleapis.com/fcm/send";
+
+    public static String sendPushNotification(String pushId)
+            throws IOException {
+        String result;
+        URL url = new URL(API_URL_FCM);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+        conn.setUseCaches(false);
+        conn.setDoInput(true);
+        conn.setDoOutput(true);
+
+        conn.setRequestMethod("POST");
+        conn.setRequestProperty("Authorization", "key=" + AUTH_KEY_FCM);
+        conn.setRequestProperty("Content-Type", "application/json");
+
+        JSONObject json = new JSONObject();
+
+        json.put("to", pushId.trim());
+        JSONObject info = new JSONObject();
+        info.put("title", "notification title"); // Notification title
+        info.put("body", "message body"); // Notification
+        // body
+        json.put("notification", info);
+        try {
+            OutputStreamWriter wr = new OutputStreamWriter(
+                    conn.getOutputStream());
+            wr.write(json.toString());
+            wr.flush();
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(
+                    (conn.getInputStream())));
+
+            String output;
+            System.out.println("Output from Server .... \n");
+            while ((output = br.readLine()) != null) {
+                System.out.println(output);
+            }
+            result = "SUCCESS";
+        } catch (Exception e) {
+            e.printStackTrace();
+            result = "FAILURE";
+        }
+        System.out.println("GCM Notification is sent successfully");
+
+        return result;
     }
 
     public static void main(String[] args) {
@@ -36,7 +91,7 @@ public class TestView extends AbstractTaskView {
 //            System.out.println(id);
 //        }
 
-        Date date = new Date();
+//        Date date = new Date();
 //        Calendar cal = Calendar.getInstance();
 //        cal.set(Calendar.HOUR_OF_DAY,17);
 //        cal.set(Calendar.MINUTE,30);
