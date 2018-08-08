@@ -121,6 +121,7 @@ public class SubstituitionTabContainer extends AbstractCommonView implements Ent
         ids.add(WorkflowCommonUtils.getDocumentSignerStatusByName(DOCUMENT_SIGNER_STATUS.IN_PROCESS).getId());
         documentSignerQM.addWhereIn("documentSignerStatus" ,ids);
         documentSignerQM.addWhereAnd("employee" ,ECriteria.EQUAL, substitution.getEmployee().getId());
+
         List<DOCUMENT_SIGNER> documentSigners = new ArrayList<>();
         try{
             documentSigners.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(documentSignerQM));
