@@ -47,4 +47,14 @@ public class SEMESTER_SUBJECT extends AbstractEntity {
 		this.subject = subject;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(semesterData);
+		sb.append(" ");
+		sb.append(subject);
+
+
+		return sb.toString();
+	}
 }

@@ -205,6 +205,7 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_LOAD_TO_CHAIR_COUNT_ALL</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_GROUPS_CREATION_NEEDED</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.VGraduateEmployment</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_STUDENT_DIFFERENCE</class>
 
 
         <class>kz.halyqsoft.univercity.entity.beans.univercity.AbstractSpiderEntity</class>
@@ -331,6 +332,7 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_STATUS</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.COMPLAINT</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.CATALOG</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_DIFFERENCE</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>

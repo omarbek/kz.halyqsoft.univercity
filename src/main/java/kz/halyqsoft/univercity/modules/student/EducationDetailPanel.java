@@ -17,6 +17,7 @@ import com.vaadin.ui.Upload.SucceededEvent;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.enumeration.OperType;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.VPairSubject;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_ORDER_DOC;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -33,12 +34,17 @@ import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.view.AbstractCommonView;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.form.AbstractFormWidgetView;
+import org.r3a.common.vaadin.widget.form.FormModel;
 import org.r3a.common.vaadin.widget.form.field.filelist.FileListFieldModel;
+import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.table.TableWidget;
 import org.r3a.common.vaadin.widget.table.model.DBTableModel;
 
+import javax.persistence.Id;
+import javax.persistence.NoResultException;
 import java.io.*;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -612,6 +618,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
         specCB.setValue(studentEducation.getSpeciality());
         specCB.setEnabled(operType.equals(OperType.TRANSFER));
         specCB.addValueChangeListener(new SpecialityChangeListener());
+
         specialityHL.addComponent(specCB);
 
         return specialityHL;
@@ -652,6 +659,113 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
             CommonUtils.showMessageAndWriteLog("Unable to load speciality list", ex);
         }
     }
+
+    private void generateSubjectDifference(ID studentId){
+
+        List<SUBJECT> randSubject = new ArrayList<>();
+        List<SUBJECT> subject = new ArrayList<>();
+
+        Long cardId;
+
+        String randStudentSql = "\n" +
+                "SELECT student_education.student_id FROM student_education\n" +
+                "  INNER JOIN student s2 ON student_education.student_id = s2.id\n" +
+                "  INNER JOIN speciality s3 ON student_education.speciality_id = s3.id\n" +
+                "WHERE s3.id=" +studentEducation.getSpeciality().getId()+
+                " GROUP BY student_education.student_id\n" +
+                "having count(student_education.student_id)=1\n" +
+                "ORDER BY RANDOM()\n" +
+                "LIMIT 1;";
+
+        Long stuId = null;
+        try{
+            stuId=(Long) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(randStudentSql,
+                    new HashMap<>());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        String randStudentSubjectSql="select * from subject\n" +
+                " INNER JOIN student_subject ss on subject.id=ss.subject_id\n" +
+                "INNER JOIN student_education se ON ss.student_id = se.id\n" +
+                "  INNER JOIN speciality s2 ON se.speciality_id = s2.id\n" +
+                "WHERE ss.student_id=170 ";//+stuId;
+
+        Map<Integer, Object> params = new HashMap<>();
+
+
+        try {
+            List tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(randStudentSubjectSql, params);
+
+            if(!tmpList.isEmpty()){
+                for(Object o : tmpList){
+                    Object[] oo =(Object[]) o;
+                    SUBJECT studentSubject = new SUBJECT();
+                    studentSubject.setId(ID.valueOf((Long)oo[0]));
+                    studentSubject.setNameKZ((String)oo[1]);
+                    studentSubject.setNameEN((String)oo[2]);
+                    studentSubject.setNameRU((String)oo[3]);
+
+                    randSubject.add(studentSubject);
+
+                }
+            }else {
+                System.out.print("nothing in randStudentSubject!");
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        String studentSubjectSql="select * from subject\n" +
+                " INNER JOIN student_subject ss on subject.id=ss.subject_id\n" +
+                "INNER JOIN student_education se ON ss.student_id = se.id\n" +
+                "  INNER JOIN speciality s2 ON se.speciality_id = s2.id\n" +
+                "WHERE ss.student_id="+studentId.getId();
+
+        Map<Integer, Object> par = new HashMap<>();
+
+
+
+        try {
+            List tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(studentSubjectSql, par);
+
+           // List qwe = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(SEMESTER_DATA.class, ID.valueOf());
+
+            if(!tmpList.isEmpty()){
+                for(Object o : tmpList){
+                    Object[] oo =(Object[]) o;
+                    SUBJECT studentSubject = new SUBJECT();
+                    studentSubject.setId(ID.valueOf((Long)oo[0]));
+                    studentSubject.setNameKZ((String)oo[1]);
+                    studentSubject.setNameEN((String)oo[2]);
+                    studentSubject.setNameRU((String)oo[3]);
+                    subject.add(studentSubject);
+                }
+            }else {
+                System.out.print("nothing in StudentSubject!");
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+                randSubject.removeAll(subject);
+
+        List<STUDENT_DIFFERENCE> studentDifferences = new ArrayList<>();
+        for(SUBJECT s:randSubject){
+            STUDENT_DIFFERENCE studentDifference=new STUDENT_DIFFERENCE();
+            studentDifference.setStudentEducation(studentEducation);
+            studentDifference.setSubject(s);
+            try {
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                        create(studentDifference);
+            } catch (Exception e) {
+                CommonUtils.showMessageAndWriteLog("Unable to save subject", e);
+            }
+        }
+}
 
     private void refreshGroups(ID specId) {
         QueryModel<GROUPS> groupsQM = new QueryModel<GROUPS>(GROUPS.class);
@@ -1091,6 +1205,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
                 newSE.setStatus(studentEducation.getStatus());
                 newSE.setCreated(new Date());
 
+                generateSubjectDifference(studentEducation.getStudent().getId());
                 createNewOrder();
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(newSE);
                 studentEducation.setStatus(ss);
@@ -1413,8 +1528,10 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
 
             if (faculty != null) {
                 refreshSpecialities(faculty.getId());
+
             } else {
                 refreshSpecialities(ID.valueOf(-1));
+
             }
         }
     }
@@ -1425,11 +1542,13 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
         public void valueChange(ValueChangeEvent ev) {
 
             SPECIALITY speciality = (SPECIALITY) ev.getProperty().getValue();
-
+//            STUDENT student = (STUDENT) ev.getProperty().getValue();
             if (speciality != null) {
                 refreshGroups(speciality.getId());
+            //    generateSubjectDifference(student.getId());
             } else {
                 refreshGroups(ID.valueOf(-1));
+               // generateSubjectDifference(ID.valueOf(-1));
             }
         }
     }
