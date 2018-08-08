@@ -7,11 +7,5 @@
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://localhost:1818/univerdata</jdbc-url>
     </data-source>
-    <data-source source="LOCAL" name="directmail2@localhost" uuid="846d2ce1-0e6d-4c5b-aabb-78d9fa008838">
-      <driver-ref>postgresql</driver-ref>
-      <synchronize>true</synchronize>
-      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost:5432/directmail2</jdbc-url>
-    </data-source>
   </component>
 </project>

@@ -271,7 +271,7 @@ public class ReportView extends AbstractTaskView {
                         sendingJson.put(entry.getKey(), entry.getValue());
                     }
                     StringEntity se = new StringEntity(sendingJson.toString(), "UTF-8");
-                    se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/sendingJson"));
+                    se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
                     post.setEntity(se);
                     HttpResponse response = client.execute(post);
                     HttpEntity entity = response.getEntity();
