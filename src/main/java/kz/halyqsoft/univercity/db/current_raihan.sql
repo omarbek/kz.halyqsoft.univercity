@@ -23,3 +23,5 @@ CREATE SEQUENCE s_graduate_employment
 
 CREATE UNIQUE index idx_graduate_employment
   ON graduate_employment (student_id);
+
+ALTER TABLE users ADD COLUMN reason varchar(180) null;
