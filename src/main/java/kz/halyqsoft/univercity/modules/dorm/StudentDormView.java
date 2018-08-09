@@ -34,6 +34,7 @@ public class StudentDormView extends AbstractTaskView {
     private Label costL;
     private STUDENT student;
     private String faculty;
+    private Label alreadyExistL, roomL, addressL, dormL;
 
     public StudentDormView(AbstractTask task) throws Exception {
         super(task);
@@ -42,8 +43,12 @@ public class StudentDormView extends AbstractTaskView {
     @Override
     public void initView(boolean b) throws Exception {
         FormLayout inFL = new FormLayout();
-        inFL.setSpacing(true);
-        inFL.setSizeFull();
+        //inFL.setSpacing(true);
+        //inFL.setSizeFull();
+
+        QueryModel<STUDENT_EDUCATION> studentQM = new QueryModel<STUDENT_EDUCATION>(STUDENT_EDUCATION.class);
+        studentQM.addWhere("student", ECriteria.EQUAL, CommonUtils.getCurrentUser().getId());
+        studentQM.addWhereNull("child");
 
         buildingCB = new ComboBox(getUILocaleUtil().getCaption("building"));
         buildingCB.setRequired(true);
@@ -98,20 +103,6 @@ public class StudentDormView extends AbstractTaskView {
         costL.setCaption(getUILocaleUtil().getCaption("cost"));
         costL.setWidth(245, Unit.PIXELS);
 
-//        List<DORM_ROOM> dr = new ArrayList<>();
-//        QueryModel<DORM_ROOM> dormRQM = new QueryModel<DORM_ROOM>(DORM_ROOM.class);
-//        dormRQM.addWhere("roomNo",ECriteria.EQUAL,roomCB.getValue());
-//        try {
-//            dr = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(dormRQM);
-//        } catch (NoResultException e) {
-//            dr = null;
-//        }
-//        if (dr != null) {
-//            for(DORM_ROOM dormRoom : dr) {
-//                costL.setValue(dormRoom.getCost().toString());
-//            }
-//        }
-
         roomCB.addValueChangeListener(new Property.ValueChangeListener() {
 
             @Override
@@ -160,19 +151,13 @@ public class StudentDormView extends AbstractTaskView {
         buttonsHL.addComponent(saveB);
         buttonsHL.addComponent(cancelB);
         inFL.addComponent(buttonsHL);
+        inFL.setComponentAlignment(buttonsHL, Alignment.MIDDLE_CENTER);
         saveB.addClickListener(new Button.ClickListener() {
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 if (roomCB.getValue() != null && costL.getValue() != null && !costL.getValue().equals("")) {
-//                    DORM_STUDENT dormStudent = new DORM_STUDENT();
-//                    DORM_ROOM dormR = (DORM_ROOM) roomCB.getValue();
-//                    dormStudent.setRoom(dormR);
-//                    dormStudent.setCost();
                     try {
-                        QueryModel<STUDENT_EDUCATION> studentQM = new QueryModel<STUDENT_EDUCATION>(STUDENT_EDUCATION.class);
-                        studentQM.addWhere("student", ECriteria.EQUAL, CommonUtils.getCurrentUser().getId());
-                        studentQM.addWhereNull("child");
 
                         QueryModel<DORM_ROOM> roomQM = new QueryModel<DORM_ROOM>(DORM_ROOM.class);
                         FromItem fi = roomQM.addJoin(EJoin.INNER_JOIN, "dorm", DORM.class, "id");
@@ -181,22 +166,22 @@ public class StudentDormView extends AbstractTaskView {
                         roomQM.addWhere(fi, "name", ECriteria.EQUAL, buildingCB.getValue().toString());
                         roomQM.addWhere("roomNo", ECriteria.EQUAL, roomCB.getValue().toString());
 
-                        STUDENT_EDUCATION STUDENT_EDUCATION = null;
+                        STUDENT_EDUCATION studentEducation = null;
                         DORM_ROOM dormRoom = null;
                         try {
-                            STUDENT_EDUCATION = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(studentQM);
+                            studentEducation = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(studentQM);
                             dormRoom = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(roomQM);
                         } catch (NoResultException e) {
-                            STUDENT_EDUCATION = null;
+                            studentEducation = null;
                         }
-                        if (STUDENT_EDUCATION != null && dormRoom != null) {
-                            DORM_STUDENT dormStudent = null;
+                        DORM_STUDENT dormStudent = null;
+                        if (studentEducation != null && dormRoom != null) {
 
                             dormStudent = new DORM_STUDENT();
                             dormStudent.setCost(Double.parseDouble(costL.getValue()));
                             dormStudent.setCreated(new Date());
                             dormStudent.setDeleted(false);
-                            dormStudent.setStudent(STUDENT_EDUCATION);
+                            dormStudent.setStudent(studentEducation);
                             dormStudent.setRoom(dormRoom);
 
                             SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(dormStudent);
@@ -209,7 +194,6 @@ public class StudentDormView extends AbstractTaskView {
                 } else {
                     Message.showError(getUILocaleUtil().getCaption("add.news.required"));
                 }
-
             }
         });
 
@@ -220,8 +204,67 @@ public class StudentDormView extends AbstractTaskView {
             }
         });
 
-        getContent().addComponent(inFL);
+        QueryModel<DORM_STUDENT> dormStudentQM = new QueryModel<DORM_STUDENT>(DORM_STUDENT.class);
+        FromItem fi = dormStudentQM.addJoin(EJoin.INNER_JOIN, "student", STUDENT_EDUCATION.class, "id");
+        dormStudentQM.addWhere(fi, "student", ECriteria.EQUAL, CommonUtils.getCurrentUser().getId());
+        dormStudentQM.addWhere("checkOutDate",null);
+        dormStudentQM.addWhere("deleted",false);
+        dormStudentQM.addWhere("requestStatus",ECriteria.EQUAL,1);
+        List<DORM_STUDENT> dormStudentId = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(dormStudentQM);
+        boolean flag = true;
+        for (DORM_STUDENT ds : dormStudentId) {
+            flag = false;
+            alreadyExistL = new Label();
+            alreadyExistL.setCaption("<html><b>"+getUILocaleUtil().getCaption("alreadyExistL")+"</b>");
+            alreadyExistL.setWidth(200, Unit.PIXELS);
+            alreadyExistL.setCaptionAsHtml(true);
 
+            addressL = new Label();
+            addressL.setCaption(getUILocaleUtil().getCaption("addressL"));
+            addressL.setWidth(200, Unit.PIXELS);
+            addressL.setValue(ds.getRoom().getDorm().getAddress());
+
+            dormL = new Label();
+            dormL.setCaption(getUILocaleUtil().getCaption("dormL"));
+            dormL.setWidth(200, Unit.PIXELS);
+            dormL.setValue(ds.getRoom().getDorm().getName());
+
+            roomL = new Label();
+            roomL.setCaption(getUILocaleUtil().getCaption("roomL"));
+            roomL.setWidth(200, Unit.PIXELS);
+            roomL.setValue(ds.getRoom().getRoomNo());
+
+            inFL.addComponent(alreadyExistL);
+            inFL.addComponent(addressL);
+            inFL.addComponent(dormL);
+            inFL.addComponent(roomL);
+        }
+
+        if(flag) {
+            getContent().addComponent(buildingCB);
+            getContent().setComponentAlignment(buildingCB,Alignment.MIDDLE_CENTER);
+
+            getContent().addComponent(roomCB);
+            getContent().setComponentAlignment(roomCB,Alignment.MIDDLE_CENTER);
+
+            getContent().addComponent(costL);
+            getContent().setComponentAlignment(costL,Alignment.MIDDLE_CENTER);
+
+            getContent().addComponent(buttonsHL);
+            getContent().setComponentAlignment(buttonsHL,Alignment.MIDDLE_CENTER);
+        }else{
+            getContent().addComponent(alreadyExistL);
+            getContent().setComponentAlignment(alreadyExistL,Alignment.MIDDLE_CENTER);
+
+            getContent().addComponent(addressL);
+            getContent().setComponentAlignment(addressL,Alignment.MIDDLE_CENTER);
+
+            getContent().addComponent(dormL);
+            getContent().setComponentAlignment(dormL,Alignment.MIDDLE_CENTER);
+
+            getContent().addComponent(roomL);
+            getContent().setComponentAlignment(roomL,Alignment.MIDDLE_CENTER);
+        }
     }
 
     private void clearIn() {

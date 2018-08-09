@@ -149,6 +149,9 @@ public class USERS extends AbstractUser implements CommonTree<USERS> {
     @Column(name="PUSH_ID")
     private String pushId;
 
+    @Column(name = "REASON")
+    private String reason;
+
     public USERS() {
     }
 
@@ -452,5 +455,13 @@ public class USERS extends AbstractUser implements CommonTree<USERS> {
 
     public void setPushId(String pushId) {
         this.pushId = pushId;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
     }
 }

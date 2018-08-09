@@ -4,6 +4,7 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import kz.halyqsoft.univercity.entity.beans.univercity.GRADUATE_EMPLOYMENT;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.VGraduate;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_STUDENT;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
@@ -33,7 +34,7 @@ public class GraduateEmploymentEdit extends AbstractDialog {
     private final boolean isNew;
     private GraduateEmploymentView graduateEmploymentView;
 
-    GraduateEmploymentEdit(GRADUATE_EMPLOYMENT graduateEmployment, boolean isNew, GraduateEmploymentView graduateEmploymentView) throws Exception {
+    GraduateEmploymentEdit(VGraduate graduateEmployment, boolean isNew, GraduateEmploymentView graduateEmploymentView) throws Exception {
         this.isNew = isNew;
         this.graduateEmploymentView = graduateEmploymentView;
 
