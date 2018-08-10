@@ -87,6 +87,8 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
     private FormModel mainBaseDataFM;
     private CheckBox kazCheckBox, rusCheckBox;
 
+    private static final String PATH_TO_PHOTO = "/var/www/html/files/photos/";
+
     public StudentEdit(final FormModel baseDataFM, VerticalLayout mainVL,
                        StudentOrApplicantView studentOrApplicantView)
             throws Exception {
@@ -2081,7 +2083,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
     public void handlePhotoWidgetEvent(PhotoWidgetEvent ev) {
         if (ev.getEvent() == PhotoWidgetEvent.CHANGED) {
             userPhotoBytes = ev.getBytes();
-            userPhotoFilename = ev.getFilename();
+            userPhotoFilename = PATH_TO_PHOTO +ev.getFilename();
             userPhotoChanged = true;
         }
     }
