@@ -33,15 +33,22 @@ public final class EmployeeFilterPanel extends AbstractFilterPanel {
 			hl.addComponent(af);
 		}
 
-//		af = getFilterComponent("firstname");
-//		if (af != null) {
-//			hl.addComponent(af);
-//		}
-//
-//		af = getFilterComponent("lastname");
-//		if (af != null) {
-//			hl.addComponent(af);
-//		}
+		af = getFilterComponent("firstname");
+		if (af != null) {
+			hl.addComponent(af);
+		}
+
+		af = getFilterComponent("lastname");
+		if (af != null) {
+			hl.addComponent(af);
+		}
+
+		getContent().addComponent(hl);
+		getContent().setComponentAlignment(hl, Alignment.MIDDLE_CENTER);
+
+		hl = new HorizontalLayout();
+		hl.setSpacing(true);
+		hl.setWidthUndefined();
 		
 		af = getFilterComponent("department");
 		if (af != null) {
@@ -49,6 +56,11 @@ public final class EmployeeFilterPanel extends AbstractFilterPanel {
 		}
 		
 		af = getFilterComponent("post");
+		if (af != null) {
+			hl.addComponent(af);
+		}
+
+		af = getFilterComponent("childAge");
 		if (af != null) {
 			hl.addComponent(af);
 		}
