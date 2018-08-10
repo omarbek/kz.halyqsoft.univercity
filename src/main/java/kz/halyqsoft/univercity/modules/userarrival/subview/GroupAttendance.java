@@ -144,7 +144,7 @@ public class GroupAttendance implements EntityListener{
                 "  INNER JOIN student_education se2\n" +
                 "    ON g.id = se2.groups_id\n" +
                 "WHERE\n" +
-                "  date_trunc('day', ua.created)= date_trunc('day' , TIMESTAMP '"+formattedDate+"')\n" +
+                "  date_trunc('day', ua.created) = date_trunc('day' , TIMESTAMP '"+formattedDate+"')\n" +
                 "  AND\n" +
                 "  ua.come_in = TRUE\n" +
                 "  AND\n" +

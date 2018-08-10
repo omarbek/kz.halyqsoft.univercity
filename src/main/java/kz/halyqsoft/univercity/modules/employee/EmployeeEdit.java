@@ -80,6 +80,10 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
     private TableWidget scientificManagementTW;
     private TableWidget experienceTW;
     private TableWidget careerTW;
+    private TableWidget employeeSkillTW;
+    private TableWidget employeeAwardTW;
+    private TableWidget employeeQualificationTW;
+    private TableWidget childTW;
     private static WorkHourWidget whw;
     private TableWidget subjectPPSTW;
     private TableWidget loadByHourTW;
@@ -193,6 +197,8 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         createWorkDayTab(readOnly);
         createSubjectPPSTab(readOnly);
         createRoomTab(readOnly);
+        createSkillAndAwardTab(readOnly);
+        createChildTab(readOnly);
     }
 
     @Override
@@ -235,6 +241,79 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
 
             return sb.toString();
         }
+    }
+
+
+    private void createChildTab(boolean readOnly) throws Exception {
+        childTW = new TableWidget(CHILD.class);
+        childTW.setButtonVisible(AbstractToolbar.REFRESH_BUTTON, false);
+        childTW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
+        childTW.setButtonVisible(AbstractToolbar.EDIT_BUTTON, false);
+        childTW.addEntityListener(this);
+        DBTableModel childTM = (DBTableModel) childTW.getWidgetModel();
+        childTM.setReadOnly(baseDataFW.getWidgetModel().isReadOnly());
+        QueryModel childQM = childTM.getQueryModel();
+        ID employeeId = ID.valueOf(-1);
+        if (!baseDataFW.getWidgetModel().isCreateNew()) {
+            employeeId = baseDataFW.getWidgetModel().getEntity().getId();
+        }
+        childQM.addWhere("employee", ECriteria.EQUAL, employeeId);
+        getTabSheet().addTab(childTW, getUILocaleUtil().getEntityLabel(CHILD.class));
+    }
+
+    private void createSkillAndAwardTab(boolean readOnly) throws Exception {
+        VerticalLayout content = new VerticalLayout();
+        content.setSizeFull();
+        content.setImmediate(true);
+        content.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
+
+        employeeSkillTW = new TableWidget(EMPLOYEE_SKILL.class);
+        employeeSkillTW.setButtonVisible(AbstractToolbar.REFRESH_BUTTON, false);
+        employeeSkillTW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
+        employeeSkillTW.setButtonVisible(AbstractToolbar.EDIT_BUTTON, false);
+        employeeSkillTW.addEntityListener(this);
+        DBTableModel employeeSkillTM = (DBTableModel) employeeSkillTW.getWidgetModel();
+        employeeSkillTM.setReadOnly(baseDataFW.getWidgetModel().isReadOnly());
+        QueryModel employeeSkillQM = employeeSkillTM.getQueryModel();
+        ID employeeId = ID.valueOf(-1);
+        if (!baseDataFW.getWidgetModel().isCreateNew()) {
+            employeeId = baseDataFW.getWidgetModel().getEntity().getId();
+        }
+        employeeSkillQM.addWhere("employee", ECriteria.EQUAL, employeeId);
+
+        employeeAwardTW = new TableWidget(EMPLOYEE_AWARD.class);
+        employeeAwardTW.setButtonVisible(AbstractToolbar.REFRESH_BUTTON, false);
+        employeeAwardTW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
+        employeeAwardTW.setButtonVisible(AbstractToolbar.EDIT_BUTTON, false);
+        employeeAwardTW.addEntityListener(this);
+        DBTableModel employeeAwardTM = (DBTableModel) employeeAwardTW.getWidgetModel();
+        employeeAwardTM.setReadOnly(baseDataFW.getWidgetModel().isReadOnly());
+        QueryModel employeeAwardQM = employeeAwardTM.getQueryModel();
+
+        if (!baseDataFW.getWidgetModel().isCreateNew()) {
+            employeeId = baseDataFW.getWidgetModel().getEntity().getId();
+        }
+        employeeAwardQM.addWhere("employee", ECriteria.EQUAL, employeeId);
+
+
+        employeeQualificationTW = new TableWidget(EMPLOYEE_QUALIFICATION.class);
+        employeeQualificationTW.setButtonVisible(AbstractToolbar.REFRESH_BUTTON, false);
+        employeeQualificationTW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
+        employeeQualificationTW.addEntityListener(this);
+        DBTableModel employeeQualificationTM = (DBTableModel) employeeQualificationTW.getWidgetModel();
+        employeeQualificationTM.setReadOnly(baseDataFW.getWidgetModel().isReadOnly());
+        QueryModel employeeQualificationQM = employeeQualificationTM.getQueryModel();
+
+        if (!baseDataFW.getWidgetModel().isCreateNew()) {
+            employeeId = baseDataFW.getWidgetModel().getEntity().getId();
+        }
+        employeeQualificationQM.addWhere("employee", ECriteria.EQUAL, employeeId);
+
+        content.addComponent(employeeSkillTW);
+        content.addComponent(employeeAwardTW);
+        content.addComponent(employeeQualificationTW);
+
+        getTabSheet().addTab(content, getUILocaleUtil().getEntityLabel(EMPLOYEE_SKILL.class));
     }
 
     private void createRoomTab(boolean readOnly) throws Exception {
@@ -1591,6 +1670,26 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
             }
 
             return false;
+        }else if(source.equals(employeeSkillTW)){
+            if (baseDataFW.getWidgetModel().isCreateNew()) {
+                Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
+                return false;
+            }
+        }else if(source.equals(employeeAwardTW)){
+            if (baseDataFW.getWidgetModel().isCreateNew()) {
+                Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
+                return false;
+            }
+        }else if(source.equals(employeeQualificationTW)){
+            if (baseDataFW.getWidgetModel().isCreateNew()) {
+                Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
+                return false;
+            }
+        }else if(source.equals(childTW)){
+            if (baseDataFW.getWidgetModel().isCreateNew()) {
+                Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
+                return false;
+            }
         }
 
         return super.preCreate(source, buttonId);
@@ -1611,6 +1710,43 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
             } catch (Exception ex) {
                 CommonUtils.showMessageAndWriteLog("Unable to set employee type", ex);
             }
+        }else if(source.equals(employeeSkillTW)){
+            EMPLOYEE_SKILL employeeSkill = (EMPLOYEE_SKILL)e;
+            EMPLOYEE emp = null;
+            try{
+                emp = (EMPLOYEE) baseDataFW.getWidgetModel().getEntity();
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
+            employeeSkill.setEmployee(emp);
+        }else if(source.equals(employeeAwardTW)){
+            EMPLOYEE_AWARD employeeAward = (EMPLOYEE_AWARD)e;
+            EMPLOYEE emp = null;
+            try{
+                emp = (EMPLOYEE) baseDataFW.getWidgetModel().getEntity();
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
+            employeeAward.setEmployee(emp);
+        }else if(source.equals(employeeQualificationTW)){
+            EMPLOYEE_QUALIFICATION employeeQualification = (EMPLOYEE_QUALIFICATION)e;
+            EMPLOYEE emp = null;
+            try{
+                emp = (EMPLOYEE) baseDataFW.getWidgetModel().getEntity();
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
+            employeeQualification.setEmployee(emp);
+            employeeQualification.setCreated(new Date());
+        }else if(source.equals(childTW)){
+            CHILD child = (CHILD)e;
+            EMPLOYEE emp = null;
+            try{
+                emp = (EMPLOYEE) baseDataFW.getWidgetModel().getEntity();
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
+            child.setEmployee(emp);
         }
     }
 
@@ -1773,6 +1909,15 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
                 hourCountFM.setInEdit(false);
             }
 
+            return true;
+        }else if(source.equals(employeeQualificationTW)){
+            EMPLOYEE_QUALIFICATION employeeQualification = (EMPLOYEE_QUALIFICATION) e;
+            employeeQualification.setUpdated(new Date());
+            try{
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(employeeQualification);
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
             return true;
         }
 

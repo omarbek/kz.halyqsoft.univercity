@@ -17,8 +17,10 @@ import com.vaadin.ui.Upload.SucceededEvent;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.enumeration.OperType;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.VPairSubject;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_ORDER_DOC;
 import kz.halyqsoft.univercity.utils.CommonUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.facade.CommonIDFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -32,11 +34,17 @@ import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.view.AbstractCommonView;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.form.AbstractFormWidgetView;
+import org.r3a.common.vaadin.widget.form.FormModel;
 import org.r3a.common.vaadin.widget.form.field.filelist.FileListFieldModel;
+import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
+import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.table.TableWidget;
 import org.r3a.common.vaadin.widget.table.model.DBTableModel;
 
+import javax.persistence.Id;
+import javax.persistence.NoResultException;
 import java.io.*;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -63,10 +71,10 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
     private VerticalLayout rightVL;
     private VerticalLayout mainVL;
 
-    private ComboBox facultyCB, specCB, studyYearCB, languageCB, educationTypeCB;
+    private ComboBox facultyCB, specCB, groupCB, studyYearCB, languageCB, educationTypeCB;
     private ComboBox statusCB, orderTypeCB, orderStudyCB;
 
-    private Label facultyLabel, specialityLabel, studyYearLabel, languageLabel;
+    private Label facultyLabel, specialityLabel, groupLabel, studyYearLabel, languageLabel;
     private Label educationTypeLabel, entryDateLabel, endDateLabel, statusLabel;
 
     private OperType operType;
@@ -84,12 +92,12 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
         mainGL.setRows(1);
         mainGL.setColumns(2);
 
-		/* 1.0. Left side */
+        /* 1.0. Left side */
         VerticalLayout leftVL = new VerticalLayout();
         leftVL.setSizeFull();
         leftVL.setSpacing(true);
 
-		/* 1.1. Education detailed info */
+        /* 1.1. Education detailed info */
         FormLayout educationFL = new FormLayout();
         educationFL.setCaption(getUILocaleUtil().getCaption("education.info"));
 
@@ -102,8 +110,22 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
         specialityLabel = new Label();
         specialityLabel.addStyleName("bold");
         specialityLabel.setCaption(getUILocaleUtil().getEntityFieldLabel(STUDENT_EDUCATION.class, "speciality"));
-        specialityLabel.setValue(studentEducation.getSpeciality().toString());
-        educationFL.addComponent(specialityLabel);
+
+        if (studentEducation.getSpeciality() == null) {
+            educationFL.addComponent(specialityLabel);
+        } else {
+            specialityLabel.setValue(studentEducation.getSpeciality().toString());
+            educationFL.addComponent(specialityLabel);
+        }
+
+        groupLabel = new Label();
+        groupLabel.addStyleName("bold");
+        groupLabel.setCaption(getUILocaleUtil().getEntityFieldLabel(STUDENT_EDUCATION.class, "groups"));
+
+        if (studentEducation.getGroups() != null) {
+            groupLabel.setValue(studentEducation.getGroups().toString());
+        }
+        educationFL.addComponent(groupLabel);
 
         studyYearLabel = new Label();
         studyYearLabel.addStyleName("bold");
@@ -150,7 +172,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
         leftVL.addComponent(educationFL);
         leftVL.setComponentAlignment(educationFL, Alignment.TOP_LEFT);
 
-		/* 1.2. Toolbar */
+        /* 1.2. Toolbar */
         if (!studentEducation.getStatus().getId().equals(ID.valueOf(2))) {
             toolbarLeftHL = new HorizontalLayout();
             toolbarLeftHL.setSpacing(true);
@@ -224,7 +246,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
             leftVL.setComponentAlignment(toolbarLeftHL, Alignment.TOP_CENTER);
         }
 
-		/* 1.3. Orders */
+        /* 1.3. Orders */
         ordersTW = new TableWidget(V_ORDER_DOC.class);
         ordersTW.showToolbar(false);
         ordersTW.addEntityListener(this);
@@ -241,7 +263,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
         leftVL.addComponent(ordersTW);
         leftVL.setComponentAlignment(ordersTW, Alignment.MIDDLE_CENTER);
 
-		/* 1.4. Order files */
+        /* 1.4. Order files */
         orderFilesTable = new Table();
         orderFilesTable.setSizeFull();
         orderFilesTable.setSelectable(false);
@@ -262,7 +284,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
 
         mainGL.addComponent(leftVL);
 
-		/* Right side */
+        /* Right side */
         rightVL = new VerticalLayout();
         rightVL.setSizeFull();
         rightVL.setSpacing(true);
@@ -311,7 +333,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
     }
 
     @Override
-    public void initView(boolean readOnly) throws Exception {
+    public void initView(boolean readOnly) {
     }
 
     private void transfer() {
@@ -326,6 +348,10 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
         HorizontalLayout hl2 = createSpecialityWidget();
         rightVL.addComponent(hl2);
         rightVL.setComponentAlignment(hl2, Alignment.TOP_RIGHT);
+
+        HorizontalLayout hlG = createGroupWidget();
+        rightVL.addComponent(hlG);
+        rightVL.setComponentAlignment(hlG, Alignment.TOP_RIGHT);
 
         HorizontalLayout hl3 = createYearLangEduTypeWidget();
         rightVL.addComponent(hl3);
@@ -356,6 +382,10 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
         HorizontalLayout hl2 = createSpecialityWidget();
         rightVL.addComponent(hl2);
         rightVL.setComponentAlignment(hl2, Alignment.TOP_RIGHT);
+
+        HorizontalLayout hlG = createGroupWidget();
+        rightVL.addComponent(hlG);
+        rightVL.setComponentAlignment(hlG, Alignment.TOP_RIGHT);
 
         HorizontalLayout hl3 = createYearLangEduTypeWidget();
         rightVL.addComponent(hl3);
@@ -391,6 +421,10 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
             rightVL.addComponent(hl2);
             rightVL.setComponentAlignment(hl2, Alignment.TOP_RIGHT);
 
+            HorizontalLayout hlG = createGroupWidget();
+            rightVL.addComponent(hlG);
+            rightVL.setComponentAlignment(hlG, Alignment.TOP_RIGHT);
+
             HorizontalLayout hl3 = createYearLangEduTypeWidget();
             rightVL.addComponent(hl3);
             rightVL.setComponentAlignment(hl3, Alignment.TOP_RIGHT);
@@ -422,6 +456,10 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
         rightVL.addComponent(hl2);
         rightVL.setComponentAlignment(hl2, Alignment.TOP_RIGHT);
 
+        HorizontalLayout hlG = createGroupWidget();
+        rightVL.addComponent(hlG);
+        rightVL.setComponentAlignment(hlG, Alignment.TOP_RIGHT);
+
         HorizontalLayout hl3 = createYearLangEduTypeWidget();
         rightVL.addComponent(hl3);
         rightVL.setComponentAlignment(hl3, Alignment.TOP_RIGHT);
@@ -451,6 +489,10 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
         HorizontalLayout hl2 = createSpecialityWidget();
         rightVL.addComponent(hl2);
         rightVL.setComponentAlignment(hl2, Alignment.TOP_RIGHT);
+
+        HorizontalLayout hlG = createGroupWidget();
+        rightVL.addComponent(hlG);
+        rightVL.setComponentAlignment(hlG, Alignment.TOP_RIGHT);
 
         HorizontalLayout hl3 = createYearLangEduTypeWidget();
         rightVL.addComponent(hl3);
@@ -566,6 +608,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
         specialityLabel.setValue(getUILocaleUtil().getEntityFieldLabel(STUDENT_EDUCATION.class, "speciality"));
         specialityHL.addComponent(specialityLabel);
         specialityHL.addComponent(createRequiredIndicator());
+
         specCB = new ComboBox();
         specCB.setNewItemsAllowed(false);
         specCB.setFilteringMode(FilteringMode.CONTAINS);
@@ -574,9 +617,32 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
         refreshSpecialities(studentEducation.getFaculty().getId());
         specCB.setValue(studentEducation.getSpeciality());
         specCB.setEnabled(operType.equals(OperType.TRANSFER));
+        specCB.addValueChangeListener(new SpecialityChangeListener());
+
         specialityHL.addComponent(specCB);
 
         return specialityHL;
+    }
+
+
+    private HorizontalLayout createGroupWidget() {
+        HorizontalLayout groupHL = new HorizontalLayout();
+        Label groupsLabel = new Label();
+        groupsLabel.setWidthUndefined();
+        groupsLabel.setValue(getUILocaleUtil().getEntityFieldLabel(STUDENT_EDUCATION.class, "groups"));
+        groupHL.addComponent(groupsLabel);
+        groupHL.addComponent(createRequiredIndicator());
+        groupCB = new ComboBox();
+        groupCB.setNewItemsAllowed(false);
+        groupCB.setFilteringMode(FilteringMode.CONTAINS);
+        groupCB.setTextInputAllowed(true);
+        groupCB.setWidth(350, Unit.PIXELS);
+        refreshGroups(studentEducation.getSpeciality().getId());
+        groupCB.setValue(studentEducation.getGroups());
+        groupCB.setEnabled(operType.equals(OperType.TRANSFER));
+        groupHL.addComponent(groupCB);
+
+        return groupHL;
     }
 
     private void refreshSpecialities(ID facultyId) {
@@ -591,6 +657,128 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
             specCB.setContainerDataSource(specialityBIC);
         } catch (Exception ex) {
             CommonUtils.showMessageAndWriteLog("Unable to load speciality list", ex);
+        }
+    }
+
+    private void generateSubjectDifference(ID studentId){
+
+        List<SUBJECT> randSubject = new ArrayList<>();
+        List<SUBJECT> subject = new ArrayList<>();
+
+        Long cardId;
+
+        String randStudentSql = "\n" +
+                "SELECT student_education.student_id FROM student_education\n" +
+                "  INNER JOIN student s2 ON student_education.student_id = s2.id\n" +
+                "  INNER JOIN speciality s3 ON student_education.speciality_id = s3.id\n" +
+                "WHERE s3.id=" +studentEducation.getSpeciality().getId()+
+                " GROUP BY student_education.student_id\n" +
+                "having count(student_education.student_id)=1\n" +
+                "ORDER BY RANDOM()\n" +
+                "LIMIT 1;";
+
+        Long stuId = null;
+        try{
+            stuId=(Long) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(randStudentSql,
+                    new HashMap<>());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        String randStudentSubjectSql="select * from subject\n" +
+                " INNER JOIN student_subject ss on subject.id=ss.subject_id\n" +
+                "INNER JOIN student_education se ON ss.student_id = se.id\n" +
+                "  INNER JOIN speciality s2 ON se.speciality_id = s2.id\n" +
+                "WHERE ss.student_id=170 ";//+stuId;
+
+        Map<Integer, Object> params = new HashMap<>();
+
+
+        try {
+            List tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(randStudentSubjectSql, params);
+
+            if(!tmpList.isEmpty()){
+                for(Object o : tmpList){
+                    Object[] oo =(Object[]) o;
+                    SUBJECT studentSubject = new SUBJECT();
+                    studentSubject.setId(ID.valueOf((Long)oo[0]));
+                    studentSubject.setNameKZ((String)oo[1]);
+                    studentSubject.setNameEN((String)oo[2]);
+                    studentSubject.setNameRU((String)oo[3]);
+
+                    randSubject.add(studentSubject);
+
+                }
+            }else {
+                System.out.print("nothing in randStudentSubject!");
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        String studentSubjectSql="select * from subject\n" +
+                " INNER JOIN student_subject ss on subject.id=ss.subject_id\n" +
+                "INNER JOIN student_education se ON ss.student_id = se.id\n" +
+                "  INNER JOIN speciality s2 ON se.speciality_id = s2.id\n" +
+                "WHERE ss.student_id="+studentId.getId();
+
+        Map<Integer, Object> par = new HashMap<>();
+
+
+
+        try {
+            List tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(studentSubjectSql, par);
+
+           // List qwe = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(SEMESTER_DATA.class, ID.valueOf());
+
+            if(!tmpList.isEmpty()){
+                for(Object o : tmpList){
+                    Object[] oo =(Object[]) o;
+                    SUBJECT studentSubject = new SUBJECT();
+                    studentSubject.setId(ID.valueOf((Long)oo[0]));
+                    studentSubject.setNameKZ((String)oo[1]);
+                    studentSubject.setNameEN((String)oo[2]);
+                    studentSubject.setNameRU((String)oo[3]);
+                    subject.add(studentSubject);
+                }
+            }else {
+                System.out.print("nothing in StudentSubject!");
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+                randSubject.removeAll(subject);
+
+        List<STUDENT_DIFFERENCE> studentDifferences = new ArrayList<>();
+        for(SUBJECT s:randSubject){
+            STUDENT_DIFFERENCE studentDifference=new STUDENT_DIFFERENCE();
+            studentDifference.setStudentEducation(studentEducation);
+            studentDifference.setSubject(s);
+            try {
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                        create(studentDifference);
+            } catch (Exception e) {
+                CommonUtils.showMessageAndWriteLog("Unable to save subject", e);
+            }
+        }
+}
+
+    private void refreshGroups(ID specId) {
+        QueryModel<GROUPS> groupsQM = new QueryModel<GROUPS>(GROUPS.class);
+        FromItem groupChairFM = groupsQM.addJoin(EJoin.INNER_JOIN, "speciality", SPECIALITY.class, "id");
+        groupsQM.addWhere(groupChairFM, "id", ECriteria.EQUAL, specId);
+        groupsQM.addWhereAnd("deleted", Boolean.FALSE);
+        groupsQM.addOrder("name");
+        try {
+            List<GROUPS> groupsList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(groupsQM);
+            BeanItemContainer<GROUPS> groupsBIC = new BeanItemContainer<GROUPS>(GROUPS.class, groupsList);
+            groupCB.setContainerDataSource(groupsBIC);
+        } catch (Exception ex) {
+            CommonUtils.showMessageAndWriteLog("Unable to load groups list", ex);
         }
     }
 
@@ -989,6 +1177,8 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
                 ss = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(STUDENT_STATUS.class, ID.valueOf(6));
             } else if (!facultyCB.getValue().equals(studentEducation.getFaculty()) || !specCB.getValue().equals(studentEducation.getSpeciality())) {
                 ss = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(STUDENT_STATUS.class, ID.valueOf(4));
+            } else if (!specCB.getValue().equals(studentEducation.getSpeciality()) || !groupCB.getValue().equals(studentEducation.getGroups())) {
+                ss = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(STUDENT_STATUS.class, ID.valueOf(10));
             } else if (!educationTypeCB.getValue().equals(studentEducation.getEducationType())) {
                 ss = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(STUDENT_STATUS.class, ID.valueOf(7));
             } else if (!languageCB.getValue().equals(studentEducation.getLanguage())) {
@@ -999,9 +1189,12 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
                 Message.showInfo(getUILocaleUtil().getMessage("unable.to.transfer"));
             } else {
                 SPECIALITY speciality = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(SPECIALITY.class, ((SPECIALITY) specCB.getValue()).getId());
+                GROUPS group = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(GROUPS.class, ((GROUPS) groupCB.getValue()).getId());
                 STUDENT_EDUCATION newSE = new STUDENT_EDUCATION();
+
                 newSE.setStudent(studentEducation.getStudent());
                 newSE.setFaculty((DEPARTMENT) facultyCB.getValue());
+                newSE.setGroups(group);
                 newSE.setChair(speciality.getDepartment());
                 newSE.setSpeciality(speciality);
                 newSE.setStudyYear((STUDY_YEAR) studyYearCB.getValue());
@@ -1012,6 +1205,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
                 newSE.setStatus(studentEducation.getStatus());
                 newSE.setCreated(new Date());
 
+                generateSubjectDifference(studentEducation.getStudent().getId());
                 createNewOrder();
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(newSE);
                 studentEducation.setStatus(ss);
@@ -1053,6 +1247,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
 
                 facultyLabel.setValue(studentEducation.getFaculty().toString());
                 specialityLabel.setValue(studentEducation.getSpeciality().toString());
+                groupLabel.setValue(studentEducation.getGroups().toString());
                 studyYearLabel.setValue(studentEducation.getStudyYear().toString());
                 languageLabel.setValue(studentEducation.getLanguage().toString());
                 educationTypeLabel.setValue(studentEducation.getEducationType().toString());
@@ -1259,6 +1454,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
 
     private void checkStudentEducationInfo() throws Exception {
         boolean ok = (facultyCB.getValue() != null && specCB.getValue() != null
+                && groupCB.getValue() != null
                 && studyYearCB.getValue() != null && languageCB.getValue() != null
                 && educationTypeCB.getValue() != null);
         if (ok) {
@@ -1328,10 +1524,31 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
         @Override
         public void valueChange(ValueChangeEvent ev) {
             DEPARTMENT faculty = (DEPARTMENT) ev.getProperty().getValue();
+
+
             if (faculty != null) {
                 refreshSpecialities(faculty.getId());
+
             } else {
                 refreshSpecialities(ID.valueOf(-1));
+
+            }
+        }
+    }
+
+    private class SpecialityChangeListener implements ValueChangeListener {
+
+        @Override
+        public void valueChange(ValueChangeEvent ev) {
+
+            SPECIALITY speciality = (SPECIALITY) ev.getProperty().getValue();
+//            STUDENT student = (STUDENT) ev.getProperty().getValue();
+            if (speciality != null) {
+                refreshGroups(speciality.getId());
+            //    generateSubjectDifference(student.getId());
+            } else {
+                refreshGroups(ID.valueOf(-1));
+               // generateSubjectDifference(ID.valueOf(-1));
             }
         }
     }

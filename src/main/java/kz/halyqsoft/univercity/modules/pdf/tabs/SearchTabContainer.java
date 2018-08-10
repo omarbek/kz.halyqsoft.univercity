@@ -1,4 +1,4 @@
-package kz.halyqsoft.univercity.modules.pdf;
+package kz.halyqsoft.univercity.modules.pdf.tabs;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.Sizeable;
@@ -7,6 +7,7 @@ import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.PDF_DOCUMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.PDF_PROPERTY;
+import kz.halyqsoft.univercity.modules.pdf.MyFileEdit;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.apache.commons.io.FileUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;

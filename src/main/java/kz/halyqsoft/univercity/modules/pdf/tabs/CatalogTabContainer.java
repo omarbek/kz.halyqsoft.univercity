@@ -1,4 +1,4 @@
-package kz.halyqsoft.univercity.modules.pdf;
+package kz.halyqsoft.univercity.modules.pdf.tabs;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.ThemeResource;

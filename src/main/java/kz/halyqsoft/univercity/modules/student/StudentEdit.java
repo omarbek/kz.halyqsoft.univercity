@@ -15,9 +15,12 @@ import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_MEDICAL_CHECKUP;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_STUDENT_DIFFERENCE;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_USER_LANGUAGE;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_STUDENT_DIFFERENCE;
 import kz.halyqsoft.univercity.filter.FStudentFilter;
 import kz.halyqsoft.univercity.filter.panel.StudentFilterPanel;
+import kz.halyqsoft.univercity.filter.panel.SubjectFilterPanel;
 import kz.halyqsoft.univercity.modules.student.tabs.*;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.changelisteners.BirthCountryChangeListener;
@@ -37,6 +40,7 @@ import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.locale.UILocaleUtil;
 import org.r3a.common.vaadin.view.AbstractCommonView;
 import org.r3a.common.vaadin.widget.DBSelectModel;
+import org.r3a.common.vaadin.widget.ERefreshType;
 import org.r3a.common.vaadin.widget.dialog.AbstractYesButtonListener;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.dialog.select.ESelectType;
@@ -49,6 +53,7 @@ import org.r3a.common.vaadin.widget.photo.PhotoWidgetEvent;
 import org.r3a.common.vaadin.widget.photo.PhotoWidgetListener;
 import org.r3a.common.vaadin.widget.table.TableWidget;
 import org.r3a.common.vaadin.widget.table.model.DBTableModel;
+import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
 
 import javax.persistence.NoResultException;
 import java.util.*;
@@ -68,7 +73,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
     private boolean userPhotoChanged;
     private CommonFormWidget userPassportFW, militaryDocFW, disabilityDocFW, repatriateDocFW, preemptiveRightFW;
     private CommonFormWidget grantDocFW;
-    private TableWidget educationTW, languageTW, medicalCheckupTW;
+    private TableWidget educationTW, languageTW, medicalCheckupTW, differenceTW;
     private FromItem educationUDFI;
     private Label lockLabel, lockReasonLabel, createdBylabel;
     private Button lockUnlockButton;
@@ -86,6 +91,11 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
     private FormLayout educationFL;
     private FormModel mainBaseDataFM;
     private CheckBox kazCheckBox, rusCheckBox;
+    private ComboBox subjectCB;
+
+    private static final int UKPU = 1;
+
+    private static final String PATH_TO_PHOTO = "/var/www/html/files/photos/";
 
     public StudentEdit(final FormModel baseDataFM, VerticalLayout mainVL,
                        StudentOrApplicantView studentOrApplicantView)
@@ -315,7 +325,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         getTabSheet().addTab(content, getMasterTabTitle());
 
         HorizontalLayout hl = new HorizontalLayout();
-        hl.setWidth(15,Unit.PERCENTAGE);
+        hl.setWidth(15, Unit.PERCENTAGE);
         kazCheckBox = new CheckBox();
         rusCheckBox = new CheckBox();
         rusCheckBox.setCaption(getUILocaleUtil().getCaption("ru.short"));
@@ -324,9 +334,8 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         rusCheckBox.setValue(false);
 
         hl.addComponents(kazCheckBox, rusCheckBox);
-        hl.setComponentAlignment(kazCheckBox,Alignment.MIDDLE_LEFT);
-        hl.setComponentAlignment(rusCheckBox,Alignment.MIDDLE_LEFT);
-
+        hl.setComponentAlignment(kazCheckBox, Alignment.MIDDLE_LEFT);
+        hl.setComponentAlignment(rusCheckBox, Alignment.MIDDLE_LEFT);
 
 
         pdfDownload = createDownloadButton();
@@ -408,6 +417,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         if (student.getCategory().getId().equals(STUDENT_CATEGORY.STUDENT_ID)) {
             createDiplomaTab(readOnly);
         }
+        createDifferenceTab(readOnly);
     }
 
     public static void studentEditPdfDownload(STUDENT student) {
@@ -1120,6 +1130,282 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         getTabSheet().addTab(content, getUILocaleUtil().getCaption("medical.checkup"));
     }
 
+    private void createDifferenceTab(boolean readOnly) throws Exception {
+
+        /* Difference */
+
+        VerticalLayout content = new VerticalLayout();
+        content.setSpacing(true);
+        content.setSizeFull();
+        QueryModel<ENTRANT_SPECIALITY> seQM = new QueryModel<>(ENTRANT_SPECIALITY.class);
+        seQM.addWhere("student", ECriteria.EQUAL, student.getId());
+
+        SocialCategoriesTab socialCategoriesTab = new SocialCategoriesTab(new StudentEditHelperImpl(), readOnly);
+        getTabSheet().addTab(socialCategoriesTab, getUILocaleUtil().getCaption("social.categories"));
+        ENTRANT_SPECIALITY se = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(seQM);
+
+
+        STUDENT s = (STUDENT) baseDataFW.getWidgetModel().getEntity();
+        final FormModel differenceFM = repatriateDocFW.getWidgetModel();
+
+
+        if (se.getUniversity().getId().equals(ID.valueOf(UKPU))) {
+
+            differenceTW = new TableWidget(V_STUDENT_DIFFERENCE.class);
+            differenceTW.addEntityListener(this);
+            differenceTW.setImmediate(true);
+            differenceTW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
+            differenceTW.setButtonVisible(AbstractToolbar.DELETE_BUTTON, false);
+
+            DBTableModel educationTM = (DBTableModel) differenceTW.getWidgetModel();
+            educationTM.setReadOnly(readOnly);
+            educationTM.getColumnModel("studentEducation").setInTable(false);
+            QueryModel qm = educationTM.getQueryModel();
+            FromItem studentEdu = qm.addJoin(EJoin.INNER_JOIN, "studentEducation", STUDENT_EDUCATION.class, "id");
+            qm.addWhere(studentEdu, "student", ECriteria.EQUAL, s.getId());
+
+            if (differenceTW != null) {
+                content.addComponent(differenceTW);
+                differenceTW.refresh();
+                content.setComponentAlignment(differenceTW, Alignment.TOP_CENTER);
+            }
+
+        } else {
+
+            List<ComboBox> subjectsCB = new ArrayList<>();
+            VerticalLayout mainVL = new VerticalLayout();
+            mainVL.setSizeFull();
+            mainVL.setImmediate(true);
+            mainVL.setDefaultComponentAlignment(Alignment.TOP_CENTER);
+            subjectCB = new ComboBox();
+            subjectCB.setCaption(" ");
+            subjectCB.setImmediate(true);
+            subjectCB.setNullSelectionAllowed(true);
+            subjectCB.setTextInputAllowed(true);
+            subjectCB.setFilteringMode(FilteringMode.CONTAINS);
+            subjectCB.setPageLength(0);
+            subjectCB.setWidth(400, Unit.PIXELS);
+            subjectsCB.add(subjectCB);
+
+            QueryModel<SUBJECT> subjectQueryModel = new QueryModel<>(SUBJECT.class);
+            FromItem subj = subjectQueryModel.addJoin(EJoin.INNER_JOIN, "id", STUDENT_SUBJECT.class, "subject");
+            FromItem edu = subj.addJoin(EJoin.INNER_JOIN, "student_id", STUDENT_EDUCATION.class, "student");
+            FromItem spe = edu.addJoin(EJoin.INNER_JOIN, "speciality", SPECIALITY.class, "id");
+            subjectQueryModel.addWhere(edu, "student", ECriteria.EQUAL, s.getId());
+
+
+            QueryModel<SEMESTER_SUBJECT> semesterSubjectQM = new QueryModel<>(SEMESTER_SUBJECT.class);
+            FromItem FI1 = semesterSubjectQM.addJoin(EJoin.INNER_JOIN, "id",
+                    STUDENT_EDUCATION.class, "student");
+            FromItem specFI = FI1.addJoin(EJoin.INNER_JOIN, "id",
+                    SPECIALITY.class, "speciality");
+
+            List<SUBJECT> subjects = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                    lookup(subjectQueryModel);
+
+            Map<Integer, ArrayList<SUBJECT>> map = new HashMap<>();
+
+            BeanItemContainer<SUBJECT> semBIC = new BeanItemContainer<>(SUBJECT.class,
+                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(subjectQueryModel));
+
+            subjectCB.setContainerDataSource(semBIC);
+
+            Button saveButton = new Button();
+            saveButton.setCaption(getUILocaleUtil().getCaption("add.news.save"));
+            saveButton.setWidth(150.0F, Unit.PIXELS);
+
+            List<SUBJECT> subjectList = new ArrayList<>();
+
+
+            SUBJECT subject = new SUBJECT();
+            List<STUDENT_DIFFERENCE> studentDifferences = new ArrayList<>();
+            // String eduSQL = "SELECT id from student_education WHERE student_id= ?1";
+
+            QueryModel<STUDENT_EDUCATION> studentEducationQM = new QueryModel<>(STUDENT_EDUCATION.class);
+            studentEducationQM.addWhere("student", ECriteria.EQUAL, s.getId());
+            studentEducationQM.addWhereNullAnd("child");
+            List<STUDENT_EDUCATION> studentEduc = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(studentEducationQM);
+
+            STUDENT_EDUCATION educQM = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(studentEducationQM);
+            STUDENT_EDUCATION studentEducation = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(STUDENT_EDUCATION.class, educQM.getId());
+
+
+            saveButton.addClickListener(new Button.ClickListener() {
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+
+                    for (ComboBox cb : subjectsCB) {
+                        if (cb.getValue() == null) {
+                            Message.showError(getUILocaleUtil().getMessage("pdf.field.empty"));
+                            return;
+                        }
+                    }
+                    STUDENT_DIFFERENCE studentDifference = new STUDENT_DIFFERENCE();
+
+
+                    List<SUBJECT> subjectsList = new ArrayList<>();
+
+                    for (ComboBox cb : subjectsCB) {
+                        subjectsList.add((SUBJECT) cb.getValue());
+                    }
+
+                    for (SUBJECT sbj : subjectsList) {
+                        studentDifference.setSubject(sbj);
+                        for (STUDENT_EDUCATION se : studentEduc) {
+                            studentDifference.setStudentEducation(studentEducation);
+
+                        }
+                    }
+                    //studentDifferences.add(studentDifference);
+                    Message.showConfirm(getUILocaleUtil().getMessage("confirmation.save"), new AbstractYesButtonListener() {
+                        @Override
+                        public void buttonClick(Button.ClickEvent clickEvent) {
+                            try {
+                                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                                        create(studentDifference);
+                                CommonUtils.showSavedNotification();
+
+                            } catch (Exception e) {
+                                CommonUtils.showMessageAndWriteLog("Unable to save subject", e);
+                            }
+                        }
+                    });
+
+
+                }
+            });
+
+
+            Button addButton = new Button();
+            addButton.addClickListener(new Button.ClickListener() {
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+
+                    subjectCB = new ComboBox();
+                    subjectCB.setCaption(" ");
+                    subjectCB.setImmediate(true);
+                    subjectCB.setNullSelectionAllowed(true);
+                    subjectCB.setTextInputAllowed(true);
+                    subjectCB.setFilteringMode(FilteringMode.CONTAINS);
+                    subjectCB.setPageLength(0);
+                    subjectCB.setWidth(400, Unit.PIXELS);
+                    subjectsCB.add(subjectCB);
+                    try {
+
+                        QueryModel<ENTRANT_SPECIALITY> seQM = new QueryModel<>(ENTRANT_SPECIALITY.class);
+                        seQM.addWhere("student", ECriteria.EQUAL, student.getId());
+
+                        ENTRANT_SPECIALITY se = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(seQM);
+
+
+                        STUDENT s = (STUDENT) baseDataFW.getWidgetModel().getEntity();
+                        final FormModel differenceFM = repatriateDocFW.getWidgetModel();
+
+                        QueryModel<SUBJECT> subjectQueryModel = new QueryModel<>(SUBJECT.class);
+                        FromItem subj = subjectQueryModel.addJoin(EJoin.INNER_JOIN, "id", STUDENT_SUBJECT.class, "subject");
+                        FromItem edu = subj.addJoin(EJoin.INNER_JOIN, "student_id", STUDENT_EDUCATION.class, "student");
+                        FromItem spe = edu.addJoin(EJoin.INNER_JOIN, "speciality", SPECIALITY.class, "id");
+                        subjectQueryModel.addWhere(edu, "student", ECriteria.EQUAL, s.getId());
+
+                        QueryModel<SEMESTER_SUBJECT> semesterSubjectQM = new QueryModel<>(SEMESTER_SUBJECT.class);
+                        FromItem FI1 = semesterSubjectQM.addJoin(EJoin.INNER_JOIN, "id",
+                                STUDENT_EDUCATION.class, "student");
+                        FromItem specFI = FI1.addJoin(EJoin.INNER_JOIN, "id",
+                                SPECIALITY.class, "speciality");
+
+                        List<SUBJECT> subjects = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                                lookup(subjectQueryModel);
+
+                        Map<Integer, ArrayList<SUBJECT>> map = new HashMap<>();
+
+                        BeanItemContainer<SUBJECT> semBIC = new BeanItemContainer<>(SUBJECT.class,
+                                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(subjectQueryModel));
+
+                        subjectCB.setContainerDataSource(semBIC);
+                        mainVL.addComponent(subjectCB);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+//                    Message.showConfirm(getUILocaleUtil().getMessage("confirmation.save"), new AbstractYesButtonListener() {
+//                        @Override
+//                        public void buttonClick(Button.ClickEvent clickEvent) {
+//                        }
+//                    });
+
+                }
+            });
+
+            addButton.setCaption(getUILocaleUtil().getCaption("add"));
+            addButton.setWidth(150.0F, Unit.PIXELS);
+            addButton.setIcon(new ThemeResource("img/button/add.png"));
+
+
+            mainVL.addComponent(subjectCB);
+
+
+            content.addComponent(mainVL);
+            content.addComponent(addButton);
+            content.addComponent(saveButton);
+            content.setComponentAlignment(saveButton, Alignment.TOP_CENTER);
+            content.setComponentAlignment(addButton, Alignment.TOP_CENTER);
+
+
+            content.setComponentAlignment(mainVL, Alignment.TOP_CENTER);
+
+        }
+        getTabSheet().addTab(content, getUILocaleUtil().getCaption("difference"));
+    }
+
+    private SEMESTER_SUBJECT getSemesterSubject(QueryModel<SEMESTER_SUBJECT> semesterSubjectQM,
+                                                SEMESTER_DATA semesterData, SUBJECT subject) throws Exception {
+        SEMESTER_SUBJECT semesterSubject;
+        try {
+            semesterSubject = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(semesterSubjectQM);
+        } catch (NoResultException ex) {
+            semesterSubject = new SEMESTER_SUBJECT();
+            semesterSubject.setSemesterData(semesterData);
+            semesterSubject.setSubject(subject);
+            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(semesterSubject);
+        }
+        return semesterSubject;
+    }
+
+    private SEMESTER_DATA getSemesterData(QueryModel<SEMESTER_DATA> semesterDataQM) throws Exception {
+        SEMESTER_DATA semesterData;
+        try {
+            semesterData = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(semesterDataQM);
+        } catch (NoResultException ex) {
+            semesterData = new SEMESTER_DATA();
+            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(semesterData);
+        }
+        return semesterData;
+    }
+
+    private void createSubject() {
+
+        VerticalLayout content = new VerticalLayout();
+        FormModel subjectFM = new FormModel(STUDENT_SUBJECT.class, true);
+        subjectFM.setReadOnly(false);
+        subjectFM.setTitleVisible(false);
+
+        List<STUDENT_SUBJECT> list = new ArrayList<>();
+        for (STUDENT_SUBJECT sbj : list) {
+            STUDENT_SUBJECT studentSubject = new STUDENT_SUBJECT();
+            studentSubject.setSemesterData(CommonUtils.getCurrentSemesterData());
+            studentSubject.setStudentEducation((STUDENT_EDUCATION) student.getStudentEducations());
+            //studentSubject.setSubject();
+        }
+        subjectFM.getFieldModel("subject").setWidth(300);
+
+    }
+
+    private void getSubject() {
+
+
+    }
+
     private void createUNTDataTab(boolean readOnly) throws Exception {
         UNTDataTab content = new UNTDataTab(student, new StudentEditHelperImpl(), readOnly);
         getTabSheet().addTab(content, getUILocaleUtil().getCaption("unt"));
@@ -1215,6 +1501,16 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
             medicalCheckupFLFM.getDeleteList().clear();
 
             return true;
+        } else if (source.equals(differenceTW)) {
+            if (baseDataFW.getWidgetModel().isCreateNew()) {
+                Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
+
+                return false;
+            }
+            FormModel educationFM = ((DBTableModel) differenceTW.getWidgetModel()).getFormModel();
+            educationFM.getFieldModel("studentEducation").setInEdit(false);
+            educationFM.getFieldModel("studentEducation").setInView(false);
+
         }
 
         return super.preCreate(source, buttonId);
@@ -1399,6 +1695,8 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
             return preSaveGrantDoc(source, e, isNew, buttonId);
         } else if (source.equals(medicalCheckupTW)) {
             return preSaveMedicalCheckup(source, e, isNew, buttonId);
+        }else if(source.equals(differenceTW)){
+            return preSaveDifference(source, e, isNew, buttonId);
         }
 
         return super.preSave(source, e, isNew, buttonId);
@@ -1997,6 +2295,46 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         return false;
     }
 
+    public boolean preSaveDifference(Object source, Entity e, boolean isNew, int buttonId) {
+        V_STUDENT_DIFFERENCE vtDifference = (V_STUDENT_DIFFERENCE) e;
+        STUDENT_DIFFERENCE difference =null;
+        FormModel fm = baseDataFW.getWidgetModel();
+        if (isNew) {
+            difference = new STUDENT_DIFFERENCE();
+            try {
+                STUDENT s = (STUDENT) fm.getEntity();
+                difference.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_STUDENT_DIFFERENCE"));
+                QueryModel<STUDENT_EDUCATION> studentEducationQM = new QueryModel<>(STUDENT_EDUCATION.class);
+                studentEducationQM.addWhere("student", ECriteria.EQUAL, s.getId());
+                studentEducationQM.addWhereNullAnd("child");
+                List<STUDENT_EDUCATION> studentEduc = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(studentEducationQM);
+
+                STUDENT_EDUCATION educQM = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(studentEducationQM);
+                STUDENT_EDUCATION studentEducation = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(STUDENT_EDUCATION.class, educQM.getId());
+
+                difference.setStudentEducation(studentEducation);
+                difference.setSubject(vtDifference.getSubject());
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(difference);
+
+                differenceTW.refresh();
+                showSavedNotification();
+            } catch (Exception ex) {
+                CommonUtils.showMessageAndWriteLog("Unable to create a subject", ex);
+            }
+        } else {
+            try {
+                difference = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(STUDENT_DIFFERENCE.class, vtDifference.getId());
+                difference.setSubject(vtDifference.getSubject());
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(difference);
+                differenceTW.refresh();
+                showSavedNotification();
+            } catch (Exception ex) {
+                CommonUtils.showMessageAndWriteLog("Unable to merge a subject", ex);
+            }
+        }
+        return false;
+    }
+
     @Override
     public boolean preDelete(Object source, List<Entity> entities, int buttonId) {
         if (source.equals(educationTW)) {
@@ -2053,6 +2391,27 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
             }
 
             return false;
+        }else if (source.equals(differenceTW)) {
+            List<STUDENT_DIFFERENCE> delList = new ArrayList<>();
+            for (Entity e : entities) {
+                try {
+                    STUDENT_DIFFERENCE mc = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(STUDENT_DIFFERENCE.class, e.getId());
+                    delList.add(mc);
+                    differenceTW.refresh();
+                } catch (Exception ex) {
+                    CommonUtils.showMessageAndWriteLog("Unable to delete subject", ex);
+                }
+            }
+
+            try {
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(delList);
+                differenceTW.refresh();
+            } catch (Exception ex) {
+                LOG.error("Unable to delete subject: ", ex);
+                Message.showError(getUILocaleUtil().getMessage("error.cannotdelentity"));
+            }
+
+            return false;
         }
 
         return super.preDelete(source, entities, buttonId);
@@ -2081,7 +2440,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
     public void handlePhotoWidgetEvent(PhotoWidgetEvent ev) {
         if (ev.getEvent() == PhotoWidgetEvent.CHANGED) {
             userPhotoBytes = ev.getBytes();
-            userPhotoFilename = ev.getFilename();
+            userPhotoFilename = PATH_TO_PHOTO +ev.getFilename();
             userPhotoChanged = true;
         }
     }

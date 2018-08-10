@@ -4,16 +4,14 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import kz.halyqsoft.univercity.entity.beans.USERS;
-import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_SIGNER;
-import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_SIGNER_STATUS;
-import kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE;
-import kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE_DEPT;
+import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.POST;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.WorkflowCommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
+import org.r3a.common.entity.ID;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.from.EJoin;
 import org.r3a.common.entity.query.from.FromItem;
@@ -23,9 +21,7 @@ import org.r3a.common.vaadin.widget.dialog.AbstractDialog;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class AddEmployeeDialog extends AbstractDialog{
 
@@ -54,9 +50,17 @@ public class AddEmployeeDialog extends AbstractDialog{
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
                 if(usersCB.getValue()!=null){
-                    documentSigner.setEmployee((EMPLOYEE) usersCB.getValue());
+                    EMPLOYEE employee = (EMPLOYEE) usersCB.getValue();
+                    documentSigner.setEmployee(employee);
                     try{
                         documentSigner.setDocumentSignerStatus(WorkflowCommonUtils.getDocumentSignerStatusByName(DOCUMENT_SIGNER_STATUS.CREATED));
+
+                        List<SUBSTITUTION> substitutions = getList(employee);
+                        if(substitutions.size()>0){
+                            documentSigner.setEmployee((EMPLOYEE) substitutions.get(0).getSubstitutor());
+                            Message.showInfo(getUILocaleUtil().getMessage("unavailable.employee"));
+
+                        }
                         documentSigner.setUpdated(new Date());
                         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(documentSigner);
                         CommonUtils.showSavedNotification();
@@ -78,5 +82,33 @@ public class AddEmployeeDialog extends AbstractDialog{
     @Override
     protected String createTitle() {
         return title;
+    }
+
+
+    public List<SUBSTITUTION> getList(EMPLOYEE employee) {
+
+        List<SUBSTITUTION> list = new ArrayList<>();
+        Map<Integer, Object> params = new HashMap<>();
+
+        String sql = "SELECT id FROM substitution where employee_id = "+ employee.getId().getId().longValue() +" and until_date > now();" ;
+
+        try {
+            List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
+            if (!tmpList.isEmpty()) {
+                for (Object o : tmpList) {
+                    ID id = ID.valueOf((Long)o);
+                    try {
+                        SUBSTITUTION substitution = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(SUBSTITUTION.class, id);
+                        list.add(substitution);
+                    }catch(Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            CommonUtils.showMessageAndWriteLog("Unable to load teacher list", ex);
+        }
+
+        return list;
     }
 }
