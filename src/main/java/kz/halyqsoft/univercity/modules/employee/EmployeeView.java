@@ -118,16 +118,9 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
         cb.setNullSelectionAllowed(true);
         cb.setTextInputAllowed(true);
         cb.setFilteringMode(FilteringMode.OFF);
-//        BeanItemContainer<Integer> childBIC = new BeanItemContainer<Integer>(Integer.class);
         for(int i = 1; i<19; i++) {
             cb.addItem(i);
         }
-//       QueryModel<CHILD> childQM = new QueryModel<>(CHILD.class);
-       // FromItem userFI = cardQM.addJoin(EJoin.INNER_JOIN, "id", USERS.class, "card");
-        //cardQM.addWhere(userFI, "typeIndex", ECriteria.EQUAL, 1);
-//        childQM.addWhere("birthDate",ECriteria.EQUAL,cb.getValue());
-//
-//        cb.setContainerDataSource(childBIC);
         filterPanel.addFilterComponent("childAge", cb);
 
         teacherGW = new GridWidget(VEmployee.class);
