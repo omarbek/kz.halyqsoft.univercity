@@ -3,15 +3,13 @@ package kz.halyqsoft.univercity.modules.schedule;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.combobox.FilteringMode;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_GROUP;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_TEACHER_LOAD_ASSIGN_DETAIL;
 import kz.halyqsoft.univercity.utils.CommonUtils;
+import kz.halyqsoft.univercity.utils.TimeUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.ID;
@@ -24,10 +22,12 @@ import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.dialog.Message;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.TemporalAdjusters;
+import java.util.*;
+import java.util.Calendar;
 
 /**
  * @author Omarbek
@@ -56,20 +56,37 @@ public class ScheduleView extends AbstractTaskView {
 
     @Override
     public void initView(boolean b) throws Exception {
-        Button generateButton = new Button("generate");//TODO
-        generateButton.addClickListener(new Button.ClickListener() {
+        HorizontalLayout buttonsHL = CommonUtils.createButtonPanel();
+
+        Button generateScheduleButton = new Button(getUILocaleUtil().getCaption("generate.schedule"));
+        generateScheduleButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 try {
-                    generate();
+                    generateSchedule();
                     refresh(groupCB);
                 } catch (Exception e) {
-                    e.printStackTrace();//TODO catch
+                    CommonUtils.showMessageAndWriteLog("Unable to generate schedule", e);
                 }
             }
         });
-        getContent().addComponent(generateButton);
-        getContent().setComponentAlignment(generateButton, Alignment.MIDDLE_CENTER);
+        buttonsHL.addComponent(generateScheduleButton);
+
+        Button generateLessonsButton = new Button(getUILocaleUtil().getCaption("generate.lessons"));
+        generateLessonsButton.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                try {
+                    generateLessons();
+                } catch (Exception e) {
+                    CommonUtils.showMessageAndWriteLog("Unable to generate lessons", e);
+                }
+            }
+        });
+        buttonsHL.addComponent(generateLessonsButton);
+
+        getContent().addComponent(buttonsHL);
+        getContent().setComponentAlignment(buttonsHL, Alignment.MIDDLE_CENTER);
 
         groupCB = new ComboBox();
         groupCB.setTextInputAllowed(true);
@@ -87,7 +104,7 @@ public class ScheduleView extends AbstractTaskView {
                 try {
                     refresh(groupCB);
                 } catch (Exception e) {
-                    e.printStackTrace();//TODO catch
+                    CommonUtils.showMessageAndWriteLog("Unable to refresh schedule widget", e);
                 }
             }
         });
@@ -98,6 +115,81 @@ public class ScheduleView extends AbstractTaskView {
         getContent().setComponentAlignment(tablesVL, Alignment.MIDDLE_CENTER);
     }
 
+    private void generateLessons() throws Exception {
+        SEMESTER_DATA currentSemesterData = CommonUtils.getCurrentSemesterData();
+        if (currentSemesterData != null) {
+            QueryModel<SCHEDULE_DETAIL> scheduleDetailQM = new QueryModel<>(SCHEDULE_DETAIL.class);
+            scheduleDetailQM.addWhere("semesterData", ECriteria.EQUAL, currentSemesterData.getId());
+            scheduleDetailQM.addWhere("id", ECriteria.EQUAL, ID.valueOf(3624));
+            List<SCHEDULE_DETAIL> scheduleDetails = SessionFacadeFactory.getSessionFacade(
+                    CommonEntityFacadeBean.class).lookup(scheduleDetailQM);
+            for (SCHEDULE_DETAIL scheduleDetail : scheduleDetails) {
+                QueryModel<LESSON> lessonQM = new QueryModel<>(LESSON.class);
+                lessonQM.addWhere("scheduleDetail", ECriteria.EQUAL, scheduleDetail.getId());
+                List<LESSON> lessons = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                        lookup(lessonQM);
+                for (LESSON lesson : lessons) {
+                    QueryModel<LESSON_DETAIL> lessonDetailQM = new QueryModel<>(LESSON_DETAIL.class);
+                    lessonDetailQM.addWhere("lesson", ECriteria.EQUAL, lesson.getId());
+                    List<LESSON_DETAIL> lessonDetails = SessionFacadeFactory.getSessionFacade(
+                            CommonEntityFacadeBean.class).lookup(lessonDetailQM);
+                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(lessonDetails);
+                }
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(lessons);
+
+                for (int i = 0; i < 15; i++) {
+                    LESSON lesson = new LESSON();
+                    lesson.setScheduleDetail(scheduleDetail);
+                    Date dateByWeekDay = getDateByWeekDay(i + 1, currentSemesterData, scheduleDetail.getWeekDay().
+                            getId().getId().intValue());
+                    lesson.setLessonDate(dateByWeekDay);
+                    lesson.setBeginDate(getDateByTime(dateByWeekDay, scheduleDetail.getLessonTime().getBeginTime()));
+                    lesson.setFinishDate(getDateByTime(dateByWeekDay, scheduleDetail.getLessonTime().getEndTime()));
+                    lesson.setCanceled(false);
+                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(lesson);
+
+                    QueryModel<STUDENT_EDUCATION> studentEducationQM = new QueryModel<>(STUDENT_EDUCATION.class);
+                    studentEducationQM.addWhere("groups", ECriteria.EQUAL, scheduleDetail.getGroup().getId());
+                    studentEducationQM.addWhereNull("child");
+                    List<STUDENT_EDUCATION> studentEducations = SessionFacadeFactory.getSessionFacade(
+                            CommonEntityFacadeBean.class).lookup(studentEducationQM);
+                    for (STUDENT_EDUCATION studentEducation : studentEducations) {
+                        LESSON_DETAIL lessonDetail = new LESSON_DETAIL();
+                        lessonDetail.setAttendanceMark(0);
+                        lessonDetail.setLesson(lesson);
+                        lessonDetail.setStudentEducation(studentEducation);
+                        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(lessonDetail);
+                    }
+
+                }
+
+            }
+        } else {
+            Message.showInfo(CommonUtils.getSemesterIsGoingNowLabel().getValue());
+        }
+    }
+
+    private Date getDateByTime(Date dateByWeekDay, TIME time) {
+        TimeUtils clock = new TimeUtils(time);
+        if (clock.isError()) return null;
+        String hours = clock.getHours();
+        String minutes = clock.getMinutes();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(dateByWeekDay);
+        cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(hours));
+        cal.set(Calendar.MINUTE, Integer.parseInt(minutes));
+        return cal.getTime();
+    }
+
+    private Date getDateByWeekDay(int week, SEMESTER_DATA currentSemesterData, int weekDay) {
+        LocalDate localDate = currentSemesterData.getBeginDate().toInstant().atZone(ZoneId.systemDefault()).
+                toLocalDate();
+        for (int i = 0; i < week; i++) {
+            localDate = localDate.with(TemporalAdjusters.next(DayOfWeek.of(weekDay)));
+        }
+        return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+    }
+
     private void refresh(ComboBox groupCB) throws Exception {
         ScheduleWidget scheduleWidget = new ScheduleWidget(currentSemesterData, (GROUPS) groupCB.getValue());
         scheduleWidget.refresh();
@@ -105,7 +197,7 @@ public class ScheduleView extends AbstractTaskView {
         tablesVL.addComponent(scheduleWidget);
     }
 
-    private void generate() throws Exception {
+    private void generateSchedule() throws Exception {
         if (currentSemesterData != null) {
             QueryModel<SCHEDULE_DETAIL> scheduleDetailQM = new QueryModel<>(SCHEDULE_DETAIL.class);
             scheduleDetailQM.addWhere("semesterData", ECriteria.EQUAL, currentSemesterData.getId());

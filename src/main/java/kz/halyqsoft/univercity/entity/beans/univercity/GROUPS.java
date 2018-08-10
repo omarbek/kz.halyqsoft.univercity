@@ -13,37 +13,43 @@ import java.util.Date;
 @Entity
 public class GROUPS extends AbstractEntity {
 
-    @FieldInfo(type = EFieldType.FK_COMBO)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 1)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "SPECIALITY_ID", referencedColumnName = "ID", nullable = false)})
     private SPECIALITY speciality;
 
-    @FieldInfo(type = EFieldType.FK_COMBO , order = 2)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 2)
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "CURATOR_ID", referencedColumnName = "ID")})
+    private EMPLOYEE curator;
+
+    @FieldInfo(type = EFieldType.FK_COMBO , order = 3)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "LANGUAGE_ID", referencedColumnName = "ID", nullable = false)})
     private LANGUAGE language;
 
-    @FieldInfo(type = EFieldType.FK_COMBO , order = 3)
+    @FieldInfo(type = EFieldType.FK_COMBO , order = 4)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "STUDY_YEAR_ID", referencedColumnName = "ID", nullable = false)})
     private STUDY_YEAR studyYear;
 
-    @FieldInfo(type = EFieldType.TEXT, order = 4)
+    @FieldInfo(type = EFieldType.TEXT, order = 5)
     @Column(name = "name" , nullable = false)
     private String name;
 
-    @FieldInfo(type = EFieldType.INTEGER, order = 5)
+    @FieldInfo(type = EFieldType.INTEGER, order = 6)
     @Column(name = "orders", nullable = false)
     private Long orders;
 
-    @FieldInfo(type = EFieldType.BOOLEAN, inGrid = false, inEdit = false, inView = false )
+    @FieldInfo(type = EFieldType.BOOLEAN, inGrid = false, inEdit = false, inView = false, order = 7 )
     @Column(name = "deleted", nullable = false)
     private boolean deleted;
 
-    @FieldInfo(type = EFieldType.DATETIME, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false)
+    @FieldInfo(type = EFieldType.DATETIME, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false, order = 8)
     @Column(name = "created")
     @Temporal(TemporalType.TIMESTAMP)
     private Date created;
@@ -105,6 +111,14 @@ public class GROUPS extends AbstractEntity {
 
     public void setStudyYear(STUDY_YEAR studyYear) {
         this.studyYear = studyYear;
+    }
+
+    public EMPLOYEE getCurator() {
+        return curator;
+    }
+
+    public void setCurator(EMPLOYEE curator) {
+        this.curator = curator;
     }
 
     @Override

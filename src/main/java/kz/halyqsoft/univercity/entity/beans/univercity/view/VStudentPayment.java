@@ -21,7 +21,7 @@ public class VStudentPayment extends AbstractEntity {
 	private String fio;
 
 	@FieldInfo(type = EFieldType.DATETIME, order = 4)
-	private Date date;
+	private Date created;
 
 	@FieldInfo(type = EFieldType.DOUBLE, order = 5)
 	private Double paymentSum;
@@ -42,12 +42,12 @@ public class VStudentPayment extends AbstractEntity {
 		this.code = code;
 	}
 
-	public Date getDate() {
-		return date;
+	public Date getCreated() {
+		return created;
 	}
 
-	public void setDate(Date date) {
-		this.date = date;
+	public void setCreated(Date created) {
+		this.created = created;
 	}
 
 	public Double getPaymentSum() {

@@ -56,25 +56,7 @@ public class CustomDocument {
 
             for (CustomField cf : customFieldList) {
                 cf.getxComboBox().setEnabled(true);
-//                Font font = new Font(Font.FontFamily.TIMES_ROMAN,
-//                        Integer.parseInt(cf.getTextSize().getValue()), cf.getFontComboBox().getTabIndex());
 
-//                BaseFont bf = BaseFont.createFont(BaseFont.COURIER, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
-//                PdfContentByte cb = pdfWriter.getDirectContent();
-//                cb.saveState();
-//                cb.beginText();
-//                cb.moveText(Integer.parseInt(cf.getxIntegerField().getValue()), Integer.parseInt(cf.getyIntegerField().getValue()));
-//                cb.setFontAndSize(bf,Integer.parseInt(cf.getTextSize().getValue()));
-//                for(int i = 0; i<bfArray.length;i++){
-//                    while(iterator.hasNext()) {
-//                        Map.Entry mentry = (Map.Entry)iterator.next();
-//                        if(cf.getStyleComboBox().getValue().equals(mentry.getValue()))
-//                            cb.setFontAndSize(bfArray[(Integer)mentry.getKey()],Integer.parseInt(cf.getTextSize().getValue()));
-//                    }}
-//                    cb.showText(cf.getTextField().getValue());
-//
-//                cb.endText();
-//                cb.restoreState();
                 Paragraph paragraph1 = new Paragraph(cf.getTextField().getValue(),
                         getFont(Integer.parseInt(cf.getTextSizeComboBox().getValue().toString()),
                                 fontMap.get(cf.getFontComboBox().getValue().toString())));
@@ -83,6 +65,8 @@ public class CustomDocument {
 
                 if(cf.getCenterCheckBox().getValue()){
                     paragraph1.setAlignment(Element.ALIGN_CENTER);
+                }else if(cf.getRightCheckBox().getValue()){
+                    paragraph1.setAlignment(Element.ALIGN_RIGHT);
                 }
 
                 paragraph1.setSpacingBefore(y);
@@ -92,15 +76,18 @@ public class CustomDocument {
                 PDF_PROPERTY pdfProperty = new PDF_PROPERTY();
                 pdfProperty.setId(cf.getId());
                 pdfProperty.setText(cf.getTextField().getValue());
+                pdfProperty.setRight(cf.getRightCheckBox().getValue());
                 pdfProperty.setX(x);
                 pdfProperty.setY(y);
                 pdfProperty.setFont(cf.getFontComboBox().getValue().toString());
                 pdfProperty.setSize(Integer.parseInt(cf.getTextSizeComboBox().getValue().toString()));
                 pdfProperty.setOrderNumber(Double.parseDouble(cf.getOrder().getValue().toString()));
+
                 pdfProperty.setCenter(cf.getCenterCheckBox().getValue());
+                pdfProperty.setRight(cf.getRightCheckBox().getValue());
+                pdfProperty.setCustom(cf.getCustomCheckBox().getValue());
+
                 pdfProperties.add(pdfProperty);
-//                pdfProperty.setPdfDocument(pdfDocument);
-//                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(pdfProperty);
 
                 document.add(paragraph1);
 

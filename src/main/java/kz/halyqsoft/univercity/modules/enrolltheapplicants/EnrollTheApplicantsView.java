@@ -1,12 +1,8 @@
 package kz.halyqsoft.univercity.modules.enrolltheapplicants;
 
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Grid;
-import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDENT_CATEGORY;
@@ -16,7 +12,9 @@ import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.ID;
 import org.r3a.common.entity.beans.AbstractTask;
+import org.r3a.common.vaadin.AbstractWebUI;
 import org.r3a.common.vaadin.view.AbstractTaskView;
+import org.r3a.common.vaadin.widget.dialog.AbstractDialog;
 
 import java.util.*;
 
@@ -76,17 +74,7 @@ public class EnrollTheApplicantsView extends AbstractTaskView {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 try {
-                    Collection<Object> selectedRows = studentGrid.getSelectedRows();
-                    for (Object object : selectedRows) {
-                        VStudent vStudent = (VStudent) object;
-                        USERS user = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
-                                lookup(USERS.class, vStudent.getId());
-                        user.setDeleted(true);
-                        user.setUpdated(new Date());
-                        user.setUpdatedBy(CommonUtils.getCurrentUserLogin());
-                        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(user);
-                    }
-                    refresh();
+                        AbstractWebUI.getInstance().addWindow(new reasonDeleted());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -162,5 +150,55 @@ public class EnrollTheApplicantsView extends AbstractTaskView {
 
         final BeanItemContainer<VStudent> bic = new BeanItemContainer<>(VStudent.class, list);
         studentGrid.setContainerDataSource(bic);
+    }
+
+    private class reasonDeleted extends AbstractDialog{
+
+        reasonDeleted(){
+
+            setWidth(500, Unit.PIXELS);
+            setHeight(300, Unit.PIXELS);
+            center();
+
+            TextArea ta = new TextArea();
+            ta.setCaption("<html><b>" + getUILocaleUtil().getCaption("reason") + "</b>");
+            ta.setWidth(100, Unit.PERCENTAGE);
+            ta.setCaptionAsHtml(true);
+            getContent().addComponent(ta);
+
+            Button deleteButton = new Button();
+            deleteButton.setWidth(120.0F, Unit.PIXELS);
+            deleteButton.setIcon(new ThemeResource("img/button/delete.png"));
+            deleteButton.setCaption(getUILocaleUtil().getCaption("delete"));
+            deleteButton.addClickListener(new Button.ClickListener() {
+                @Override
+                public void buttonClick(Button.ClickEvent event) {
+                    try {
+                    Collection<Object> selectedRows = studentGrid.getSelectedRows();
+                    for (Object object : selectedRows) {
+                        VStudent vStudent = (VStudent) object;
+                        USERS user = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                                lookup(USERS.class, vStudent.getId());
+                        user.setDeleted(true);
+                        user.setUpdated(new Date());
+                        user.setUpdatedBy(CommonUtils.getCurrentUserLogin());
+                        user.setReason(ta.getValue());
+                        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(user);
+                    }
+                    refresh();
+                    close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            getContent().addComponent(deleteButton);
+            getContent().setComponentAlignment(deleteButton, Alignment.MIDDLE_CENTER);
+        }
+
+        @Override
+        protected String createTitle() {
+            return null;
+        }
     }
 }

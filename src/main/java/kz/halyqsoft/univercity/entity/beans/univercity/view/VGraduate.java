@@ -9,23 +9,20 @@ public class VGraduate extends AbstractEntity {
     @FieldInfo(type=EFieldType.TEXT, order = 1)
     private String FIO;
 
-    @FieldInfo(type = EFieldType.BOOLEAN, order = 2)
-    private boolean employed;
+    @FieldInfo(type = EFieldType.TEXT, order = 2)
+    private String employed;
 
-    @FieldInfo(type = EFieldType.BOOLEAN, order = 3)
-    private boolean bySpeciality;
+    @FieldInfo(type = EFieldType.TEXT, order = 3)
+    private String bySpeciality;
 
-    @FieldInfo(type = EFieldType.BOOLEAN, order = 4)
-    private boolean master;
+    @FieldInfo(type = EFieldType.TEXT, order = 4)
+    private String master;
 
-    @FieldInfo(type = EFieldType.BOOLEAN, order = 5)
-    private boolean decree;
+    @FieldInfo(type = EFieldType.TEXT, order = 5)
+    private String decree;
 
-    @FieldInfo(type = EFieldType.BOOLEAN, order = 6)
-    private boolean army;
-
-    public VGraduate() {
-    }
+    @FieldInfo(type = EFieldType.TEXT, order = 6)
+    private String army;
 
     public String getFIO() {
         return FIO;
@@ -35,43 +32,43 @@ public class VGraduate extends AbstractEntity {
         this.FIO = FIO;
     }
 
-    public boolean isEmployed() {
+    public String getEmployed() {
         return employed;
     }
 
-    public void setEmployed(boolean employed) {
+    public void setEmployed(String employed) {
         this.employed = employed;
     }
 
-    public boolean isBySpeciality() {
+    public String getBySpeciality() {
         return bySpeciality;
     }
 
-    public void setBySpeciality(boolean bySpeciality) {
+    public void setBySpeciality(String bySpeciality) {
         this.bySpeciality = bySpeciality;
     }
 
-    public boolean isMaster() {
+    public String getMaster() {
         return master;
     }
 
-    public void setMaster(boolean master) {
+    public void setMaster(String master) {
         this.master = master;
     }
 
-    public boolean isDecree() {
+    public String getDecree() {
         return decree;
     }
 
-    public void setDecree(boolean decree) {
+    public void setDecree(String decree) {
         this.decree = decree;
     }
 
-    public boolean isArmy() {
+    public String getArmy() {
         return army;
     }
 
-    public void setArmy(boolean army) {
+    public void setArmy(String army) {
         this.army = army;
     }
 }

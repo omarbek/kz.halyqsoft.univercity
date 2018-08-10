@@ -33,6 +33,12 @@ public class PDF_PROPERTY extends AbstractEntity{
     @Column(name = "center", nullable = false)
     private boolean center;
 
+    @Column(name = "rights", nullable = false)
+    private boolean right;
+
+    @Column(name = "custom", nullable = false)
+    private boolean custom;
+
     public String getText() {
         return text;
     }
@@ -95,5 +101,21 @@ public class PDF_PROPERTY extends AbstractEntity{
 
     public void setCenter(boolean center) {
         this.center = center;
+    }
+
+    public boolean isRight() {
+        return right;
+    }
+
+    public void setRight(boolean right) {
+        this.right = right;
+    }
+
+    public boolean isCustom() {
+        return custom;
+    }
+
+    public void setCustom(boolean custom) {
+        this.custom = custom;
     }
 }

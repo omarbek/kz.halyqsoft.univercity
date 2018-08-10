@@ -9,14 +9,12 @@ import com.vaadin.event.MouseEvents;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.*;
 import com.vaadin.ui.declarative.FieldBinder;
+import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.GROUPS;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_EDUCATION;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_DOCUMENT;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SPECIALITY;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDENT_CATEGORY;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDENT_DIPLOMA_TYPE;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDY_YEAR;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VAccountants;
 import kz.halyqsoft.univercity.filter.FAccountantFilter;
 import kz.halyqsoft.univercity.filter.FGroupFilter;
@@ -148,11 +146,19 @@ public class GroupsView extends AbstractTaskView implements FilterPanelListener 
     }
 
     private void generateNew(int STUDENT_MAX){
+        STUDY_YEAR studyYear = null;
+        try{
+            studyYear = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(STUDY_YEAR.class, ID.valueOf(1));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         QueryModel<STUDENT> studentQueryModel = new QueryModel<>(STUDENT.class);
         FromItem fi = studentQueryModel.addJoin(EJoin.INNER_JOIN , "id" , STUDENT_EDUCATION.class , "student");
         FromItem fi2 = fi.addJoin(EJoin.INNER_JOIN, "studyYear" , STUDY_YEAR.class , "id");
-        studentQueryModel.addWhere(fi2 , "studyYear" , ECriteria.EQUAL , 1);
+        FromItem fi3 = studentQueryModel.addJoin(EJoin.INNER_JOIN, "id" , USERS.class, "id");
 
+        studentQueryModel.addWhere(fi2 , "studyYear" , ECriteria.EQUAL , studyYear.getId());
+        studentQueryModel.addWhereAnd(fi3 , "deleted" , ECriteria.EQUAL , false);
         List students = null;
 
         try{
@@ -193,15 +199,20 @@ public class GroupsView extends AbstractTaskView implements FilterPanelListener 
             languageMap.put("ru", specialityMapRu);
             languageMap.put("en", specialityMapEn);
 
+            Map <String, LANGUAGE>languageObjectMap = new HashMap();
 
             for(STUDENT s : (List<STUDENT>)students)  {
                 String lang = s.getEntrantSpecialities().iterator().next().getLanguage().getLangName();
+
                 if(lang.equalsIgnoreCase("Казахский")){
                     languageMap.get("kz").get(getStudentEducationByStudentId(s.getId()).getSpeciality()).add(s);
+                    languageObjectMap.put("kz" , s.getEntrantSpecialities().iterator().next().getLanguage());
                 }else if(lang.equalsIgnoreCase("Английский")){
                     languageMap.get("en").get(getStudentEducationByStudentId(s.getId()).getSpeciality()).add(s);
+                    languageObjectMap.put("en" , s.getEntrantSpecialities().iterator().next().getLanguage());
                 }else{
                     languageMap.get("ru").get(getStudentEducationByStudentId(s.getId()).getSpeciality()).add(s);
+                    languageObjectMap.put("ru" , s.getEntrantSpecialities().iterator().next().getLanguage());
                 }
             }
 
@@ -218,6 +229,9 @@ public class GroupsView extends AbstractTaskView implements FilterPanelListener 
                             groups = new GROUPS();
                             groups.setName(  speciality.getCode() + "-" + langKey + "-" + ((Calendar.getInstance().get(Calendar.YEAR)-2000)*100+groupCounter));
                             groups.setSpeciality(speciality);
+                            groups.setLanguage(languageObjectMap.get(langKey));
+                            groups.setStudyYear(studyYear);
+
                             groups.setOrders(new Long(groupCounter));
                             groups.setDeleted(false);
                             groups.setCreated(new Date());
@@ -235,6 +249,8 @@ public class GroupsView extends AbstractTaskView implements FilterPanelListener 
                                 groupCounter++;
                                 groups = new GROUPS();
                                 groups.setName(speciality.getCode() + "-" + langKey + "-" + ((Calendar.getInstance().get(Calendar.YEAR)-2000)*100+groupCounter ));
+                                groups.setLanguage(languageObjectMap.get(langKey));
+                                groups.setStudyYear(studyYear);
                                 groups.setSpeciality(speciality);
                                 groups.setOrders(new Long(groupCounter));
                                 groups.setDeleted(false);
@@ -259,6 +275,20 @@ public class GroupsView extends AbstractTaskView implements FilterPanelListener 
                 List<GROUPS> list = new ArrayList<>();
                 for(GROUPS group : set)
                 {
+                    QueryModel<STUDENT_EDUCATION> studentEducationQM = new QueryModel<>(STUDENT_EDUCATION.class);
+                    studentEducationQM.addWhere("groups" , ECriteria.EQUAL , group.getId());
+
+                    try{
+                        List<STUDENT_EDUCATION> studentEducations = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(studentEducationQM);
+                        for(STUDENT_EDUCATION studentEducation :studentEducations){
+                            studentEducation.setGroups(null);
+                        }
+                        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(studentEducations);
+                    }catch (NoResultException e){
+                        System.out.println(e.getMessage());
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
                     list.add(group);
                 }
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(list);

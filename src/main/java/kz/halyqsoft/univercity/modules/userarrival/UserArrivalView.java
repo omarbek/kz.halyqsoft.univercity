@@ -4,14 +4,13 @@ import com.vaadin.data.Property;
 import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.event.MouseEvents;
 import com.vaadin.server.ThemeResource;
+import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.USER_TYPE;
 import kz.halyqsoft.univercity.entity.beans.univercity.enumeration.UserType;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.VDepartmentInfo;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.VEmployeeInfo;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.V_EMPLOYEE;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.V_STUDENT;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.*;
 import kz.halyqsoft.univercity.modules.reports.MenuColumn;
+import kz.halyqsoft.univercity.modules.userarrival.subview.GroupAttendance;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -41,12 +40,13 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
     private HorizontalSplitPanel mainHSP;
     private HorizontalLayout mainHL, secondHL;
     private VerticalLayout tableVL;
-    private GridWidget employeeGW;
+    private GridWidget employeeGW, absentsGW;
     private GridWidget employeeByDepartmentGW;
     private USER_TYPE userType;
     private DateField date;
     private HorizontalLayout buttonsHL;
     private Long depID;
+    private ComboBox absentDayCB;
 
     public UserArrivalView(AbstractTask task) throws Exception {
         super(task);
@@ -93,6 +93,7 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
         MenuColumn menuColumn = new MenuColumn();
         menuTT.addGeneratedColumn("user arrival", menuColumn);
         menuTT.setColumnHeader("user arrival", getUILocaleUtil().getCaption("attendanceHeader"));
+
         menuTT.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
@@ -105,8 +106,7 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
                             setLaters();
                             setEmployees();
                             setNoCards();
-                        }
-                        if (employeeAttendance.equals(event.getProperty().getValue().toString())) {
+                        }else if (employeeAttendance.equals(event.getProperty().getValue().toString())) {
                             date = new DateField();
                             Date currentDate = new Date();
                             date.setValue(currentDate);
@@ -115,8 +115,7 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
                                 public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
                                     if (date.getValue() != null) {
                                         DateFormat dateFormat = new SimpleDateFormat();
-                                        ((DBGridModel) employeeGW.getWidgetModel()).
-                                                setEntities(getList(dateFormat.format(date.getValue())));
+                                        ((DBGridModel) employeeGW.getWidgetModel()).setEntities(getList(dateFormat.format(date.getValue())));
                                         if(employeeByDepartmentGW!=null){
                                             ((DBGridModel) employeeByDepartmentGW.getWidgetModel()).
                                                     setEntities(getEmployee(dateFormat.format(date.getValue())));
@@ -127,6 +126,12 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
                                 }
                             });
                             setDepartmentInfo();
+                        }else if(studentAttendance.equalsIgnoreCase(event.getProperty().getValue().toString())){
+                            GroupAttendance groupAttendance = new GroupAttendance();
+
+                            mainHL.addComponent(groupAttendance.getMainVL());
+                        }else if(absent.equalsIgnoreCase(event.getProperty().getValue().toString())){
+                            setAbsentsInfo();
                         }
                         mainHSP.addComponent(mainHL);
                     }
@@ -281,6 +286,8 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
                 " GROUP BY  dep.dept_name,dep.id";
 
         try {
+
+
             List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
             if (!tmpList.isEmpty()) {
                 for (Object o : tmpList) {
@@ -325,6 +332,7 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
 
     @Override
     public void handleEntityEvent(EntityEvent ev) {
+
         if (ev.getSource().equals(employeeGW)) {
             if (ev.getAction() == EntityEvent.SELECTED) {
 
@@ -414,5 +422,94 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
 
         refreshEmployeeList(emplList);
         return emplList;
+    }
+
+    private void setAbsentsInfo() throws Exception {
+        absentDayCB = new ComboBox(getUILocaleUtil().getCaption("absentDayCB"));
+        absentDayCB.setNullSelectionAllowed(true);
+        absentDayCB.setTextInputAllowed(true);
+        absentDayCB.setFilteringMode(FilteringMode.CONTAINS);
+        absentDayCB.setWidth(300, Unit.PIXELS);
+        for(int i = 5; i<100; i++) {
+            absentDayCB.addItem(i);
+        }
+        absentDayCB.addValueChangeListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
+                ((DBGridModel) absentsGW.getWidgetModel()).setEntities(getAbsentList((Integer)absentDayCB.getValue()));
+            }
+        });
+
+        absentsGW = new GridWidget(VAbsents.class);
+        absentsGW.setCaption(getUILocaleUtil().getCaption("absentsGW"));
+        absentsGW.setImmediate(true);
+        absentsGW.showToolbar(false);
+        absentsGW.setButtonVisible(AbstractToolbar.REFRESH_BUTTON, true);
+
+        DBGridModel absentsGM = (DBGridModel) absentsGW.getWidgetModel();
+        absentsGM.setEntities(getAbsentList((Integer)absentDayCB.getValue()));
+        absentsGM.setTitleVisible(false);
+        absentsGM.setMultiSelect(false);
+        absentsGM.setRefreshType(ERefreshType.MANUAL);
+
+        tableVL = new VerticalLayout();
+        tableVL.addComponent(absentDayCB);
+        tableVL.setComponentAlignment(absentDayCB, Alignment.MIDDLE_RIGHT);
+        tableVL.addComponent(absentsGW);
+        mainHL.addComponent(tableVL);
+    }
+
+    public List<VAbsents> getAbsentList(Integer number) {
+
+        List<VAbsents> list = new ArrayList<>();
+        Map<Integer, Object> params = new HashMap<>();
+        String sql = "SELECT\n" +
+                "  trim(u.LAST_NAME || ' ' || u.FIRST_NAME || ' ' || coalesce(u.MIDDLE_NAME, '')) FIO,\n" +
+                "  vstudent.faculty_name,\n" +
+                "  vstudent.speciality_name,\n" +
+                "  vstudent.group_name,\n" +
+                "  date_part('days', now()::date - (max(arrive.created) )\n" +
+                "  ) as                                                                           absentDay\n" +
+                "FROM user_arrival arrive\n" +
+                "  INNER JOIN users u on arrive.user_id = u.id\n" +
+                "  INNER JOIN v_student vstudent on u.id = vstudent.id\n" +
+                "GROUP BY FIO,\n" +
+                "  vstudent.faculty_name,\n" +
+                "  vstudent.speciality_name,\n" +
+                "  vstudent.group_name\n" +
+                "HAVING date_part('days', now()::date - (max(arrive.created) )\n" +
+                ") > 5";
+        if(number!=null){
+            sql = sql + "and  date_part('days', now()::date - (max(arrive.created) )\n" +
+                    ") <= " + number;
+        }
+        try {
+            List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
+            if (!tmpList.isEmpty()) {
+                for (Object o : tmpList) {
+                    Object[] oo = (Object[]) o;
+                    VAbsents vAbsent = new VAbsents();
+                    vAbsent.setFIO((String) oo[0]);
+                    vAbsent.setFaculty((String) oo[1]);
+                    vAbsent.setSpeciality((String) oo[2]);
+                    vAbsent.setGroup((String) oo[3]);
+                    vAbsent.setAbsentSum((Double) oo[4]);
+                    list.add(vAbsent);
+                }
+            }
+        } catch (Exception ex) {
+            CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
+        }
+        refreshAbsentList(list);
+        return list;
+    }
+
+    private void refreshAbsentList(List<VAbsents> list) {
+        ((DBGridModel) absentsGW.getWidgetModel()).setEntities(list);
+        try {
+            absentsGW.refresh();
+        } catch (Exception ex) {
+            CommonUtils.showMessageAndWriteLog("Unable to refresh department list", ex);
+        }
     }
 }

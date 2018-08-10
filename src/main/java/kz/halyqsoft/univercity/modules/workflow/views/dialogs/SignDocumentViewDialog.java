@@ -6,15 +6,15 @@ import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfSignatureAppearance;
 import com.itextpdf.text.pdf.PdfStamper;
 import com.itextpdf.text.pdf.security.*;
-import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.Page;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
-import kz.halyqsoft.univercity.modules.workflow.WorkflowCommonUtils;
+import kz.halyqsoft.univercity.utils.FieldValidator;
+import kz.halyqsoft.univercity.utils.WorkflowCommonUtils;
 import kz.halyqsoft.univercity.modules.workflow.views.InOnSignView;
-import kz.halyqsoft.univercity.utils.EmployeePdfCreator;
+import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.bouncycastle.openssl.PasswordException;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -22,6 +22,7 @@ import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.event.EntityListener;
 import org.r3a.common.entity.query.QueryModel;
+import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.AbstractWebUI;
 import org.r3a.common.vaadin.widget.dialog.AbstractDialog;
 import org.r3a.common.vaadin.widget.dialog.Message;
@@ -35,129 +36,168 @@ import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-
-@VaadinServletConfiguration(productionMode = false, ui = AbstractWebUI.class, widgetset="com.example.tester.widgetset.TesterWidgetset")
 public class SignDocumentViewDialog extends AbstractDialog implements EntityListener{
     private final String title;
-    private InOnSignView prevView;
-    private GridWidget documentSignerGW;
     private DOCUMENT document;
 
     private File keyFile;
     private static String DEST = "signed_by_%s.pdf";
 
 
-    public SignDocumentViewDialog(InOnSignView prevView , String title, DOCUMENT document){
+    public SignDocumentViewDialog( String title, DOCUMENT document){
+        checkIfAllSignersSignedDocument(document);
+
         this.title = title;
-        this.prevView = prevView;
         this.document = document;
 
         setWidth(80 ,Unit.PERCENTAGE);
         setImmediate(true);
         setResponsive(true);
-        setClosable(false);
+        setClosable(true);
 
+        VerticalLayout content = new VerticalLayout();
+        content.setImmediate(true);
 
-        QueryModel<DOCUMENT_SIGNER_STATUS> documentSignerStatusQM = new QueryModel<>(DOCUMENT_SIGNER_STATUS.class);
-        List<DOCUMENT_SIGNER_STATUS> documentSignerStatusList = new ArrayList<>();
-        try{
-            documentSignerStatusList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(documentSignerStatusQM));
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        BeanItemContainer<DOCUMENT_SIGNER_STATUS> documentSignerStatusBIC = new BeanItemContainer<DOCUMENT_SIGNER_STATUS>(DOCUMENT_SIGNER_STATUS.class, documentSignerStatusList);
+        PasswordField passwordField = new PasswordField(getUILocaleUtil().getCaption("enter.password"));
+        passwordField.setRequired(true);
+        passwordField.setWidth(100, Unit.PERCENTAGE);
+        FileUploader receiver = new FileUploader(keyFile);
+        Upload upload = new Upload(getUILocaleUtil().getCaption("upload.certificate"), receiver);
 
-        ComboBox documentSignerStatusCB = new ComboBox();
-        documentSignerStatusCB.setContainerDataSource(documentSignerStatusBIC);
-        documentSignerStatusCB.addValueChangeListener(new Property.ValueChangeListener() {
+        upload.addFinishedListener(new Upload.FinishedListener() {
             @Override
-            public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
-                DOCUMENT_SIGNER_STATUS dss = (DOCUMENT_SIGNER_STATUS) valueChangeEvent.getProperty().getValue();
+            public void uploadFinished(Upload.FinishedEvent finishedEvent) {
+                try{
+                    document.setFileByte(sign(receiver.getFile(), passwordField.getValue(), document));
 
-                if(dss.getStatusName().equalsIgnoreCase(DOCUMENT_SIGNER_STATUS.SIGNED)){
-
-                    class FileUploader implements Upload.Receiver, Upload.SucceededListener {
-                        private File file;
-
-                        public FileUploader(File file){
-                            this.file = file;
-                        }
-
-                        @Override
-                        public OutputStream receiveUpload(String filename, String mimeType) {
-                            FileOutputStream fos = null; // Stream to write to
-                            try {
-                                file = new File(filename);
-                                fos = new FileOutputStream(file);
-
-                            } catch (final java.io.FileNotFoundException e) {
-                                new Notification("Could not open file",
-                                        e.getMessage(),
-                                        Notification.Type.ERROR_MESSAGE)
-                                        .show(Page.getCurrent());
-                                return null;
+                    QueryModel<DOCUMENT_SIGNER> documentSignersQM = new QueryModel<>(DOCUMENT_SIGNER.class);
+                    documentSignersQM.addWhere("document", ECriteria.EQUAL , document.getId());
+                    List<DOCUMENT_SIGNER> documentSigners = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(documentSignersQM);
+                    boolean flag = true;
+                    DOCUMENT_STATUS documentStatus = WorkflowCommonUtils.getDocumentStatusByName(DOCUMENT_STATUS.ACCEPTED);
+                    DOCUMENT_SIGNER_STATUS documentSignerStatus = WorkflowCommonUtils.getDocumentSignerStatusByName(DOCUMENT_SIGNER_STATUS.SIGNED);
+                    if(documentSigners.size()>0){
+                        for(DOCUMENT_SIGNER documentSigner : documentSigners){
+                            if(documentSigner.getDocumentSignerStatus().getId()!=documentSignerStatus.getId()){
+                                flag = false;
                             }
-                            return fos;
-                        }
-
-                        @Override
-                        public void uploadSucceeded(Upload.SucceededEvent event) {
-
-                        }
-
-                        public File getFile() {
-                            return file;
                         }
                     }
-                    PasswordField passwordField = new PasswordField(getUILocaleUtil().getCaption("enter.password"));
-                    passwordField.setRequired(true);
-                    FileUploader receiver = new FileUploader(keyFile);
+                    if(flag){
+                        document.setDocumentStatus(documentStatus);
+                    }
 
-                    Upload upload = new Upload("Upload certificate here", receiver);
-                    upload.addFinishedListener(new Upload.FinishedListener() {
-                        @Override
-                        public void uploadFinished(Upload.FinishedEvent finishedEvent) {
-                            try{
-                                document.setFileByte(sign(receiver.getFile(), passwordField.getValue(), document));
-                                DOCUMENT_STATUS documentStatus = WorkflowCommonUtils.getDocumentStatusByName(DOCUMENT_STATUS.ACCEPTED);
-                                document.setDocumentStatus(documentStatus);
-                                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(document);
-                                Message.showInfo(getUILocaleUtil().getCaption("signed"));
-                                close();
-                                prevView.getInOnSignDocsGW().refresh();
-                            }catch (PasswordException pe){
-                                Message.showError(pe.toString());
-                                pe.printStackTrace();
-                            }catch (Exception e){
-                                Message.showError(e.getMessage());
-                                e.printStackTrace();
-                            }
-                        }
-                    });
-                    upload.setImmediate(true);
-                    upload.setButtonCaption("Start Upload");
+                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(document);
 
-                    getContent().addComponent(passwordField);
-                    upload.addSucceededListener(receiver);
-                    getContent().addComponent(upload);
+                    QueryModel<DOCUMENT_SIGNER> documentSignerQM = new QueryModel<>(DOCUMENT_SIGNER.class);
+                    documentSignerQM.addWhere("document", ECriteria.EQUAL, document.getId());
+                    documentSignerQM.addWhereAnd("employee", ECriteria.EQUAL, CommonUtils.getCurrentUser().getId());
+                    documentSignerQM.addWhereAnd("documentSignerStatus", ECriteria.NOT_EQUAL, WorkflowCommonUtils.getDocumentSignerStatusByName(DOCUMENT_SIGNER_STATUS.SIGNED).getId());
 
+                    List<DOCUMENT_SIGNER> documentSignerss = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(documentSignerQM);
+                    if(documentSignerss.size()>0){
+                        documentSignerss.get(0).setDocumentSignerStatus(WorkflowCommonUtils.getDocumentSignerStatusByName(DOCUMENT_SIGNER_STATUS.SIGNED));
+                        documentSignerss.get(0).setUpdated(new Date());
+                        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(documentSignerss.get(0));
+                    }
+                    checkIfAllSignersSignedDocument(document);
+                    Message.showInfo(getUILocaleUtil().getCaption("signed"));
+                    close();
+
+                }catch (PasswordException pe){
+                    Message.showError(getUILocaleUtil().getMessage("incorrect.password"));
+                    pe.printStackTrace();
+                }catch (IOException e){
+                    Message.showError(getUILocaleUtil().getMessage("incorrect.password"));
+                    e.printStackTrace();
+                }catch (Exception e){
+                    Message.showError(e.getMessage());
+                    e.printStackTrace();
                 }
             }
         });
+        upload.setImmediate(true);
+        upload.setButtonCaption(getUILocaleUtil().getMessage("start.to.upload"));
 
-        Embedded pdf = new Embedded(null, EmployeePdfCreator.createResourceStudent(document));
-        pdf.setSizeFull();
-        pdf.setMimeType("application/pdf");
-        pdf.setType(2);
-        pdf.setSizeFull();
-        pdf.setHeight(700, Unit.PIXELS);
-        getContent().removeAllComponents();
-        getContent().addComponent(pdf);
+        content.addComponent(passwordField);
+        content.setComponentAlignment(passwordField, Alignment.MIDDLE_CENTER);
 
-        getContent().addComponent(documentSignerStatusCB);
+        upload.addSucceededListener(receiver);
+        content.addComponent(upload);
+        content.setComponentAlignment(upload, Alignment.MIDDLE_CENTER);
 
+
+
+        getContent().addComponent(content);
+        getContent().setComponentAlignment(content, Alignment.MIDDLE_CENTER);
+
+
+        AbstractWebUI.getInstance().addWindow(this);
+    }
+
+        class FileUploader implements Upload.Receiver, Upload.SucceededListener {
+            private File file;
+
+            public FileUploader(File file){
+                this.file = file;
+            }
+
+            @Override
+            public OutputStream receiveUpload(String filename, String mimeType) {
+                FileOutputStream fos = null; // Stream to write to
+                try {
+                    file = new File(filename);
+                    fos = new FileOutputStream(file);
+
+                } catch (final java.io.FileNotFoundException e) {
+                    new Notification("Could not open file",
+                            e.getMessage(),
+                            Notification.Type.ERROR_MESSAGE)
+                            .show(Page.getCurrent());
+                    return null;
+                }
+                return fos;
+            }
+
+            @Override
+            public void uploadSucceeded(Upload.SucceededEvent event) {
+
+            }
+
+            public File getFile() {
+                return file;
+            }
+        }
+
+    public static void checkIfAllSignersSignedDocument(DOCUMENT document){
+        List<DOCUMENT_SIGNER> documentSigners = new ArrayList<>();
+        QueryModel<DOCUMENT_SIGNER> documentSignerQM = new QueryModel<>(DOCUMENT_SIGNER.class);
+        documentSignerQM.addWhere("document" ,ECriteria.EQUAL, document.getId());
+        try{
+            documentSigners.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(documentSignerQM));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        boolean flag = true;
+        for(DOCUMENT_SIGNER ds :documentSigners){
+            if(!ds.getDocumentSignerStatus().getStatusName().equalsIgnoreCase(WorkflowCommonUtils.getDocumentSignerStatusByName(DOCUMENT_SIGNER_STATUS.SIGNED).getStatusName())){
+                flag = false;
+                break;
+            }
+        }
+
+        if(flag){
+            document.setUpdated(new Date());
+            document.setDocumentStatus(WorkflowCommonUtils.getDocumentStatusByName(DOCUMENT_STATUS.ACCEPTED));
+            try{
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(document);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
     }
 
     public byte[] sign(File keyFile, String password , DOCUMENT document) throws IOException, DocumentException, GeneralSecurityException {
@@ -175,7 +215,7 @@ public class SignDocumentViewDialog extends AbstractDialog implements EntityList
 
         PdfSignatureAppearance appearance = stamper.getSignatureAppearance();
         appearance.setCertificate(certificateChain[0]);
-        appearance.setVisibleSignature(new Rectangle(250,50,10,10) , 1 , "Signature1");
+        //appearance.setVisibleSignature(new Rectangle(250,50,10,10) , 1 , "Signature1");
 
         ExternalSignature externalSignature = new PrivateKeySignature(privateKey, "SHA-256", null);
         ExternalDigest externalDigest = new BouncyCastleDigest();
@@ -273,4 +313,6 @@ public class SignDocumentViewDialog extends AbstractDialog implements EntityList
     public void onException(Object o, Throwable throwable) {
 
     }
+
+
 }

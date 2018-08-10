@@ -7,6 +7,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import kz.halyqsoft.univercity.entity.beans.USERS;
+import kz.halyqsoft.univercity.entity.beans.USER_ROLES;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_DATA;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
@@ -30,13 +31,20 @@ import org.slf4j.LoggerFactory;
 
 import javax.persistence.NoResultException;
 import java.math.BigInteger;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import kz.halyqsoft.univercity.entity.beans.ROLES;
 
 /**
  * @author Omarbek
  * @created on 15.03.2018
  */
 public class CommonUtils {
+
+
+    public static final String DATETIME = "yyyy-MM-dd' 'HH:mm:ss.SSS";
+    public static final String DATE = "dd.MM.yyyy";
 
     public static final Logger LOG = LoggerFactory.getLogger("ROOT");
     public static int currentYear = Calendar.getInstance().get(Calendar.YEAR);
@@ -62,6 +70,25 @@ public class CommonUtils {
             CommonUtils.showMessageAndWriteLog("Unable to get user", e);
         }
         return null;
+    }
+
+    public static List<ROLES> getCurrentUserRolesList(){
+        ArrayList<ROLES> roles = new ArrayList<>();
+        QueryModel<USER_ROLES> userRolesQM = new QueryModel<>(USER_ROLES.class);
+        userRolesQM.addWhere("user", ECriteria.EQUAL , getCurrentUser().getId());
+
+        List<USER_ROLES> userRoles = new ArrayList<>();
+        try{
+            userRoles.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(userRolesQM));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        for(USER_ROLES ur : userRoles){
+            roles.add(ur.getRole());
+        }
+
+        return roles;
     }
 
     private static STUDENT getStudent(Map<String, Object> params) {
@@ -217,6 +244,11 @@ public class CommonUtils {
             login = getLogin(login + sequenceForEmployee++);
         }
         return login;
+    }
+
+    public static String getFormattedDate(Date date){
+        DateFormat formatter = new SimpleDateFormat(DATETIME);
+        return  formatter.format(date);
     }
 
     public static String getCode(String beginYear) {

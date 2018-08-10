@@ -95,7 +95,10 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
 
     private static final int UKPU = 1;
 
-    public StudentEdit(final FormModel baseDataFM, VerticalLayout mainVL, StudentOrApplicantView studentOrApplicantView)
+    private static final String PATH_TO_PHOTO = "/var/www/html/files/photos/";
+
+    public StudentEdit(final FormModel baseDataFM, VerticalLayout mainVL,
+                       StudentOrApplicantView studentOrApplicantView)
             throws Exception {
         super();
         this.mainVL = mainVL;
@@ -410,7 +413,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         createParentsTab(readOnly);
         createAwardsTab(readOnly);
         createSocialCategoriesTab(readOnly);
-//        createDebtAndPaymentTab(readOnly);//TODO add later
+        createDebtAndPaymentTab(readOnly);
         if (student.getCategory().getId().equals(STUDENT_CATEGORY.STUDENT_ID)) {
             createDiplomaTab(readOnly);
         }
@@ -2437,7 +2440,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
     public void handlePhotoWidgetEvent(PhotoWidgetEvent ev) {
         if (ev.getEvent() == PhotoWidgetEvent.CHANGED) {
             userPhotoBytes = ev.getBytes();
-            userPhotoFilename = ev.getFilename();
+            userPhotoFilename = PATH_TO_PHOTO +ev.getFilename();
             userPhotoChanged = true;
         }
     }

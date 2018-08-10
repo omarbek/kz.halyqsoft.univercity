@@ -2,7 +2,6 @@ package kz.halyqsoft.univercity.utils.register;
 
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.data.validator.IntegerRangeValidator;
-import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
@@ -116,6 +115,8 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
         dataFM.getFieldModel("phoneMobile").setRequired(true);
         dataFM.getFieldModel("code").setInEdit(false);
         dataFM.getFieldModel("card").setInEdit(false);
+        dataFM.getFieldModel("login").setInEdit(false);
+        dataFM.getFieldModel("login").setInView(false);
 
         udfQM = new QueryModel<>(USER_DOCUMENT_FILE.class);
         udfQM.addSelect("id");

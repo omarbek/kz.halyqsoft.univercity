@@ -35,6 +35,7 @@ public class ComplaintsEdit extends AbstractFormWidgetView {
     private RichTextArea description;
 
     ComplaintsEdit() {
+        setBackButtonVisible(false);
         buildComplaintsEditTab();
         buildMyComplaintsEditTab();//TODO
     }

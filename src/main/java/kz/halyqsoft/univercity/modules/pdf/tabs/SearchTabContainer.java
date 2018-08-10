@@ -1,13 +1,13 @@
-package kz.halyqsoft.univercity.modules.pdf;
+package kz.halyqsoft.univercity.modules.pdf.tabs;
 
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.server.FileResource;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.PDF_DOCUMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.PDF_PROPERTY;
+import kz.halyqsoft.univercity.modules.pdf.MyFileEdit;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.apache.commons.io.FileUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
@@ -29,7 +29,7 @@ public class SearchTabContainer extends AbstractCommonView {
 
     private Table docTable;
     private final static String FILE_NAME = "fileName";
-    private final static String TITLE = "title";
+    private final static String CREATED = "created";
 
 
     public SearchTabContainer() throws Exception{
@@ -102,8 +102,8 @@ public class SearchTabContainer extends AbstractCommonView {
         docTable.setMultiSelect(true);
         docTable.setSelectable(true);
         docTable.setCaption(getUILocaleUtil().getCaption("my.documents"));
-        docTable.setColumnHeader(TITLE, getUILocaleUtil().getCaption("title"));
         docTable.setColumnHeader(FILE_NAME, getUILocaleUtil().getCaption("file.name"));
+        docTable.setColumnHeader(CREATED, getUILocaleUtil().getCaption("created"));
 
         setAllColumnWidth();
         setAllColumnAlign();
@@ -123,16 +123,16 @@ public class SearchTabContainer extends AbstractCommonView {
         BeanItemContainer<PDF_DOCUMENT> docBIC = new BeanItemContainer<>(PDF_DOCUMENT.class, SessionFacadeFactory.
                 getSessionFacade(CommonEntityFacadeBean.class).lookup(docQM));
         docTable.setContainerDataSource(docBIC);
-        docTable.setVisibleColumns(TITLE, FILE_NAME/*, OPEN_DOC_BUTTON, OPEN_BUTTON*/);
+        docTable.setVisibleColumns(FILE_NAME,CREATED /*, OPEN_DOC_BUTTON, OPEN_BUTTON*/);
     }
 
     private void setAllColumnAlign() {
-        docTable.setColumnAlignment(TITLE, Table.Align.CENTER);
         docTable.setColumnAlignment(FILE_NAME, Table.Align.CENTER);
+        docTable.setColumnAlignment(CREATED, Table.Align.CENTER);
     }
     private void setAllColumnWidth() {//TODO
-        docTable.setColumnWidth(TITLE, 805);//370
-        docTable.setColumnWidth(FILE_NAME, 500);//333
+        docTable.setColumnWidth(FILE_NAME, 805);//333
+        docTable.setColumnWidth(CREATED, 500);//370
     }
 
 

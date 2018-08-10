@@ -13,7 +13,13 @@
     </facet>
     <facet type="gwt" name="GWT">
       <configuration>
+        <setting name="compilerMaxHeapSize" value="1024" />
+        <setting name="gwtScriptOutputStyle" value="DETAILED" />
+        <setting name="gwtSdkUrl" value="file://" />
         <setting name="webFacet" value="Web" />
+        <packaging>
+          <module name="kz.halyqsoft.univercity.UnivercityWidgetset" enabled="false" />
+        </packaging>
       </configuration>
     </facet>
     <facet type="jpa" name="JPA">
@@ -21,6 +27,8 @@
         <setting name="validation-enabled" value="true" />
         <setting name="provider-name" value="" />
         <datasource-mapping>
+          <factory-entry name="Entities" />
+          <factory-entry name="KBTU-PU" />
           <factory-entry name="UNIVER-PU" />
         </datasource-mapping>
         <deploymentDescriptor name="persistence.xml" url="file://$MODULE_DIR$/src/main/resources/META-INF/persistence.xml" />
@@ -94,5 +102,14 @@
     <orderEntry type="library" name="Maven: org.apache.xmlbeans:xmlbeans:2.6.0" level="project" />
     <orderEntry type="library" name="Maven: stax:stax-api:1.0.1" level="project" />
     <orderEntry type="library" name="Maven: com.github.virtuald:curvesapi:1.04" level="project" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$USER_HOME$/Downloads/chilkat-9.5.0-jdk8-x64/chilkat-9.5.0-jdk8-x64/chilkat.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
