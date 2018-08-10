@@ -22,6 +22,7 @@ public final class FStudentFilter extends AbstractFilterBean {
     private STUDENT_EDUCATION_TYPE educationType;
     private String dormStatus;
     private CARD card;
+    private STUDENT_DIPLOMA_TYPE studentDiplomaType;
 
     public FStudentFilter() {
     }
@@ -114,10 +115,18 @@ public final class FStudentFilter extends AbstractFilterBean {
         this.card = card;
     }
 
+    public STUDENT_DIPLOMA_TYPE getStudentDiplomaType() {
+        return studentDiplomaType;
+    }
+
+    public void setStudentDiplomaType(STUDENT_DIPLOMA_TYPE studentDiplomaType) {
+        this.studentDiplomaType = studentDiplomaType;
+    }
+
     @Override
     public boolean hasFilter() {
         return !(code == null && firstname == null && lastname == null && studentStatus == null
                 && lockReason == null && faculty == null && speciality == null && studyYear == null
-                && educationType == null && dormStatus == null && card == null);
+                && educationType == null && dormStatus == null && card == null && studentDiplomaType == null);
     }
 }
