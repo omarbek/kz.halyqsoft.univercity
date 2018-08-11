@@ -1,7 +1,10 @@
 package kz.halyqsoft.univercity.entity.beans.univercity.view;
 
 import kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.CANDIDATE;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEGREE;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.QUALIFICATION;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SPECIALITY;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
@@ -48,6 +51,7 @@ public class V_EMPLOYEE_DEGREE extends AbstractEntity {
 	@Column(name = "EXPIRE_DATE")
     @Temporal(TemporalType.DATE)
     private Date expireDate;
+
 	
 	@FieldInfo(type = EFieldType.FK_COMBO, order = 5, inGrid = false)
     @ManyToOne
@@ -60,14 +64,36 @@ public class V_EMPLOYEE_DEGREE extends AbstractEntity {
 	private String degreeName;
 	
 	@FieldInfo(type = EFieldType.TEXT, max = 64, order = 7)
-	@Column(name = "SCHOOL_NAME", nullable = false)
-	private String schoolName;
+	@Column(name = "place_of_issue", nullable = false)
+	private String placeOfIssue;
 	
 	@FieldInfo(type = EFieldType.TEXT, max = 64, order = 8, inGrid = false)
 	@Column(name = "DISSERTATION_TOPIC", nullable = false)
 	private String dissertationTopic;
+
+	@FieldInfo(type = EFieldType.FK_COMBO,required = false, order = 9)
+	@ManyToOne
+	@JoinColumns({
+			@JoinColumn(name = "CANDIDATE_ID", referencedColumnName = "ID")})
+	private CANDIDATE candidate;
+
+	@FieldInfo(type = EFieldType.FK_COMBO,required = false, order = 10)
+	@ManyToOne
+	@JoinColumns({
+			@JoinColumn(name = "SPECIALITY_ID", referencedColumnName = "ID")})
+	private SPECIALITY speciality;
+
+	@FieldInfo(type = EFieldType.FK_COMBO, required = false, order = 11)
+	@ManyToOne
+	@JoinColumns({
+			@JoinColumn(name = "QUALIFICATION_ID", referencedColumnName = "ID")})
+	private QUALIFICATION qualification;
+
+	@FieldInfo(type = EFieldType.DATE, max = 2099, required = false, order = 12)
+	@Column(name = "ENTRANCE_YEAR", nullable = false)
+	private Date entranceYear;
 	
-	@FieldInfo(type = EFieldType.BOOLEAN, order = 20, required = false, inEdit = false, inGrid = false, inView = false)
+	@FieldInfo(type = EFieldType.BOOLEAN, order = 13, required = false, inEdit = false, inGrid = false, inView = false)
 	@Column(name = "DELETED", nullable = false)
     private boolean deleted;
 	
@@ -126,12 +152,12 @@ public class V_EMPLOYEE_DEGREE extends AbstractEntity {
 		this.degreeName = degreeName;
 	}
 
-	public String getSchoolName() {
-		return schoolName;
+	public String getPlaceOfIssue() {
+		return placeOfIssue;
 	}
 
-	public void setSchoolName(String schoolName) {
-		this.schoolName = schoolName;
+	public void setPlaceOfIssue(String placeOfIssue) {
+		this.placeOfIssue = placeOfIssue;
 	}
 
 	public String getDissertationTopic() {
@@ -156,5 +182,41 @@ public class V_EMPLOYEE_DEGREE extends AbstractEntity {
 
 	public void setFileList(List<FileBean> fileList) {
 		this.fileList = fileList;
+	}
+
+	public static long getSerialVersionUID() {
+		return serialVersionUID;
+	}
+
+	public CANDIDATE getCandidate() {
+		return candidate;
+	}
+
+	public void setCandidate(CANDIDATE candidate) {
+		this.candidate = candidate;
+	}
+
+	public SPECIALITY getSpeciality() {
+		return speciality;
+	}
+
+	public void setSpeciality(SPECIALITY speciality) {
+		this.speciality = speciality;
+	}
+
+	public QUALIFICATION getQualification() {
+		return qualification;
+	}
+
+	public void setQualification(QUALIFICATION qualification) {
+		this.qualification = qualification;
+	}
+
+	public Date getEntranceYear() {
+		return entranceYear;
+	}
+
+	public void setEntranceYear(Date entranceYear) {
+		this.entranceYear = entranceYear;
 	}
 }

@@ -2728,8 +2728,12 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
                 ed.setIssueDate(ved.getIssueDate());
                 ed.setExpireDate(ved.getExpireDate());
                 ed.setDegree(ved.getDegree());
-                ed.setSchoolName(ved.getSchoolName());
+                ed.setPlaceOfIssue(ved.getPlaceOfIssue());
                 ed.setDissertationTopic(ved.getDissertationTopic());
+                ed.setCandidate(ved.getCandidate());
+                ed.setSpeciality(ved.getSpeciality());
+                ed.setQualification(ved.getQualification());
+                ed.setEntranceYear(ved.getEntranceYear());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(ed);
 
                 QueryModel scientificDegreeQM = ((DBTableModel) scientificDegreeTW.getWidgetModel()).getQueryModel();
@@ -2747,8 +2751,12 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
                 ed.setIssueDate(ved.getIssueDate());
                 ed.setExpireDate(ved.getExpireDate());
                 ed.setDegree(ved.getDegree());
-                ed.setSchoolName(ved.getSchoolName());
+                ed.setPlaceOfIssue(ved.getPlaceOfIssue());
                 ed.setDissertationTopic(ved.getDissertationTopic());
+                ed.setCandidate(ved.getCandidate());
+                ed.setSpeciality(ved.getSpeciality());
+                ed.setQualification(ved.getQualification());
+                ed.setEntranceYear(ved.getEntranceYear());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(ed);
                 scientificDegreeTW.refresh();
                 showSavedNotification();
