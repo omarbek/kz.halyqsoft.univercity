@@ -28,10 +28,10 @@ import java.util.List;
 
 public class EmployeePdfCreator {
 
-    public static StreamResource createResourceStudent(DOCUMENT document) {
+    public static StreamResource createResourceWithReloadingResource(DOCUMENT document) {
         String fileName = document.getPdfDocument().getFileName()+"_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
 
-        return new StreamResource(new StreamResource.StreamSource() {
+        StreamResource sr = new StreamResource(new StreamResource.StreamSource() {
             @Override
             public InputStream getStream() {
                 Document docum = new Document();
@@ -187,6 +187,7 @@ public class EmployeePdfCreator {
                     pdfWriter.close();
                     docum.close();
                     document.setFileByte(byteArrayOutputStream1.toByteArray());
+
                     return new ByteArrayInputStream(byteArrayOutputStream1.toByteArray());
 
                 } catch (Exception e) {
@@ -195,6 +196,8 @@ public class EmployeePdfCreator {
                 }
             }
         }, fileName);
+        sr.setCacheTime(0);
+        return  sr;
     }
 
     private static String setReplaced(String text, USERS employee) {
@@ -275,18 +278,31 @@ public class EmployeePdfCreator {
         }, fileName);
     }
 
+    public static StreamResource getStreamResourceFromDocument(DOCUMENT document){
+        StreamResource ss =  new StreamResource(new StreamResource.StreamSource() {
+            @Override
+            public InputStream getStream() {
+                return new ByteArrayInputStream(document.getFileByte());
+            }
+        }, document.getPdfDocument().getFileName());
+        ss.setCacheTime(0);
+        return ss;
+    }
+
     public static StreamResource getStreamResourceFromByte(byte[] file, String fileName){
-         return new StreamResource(new StreamResource.StreamSource() {
+         StreamResource sr = new StreamResource(new StreamResource.StreamSource() {
              @Override
              public InputStream getStream() {
                  return new ByteArrayInputStream(file);
              }
          }, fileName);
+         sr.setCacheTime(0);
+         return  sr;
     }
 
 
     public static StreamResource getResource(String filePath , File file) {
-        return new StreamResource(new StreamResource.StreamSource() {
+        StreamResource sr =  new StreamResource(new StreamResource.StreamSource() {
 
             @Override
             public InputStream getStream() {
@@ -309,6 +325,8 @@ public class EmployeePdfCreator {
             }
 
         }, file.getName());
+        sr.setCacheTime(0);
+        return sr;
     }
 
     public static boolean deleteRelatedDoc(DOCUMENT document){

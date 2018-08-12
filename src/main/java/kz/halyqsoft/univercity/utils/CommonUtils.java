@@ -42,6 +42,7 @@ import kz.halyqsoft.univercity.entity.beans.ROLES;
  */
 public class CommonUtils {
 
+    public static final String PDF_MIME_TYPE = "application/pdf";
 
     public static final String DATETIME = "yyyy-MM-dd' 'HH:mm:ss.SSS";
     public static final String DATE = "dd.MM.yyyy";
