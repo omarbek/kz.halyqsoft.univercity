@@ -209,6 +209,7 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_GROUPS_CREATION_NEEDED</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.VGraduateEmployment</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_STUDENT_DIFFERENCE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_MASTER</class>
 
 
         <class>kz.halyqsoft.univercity.entity.beans.univercity.AbstractSpiderEntity</class>
@@ -345,6 +346,7 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.PRACTICE_STUDENT</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.SUBSTITUTION</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.CHILD</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.MASTER</class>
 
         <class>kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_DIFFERENCE</class>
 
