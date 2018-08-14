@@ -5,6 +5,7 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.DORM_STUDENT;
+import kz.halyqsoft.univercity.entity.beans.univercity.DORM_STUDENT_VIOLATION;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_EDUCATION;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DORM;
@@ -35,6 +36,7 @@ public class StudentDormView extends AbstractTaskView {
     private STUDENT student;
     private String faculty;
     private Label alreadyExistL, roomL, addressL, dormL;
+    private Label violationL,reasonL;
 
     public StudentDormView(AbstractTask task) throws Exception {
         super(task);
@@ -253,17 +255,59 @@ public class StudentDormView extends AbstractTaskView {
             getContent().addComponent(buttonsHL);
             getContent().setComponentAlignment(buttonsHL,Alignment.MIDDLE_CENTER);
         }else{
-            getContent().addComponent(alreadyExistL);
-            getContent().setComponentAlignment(alreadyExistL,Alignment.MIDDLE_CENTER);
+            QueryModel<DORM_STUDENT> violationQM = new QueryModel<DORM_STUDENT>(DORM_STUDENT.class);
+            FromItem from = violationQM.addJoin(EJoin.INNER_JOIN, "student", STUDENT_EDUCATION.class, "id");
+            violationQM.addWhere(from, "student", ECriteria.EQUAL, CommonUtils.getCurrentUser().getId());
 
-            getContent().addComponent(addressL);
-            getContent().setComponentAlignment(addressL,Alignment.MIDDLE_CENTER);
+            DORM_STUDENT ds = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(violationQM);
+            if(ds.getCheckOutDate()==null){
+                getContent().addComponent(alreadyExistL);
+                getContent().setComponentAlignment(alreadyExistL, Alignment.MIDDLE_CENTER);
 
-            getContent().addComponent(dormL);
-            getContent().setComponentAlignment(dormL,Alignment.MIDDLE_CENTER);
+                getContent().addComponent(addressL);
+                getContent().setComponentAlignment(addressL, Alignment.MIDDLE_CENTER);
 
-            getContent().addComponent(roomL);
-            getContent().setComponentAlignment(roomL,Alignment.MIDDLE_CENTER);
+                getContent().addComponent(dormL);
+                getContent().setComponentAlignment(dormL, Alignment.MIDDLE_CENTER);
+
+                getContent().addComponent(roomL);
+                getContent().setComponentAlignment(roomL, Alignment.MIDDLE_CENTER);
+
+            }else{
+
+                QueryModel<DORM_STUDENT_VIOLATION> dormStudentViolationQM = new QueryModel<DORM_STUDENT_VIOLATION>(DORM_STUDENT_VIOLATION.class);
+                dormStudentViolationQM.addWhere("dormStudent", ECriteria.EQUAL, ds.getId());
+                DORM_STUDENT_VIOLATION dv = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(dormStudentViolationQM);
+
+                violationL = new Label();
+                violationL.setCaption("<html><b>"+getUILocaleUtil().getCaption("violationL")+"</b>");
+                violationL.setWidth(200, Unit.PIXELS);
+                violationL.setCaptionAsHtml(true);
+
+                reasonL = new Label();
+                reasonL.setCaption(getUILocaleUtil().getCaption("reasonL"));
+                reasonL.setWidth(200, Unit.PIXELS);
+                reasonL.setValue(dv.getViolationType().getTypeName());
+
+                roomL = new Label();
+                roomL.setCaption(getUILocaleUtil().getCaption("roomL"));
+                roomL.setWidth(200, Unit.PIXELS);
+                roomL.setValue(ds.getRoom().getRoomNo());
+
+                inFL.addComponent(violationL);
+                inFL.addComponent(reasonL);
+                inFL.addComponent(roomL);
+
+                getContent().addComponent(violationL);
+                getContent().setComponentAlignment(violationL, Alignment.MIDDLE_CENTER);
+
+                getContent().addComponent(reasonL);
+                getContent().setComponentAlignment(reasonL, Alignment.MIDDLE_CENTER);
+
+                getContent().addComponent(roomL);
+                getContent().setComponentAlignment(roomL, Alignment.MIDDLE_CENTER);
+
+            }
         }
     }
 

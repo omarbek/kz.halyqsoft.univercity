@@ -47,6 +47,7 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
 
     private final EmployeeFilterPanel filterPanel;
     private GridWidget teacherGW;
+    private ComboBox cb;
 
     public EmployeeView(AbstractTask task) throws Exception {
         super(task);
@@ -60,17 +61,18 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
         tf.setNullRepresentation("");
         tf.setNullSettingAllowed(true);
         filterPanel.addFilterComponent("code", tf);
-//        TextField tf = new TextField();
-//        tf.setNullRepresentation("");
-//        tf.setNullSettingAllowed(true);
-//        filterPanel.addFilterComponent("firstname", tf);
-//
-//        tf = new TextField();
-//        tf.setNullRepresentation("");
-//        tf.setNullSettingAllowed(true);
-//        filterPanel.addFilterComponent("lastname", tf);
 
-        ComboBox cb = new ComboBox();
+         tf = new TextField();
+        tf.setNullRepresentation("");
+        tf.setNullSettingAllowed(true);
+        filterPanel.addFilterComponent("firstname", tf);
+
+        tf = new TextField();
+        tf.setNullRepresentation("");
+        tf.setNullSettingAllowed(true);
+        filterPanel.addFilterComponent("lastname", tf);
+
+         cb = new ComboBox();
         cb.setNullSelectionAllowed(true);
         cb.setTextInputAllowed(true);
         cb.setFilteringMode(FilteringMode.OFF);
@@ -112,6 +114,15 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
         getContent().addComponent(filterPanel);
         getContent().setComponentAlignment(filterPanel, Alignment.TOP_CENTER);
 
+        cb = new ComboBox();
+        cb.setNullSelectionAllowed(true);
+        cb.setTextInputAllowed(true);
+        cb.setFilteringMode(FilteringMode.OFF);
+        for(int i = 1; i<19; i++) {
+            cb.addItem(i);
+        }
+        filterPanel.addFilterComponent("childAge", cb);
+
         teacherGW = new GridWidget(VEmployee.class);
         teacherGW.addEntityListener(this);
         teacherGW.showToolbar(true);
@@ -141,19 +152,19 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
             sb.append(ef.getCode().trim().toLowerCase());
             sb.append("%'");
         }
-//        if (ef.getFirstname() != null && ef.getFirstname().trim().length() >= 3) {
-//            sb.append("lower(usr.FIRST_NAME) like '");
-//            sb.append(ef.getFirstname().trim().toLowerCase());
-//            sb.append("%'");
-//        }
-//        if (ef.getLastname() != null && ef.getLastname().trim().length() >= 3) {
-//            if (sb.length() > 0) {
-//                sb.append(" and ");
-//            }
-//            sb.append("lower(usr.LAST_NAME) like '");
-//            sb.append(ef.getLastname().trim().toLowerCase());
-//            sb.append("%'");
-//        }
+        if (ef.getFirstname() != null && ef.getFirstname().trim().length() >= 3) {
+            sb.append("lower(usr.FIRST_NAME) like '");
+            sb.append(ef.getFirstname().trim().toLowerCase());
+            sb.append("%'");
+        }
+        if (ef.getLastname() != null && ef.getLastname().trim().length() >= 3) {
+            if (sb.length() > 0) {
+                sb.append(" and ");
+            }
+            sb.append("lower(usr.LAST_NAME) like '");
+            sb.append(ef.getLastname().trim().toLowerCase());
+            sb.append("%'");
+        }
         if (ef.getCard() != null) {
             params.put(i, ef.getCard().getId().getId());
             if (sb.length() > 0) {
@@ -178,8 +189,16 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
             sb.append("empl_dept.POST_ID = ?");
             sb.append(i++);
         }
+        if (ef.getChildAge() != null) {
+            if (sb.length() > 0) {
+                sb.append(" and ");
+            }
+            sb.append(" date_part('year',age(c2.birth_date)) <= "+ef.getChildAge()+" ");
+            i++;
+        }
 
         List<VEmployee> list = new ArrayList<>();
+
         if (sb.length() > 0) {
             sb.append(" and ");
         }
@@ -193,9 +212,10 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
                 "FROM EMPLOYEE empl INNER JOIN USERS usr ON empl.ID = usr.ID " +
                 "  LEFT JOIN EMPLOYEE_DEPT empl_dept ON empl_dept.EMPLOYEE_ID = empl.ID AND empl_dept.DISMISS_DATE IS NULL " +
                 "  LEFT JOIN DEPARTMENT dep ON empl_dept.DEPT_ID = dep.ID " +
-                "  LEFT JOIN POST post ON empl_dept.POST_ID = post.id " + sb.toString() +
-                " usr.id not in (1,2) and usr.deleted = FALSE" +
-                " order by FIO";
+                "  LEFT JOIN POST post ON empl_dept.POST_ID = post.id " +
+                " LEFT JOIN child c2 on empl.id = c2.employee_id " + sb.toString() +
+                " usr.id not in (1,2) and usr.deleted = FALSE " +
+                " order by FIO ";
         try {
             List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
             if (!tmpList.isEmpty()) {
