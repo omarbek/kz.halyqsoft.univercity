@@ -79,7 +79,12 @@ public final class StudentFilterPanel extends AbstractFilterPanel {
 		if (af != null) {
 			hl.addComponent(af);
 		}
-		
+
+		af = getFilterComponent("studentDiplomaType");
+		if (af != null) {
+			hl.addComponent(af);
+		}
+
 		getContent().addComponent(hl);
 		getContent().setComponentAlignment(hl, Alignment.MIDDLE_CENTER);
 	}

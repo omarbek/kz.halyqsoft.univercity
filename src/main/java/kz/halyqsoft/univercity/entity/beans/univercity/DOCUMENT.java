@@ -67,11 +67,11 @@ public class DOCUMENT extends AbstractEntity{
     private boolean deleted;
 
 
-    @FieldInfo(inGrid = false , inView = false , inEdit = false, order = 10)
-    @Column(name = "file_byte")
-    @Lob
+    @FieldInfo(inGrid = false , inView = false , inEdit = false, order = 10, isFile = true)
+    @Column(name = "file_byte" , nullable = true)
     @Basic(fetch = FetchType.LAZY)
     private byte[] fileByte;
+
 
     @FieldInfo(type = EFieldType.TEXT,inEdit = false, inView = false , inGrid = false, order = 11)
     @Column(name = "related_document_file_path")

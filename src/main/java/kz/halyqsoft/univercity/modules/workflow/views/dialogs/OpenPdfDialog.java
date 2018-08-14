@@ -52,11 +52,6 @@ public class OpenPdfDialog extends WindowUtils{
                     documentSigner.setUpdated(new Date());
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(documentSigner);
 
-
-                    if(baseView instanceof InOnAgreeView){
-                        ((InOnAgreeView)baseView).getDbGridModel().setEntities(((InOnAgreeView) baseView).getList());
-                    }
-
                     close();
                 }catch (Exception e){
                     e.printStackTrace();
@@ -79,7 +74,7 @@ public class OpenPdfDialog extends WindowUtils{
         refusedVL.setImmediate(true);
         refusedVL.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
 
-        Embedded pdf = new Embedded(null, EmployeePdfCreator.createResourceStudent( document));
+        Embedded pdf = new Embedded(null, EmployeePdfCreator.getStreamResourceFromDocument( document));
 
         pdf.setImmediate(true);
         pdf.setSizeFull();
@@ -87,14 +82,20 @@ public class OpenPdfDialog extends WindowUtils{
         pdf.setType(2);
         pdf.setHeight(570,Unit.PIXELS);
 
+
+        mainVL.setHeight(100, Unit.PERCENTAGE);
+        mainVL.addComponent(pdf);
+
         TextArea textArea = new TextArea( document.getCreatorEmployee().getFirstName() + " " + document.getCreatorEmployee().getLastName() + ": " + getUILocaleUtil().getCaption("message")  ) ;
-        textArea.setValue(document.getMessage());
+        if(document.getMessage()!=null){
+            textArea.setValue(document.getMessage());
+        }else{
+            textArea.setValue("");
+        }
         textArea.setWordwrap(true);
         textArea.setImmediate(true);
         textArea.setReadOnly(true);
         textArea.setWidth(100, Unit.PERCENTAGE);
-        mainVL.setHeight(100, Unit.PERCENTAGE);
-        mainVL.addComponent(pdf);
         mainVL.addComponent(textArea);
 
         if(document.getRelatedDocumentFilePath()!=null){

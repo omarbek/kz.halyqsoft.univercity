@@ -156,6 +156,17 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
         cb.setContainerDataSource(educationTypeBIC);
         studentFilterPanel.addFilterComponent("educationType", cb);
 
+        cb = new ComboBox();
+        cb.setNullSelectionAllowed(true);
+        cb.setTextInputAllowed(false);
+        cb.setFilteringMode(FilteringMode.STARTSWITH);
+        cb.setPageLength(0);
+        QueryModel<STUDENT_DIPLOMA_TYPE> diplomaTypeQM = new QueryModel<>(STUDENT_DIPLOMA_TYPE.class);
+        BeanItemContainer<STUDENT_DIPLOMA_TYPE> diplomaTypeBIC = new BeanItemContainer<>(STUDENT_DIPLOMA_TYPE.class,
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(diplomaTypeQM));
+        cb.setContainerDataSource(diplomaTypeBIC);
+        studentFilterPanel.addFilterComponent("studentDiplomaType", cb);
+
 
         return studentFilterPanel;
     }
@@ -413,7 +424,7 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
             if (sb.length() > 0) {
                 sb.append(" and ");
             }
-            sb.append(" and stu.FIRST_NAME ilike '");
+            sb.append("  stu.FIRST_NAME ilike '");
             sb.append(sf.getFirstname().trim());
             sb.append("%'");
         }
@@ -450,6 +461,10 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
             params.put(i, sf.getEducationType().getId().getId());
             sb.append(" and stu.education_type_id = ?" + i++);
         }
+        if (sf.getStudentDiplomaType() != null) {
+            params.put(i, sf.getStudentDiplomaType().getId().getId());
+            sb.append(" and st.diploma_type_id = ?" + i++);
+        }
 
         List<VStudent> list = new ArrayList<>();
         sb.insert(0, " where stu.category_id = " + categoryType);
@@ -461,6 +476,8 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
                 "  stu.faculty_short_name                                                               FACULTY, " +
                 "  stu.speciality_name                                                                  SPEC_NAME " +
                 "FROM V_STUDENT stu " +
+                "  INNER JOIN student st on st.id = stu.id\n" +
+                "  INNER JOIN student_diploma_type t on st.diploma_type_id = t.id" +
                 sb.toString() +
                 " ORDER BY FIO";
         try {

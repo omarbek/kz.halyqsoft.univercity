@@ -14,11 +14,12 @@ public final class FEmployeeFilter extends AbstractFilterBean {
     private static final long serialVersionUID = 6675454138920254736L;
 
     private String code;
-    //	private String firstname;
-//	private String lastname;
+    private String firstname;
+	private String lastname;
     private DEPARTMENT department;
     private POST post;
     private CARD card;
+    private Integer childAge;
 
     public FEmployeeFilter() {
     }
@@ -31,21 +32,21 @@ public final class FEmployeeFilter extends AbstractFilterBean {
         this.code = code;
     }
 
-//	public String getFirstname() {
-//		return firstname;
-//	}
-//
-//	public void setFirstname(String firstname) {
-//		this.firstname = firstname;
-//	}
-//
-//	public String getLastname() {
-//		return lastname;
-//	}
-//
-//	public void setLastname(String lastname) {
-//		this.lastname = lastname;
-//	}
+	public String getFirstname() {
+		return firstname;
+	}
+
+	public void setFirstname(String firstname) {
+		this.firstname = firstname;
+	}
+
+	public String getLastname() {
+		return lastname;
+	}
+
+	public void setLastname(String lastname) {
+		this.lastname = lastname;
+	}
 
     public DEPARTMENT getDepartment() {
         return department;
@@ -71,9 +72,17 @@ public final class FEmployeeFilter extends AbstractFilterBean {
         this.card = card;
     }
 
+    public Integer getChildAge() {
+        return childAge;
+    }
+
+    public void setChildAge(Integer childAge) {
+        this.childAge = childAge;
+    }
+
     @Override
     public boolean hasFilter() {
-        return (!(code == null /*&& firstname == null && lastname == null */
-                && department == null && post == null && card == null));
+        return (!(code == null && firstname == null && lastname == null
+                && department == null && post == null && card == null && childAge == null));
     }
 }
