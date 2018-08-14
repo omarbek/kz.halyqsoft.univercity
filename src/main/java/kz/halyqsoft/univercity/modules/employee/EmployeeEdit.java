@@ -10,11 +10,13 @@ import kz.halyqsoft.univercity.entity.beans.univercity.view.*;
 import kz.halyqsoft.univercity.modules.employee.workhour.WorkHourWidget;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.changelisteners.*;
+import org.postgresql.util.PGInterval;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.facade.CommonIDFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.ID;
+import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.file.FileBean;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.from.EJoin;
@@ -93,6 +95,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
     private CustomGridSelectDialog roomSelectDlg;
     private VerticalLayout mainVL;
     private EmployeeView employeeView;
+    private Label experienceL;
 
     private static final int DOES_NOT_WORK = 2;
 
@@ -1235,7 +1238,6 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
     private void createExperienceTab(boolean readOnly) throws Exception {
         VerticalLayout content = new VerticalLayout();
         content.setSpacing(true);
-        content.setSizeFull();
 
         ID employeeId = ID.valueOf(-1);
         if (!baseDataFW.getWidgetModel().isCreateNew()) {
@@ -1243,16 +1245,126 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         }
 
         /* Experiences */
-        experienceTW = new TableWidget(PREVIOUS_EXPERIENCE.class);
+        experienceTW = new TableWidget(VPreviousExperience.class);
         experienceTW.addEntityListener(this);
+
         DBTableModel experienceTM = (DBTableModel) experienceTW.getWidgetModel();
-        experienceTM.setReadOnly(readOnly);
-        QueryModel publicationQM = experienceTM.getQueryModel();
-        publicationQM.addWhere("employee", ECriteria.EQUAL, employeeId);
+        experienceTM.setCrudEntityClass(PREVIOUS_EXPERIENCE.class);
+        experienceTM.setRefreshType(ERefreshType.MANUAL);
+
+        refresh();
+
+
+        experienceL = new Label();
+        experienceL.setCaptionAsHtml(true);
+        experienceL.setWidth(800, Unit.PIXELS);
+        if(getSum()!=null&&getList()!=null) {
+            experienceL.setCaption("<html><b>" +
+                    getUILocaleUtil().getCaption("experienceL") + "</b>" + " " +
+                    String.valueOf((getSum().getYears())) + getUILocaleUtil().getCaption("experienceL.year")
+                    + " " + String.valueOf(getSum().getMonths()) + getUILocaleUtil().getCaption("experienceL.month"));
+        }else{
+            experienceL.setCaption("<html><b>" +
+                    getUILocaleUtil().getCaption("experienceL") + "</b>");
+        }
+
         content.addComponent(experienceTW);
         content.setComponentAlignment(experienceTW, Alignment.MIDDLE_CENTER);
+        content.addComponent(experienceL);
+        content.setComponentAlignment(experienceL, Alignment.TOP_RIGHT);
 
         getTabSheet().addTab(content, getUILocaleUtil().getCaption("experience"));
+    }
+
+    @Override
+    public void handleEntityEvent(EntityEvent ev) {
+        if (ev.getAction() == EntityEvent.CREATED || ev.getAction() == EntityEvent.MERGED
+                || ev.getAction() == EntityEvent.REMOVED) {
+            refresh();
+        }
+    }
+
+    private void refresh() {
+        try {
+            List<VPreviousExperience> previousExperiences = getList();
+            ((DBTableModel) experienceTW.getWidgetModel()).setEntities(previousExperiences);
+            experienceTW.refresh();
+        } catch (Exception ex) {
+            CommonUtils.showMessageAndWriteLog("Unable to refresh speciality and corpus grid", ex);
+        }
+    }
+
+    public PGInterval getSum() throws Exception{
+        PGInterval sum = null;
+        ID employeeId = ID.valueOf(-1);
+        if (!baseDataFW.getWidgetModel().isCreateNew()) {
+            employeeId = baseDataFW.getWidgetModel().getEntity().getId();
+        }
+        Map<Integer, Object> params = new HashMap<>();
+        String sql = "select sum(age(dismiss_date,hire_date))\n" +
+                "from previous_experience\n" +
+                "where employee_id =" + employeeId;
+
+        try {
+            Object o = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(sql, params);
+            sum= (PGInterval)o;
+        } catch (Exception ex) {
+            CommonUtils.showMessageAndWriteLog("Unable to load sum", ex);
+        }
+        return sum;
+    }
+
+    public List<VPreviousExperience> getList() throws Exception{
+        PGInterval sum = null;
+        ID employeeId = ID.valueOf(-1);
+        if (!baseDataFW.getWidgetModel().isCreateNew()) {
+            employeeId = baseDataFW.getWidgetModel().getEntity().getId();
+        }
+
+        List<VPreviousExperience> list = new ArrayList<>();
+        Map<Integer, Object> params = new HashMap<>();
+        String sql = "select " +
+                "  id," +
+                "  organization_name,\n" +
+                "  post_name,\n" +
+                "  hire_date,\n" +
+                "  dismiss_date,\n" +
+                "  age(dismiss_date, hire_date)\n" +
+                "from previous_experience" +
+                " where employee_id = " + employeeId;
+
+        try {
+            List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
+            if (!tmpList.isEmpty()) {
+                for (Object o : tmpList) {
+                    Object[] oo = (Object[]) o;
+                    VPreviousExperience vPreviousExperience = new VPreviousExperience();
+                    vPreviousExperience.setId(ID.valueOf((long)oo[0]));
+                    vPreviousExperience.setOrganizationName((String)oo[1]);
+                    vPreviousExperience.setPostName((String)oo[2]);
+                    vPreviousExperience.setHireDate((Date)oo[3]);
+                    vPreviousExperience.setDismissDate((Date) oo[4]);
+                    sum = (PGInterval) oo[5];
+                    vPreviousExperience.setWorkPeriod(String.valueOf(sum.getYears())
+                            +getUILocaleUtil().getCaption("experienceL.table")+" "
+                            +String.valueOf(sum.getMonths())+getUILocaleUtil().getCaption("experienceL.month"));
+                    list.add(vPreviousExperience);
+                }
+            }
+        } catch (Exception ex) {
+            CommonUtils.showMessageAndWriteLog("Unable to load experience list", ex);
+        }
+        refreshExperience(list);
+        return list;
+    }
+
+    private void refreshExperience(List<VPreviousExperience> list) {
+        ((DBTableModel) experienceTW.getWidgetModel()).setEntities(list);
+        try {
+            experienceTW.refresh();
+        } catch (Exception ex) {
+            CommonUtils.showMessageAndWriteLog("Unable to refresh experience list", ex);
+        }
     }
 
     private void createCareerTab(boolean readOnly) throws Exception {
@@ -1918,6 +2030,15 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
             }catch (Exception ex){
                 ex.printStackTrace();
             }
+            return true;
+        }else if (source.equals(experienceTW)) {
+            EMPLOYEE emp = null;
+            try {
+                emp = (EMPLOYEE) baseDataFW.getWidgetModel().getEntity();
+            } catch (Exception ex) {
+                ex.printStackTrace();//TODO catch
+            }
+            FormModel careerFM = ((DBSelectModel) experienceTW.getWidgetModel()).getFormModel();
             return true;
         }
 
@@ -2950,8 +3071,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         if (isNew) {
             try {
                 pe.setEmployee((EMPLOYEE) baseDataFW.getWidgetModel().getEntity());
-                QueryModel experienceQM = ((DBTableModel) experienceTW.getWidgetModel()).getQueryModel();
-                experienceQM.addWhere("employee", ECriteria.EQUAL, pe.getEmployee().getId());
+                experienceTW.refresh();
             } catch (Exception ex) {
                 CommonUtils.showMessageAndWriteLog("Unable to create a experience", ex);
                 Message.showError("Unable to create a experience");
@@ -3150,7 +3270,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
             }
 
             return false;
-        } else if (source.equals(roomTW)) {
+        }else if (source.equals(roomTW)) {
             List<TEACHER_ROOM> delList = new ArrayList<TEACHER_ROOM>();
             try {
                 for (Entity e : entities) {
@@ -3222,5 +3342,9 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
 
             return can;
         }
+
+
     }
+
+
 }
