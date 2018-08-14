@@ -18,7 +18,6 @@ import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.ID;
 import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.file.FileBean;
-import org.r3a.common.entity.file.FileEntity;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.from.EJoin;
 import org.r3a.common.entity.query.from.FromItem;
@@ -1281,8 +1280,8 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         if(getSum()!=null&&getList()!=null) {
             experienceL.setCaption("<html><b>" +
                     getUILocaleUtil().getCaption("experienceL") + "</b>" + " " +
-                    String.valueOf((getSum().getYears())) + getUILocaleUtil().getCaption("experienceL.year")
-                    + " " + String.valueOf(getSum().getMonths()) + getUILocaleUtil().getCaption("experienceL.month"));
+                    String.valueOf((getSum().getYears())) +" "+ getUILocaleUtil().getCaption("experienceL.year")
+                    + " " + String.valueOf(getSum().getMonths()) +" "+ getUILocaleUtil().getCaption("experienceL.month"));
         }else{
             experienceL.setCaption("<html><b>" +
                     getUILocaleUtil().getCaption("experienceL") + "</b>");
@@ -1366,8 +1365,8 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
                     vPreviousExperience.setDismissDate((Date) oo[4]);
                     sum = (PGInterval) oo[5];
                     vPreviousExperience.setWorkPeriod(String.valueOf(sum.getYears())
-                            +getUILocaleUtil().getCaption("experienceL.table")+" "
-                            +String.valueOf(sum.getMonths())+getUILocaleUtil().getCaption("experienceL.month"));
+                            +" "+getUILocaleUtil().getCaption("experienceL.year")+" "
+                            +String.valueOf(sum.getMonths())+" "+getUILocaleUtil().getCaption("experienceL.month"));
                     list.add(vPreviousExperience);
                 }
             }
