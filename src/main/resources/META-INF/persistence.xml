@@ -148,6 +148,7 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEVICE</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.SKILL</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.QUALIFICATION</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.CANDIDATE</class>
 
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_SPECIALITY</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_ORGANIZATION</class>
@@ -208,6 +209,7 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_GROUPS_CREATION_NEEDED</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.VGraduateEmployment</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_STUDENT_DIFFERENCE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_MASTER</class>
 
 
         <class>kz.halyqsoft.univercity.entity.beans.univercity.AbstractSpiderEntity</class>
@@ -344,6 +346,7 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.PRACTICE_STUDENT</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.SUBSTITUTION</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.CHILD</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.MASTER</class>
 
         <class>kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_DIFFERENCE</class>
 
@@ -351,7 +354,7 @@
         <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
         <properties>
             <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
-            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/univerdb"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/realdb"/>
             <property name="javax.persistence.jdbc.user" value="postgres"/>
             <property name="javax.persistence.jdbc.password" value="ukpu18!"/>
             <!--<property name="javax.persistence.jdbc.user" value="${javax.persistence.jdbc.user}"/>-->

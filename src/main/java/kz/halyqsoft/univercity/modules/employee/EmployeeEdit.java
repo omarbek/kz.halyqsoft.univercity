@@ -18,6 +18,7 @@ import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.ID;
 import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.file.FileBean;
+import org.r3a.common.entity.file.FileEntity;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.from.EJoin;
 import org.r3a.common.entity.query.from.FromItem;
@@ -86,6 +87,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
     private TableWidget employeeAwardTW;
     private TableWidget employeeQualificationTW;
     private TableWidget childTW;
+    private TableWidget masterTW;
     private static WorkHourWidget whw;
     private TableWidget subjectPPSTW;
     private TableWidget loadByHourTW;
@@ -202,6 +204,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         createRoomTab(readOnly);
         createSkillAndAwardTab(readOnly);
         createChildTab(readOnly);
+        createMasterTab(readOnly);
     }
 
     @Override
@@ -262,6 +265,24 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         }
         childQM.addWhere("employee", ECriteria.EQUAL, employeeId);
         getTabSheet().addTab(childTW, getUILocaleUtil().getEntityLabel(CHILD.class));
+    }
+
+    private void createMasterTab(boolean readOnly) throws Exception{
+        masterTW = new TableWidget(MASTER.class);
+        masterTW.setButtonVisible(AbstractToolbar.REFRESH_BUTTON, false);
+        masterTW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
+        masterTW.setButtonVisible(AbstractToolbar.EDIT_BUTTON, false);
+        masterTW.addEntityListener(this);
+        DBTableModel masterTM = (DBTableModel) masterTW.getWidgetModel();
+        masterTM.setReadOnly(baseDataFW.getWidgetModel().isReadOnly());
+        QueryModel masterQM = masterTM.getQueryModel();
+        ID employeeId = ID.valueOf(-1);
+        if (!baseDataFW.getWidgetModel().isCreateNew()) {
+            employeeId = baseDataFW.getWidgetModel().getEntity().getId();
+        }
+        masterQM.addWhere("employee", ECriteria.EQUAL, employeeId);
+
+        getTabSheet().addTab(masterTW, getUILocaleUtil().getEntityLabel(MASTER.class));
     }
 
     private void createSkillAndAwardTab(boolean readOnly) throws Exception {
@@ -634,8 +655,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
 
         return true;
     }
-
-    private void createDocumentsTab(boolean readOnly) throws Exception {
+        private void createDocumentsTab(boolean readOnly) throws Exception {
         VerticalLayout content = new VerticalLayout();
         content.setSpacing(true);
         content.setSizeFull();
@@ -1803,6 +1823,12 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
                 return false;
             }
         }
+        else if(source.equals(masterTW)){
+            if (baseDataFW.getWidgetModel().isCreateNew()) {
+                Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
+                return false;
+            }
+        }
 
         return super.preCreate(source, buttonId);
     }
@@ -1859,6 +1885,16 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
                 ex.printStackTrace();
             }
             child.setEmployee(emp);
+        }
+        else if(source.equals(masterTW)){
+            MASTER master = (MASTER)e;
+            EMPLOYEE emp = null;
+            try{
+                emp = (EMPLOYEE) baseDataFW.getWidgetModel().getEntity();
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }
+            master.setEmployee(emp);
         }
     }
 
@@ -2180,7 +2216,6 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
 
             return true;
         }
-
         return super.onPreview(source, e, buttonId);
     }
 
@@ -2224,6 +2259,8 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
             return preSaveLoadByHour(source, e, isNew, buttonId);
         } else if (source.equals(graduateStudentLoadGW)) {
             return preSaveGraduateStudentLoad(source, e, isNew, buttonId);
+        }else if(source.equals(masterTW)){
+          return preSaveMaster(source, e, isNew, buttonId);
         }
 
         return super.preSave(source, e, isNew, buttonId);
@@ -2849,8 +2886,12 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
                 ed.setIssueDate(ved.getIssueDate());
                 ed.setExpireDate(ved.getExpireDate());
                 ed.setDegree(ved.getDegree());
-                ed.setSchoolName(ved.getSchoolName());
+                ed.setPlaceOfIssue(ved.getPlaceOfIssue());
                 ed.setDissertationTopic(ved.getDissertationTopic());
+                ed.setCandidate(ved.getCandidate());
+                ed.setSpeciality(ved.getSpeciality());
+                ed.setQualification(ved.getQualification());
+                ed.setEntranceYear(ved.getEntranceYear());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(ed);
 
                 QueryModel scientificDegreeQM = ((DBTableModel) scientificDegreeTW.getWidgetModel()).getQueryModel();
@@ -2868,8 +2909,12 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
                 ed.setIssueDate(ved.getIssueDate());
                 ed.setExpireDate(ved.getExpireDate());
                 ed.setDegree(ved.getDegree());
-                ed.setSchoolName(ved.getSchoolName());
+                ed.setPlaceOfIssue(ved.getPlaceOfIssue());
                 ed.setDissertationTopic(ved.getDissertationTopic());
+                ed.setCandidate(ved.getCandidate());
+                ed.setSpeciality(ved.getSpeciality());
+                ed.setQualification(ved.getQualification());
+                ed.setEntranceYear(ved.getEntranceYear());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(ed);
                 scientificDegreeTW.refresh();
                 showSavedNotification();
@@ -3111,6 +3156,36 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         return false;
     }
 
+    private boolean preSaveMaster(Object source, Entity e, boolean isNew, int buttonId) {
+        MASTER ed = (MASTER) e;
+        FormModel fm = baseDataFW.getWidgetModel();
+        if (isNew) {
+            try {
+                EMPLOYEE emp = (EMPLOYEE) fm.getEntity();
+                ed.setEmployee(emp);
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(ed);
+
+                QueryModel careerQM = ((DBTableModel) masterTW.getWidgetModel()).getQueryModel();
+                careerQM.addWhere("employee", ECriteria.EQUAL, emp.getId());
+
+                masterTW.refresh();
+                showSavedNotification();
+            } catch (Exception ex) {
+                CommonUtils.showMessageAndWriteLog("Unable to create a master", ex);
+            }
+        } else {
+            try {
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(ed);
+                careerTW.refresh();
+                showSavedNotification();
+            } catch (Exception ex) {
+                CommonUtils.showMessageAndWriteLog("Unable to merge a master", ex);
+            }
+        }
+
+        return false;
+    }
+
     @Override
     public boolean preDelete(Object source, List<Entity> entities, int buttonId) {
         if (source.equals(educationTW)) {
@@ -3283,6 +3358,25 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
                 CommonUtils.showMessageAndWriteLog("Unable to delete teacher room", ex);
                 Message.showError(ex.toString());
             }
+        }else if (source.equals(masterTW)) {
+            List<MASTER> delList = new ArrayList<MASTER>();
+            for (Entity e : entities) {
+                try {
+                    delList.add(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(MASTER.class, e.getId()));
+                } catch (Exception ex) {
+                    CommonUtils.showMessageAndWriteLog("Unable to delete master", ex);
+                }
+            }
+
+            try {
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(delList);
+                masterTW.refresh();
+            } catch (Exception ex) {
+                CommonUtils.showMessageAndWriteLog("Unable to delete master", ex);
+                Message.showError(getUILocaleUtil().getMessage("error.cannotdelentity"));
+            }
+
+            return false;
         }
 
         return super.preDelete(source, entities, buttonId);

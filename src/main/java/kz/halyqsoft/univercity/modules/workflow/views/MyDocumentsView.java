@@ -8,10 +8,7 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Embedded;
 import kz.halyqsoft.univercity.entity.beans.USERS;
-import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT;
-import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_SIGNER;
-import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_STATUS;
-import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_USER_REAL_INPUT;
+import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.utils.WorkflowCommonUtils;
 import kz.halyqsoft.univercity.utils.EmployeePdfCreator;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
@@ -20,6 +17,8 @@ import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.event.EntityListener;
 import org.r3a.common.entity.query.QueryModel;
+import org.r3a.common.entity.query.from.EJoin;
+import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.AbstractWebUI;
 import org.r3a.common.vaadin.widget.dialog.AbstractDialog;
@@ -36,6 +35,9 @@ import java.util.List;
 public class MyDocumentsView extends BaseView implements EntityListener{
     private USERS currentUser;
     private TableWidget myDocsTW;
+
+    private TableWidget signedByMeDocsTW;
+
     private Button linkedTables;
     public MyDocumentsView(String title){
         super(title);
@@ -108,9 +110,35 @@ public class MyDocumentsView extends BaseView implements EntityListener{
         dbTableModel.setDeferredDelete(true);
         dbTableModel.getQueryModel().addWhere("creatorEmployee" , ECriteria.EQUAL , currentUser.getId());
         dbTableModel.getQueryModel().addWhereAnd("documentStatus" ,  ECriteria.EQUAL, WorkflowCommonUtils.getDocumentStatusByName(DOCUMENT_STATUS.ACCEPTED).getId());
+
+
+        signedByMeDocsTW = new TableWidget(DOCUMENT.class);
+        signedByMeDocsTW.setCaption(getUILocaleUtil().getCaption("signed.by.me.docs"));
+        signedByMeDocsTW.setSizeFull();
+        signedByMeDocsTW.setImmediate(true);
+        signedByMeDocsTW.setResponsive(true);
+        signedByMeDocsTW.setButtonVisible(IconToolbar.ADD_BUTTON , false);
+        signedByMeDocsTW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
+        signedByMeDocsTW.setButtonVisible(IconToolbar.EDIT_BUTTON, false);
+        signedByMeDocsTW.addEntityListener(this);
+
+
+        DBTableModel signedByMeTM = (DBTableModel) signedByMeDocsTW.getWidgetModel();
+
+        signedByMeTM.setDeferredDelete(true);
+        FromItem fi = signedByMeTM.getQueryModel().addJoin(EJoin.INNER_JOIN , "id" , DOCUMENT_SIGNER.class,"document");
+        signedByMeTM.getQueryModel().addWhere(fi , "employee" ,ECriteria.EQUAL , currentUser.getId());
+        signedByMeTM.getQueryModel().addWhereAnd("documentStatus" ,  ECriteria.EQUAL, WorkflowCommonUtils.getDocumentStatusByName(DOCUMENT_STATUS.ACCEPTED).getId());
+
+
         getContent().addComponent(linkedTables);
         getContent().setComponentAlignment(linkedTables, Alignment.MIDDLE_CENTER);
+
+
         getContent().addComponent(myDocsTW);
+
+
+        getContent().addComponent(signedByMeDocsTW);
     }
 
     @Override

@@ -17,15 +17,12 @@ import kz.halyqsoft.univercity.modules.workflow.views.fields.CustomComponentHL;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.EmployeePdfCreator;
 import kz.halyqsoft.univercity.utils.FieldValidator;
-import kz.halyqsoft.univercity.utils.WorkflowCommonUtils;
 import org.apache.commons.io.IOUtils;
-import org.bouncycastle.openssl.PasswordException;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.event.EntityListener;
-import org.r3a.common.entity.file.FileBean;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.view.AbstractCommonView;
@@ -35,6 +32,7 @@ import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.form.field.filelist.FileListFieldModel;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
+import org.r3a.common.vaadin.widget.toolbar.IconToolbar;
 
 public class CreateViewDialog extends AbstractDialog implements EntityListener {
     private final String title;
@@ -43,10 +41,13 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
     private DOCUMENT document;
     private ComboBox importanceCB;
     private TextArea messageTA;
-    private File customFile;
     private Upload uploadRelatedFile;
     private File relatedFile;
     private String relatedFilePath;
+    private boolean customDocumentFlag = false;
+    private List<CustomComponentHL> customComponentHLS = new ArrayList<>();
+    private Button emptyRelatedUpload = new Button();
+
 
     public CreateViewDialog(AbstractCommonView prevView, String title, final DOCUMENT document, List<PDF_DOCUMENT_SIGNER_POST> pdfDocumentSignerPosts) {
         getContent().setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
@@ -61,6 +62,7 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
         HorizontalLayout mainHL = new HorizontalLayout();
         mainHL.setSizeFull();
         mainHL.setImmediate(true);
+        mainHL.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
 
         QueryModel<DOCUMENT_IMPORTANCE> importanceQM = new QueryModel(DOCUMENT_IMPORTANCE.class);
         BeanItemContainer importanceBIC = null;
@@ -82,20 +84,58 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
         this.messageTA.setWidth(100, Unit.PERCENTAGE);
         this.getContent().addComponent(this.messageTA);
 
-        FileUploader receiver = new FileUploader(customFile);
+        Button clearUpload = new Button();
+        clearUpload.setCaption(getUILocaleUtil().getCaption("clear"));
+        clearUpload.setVisible(false);
+        clearUpload.setImmediate(true);
+        clearUpload.addClickListener(new ClickListener() {
+            @Override
+            public void buttonClick(ClickEvent clickEvent) {
+                customDocumentFlag = false;
+                clearUpload.setVisible(false);
+                setInabilityOfCustomComponents(true);
+            }
+        });
+
+        emptyRelatedUpload.setCaption(getUILocaleUtil().getCaption("empty"));
+        emptyRelatedUpload.setVisible(false);
+        emptyRelatedUpload.setImmediate(true);
+        emptyRelatedUpload.addClickListener(new ClickListener() {
+            @Override
+            public void buttonClick(ClickEvent clickEvent) {
+                emptyRelatedUpload.setVisible(false);
+                deleteRelatedFile();
+            }
+        });
+
+        FileUploader receiver = new FileUploader();
 
         Upload upload = new Upload(getUILocaleUtil().getMessage("upload.custom"), receiver);
 
-        upload.addFinishedListener(new Upload.FinishedListener() {
+        upload.addSucceededListener(new Upload.SucceededListener() {
             @Override
-            public void uploadFinished(Upload.FinishedEvent finishedEvent) {
+            public void uploadSucceeded(Upload.SucceededEvent succeededEvent) {
                 try{
                     document.setFileByte( IOUtils.toByteArray(new FileInputStream(receiver.getFile())));
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(document);
                     CommonUtils.showSavedNotification();
+                    customDocumentFlag = true;
+                    clearUpload.setVisible(true);
+                    setInabilityOfCustomComponents(false);
                 }catch (Exception e){
                     Message.showError(e.getMessage());
                     e.printStackTrace();
+                }
+            }
+        });
+
+        upload.addStartedListener(new Upload.StartedListener() {
+            @Override
+            public void uploadStarted(Upload.StartedEvent startedEvent) {
+                if (!CommonUtils.PDF_MIME_TYPE.equalsIgnoreCase(startedEvent.getMIMEType())) {
+                    upload.interruptUpload();
+                    String message = getUILocaleUtil().getMessage("error.permittedfiletype");
+                    Message.showError(String.format(message, CommonUtils.PDF_MIME_TYPE));
                 }
             }
         });
@@ -115,10 +155,10 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
 
 
         mainHL.addComponent(uploadRelatedFile);
-        mainHL.setComponentAlignment(uploadRelatedFile, Alignment.MIDDLE_CENTER);
+        mainHL.addComponent(emptyRelatedUpload);
 
         mainHL.addComponent(upload);
-        mainHL.setComponentAlignment(upload, Alignment.MIDDLE_CENTER);
+        mainHL.addComponent(clearUpload);
 
         getContent().addComponent(mainHL);
 
@@ -134,7 +174,6 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
             e.printStackTrace();
         }
 
-        List<CustomComponentHL> customComponentHLS = new ArrayList<>();
         for(DOCUMENT_USER_INPUT documentUserInput : documentUserInputList){
             CustomComponentHL component = new CustomComponentHL(documentUserInput);
             getContent().addComponent(component);
@@ -146,6 +185,7 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
             this.documentSignerGW.setImmediate(true);
             this.documentSignerGW.setButtonVisible(1, false);
             this.documentSignerGW.setButtonVisible(3, false);
+            this.documentSignerGW.setButtonVisible(IconToolbar.PREVIEW_BUTTON, false);
             this.documentSignerGW.addEntityListener(this);
             DBGridModel dbGridModel = (DBGridModel)this.documentSignerGW.getWidgetModel();
             dbGridModel.getQueryModel().addWhere("document", ECriteria.EQUAL, document.getId());
@@ -169,7 +209,8 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
                 for(CustomComponentHL componentt : customComponentHLS){
                     if(!FieldValidator.isNotEmpty(componentt.getValueTA().getValue())){
                         Message.showError(CreateViewDialog.this.getUILocaleUtil().getMessage("pdf.field.empty"));
-                        return;
+                        CreateViewDialog.this.open();
+                        break;
                     }
                 }
 
@@ -192,14 +233,15 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
                 document.setMessage(CreateViewDialog.this.messageTA.getValue());
                 document.setDocumentImportance((DOCUMENT_IMPORTANCE)CreateViewDialog.this.importanceCB.getValue());
 
-                EmployeePdfCreator.createResourceStudent(document).getStreamSource().getStream();
+                if(!customDocumentFlag){
+                    EmployeePdfCreator.createResourceWithReloadingResource(document).getStreamSource().getStream();
+                }
 
                 try {
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(document);
                 } catch (Exception var4) {
                     var4.printStackTrace();
                 }
-
 
                 CreateViewDialog.this.close();
             }
@@ -210,6 +252,8 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
                 Message.showConfirm(CreateViewDialog.this.getUILocaleUtil().getMessage("all.values.deleted"), new AbstractYesButtonListener() {
                     @Override
                     public void buttonClick(ClickEvent clickEvent) {
+                        deleteRelatedFile();
+
                         try {
                             SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(CreateViewDialog.this.documentSignerGW.getAllEntities());
                         } catch (Exception var4) {
@@ -231,6 +275,13 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
         });
     }
 
+    private void setInabilityOfCustomComponents(boolean flag){
+        for(CustomComponentHL cc: customComponentHLS){
+            cc.getValueTA().setValue("default");
+            cc.getValueTA().setEnabled(flag);
+        }
+    }
+
     public String getTitle() {
         return this.title;
     }
@@ -241,11 +292,6 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
 
     class FileUploader implements Upload.Receiver, Upload.SucceededListener {
         private File file;
-
-        public FileUploader(File file){
-            this.file = file;
-        }
-
         @Override
         public OutputStream receiveUpload(String filename, String mimeType) {
             FileOutputStream fos = null; // Stream to write to
@@ -301,9 +347,13 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
                         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(document);
 
                     } catch (Exception ex) {
+                        ex.printStackTrace();
                     }
                 }
             }
+
+            emptyRelatedUpload.setVisible(true);
+            Message.showInfo(getUILocaleUtil().getMessage("file.successfully"));
         }
 
         @Override
@@ -341,6 +391,18 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
                 uploadRelatedFile.interruptUpload();
                 String message = getUILocaleUtil().getMessage("error.filetoobig");
                 Message.showError(String.format(message, maxSize / 1024));
+            }
+        }
+    }
+
+    private void deleteRelatedFile(){
+        if(document.getRelatedDocumentFilePath()!=null){
+            if(!document.getRelatedDocumentFilePath().equalsIgnoreCase("")){
+                File file = new File(document.getRelatedDocumentFilePath());
+                if(file.exists()){
+                    file.delete();
+                }
+                document.setRelatedDocumentFilePath(null);
             }
         }
     }

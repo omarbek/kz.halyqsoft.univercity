@@ -20,6 +20,8 @@ public class DEGREE extends AbstractEntity {
 	@Column(name = "DEGREE_NAME", nullable = false)
 	private String degreeName;
 
+
+
 	public DEGREE() {
 	}
 
