@@ -3,6 +3,7 @@ package kz.halyqsoft.univercity.modules.curriculum.working;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.event.MouseEvents;
 import com.vaadin.server.*;
 import com.vaadin.server.StreamResource.StreamSource;
 import com.vaadin.shared.ui.combobox.FilteringMode;
@@ -13,10 +14,7 @@ import com.vaadin.ui.TabSheet.SelectedTabChangeEvent;
 import com.vaadin.ui.TabSheet.SelectedTabChangeListener;
 import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.VCurriculumCreditCycleSum;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.V_CURRICULUM_ADD_PROGRAM;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.V_CURRICULUM_AFTER_SEMESTER;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.V_CURRICULUM_DETAIL;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.*;
 import kz.halyqsoft.univercity.modules.curriculum.working.cycle.CyclePanel;
 import kz.halyqsoft.univercity.modules.curriculum.working.schedule.SchedulePanel;
 import kz.halyqsoft.univercity.modules.curriculum.working.semester.AddProgramPanel;
@@ -292,8 +290,8 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
         getContent().setComponentAlignment(totalCreditSumLabel, Alignment.TOP_LEFT);
 
         detailPanelList = new ArrayList<SemesterDetailPanel>();
-        detailPanelList = new ArrayList<SemesterDetailPanel>();
         TabSheet ts = new TabSheet();
+
 
         QueryModel<SEMESTER> semesterQM = new QueryModel<SEMESTER>(SEMESTER.class);
         semesterQM.addWhere("id", ECriteria.LESS_EQUAL, ID.valueOf(8));
@@ -304,9 +302,84 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
             cdp.setWidth(100, Unit.PERCENTAGE);
             cdp.setCurriculum(curriculum);
             cdp.initPanel();
+
             detailPanelList.add(cdp);
             ts.addTab(cdp, getUILocaleUtil().getCaption("semester." + s.getId().toString()));
         }
+
+        ts.addSelectedTabChangeListener(new SelectedTabChangeListener() {
+            @Override
+            public void selectedTabChange(SelectedTabChangeEvent selectedTabChangeEvent) {
+
+                int totalSum = 0;
+                int elTotalSum = 0;
+                int ansTolal = 0;
+
+                if (ts.getSelectedTab() instanceof SemesterDetailPanel) {
+                    SemesterDetailPanel semesterDetailPanel = (SemesterDetailPanel) ts.getSelectedTab();
+
+                    QueryModel<SEMESTER> qmSemester = new QueryModel<SEMESTER>(SEMESTER.class);
+                    qmSemester.addWhere("id", ECriteria.EQUAL, semesterDetailPanel.getSemester().getId());
+                    qmSemester.addWhere("studyYear", ECriteria.EQUAL, semesterDetailPanel.getSemester().getStudyYear().getId());
+                    qmSemester.addOrder("id");
+
+                    List<SEMESTER> semesters = new ArrayList<>();
+                    try {
+                        semesters = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(qmSemester);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    QueryModel<V_ELECTIVE_SUBJECT> electiveSubjectQueryModel = new QueryModel<V_ELECTIVE_SUBJECT>(V_ELECTIVE_SUBJECT.class);
+                    electiveSubjectQueryModel.addWhere("curriculum", ECriteria.EQUAL, curriculum.getId());
+                    electiveSubjectQueryModel.addWhere("deleted", Boolean.FALSE);
+
+                    QueryModel<V_CURRICULUM_DETAIL> curriculumDetailQueryModel = new QueryModel<V_CURRICULUM_DETAIL>(V_CURRICULUM_DETAIL.class);
+                    curriculumDetailQueryModel.addWhere("curriculum", ECriteria.EQUAL, curriculum.getId());
+                    curriculumDetailQueryModel.addWhere("deleted", Boolean.FALSE);
+
+                    for (SEMESTER semester : semesters) {
+                        curriculumDetailQueryModel.addWhere("semester", ECriteria.EQUAL, semester.getId());
+                        electiveSubjectQueryModel.addWhere("semester", ECriteria.EQUAL, semester.getId());
+                        List<V_CURRICULUM_DETAIL> detailList = new ArrayList<>();
+                        List<V_ELECTIVE_SUBJECT> electiveSubjects = new ArrayList<>();
+                        try {
+                            detailList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(curriculumDetailQueryModel);
+                            electiveSubjects = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(electiveSubjectQueryModel);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                        for (V_CURRICULUM_DETAIL v : detailList) {
+                            totalSum += v.getCredit();
+                            if (v.getSubjectCode() != null && !v.isConsiderCredit()) {
+                                totalSum = totalSum - v.getCredit();
+                            }
+
+                        }
+                        for (V_ELECTIVE_SUBJECT ve : electiveSubjects) {
+                            elTotalSum += ve.getCredit();
+                            if (ve.getSubjectCode() != null && !ve.isConsiderCredit()) {
+                                totalSum -= ve.getCredit();
+                            }
+                        }
+                        ansTolal = totalSum + elTotalSum;
+                    }
+                } else if (ts.getSelectedTab() instanceof AddProgramPanel) {
+                    AddProgramPanel addProgramPanel = (AddProgramPanel) ts.getSelectedTab();
+
+                         ansTolal+=addProgramPanel.getTotalCredit();
+
+                }else if (ts.getSelectedTab() instanceof AfterSemesterProgamPanel) {
+                    AfterSemesterProgamPanel afterSemesterProgamPanel = (AfterSemesterProgamPanel) ts.getSelectedTab();
+
+                    ansTolal+=afterSemesterProgamPanel.getTotalCredit();
+
+                }
+                   totalCreditSumLabel.setValue(String.format(getUILocaleUtil().getCaption("total.credit.sum"), ansTolal));
+
+            }
+        });
 
         addProgramPanel = new AddProgramPanel(this);
         addProgramPanel.setCurriculum(curriculum);
@@ -378,13 +451,14 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
 
     public void setTotalCreditSum() {
         int sum = 0;
+        int totalSumAns = 0;
+
         for (SemesterDetailPanel cdp : detailPanelList) {
             sum += cdp.getTotalCredit();
         }
-        creditSumLabel.setValue(String.format(getUILocaleUtil().getCaption("credit.sum"), sum));
+        totalSumAns = sum + addProgramPanel.getTotalCredit() + afterSemesterProgamPanel.getTotalCredit();
+        creditSumLabel.setValue(String.format(getUILocaleUtil().getCaption("credit.sum"), totalSumAns));
 
-        int totalSum = sum + addProgramPanel.getTotalCredit() + afterSemesterProgamPanel.getTotalCredit();
-        totalCreditSumLabel.setValue(String.format(getUILocaleUtil().getCaption("total.credit.sum"), totalSum));
     }
 
     public void save() throws Exception {
@@ -989,7 +1063,7 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
         cell.setCellStyle(styles.get(ExcelStyles.FOOTER));
 
         cell = row.createCell(3);
-        cell.setCellValue(totalAdditional);
+        //cell.setCellValue(totalAdditional);
         cell.setCellStyle(styles.get(ExcelStyles.FOOTER));
 
         return lastRow;
