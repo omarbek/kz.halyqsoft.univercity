@@ -324,8 +324,12 @@ public class EmployeesForm extends UsersForm {
                 employeeDegree.setIssueDate(vEmployeeDegree.getIssueDate());
                 employeeDegree.setExpireDate(vEmployeeDegree.getExpireDate());
                 employeeDegree.setDegree(vEmployeeDegree.getDegree());
-                employeeDegree.setSchoolName(vEmployeeDegree.getSchoolName());
+                employeeDegree.setPlaceOfIssue(vEmployeeDegree.getPlaceOfIssue());
                 employeeDegree.setDissertationTopic(vEmployeeDegree.getDissertationTopic());
+                employeeDegree.setCandidate(vEmployeeDegree.getCandidate());
+                employeeDegree.setSpeciality(vEmployeeDegree.getSpeciality());
+                employeeDegree.setQualification(vEmployeeDegree.getQualification());
+                employeeDegree.setEntranceYear(vEmployeeDegree.getEntranceYear());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(employeeDegree);
 
                 QueryModel employeeDegreeQM = ((DBTableModel) employeeDegreeTW.getWidgetModel()).getQueryModel();
@@ -344,7 +348,11 @@ public class EmployeesForm extends UsersForm {
                 employeeDegree.setExpireDate(vEmployeeDegree.getExpireDate());
                 employeeDegree.setDegree(vEmployeeDegree.getDegree());
                 employeeDegree.setDissertationTopic(vEmployeeDegree.getDissertationTopic());
-                employeeDegree.setSchoolName(vEmployeeDegree.getSchoolName());
+                employeeDegree.setPlaceOfIssue(vEmployeeDegree.getPlaceOfIssue());
+                employeeDegree.setCandidate(vEmployeeDegree.getCandidate());
+                employeeDegree.setSpeciality(vEmployeeDegree.getSpeciality());
+                employeeDegree.setQualification(vEmployeeDegree.getQualification());
+                employeeDegree.setEntranceYear(vEmployeeDegree.getEntranceYear());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(employeeDegree);
                 employeeDegreeTW.refresh();
                 showSavedNotification();
@@ -627,11 +635,8 @@ public class EmployeesForm extends UsersForm {
                 return true;
             } else if (source.equals(careerTW)) {
                 return true;
-            } else if (source.equals(scientificActivityTW)) {
-                return true;
-            }
+            } else return source.equals(scientificActivityTW);
         }
-        return false;
     }
 
     @Override

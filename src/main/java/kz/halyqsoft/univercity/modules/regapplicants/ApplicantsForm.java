@@ -580,7 +580,7 @@ public final class ApplicantsForm extends UsersForm {
     }
 
     @Override
-    protected String getLogin(String s) throws Exception {
+    protected String getLogin(String s) {
         return null;
     }
 
@@ -596,6 +596,8 @@ public final class ApplicantsForm extends UsersForm {
             fileName = "Қолхат_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
         } else if (value.equals("82")) {//TODO Assyl check all docs, not only yours
             fileName = "Договор магистрант_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
+        }else if (value.equals("90")) {
+            fileName = "келісім-шарт_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
         } else {
             fileName = "Өтініш_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
         }
@@ -767,8 +769,24 @@ public final class ApplicantsForm extends UsersForm {
                     for (PDF_PROPERTY property : properties) {
 
                         String text = property.getText();
-                        if (student != null) {
-                            setReplaced(text, student);
+
+                        if(text.startsWith("до 25 сентября")
+                                && student.getDiplomaType().toString().equals("Заочный 2-высшее")){
+                          replaced = "до 1 октября – 60000 тенге                     до 1 февраля – 60000 тенге";
+
+                        } else if( text.startsWith("25 қыркүйекке дейін") &&
+                                student.getDiplomaType().toString().equals("Заочный 2-высшее")){
+                            replaced = "1 қазанға дейін – 60000 тенге                   1 қаңтарға дейін – 60000 тенге";
+
+                        }else if ((text.startsWith("до 25 сентября")  || text.startsWith("25 қыркүйекке дейін")) && student.getDiplomaType().toString().equals("Заочный после колледжа")) {
+                            replaced = "до 1 октября – 60500 тенге                     до 1 февраля – 60500 тенге";
+
+                        }else if (text.startsWith("25 қыркүйекке дейін") && student.getDiplomaType().toString().equals("Заочный после колледжа")) {
+                            replaced = "1 қазанға дейін – 60000 тенге                   1 қаңтарға дейін – 60000 тенге";
+                        } else {
+                            if (student != null) {
+                                setReplaced(text, student);
+                            }
                         }
                         Paragraph paragraph = new Paragraph(replaced,
                                 getFont(Integer.parseInt(property.getSize().toString()),
@@ -860,9 +878,16 @@ public final class ApplicantsForm extends UsersForm {
         String today = formatter.format(date);
         if (student.getDiplomaType().toString().equals("Очный")) {
             ochnii = "очной";
-        } else if (student.getDiplomaType().toString().equals("Заочный")) {
+        } else if (student.getDiplomaType().toString().equals("Заочный") ||
+                student.getDiplomaType().toString().equals("Заочный после колледжа")||
+                student.getDiplomaType().toString().equals("Заочный 2-высшее")) {
             ochnii = "заочной";
         }
+
+        String pdfProperty = "";
+        String tableType = "ansEdu тенге ";
+
+
 
 //        DateFormat form = new SimpleDateFormat("E MMM dd HH:mm:ss Z yyyy");
         DateFormat form = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.US);
@@ -874,14 +899,14 @@ public final class ApplicantsForm extends UsersForm {
         Date date1 = formatter.parse(birthdayDate);
         String birthday = formatter.format(date1);
 
-        Date dateDocument = (Date) form.parse(educationDoc.getIssueDate().toString());
+        Date dateDocument = form.parse(educationDoc.getIssueDate().toString());
         Calendar cal1 = Calendar.getInstance();
         cal1.setTime(dateDocument);
         String formatDate = cal1.get(Calendar.DATE) + "." + (cal1.get(Calendar.MONTH) + 1) + "." + cal1.get(Calendar.YEAR);
         Date date2 = formatter.parse(formatDate);
         String attestationDate = formatter.format(date2);
 
-        Date created = (Date) form.parse(student.getCreated().toString());
+        Date created = form.parse(student.getCreated().toString());
         Calendar cal2 = Calendar.getInstance();
         cal2.setTime(created);
         String format = cal2.get(Calendar.DATE) + "." + (cal2.get(Calendar.MONTH) + 1) + "." + cal2.get(Calendar.YEAR);
@@ -946,7 +971,7 @@ public final class ApplicantsForm extends UsersForm {
         String iin = "";
         String passportNumber = "";
         if (user_passport != null) {
-            iin = ((USER_PASSPORT) user_passport).getIin();
+            iin = user_passport.getIin();
             passportNumber = user_passport.getDocumentNo();
         }
         String fullAddress = "";
@@ -961,6 +986,7 @@ public final class ApplicantsForm extends UsersForm {
         String firstCourseMoney = moneyForEducation;
         String secondCourseMoney = moneyForEducation;
 
+
         LocalDateTime now = LocalDateTime.now();
 
         Map<String, Object> params = new HashMap<>();
@@ -969,6 +995,7 @@ public final class ApplicantsForm extends UsersForm {
         USERS tecnhik = CommonUtils.getEmployee(params);
         replaced = text.replaceAll("\\$fio", student.toString())
                 .replaceAll("\\$money", moneyForEducation)
+                //.replaceAll(tableType, pdfProperty)
                 .replaceAll("\\$ansEdu", answerEdu)
                 .replaceAll("\\$ansDorm", answerDorm)
                 .replaceAll("\\$firstCourseMoney", firstCourseMoney)
@@ -1025,6 +1052,8 @@ public final class ApplicantsForm extends UsersForm {
                 .replaceAll("\\$diplomaType", student.getDiplomaType().toString())
                 .replaceAll("\\$group", "")
                 .replaceAll("қажет, қажет емес", dorm);
+
+
     }
 
     private static ACCOUNTANT_PRICE getAccountantPrice(STUDENT student, int contractPaymentTypeId) throws Exception {
@@ -1243,10 +1272,7 @@ public final class ApplicantsForm extends UsersForm {
             return true;
         } else if (source.equals(awardsTW)) {
             return true;
-        } else if (source.equals(socialCategoriesTW)) {
-            return true;
-        }
-        return false;
+        } else return source.equals(socialCategoriesTW);
     }
 
     @Override
