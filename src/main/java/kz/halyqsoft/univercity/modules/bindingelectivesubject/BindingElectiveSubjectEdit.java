@@ -6,8 +6,10 @@ import com.vaadin.ui.HorizontalLayout;
 import kz.halyqsoft.univercity.entity.beans.univercity.CATALOG_ELECTIVE_SUBJECTS;
 import kz.halyqsoft.univercity.entity.beans.univercity.ELECTIVE_BINDED_SUBJECT;
 import kz.halyqsoft.univercity.entity.beans.univercity.PAIR_SUBJECT;
+import kz.halyqsoft.univercity.entity.beans.univercity.SEMESTER_SUBJECT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_DATA;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SPECIALITY;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VPairSubject;
 import kz.halyqsoft.univercity.utils.CommonUtils;
@@ -249,11 +251,11 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
                     CATALOG_ELECTIVE_SUBJECTS cat = getCat(catQM, spec, year);
                     electiveBindedSubject.setCatalogElectiveSubjects(cat);
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(electiveBindedSubject);
+
                     studentBindingElectiveCFW.getWidgetModel().loadEntity(electiveBindedSubject.getId());
                     studentBindingElectiveCFW.refresh();
 
                     BindingElectiveSubjectEdit.this.electiveBindedSubject=electiveBindedSubject;
-
                     CommonUtils.showSavedNotification();
 
                 } catch (Exception ex) {
@@ -374,6 +376,27 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
             List<PAIR_SUBJECT> delList = new ArrayList<>();
             for (Entity entity : entities) {
                 try {
+                    PAIR_SUBJECT pairSubject = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(PAIR_SUBJECT.class, entity.getId());
+
+                    QueryModel<SEMESTER_DATA> semesterDataQM = new QueryModel<>(SEMESTER_DATA.class);
+                    semesterDataQM.addWhere("year" , ECriteria.EQUAL, pairSubject.getElectveBindedSubject().getCatalogElectiveSubjects().getEntranceYear().getId()) ;
+                    semesterDataQM.addWhere("semesterPeriod" , ECriteria.EQUAL, pairSubject.getElectveBindedSubject().getSemester().getSemesterPeriod().getId()) ;
+                    SEMESTER_DATA semesterData = null;
+                    try{
+                        semesterData = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(semesterDataQM);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+
+                    if(semesterData!=null){
+                        QueryModel<SEMESTER_SUBJECT> semesterSubjectQM = new QueryModel<>(SEMESTER_SUBJECT.class);
+                        semesterSubjectQM.addWhere("semesterData" , ECriteria.EQUAL ,semesterData.getId() );
+                        semesterSubjectQM.addWhereAnd("subject" , ECriteria.EQUAL , pairSubject.getSubject().getId());
+                        ArrayList<SEMESTER_SUBJECT> semesterSubjects = new ArrayList<>();
+                        semesterSubjects.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(semesterSubjectQM));
+                        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(semesterSubjects);
+                    }
+
                     delList.add(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
                             lookup(PAIR_SUBJECT.class, entity.getId()));
                 } catch (Exception ex) {

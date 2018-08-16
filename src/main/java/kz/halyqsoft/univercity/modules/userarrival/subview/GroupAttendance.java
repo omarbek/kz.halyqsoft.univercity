@@ -211,7 +211,7 @@ public class GroupAttendance implements EntityListener{
                     }
                     vg.setCount((Long)oo[3]);
                     vg.setIsPresent(0L);
-                    vg.setAbsent(0L);
+                    vg.setAbsent((Long)oo[3]);
                     vg.setPercantage(0L);
 
                     boolean flag = false;

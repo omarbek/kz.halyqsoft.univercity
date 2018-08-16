@@ -88,54 +88,99 @@ public class SemesterPanel extends AbstractCommonPanel {
         saveButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                STUDENT_SUBJECT studentSubject = new STUDENT_SUBJECT();
-                QueryModel<SEMESTER_SUBJECT> semesterSubjectQM = new QueryModel<>(SEMESTER_SUBJECT.class);
-                QueryModel<SEMESTER_DATA> semesterDataQM = new QueryModel<>(SEMESTER_DATA.class);
-                for(OptionGroup sub:optionGroups) {
-                    ENTRANCE_YEAR entranceYear = CommonUtils.getCurrentSemesterData().getYear();
-                    SEMESTER_PERIOD semesterPeriod = null;
-                    for(PAIR_SUBJECT pairSubject:subjects) {
-                        semesterPeriod = pairSubject.getElectveBindedSubject().getSemester().getSemesterPeriod();
+                for(OptionGroup sub:optionGroups){
+                    if(sub.getValue()==null){
+                        Message.showError(getUILocaleUtil().getMessage("select.subject"));
+                        return;
                     }
-                    semesterDataQM.addWhere("year", ECriteria.EQUAL, entranceYear.getId());
-                    semesterDataQM.addWhere("semesterPeriod", ECriteria.EQUAL, semesterPeriod.getId());
-                    SEMESTER_DATA semesterData = null;
-                    try {
-                        semesterData = getSemesterData(semesterDataQM, entranceYear, semesterPeriod);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    SUBJECT subject = ((SUBJECT) sub.getValue());
-                    semesterSubjectQM.addWhere("subject", ECriteria.EQUAL, subject.getId());
-                    semesterSubjectQM.addWhere("semesterData", ECriteria.EQUAL, semesterData.getId());
-                    SEMESTER_SUBJECT semesterSubject = null;
-                    try {
-                        semesterSubject = getSemesterSubject(semesterSubjectQM, semesterData, subject);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    studentSubject.setSemesterData(semesterData);
-                    STUDENT_EDUCATION studentEdu = studentEducation;
-                    studentSubject.setStudentEducation(studentEdu);
-                    studentSubject.setRegDate(new Date());
-                    studentSubject.setSubject(semesterSubject);
-                    try {
-                        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
-                                create(studentSubject);
-                    } catch (Exception e) {
-                        CommonUtils.showMessageAndWriteLog("Unable to save subject", e);
-                    }
-
                 }
+
                 Message.showConfirm(getUILocaleUtil().getMessage("confirmation.save"), new AbstractYesButtonListener() {
                     @Override
                     public void buttonClick(Button.ClickEvent clickEvent) {
+                        QueryModel<SEMESTER_SUBJECT> semesterSubjectQM = new QueryModel<>(SEMESTER_SUBJECT.class);
+                        QueryModel<SEMESTER_DATA> semesterDataQM = new QueryModel<>(SEMESTER_DATA.class);
+
+
+
+                        ArrayList<STUDENT_SUBJECT>studentSubjects = new ArrayList<>();
+
+                        for(OptionGroup sub:optionGroups) {
+                            ENTRANCE_YEAR entranceYear = CommonUtils.getCurrentSemesterData().getYear();
+                            SEMESTER_PERIOD semesterPeriod = null;
+                            for(PAIR_SUBJECT pairSubject:subjects) {
+                                semesterPeriod = pairSubject.getElectveBindedSubject().getSemester().getSemesterPeriod();
+                            }
+                            semesterDataQM.addWhere("year", ECriteria.EQUAL, entranceYear.getId());
+                            semesterDataQM.addWhere("semesterPeriod", ECriteria.EQUAL, semesterPeriod.getId());
+                            SEMESTER_DATA semesterData = null;
+                            try {
+                                semesterData = getSemesterData(semesterDataQM, entranceYear, semesterPeriod);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            STUDENT_SUBJECT studentSubject = new STUDENT_SUBJECT();
+
+                            SUBJECT subject = ((SUBJECT) sub.getValue());
+                            semesterSubjectQM.addWhere("subject", ECriteria.EQUAL, subject.getId());
+                            semesterSubjectQM.addWhere("semesterData", ECriteria.EQUAL, semesterData.getId());
+                            SEMESTER_SUBJECT semesterSubject = null;
+                            try {
+                                semesterSubject = getSemesterSubject(semesterSubjectQM, semesterData, subject);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            studentSubject.setSemesterData(semesterData);
+                            studentSubject.setStudentEducation(studentEducation);
+                            studentSubject.setRegDate(new Date());
+                            studentSubject.setSubject(semesterSubject);
+
+                            studentSubjects.add(studentSubject);
+                        }
+
+                        if(!studentSubjects.isEmpty()){
+                            try {
+                                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                                        create(studentSubjects);
+                                saveButton.setEnabled(false);
+                            } catch (Exception e) {
+                                CommonUtils.showMessageAndWriteLog("Unable to save subject", e);
+                            }
+                        }
                     }
                 });
             }
         });
-        getContent().addComponent(saveButton);
-        getContent().setComponentAlignment(saveButton,Alignment.MIDDLE_CENTER);
+
+        QueryModel<STUDENT_SUBJECT> studentSubjectQM = new QueryModel<>(STUDENT_SUBJECT.class);
+        studentSubjectQM.addWhere("semesterData" ,ECriteria.EQUAL,CommonUtils.getCurrentSemesterData().getId());
+        studentSubjectQM.addWhere("studentEducation" ,ECriteria.EQUAL,studentEducation.getId());
+        ArrayList<STUDENT_SUBJECT> studentSubjects = new ArrayList<>();
+        try{
+            studentSubjects.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(studentSubjectQM));
+
+        }catch (NoResultException e) {
+            System.out.println(e.getMessage());
+
+        }
+
+        if(studentSubjects.size()==0){
+            getContent().addComponent(saveButton);
+            getContent().setComponentAlignment(saveButton,Alignment.MIDDLE_CENTER);
+        }else{
+            for(OptionGroup gr :optionGroups){
+                for(Object o : gr.getItemIds()){
+                    for(STUDENT_SUBJECT ss : studentSubjects){
+                        if(((SUBJECT)o).getId().getId().longValue()==(ss.getSubject().getSubject().getId().getId().longValue())){
+                            gr.setValue(o);
+                        }
+                    }
+                }
+            }
+        }
+
+
+
     }
 
     private SEMESTER_SUBJECT getSemesterSubject(QueryModel<SEMESTER_SUBJECT> semesterSubjectQM,
