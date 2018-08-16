@@ -1143,4 +1143,24 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
             userPhotoChanged = true;
         }
     }
+
+    public VerticalLayout getButtonsVL() {
+        return buttonsVL;
+    }
+
+    public Button getPreemRightButton() {
+        return preemRightButton;
+    }
+
+    public Button getEduDocsButton() {
+        return eduDocsButton;
+    }
+
+    public TableWidget getEduDocTW() {
+        return eduDocTW;
+    }
+
+    public Button getMedButton() {
+        return medButton;
+    }
 }

@@ -1305,6 +1305,11 @@ public final class ApplicantsForm extends UsersForm {
                 return false;
             }
 
+            if(specTW.getAllEntities().size()>0){
+                Message.showInfo(getUILocaleUtil().getMessage("more.records.not.required"));
+                return false;
+            }
+
             FormModel entrantSpecialityFM = ((DBTableModel) specTW.getWidgetModel()).getFormModel();
             FKFieldModel specialityFKFM = (FKFieldModel) entrantSpecialityFM.getFieldModel("speciality");
             specialityFKFM.setDialogWidth(600);
