@@ -24,7 +24,9 @@ import org.r3a.common.vaadin.widget.dialog.Message;
 
 import javax.persistence.NoResultException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Dinassil Omarbek
@@ -36,7 +38,7 @@ public class StudentDormView extends AbstractTaskView {
     private STUDENT student;
     private String faculty;
     private Label alreadyExistL, roomL, addressL, dormL;
-    private Label violationL,reasonL;
+    private Label violationL, reasonL;
 
     public StudentDormView(AbstractTask task) throws Exception {
         super(task);
@@ -209,15 +211,15 @@ public class StudentDormView extends AbstractTaskView {
         QueryModel<DORM_STUDENT> dormStudentQM = new QueryModel<DORM_STUDENT>(DORM_STUDENT.class);
         FromItem fi = dormStudentQM.addJoin(EJoin.INNER_JOIN, "student", STUDENT_EDUCATION.class, "id");
         dormStudentQM.addWhere(fi, "student", ECriteria.EQUAL, CommonUtils.getCurrentUser().getId());
-        dormStudentQM.addWhere("checkOutDate",null);
-        dormStudentQM.addWhere("deleted",false);
-        dormStudentQM.addWhere("requestStatus",ECriteria.EQUAL,1);
+        dormStudentQM.addWhere("checkOutDate", null);//TODO Raikhan
+        dormStudentQM.addWhere("deleted", false);
+        dormStudentQM.addWhere("requestStatus", ECriteria.EQUAL, 1);
         List<DORM_STUDENT> dormStudentId = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(dormStudentQM);
         boolean flag = true;
         for (DORM_STUDENT ds : dormStudentId) {
             flag = false;
             alreadyExistL = new Label();
-            alreadyExistL.setCaption("<html><b>"+getUILocaleUtil().getCaption("alreadyExistL")+"</b>");
+            alreadyExistL.setCaption("<html><b>" + getUILocaleUtil().getCaption("alreadyExistL") + "</b>");
             alreadyExistL.setWidth(200, Unit.PIXELS);
             alreadyExistL.setCaptionAsHtml(true);
 
@@ -242,25 +244,28 @@ public class StudentDormView extends AbstractTaskView {
             inFL.addComponent(roomL);
         }
 
-        if(flag) {
+        if (flag) {
             getContent().addComponent(buildingCB);
-            getContent().setComponentAlignment(buildingCB,Alignment.MIDDLE_CENTER);
+            getContent().setComponentAlignment(buildingCB, Alignment.MIDDLE_CENTER);
 
             getContent().addComponent(roomCB);
-            getContent().setComponentAlignment(roomCB,Alignment.MIDDLE_CENTER);
+            getContent().setComponentAlignment(roomCB, Alignment.MIDDLE_CENTER);
 
             getContent().addComponent(costL);
-            getContent().setComponentAlignment(costL,Alignment.MIDDLE_CENTER);
+            getContent().setComponentAlignment(costL, Alignment.MIDDLE_CENTER);
 
             getContent().addComponent(buttonsHL);
-            getContent().setComponentAlignment(buttonsHL,Alignment.MIDDLE_CENTER);
-        }else{
-            QueryModel<DORM_STUDENT> violationQM = new QueryModel<DORM_STUDENT>(DORM_STUDENT.class);
-            FromItem from = violationQM.addJoin(EJoin.INNER_JOIN, "student", STUDENT_EDUCATION.class, "id");
-            violationQM.addWhere(from, "student", ECriteria.EQUAL, CommonUtils.getCurrentUser().getId());
-
-            DORM_STUDENT ds = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(violationQM);
-            if(ds.getCheckOutDate()==null){
+            getContent().setComponentAlignment(buttonsHL, Alignment.MIDDLE_CENTER);
+        } else {
+            String sql = "SELECT stu.* " +
+                    "FROM dorm_student stu " +
+                    "  INNER JOIN student_education stu_edu ON stu.student_id = stu_edu.id AND stu_edu.child_id IS NULL " +
+                    "WHERE stu_edu.student_id = ?1 AND stu.check_in_date IS NOT NULL AND stu.request_status_id = 1";
+            Map<Integer, Object> params = new HashMap<>();
+            params.put(1,CommonUtils.getCurrentUser().getId().getId());
+            DORM_STUDENT ds = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(sql, params,
+                    DORM_STUDENT.class);
+            if (ds.getCheckOutDate() == null) {
                 getContent().addComponent(alreadyExistL);
                 getContent().setComponentAlignment(alreadyExistL, Alignment.MIDDLE_CENTER);
 
@@ -273,14 +278,14 @@ public class StudentDormView extends AbstractTaskView {
                 getContent().addComponent(roomL);
                 getContent().setComponentAlignment(roomL, Alignment.MIDDLE_CENTER);
 
-            }else{
+            } else {
 
                 QueryModel<DORM_STUDENT_VIOLATION> dormStudentViolationQM = new QueryModel<DORM_STUDENT_VIOLATION>(DORM_STUDENT_VIOLATION.class);
                 dormStudentViolationQM.addWhere("dormStudent", ECriteria.EQUAL, ds.getId());
                 DORM_STUDENT_VIOLATION dv = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(dormStudentViolationQM);
 
                 violationL = new Label();
-                violationL.setCaption("<html><b>"+getUILocaleUtil().getCaption("violationL")+"</b>");
+                violationL.setCaption("<html><b>" + getUILocaleUtil().getCaption("violationL") + "</b>");
                 violationL.setWidth(200, Unit.PIXELS);
                 violationL.setCaptionAsHtml(true);
 

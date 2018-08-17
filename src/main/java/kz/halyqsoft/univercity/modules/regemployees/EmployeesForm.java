@@ -3,9 +3,7 @@ package kz.halyqsoft.univercity.modules.regemployees;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
-import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.EMPLOYEE_TYPE;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
 import kz.halyqsoft.univercity.entity.beans.univercity.enumeration.Flag;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.*;
@@ -23,7 +21,6 @@ import org.r3a.common.entity.ID;
 import org.r3a.common.entity.file.FileBean;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.where.ECriteria;
-import org.r3a.common.vaadin.widget.DBSelectModel;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.form.FormModel;
 import org.r3a.common.vaadin.widget.form.GridFormWidget;
@@ -52,7 +49,13 @@ public class EmployeesForm extends UsersForm {
 
     EmployeesForm(final FormModel dataFM, ENTRANCE_YEAR entranceYear) throws Exception {
         super(dataFM, entranceYear);
-
+        getButtonsVL().removeComponent(getPreemRightButton());
+        getEduDocsButton().addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                addToLayout(getEduDocTW(), getMedButton(), clickEvent);
+            }
+        });
         dataAFW.setCaption(getUILocaleUtil().getCaption("regapplicant.main.data"));
 
         factAddressButton.setCaption(getUILocaleUtil().getCaption("address.residential"));

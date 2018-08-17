@@ -22,13 +22,13 @@ import org.r3a.common.vaadin.view.AbstractTaskView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ScheduleTableView extends AbstractTaskView  {
+public class ScheduleTableView extends AbstractTaskView {
 
     private List<TIME> times = new ArrayList<>();
     private List<WEEK_DAY> weekDays;
     private GridLayout matrixGL;
     private boolean addComponent = true;
-    private   USERS user = CommonUtils.getCurrentUser();
+    private USERS user = CommonUtils.getCurrentUser();
 
     private static final int STUDENT = 2;
 
@@ -39,123 +39,123 @@ public class ScheduleTableView extends AbstractTaskView  {
     @Override
     public void initView(boolean b) throws Exception {
 
-       if(user.getTypeIndex()==STUDENT) {
+        if (user.getTypeIndex() == STUDENT) {
 
-           QueryModel<LESSON_TIME> lessonTimeQM = new QueryModel<>(LESSON_TIME.class);
-           List<LESSON_TIME> lessonTimeList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
-                   lessonTimeQM);
-           for (LESSON_TIME lt : lessonTimeList) {
-               QueryModel<TIME> timeQM = new QueryModel<>(TIME.class);
-               timeQM.addWhere("id", ECriteria.EQUAL, lt.getBeginTime().getId());
-               timeQM.addOrder("timeValue");
-               TIME time = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(timeQM);
-               times.add(time);
-           }
+            QueryModel<LESSON_TIME> lessonTimeQM = new QueryModel<>(LESSON_TIME.class);
+            List<LESSON_TIME> lessonTimeList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
+                    lessonTimeQM);
+            for (LESSON_TIME lt : lessonTimeList) {
+                QueryModel<TIME> timeQM = new QueryModel<>(TIME.class);
+                timeQM.addWhere("id", ECriteria.EQUAL, lt.getBeginTime().getId());
+                timeQM.addOrder("timeValue");
+                TIME time = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(timeQM);
+                times.add(time);
+            }
 
-           QueryModel<WEEK_DAY> weekDayQM = new QueryModel<>(WEEK_DAY.class);
-           List<WEEK_DAY> weekDayList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
-                   weekDayQM);
+            QueryModel<WEEK_DAY> weekDayQM = new QueryModel<>(WEEK_DAY.class);
+            List<WEEK_DAY> weekDayList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
+                    weekDayQM);
 
-           for (WEEK_DAY weekDay : weekDayList) {
-               weekDays = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(weekDayQM);
-           }
+            for (WEEK_DAY weekDay : weekDayList) {
+                weekDays = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(weekDayQM);
+            }
 
-           int cols = 9;
-           int rows = times.size() + 1;
+            int cols = 9;
+            int rows = times.size() + 1;
 
-           matrixGL = new GridLayout();
-           matrixGL.setHeight(100, Unit.PERCENTAGE);
-           matrixGL.setWidth(78, Unit.PERCENTAGE);
-           matrixGL.setColumns(cols);
-           matrixGL.setRows(rows);
+            matrixGL = new GridLayout();
+            matrixGL.setHeight(100, Unit.PERCENTAGE);
+            matrixGL.setWidth(78, Unit.PERCENTAGE);
+            matrixGL.setColumns(cols);
+            matrixGL.setRows(rows);
 
-           int i = 1, j = 1;
-           for (TIME time : times) {
-               Label timeLabel = new Label(time.toString());
-               timeLabel.setHeightUndefined();
-               timeLabel.setWidth(35, Unit.PIXELS);
-               timeLabel.addStyleName("day-time");
-               timeLabel.addStyleName("bold");
-               matrixGL.addComponent(timeLabel, 0, j);
-               matrixGL.setComponentAlignment(timeLabel, Alignment.MIDDLE_RIGHT);
-               j++;
-           }
+            int i = 1, j = 1;
+            for (TIME time : times) {
+                Label timeLabel = new Label(time.toString());
+                timeLabel.setHeightUndefined();
+                timeLabel.setWidth(35, Unit.PIXELS);
+                timeLabel.addStyleName("day-time");
+                timeLabel.addStyleName("bold");
+                matrixGL.addComponent(timeLabel, 0, j);
+                matrixGL.setComponentAlignment(timeLabel, Alignment.MIDDLE_RIGHT);
+                j++;
+            }
 
-           for (WEEK_DAY wd : weekDays) {
-               Label l = new Label(wd.getDayNameRU());
-               l.setSizeUndefined();
-               l.addStyleName("day-time");
-               l.addStyleName("bold");
-               matrixGL.addComponent(l, i, 0);
-               matrixGL.setComponentAlignment(l, Alignment.MIDDLE_LEFT);
-               matrixGL.setColumnExpandRatio(i, 1);
-               i++;
-           }
-
-
-           getContent().addComponent(matrixGL);
-           getContent().setComponentAlignment(matrixGL, Alignment.MIDDLE_CENTER);
-           refreshStudent();
-       }else{
-
-           QueryModel<LESSON_TIME> lessonTimeQM = new QueryModel<>(LESSON_TIME.class);
-           List<LESSON_TIME> lessonTimeList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
-                   lessonTimeQM);
-           for (LESSON_TIME lt : lessonTimeList) {
-               QueryModel<TIME> timeQM = new QueryModel<>(TIME.class);
-               timeQM.addWhere("id", ECriteria.EQUAL, lt.getBeginTime().getId());
-               timeQM.addOrder("timeValue");
-               TIME time = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(timeQM);
-               times.add(time);
-           }
-
-           QueryModel<WEEK_DAY> weekDayQM = new QueryModel<>(WEEK_DAY.class);
-           List<WEEK_DAY> weekDayList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
-                   weekDayQM);
-
-           for (WEEK_DAY weekDay : weekDayList) {
-               weekDays = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(weekDayQM);
-           }
-
-           int cols = 9;
-           int rows = times.size() + 1;
-
-           matrixGL = new GridLayout();
-           matrixGL.setHeight(100, Unit.PERCENTAGE);
-           matrixGL.setWidth(78, Unit.PERCENTAGE);
-           matrixGL.setColumns(cols);
-           matrixGL.setRows(rows);
-
-           int i = 1, j = 1;
-           for (TIME time : times) {
-               Label timeLabel = new Label(time.toString());
-               timeLabel.setHeightUndefined();
-               timeLabel.setWidth(35, Unit.PIXELS);
-               timeLabel.addStyleName("day-time");
-               timeLabel.addStyleName("bold");
-               matrixGL.addComponent(timeLabel, 0, j);
-               matrixGL.setComponentAlignment(timeLabel, Alignment.MIDDLE_RIGHT);
-               j++;
-           }
-
-           for (WEEK_DAY wd : weekDays) {
-               Label l = new Label(wd.getDayNameRU());
-               l.setSizeUndefined();
-               l.addStyleName("day-time");
-               l.addStyleName("bold");
-               matrixGL.addComponent(l, i, 0);
-               matrixGL.setComponentAlignment(l, Alignment.MIDDLE_LEFT);
-               matrixGL.setColumnExpandRatio(i, 1);
-               i++;
-           }
+            for (WEEK_DAY wd : weekDays) {
+                Label l = new Label(wd.getDayNameRU());
+                l.setSizeUndefined();
+                l.addStyleName("day-time");
+                l.addStyleName("bold");
+                matrixGL.addComponent(l, i, 0);
+                matrixGL.setComponentAlignment(l, Alignment.MIDDLE_LEFT);
+                matrixGL.setColumnExpandRatio(i, 1);
+                i++;
+            }
 
 
-           refreshTeacher();
-           getContent().addComponent(matrixGL);
-           getContent().setComponentAlignment(matrixGL, Alignment.MIDDLE_CENTER);
+            getContent().addComponent(matrixGL);
+            getContent().setComponentAlignment(matrixGL, Alignment.MIDDLE_CENTER);
+            refreshStudent();
+        } else {
+
+            QueryModel<LESSON_TIME> lessonTimeQM = new QueryModel<>(LESSON_TIME.class);
+            List<LESSON_TIME> lessonTimeList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
+                    lessonTimeQM);
+            for (LESSON_TIME lt : lessonTimeList) {
+                QueryModel<TIME> timeQM = new QueryModel<>(TIME.class);
+                timeQM.addWhere("id", ECriteria.EQUAL, lt.getBeginTime().getId());
+                timeQM.addOrder("timeValue");
+                TIME time = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(timeQM);
+                times.add(time);
+            }
+
+            QueryModel<WEEK_DAY> weekDayQM = new QueryModel<>(WEEK_DAY.class);
+            List<WEEK_DAY> weekDayList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
+                    weekDayQM);
+
+            for (WEEK_DAY weekDay : weekDayList) {
+                weekDays = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(weekDayQM);
+            }
+
+            int cols = 9;
+            int rows = times.size() + 1;
+
+            matrixGL = new GridLayout();
+            matrixGL.setHeight(100, Unit.PERCENTAGE);
+            matrixGL.setWidth(78, Unit.PERCENTAGE);
+            matrixGL.setColumns(cols);
+            matrixGL.setRows(rows);
+
+            int i = 1, j = 1;
+            for (TIME time : times) {
+                Label timeLabel = new Label(time.toString());
+                timeLabel.setHeightUndefined();
+                timeLabel.setWidth(35, Unit.PIXELS);
+                timeLabel.addStyleName("day-time");
+                timeLabel.addStyleName("bold");
+                matrixGL.addComponent(timeLabel, 0, j);
+                matrixGL.setComponentAlignment(timeLabel, Alignment.MIDDLE_RIGHT);
+                j++;
+            }
+
+            for (WEEK_DAY wd : weekDays) {
+                Label l = new Label(wd.getDayNameRU());
+                l.setSizeUndefined();
+                l.addStyleName("day-time");
+                l.addStyleName("bold");
+                matrixGL.addComponent(l, i, 0);
+                matrixGL.setComponentAlignment(l, Alignment.MIDDLE_LEFT);
+                matrixGL.setColumnExpandRatio(i, 1);
+                i++;
+            }
 
 
-       }
+            refreshTeacher();
+            getContent().addComponent(matrixGL);
+            getContent().setComponentAlignment(matrixGL, Alignment.MIDDLE_CENTER);
+
+
+        }
 
     }
 
@@ -214,12 +214,12 @@ public class ScheduleTableView extends AbstractTaskView  {
         }
     }
 
-    public void refreshTeacher() throws Exception{
+    public void refreshTeacher() throws Exception {
         SEMESTER_DATA semesterData = CommonUtils.getCurrentSemesterData();
         QueryModel<USERS> userQM = new QueryModel<>(USERS.class);
-        userQM.addWhere( "id", ECriteria.EQUAL, user.getId());
+        userQM.addWhere("id", ECriteria.EQUAL, user.getId());
 
-       USERS teacher = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(userQM);
+        USERS teacher = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(userQM);
 
         if (teacher != null) {
             QueryModel<SCHEDULE_DETAIL> sdQM = new QueryModel<>(SCHEDULE_DETAIL.class);
