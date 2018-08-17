@@ -5,6 +5,9 @@ import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.ELECTIVE_BINDED_SUBJECT;
 import kz.halyqsoft.univercity.entity.beans.univercity.PAIR_SUBJECT;
+import kz.halyqsoft.univercity.entity.beans.univercity.SEMESTER_SUBJECT;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_DATA;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.WindowUtils;
@@ -12,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.query.QueryModel;
+import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.widget.dialog.Message;
 
 /**
@@ -114,6 +118,21 @@ public class BindingElectiveSubjectDialog extends WindowUtils {
                             } else {
                                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(
                                         modifiedPairSubject);
+                                SEMESTER_SUBJECT semesterSubject = new SEMESTER_SUBJECT();
+                                semesterSubject.setSubject(modifiedPairSubject.getSubject());
+                                QueryModel<SEMESTER_DATA> semesterDataQM = new QueryModel<>(SEMESTER_DATA.class);
+                                semesterDataQM.addWhere("year" , ECriteria.EQUAL, electiveBindedSubject.getCatalogElectiveSubjects().getEntranceYear().getId()) ;
+                                semesterDataQM.addWhere("semesterPeriod" , ECriteria.EQUAL, electiveBindedSubject.getSemester().getSemesterPeriod().getId()) ;
+                                SEMESTER_DATA semesterData = null;
+                                try{
+                                    semesterData = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(semesterDataQM);
+                                }catch (Exception e){
+                                    e.printStackTrace();
+                                }
+                                if(semesterData!=null){
+                                    semesterSubject.setSemesterData(semesterData);
+                                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(semesterSubject);
+                                }
                             }
 
                             close();

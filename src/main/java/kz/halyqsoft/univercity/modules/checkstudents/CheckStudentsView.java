@@ -226,7 +226,7 @@ public class CheckStudentsView extends AbstractTaskView implements EntityListene
         String sql = "select usr.* from users usr " +
                 "INNER JOIN student stu on stu.id=usr.id " +
                 "where usr.id not in (select id from v_student) and usr.user_type_id=2 " +
-                "and stu.category_id=1 ";
+                "and stu.category_id=1 and usr.deleted=false";
         List<USERS> list = new ArrayList<>();
         try {
             Map<Integer, Object> params = new HashMap<>();

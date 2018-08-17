@@ -1,13 +1,10 @@
 package kz.halyqsoft.univercity.modules.userarrival.subview.dialogs;
 
-import com.vaadin.ui.Button;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.USERS;
-import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_ARRIVAL;
+import kz.halyqsoft.univercity.entity.beans.univercity.USER_PHOTO;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.TURNSTILE_TYPE;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.VGroup;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.VStudentInfo;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -20,37 +17,95 @@ import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.AbstractWebUI;
 import org.r3a.common.vaadin.widget.ERefreshType;
 import org.r3a.common.vaadin.widget.dialog.AbstractDialog;
-import org.r3a.common.vaadin.widget.grid.GridWidget;
-import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
+import org.r3a.common.vaadin.widget.form.FormModel;
+import org.r3a.common.vaadin.widget.form.GridFormWidget;
+import org.r3a.common.vaadin.widget.photo.PhotoWidget;
 import org.r3a.common.vaadin.widget.table.TableWidget;
 import org.r3a.common.vaadin.widget.table.model.DBTableModel;
 
-import javax.swing.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class DetalizationDialog extends AbstractDialog implements EntityListener{
 
     private String title;
-    private VerticalLayout mainVL;
+    private VerticalLayout userArrivalVL;
+    private VerticalLayout userDataVL;
+    private HorizontalSplitPanel mainHSP;
+
     public DetalizationDialog(String title, USERS user , Date date) {
 
         this.title = title;
 
         setImmediate(true);
-        setWidth(60, Unit.PERCENTAGE);
-        setHeight(60, Unit.PERCENTAGE);
+        setWidth(95, Unit.PERCENTAGE);
+        setHeight(70, Unit.PERCENTAGE);
 
-        mainVL = new VerticalLayout();
-        mainVL.setSizeFull();
-        mainVL.setImmediate(true);
+        mainHSP = new HorizontalSplitPanel();
+        mainHSP.setSizeFull();
+        mainHSP.setImmediate(true);
+        mainHSP.setLocked(true);
+        mainHSP.setSplitPosition(45);
 
+        userArrivalVL = new VerticalLayout();
+        userArrivalVL.setSizeFull();
+        userArrivalVL.setImmediate(true);
+        userArrivalVL.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
+
+        userDataVL = new VerticalLayout();
+        userDataVL.setSizeFull();
+        userDataVL.setImmediate(true);
+        userDataVL.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
+
+        VerticalLayout userDataVL = new VerticalLayout();
+        userDataVL.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
+
+        userDataVL.setImmediate(true);
+        userDataVL.setSizeFull();
+        userDataVL.setResponsive(true);
+
+        USER_PHOTO userPhoto = null;
+        QueryModel<USER_PHOTO> userPhotoQM = new QueryModel<>(USER_PHOTO.class);
+        userPhotoQM.addWhere("user" , ECriteria.EQUAL , user.getId());
+        try{
+            userPhoto = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(userPhotoQM);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        if(userPhoto!=null){
+            PhotoWidget photoWidget = new PhotoWidget(userPhoto.getPhoto());
+            photoWidget.setReadOnly(true);
+            photoWidget.setSaveButtonVisible(false);
+            photoWidget.setEnabled(false);
+            photoWidget.setResponsive(true);
+
+            for(int i = 0 ; i < photoWidget.getContent().getComponentCount() ;i ++){
+                if(photoWidget.getContent().getComponent(i) instanceof Upload || photoWidget.getContent().getComponent(i) instanceof Button){
+                    photoWidget.getContent().getComponent(i).setVisible(false);
+                }
+            }
+            userArrivalVL.addComponent(photoWidget);
+        }
+        FormModel userModel = new FormModel(USERS.class);
+        GridFormWidget gridFormWidget = null;
+        try{
+            userModel.loadEntity(user.getId());
+            userModel.setReadOnly(true);
+            gridFormWidget = new GridFormWidget(userModel);
+            gridFormWidget.setResponsive(true);
+            gridFormWidget.setEnabled(false);
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        if(gridFormWidget!=null) {
+            userDataVL.addComponent(gridFormWidget);
+        }
         TableWidget userArrivalTW = new TableWidget(USER_ARRIVAL.class);
         userArrivalTW.showToolbar(false);
         userArrivalTW.setImmediate(true);
         userArrivalTW.setSizeFull();
         userArrivalTW.addEntityListener(this);
-
         DBTableModel dbTableModel = (DBTableModel)userArrivalTW.getWidgetModel();
         dbTableModel.setEntities(getList(user,date));
         dbTableModel.setRefreshType(ERefreshType.MANUAL);
@@ -65,9 +120,12 @@ public class DetalizationDialog extends AbstractDialog implements EntityListener
             }
         });
 
-        mainVL.addComponent(userArrivalTW);
+        userArrivalVL.addComponent(userArrivalTW);
+        this.userDataVL.addComponent(userDataVL);
+        mainHSP.setFirstComponent(userArrivalVL);
+        mainHSP.setSecondComponent(this.userDataVL);
 
-        getContent().addComponent(mainVL);
+        getContent().addComponent(mainHSP);
         getContent().addComponent(closeBtn);
 
         AbstractWebUI.getInstance().addWindow(this);

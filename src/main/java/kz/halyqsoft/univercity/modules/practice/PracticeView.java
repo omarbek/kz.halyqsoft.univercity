@@ -25,6 +25,7 @@ import org.r3a.common.entity.query.from.EJoin;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.ERefreshType;
+import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 import org.r3a.common.vaadin.widget.filter2.FilterPanelListener;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
@@ -52,6 +53,10 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
 
         initGridWidget();
         initFilter();
+
+//        GridWidget studentPractice = new GridWidget(PRACTICE_STUDENT.class);
+//        mainVL.addComponent(studentPractice);
+
         mainVL.addComponent(informationPracticeFP);
         mainVL.addComponent(informationPracticeGW);
         getContent().addComponent(mainVL);

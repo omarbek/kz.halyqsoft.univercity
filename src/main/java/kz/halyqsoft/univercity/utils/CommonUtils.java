@@ -92,6 +92,16 @@ public class CommonUtils {
         return roles;
     }
 
+    public static boolean isCurrentUserAdmin(){
+        for(ROLES role : getCurrentUserRolesList()){
+            if(role.getId().getId().longValue()==3){
+                return true;
+            }
+        }
+        return false;
+    }
+
+
     private static STUDENT getStudent(Map<String, Object> params) {
         try {
             return (STUDENT) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).

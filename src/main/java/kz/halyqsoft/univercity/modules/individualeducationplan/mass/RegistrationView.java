@@ -15,10 +15,7 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Grid.SelectionMode;
 import kz.halyqsoft.univercity.entity.beans.USERS;
-import kz.halyqsoft.univercity.entity.beans.univercity.SEMESTER_SUBJECT;
-import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
-import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_EDUCATION;
-import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_SUBJECT;
+import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VStudent;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_SEMESTER_SUBJECT;
@@ -46,16 +43,13 @@ import java.util.*;
 @SuppressWarnings({"serial"})
 public class RegistrationView extends AbstractTaskView {
 
-    private ComboBox studyYearCB;
-    private ComboBox semesterPeriodCB;
+    private ComboBox courseCB;
     private TextField subjectNameTF;
     private Grid subjectGrid;
     private TextField studentCodeTF;
     private TextField studentLastNameTF;
     private TextField studentFirstNameTF;
-    private ComboBox facultyCB;
     private ComboBox specialityCB;
-    private ComboBox studentStudyYearCB;
     private ComboBox educationTypeCB;
     private ComboBox schoolEducationLanguage;
     private Grid foundStudentGrid;
@@ -72,51 +66,53 @@ public class RegistrationView extends AbstractTaskView {
         subjectFilterHL.setCaption(getUILocaleUtil().getCaption("search.subject"));
 
         Label l = new Label();
-        l.setSizeUndefined();
-        l.addStyleName("bold");
-        l.setValue(getUILocaleUtil().getCaption("study.year.1"));
-        subjectFilterHL.addComponent(l);
-
         SEMESTER_DATA sd = CommonUtils.getCurrentSemesterData();
-        QueryModel<ENTRANCE_YEAR> studyYearQM = new QueryModel<>(ENTRANCE_YEAR.class);
-        studyYearQM.addWhere("beginYear", ECriteria.LESS_EQUAL, sd.getYear().getBeginYear() + 1);
-        studyYearQM.addWhereAnd("endYear", ECriteria.LESS_EQUAL, sd.getYear().getEndYear() + 1);
-        studyYearQM.addOrderDesc("beginYear");
-        BeanItemContainer<ENTRANCE_YEAR> studyYearBIC = new BeanItemContainer<>(ENTRANCE_YEAR.class,
-                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(studyYearQM));
-        studyYearCB = new ComboBox();
-        studyYearCB.setWidth(100, Unit.PIXELS);
-        studyYearCB.setContainerDataSource(studyYearBIC);
-        studyYearCB.setImmediate(true);
-        studyYearCB.setNullSelectionAllowed(true);
-        studyYearCB.setTextInputAllowed(false);
-        studyYearCB.setFilteringMode(FilteringMode.OFF);
-        subjectFilterHL.addComponent(studyYearCB);
+
+
+        QueryModel<SPECIALITY> specialityQM = new QueryModel<>(SPECIALITY.class);
+        specialityQM.addWhere("deleted", Boolean.FALSE);
+        BeanItemContainer<SPECIALITY> specialityBIC = new BeanItemContainer<>(SPECIALITY.class, SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(specialityQM));
+
 
         l = new Label();
         l.setSizeUndefined();
         l.addStyleName("bold");
-        l.setValue(getUILocaleUtil().getCaption("semester"));
+        l.setValue(getUILocaleUtil().getEntityFieldLabel(VStudent.class, "specialty"));
         subjectFilterHL.addComponent(l);
 
-        QueryModel<SEMESTER_PERIOD> semesterPeriodQM = new QueryModel<>(SEMESTER_PERIOD.class);
-        semesterPeriodQM.addWhere("id", ECriteria.LESS_EQUAL, ID.valueOf(2));
-        semesterPeriodQM.addOrder("id");
-        BeanItemContainer<SEMESTER_PERIOD> semesterPeriodBIC = new BeanItemContainer<>(SEMESTER_PERIOD.class,
-                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(semesterPeriodQM));
-        semesterPeriodCB = new ComboBox();
-        semesterPeriodCB.setWidth(100, Unit.PIXELS);
-        semesterPeriodCB.setContainerDataSource(semesterPeriodBIC);
-        semesterPeriodCB.setImmediate(true);
-        semesterPeriodCB.setNullSelectionAllowed(true);
-        semesterPeriodCB.setTextInputAllowed(false);
-        semesterPeriodCB.setFilteringMode(FilteringMode.OFF);
-        subjectFilterHL.addComponent(semesterPeriodCB);
+
+        specialityCB = new ComboBox();
+        specialityCB.setImmediate(true);
+        specialityCB.setNullSelectionAllowed(true);
+        specialityCB.setTextInputAllowed(false);
+        specialityCB.setContainerDataSource(specialityBIC);
+        specialityCB.setFilteringMode(FilteringMode.CONTAINS);
+        subjectFilterHL.addComponent(specialityCB);
+
+        QueryModel<STUDY_YEAR> courseQM = new QueryModel<>(STUDY_YEAR.class);
+        BeanItemContainer<STUDY_YEAR> courseBIC = new BeanItemContainer<>(STUDY_YEAR.class,
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(courseQM));
 
         l = new Label();
         l.setSizeUndefined();
         l.addStyleName("bold");
-        l.setValue(getUILocaleUtil().getCaption("course.name"));
+        l.setValue(getUILocaleUtil().getCaption("course"));
+        subjectFilterHL.addComponent(l);
+
+        courseCB = new ComboBox();
+        courseCB.setWidth(100, Unit.PIXELS);
+        courseCB.setContainerDataSource(courseBIC);
+        courseCB.setImmediate(true);
+        courseCB.setNullSelectionAllowed(true);
+        courseCB.setTextInputAllowed(false);
+        courseCB.setFilteringMode(FilteringMode.OFF);
+        subjectFilterHL.addComponent(courseCB);
+
+
+        l = new Label();
+        l.setSizeUndefined();
+        l.addStyleName("bold");
+        l.setValue(getUILocaleUtil().getCaption("discipline.name"));
         subjectFilterHL.addComponent(l);
 
         subjectNameTF = new TextField();
@@ -157,8 +153,8 @@ public class RegistrationView extends AbstractTaskView {
                         new ArrayList<>());
                 subjectGrid.setContainerDataSource(bic);
                 subjectNameTF.setValue(null);
-                studyYearCB.setValue(null);
-                semesterPeriodCB.setValue(null);
+                courseCB.setValue(null);
+                specialityCB.setValue(null);
             }
         });
         subjectFilterButtonHL.addComponent(subjectFilterClear);
@@ -169,10 +165,12 @@ public class RegistrationView extends AbstractTaskView {
         subjectGrid = new Grid();
         subjectGrid.setCaption(getUILocaleUtil().getCaption("found.subjects"));
         subjectGrid.setWidth(100, Unit.PERCENTAGE);
-        subjectGrid.setColumns("subjectName", "chairName", "levelName", "cycleShortName", "credit",
-                "formula", "controlTypeName");
+        subjectGrid.setColumns("subjectName","pairNumber" , "chairName", "levelName", "cycleShortName", "credit",
+                "formula", "controlTypeName" );
         subjectGrid.getColumn("subjectName").setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(V_SUBJECT_SELECT.class,
                 "nameRU")).setWidthUndefined();
+        subjectGrid.getColumn("pairNumber").setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(
+                PAIR_SUBJECT.class, "pairNumber")).setWidth(80);
         subjectGrid.getColumn("chairName").setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(V_SUBJECT_SELECT.class,
                 "chair")).setWidthUndefined();
         subjectGrid.getColumn("levelName").setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(V_SUBJECT_SELECT.class,
@@ -195,8 +193,8 @@ public class RegistrationView extends AbstractTaskView {
         GridLayout studentFilterGL = new GridLayout();
         studentFilterGL.setSpacing(true);
         studentFilterGL.setCaption(getUILocaleUtil().getCaption("search.student"));
-        studentFilterGL.setColumns(4);
-        studentFilterGL.setRows(2);
+        studentFilterGL.setColumns(5);
+        studentFilterGL.setRows(1);
 
         studentCodeTF = new TextField();
         studentCodeTF.setCaption("ID");
@@ -245,46 +243,11 @@ public class RegistrationView extends AbstractTaskView {
         schoolEducationLanguage.setFilteringMode(FilteringMode.OFF);
         studentFilterGL.addComponent(schoolEducationLanguage);
 
-        QueryModel<DEPARTMENT> facultyQM = new QueryModel<>(DEPARTMENT.class);
-//        facultyQM.addWhere("type", ECriteria.EQUAL, DEPARTMENT_TYPE.FACULTY_ID);//TODO
-        facultyQM.addWhereAnd("deleted", Boolean.FALSE);
-        facultyQM.addOrder("deptName");
-        BeanItemContainer<DEPARTMENT> facultyBIC = new BeanItemContainer<>(DEPARTMENT.class,
-                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(facultyQM));
-        facultyCB = new ComboBox();
-        facultyCB.setCaption(getUILocaleUtil().getEntityFieldLabel(VStudent.class, "faculty"));
-        facultyCB.setContainerDataSource(facultyBIC);
-        facultyCB.setImmediate(true);
-        facultyCB.setNullSelectionAllowed(true);
-        facultyCB.setTextInputAllowed(false);
-        facultyCB.setFilteringMode(FilteringMode.OFF);
-        facultyCB.setPageLength(0);
-        studentFilterGL.addComponent(facultyCB);
-
-        specialityCB = new ComboBox();
-        specialityCB.setCaption(getUILocaleUtil().getEntityFieldLabel(VStudent.class, "specialty"));
-        specialityCB.setImmediate(true);
-        specialityCB.setNullSelectionAllowed(true);
-        specialityCB.setTextInputAllowed(false);
-        specialityCB.setFilteringMode(FilteringMode.OFF);
-        specialityCB.setPageLength(0);
-        studentFilterGL.addComponent(specialityCB);
-
-        facultyCB.addValueChangeListener(new FacultyChangeListener(specialityCB));
 
         QueryModel<STUDY_YEAR> studentStudyYearQM = new QueryModel<>(STUDY_YEAR.class);
         studentStudyYearQM.addOrder("studyYear");
         BeanItemContainer<STUDY_YEAR> studentStudyYearBIC = new BeanItemContainer<>(STUDY_YEAR.class,
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(studentStudyYearQM));
-        studentStudyYearCB = new ComboBox();
-        studentStudyYearCB.setCaption(getUILocaleUtil().getEntityFieldLabel(STUDENT_EDUCATION.class, "studyYear"));
-        studentStudyYearCB.setContainerDataSource(studentStudyYearBIC);
-        studentStudyYearCB.setImmediate(true);
-        studentStudyYearCB.setNullSelectionAllowed(true);
-        studentStudyYearCB.setTextInputAllowed(false);
-        studentStudyYearCB.setFilteringMode(FilteringMode.OFF);
-        studentStudyYearCB.setPageLength(0);
-        studentFilterGL.addComponent(studentStudyYearCB);
 
         QueryModel<STUDENT_EDUCATION_TYPE> educationTypeQM = new QueryModel<>(
                 STUDENT_EDUCATION_TYPE.class);
@@ -333,9 +296,6 @@ public class RegistrationView extends AbstractTaskView {
                 studentCodeTF.setValue(null);
                 studentLastNameTF.setValue(null);
                 studentFirstNameTF.setValue(null);
-                facultyCB.setValue(null);
-                specialityCB.setValue(null);
-                studentStudyYearCB.setValue(null);
                 educationTypeCB.setValue(null);
                 schoolEducationLanguage.setValue(null);
             }
@@ -431,54 +391,67 @@ public class RegistrationView extends AbstractTaskView {
     }
 
     private void refreshSubjectGrid() {
-        if (studyYearCB.getValue() == null) {
-            Message.showInfo(getUILocaleUtil().getMessage("select.study.year"));
+
+//        if (facultyCB.getValue() == null) {
+//            Message.showInfo(getUILocaleUtil().getMessage("select.faculty"));
+//            return;
+//        }
+//
+//        if (specialityCB.getValue() == null) {
+//            Message.showInfo(getUILocaleUtil().getMessage("select.speciality"));
+//            return;
+//        }
+
+        if (courseCB.getValue() == null) {
+            Message.showInfo(getUILocaleUtil().getMessage("select.course"));
             return;
         }
 
-        if (semesterPeriodCB.getValue() == null) {
-            Message.showInfo(getUILocaleUtil().getMessage("select.semester"));
-            return;
-        }
 
         Map<Integer, Object> params = new HashMap<>(2);
-        params.put(1, ((ENTRANCE_YEAR) studyYearCB.getValue()).getId().getId());
-        params.put(2, ((SEMESTER_PERIOD) semesterPeriodCB.getValue()).getId().getId());
-        String sql = "SELECT " +
-                "  a.ID, " +
-                "  b.NAME_RU   SUBJECT_NAME, " +
-                "  h.DEPT_NAME CHAIR_NAME, " +
-                "  c.LEVEL_NAME, " +
-                "  d.CYCLE_SHORT_NAME, " +
-                "  e.CREDIT, " +
-                "  f.FORMULA, " +
-                "  g.TYPE_NAME CONTROL_TYPE_NAME " +
-                "FROM SEMESTER_SUBJECT a INNER JOIN SUBJECT b " +
-                "    ON a.SUBJECT_ID = b.ID " +
-                "  INNER JOIN LEVEL c ON b.LEVEL_ID = c.ID " +
-                "  INNER JOIN SUBJECT_CYCLE d " +
-                "    ON b.SUBJECT_CYCLE_ID = d.ID " +
-                "  INNER JOIN CREDITABILITY e ON b.CREDITABILITY_ID = e.ID " +
-                "  INNER JOIN ACADEMIC_FORMULA f ON b.ACADEMIC_FORMULA_ID = f.ID " +
-                "  INNER JOIN CONTROL_TYPE g " +
-                "    ON b.CONTROL_TYPE_ID = g.ID " +
-                "  INNER JOIN DEPARTMENT h ON b.CHAIR_ID = h.ID " +
-                "WHERE exists " +
-                "      (SELECT 1 " +
-                "       FROM SEMESTER_DATA h " +
-                "       WHERE a.SEMESTER_DATA_ID = h.ID AND h.YEAR_ID = ?1 AND " +
-                "             h.SEMESTER_PERIOD_ID = ?2) " +
-                "      AND b.deleted = FALSE AND b.mandatory = FALSE";
+        params.put(1, ((STUDY_YEAR) courseCB.getValue()).getId().getId());
+        String sql = "SELECT\n" +
+                "    ss.id,\n" +
+                "    subj.name_ru      SUBJECT_NAME,\n" +
+                "    d2.dept_name CHAIR_NAME,\n" +
+                "    l.LEVEL_NAME,\n" +
+                "    sc.cycle_short_name,\n" +
+                "    credit.credit,\n" +
+                "    a.formula,\n" +
+                "    c2.type_name CONTROL_TYPE_NAME,\n" +
+                "    pair.pair_number\n" +
+                "\n" +
+                "  FROM pair_subject pair\n" +
+                "    INNER JOIN subject subj ON subj.id = pair.subject_id\n" +
+                "    INNER JOIN creditability credit ON credit.id = subj.creditability_id\n" +
+                "    INNER JOIN elective_binded_subject elect_bind ON elect_bind.id = pair.elective_binded_subject_id\n" +
+                "    INNER JOIN semester sem ON sem.id = elect_bind.semester_id\n" +
+                "    INNER JOIN subject_cycle sc ON subj.subject_cycle_id = sc.id\n" +
+                "    INNER JOIN department d2 ON subj.chair_id = d2.id\n" +
+                "    INNER JOIN academic_formula a ON subj.academic_formula_id = a.id\n" +
+                "    INNER JOIN control_type c2 ON subj.control_type_id = c2.id\n" +
+                "    INNER JOIN semester_subject ss ON subj.id = ss.subject_id\n" +
+                "    INNER JOIN level l ON subj.level_id = l.id\n" +
+                "    INNER JOIN speciality s2 ON d2.id = s2.chair_id " +
+                "  WHERE subj.mandatory = FALSE AND subj.subject_cycle_id\n" +
+                "  IS NOT NULL AND\n" +
+                "        subj.deleted = FALSE AND  subj.mandatory = FALSE  AND sem.study_year_id = ?1 AND ss.semester_data_id = "+CommonUtils.getCurrentSemesterData().getId().getId().longValue();
 
         String subjectName = subjectNameTF.getValue();
-
+        CommonUtils.getCurrentSemesterData();
         if (subjectName != null && subjectName.trim().length() >= 3) {
-            sql = sql + " and b.NAME_RU ilike '%";
+            sql = sql + " and subj.NAME_RU ilike '%";
             sql = sql + subjectName.trim().toLowerCase();
             sql = sql + "%'";
         }
+        int i = 1;
+        if (specialityCB.getValue()!=null) {
+            sql = sql + " AND s2.id  = ?"+(++i);
+            params.put(i , ((SPECIALITY)specialityCB.getValue()).getId().getId());
+        }
 
         try {
+            sql = sql + " ORDER BY pair.PAIR_NUMBER DESC ";
             List<V_SEMESTER_SUBJECT> list = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
                     sql, params, V_SEMESTER_SUBJECT.class);
             BeanItemContainer<V_SEMESTER_SUBJECT> bic = new BeanItemContainer<>(V_SEMESTER_SUBJECT.class, list);
@@ -495,6 +468,11 @@ public class RegistrationView extends AbstractTaskView {
             //TODO
         }
         boolean filterSet = false;
+
+        if(subjectGrid.getSelectedRow()!=null){
+            filterSet = true;
+        }
+
         Map<Integer, Object> params = new HashMap<>();
         params.put(1, currentUser.getId().getId());
         String sql = "SELECT " +
@@ -507,12 +485,12 @@ public class RegistrationView extends AbstractTaskView {
                 "FROM STUDENT a INNER JOIN USERS b ON a.ID = b.ID " +
                 "  INNER JOIN STUDENT_EDUCATION c ON a.ID = c.STUDENT_ID AND c.CHILD_ID IS NULL " +
                 "  INNER JOIN DEPARTMENT d ON c.FACULTY_ID = d.ID " +
-                "  INNER JOIN SPECIALITY e ON c.SPECIALITY_ID = e.ID ";
+                "  INNER JOIN SPECIALITY e ON c.SPECIALITY_ID = e.ID " +
+                "  INNER JOIN USER_DOCUMENT f on a.ID = f.USER_ID inner join EDUCATION_DOC g on f.ID = g.ID ";
         int i = 2;
         StringBuilder sb = new StringBuilder();
         if (schoolEducationLanguage.getValue() != null) {
-            sql = sql + " inner join USER_DOCUMENT f on a.ID = f.USER_ID inner join EDUCATION_DOC g on f.ID = g.ID";
-            sb.append("f.DOCUMENT_TYPE_ID = ?");
+            sb.append(" and f.DOCUMENT_TYPE_ID = ?");
             sb.append(i);
             params.put(i++, 3);
 
@@ -521,37 +499,23 @@ public class RegistrationView extends AbstractTaskView {
             params.put(i++, ((LANGUAGE) schoolEducationLanguage.getValue()).getId().getId());
             filterSet = true;
         }
-        if (facultyCB.getValue() != null) {
-            if (filterSet) {
-                sb.append(" and ");
-            }
-            sb.append("c.FACULTY_ID = ?");
-            sb.append(i);
-            params.put(i++, ((DEPARTMENT) facultyCB.getValue()).getId().getId());
-            filterSet = true;
-        }
+
         if (specialityCB.getValue() != null) {
-            if (filterSet) {
-                sb.append(" and ");
-            }
+            sb.append(" and ");
             sb.append("c.SPECIALITY_ID = ?");
             sb.append(i);
             params.put(i++, ((SPECIALITY) specialityCB.getValue()).getId().getId());
             filterSet = true;
         }
-        if (studentStudyYearCB.getValue() != null) {
-            if (filterSet) {
-                sb.append(" and ");
-            }
+        if (courseCB.getValue() != null) {
+            sb.append(" and ");
             sb.append("c.STUDY_YEAR_ID = ?");
             sb.append(i);
-            params.put(i++, ((STUDY_YEAR) studentStudyYearCB.getValue()).getId().getId());
+            params.put(i++, ((STUDY_YEAR) courseCB.getValue()).getId().getId());
             filterSet = true;
         }
         if (educationTypeCB.getValue() != null) {
-            if (filterSet) {
-                sb.append(" and ");
-            }
+            sb.append(" and ");
             sb.append("c.EDUCATION_TYPE_ID = ?");
             sb.append(i);
             params.put(i++, ((STUDENT_EDUCATION_TYPE) educationTypeCB.getValue()).getId().getId());
@@ -569,9 +533,7 @@ public class RegistrationView extends AbstractTaskView {
 
         String studentCode = studentCodeTF.getValue();
         if (studentCode != null && studentCode.trim().length() >= 2) {
-            if (filterSet) {
-                sb.append(" and ");
-            }
+            sb.append(" and ");
             sb.append("lower(b.CODE) like '");
             sb.append(studentCode.trim().toLowerCase());
             sb.append("%'");
@@ -580,9 +542,8 @@ public class RegistrationView extends AbstractTaskView {
 
         String lastName = studentLastNameTF.getValue();
         if (lastName != null && lastName.trim().length() >= 3) {
-            if (filterSet) {
-                sb.append(" and ");
-            }
+
+            sb.append(" and ");
             sb.append("b.LAST_NAME ilike '%");
             sb.append(lastName.trim().toLowerCase());
             sb.append("%'");
@@ -591,9 +552,8 @@ public class RegistrationView extends AbstractTaskView {
 
         String firstName = studentFirstNameTF.getValue();
         if (firstName != null && firstName.trim().length() >= 3) {
-            if (filterSet) {
-                sb.append(" and ");
-            }
+            sb.append(" and ");
+
             sb.append("b.FIRST_NAME ilike '%");
             sb.append(firstName.trim().toLowerCase());
             sb.append("%'");
@@ -601,7 +561,7 @@ public class RegistrationView extends AbstractTaskView {
         }
 
         if (!filterSet) {
-            Message.showInfo(getUILocaleUtil().getMessage("select.something"));
+//            Message.showInfo(getUILocaleUtil().getMessage("select.something"));
             return;
         }
 
@@ -609,14 +569,25 @@ public class RegistrationView extends AbstractTaskView {
             sb.append(" and c.STUDENT_STATUS_ID = ?");
             sb.append(i);
             params.put(i, 1);//the last param
-            sb.insert(0, " where a.advisor_id = ?1 and ");
+            sb.insert(0, " where a.advisor_id = ?1  ");
             sql = sql + sb.toString() + " order by b.LAST_NAME, b.FIRST_NAME";
             List<V_STUDENT_SELECT> list = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(sql,
                     params, V_STUDENT_SELECT.class);
+
+
             Container.Indexed ds = subjectStudentGrid.getContainerDataSource();
             for (Object item : ds.getItemIds()) {
                 V_STUDENT_SELECT studentSelect = (V_STUDENT_SELECT) item;
                 list.remove(studentSelect);
+            }
+
+            for (Iterator<V_STUDENT_SELECT> it = list.iterator(); it.hasNext();) {
+                V_STUDENT_SELECT studentSelect = it.next();
+                if(subjectGrid.getSelectedRow()!=null){
+                    if(checkIfHasPairSubject(studentSelect)){
+                        it.remove();
+                    }
+                }
             }
             BeanItemContainer<V_STUDENT_SELECT> bic = new BeanItemContainer<>(V_STUDENT_SELECT.class, list);
             foundStudentGrid.setContainerDataSource(bic);
@@ -624,6 +595,48 @@ public class RegistrationView extends AbstractTaskView {
             LOG.error("Unable to find a student: ", ex);
             Message.showError(ex.toString());
         }
+    }
+
+    private boolean checkIfHasPairSubject(V_STUDENT_SELECT studentSelect){
+
+        Integer pairNumber = ((V_SEMESTER_SUBJECT)subjectGrid.getSelectedRow()).getPairNumber();
+        ID semesterSubjectId =((V_SEMESTER_SUBJECT)subjectGrid.getSelectedRow()).getId();
+        SEMESTER_SUBJECT semesterSubject = null;
+        try{
+            semesterSubject = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(SEMESTER_SUBJECT.class , semesterSubjectId);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+
+        Map<Integer, Object> params = new HashMap<>();
+
+        String sql = "SELECT studSub.subject_id\n" +
+                "FROM student_subject studSub\n" +
+                "INNER JOIN semester_subject semSub\n" +
+                "    ON studSub.subject_id = semSub.id\n" +
+                "INNER JOIN student_education studEdu\n" +
+                "    ON studSub.student_id = studEdu.id\n" +
+                "INNER JOIN subject sub\n" +
+                "    ON semSub.subject_id = sub.id\n" +
+                "INNER JOIN pair_subject pairSub\n" +
+                "    ON sub.id = pairSub.subject_id\n" +
+                "WHERE semSub.semester_data_id = "+semesterSubject.getSemesterData().getId()+" \n" +
+                "      AND\n" +
+                "      studEdu.student_id = "+ studentSelect.getId() +" \n" +
+                "      AND\n" +
+                "      pairSub.pair_number = "+pairNumber+" ";
+
+        try{
+            List o = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
+            if(o.size()>0){
+                return true;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return false;
     }
 
     private void refreshSubjectStudentGrid() {
@@ -634,12 +647,17 @@ public class RegistrationView extends AbstractTaskView {
                     "e.SPEC_NAME from STUDENT a inner join USERS b on a.ID = b.ID inner join STUDENT_EDUCATION c on " +
                     "a.ID = c.STUDENT_ID and c.CHILD_ID is null inner join DEPARTMENT d on c.FACULTY_ID = d.ID " +
                     "inner join SPECIALITY e on c.SPECIALITY_ID = e.ID where exists (select 1 from STUDENT_SUBJECT f " +
-                    "where f.STUDENT_ID = c.ID and f.SUBJECT_ID = ?1 and f.DELETED = ?2)";
+                    "where f.STUDENT_ID = c.ID and f.SUBJECT_ID = ?1 and f.DELETED = ?2) ";
+            if(!CommonUtils.isCurrentUserAdmin()){
+                sql = sql + " and a.advisor_id = " + CommonUtils.getCurrentUser().getId().getId().longValue();
+            }
+
             params.put(1, ((V_SEMESTER_SUBJECT) o).getId().getId());
             params.put(2, Boolean.FALSE);
             try {
                 List<V_STUDENT_SELECT> list = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
                         sql, params, V_STUDENT_SELECT.class);
+
                 BeanItemContainer<V_STUDENT_SELECT> bic = new BeanItemContainer<>(V_STUDENT_SELECT.class, list);
                 subjectStudentGrid.setContainerDataSource(bic);
             } catch (Exception ex) {
@@ -687,37 +705,6 @@ public class RegistrationView extends AbstractTaskView {
                 new CancelYesListener(subjectId, list));
     }
 
-    private class FacultyChangeListener implements ValueChangeListener {
-
-        private final ComboBox specialityCB;
-
-        FacultyChangeListener(ComboBox specialityCB) {
-            super();
-            this.specialityCB = specialityCB;
-        }
-
-        @Override
-        public void valueChange(ValueChangeEvent ev) {
-            DEPARTMENT faculty = (DEPARTMENT) ev.getProperty().getValue();
-            if (faculty != null) {
-                QueryModel<SPECIALITY> specialityQM = new QueryModel<>(SPECIALITY.class);
-                FromItem chairFI = specialityQM.addJoin(EJoin.INNER_JOIN, "department", DEPARTMENT.class, "id");
-                specialityQM.addWhere("deleted", Boolean.FALSE);
-                specialityQM.addWhereAnd(chairFI, "parent", ECriteria.EQUAL, faculty.getId());
-                try {
-                    BeanItemContainer<SPECIALITY> specialityBIC = new BeanItemContainer<>(SPECIALITY.class,
-                            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(specialityQM));
-                    specialityCB.setContainerDataSource(specialityBIC);
-                } catch (Exception ex) {
-                    LOG.error("Unable to find specialities: ", ex);
-                    Message.showError(ex.toString());
-                }
-            } else {
-                specialityCB.removeAllItems();
-            }
-        }
-    }
-
     private class SubjectSelectListener implements SelectionListener {
 
         @Override
@@ -739,13 +726,11 @@ public class RegistrationView extends AbstractTaskView {
 
         @Override
         public void buttonClick(ClickEvent ev) {
-            QueryModel<SEMESTER_DATA> sdQM = new QueryModel<>(SEMESTER_DATA.class);
-            sdQM.addWhere("year", ECriteria.EQUAL, ((ENTRANCE_YEAR) studyYearCB.getValue()).getId());
-            sdQM.addWhereAnd("semesterPeriod", ECriteria.EQUAL, ((SEMESTER_PERIOD) semesterPeriodCB.getValue()).getId());
+
             Date regDate = new Date();
             List<STUDENT_SUBJECT> newList = new ArrayList<>();
             try {
-                SEMESTER_DATA sd = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(sdQM);
+
                 SEMESTER_SUBJECT ss = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
                         SEMESTER_SUBJECT.class, semesterSubjectId);
                 QueryModel<STUDENT_EDUCATION> seQM = new QueryModel<>(STUDENT_EDUCATION.class);
@@ -755,7 +740,7 @@ public class RegistrationView extends AbstractTaskView {
                     STUDENT_EDUCATION se = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
                             lookupSingle(seQM);
                     STUDENT_SUBJECT ss1 = new STUDENT_SUBJECT();
-                    ss1.setSemesterData(sd);
+                    ss1.setSemesterData(ss.getSemesterData());
                     ss1.setStudentEducation(se);
                     ss1.setSubject(ss);
                     ss1.setRegDate(regDate);
@@ -786,17 +771,13 @@ public class RegistrationView extends AbstractTaskView {
 
         @Override
         public void buttonClick(ClickEvent ev) {
-            QueryModel<SEMESTER_DATA> sdQM = new QueryModel<>(SEMESTER_DATA.class);
-            sdQM.addWhere("year", ECriteria.EQUAL, ((ENTRANCE_YEAR) studyYearCB.getValue()).getId());
-            sdQM.addWhereAnd("semesterPeriod", ECriteria.EQUAL, ((SEMESTER_PERIOD) semesterPeriodCB.getValue()).getId());
             List<STUDENT_SUBJECT> delList = new ArrayList<>();
             try {
-                SEMESTER_DATA sd = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(sdQM);
-                SEMESTER_SUBJECT ss = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
+                 SEMESTER_SUBJECT ss = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
                         SEMESTER_SUBJECT.class, semesterSubjectId);
                 QueryModel<STUDENT_SUBJECT> ssQM = new QueryModel<>(STUDENT_SUBJECT.class);
                 FromItem ssFI = ssQM.addJoin(EJoin.INNER_JOIN, "studentEducation", STUDENT_EDUCATION.class, "id");
-                ssQM.addWhere("semesterData", ECriteria.EQUAL, sd.getId());
+                ssQM.addWhere("semesterData", ECriteria.EQUAL, ss.getSemesterData().getId());
                 ssQM.addWhere("subject", ECriteria.EQUAL, ss.getId());
                 ssQM.addWhereNull(ssFI, "child");
                 for (V_STUDENT_SELECT vss : studentList) {
@@ -809,6 +790,7 @@ public class RegistrationView extends AbstractTaskView {
                 if (!delList.isEmpty()) {
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(delList);
                     refreshSubjectStudentGrid();
+                    refreshFoundStudentGrid();
                 }
             } catch (Exception ex) {
                 LOG.error("Unable to unregister the students from the subject: ", ex);

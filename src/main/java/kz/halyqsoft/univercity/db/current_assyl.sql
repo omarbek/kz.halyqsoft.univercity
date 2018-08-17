@@ -50,5 +50,3 @@ create sequence S_MESSAGE
   minvalue 0
   start with 1
   no cycle;
-
-ALTER TABLE document ALTER COLUMN file_byte DROP NOT NULL ;

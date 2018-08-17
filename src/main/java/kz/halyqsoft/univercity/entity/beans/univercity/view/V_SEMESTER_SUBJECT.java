@@ -28,7 +28,10 @@ public class V_SEMESTER_SUBJECT extends AbstractEntity {
 
 	@Column(name = "CREDIT", nullable = false)
 	private Integer credit;
-	
+
+	@Column(name = "PAIR_NUMBER", nullable = false)
+	private Integer pairNumber;
+
 	@Column(name = "FORMULA", nullable = false)
 	private String formula;
 	
@@ -92,5 +95,13 @@ public class V_SEMESTER_SUBJECT extends AbstractEntity {
 
 	public void setControlTypeName(String controlTypeName) {
 		this.controlTypeName = controlTypeName;
+	}
+
+	public Integer getPairNumber() {
+		return pairNumber;
+	}
+
+	public void setPairNumber(Integer pairNumber) {
+		this.pairNumber = pairNumber;
 	}
 }
