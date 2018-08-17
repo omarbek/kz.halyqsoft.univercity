@@ -13,7 +13,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PdfView extends AbstractTaskView {
+public class PdfView extends AbstractTaskView {//this is unused
     private Button generateButton;
     private Button addComponentButton;
     private TextField pdfTitle;
