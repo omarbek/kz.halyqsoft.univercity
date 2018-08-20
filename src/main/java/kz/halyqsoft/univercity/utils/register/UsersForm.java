@@ -527,6 +527,7 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
         iinTF.setWidth(200, Unit.PIXELS);
         iinTF.setMaxLength(12);
         iinTF.setImmediate(true);
+        iinTF.setRequired(true);
 
         iinTF.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
