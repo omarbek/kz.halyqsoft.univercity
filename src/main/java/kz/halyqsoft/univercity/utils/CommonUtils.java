@@ -203,6 +203,7 @@ public class CommonUtils {
         HorizontalLayout buttonPanel = new HorizontalLayout();
         buttonPanel.setSpacing(true);
         buttonPanel.setWidthUndefined();
+        buttonPanel.setImmediate(true);
         return buttonPanel;
     }
 

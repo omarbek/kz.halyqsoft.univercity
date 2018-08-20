@@ -212,7 +212,7 @@ public class EmployeePdfCreator {
         return result;
     }
 
-    private static Font getFont(int fontSize, int font) {
+    public static Font getFont(int fontSize, int font) {
         String fontPath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath() + "/WEB-INF/classes/fonts";
         BaseFont timesNewRoman = null;
         try {
@@ -301,7 +301,7 @@ public class EmployeePdfCreator {
     }
 
 
-    public static StreamResource getResource(String filePath , File file) {
+    public static StreamResource getResourceFromFile(String filePath , File file) {
         StreamResource sr =  new StreamResource(new StreamResource.StreamSource() {
 
             @Override
