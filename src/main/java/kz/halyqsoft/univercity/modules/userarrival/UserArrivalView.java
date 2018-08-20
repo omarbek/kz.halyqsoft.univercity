@@ -2,15 +2,16 @@ package kz.halyqsoft.univercity.modules.userarrival;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.util.HierarchicalContainer;
-import com.vaadin.event.MouseEvents;
-import com.vaadin.server.ThemeResource;
-import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.USER_TYPE;
 import kz.halyqsoft.univercity.entity.beans.univercity.enumeration.UserType;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.*;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.VDepartmentInfo;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.VEmployeeInfo;
 import kz.halyqsoft.univercity.modules.reports.MenuColumn;
-import kz.halyqsoft.univercity.modules.userarrival.subview.*;
+import kz.halyqsoft.univercity.modules.userarrival.subview.AbsentAttendance;
+import kz.halyqsoft.univercity.modules.userarrival.subview.GroupAttendance;
+import kz.halyqsoft.univercity.modules.userarrival.subview.MainSection;
+import kz.halyqsoft.univercity.modules.userarrival.subview.SigningSection;
 import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.PrintDialog;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
@@ -19,8 +20,6 @@ import org.r3a.common.entity.ID;
 import org.r3a.common.entity.beans.AbstractTask;
 import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.event.EntityListener;
-import org.r3a.common.entity.query.QueryModel;
-import org.r3a.common.entity.query.select.EAggregate;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.ERefreshType;
 import org.r3a.common.vaadin.widget.dialog.Message;
@@ -32,8 +31,6 @@ import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-
-import static kz.halyqsoft.univercity.utils.CommonUtils.getUILocaleUtil;
 
 /**
  * @author Omarbek
@@ -407,61 +404,5 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
         tableVL.setComponentAlignment(topHL, Alignment.MIDDLE_RIGHT);
         tableVL.addComponent(employeeGW);
         mainHL.addComponent(tableVL);
-    }
-
-    public List<VAbsents> getAbsentList(Integer number) {
-
-        List<VAbsents> list = new ArrayList<>();
-        Map<Integer, Object> params = new HashMap<>();
-        String sql = "SELECT\n" +
-                "  trim(u.LAST_NAME || ' ' || u.FIRST_NAME || ' ' || coalesce(u.MIDDLE_NAME, '')) FIO,\n" +
-                "  vstudent.faculty_name,\n" +
-                "  vstudent.speciality_name,\n" +
-                "  vstudent.group_name,\n" +
-                "  date_part('days', now()::date - (max(arrive.created) )\n" +
-                "  ) as                                                                           absentDay,\n" +
-                "  max(arrive.created)\n" +
-                "FROM user_arrival arrive\n" +
-                "  INNER JOIN users u on arrive.user_id = u.id\n" +
-                "  INNER JOIN v_student vstudent on u.id = vstudent.id\n" +
-                "GROUP BY FIO,\n" +
-                "  vstudent.faculty_name,\n" +
-                "  vstudent.speciality_name,\n" +
-                "  vstudent.group_name\n" +
-                "HAVING date_part('days', now()::date - (max(arrive.created) )\n" +
-                ") > 5";
-        if(number!=null){
-            sql = sql + "and  date_part('days', now()::date - (max(arrive.created) )\n" +
-                    ") <= " + number;
-        }
-        try {
-            List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
-            if (!tmpList.isEmpty()) {
-                for (Object o : tmpList) {
-                    Object[] oo = (Object[]) o;
-                    VAbsents vAbsent = new VAbsents();
-                    vAbsent.setFIO((String) oo[0]);
-                    vAbsent.setFaculty((String) oo[1]);
-                    vAbsent.setSpeciality((String) oo[2]);
-                    vAbsent.setGroup((String) oo[3]);
-                    vAbsent.setAbsentSum((Double) oo[4]);
-                    vAbsent.setLastVisit((Date)oo[5]);
-                    list.add(vAbsent);
-                }
-            }
-        } catch (Exception ex) {
-            CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
-        }
-        refreshAbsentList(list);
-        return list;
-    }
-
-    private void refreshAbsentList(List<VAbsents> list) {
-        ((DBGridModel) absentsGW.getWidgetModel()).setEntities(list);
-        try {
-            absentsGW.refresh();
-        } catch (Exception ex) {
-            CommonUtils.showMessageAndWriteLog("Unable to refresh department list", ex);
-        }
     }
 }
