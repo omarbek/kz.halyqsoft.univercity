@@ -1,6 +1,5 @@
 package kz.halyqsoft.univercity.entity.beans.univercity;
 
-import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEX;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
@@ -19,15 +18,15 @@ public class CHILD extends AbstractEntity {
 			@JoinColumn(name = "EMPLOYEE_ID", referencedColumnName = "ID", nullable = false)})
 	private EMPLOYEE employee;
 
-	@FieldInfo(type = EFieldType.TEXT, max = 32, order = 2)
+	@FieldInfo(type = EFieldType.TEXT, max = 32, order = 2,inGrid = false)
 	@Column(name = "FIRST_NAME", nullable = false)
 	private String firstName;
 
-	@FieldInfo(type = EFieldType.TEXT, max = 32, order = 3)
+	@FieldInfo(type = EFieldType.TEXT, max = 32, order = 3,inGrid = false)
 	@Column(name = "LAST_NAME", nullable = false)
 	private String lastName;//
 
-	@FieldInfo(type = EFieldType.TEXT, max = 32, order = 4, required = false)
+	@FieldInfo(type = EFieldType.TEXT, max = 32, order = 4, required = false,inGrid = false)
 	@Column(name = "MIDDLE_NAME")
 	private String middleName;
 

@@ -4,6 +4,8 @@ import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
 
+import java.util.Date;
+
 public class VAbsents extends AbstractEntity {
 
     @FieldInfo(type=EFieldType.TEXT, order = 1)
@@ -20,6 +22,9 @@ public class VAbsents extends AbstractEntity {
 
     @FieldInfo(type = EFieldType.DOUBLE, order = 5)
     private Double absentSum;
+
+    @FieldInfo(type = EFieldType.DATE, order = 6)
+    private Date lastVisit;
 
     public String getFIO() {
         return FIO;
@@ -59,5 +64,13 @@ public class VAbsents extends AbstractEntity {
 
     public void setAbsentSum(Double absentSum) {
         this.absentSum = absentSum;
+    }
+
+    public Date getLastVisit() {
+        return lastVisit;
+    }
+
+    public void setLastVisit(Date lastVisit) {
+        this.lastVisit = lastVisit;
     }
 }

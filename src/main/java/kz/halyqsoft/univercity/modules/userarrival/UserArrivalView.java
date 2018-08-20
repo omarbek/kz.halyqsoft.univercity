@@ -469,7 +469,8 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
                 "  vstudent.speciality_name,\n" +
                 "  vstudent.group_name,\n" +
                 "  date_part('days', now()::date - (max(arrive.created) )\n" +
-                "  ) as                                                                           absentDay\n" +
+                "  ) as                                                                           absentDay,\n" +
+                "  max(arrive.created)\n" +
                 "FROM user_arrival arrive\n" +
                 "  INNER JOIN users u on arrive.user_id = u.id\n" +
                 "  INNER JOIN v_student vstudent on u.id = vstudent.id\n" +
@@ -494,6 +495,7 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
                     vAbsent.setSpeciality((String) oo[2]);
                     vAbsent.setGroup((String) oo[3]);
                     vAbsent.setAbsentSum((Double) oo[4]);
+                    vAbsent.setLastVisit((Date)oo[5]);
                     list.add(vAbsent);
                 }
             }
