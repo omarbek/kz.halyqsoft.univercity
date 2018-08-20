@@ -424,7 +424,7 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
             if (sb.length() > 0) {
                 sb.append(" and ");
             }
-            sb.append("  stu.FIRST_NAME ilike '");
+            sb.append(" and stu.FIRST_NAME ilike '");
             sb.append(sf.getFirstname().trim());
             sb.append("%'");
         }

@@ -26,7 +26,7 @@ import java.util.List;
  * @author Omarbek
  * @created on 16.04.2018
  */
-public class MyFilesView extends AbstractTaskView {
+public class MyFilesView extends AbstractTaskView {//this is unused
 
     public MyFilesView(AbstractTask task) throws Exception {
         super(task);

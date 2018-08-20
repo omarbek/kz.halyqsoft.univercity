@@ -1,7 +1,8 @@
 package kz.halyqsoft.univercity.utils.register;
 
-import com.vaadin.data.validator.EmailValidator;
-import com.vaadin.data.validator.IntegerRangeValidator;
+import com.vaadin.data.Property;
+import com.vaadin.data.Validator;
+import com.vaadin.data.validator.*;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
@@ -13,6 +14,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.enumeration.Flag;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_MEDICAL_CHECKUP;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_USER_LANGUAGE;
 import kz.halyqsoft.univercity.utils.CommonUtils;
+import kz.halyqsoft.univercity.utils.FieldValidator;
 import kz.halyqsoft.univercity.utils.changelisteners.SchoolCountryChangeListener;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.facade.CommonIDFacadeBean;
@@ -46,7 +48,7 @@ import java.util.*;
  * @created on 16.05.2018
  */
 public abstract class UsersForm extends AbstractFormWidgetView implements PhotoWidgetListener {
-
+    StringLengthValidator lengthValidator = new StringLengthValidator("ИИН должен состоять из 12 цифр",12,13,false);
     private VerticalLayout buttonsVL;
     private VerticalLayout messForm;
     private FromItem educationUDFI;
@@ -54,7 +56,7 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
     protected HorizontalLayout contentHL;
     protected QueryModel<USER_DOCUMENT_FILE> udfQM;
     protected AbstractFormWidget dataAFW;
-
+    public static String iin;
     private TableWidget eduDocTW, languagesTW, medicalCheckupTW;
 
     private Button mainDataButton, regAddressButton;
@@ -80,6 +82,8 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
     protected Repatriate repatriate;
     protected Passport passport;
     protected Flag flag;
+
+    private TextField iinTF;
 
     private static final int ADDRESS_REG = 1;
     private static final int ADDRESS_FACT = 2;
@@ -225,6 +229,11 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
                 if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.REG_ADDRESS.equals(flag)))
                         || !(Flag.MAIN_DATA.equals(flag) || Flag.REG_ADDRESS.equals(flag))) {
                     addToLayout(Flag.ID_DOC, passport.getMainGFW(), militaryButton, event);
+                    FormModel mainFM = passport.getMainGFW().getWidgetModel();
+                    if(iin!=null) {
+                        mainFM.getFieldModel("iin").getField().setValue(iin);
+                        mainFM.getFieldModel("iin").getField().setReadOnly(true);
+                    }
                 }
             }
         });
@@ -513,6 +522,54 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
 
     private VerticalLayout getPhotoVL() {
         VerticalLayout photoAndButtonsVL = new VerticalLayout();
+        photoAndButtonsVL.setSpacing(true);
+        iinTF=new TextField();
+        iinTF.setWidth(200, Unit.PIXELS);
+        iinTF.setMaxLength(12);
+        iinTF.setImmediate(true);
+
+        iinTF.addValueChangeListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
+
+                if(iinTF.getValue()!=null && !iinTF.getValue().trim().equals("")) {
+
+                        QueryModel<USER_DOCUMENT> userDocumentQM = new QueryModel<>(USER_DOCUMENT.class);
+                        FromItem udItem = userDocumentQM.addJoin(EJoin.INNER_JOIN, "id", USER_PASSPORT.class, "id");
+                        userDocumentQM.addWhere(udItem, "iin", ECriteria.EQUAL, iinTF.getValue());
+                        userDocumentQM.addWhere("deleted",ECriteria.EQUAL,false);
+
+
+                        try {
+                            USER_DOCUMENT userDocument = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(userDocumentQM);
+                            if (userDocument != null) {
+                                Message.showInfo("ИИН уже существует");
+                            }
+                        } catch (Exception e) {
+                        }
+                        boolean flag = true;
+                        for(Validator v: iinTF.getValidators()) {
+                            if(v.equals(lengthValidator)){
+                                flag = false;
+                            }
+                        }
+
+                        if(flag){
+                            iinTF.addValidator(lengthValidator);
+                        }
+
+                    if (FieldValidator.isNumber(iinTF.getValue())) {
+                            iin = iinTF.getValue();
+                        } else {
+                            iinTF.setValue("");
+                            iin = "";
+                        }
+                    }else {
+                    iinTF.removeValidator(lengthValidator);
+                }
+
+            }
+        });
 
         PhotoWidget userPW = new PhotoWidget(userPhotoBytes);
         userPW.setPhotoHeight(290, Unit.PIXELS);
@@ -520,19 +577,32 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
         userPW.setSaveButtonVisible(false);
         userPW.addListener(UsersForm.this);
         photoAndButtonsVL.addComponent(userPW);
+        photoAndButtonsVL.addComponent(iinTF);
+        iinTF.setCaption(getUILocaleUtil().getCaption("iin"));
+
         photoAndButtonsVL.setComponentAlignment(userPW, Alignment.TOP_CENTER);
+        photoAndButtonsVL.setComponentAlignment(iinTF, Alignment.TOP_CENTER);
+
 
         Button nextButton = createNextButton(factAddressButton, NEXT_BUTTON_CAPTION);
+        nextButton.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+
+            }
+        });
 
         Button cancelButton = createCancelButton();
         cancelButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 dataAFW.cancel();
+                iinTF.clear();
             }
         });
 
         HorizontalLayout buttonsHL = createButtonPanel();
+
         buttonsHL.addComponent(nextButton);
         buttonsHL.addComponent(cancelButton);
 
@@ -930,10 +1000,7 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
             FormModel medicalCheckupFM = ((DBTableModel) medicalCheckupTW.getWidgetModel()).getFormModel();
 
             return refreshFiles(e, udfQM, medicalCheckupFM);
-        } else if (source.equals(languagesTW)) {
-            return true;
-        }
-        return false;
+        } else return source.equals(languagesTW);
     }
 
     protected boolean refreshFiles(Entity e, QueryModel<USER_DOCUMENT_FILE> udfQM, FormModel educationFM) {
@@ -1142,5 +1209,25 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
             userPhotoFilename = photoWidgetEvent.getFilename();
             userPhotoChanged = true;
         }
+    }
+
+    public VerticalLayout getButtonsVL() {
+        return buttonsVL;
+    }
+
+    public Button getPreemRightButton() {
+        return preemRightButton;
+    }
+
+    public Button getEduDocsButton() {
+        return eduDocsButton;
+    }
+
+    public TableWidget getEduDocTW() {
+        return eduDocTW;
+    }
+
+    public Button getMedButton() {
+        return medButton;
     }
 }
