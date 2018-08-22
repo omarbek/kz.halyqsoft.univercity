@@ -33,74 +33,65 @@ public class V_EMPLOYEE_DEGREE extends AbstractEntity {
 	private static final long serialVersionUID = 5789627256671349500L;
 
 	@FieldInfo(type = EFieldType.FK_COMBO, order = 1, inEdit = false, inGrid = false, inView = false)
-    @ManyToOne
-    @JoinColumns({
-        @JoinColumn(name = "EMPLOYEE_ID", referencedColumnName = "ID")})
-    private EMPLOYEE employee;
-	
+	@ManyToOne
+	@JoinColumns({
+			@JoinColumn(name = "EMPLOYEE_ID", referencedColumnName = "ID")})
+	private EMPLOYEE employee;
+
 	@FieldInfo(type = EFieldType.TEXT, max = 12, order = 2, inGrid = false)
 	@Column(name = "DOCUMENT_NO", nullable = false)
 	private String documentNo;
-	
+
 	@FieldInfo(type = EFieldType.DATE, order = 3, inGrid = false)
 	@Column(name = "ISSUE_DATE")
-    @Temporal(TemporalType.DATE)
-    private Date issueDate;
-	
+	@Temporal(TemporalType.DATE)
+	private Date issueDate;
+
 	@FieldInfo(type = EFieldType.DATE, order = 4, required = false, inGrid = false)
 	@Column(name = "EXPIRE_DATE")
-    @Temporal(TemporalType.DATE)
-    private Date expireDate;
+	@Temporal(TemporalType.DATE)
+	private Date expireDate;
 
-	
+
 	@FieldInfo(type = EFieldType.FK_COMBO, order = 5, inGrid = false)
-    @ManyToOne
-    @JoinColumns({
-        @JoinColumn(name = "DEGREE_ID", referencedColumnName = "ID")})
-    private DEGREE degree;
-	
+	@ManyToOne
+	@JoinColumns({
+			@JoinColumn(name = "DEGREE_ID", referencedColumnName = "ID")})
+	private DEGREE degree;
+
 	@FieldInfo(type = EFieldType.TEXT, max = 64, order = 6, inEdit = false, inView = false)
 	@Column(name = "DEGREE_NAME", nullable = false)
 	private String degreeName;
-	
+
 	@FieldInfo(type = EFieldType.TEXT, max = 64, order = 7)
 	@Column(name = "place_of_issue", nullable = false)
 	private String placeOfIssue;
-	
+
 	@FieldInfo(type = EFieldType.TEXT, max = 64, order = 8, inGrid = false)
 	@Column(name = "DISSERTATION_TOPIC", nullable = false)
 	private String dissertationTopic;
 
-	@FieldInfo(type = EFieldType.FK_COMBO,required = false, order = 9)
+	@FieldInfo(type = EFieldType.FK_COMBO, required = false, order = 9)
 	@ManyToOne
 	@JoinColumns({
 			@JoinColumn(name = "CANDIDATE_ID", referencedColumnName = "ID")})
 	private CANDIDATE candidate;
 
-	@FieldInfo(type = EFieldType.FK_COMBO,required = false, order = 10)
+	@FieldInfo(type = EFieldType.FK_COMBO, required = false, order = 10)
 	@ManyToOne
 	@JoinColumns({
 			@JoinColumn(name = "SPECIALITY_ID", referencedColumnName = "ID")})
 	private SPECIALITY speciality;
 
-	@FieldInfo(type = EFieldType.FK_COMBO, required = false, order = 11)
-	@ManyToOne
-	@JoinColumns({
-			@JoinColumn(name = "QUALIFICATION_ID", referencedColumnName = "ID")})
-	private QUALIFICATION qualification;
 
-	@FieldInfo(type = EFieldType.DATE, max = 2099, required = false, order = 12)
-	@Column(name = "ENTRANCE_YEAR", nullable = false)
-	private Date entranceYear;
-	
 	@FieldInfo(type = EFieldType.BOOLEAN, order = 13, required = false, inEdit = false, inGrid = false, inView = false)
 	@Column(name = "DELETED", nullable = false)
-    private boolean deleted;
-	
+	private boolean deleted;
+
 	@Transient
 	@FieldInfo(type = EFieldType.FILE_LIST, order = 21, required = false, inGrid = false)
 	private List<FileBean> fileList = new ArrayList<FileBean>();
-	
+
 	public V_EMPLOYEE_DEGREE() {
 	}
 
@@ -202,21 +193,5 @@ public class V_EMPLOYEE_DEGREE extends AbstractEntity {
 
 	public void setSpeciality(SPECIALITY speciality) {
 		this.speciality = speciality;
-	}
-
-	public QUALIFICATION getQualification() {
-		return qualification;
-	}
-
-	public void setQualification(QUALIFICATION qualification) {
-		this.qualification = qualification;
-	}
-
-	public Date getEntranceYear() {
-		return entranceYear;
-	}
-
-	public void setEntranceYear(Date entranceYear) {
-		this.entranceYear = entranceYear;
 	}
 }
