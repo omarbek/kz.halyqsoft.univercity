@@ -223,7 +223,7 @@ public final class ApplicantsForm extends UsersForm {
             studentEducation.setChair(speciality.getDepartment());
             studentEducation.setSpeciality(speciality);
             V_ENTRANT_SPECIALITY entrantSpeciality = (V_ENTRANT_SPECIALITY)specTW.getAllEntities().get(0);
-            studentEducation.setLanguage(entrantSpeciality.getLanguage());//TODO check
+            studentEducation.setLanguage(entrantSpeciality.getLanguage());
             studentEducation.setStudyYear(SessionFacadeFactory.getSessionFacade(
                     CommonEntityFacadeBean.class).lookup(STUDY_YEAR.class, ID.valueOf(1)));
             studentEducation.setEducationType(SessionFacadeFactory.getSessionFacade(

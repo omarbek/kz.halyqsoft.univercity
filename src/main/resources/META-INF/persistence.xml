@@ -211,7 +211,6 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_STUDENT_DIFFERENCE</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_MASTER</class>
 
-
         <class>kz.halyqsoft.univercity.entity.beans.univercity.AbstractSpiderEntity</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.AbstractStudentEntity</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.AbstractWorkHourEntity</class>
@@ -347,7 +346,6 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.SUBSTITUTION</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.CHILD</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.MASTER</class>
-
         <class>kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_DIFFERENCE</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
