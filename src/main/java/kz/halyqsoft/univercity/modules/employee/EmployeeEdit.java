@@ -1426,12 +1426,15 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
                     vPreviousExperience.setOrganizationName((String)oo[1]);
                     vPreviousExperience.setPostName((String)oo[2]);
                     vPreviousExperience.setHireDate((Date)oo[3]);
-                    vPreviousExperience.setDismissDate((Date) oo[4]);
+                        vPreviousExperience.setDismissDate((Date) oo[4]);
                     sum = (PGInterval) oo[5];
-                    vPreviousExperience.setWorkPeriod(String.valueOf(sum.getYears())
-                            +" "+getUILocaleUtil().getCaption("experienceL.year")+" "
-                            +String.valueOf(sum.getMonths())+" "+getUILocaleUtil().getCaption("experienceL.month"));
-                    list.add(vPreviousExperience);
+                    if(sum!=null) {
+                        vPreviousExperience.setWorkPeriod(String.valueOf(sum.getYears())
+                                + " " + getUILocaleUtil().getCaption("experienceL.year") + " "
+                                + String.valueOf(sum.getMonths()) + " " + getUILocaleUtil().getCaption("experienceL.month"));
+                        list.add(vPreviousExperience);
+                    }
+
                 }
             }
         } catch (Exception ex) {
@@ -1657,7 +1660,6 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
             QueryModel schoolCountryQM = schoolCountryFieldModel.getQueryModel();
             schoolCountryQM.addWhereNull("parent");
             schoolCountryQM.addOrder("countryName");
-
             FKFieldModel schoolRegionFieldModel = (FKFieldModel) educationFM.getFieldModel("schoolRegion");
             QueryModel schoolRegionQM = schoolRegionFieldModel.getQueryModel();
             schoolRegionQM.addWhere("parent", ECriteria.EQUAL, ID.valueOf(-1));
@@ -2953,8 +2955,6 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
                 ed.setDissertationTopic(ved.getDissertationTopic());
                 ed.setCandidate(ved.getCandidate());
                 ed.setSpeciality(ved.getSpeciality());
-                ed.setQualification(ved.getQualification());
-                ed.setEntranceYear(ved.getEntranceYear());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(ed);
 
                 QueryModel scientificDegreeQM = ((DBTableModel) scientificDegreeTW.getWidgetModel()).getQueryModel();
@@ -2976,8 +2976,6 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
                 ed.setDissertationTopic(ved.getDissertationTopic());
                 ed.setCandidate(ved.getCandidate());
                 ed.setSpeciality(ved.getSpeciality());
-                ed.setQualification(ved.getQualification());
-                ed.setEntranceYear(ved.getEntranceYear());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(ed);
                 scientificDegreeTW.refresh();
                 showSavedNotification();
@@ -3228,8 +3226,8 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
                 ed.setEmployee(emp);
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(ed);
 
-                QueryModel careerQM = ((DBTableModel) masterTW.getWidgetModel()).getQueryModel();
-                careerQM.addWhere("employee", ECriteria.EQUAL, emp.getId());
+                QueryModel masterQM = ((DBTableModel) masterTW.getWidgetModel()).getQueryModel();
+                masterQM.addWhere("employee", ECriteria.EQUAL, emp.getId());
 
                 masterTW.refresh();
                 showSavedNotification();
@@ -3239,7 +3237,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         } else {
             try {
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(ed);
-                careerTW.refresh();
+                masterTW.refresh();
                 showSavedNotification();
             } catch (Exception ex) {
                 CommonUtils.showMessageAndWriteLog("Unable to merge a master", ex);

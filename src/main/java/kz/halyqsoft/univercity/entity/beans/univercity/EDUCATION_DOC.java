@@ -1,11 +1,6 @@
 package kz.halyqsoft.univercity.entity.beans.univercity;
 
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.COUNTRY;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.EDUCATION_DOC_TYPE;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.EDUCATION_TYPE;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.LANGUAGE;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SCHOOL_CERTIFICATE_TYPE;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SCHOOL_TYPE;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
 
@@ -15,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
+import java.util.Date;
 
 /**
  * @author Omarbek
@@ -95,16 +91,31 @@ public class EDUCATION_DOC extends USER_DOCUMENT {
 	@FieldInfo(type = EFieldType.INTEGER, order = 18, columnWidth = 130, required = false, inGrid = false)
 	@Column(name = "END_YEAR")
     private Integer endYear;
-	
-	@FieldInfo(type = EFieldType.TEXT, max = 64, order = 19, required = false, inGrid = false)
-	@Column(name = "FACULTY_NAME", nullable = true)
-	private String facultyName;
-	
-	@FieldInfo(type = EFieldType.TEXT, max = 64, order = 20, required = false, inGrid = false)
-	@Column(name = "SPECIALITY_NAME", nullable = true)
+
+	@FieldInfo(type = EFieldType.TEXT, max = 64, order = 19)
+	@Column(name = "speciality_name")
 	private String specialityName;
 
+	@FieldInfo(type = EFieldType.TEXT, max = 64, order = 22, required = false, inGrid = false)
+	@Column(name = "FACULTY_NAME", nullable = true)
+	private String facultyName;
+
+	@FieldInfo(type = EFieldType.DATE, max = 2099, order = 23)
+	@Column(name = "ENTRANCE_YEAR", nullable = false)
+	private Date entranceYear;
+
+	@FieldInfo(type = EFieldType.FK_COMBO, order = 24)
+	@ManyToOne
+	@JoinColumns({
+			@JoinColumn(name = "QUALIFICATION_ID", referencedColumnName = "ID")})
+	private QUALIFICATION qualification;
+
+
 	public EDUCATION_DOC() {
+	}
+
+	public static long getSerialVersionUID() {
+		return serialVersionUID;
 	}
 
 	public EDUCATION_TYPE getEducationType() {
@@ -186,7 +197,7 @@ public class EDUCATION_DOC extends USER_DOCUMENT {
 	public void setHighGraduated(boolean highGraduated) {
 		this.highGraduated = highGraduated;
 	}
-	
+
 	public boolean isGoldMark() {
 		return goldMark;
 	}
@@ -234,4 +245,21 @@ public class EDUCATION_DOC extends USER_DOCUMENT {
 	public void setSpecialityName(String specialityName) {
 		this.specialityName = specialityName;
 	}
+
+	public Date getEntranceYear() {
+		return entranceYear;
+	}
+
+	public void setEntranceYear(Date entranceYear) {
+		this.entranceYear = entranceYear;
+	}
+
+	public QUALIFICATION getQualification() {
+		return qualification;
+	}
+
+	public void setQualification(QUALIFICATION qualification) {
+		this.qualification = qualification;
+	}
+
 }
