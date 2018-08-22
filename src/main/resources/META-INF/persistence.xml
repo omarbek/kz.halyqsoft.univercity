@@ -211,7 +211,6 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_STUDENT_DIFFERENCE</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_MASTER</class>
 
-
         <class>kz.halyqsoft.univercity.entity.beans.univercity.AbstractSpiderEntity</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.AbstractStudentEntity</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.AbstractWorkHourEntity</class>
@@ -347,7 +346,6 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.SUBSTITUTION</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.CHILD</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.MASTER</class>
-
         <class>kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_DIFFERENCE</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
@@ -355,8 +353,8 @@
         <properties>
             <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
             <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/realdb"/>
-            <property name="javax.persistence.jdbc.user" value="univer"/>
-            <property name="javax.persistence.jdbc.password" value="univer"/>
+            <property name="javax.persistence.jdbc.user" value="postgres"/>
+            <property name="javax.persistence.jdbc.password" value="ukpu18!"/>
             <!--<property name="javax.persistence.jdbc.user" value="${javax.persistence.jdbc.user}"/>-->
             <!--<property name="javax.persistence.jdbc.password" value="${javax.persistence.jdbc.password}"/>-->
             <property name="eclipselink.connection-pool.default.initial" value="1"/>

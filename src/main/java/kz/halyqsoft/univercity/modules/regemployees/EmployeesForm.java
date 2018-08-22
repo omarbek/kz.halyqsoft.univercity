@@ -29,7 +29,6 @@ import org.r3a.common.vaadin.widget.form.field.filelist.FileListFieldModel;
 import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 import org.r3a.common.vaadin.widget.table.TableWidget;
 import org.r3a.common.vaadin.widget.table.model.DBTableModel;
-import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
 
 import java.util.*;
 
@@ -427,8 +426,6 @@ public class EmployeesForm extends UsersForm {
                 employeeDegree.setDissertationTopic(vEmployeeDegree.getDissertationTopic());
                 employeeDegree.setCandidate(vEmployeeDegree.getCandidate());
                 employeeDegree.setSpeciality(vEmployeeDegree.getSpeciality());
-                employeeDegree.setQualification(vEmployeeDegree.getQualification());
-                employeeDegree.setEntranceYear(vEmployeeDegree.getEntranceYear());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(employeeDegree);
 
                 QueryModel employeeDegreeQM = ((DBTableModel) employeeDegreeTW.getWidgetModel()).getQueryModel();
@@ -450,8 +447,6 @@ public class EmployeesForm extends UsersForm {
                 employeeDegree.setPlaceOfIssue(vEmployeeDegree.getPlaceOfIssue());
                 employeeDegree.setCandidate(vEmployeeDegree.getCandidate());
                 employeeDegree.setSpeciality(vEmployeeDegree.getSpeciality());
-                employeeDegree.setQualification(vEmployeeDegree.getQualification());
-                employeeDegree.setEntranceYear(vEmployeeDegree.getEntranceYear());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(employeeDegree);
                 employeeDegreeTW.refresh();
                 showSavedNotification();
