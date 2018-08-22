@@ -222,10 +222,10 @@ public final class ApplicantsForm extends UsersForm {
             studentEducation.setFaculty(speciality.getDepartment().getParent());
             studentEducation.setChair(speciality.getDepartment());
             studentEducation.setSpeciality(speciality);
+            V_ENTRANT_SPECIALITY entrantSpeciality = (V_ENTRANT_SPECIALITY)specTW.getAllEntities().get(0);
+            studentEducation.setLanguage(entrantSpeciality.getLanguage());//TODO check
             studentEducation.setStudyYear(SessionFacadeFactory.getSessionFacade(
                     CommonEntityFacadeBean.class).lookup(STUDY_YEAR.class, ID.valueOf(1)));
-            studentEducation.setLanguage(SessionFacadeFactory.getSessionFacade(
-                    CommonEntityFacadeBean.class).lookup(LANGUAGE.class, ID.valueOf(1)));
             studentEducation.setEducationType(SessionFacadeFactory.getSessionFacade(
                     CommonEntityFacadeBean.class).lookup(STUDENT_EDUCATION_TYPE.class, ID.valueOf(1)));
             DateFormat uriDateFormat = new SimpleDateFormat("yyyy-MM-dd");

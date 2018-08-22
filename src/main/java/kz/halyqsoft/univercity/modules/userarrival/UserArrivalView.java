@@ -11,9 +11,8 @@ import kz.halyqsoft.univercity.entity.beans.univercity.view.VDepartmentInfo;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VEmployeeInfo;
 import kz.halyqsoft.univercity.modules.reports.MenuColumn;
 import kz.halyqsoft.univercity.modules.userarrival.subview.*;
-import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.PrintDialog;
-import kz.halyqsoft.univercity.modules.userarrival.subview.GroupLatecomers;
 import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.DetalizationDialog;
+import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.PrintDialog;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -218,64 +217,6 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
 
         mainHSP.addComponent(menuTT);
         getContent().addComponent(mainHSP);
-    }
-
-
-    @Override
-    public void handleEntityEvent(EntityEvent ev) {
-
-        if (ev.getSource().equals(employeeGW)) {
-            if (ev.getAction() == EntityEvent.SELECTED) {
-
-                mainHL.removeAllComponents();
-                employeeByDepartmentGW = new GridWidget(VEmployeeInfo.class);
-                employeeByDepartmentGW.setCaption(getUILocaleUtil().getCaption("employeeByDepartmentGW"));
-                employeeByDepartmentGW.setImmediate(true);
-                employeeByDepartmentGW.showToolbar(false);
-                employeeByDepartmentGW.setButtonVisible(AbstractToolbar.REFRESH_BUTTON, true);
-
-                DBGridModel employeeByDepGM = (DBGridModel) employeeByDepartmentGW.getWidgetModel();
-                employeeByDepGM.setTitleVisible(false);
-                employeeByDepGM.setMultiSelect(false);
-                employeeByDepGM.setEntities(getEmployee(date.getValue().toString()));
-                employeeByDepGM.setRefreshType(ERefreshType.MANUAL);
-
-                Button backButton = new Button(getUILocaleUtil().getCaption("backButton"));
-                backButton.addClickListener(new Button.ClickListener() {
-                    @Override
-                    public void buttonClick(Button.ClickEvent clickEvent) {
-                        tableVL.removeAllComponents();
-                        mainHL.removeAllComponents();
-                        setDepartmentInfo();
-                    }
-                });
-
-
-                DBGridModel employeeGM = (DBGridModel) employeeGW.getWidgetModel();
-                employeeGM.setTitleVisible(false);
-                employeeGM.setMultiSelect(false);
-                employeeGM.setEntities(getList(date.getValue().toString()));
-                employeeGM.setRefreshType(ERefreshType.MANUAL);
-
-                tableVL = new VerticalLayout();
-                secondHL = new HorizontalLayout();
-                secondHL.setSizeFull();
-                secondHL.addComponent(backButton);
-                secondHL.setComponentAlignment(backButton, Alignment.MIDDLE_LEFT);
-
-                HorizontalLayout topHL = CommonUtils.createButtonPanel();
-                topHL.setDefaultComponentAlignment(Alignment.MIDDLE_RIGHT);
-
-                topHL.addComponent(date);
-                topHL.addComponent(printBtn);
-
-                secondHL.addComponent(topHL);
-                secondHL.setComponentAlignment(topHL, Alignment.MIDDLE_RIGHT);
-                tableVL.addComponent(secondHL);
-                tableVL.addComponent(employeeByDepartmentGW);
-                mainHL.addComponent(tableVL);
-            }
-        }
     }
 
     public List<VDepartmentInfo> getList(String date) {

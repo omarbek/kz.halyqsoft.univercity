@@ -4,13 +4,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
 
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.ManyToOne;
-import java.util.Date;
+import javax.persistence.*;
 
 /**
  * @author Omarbek
@@ -84,7 +78,7 @@ public class EDUCATION_DOC extends USER_DOCUMENT {
 	@Column(name = "GPA")
     private Double gpa;
 	
-	@FieldInfo(type = EFieldType.INTEGER, order = 17, columnWidth = 130, required = false, inGrid = false, inEdit = false, inView = false)
+	@FieldInfo(type = EFieldType.INTEGER, order = 17, columnWidth = 130, required = false, inGrid = false)
 	@Column(name = "ENTRY_YEAR")
     private Integer entryYear;
 	
@@ -92,7 +86,7 @@ public class EDUCATION_DOC extends USER_DOCUMENT {
 	@Column(name = "END_YEAR")
     private Integer endYear;
 
-	@FieldInfo(type = EFieldType.TEXT, max = 64, order = 19)
+	@FieldInfo(type = EFieldType.TEXT, max = 64, order = 19,required=false)
 	@Column(name = "speciality_name")
 	private String specialityName;
 
@@ -100,16 +94,11 @@ public class EDUCATION_DOC extends USER_DOCUMENT {
 	@Column(name = "FACULTY_NAME", nullable = true)
 	private String facultyName;
 
-	@FieldInfo(type = EFieldType.DATE, max = 2099, order = 23)
-	@Column(name = "ENTRANCE_YEAR", nullable = false)
-	private Date entranceYear;
-
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 24)
+	@FieldInfo(type = EFieldType.FK_COMBO, order = 24,required=false)
 	@ManyToOne
 	@JoinColumns({
 			@JoinColumn(name = "QUALIFICATION_ID", referencedColumnName = "ID")})
 	private QUALIFICATION qualification;
-
 
 	public EDUCATION_DOC() {
 	}
@@ -244,14 +233,6 @@ public class EDUCATION_DOC extends USER_DOCUMENT {
 
 	public void setSpecialityName(String specialityName) {
 		this.specialityName = specialityName;
-	}
-
-	public Date getEntranceYear() {
-		return entranceYear;
-	}
-
-	public void setEntranceYear(Date entranceYear) {
-		this.entranceYear = entranceYear;
 	}
 
 	public QUALIFICATION getQualification() {
