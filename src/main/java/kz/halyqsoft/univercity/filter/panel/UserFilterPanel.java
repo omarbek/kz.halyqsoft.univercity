@@ -27,6 +27,11 @@ public final class UserFilterPanel extends AbstractFilterPanel {
             hl.addComponent(af);
         }
 
+        af = getFilterComponent("iin");
+        if (af != null) {
+            hl.addComponent(af);
+        }
+
         af = getFilterComponent("firstname");
         if (af != null) {
             hl.addComponent(af);

@@ -17,10 +17,8 @@ import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_MEDICAL_CHECKUP;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_STUDENT_DIFFERENCE;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_USER_LANGUAGE;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.V_STUDENT_DIFFERENCE;
 import kz.halyqsoft.univercity.filter.FStudentFilter;
 import kz.halyqsoft.univercity.filter.panel.StudentFilterPanel;
-import kz.halyqsoft.univercity.filter.panel.SubjectFilterPanel;
 import kz.halyqsoft.univercity.modules.student.tabs.*;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.changelisteners.BirthCountryChangeListener;
@@ -40,7 +38,6 @@ import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.locale.UILocaleUtil;
 import org.r3a.common.vaadin.view.AbstractCommonView;
 import org.r3a.common.vaadin.widget.DBSelectModel;
-import org.r3a.common.vaadin.widget.ERefreshType;
 import org.r3a.common.vaadin.widget.dialog.AbstractYesButtonListener;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.dialog.select.ESelectType;
@@ -1140,8 +1137,6 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         QueryModel<ENTRANT_SPECIALITY> seQM = new QueryModel<>(ENTRANT_SPECIALITY.class);
         seQM.addWhere("student", ECriteria.EQUAL, student.getId());
 
-        SocialCategoriesTab socialCategoriesTab = new SocialCategoriesTab(new StudentEditHelperImpl(), readOnly);
-        getTabSheet().addTab(socialCategoriesTab, getUILocaleUtil().getCaption("social.categories"));
         ENTRANT_SPECIALITY se = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(seQM);
 
 
@@ -1457,9 +1452,9 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
             QueryModel schoolTypeQM = schoolTypeFM.getQueryModel();
             schoolTypeQM.addOrder("typeName");
 
-            FKFieldModel preemptiveRightFM = (FKFieldModel) educationFM.getFieldModel("type");
+            FKFieldModel preemptiveRightFM = (FKFieldModel) educationFM.getFieldModel("schoolCertificateType");
             QueryModel preemptiveRightTypeQM = preemptiveRightFM.getQueryModel();
-            preemptiveRightTypeQM.addOrder("type");
+            preemptiveRightTypeQM.addOrder("typeName");
 
             FKFieldModel schoolCountryFieldModel = (FKFieldModel) educationFM.getFieldModel("schoolCountry");
             QueryModel schoolCountryQM = schoolCountryFieldModel.getQueryModel();
