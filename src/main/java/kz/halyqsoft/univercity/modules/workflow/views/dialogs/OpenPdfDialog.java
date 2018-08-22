@@ -10,14 +10,12 @@ import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_SIGNER;
 import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_SIGNER_STATUS;
 import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_STATUS;
 import kz.halyqsoft.univercity.modules.workflow.views.BaseView;
-import kz.halyqsoft.univercity.modules.workflow.views.InOnAgreeView;
 import kz.halyqsoft.univercity.utils.*;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.widget.dialog.Message;
-import org.r3a.common.vaadin.widget.grid.GridWidget;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -101,7 +99,7 @@ public class OpenPdfDialog extends WindowUtils{
         if(document.getRelatedDocumentFilePath()!=null){
 
             File file = new File(document.getRelatedDocumentFilePath());
-            StreamResource sr = EmployeePdfCreator.getResource(document.getRelatedDocumentFilePath(),file);
+            StreamResource sr = EmployeePdfCreator.getResourceFromFile(document.getRelatedDocumentFilePath(),file);
             FileDownloader fileDownloader = new FileDownloader(sr);
             sr.setCacheTime(0);
             fileDownloader.extend(downloadRelatedDocs);

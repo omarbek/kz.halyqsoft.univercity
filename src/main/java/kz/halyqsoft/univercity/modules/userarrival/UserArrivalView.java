@@ -2,16 +2,18 @@ package kz.halyqsoft.univercity.modules.userarrival;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.util.HierarchicalContainer;
-import com.vaadin.event.MouseEvents;
-import com.vaadin.server.ThemeResource;
-import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.USER_TYPE;
 import kz.halyqsoft.univercity.entity.beans.univercity.enumeration.UserType;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.*;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.VDepartmentInfo;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.VEmployeeInfo;
 import kz.halyqsoft.univercity.modules.reports.MenuColumn;
+import kz.halyqsoft.univercity.modules.userarrival.subview.AbsentAttendance;
 import kz.halyqsoft.univercity.modules.userarrival.subview.GroupAttendance;
+import kz.halyqsoft.univercity.modules.userarrival.subview.MainSection;
+import kz.halyqsoft.univercity.modules.userarrival.subview.SigningSection;
+import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.PrintDialog;
 import kz.halyqsoft.univercity.modules.userarrival.subview.GroupLatecomers;
 import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.DetalizationDialog;
 import kz.halyqsoft.univercity.utils.CommonUtils;
@@ -21,13 +23,12 @@ import org.r3a.common.entity.ID;
 import org.r3a.common.entity.beans.AbstractTask;
 import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.event.EntityListener;
-import org.r3a.common.entity.query.QueryModel;
-import org.r3a.common.entity.query.select.EAggregate;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.ERefreshType;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
+import org.r3a.common.vaadin.widget.grid.model.GridColumnModel;
 import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
 
 import java.text.DateFormat;
@@ -42,13 +43,17 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
 
     private HorizontalSplitPanel mainHSP;
     private HorizontalLayout mainHL, secondHL;
-    private VerticalLayout tableVL;
-    private GridWidget employeeGW, absentsGW,lateGW;
-    private GridWidget employeeByDepartmentGW;
+    private GridWidget absentsGW,lateGW;
     private USER_TYPE userType;
-    private DateField date;
     private HorizontalLayout buttonsHL;
+    private VerticalLayout tableVL;
+    private Button printBtn;
+
+    private DateField date;
+    private GridWidget employeeGW;
+    private GridWidget employeeByDepartmentGW;
     private Long depID;
+
     private Long emplID;
     private ComboBox absentDayCB;
     private Button detalizationBtn;
@@ -72,7 +77,6 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
         mainHL = new HorizontalLayout();
         mainHL.setSpacing(true);
         mainHL.setSizeFull();
-        
 
         final TreeTable menuTT = new TreeTable();
 
@@ -83,12 +87,14 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
         String latecomers = getUILocaleUtil().getCaption("latecomers");
         String absent = getUILocaleUtil().getCaption("absent");
         String yearlyAttendance = getUILocaleUtil().getCaption("yearlyAttendance");
+        String manuallySign = getUILocaleUtil().getCaption("manuallySign");
         hierarchicalContainer.addItem(main);
         hierarchicalContainer.addItem(studentAttendance);
         hierarchicalContainer.addItem(employeeAttendance);
         hierarchicalContainer.addItem(latecomers);
         hierarchicalContainer.addItem(absent);
         hierarchicalContainer.addItem(yearlyAttendance);
+        hierarchicalContainer.addItem(manuallySign);
 
         menuTT.setContainerDataSource(hierarchicalContainer);
         menuTT.setSizeFull();
@@ -111,11 +117,10 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
                         mainHSP.removeComponent(mainHL);
                         mainHL.removeAllComponents();
                         if (main.equals(event.getProperty().getValue().toString())) {
-                            setStudents();
-                            setLaters();
-                            setEmployees();
-                            setNoCards();
+                            MainSection mainSection = new MainSection();
+                            mainHL.addComponent(mainSection.getMainVL());
                         }else if (employeeAttendance.equals(event.getProperty().getValue().toString())) {
+
                             date = new DateField();
                             Date currentDate = new Date();
                             date.setValue(currentDate);
@@ -136,11 +141,16 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
                                 }
                             });
                             setDepartmentInfo();
+
                         }else if(studentAttendance.equalsIgnoreCase(event.getProperty().getValue().toString())){
                             GroupAttendance groupAttendance = new GroupAttendance();
-
                             mainHL.addComponent(groupAttendance.getMainVL());
                         }else if(absent.equalsIgnoreCase(event.getProperty().getValue().toString())){
+                            AbsentAttendance absentAttendance = new AbsentAttendance(tableVL);
+                            mainHL.addComponent(absentAttendance.getAbsentsInfo());
+                        }else if(manuallySign.equalsIgnoreCase(event.getProperty().getValue().toString())){
+                            SigningSection signingSection = new SigningSection();
+                            mainHL.addComponent(signingSection.getMainVL());
                             setAbsentsInfo();
 
                         }else if(latecomers.equalsIgnoreCase(event.getProperty().getValue().toString())){
@@ -154,116 +164,91 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
                 }
             }
 
-            private void setNoCards() {
-                Panel noCardButton = new Panel("<html><b>"+ getUILocaleUtil().getCaption("noCardButton") +"</b><br>" +
-                        "0%<br>" +
-                        "(0 из 3209)</html>");
-                noCardButton.setIcon(new ThemeResource("img/card.png"));
-                noCardButton.addClickListener(new MouseEvents.ClickListener() {
-                    @Override
-                    public void click(MouseEvents.ClickEvent event) {
-                        Message.showInfo("no card");
+        });
+
+
+        printBtn = new Button(CommonUtils.getUILocaleUtil().getCaption("export"));
+        printBtn.setImmediate(true);
+        printBtn.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+
+                List<String> tableHeader = new ArrayList<>();
+                List<List<String>> tableBody= new ArrayList<>();
+
+                String fileName = "document";
+
+                if(tableVL.getComponentIndex(employeeByDepartmentGW)!=-1){
+                    for(GridColumnModel gcm :((DBGridModel)employeeByDepartmentGW.getWidgetModel()).getColumnModels()){
+                        tableHeader.add(gcm.getLabel());
                     }
-                });
-                mainHL.addComponent(noCardButton);
-                mainHL.setComponentAlignment(noCardButton, Alignment.MIDDLE_CENTER);
-            }
-
-            private void setEmployees() throws Exception {
-                QueryModel<V_EMPLOYEE> employeeQM = new QueryModel<>(V_EMPLOYEE.class);
-                employeeQM.addSelect("code", EAggregate.COUNT);
-                employeeQM.addWhere("deleted", Boolean.FALSE);
-                Long allEmployees = (Long) SessionFacadeFactory.
-                        getSessionFacade(CommonEntityFacadeBean.class).lookupItems(employeeQM);
-
-                String sql = "SELECT count(1) " +
-                        "FROM user_arrival arriv INNER JOIN v_employee empl ON empl.id = arriv.user_id " +
-                        "WHERE date_trunc('day', arriv.created) = date_trunc('day', now()) " +
-                        "      AND arriv.created = (SELECT max(max_arriv.created) " +
-                        "                           FROM user_arrival max_arriv " +
-                        "                           WHERE max_arriv.user_id = arriv.user_id) " +
-                        "      AND come_in = TRUE";
-                Long inEmployees = (Long) SessionFacadeFactory.getSessionFacade(
-                        CommonEntityFacadeBean.class).lookupSingle(sql, new HashMap<>());
-                long inPercent = inEmployees * 100 / allEmployees;
-
-                Panel employeesPanel = new Panel("<b>"+ getUILocaleUtil().getCaption("employeesPanel")+" - " + allEmployees + "</b><br>" +
-                        ""+ getUILocaleUtil().getCaption("attendanceOf")+" - " + inEmployees + " (" + inPercent + "%)<br>" +
-                        ""+ getUILocaleUtil().getCaption("absentOf")+" - " + (allEmployees - inEmployees) + " (" + (100 - inPercent) + "%)" +
-                        "<br>");
-                employeesPanel.setIcon(new ThemeResource("img/employee.png"));
-                employeesPanel.setHeight(155, Unit.PIXELS);
-                employeesPanel.addClickListener(new MouseEvents.ClickListener() {
-                    @Override
-                    public void click(MouseEvents.ClickEvent event) {
-                        Message.showInfo("employees");
+                    for(int i = 0 ; i < employeeByDepartmentGW.getAllEntities().size(); i++){
+                        VEmployeeInfo vEmployeeInfo = (VEmployeeInfo) employeeByDepartmentGW.getAllEntities().get(i);
+                        if(employeeByDepartmentGW.getCaption()!=null){
+                            fileName = employeeByDepartmentGW.getCaption();
+                        }
+                        List<String> list = new ArrayList<>();
+                        list.add(vEmployeeInfo.getFIO());
+                        list.add(vEmployeeInfo.getCode());
+                        list.add(vEmployeeInfo.getComeIN()!= null ? CommonUtils.getFormattedDate(vEmployeeInfo.getComeIN()) : " ");
+                        list.add(vEmployeeInfo.getComeOUT()!= null ? CommonUtils.getFormattedDate(vEmployeeInfo.getComeOUT()) : " ");
+                        tableBody.add(list);
                     }
-                });
-                mainHL.addComponent(employeesPanel);
-                mainHL.setComponentAlignment(employeesPanel, Alignment.MIDDLE_CENTER);
-            }
-
-            private void setLaters() {
-                Panel latersPanel = new Panel("<html><b>"+ getUILocaleUtil().getCaption("latersPanel") +"</b><br>" +
-                        "9.8%<br>" +
-                        "(313 из 3209)</html>");
-                latersPanel.setIcon(new ThemeResource("img/clock.png"));
-                latersPanel.addClickListener(new MouseEvents.ClickListener() {
-                    @Override
-                    public void click(MouseEvents.ClickEvent event) {
-                        Message.showInfo("laters");
+                }else if(tableVL.getComponentIndex(employeeGW)!=-1){
+                    for(GridColumnModel gcm :((DBGridModel)employeeGW.getWidgetModel()).getColumnModels()){
+                        tableHeader.add(gcm.getLabel());
                     }
-                });
-                mainHL.addComponent(latersPanel);
-                mainHL.setComponentAlignment(latersPanel, Alignment.MIDDLE_CENTER);
-            }
-
-            private void setStudents() throws Exception {
-                QueryModel<V_STUDENT> studentQM = new QueryModel<>(V_STUDENT.class);
-                studentQM.addSelect("userCode", EAggregate.COUNT);
-                studentQM.addWhere("deleted", Boolean.FALSE);
-                Long allStudents = (Long) SessionFacadeFactory.
-                        getSessionFacade(CommonEntityFacadeBean.class).lookupItems(studentQM);
-
-                String sql = "SELECT count(1) " +
-                        "FROM user_arrival arriv INNER JOIN v_student stu ON stu.id = arriv.user_id " +
-                        "WHERE date_trunc('day', arriv.created) = date_trunc('day', now()) " +
-                        "      AND arriv.created = (SELECT max(max_arriv.created) " +
-                        "                           FROM user_arrival max_arriv " +
-                        "                           WHERE max_arriv.user_id = arriv.user_id) " +
-                        "      AND come_in = TRUE";
-                Long inStudents = (Long) SessionFacadeFactory.getSessionFacade(
-                        CommonEntityFacadeBean.class).lookupSingle(sql, new HashMap<>());
-                long inPercent = inStudents * 100 / allStudents;
-
-                Panel studentsPanel = new Panel("<b>"+ getUILocaleUtil().getCaption("studentsPanel") +" - " + allStudents + "</b><br>" +
-                        ""+ getUILocaleUtil().getCaption("attendanceOf")+" - " + inStudents + " (" + inPercent + "%)<br>" +
-                        ""+ getUILocaleUtil().getCaption("absentOf")+" - " + (allStudents - inStudents) + " (" + (100 - inPercent) + "%)" +
-                        "<br>");
-                studentsPanel.setIcon(new ThemeResource("img/student.png"));
-                studentsPanel.addClickListener(new MouseEvents.ClickListener() {
-                    @Override
-                    public void click(MouseEvents.ClickEvent event) {
-                        Message.showInfo("Students");
+                    for(int i = 0 ; i < employeeGW.getAllEntities().size(); i++){
+                        VDepartmentInfo vDepartmentInfo = (VDepartmentInfo) employeeGW.getAllEntities().get(i);
+                        if(employeeGW.getCaption()!=null){
+                            fileName = employeeGW.getCaption();
+                        }
+                        List<String> list = new ArrayList<>();
+                        list.add(vDepartmentInfo.getDeptName());
+                        list.add(vDepartmentInfo.getCount().toString());
+                        list.add(vDepartmentInfo.getIsPresent().toString());
+                        list.add(vDepartmentInfo.getPercantage()+" %");
+                        tableBody.add(list);
                     }
-                });
-                mainHL.addComponent(studentsPanel);
-                mainHL.setComponentAlignment(studentsPanel, Alignment.MIDDLE_CENTER);
+                }
+
+                PrintDialog printDialog = new PrintDialog(tableHeader, tableBody , CommonUtils.getUILocaleUtil().getCaption("print"),fileName);
             }
         });
+
         mainHSP.addComponent(menuTT);
         getContent().addComponent(mainHSP);
     }
 
-    private void setDepartmentInfo() {
 
-        employeeGW = new GridWidget(VDepartmentInfo.class);
-        employeeGW.setCaption(getUILocaleUtil().getCaption("employeeGW"));
-        employeeGW.setImmediate(true);
-        employeeGW.showToolbar(false);
-        employeeGW.setButtonVisible(AbstractToolbar.REFRESH_BUTTON, true);
-        employeeGW.addEntityListener(UserArrivalView.this);
+    @Override
+    public void handleEntityEvent(EntityEvent ev) {
 
+        if (ev.getSource().equals(employeeGW)) {
+            if (ev.getAction() == EntityEvent.SELECTED) {
+
+                mainHL.removeAllComponents();
+                employeeByDepartmentGW = new GridWidget(VEmployeeInfo.class);
+                employeeByDepartmentGW.setCaption(getUILocaleUtil().getCaption("employeeByDepartmentGW"));
+                employeeByDepartmentGW.setImmediate(true);
+                employeeByDepartmentGW.showToolbar(false);
+                employeeByDepartmentGW.setButtonVisible(AbstractToolbar.REFRESH_BUTTON, true);
+
+                DBGridModel employeeByDepGM = (DBGridModel) employeeByDepartmentGW.getWidgetModel();
+                employeeByDepGM.setTitleVisible(false);
+                employeeByDepGM.setMultiSelect(false);
+                employeeByDepGM.setEntities(getEmployee(date.getValue().toString()));
+                employeeByDepGM.setRefreshType(ERefreshType.MANUAL);
+
+                Button backButton = new Button(getUILocaleUtil().getCaption("backButton"));
+                backButton.addClickListener(new Button.ClickListener() {
+                    @Override
+                    public void buttonClick(Button.ClickEvent clickEvent) {
+                        tableVL.removeAllComponents();
+                        mainHL.removeAllComponents();
+                        setDepartmentInfo();
+                    }
+                });
 
 
         DBGridModel employeeGM = (DBGridModel) employeeGW.getWidgetModel();
@@ -272,12 +257,29 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
         employeeGM.setEntities(getList(date.getValue().toString()));
         employeeGM.setRefreshType(ERefreshType.MANUAL);
 
-        tableVL = new VerticalLayout();
-        tableVL.addComponent(date);
-        tableVL.setComponentAlignment(date, Alignment.MIDDLE_RIGHT);
-        tableVL.addComponent(employeeGW);
-        mainHL.addComponent(tableVL);
+                tableVL = new VerticalLayout();
+                secondHL = new HorizontalLayout();
+                secondHL.setSizeFull();
+                secondHL.addComponent(backButton);
+                secondHL.setComponentAlignment(backButton, Alignment.MIDDLE_LEFT);
+
+                HorizontalLayout topHL = CommonUtils.createButtonPanel();
+                topHL.setDefaultComponentAlignment(Alignment.MIDDLE_RIGHT);
+
+
+                topHL.addComponent(date);
+                topHL.addComponent(printBtn);
+
+                secondHL.addComponent(topHL);
+                secondHL.setComponentAlignment(topHL, Alignment.MIDDLE_RIGHT);
+                tableVL.addComponent(secondHL);
+                tableVL.addComponent(employeeByDepartmentGW);
+                mainHL.addComponent(tableVL);
+            }
+        }
     }
+
+
 
     public List<VDepartmentInfo> getList(String date) {
 
@@ -471,77 +473,32 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
 
 
 
-        absentsGW = new GridWidget(VAbsents.class);
-        absentsGW.setCaption(getUILocaleUtil().getCaption("absentsGW"));
-        absentsGW.setImmediate(true);
-        absentsGW.showToolbar(false);
-        absentsGW.setButtonVisible(AbstractToolbar.REFRESH_BUTTON, true);
+    public void setDepartmentInfo() {
 
-        DBGridModel absentsGM = (DBGridModel) absentsGW.getWidgetModel();
-        absentsGM.setEntities(getAbsentList((Integer)absentDayCB.getValue()));
-        absentsGM.setTitleVisible(false);
-        absentsGM.setMultiSelect(false);
-        absentsGM.setRefreshType(ERefreshType.MANUAL);
+        employeeGW = new GridWidget(VDepartmentInfo.class);
+        employeeGW.setCaption(getUILocaleUtil().getCaption("employeeGW"));
+        employeeGW.setImmediate(true);
+        employeeGW.showToolbar(false);
+        employeeGW.setButtonVisible(AbstractToolbar.REFRESH_BUTTON, true);
+        employeeGW.addEntityListener(this);
+
+        DBGridModel employeeGM = (DBGridModel) employeeGW.getWidgetModel();
+        employeeGM.setTitleVisible(false);
+        employeeGM.setMultiSelect(false);
+        employeeGM.setEntities(getList(date.getValue().toString()));
+        employeeGM.setRefreshType(ERefreshType.MANUAL);
 
         tableVL = new VerticalLayout();
-        tableVL.addComponent(absentDayCB);
-        tableVL.setComponentAlignment(absentDayCB, Alignment.MIDDLE_RIGHT);
-        tableVL.addComponent(absentsGW);
+        HorizontalLayout topHL = CommonUtils.createButtonPanel();
+        topHL.setDefaultComponentAlignment(Alignment.MIDDLE_RIGHT);
+
+
+        topHL.addComponent(date);
+        topHL.addComponent(printBtn);
+
+        tableVL.addComponent(topHL);
+        tableVL.setComponentAlignment(topHL, Alignment.MIDDLE_RIGHT);
+        tableVL.addComponent(employeeGW);
         mainHL.addComponent(tableVL);
-    }
-
-
-    public List<VAbsents> getAbsentList(Integer number) {
-
-        List<VAbsents> list = new ArrayList<>();
-        Map<Integer, Object> params = new HashMap<>();
-        String sql = "SELECT\n" +
-                "  trim(u.LAST_NAME || ' ' || u.FIRST_NAME || ' ' || coalesce(u.MIDDLE_NAME, '')) FIO,\n" +
-                "  vstudent.faculty_name,\n" +
-                "  vstudent.speciality_name,\n" +
-                "  vstudent.group_name,\n" +
-                "  date_part('days', now()::date - (max(arrive.created) )\n" +
-                "  ) as                                                                           absentDay\n" +
-                "FROM user_arrival arrive\n" +
-                "  INNER JOIN users u on arrive.user_id = u.id\n" +
-                "  INNER JOIN v_student vstudent on u.id = vstudent.id\n" +
-                "GROUP BY FIO,\n" +
-                "  vstudent.faculty_name,\n" +
-                "  vstudent.speciality_name,\n" +
-                "  vstudent.group_name\n" +
-                "HAVING date_part('days', now()::date - (max(arrive.created) )\n" +
-                ") > 5";
-        if(number!=null){
-            sql = sql + "and  date_part('days', now()::date - (max(arrive.created) )\n" +
-                    ") <= " + number;
-        }
-        try {
-            List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
-            if (!tmpList.isEmpty()) {
-                for (Object o : tmpList) {
-                    Object[] oo = (Object[]) o;
-                    VAbsents vAbsent = new VAbsents();
-                    vAbsent.setFIO((String) oo[0]);
-                    vAbsent.setFaculty((String) oo[1]);
-                    vAbsent.setSpeciality((String) oo[2]);
-                    vAbsent.setGroup((String) oo[3]);
-                    vAbsent.setAbsentSum((Double) oo[4]);
-                    list.add(vAbsent);
-                }
-            }
-        } catch (Exception ex) {
-            CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
-        }
-        refreshAbsentList(list);
-        return list;
-    }
-
-    private void refreshAbsentList(List<VAbsents> list) {
-        ((DBGridModel) absentsGW.getWidgetModel()).setEntities(list);
-        try {
-            absentsGW.refresh();
-        } catch (Exception ex) {
-            CommonUtils.showMessageAndWriteLog("Unable to refresh department list", ex);
-        }
     }
 }

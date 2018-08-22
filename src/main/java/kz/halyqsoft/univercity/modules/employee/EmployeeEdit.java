@@ -250,20 +250,70 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
 
 
     private void createChildTab(boolean readOnly) throws Exception {
-        childTW = new TableWidget(CHILD.class);
-        childTW.setButtonVisible(AbstractToolbar.REFRESH_BUTTON, false);
-        childTW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
-        childTW.setButtonVisible(AbstractToolbar.EDIT_BUTTON, false);
-        childTW.addEntityListener(this);
-        DBTableModel childTM = (DBTableModel) childTW.getWidgetModel();
-        childTM.setReadOnly(baseDataFW.getWidgetModel().isReadOnly());
-        QueryModel childQM = childTM.getQueryModel();
+
         ID employeeId = ID.valueOf(-1);
         if (!baseDataFW.getWidgetModel().isCreateNew()) {
             employeeId = baseDataFW.getWidgetModel().getEntity().getId();
         }
-        childQM.addWhere("employee", ECriteria.EQUAL, employeeId);
+
+        childTW = new TableWidget(VChild.class);
+        childTW.setButtonVisible(AbstractToolbar.REFRESH_BUTTON, false);
+        childTW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
+        childTW.setButtonVisible(AbstractToolbar.EDIT_BUTTON, false);
+        childTW.addEntityListener(this);
+
+        DBTableModel childTM = (DBTableModel) childTW.getWidgetModel();
+        childTM.setCrudEntityClass(CHILD.class);
+        childTM.setRefreshType(ERefreshType.MANUAL);
+        //childTM.setEntities(getChildList());
+
+        refreshChild();
         getTabSheet().addTab(childTW, getUILocaleUtil().getEntityLabel(CHILD.class));
+    }
+    public List<VChild> getChildList() throws Exception{
+
+        ID employeeId = ID.valueOf(-1);
+        if (!baseDataFW.getWidgetModel().isCreateNew()) {
+            employeeId = baseDataFW.getWidgetModel().getEntity().getId();
+        }
+
+        List<VChild> list = new ArrayList<>();
+        Map<Integer, Object> params = new HashMap<>();
+        String sql = "SELECT " +
+                " child.id,\n" +
+                "  sex.sex_name,\n" +
+                "  date_part('year',age(child.birth_date))\n" +
+                "from child\n" +
+                "INNER JOIN sex  on child.sex_id = sex.id\n" +
+                "  WHERE child.employee_id = " + employeeId  +
+                " GROUP BY child.id, sex.sex_name,child.birth_date";
+
+        try {
+            List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
+            if (!tmpList.isEmpty()) {
+                for (Object o : tmpList) {
+                    Object[] oo = (Object[]) o;
+                    VChild child = new VChild();
+                    child.setId(ID.valueOf((long)oo[0]));
+                    child.setSex((String)oo[1]);
+                    child.setChildAge((double)oo[2]);
+                    list.add(child);
+                }
+            }
+        } catch (Exception ex) {
+            CommonUtils.showMessageAndWriteLog("Unable to load experience list", ex);
+        }
+        refreshChild(list);
+        return list;
+    }
+
+    private void refreshChild(List<VChild> list) {
+        ((DBTableModel) childTW.getWidgetModel()).setEntities(list);
+        try {
+            childTW.refresh();
+        } catch (Exception ex) {
+            CommonUtils.showMessageAndWriteLog("Unable to refresh experience list", ex);
+        }
     }
 
     private void createMasterTab(boolean readOnly) throws Exception{
@@ -1273,7 +1323,6 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
 
         refresh();
 
-
         experienceL = new Label();
         experienceL.setCaptionAsHtml(true);
         experienceL.setWidth(800, Unit.PIXELS);
@@ -1300,18 +1349,33 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         if (ev.getAction() == EntityEvent.CREATED || ev.getAction() == EntityEvent.MERGED
                 || ev.getAction() == EntityEvent.REMOVED) {
             refresh();
+            refreshChild();
         }
     }
 
     private void refresh() {
         try {
-            List<VPreviousExperience> previousExperiences = getList();
-            ((DBTableModel) experienceTW.getWidgetModel()).setEntities(previousExperiences);
-            experienceTW.refresh();
+                List<VPreviousExperience> previousExperiences = getList();
+                ((DBTableModel) experienceTW.getWidgetModel()).setEntities(previousExperiences);
+
+                experienceTW.refresh();
+
         } catch (Exception ex) {
-            CommonUtils.showMessageAndWriteLog("Unable to refresh speciality and corpus grid", ex);
+            CommonUtils.showMessageAndWriteLog("Unable to refresh experience grid", ex);
         }
     }
+
+    private void refreshChild() {
+        try {
+            List<VChild> child = getChildList();
+            ((DBTableModel) childTW.getWidgetModel()).setEntities(child);
+
+            childTW.refresh();
+        } catch (Exception ex) {
+            CommonUtils.showMessageAndWriteLog("Unable to refresh experience grid", ex);
+        }
+    }
+
 
     public PGInterval getSum() throws Exception{
         PGInterval sum = null;

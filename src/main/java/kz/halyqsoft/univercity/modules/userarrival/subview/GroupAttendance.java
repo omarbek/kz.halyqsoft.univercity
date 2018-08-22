@@ -6,8 +6,10 @@ import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VGroup;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.VStudent;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VStudentInfo;
 import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.DetalizationDialog;
+import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.PrintDialog;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
@@ -19,6 +21,7 @@ import org.r3a.common.vaadin.widget.ERefreshType;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
+import org.r3a.common.vaadin.widget.grid.model.GridColumnModel;
 import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
 
 import java.text.SimpleDateFormat;
@@ -29,8 +32,10 @@ import kz.halyqsoft.univercity.utils.CommonUtils;
 public class GroupAttendance implements EntityListener{
     private VerticalLayout mainVL;
     private HorizontalLayout topHL;
+    private HorizontalLayout buttonPanel;
     private GridWidget vGroupGW;
     private DateField dateField;
+    private Button printBtn;
     private DBGridModel vGroupGM;
     private Button backButton;
     private GridWidget vStudentInfoGW;
@@ -40,6 +45,8 @@ public class GroupAttendance implements EntityListener{
     public GroupAttendance(){
         mainVL = new VerticalLayout();
         mainVL.setImmediate(true);
+
+        buttonPanel = CommonUtils.createButtonPanel();
 
         topHL = new HorizontalLayout();
         topHL.setWidth(100, Sizeable.Unit.PERCENTAGE);
@@ -59,6 +66,61 @@ public class GroupAttendance implements EntityListener{
                 mainVL.addComponent(vGroupGW);
                 backButton.setVisible(false);
                 detalizationBtn.setVisible(false);
+            }
+        });
+
+        printBtn = new Button(CommonUtils.getUILocaleUtil().getCaption("export"));
+        printBtn.setImmediate(true);
+        printBtn.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+
+                List<String> tableHeader = new ArrayList<>();
+                List<List<String>> tableBody= new ArrayList<>();
+
+                String fileName = "document";
+
+                if(mainVL.getComponentIndex(vGroupGW)!=-1){
+                    for(GridColumnModel gcm : vGroupGM.getColumnModels()){
+                        tableHeader.add(gcm.getLabel());
+                    }
+                    for(int i = 0 ; i < vGroupGW.getAllEntities().size(); i++){
+                        VGroup vGroup = (VGroup) vGroupGW.getAllEntities().get(i);
+                        if(vGroupGW.getCaption()!=null){
+                            fileName = vGroupGW.getCaption();
+                        }
+                        List<String> list = new ArrayList<>();
+                        list.add(vGroup.getGroupName());
+                        if(vGroup.getCurator()!=null) {
+                            list.add(vGroup.getCurator().toString());
+                        }else{
+                            list.add("");
+                        }
+                        list.add(vGroup.getCount().toString());
+                        list.add(vGroup.getIsPresent().toString());
+                        list.add(vGroup.getAbsent().toString());
+                        list.add(Math.round(vGroup.getPercantage())+"%");
+                        tableBody.add(list);
+                    }
+                }else if(mainVL.getComponentIndex(vStudentInfoGW)!=-1){
+                    for(GridColumnModel gcm : vStudentInfoGM.getColumnModels()){
+                        tableHeader.add(gcm.getLabel());
+                    }
+                    for(int i = 0 ; i < vStudentInfoGW.getAllEntities().size(); i++){
+                        VStudentInfo vStudentInfo = (VStudentInfo) vStudentInfoGW.getAllEntities().get(i);
+                        if(vStudentInfoGW.getCaption()!=null){
+                            fileName = vStudentInfoGW.getCaption();
+                        }
+                        List<String> list = new ArrayList<>();
+                        list.add(vStudentInfo.getStudent().toString());
+                        list.add(vStudentInfo.getCode());
+                        list.add(vStudentInfo.getComeIN()!=null ? CommonUtils.getFormattedDate(vStudentInfo.getComeIN()): "");
+                        list.add(vStudentInfo.getComeOUT()!=null ? CommonUtils.getFormattedDate(vStudentInfo.getComeOUT()): "");
+                        tableBody.add(list);
+                    }
+                }
+
+                PrintDialog printDialog = new PrintDialog(tableHeader, tableBody , CommonUtils.getUILocaleUtil().getCaption("print"),fileName);
             }
         });
 
@@ -89,15 +151,21 @@ public class GroupAttendance implements EntityListener{
                 if(vStudentInfoGW.getSelectedEntity()!=null){
                     DetalizationDialog detalizationDialog = new DetalizationDialog(CommonUtils.getUILocaleUtil().getCaption("detalization") ,((VStudentInfo)vStudentInfoGW.getSelectedEntity()).getStudent() , dateField.getValue());
                 }else{
-                    Message.showError("chooseARecord");
+                    Message.showError(CommonUtils.getUILocaleUtil().getCaption("chooseARecord"));
                 }
             }
         });
-        topHL.addComponent(dateField);
-        topHL.setComponentAlignment(dateField, Alignment.TOP_RIGHT);
+        buttonPanel.addComponent(dateField);
+        buttonPanel.setComponentAlignment(dateField, Alignment.MIDDLE_CENTER);
 
-        topHL.addComponent(detalizationBtn);
-        topHL.setComponentAlignment(detalizationBtn, Alignment.TOP_RIGHT);
+        buttonPanel.addComponent(printBtn);
+        buttonPanel.setComponentAlignment(printBtn, Alignment.MIDDLE_CENTER);
+
+        buttonPanel.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
+        buttonPanel.addComponent(detalizationBtn);
+
+        topHL.addComponent(buttonPanel);
+        topHL.setComponentAlignment(buttonPanel, Alignment.TOP_RIGHT);
 
         vGroupGW = new GridWidget(VGroup.class);
         vGroupGW.setImmediate(true);

@@ -27,7 +27,6 @@ import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.dialog.AbstractDialog;
 import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 import org.r3a.common.vaadin.widget.filter2.FilterPanelListener;
-import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -302,7 +301,7 @@ public class EnrollTheApplicantsView extends AbstractTaskView implements EntityL
 
     private void filterUser(StringBuilder sb, Map<Integer, Object> params) {
         List<VStudent> Vlist = new ArrayList<>();
-        String sql = "SELECT x.user_code,trim(x.LAST_NAME||' '||x.FIRST_NAME||' '||coalesce(x.MIDDLE_NAME, '')) fio,sc.category_name,\n" +
+        String sql = "SELECT x.id,x.user_code,trim(x.LAST_NAME||' '||x.FIRST_NAME||' '||coalesce(x.MIDDLE_NAME, '')) fio,sc.category_name,\n" +
                 "  ss.status_name,d.dept_name,s.spec_name,sy.study_year,l.lang_name\n" +
                 "FROM v_student x\n" +
                 "  INNER JOIN student_category sc on x.category_id=sc.id\n" +
@@ -329,14 +328,15 @@ public class EnrollTheApplicantsView extends AbstractTaskView implements EntityL
                 for (Object o : tmpList) {
                     Object[] oo = (Object[]) o;
                     VStudent sp = new VStudent();
-                    sp.setCode((String) oo[0]);
-                    sp.setFio((String) oo[1]);
-                    sp.setCategory((String) oo[2]);
-                    sp.setStatus((String) oo[3]);
-                    sp.setFaculty((String) oo[4]);
-                    sp.setSpecialty((String) oo[5]);
-                    sp.setStudyYear(oo[6] != null ? ((BigDecimal) oo[6]).intValue() : 0);
-                    sp.setLanguageName((String) oo[7]);
+                    sp.setId(ID.valueOf((long)oo[0]));
+                    sp.setCode((String) oo[1]);
+                    sp.setFio((String) oo[2]);
+                    sp.setCategory((String) oo[3]);
+                    sp.setStatus((String) oo[4]);
+                    sp.setFaculty((String) oo[5]);
+                    sp.setSpecialty((String) oo[6]);
+                    sp.setStudyYear(oo[7] != null ? ((BigDecimal) oo[7]).intValue() : 0);
+                    sp.setLanguageName((String) oo[8]);
                     list.add(sp);
                 }
             }
