@@ -309,7 +309,6 @@ public class EmployeesForm extends UsersForm {
                     masterTM.getColumnModel("graduationYear").setInTable(false);
                     masterTM.getColumnModel("university").setInTable(false);
                     masterTM.getColumnModel("speciality").setInTable(false);
-                    masterTM.getColumnModel("qualification").setInTable(false);
                     masterTM.getColumnModel("diplomaNumber").setInTable(false);
 
                 } else {
@@ -317,7 +316,6 @@ public class EmployeesForm extends UsersForm {
                     masterTM.getColumnModel("graduationYear").setInTable(true);
                     masterTM.getColumnModel("university").setInTable(true);
                     masterTM.getColumnModel("speciality").setInTable(true);
-                    masterTM.getColumnModel("qualification").setInTable(true);
                     masterTM.getColumnModel("diplomaNumber").setInTable(true);
                 }
                 masterQM.addWhere("employee", ECriteria.EQUAL, employeeId);
