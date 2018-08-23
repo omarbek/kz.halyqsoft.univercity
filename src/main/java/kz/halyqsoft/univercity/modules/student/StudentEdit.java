@@ -1058,7 +1058,6 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
 
         FileListFieldModel preemptiveRightFLFM = (FileListFieldModel) preemptiveRightFM.getFieldModel("fileList");
         preemptiveRightFLFM.permitMimeType(FileListFieldModel.JPEG);
-//        PREEMPTIVE_TYPE type = null;//TODO type
         if (baseDataFW.getWidgetModel().isCreateNew()) {
             preemptiveRightFM.createNew();
         } else {
@@ -1066,12 +1065,9 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
             FromItem fi = preemptiveRightQM.addJoin(EJoin.INNER_JOIN, "id", USER_DOCUMENT.class, "id");
             preemptiveRightQM.addWhere(fi, "user", ECriteria.EQUAL, baseDataFW.getWidgetModel().getEntity().getId());
             preemptiveRightQM.addWhereAnd(fi, "deleted", Boolean.FALSE);
-//            preemptiveRightQM.addJoin(EJoin.INNER_JOIN, "type", PREEMPTIVE_TYPE.class, "id");
             try {
                 PREEMPTIVE_RIGHT preemptiveRight = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(preemptiveRightQM);
                 if (preemptiveRight != null) {
-//                    type = preemptiveRight.getType();
-                    // pdfSource.setPreemptiveRight(preemptiveRight);
                     preemptiveRightFM.loadEntity(preemptiveRight.getId());
                     udfQM.addWhere("userDocument", ECriteria.EQUAL, preemptiveRight.getId());
                     List udfList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(udfQM);

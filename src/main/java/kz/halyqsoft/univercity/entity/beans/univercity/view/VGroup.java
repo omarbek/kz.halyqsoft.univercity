@@ -30,6 +30,9 @@ public class VGroup extends AbstractEntity {
     @FieldInfo(type = EFieldType.INTEGER, order = 7, inGrid = false, inView = false, inEdit = false)
     private Long groupID;
 
+    @FieldInfo(type = EFieldType.INTEGER, order = 8 )
+    private String time;
+
     public String getGroupName() {
         return groupName;
     }
@@ -84,5 +87,13 @@ public class VGroup extends AbstractEntity {
 
     public void setGroupID(Long groupID) {
         this.groupID = groupID;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
     }
 }

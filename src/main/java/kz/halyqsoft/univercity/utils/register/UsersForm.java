@@ -178,6 +178,8 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
 
                 registrationHSP.addComponent(contentHL);
                 getContent().addComponent(registrationHSP);
+
+
             }
 
 
@@ -207,8 +209,11 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
                 if ((flagSave(flag, dataFM) && Flag.MAIN_DATA.equals(flag))
                         || !Flag.MAIN_DATA.equals(flag)) {
                     addToLayout(Flag.FACT_ADDRESS, address.getAddressFactGFW(), regAddressButton, event);
+
                 }
+
             }
+
         });
 
         regAddressButton = createFormButton("address.registration", false);
@@ -218,6 +223,7 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
                 if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.FACT_ADDRESS.equals(flag)))
                         || !(Flag.MAIN_DATA.equals(flag) || Flag.FACT_ADDRESS.equals(flag))) {
                     addToLayout(Flag.REG_ADDRESS, address.getAddressRegGFW(), idDocButton, event);
+
                 }
             }
         });
@@ -559,6 +565,7 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
 
                         if(flag){
                             iinTF.addValidator(lengthValidator);
+                            return;
                         }
 
                     if (FieldValidator.isNumber(iinTF.getValue())) {
@@ -713,7 +720,11 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
                         if( iinTF.getValue().equals("") && iin==null){
                             Message.showError(getUILocaleUtil().getMessage("error.iin"));
                             return;
-                        }
+                        }if(iinTF.getValue().toString().length()<12){
+                             Message.showError(getUILocaleUtil().getMessage("incorrect.iin"));
+                    return;
+                }
+
                 clickButton.click();
             }
         });

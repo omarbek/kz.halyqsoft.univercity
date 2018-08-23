@@ -40,10 +40,10 @@ public class EmployeesForm extends UsersForm {
 
     private TableWidget employeeDegreeTW, publicationTW;
     private TableWidget scientificActivityTW, scientificManagementTW;
-    private TableWidget experienceTW, careerTW,childTW,magisterTW;
+    private TableWidget experienceTW, careerTW, childTW, magisterTW;
 
     private Button employeeDegreeButton, publicationButton, scientActButton;
-    private Button scientManagemButton, experienceButton, careerButton,magisterButton,childButton;
+    private Button scientManagemButton, experienceButton, careerButton, magisterButton, childButton;
 
     private boolean saveCareer;
 
@@ -240,7 +240,7 @@ public class EmployeesForm extends UsersForm {
             }
         });
 
-        childButton=createFormButton("child",true);
+        childButton = createFormButton("child", true);
         childButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
@@ -283,7 +283,7 @@ public class EmployeesForm extends UsersForm {
             }
         });
 
-        magisterButton=createFormButton("master",true);
+        magisterButton = createFormButton("master", true);
         magisterButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
@@ -640,16 +640,16 @@ public class EmployeesForm extends UsersForm {
         return false;
     }
 
-    private boolean preSaveChild(Entity e,boolean isNew){
+    private boolean preSaveChild(Entity e, boolean isNew) {
         CHILD child = (CHILD) e;
         FormModel formModel = dataAFW.getWidgetModel();
-        if(isNew){
+        if (isNew) {
             try {
                 EMPLOYEE employee = (EMPLOYEE) formModel.getEntity();
                 child.setEmployee(employee);
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(child);
 
-                QueryModel childQM = ((DBTableModel)childTW.getWidgetModel()).getQueryModel();
+                QueryModel childQM = ((DBTableModel) childTW.getWidgetModel()).getQueryModel();
                 childQM.addWhere("employee", ECriteria.EQUAL, employee.getId());
 
                 childTW.refresh();
@@ -658,12 +658,12 @@ public class EmployeesForm extends UsersForm {
             } catch (Exception e1) {
                 e1.printStackTrace();
             }
-        }else {
+        } else {
             try {
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(child);
                 childTW.refresh();
                 showSavedNotification();
-            }catch (Exception ex){
+            } catch (Exception ex) {
                 CommonUtils.showMessageAndWriteLog("Unable to merge an employee child", ex);
             }
         }
@@ -671,16 +671,16 @@ public class EmployeesForm extends UsersForm {
         return false;
     }
 
-    private boolean preSaveMagister(Entity e,boolean isNew){
+    private boolean preSaveMagister(Entity e, boolean isNew) {
         MASTER master = (MASTER) e;
         FormModel formModel = dataAFW.getWidgetModel();
-        if(isNew){
+        if (isNew) {
             try {
                 EMPLOYEE employee = (EMPLOYEE) formModel.getEntity();
                 master.setEmployee(employee);
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(master);
 
-                QueryModel masterQM = ((DBTableModel)magisterTW.getWidgetModel()).getQueryModel();
+                QueryModel masterQM = ((DBTableModel) magisterTW.getWidgetModel()).getQueryModel();
                 masterQM.addWhere("employee", ECriteria.EQUAL, employee.getId());
 
                 magisterTW.refresh();
@@ -689,19 +689,18 @@ public class EmployeesForm extends UsersForm {
             } catch (Exception e1) {
                 e1.printStackTrace();
             }
-        }else {
+        } else {
             try {
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(master);
                 magisterTW.refresh();
                 showSavedNotification();
-            }catch (Exception e2){
+            } catch (Exception e2) {
                 CommonUtils.showMessageAndWriteLog("Unable to merge an employee master", e2);
             }
         }
 
         return false;
     }
-
 
 
     private boolean preSaveScientificActivity(Entity e, boolean isNew) {
@@ -830,9 +829,9 @@ public class EmployeesForm extends UsersForm {
             return canSave;
         } else if (source.equals(scientificActivityTW)) {
             return canSave();
-        }else if(source.equals(childTW)){
-            return   canSave();
-        }else if(source.equals(magisterTW)){
+        } else if (source.equals(childTW)) {
+            return canSave();
+        } else if (source.equals(magisterTW)) {
             return canSave();
         }
 
@@ -864,10 +863,10 @@ public class EmployeesForm extends UsersForm {
             return preSaveScientificActivity(e, isNew);
         } else if (source.equals(scientificManagementTW)) {
             return preSaveScientificManagement(e, isNew);
-        }else if(source.equals(childTW)){
-            return preSaveChild(e,isNew);
-        }else if(source.equals(magisterTW)){
-            return preSaveMagister(e,isNew);
+        } else if (source.equals(childTW)) {
+            return preSaveChild(e, isNew);
+        } else if (source.equals(magisterTW)) {
+            return preSaveMagister(e, isNew);
         }
         return super.preSave(source, e, isNew, buttonId);
     }

@@ -56,7 +56,6 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
         if (electiveBindedSubject != null) {
             studentBindingElectiveId = electiveBindedSubject.getId();
         }
-
         setWidth(700, Unit.PIXELS);
         setHeight(500, Unit.PIXELS);
         center();

@@ -57,6 +57,7 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
     @Override
     public void initView(boolean b) throws Exception {
         filterPanel.addFilterPanelListener(this);
+
         TextField tf = new TextField();
         tf.setNullRepresentation("");
         tf.setNullSettingAllowed(true);

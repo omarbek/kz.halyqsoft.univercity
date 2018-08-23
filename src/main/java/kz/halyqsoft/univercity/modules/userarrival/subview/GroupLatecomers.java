@@ -1,11 +1,11 @@
 package kz.halyqsoft.univercity.modules.userarrival.subview;
 
 import com.vaadin.data.Property;
-import com.vaadin.server.Sizeable;
 import com.vaadin.ui.*;
-import kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.VEmployee;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VGroup;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.VLatecomers;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VStudentInfo;
 import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.DetalizationDialog;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
@@ -21,6 +21,7 @@ import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -74,7 +75,7 @@ public class GroupLatecomers implements EntityListener{
                     vGroupGM.setEntities(getList(dateField.getValue()));
                 }else if(mainVL.getComponentIndex(vStudentInfoGW)>-1){
                     if(vGroupGW.getSelectedEntity()!=null){
-                        vStudentInfoGM.setEntities(getList((VGroup) vGroupGW.getSelectedEntity() , dateField.getValue()));
+                       // vStudentInfoGM.setEntities(getList((VLatecomers) vGroupGW.getSelectedEntity() , dateField.getValue()));
                     }
                 }
             }
@@ -98,7 +99,7 @@ public class GroupLatecomers implements EntityListener{
         topHL.addComponent(detalizationBtn);
         topHL.setComponentAlignment(detalizationBtn, Alignment.TOP_RIGHT);
 
-        vGroupGW = new GridWidget(VGroup.class);
+        vGroupGW = new GridWidget(VLatecomers.class);
         vGroupGW.setImmediate(true);
         vGroupGW.showToolbar(false);
 
@@ -121,77 +122,80 @@ public class GroupLatecomers implements EntityListener{
         return mainVL;
     }
 
-    public List<VGroup> getList(Date date){
-        List<VGroup> groupList = new ArrayList<>();
+    public List<VLatecomers> getList(Date date){
+        List<VLatecomers> vLatecomersList=new ArrayList<>();
 
         Map<Integer,Object> params = new HashMap<>();
         String formattedDate = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS").format(date);
 
-        String sql="SELECT  g.name as group_name, g.id as group_id, \n" +
-                "       count(DISTINCT ua.user_id) AS late_students\n" +
+        String sql =
+                "SELECT g.name ,trim(u.LAST_NAME || ' ' || u.FIRST_NAME || ' ' || coalesce(u.MIDDLE_NAME, '')) FIO,\n" +
+                        "  t.time_value "+
                 "FROM groups g\n" +
+                "  INNER JOIN student_education se\n" +
+                "    ON g.id = se.groups_id\n" +
+                "  INNER JOIN users u\n" +
+                "    ON u.id = se.student_id\n" +
                 "  INNER JOIN student_education se2\n" +
                 "    ON g.id = se2.groups_id\n" +
-                "  INNER JOIN users u on se2.student_id=u.id\n" +
                 "  INNER JOIN user_arrival ua\n" +
-                "    ON ua.user_id = se2.student_id\n" +
-                "  INNER JOIN schedule_detail sd ON g.id = sd.group_id\n" +
-                "  INNER JOIN lesson_time lt ON sd.lesson_time_id = lt.id\n" +
-                "  INNER JOIN time t ON lt.begin_time_id = t.id\n" +
-                "  INNER JOIN week_day day2 ON sd.week_day_id = day2.id\n" +
-                "WHERE\n" +
-                "  sd.week_day_id=(SELECT extract(isodow FROM '"+formattedDate+"'::TIMESTAMP))\n" +
-                "  AND (SELECT min(created) FROM  user_arrival)::TIME  >(SELECT min(time_name) FROM time)::TIME\n" +
-                "  AND ua.come_in = TRUE\n" +
-                "GROUP BY g.name, curator_id, g.id,  day2.day_name_ru,  se2.student_id, t.time_name,ua.created\n" +
-                "ORDER BY t.time_name, ua.created;\n";
-
+                "    ON ua.user_id = se.student_id\n" +
+                "  INNER JOIN schedule_detail sd\n" +
+                "    ON g.id = sd.group_id\n" +
+                "  INNER JOIN lesson_time lt\n" +
+                "    ON sd.lesson_time_id = lt.id\n" +
+                "  INNER JOIN time t\n" +
+                "    ON lt.begin_time_id = t.id\n" +
+                "  INNER JOIN week_day day2\n" +
+                "    ON sd.week_day_id = day2.id\n" +
+                "  INNER JOIN subject s3 ON sd.subject_id = s3.id\n" +
+                "WHERE u.deleted = FALSE AND\n" +
+                "      ua.come_in = TRUE AND\n" +
+                "      sd.week_day_id = (select extract(ISODOW FROM TIMESTAMP '"+formattedDate+"')) AND\n" +
+                "      date_trunc('day' , ua.created ) = date_trunc('day' , TIMESTAMP '"+formattedDate+"') AND\n" +
+                "      t.time_value=\n" +
+                "      (\n" +
+                "        select\n" +
+                "          max(t3.time_value)\n" +
+                "        FROM schedule_detail sdinner\n" +
+                "          INNER JOIN groups g2\n" +
+                "            ON sdinner.group_id = g2.id\n" +
+                "          INNER JOIN student_education s2\n" +
+                "            ON g2.id = s2.groups_id\n" +
+                "          INNER JOIN lesson_time t2\n" +
+                "            ON sdinner.lesson_time_id = t2.id\n" +
+                "          INNER JOIN time t3\n" +
+                "            ON t2.begin_time_id = t3.id\n" +
+                "          INNER JOIN week_day day3\n" +
+                "            ON sdinner.week_day_id = day3.id\n" +
+                "          INNER JOIN user_arrival ua3\n" +
+                "            ON ua3.user_id = s2.student_id\n" +
+                "        WHERE s2.student_id = u.id AND\n" +
+                "              sdinner.week_day_id = (select extract(ISODOW FROM TIMESTAMP '"+formattedDate+"')) AND\n" +
+                "              date_trunc('day' , ua3.created ) = date_trunc('day' , TIMESTAMP '"+formattedDate+"'))\n" +
+                "GROUP BY g.name,FIO,t.time_value ;";
         try {
             List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
             if (!tmpList.isEmpty()) {
                 for (Object o : tmpList) {
                     Object[] oo = (Object[]) o;
-                    VGroup vg = new VGroup();
-                    vg.setGroupName((String)oo[0]);
-                    vg.setGroupID((Long) oo[1]);
-                    vg.setCount((Long)oo[2]);
-                    groupList.add(vg);
+                    VLatecomers vl = new VLatecomers();
+                    vl.setGroupName((String)oo[0]);
+                    vl.setFio((String)oo[1]);
+                    vl.setTime((BigDecimal)(oo[2]));
+                    vLatecomersList.add(vl);
                 }
             }
         } catch (Exception ex) {
             CommonUtils.showMessageAndWriteLog("Unable to load vgroup list", ex);
         }
-        try {
-            List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
-            if (!tmpList.isEmpty()) {
-                for (Object o : tmpList) {
-                    Object[] oo = (Object[]) o;
-                    VGroup vg = new VGroup();
-                    vg.setGroupName((String)oo[0]);
-                    vg.setGroupID((Long) oo[1]);
-                    vg.setCount((Long)oo[2]);
 
-                    boolean flag = false;
-                    for(VGroup vGroup : groupList){
-                        if(vGroup.getGroupID()==vg.getGroupID()){
-                            flag = true;
-                            break;
-                        }
-                    }
-                    if(!flag){
-                        groupList.add(vg);
-                    }
-                }
-            }
-        } catch (Exception ex) {
-            CommonUtils.showMessageAndWriteLog("Unable to load vgroup list", ex);
-        }
-        refreshList(groupList);
-        return groupList;
+        refreshList(vLatecomersList);
+        return vLatecomersList;
     }
 
 
-    public List<VStudentInfo> getList(VGroup vGroup, Date date){
+    public List<VStudentInfo> getList(VLatecomers vGroup, Date date){
         List<VStudentInfo> groupList = new ArrayList<>();
 
         Map<Integer,Object> params = new HashMap<>();
@@ -256,7 +260,7 @@ public class GroupLatecomers implements EntityListener{
         return groupList;
     }
 
-    private void refreshList(List<VGroup> list) {
+    private void refreshList(List<VLatecomers> list) {
         ((DBGridModel) vGroupGW.getWidgetModel()).setEntities(list);
         try {
             vGroupGW.refresh();
@@ -268,26 +272,26 @@ public class GroupLatecomers implements EntityListener{
     @Override
     public void handleEntityEvent(EntityEvent entityEvent) {
         if(entityEvent.getSource().equals(vGroupGW)){
-            if(entityEvent.getAction()==EntityEvent.SELECTED){
-                if(vGroupGW!=null){
-                    mainVL.removeComponent(vGroupGW);
-
-                    vStudentInfoGW = new GridWidget(VStudentInfo.class);
-                    vStudentInfoGW.showToolbar(false);
-                    vStudentInfoGW.addEntityListener(this);
-                    vStudentInfoGW.setImmediate(true);
-
-                    vStudentInfoGM = (DBGridModel)vStudentInfoGW.getWidgetModel();
-                    vStudentInfoGM.setRowNumberVisible(true);
-                    vStudentInfoGM.setRowNumberWidth(30);
-                    vStudentInfoGM.setRefreshType(ERefreshType.MANUAL);
-                    vStudentInfoGM.setEntities(getList((VGroup) vGroupGW.getSelectedEntity(), dateField.getValue()));
-                    mainVL.addComponent(vStudentInfoGW);
-
-                    backButton.setVisible(true);
-                    detalizationBtn.setVisible(true);
-                }
-            }
+//            if(entityEvent.getAction()==EntityEvent.SELECTED){
+//                if(vGroupGW!=null){
+//                    mainVL.removeComponent(vGroupGW);
+//
+//                    vStudentInfoGW = new GridWidget(VStudentInfo.class);
+//                    vStudentInfoGW.showToolbar(false);
+//                    vStudentInfoGW.addEntityListener(this);
+//                    vStudentInfoGW.setImmediate(true);
+//
+//                    vStudentInfoGM = (DBGridModel)vStudentInfoGW.getWidgetModel();
+//                    vStudentInfoGM.setRowNumberVisible(true);
+//                    vStudentInfoGM.setRowNumberWidth(30);
+//                    vStudentInfoGM.setRefreshType(ERefreshType.MANUAL);
+//                   //vStudentInfoGM.setEntities(getList((VLatecomers) vGroupGW.getSelectedEntity(), dateField.getValue()));
+//                    mainVL.addComponent(vStudentInfoGW);
+//
+//                    backButton.setVisible(true);
+//                    detalizationBtn.setVisible(true);
+//                }
+//            }
         }
     }
 

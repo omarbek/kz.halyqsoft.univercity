@@ -414,7 +414,7 @@ ALTER TABLE EDUCATION_DOC
 ALTER TABLE EDUCATION_DOC
   ALTER COLUMN high_graduated TYPE BOOLEAN
   USING CASE WHEN high_graduated = 0
-  THEN FALSE
+  THEN FALSEv
         WHEN high_graduated = 1
           THEN TRUE
         ELSE NULL
