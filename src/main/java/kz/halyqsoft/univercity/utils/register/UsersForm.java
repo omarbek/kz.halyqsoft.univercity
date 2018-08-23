@@ -84,6 +84,7 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
     protected Flag flag;
 
     private TextField iinTF;
+    private boolean f=true;
 
     private static final int ADDRESS_REG = 1;
     private static final int ADDRESS_FACT = 2;
@@ -197,21 +198,28 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
 
                 VerticalLayout photoAndButtonVL = getPhotoVL();
                 contentHL.addComponent(photoAndButtonVL);
-
                 registrationHSP.addComponent(contentHL);
             }
         });
 
+
         factAddressButton = createFormButton("address.residential", true);
+
         factAddressButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                if ((flagSave(flag, dataFM) && Flag.MAIN_DATA.equals(flag))
+
+                if( iinTF.getValue().equals("") && iin==null) {
+                    Message.showError(getUILocaleUtil().getMessage("error.iin"));
+                    f=false;
+                }else if(iinTF.getValue().toString().length()<12){
+                    Message.showError(getUILocaleUtil().getMessage("incorrect.iin"));
+                    f=false;
+                }else if((flagSave(flag, dataFM) && Flag.MAIN_DATA.equals(flag))
                         || !Flag.MAIN_DATA.equals(flag)) {
-                    addToLayout(Flag.FACT_ADDRESS, address.getAddressFactGFW(), regAddressButton, event);
-
+                        addToLayout(Flag.FACT_ADDRESS, address.getAddressFactGFW(), regAddressButton, event);
+                       f=true;
                 }
-
             }
 
         });
@@ -220,10 +228,17 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
         regAddressButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.FACT_ADDRESS.equals(flag)))
-                        || !(Flag.MAIN_DATA.equals(flag) || Flag.FACT_ADDRESS.equals(flag))) {
-                    addToLayout(Flag.REG_ADDRESS, address.getAddressRegGFW(), idDocButton, event);
 
+                if( iinTF.getValue().equals("") && iin==null) {
+                    Message.showError(getUILocaleUtil().getMessage("error.iin"));
+                    f=false;
+                }else if(iinTF.getValue().toString().length()<12){
+                    Message.showError(getUILocaleUtil().getMessage("incorrect.iin"));
+                    f=false;
+                }else if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.FACT_ADDRESS.equals(flag)))
+                        || !(Flag.MAIN_DATA.equals(flag) || Flag.FACT_ADDRESS.equals(flag))) {
+                        addToLayout(Flag.REG_ADDRESS, address.getAddressRegGFW(), idDocButton, event);
+                    f=true;
                 }
             }
         });
@@ -232,17 +247,26 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
         idDocButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.REG_ADDRESS.equals(flag)))
+                if( iinTF.getValue().equals("") && iin==null) {
+                    Message.showError(getUILocaleUtil().getMessage("error.iin"));
+                    f=false;
+                }else if(iinTF.getValue().toString().length()<12){
+                    Message.showError(getUILocaleUtil().getMessage("incorrect.iin"));
+                    f=false;
+                }else  if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.REG_ADDRESS.equals(flag)))
                         || !(Flag.MAIN_DATA.equals(flag) || Flag.REG_ADDRESS.equals(flag))) {
-                    addToLayout(Flag.ID_DOC, passport.getMainGFW(), militaryButton, event);
 
-                    FormModel mainFM = passport.getMainGFW().getWidgetModel();
-                    mainFM.getFieldModel("iin").setRequired(true);
-                    if(iin!=null) {
-                        mainFM.getFieldModel("iin").getField().setValue(iin);
-                        mainFM.getFieldModel("iin").getField().setReadOnly(true);
+                        addToLayout(Flag.ID_DOC, passport.getMainGFW(), militaryButton, event);
+
+                        FormModel mainFM = passport.getMainGFW().getWidgetModel();
+                        mainFM.getFieldModel("iin").setRequired(true);
+                        if(iin!=null) {
+                            mainFM.getFieldModel("iin").getField().setValue(iin);
+                            mainFM.getFieldModel("iin").getField().setReadOnly(true);
+                            f=true;
                     }
                 }
+
             }
         });
 
@@ -250,9 +274,18 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
         militaryButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.ID_DOC.equals(flag)))
+
+                if( iinTF.getValue().equals("") && iin==null) {
+                    Message.showError(getUILocaleUtil().getMessage("error.iin"));
+                    f=false;
+                }else if(iinTF.getValue().toString().length()<12){
+                    Message.showError(getUILocaleUtil().getMessage("incorrect.iin"));
+                    f=false;
+                }else if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.ID_DOC.equals(flag)))
                         || !(Flag.MAIN_DATA.equals(flag) || Flag.ID_DOC.equals(flag))) {
-                    addToLayout(Flag.MILITARY, military.getMainGFW(), disabilityButton, event);
+                        addToLayout(Flag.MILITARY, military.getMainGFW(), disabilityButton, event);
+                        f=true;
+
                 }
             }
         });
@@ -261,9 +294,19 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
         disabilityButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.MILITARY.equals(flag)))
+
+                if( iinTF.getValue().equals("") && iin==null) {
+                    Message.showError(getUILocaleUtil().getMessage("error.iin"));
+                    f=false;
+                }else if(iinTF.getValue().toString().length()<12){
+                    Message.showError(getUILocaleUtil().getMessage("incorrect.iin"));
+                    f=false;
+                }else   if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.MILITARY.equals(flag)))
                         || !(Flag.MAIN_DATA.equals(flag) || Flag.MILITARY.equals(flag))) {
-                    addToLayout(Flag.DISABILITY, disability.getMainGFW(), repatriateButton, event);
+
+                        addToLayout(Flag.DISABILITY, disability.getMainGFW(), repatriateButton, event);
+                        f=true;
+
                 }
             }
         });
@@ -272,10 +315,20 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
         repatriateButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.DISABILITY.equals(flag)))
+
+                if( iinTF.getValue().equals("") && iin==null) {
+                    Message.showError(getUILocaleUtil().getMessage("error.iin"));
+                    f=false;
+                }else if(iinTF.getValue().toString().length()<12){
+                    Message.showError(getUILocaleUtil().getMessage("incorrect.iin"));
+                    f=false;
+                }else if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.DISABILITY.equals(flag)))
                         || !(Flag.MAIN_DATA.equals(flag) || Flag.DISABILITY.equals(flag))) {
-                    addToLayout(Flag.REPATRIATE, repatriate.getMainGFW(), eduDocButton, event);
-                }
+
+                        addToLayout(Flag.REPATRIATE, repatriate.getMainGFW(), eduDocButton, event);
+                        f=true;
+                    }
+
             }
         });
 
@@ -283,10 +336,20 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
         eduDocButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.REPATRIATE.equals(flag)))
+
+                if( iinTF.getValue().equals("") && iin==null) {
+                    Message.showError(getUILocaleUtil().getMessage("error.iin"));
+                    f=false;
+                }else if(iinTF.getValue().toString().length()<12){
+                    Message.showError(getUILocaleUtil().getMessage("incorrect.iin"));
+                    f=false;
+                }else if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.REPATRIATE.equals(flag)))
                         || !(Flag.MAIN_DATA.equals(flag) || Flag.REPATRIATE.equals(flag))) {
-                    addToLayout(Flag.EDU_DOC, educationDoc.getMainGFW(), eduDocsButton, event);
-                }
+
+                        addToLayout(Flag.EDU_DOC, educationDoc.getMainGFW(), eduDocsButton, event);
+                        f=true;
+                    }
+
             }
         });
 
@@ -294,35 +357,44 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
         eduDocsButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.EDU_DOC.equals(flag)))
+
+                if( iinTF.getValue().equals("") && iin==null) {
+                    Message.showError(getUILocaleUtil().getMessage("error.iin"));
+                    f=false;
+                }else if(iinTF.getValue().toString().length()<12){
+                    Message.showError(getUILocaleUtil().getMessage("incorrect.iin"));
+                    f=false;
+                }else  if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.EDU_DOC.equals(flag)))
                         || !(Flag.MAIN_DATA.equals(flag) || Flag.EDU_DOC.equals(flag))) {
-                    flag = Flag.EDU_DOCS;
-                    eduDocTW = new TableWidget(EDUCATION_DOC.class);
-                    eduDocTW.addEntityListener(UsersForm.this);
-                    eduDocTW.setWidth("667px");
-                    eduDocTW.addStyleName("toTop");
-                    FormModel docFM = new FormModel(EDUCATION_DOC.class, true);
-                    docFM.getFieldModel("schoolCountry").setRequired(true);
-                    docFM.getFieldModel("language").setRequired(true);
-                    docFM.getFieldModel("schoolRegion").setRequired(true);
 
-                    DBTableModel educationTM = (DBTableModel) eduDocTW.getWidgetModel();
-                    educationTM.getColumnModel("entryYear").setAlignment(Table.Align.CENTER);
-                    educationTM.getColumnModel("endYear").setAlignment(Table.Align.CENTER);
-                    QueryModel educationQM = educationTM.getQueryModel();
-                    educationUDFI = educationQM.addJoin(EJoin.INNER_JOIN, "id", USER_DOCUMENT.class, "id");
-                    educationQM.addWhere(educationUDFI, "deleted", Boolean.FALSE);
-                    ID userId1 = ID.valueOf(-1);
-                    if (!dataFM.isCreateNew()) {
-                        try {
-                            userId1 = dataFM.getEntity().getId();
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                        flag = Flag.EDU_DOCS;
+                        eduDocTW = new TableWidget(EDUCATION_DOC.class);
+                        eduDocTW.addEntityListener(UsersForm.this);
+                        eduDocTW.setWidth("667px");
+                        eduDocTW.addStyleName("toTop");
+                        FormModel docFM = new FormModel(EDUCATION_DOC.class, true);
+                        docFM.getFieldModel("schoolCountry").setRequired(true);
+                        docFM.getFieldModel("language").setRequired(true);
+                        docFM.getFieldModel("schoolRegion").setRequired(true);
+
+                        DBTableModel educationTM = (DBTableModel) eduDocTW.getWidgetModel();
+                        educationTM.getColumnModel("entryYear").setAlignment(Table.Align.CENTER);
+                        educationTM.getColumnModel("endYear").setAlignment(Table.Align.CENTER);
+                        QueryModel educationQM = educationTM.getQueryModel();
+                        educationUDFI = educationQM.addJoin(EJoin.INNER_JOIN, "id", USER_DOCUMENT.class, "id");
+                        educationQM.addWhere(educationUDFI, "deleted", Boolean.FALSE);
+                        ID userId1 = ID.valueOf(-1);
+                        if (!dataFM.isCreateNew()) {
+                            try {
+                                userId1 = dataFM.getEntity().getId();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
-                    }
-                    educationQM.addWhereAnd(educationUDFI, "user", ECriteria.EQUAL, userId1);
+                        educationQM.addWhereAnd(educationUDFI, "user", ECriteria.EQUAL, userId1);
 
-                    addToLayout(eduDocTW, preemRightButton, event);
+                        addToLayout(eduDocTW, preemRightButton, event);
+                        f=true;
                 }
             }
         });
@@ -331,20 +403,29 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
         preemRightButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                if ((flagSave(flag, dataFM) && Flag.MAIN_DATA.equals(flag))
+
+                if( iinTF.getValue().equals("") && iin==null) {
+                    Message.showError(getUILocaleUtil().getMessage("error.iin"));
+                    f=false;
+                }else if(iinTF.getValue().toString().length()<12){
+                    Message.showError(getUILocaleUtil().getMessage("incorrect.iin"));
+                    f=false;
+                }else if ((flagSave(flag, dataFM) && Flag.MAIN_DATA.equals(flag))
                         || !Flag.MAIN_DATA.equals(flag)) {
-                    flag = Flag.PREEM_RIGHT;
 
-                    languagesTW = getTableWidget(V_USER_LANGUAGE.class, "user", null);
+                        flag = Flag.PREEM_RIGHT;
 
-                    VerticalLayout preemLang = getPreemptiveRightVL(preemptiveRight.getMainGFW(), languagesTW);
+                        languagesTW = getTableWidget(V_USER_LANGUAGE.class, "user", null);
 
-                    setActive(event);
-                    contentHL.removeAllComponents();
-                    contentHL.addComponent(preemLang);
-                    Button nextButton = createNextButton(medButton, NEXT_BUTTON_CAPTION);
-                    contentHL.addComponent(nextButton);
-                    contentHL.setComponentAlignment(nextButton, Alignment.MIDDLE_CENTER);
+                        VerticalLayout preemLang = getPreemptiveRightVL(preemptiveRight.getMainGFW(), languagesTW);
+
+                        setActive(event);
+                        contentHL.removeAllComponents();
+                        contentHL.addComponent(preemLang);
+                        Button nextButton = createNextButton(medButton, NEXT_BUTTON_CAPTION);
+                        contentHL.addComponent(nextButton);
+                        contentHL.setComponentAlignment(nextButton, Alignment.MIDDLE_CENTER);
+                        f=true;
                 }
             }
         });
@@ -353,32 +434,42 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
         medButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.PREEM_RIGHT.equals(flag)))
+
+                if( iinTF.getValue().equals("") && iin==null) {
+                    Message.showError(getUILocaleUtil().getMessage("error.iin"));
+                    f=false;
+                }else if(iinTF.getValue().toString().length()<12){
+                    Message.showError(getUILocaleUtil().getMessage("incorrect.iin"));
+                    f=false;
+                }else  if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.PREEM_RIGHT.equals(flag)))
                         || !(Flag.MAIN_DATA.equals(flag) || Flag.PREEM_RIGHT.equals(flag))) {
-                    flag = Flag.MED;
 
-                    medicalCheckupTW = new TableWidget(V_MEDICAL_CHECKUP.class);
-                    medicalCheckupTW.addEntityListener(UsersForm.this);
-                    medicalCheckupTW.setWidth("667px");
-                    DBTableModel medicalCheckupTM = (DBTableModel) medicalCheckupTW.getWidgetModel();
-                    medicalCheckupTM.getColumnModel("allowWork").setInTable(false);
-                    QueryModel medicalCheckupQM = medicalCheckupTM.getQueryModel();
-                    medicalCheckupQM.addWhere("deleted", Boolean.FALSE);
-                    ID userId2 = ID.valueOf(-1);
-                    if (!dataAFW.getWidgetModel().isCreateNew()) {
-                        try {
-                            userId2 = dataAFW.getWidgetModel().getEntity().getId();
-                        } catch (Exception e) {
-                            e.printStackTrace();//TODO catch
+                        flag = Flag.MED;
+
+                        medicalCheckupTW = new TableWidget(V_MEDICAL_CHECKUP.class);
+                        medicalCheckupTW.addEntityListener(UsersForm.this);
+                        medicalCheckupTW.setWidth("667px");
+                        DBTableModel medicalCheckupTM = (DBTableModel) medicalCheckupTW.getWidgetModel();
+                        medicalCheckupTM.getColumnModel("allowWork").setInTable(false);
+                        QueryModel medicalCheckupQM = medicalCheckupTM.getQueryModel();
+                        medicalCheckupQM.addWhere("deleted", Boolean.FALSE);
+                        ID userId2 = ID.valueOf(-1);
+                        if (!dataAFW.getWidgetModel().isCreateNew()) {
+                            try {
+                                userId2 = dataAFW.getWidgetModel().getEntity().getId();
+                            } catch (Exception e) {
+                                e.printStackTrace();//TODO catch
+                            }
                         }
-                    }
-                    medicalCheckupQM.addWhereAnd("user", ECriteria.EQUAL, userId2);
+                        medicalCheckupQM.addWhereAnd("user", ECriteria.EQUAL, userId2);
 
-                    FormModel medicalCheckupFM = medicalCheckupTM.getFormModel();
-                    medicalCheckupFM.getFieldModel("allowWork").setInEdit(false);
-                    medicalCheckupFM.getFieldModel("allowWork").setInView(false);
+                        FormModel medicalCheckupFM = medicalCheckupTM.getFormModel();
+                        medicalCheckupFM.getFieldModel("allowWork").setInEdit(false);
+                        medicalCheckupFM.getFieldModel("allowWork").setInView(false);
 
-                    addToLayout(medicalCheckupTW, getAfterMedButton(), event);
+                        addToLayout(medicalCheckupTW, getAfterMedButton(), event);
+                        f=true;
+
                 }
             }
         });
@@ -720,7 +811,7 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
                         if( iinTF.getValue().equals("") && iin==null){
                             Message.showError(getUILocaleUtil().getMessage("error.iin"));
                             return;
-                        }if(iinTF.getValue().toString().length()<12){
+                        }else if(iinTF.getValue().toString().length()<12){
                              Message.showError(getUILocaleUtil().getMessage("incorrect.iin"));
                     return;
                 }
