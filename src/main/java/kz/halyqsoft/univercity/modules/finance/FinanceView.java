@@ -3,13 +3,16 @@ package kz.halyqsoft.univercity.modules.finance;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.TextField;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_FIN_DEBT;
+import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_PAYMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VStudentFinDebt;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VStudentPayment;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_STUDENT_DEBTS;
 import kz.halyqsoft.univercity.filter.FStudentFilter;
 import kz.halyqsoft.univercity.filter.panel.StudentFilterPanel;
 import kz.halyqsoft.univercity.utils.CommonUtils;
@@ -150,22 +153,22 @@ public class FinanceView extends AbstractTaskView implements EntityListener, Fil
         getContent().addComponent(filterPanel);
         getContent().setComponentAlignment(filterPanel, Alignment.TOP_CENTER);
 
-        studentDebtGW = new GridWidget(VStudentFinDebt.class);
+        studentDebtGW = new GridWidget(V_STUDENT_DEBTS.class);
         studentDebtGW.addEntityListener(this);
-        studentDebtGW.setButtonVisible(IconToolbar.REFRESH_BUTTON, false);
+        studentDebtGW.showToolbar(false);
         DBGridModel studentDebtGM = (DBGridModel) studentDebtGW.getWidgetModel();
         studentDebtGM.setHeightByRows(5);
-        studentDebtGM.setCrudEntityClass(STUDENT_FIN_DEBT.class);
         studentDebtGM.setRefreshType(ERefreshType.MANUAL);
         studentDebtGM.setMultiSelect(false);
         studentDebtGM.setRowNumberVisible(true);
         studentDebtGM.setRowNumberWidth(50);
 
         studentPaymentGW = new GridWidget(VStudentPayment.class);
-        studentPaymentGW.showToolbar(false);
+        studentPaymentGW.addEntityListener(this);
+        studentPaymentGW.setButtonVisible(IconToolbar.REFRESH_BUTTON, false);
         DBGridModel studentPaymentGM = (DBGridModel) studentPaymentGW.getWidgetModel();
         studentPaymentGM.setHeightByRows(5);
-        studentPaymentGM.setReadOnly(true);
+        studentPaymentGM.setCrudEntityClass(STUDENT_PAYMENT.class);
         studentPaymentGM.setRefreshType(ERefreshType.MANUAL);
         studentPaymentGM.setMultiSelect(false);
         studentPaymentGM.setRowNumberVisible(true);
@@ -196,8 +199,8 @@ public class FinanceView extends AbstractTaskView implements EntityListener, Fil
 
     @Override
     public boolean preSave(Object source, Entity e, boolean isNew, int buttonId) {
-        STUDENT_FIN_DEBT studentFinDebt = (STUDENT_FIN_DEBT) e;
-        studentFinDebt.setCreated(new Date());
+        STUDENT_PAYMENT studentPayment = (STUDENT_PAYMENT) e;
+        studentPayment.setCreated(new Date());
         return true;
     }
 
@@ -253,7 +256,11 @@ public class FinanceView extends AbstractTaskView implements EntityListener, Fil
             sb.append(i);
         }
 
-        filterFinDebt(sb, params);
+        try {
+            filterFinDebt(sb, params);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         filterPayment(sb, params);
     }
 
@@ -301,40 +308,16 @@ public class FinanceView extends AbstractTaskView implements EntityListener, Fil
         }
     }
 
-    private void filterFinDebt(StringBuilder sb, Map<Integer, Object> params) {
-        List<VStudentFinDebt> list = new ArrayList<>();
-        String sql = "select x2.id, trim(x.LAST_NAME||' '||x.FIRST_NAME||' '||coalesce(x.MIDDLE_NAME, '')) fio," +
-                " x.user_code," +
-                " x2.created, x2.debt_sum debtSum," +
-                " case when x2.retake=true then '+' else '-' end retake"
-                + " from v_student x"
-                + " inner join STUDENT_FIN_DEBT x2 on x2.student_id=x.id"
-                + " where x.deleted=false and x2.deleted=false "
-                + sb.toString();
-        try {
-            List tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql,
-                    params);
-            if (!tmpList.isEmpty()) {
-                for (Object o : tmpList) {
-                    Object[] oo = (Object[]) o;
-                    VStudentFinDebt sfd = new VStudentFinDebt();
-                    sfd.setId(ID.valueOf((long) oo[0]));
-                    sfd.setFio((String) oo[1]);
-                    sfd.setCode((String) oo[2]);
-                    sfd.setCreated((Date) oo[3]);
-                    sfd.setDebtSum(((BigDecimal) oo[4]).doubleValue());
-                    sfd.setRetake((String) oo[5]);
-                    list.add(sfd);
-                }
-            }
-        } catch (Exception ex) {
-            CommonUtils.showMessageAndWriteLog("Unable to load students' debt list", ex);
-        }
-
-        refreshFinDebt(list);
+    private void filterFinDebt(StringBuilder sb, Map<Integer, Object> params) throws Exception {
+        QueryModel<V_STUDENT_DEBTS> studentDebtsQM = new QueryModel<>(V_STUDENT_DEBTS.class);
+        String sql = "SELECT * FROM V_STUDENT_DEBTS sd " +
+                "INNER JOIN v_student x on sd.user_code=x.user_code" +
+                " WHERE x.deleted=false " + sb.toString();
+        List<V_STUDENT_DEBTS> scheduleDetails = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(sql,params,V_STUDENT_DEBTS.class);
+        refreshFinDebt(scheduleDetails);
     }
 
-    private void refreshFinDebt(List<VStudentFinDebt> list) {
+    private void refreshFinDebt(List<V_STUDENT_DEBTS> list) {
         ((DBGridModel) studentDebtGW.getWidgetModel()).setEntities(list);
         try {
             studentDebtGW.refresh();

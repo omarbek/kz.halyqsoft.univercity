@@ -654,17 +654,17 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
                             }
                         }
 
-                        if(flag){
+                         if(flag){
                             iinTF.addValidator(lengthValidator);
-                            return;
+                             if (FieldValidator.isNumber(iinTF.getValue())) {
+                                 iin = iinTF.getValue();
+                             } else {
+                                 iinTF.setValue("");
+                                 iin = "";
+                             }
                         }
 
-                    if (FieldValidator.isNumber(iinTF.getValue())) {
-                            iin = iinTF.getValue();
-                        } else {
-                            iinTF.setValue("");
-                            iin = "";
-                        }
+
                     }else {
                     iinTF.removeValidator(lengthValidator);
                 }
