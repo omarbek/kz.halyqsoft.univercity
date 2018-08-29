@@ -32,7 +32,7 @@ public abstract class WindowUtils extends AbstractDialog {
         this.defaultUnit = defaultUnit;
     }
 
-    protected void init(Integer width, Integer height) {
+    public void init(Integer width, Integer height) {
         if (width != null && height != null) {
             setWidth(width, defaultUnit);
             setHeight(height, defaultUnit);

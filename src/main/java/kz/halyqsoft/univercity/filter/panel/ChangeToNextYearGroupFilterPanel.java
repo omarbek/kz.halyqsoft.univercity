@@ -3,14 +3,14 @@ package kz.halyqsoft.univercity.filter.panel;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.HorizontalLayout;
+import kz.halyqsoft.univercity.filter.FChangeToNextYearGroupFilter;
 import kz.halyqsoft.univercity.filter.FGroupFilter;
-import kz.halyqsoft.univercity.filter.FStudentFilter;
 import org.r3a.common.vaadin.widget.filter2.panel.AbstractFilterPanel;
 
 @SuppressWarnings("serial")
-public final class GroupFilterPanel extends AbstractFilterPanel {
+public final class ChangeToNextYearGroupFilterPanel extends AbstractFilterPanel {
 
-	public GroupFilterPanel(FGroupFilter filterBean) {
+	public ChangeToNextYearGroupFilterPanel(FChangeToNextYearGroupFilter filterBean) {
 		super(filterBean);
 	}
 
@@ -25,18 +25,13 @@ public final class GroupFilterPanel extends AbstractFilterPanel {
 			hl.addComponent(af);
 		}
 
-		af = getFilterComponent("code");
-		if (af != null) {
-			hl.addComponent(af);
-		}
-
 		af = getFilterComponent("group");
 		if (af != null) {
 			hl.addComponent(af);
 		}
 
 		
-		af = getFilterComponent("orders");
+		af = getFilterComponent("studyYear");
 		if (af != null) {
 			hl.addComponent(af);
 		}

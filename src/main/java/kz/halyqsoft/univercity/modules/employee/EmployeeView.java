@@ -1,19 +1,23 @@
 package kz.halyqsoft.univercity.modules.employee;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.combobox.FilteringMode;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.TextField;
+import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.USERS;
+import kz.halyqsoft.univercity.entity.beans.univercity.CATALOG;
 import kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.CARD;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEPARTMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.POST;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VEmployee;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.VStudent;
 import kz.halyqsoft.univercity.filter.FEmployeeFilter;
 import kz.halyqsoft.univercity.filter.panel.EmployeeFilterPanel;
 import kz.halyqsoft.univercity.utils.CommonUtils;
+import kz.halyqsoft.univercity.utils.FieldValidator;
+import kz.halyqsoft.univercity.utils.WindowUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
@@ -27,6 +31,7 @@ import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.ERefreshType;
+import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 import org.r3a.common.vaadin.widget.filter2.FilterPanelListener;
 import org.r3a.common.vaadin.widget.form.FormModel;
@@ -34,10 +39,7 @@ import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Omarbek
@@ -136,6 +138,117 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
         teacherGM.setRefreshType(ERefreshType.MANUAL);
 
         doFilter(filterPanel.getFilterBean());
+
+        Button saveToCatalog = new Button(getUILocaleUtil().getCaption("saveToCatalog"));
+        saveToCatalog.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+
+                List<VEmployee> employees = new ArrayList<>();
+
+                for (Entity ve : teacherGW.getAllEntities()) {
+                    employees.add((VEmployee) ve);
+                }
+                if (employees.size() > 0) {
+                    WindowUtils saveDialog = new WindowUtils() {
+                        @Override
+                        protected String createTitle() {
+                            return getUILocaleUtil().getEntityLabel(CATALOG.class);
+                        }
+
+                        @Override
+                        protected void refresh() {
+
+                        }
+
+                        @Override
+                        protected VerticalLayout getVerticalLayout() {
+
+                            VerticalLayout vl = new VerticalLayout();
+                            Label descriptionL = new Label(getUILocaleUtil().getEntityFieldLabel(CATALOG.class, "description"));
+                            TextArea descriptionTA = new TextArea();
+                            descriptionTA.setWidth(100, Unit.PERCENTAGE);
+                            descriptionTA.setRequired(true);
+                            Label nameL = new Label(getUILocaleUtil().getEntityFieldLabel(CATALOG.class, "name"));
+
+                            TextField nameTF = new TextField();
+                            nameTF.setWidth(100, Unit.PERCENTAGE);
+                            nameTF.setRequired(true);
+
+                            Button saveBtn = CommonUtils.createSaveButton();
+                            saveBtn.addClickListener(new Button.ClickListener() {
+                                @Override
+                                public void buttonClick(Button.ClickEvent clickEvent) {
+
+                                    String name = nameTF.getValue();
+                                    String description = descriptionTA.getValue();
+                                    String jsonInString = "";
+
+
+                                    if (FieldValidator.isNotEmpty(name) && FieldValidator.isNotEmpty(description)) {
+
+                                        if (nameTF.getValue().toCharArray()[0] != '$') {
+                                            name = name.trim();
+                                            name = name.replaceAll("\\s+","");
+                                            name = "$" + name;
+                                        }
+
+                                        ObjectMapper mapper = new ObjectMapper();
+                                        try {
+                                            jsonInString = mapper.writeValueAsString(employees);
+                                        } catch (JsonProcessingException e) {
+                                            e.printStackTrace();
+                                            Message.showError(e.getMessage());
+                                            return;
+                                        }
+
+                                        CATALOG catalog = new CATALOG();
+                                        catalog.setCreated(new Date());
+                                        catalog.setDescription(description);
+                                        catalog.setName(name);
+                                        if (jsonInString.toCharArray()[0] == '[' && jsonInString.toCharArray()[jsonInString.toCharArray().length - 1] == ']') {
+                                            jsonInString = jsonInString.substring(1, jsonInString.length() - 1);
+                                        }
+                                        catalog.setValue(jsonInString);
+
+                                        try {
+                                            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(catalog);
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                            Message.showError(e.getMessage());
+                                            return;
+                                        }
+
+                                        CommonUtils.showSavedNotification();
+                                        close();
+                                    } else {
+                                        Message.showError(getUILocaleUtil().getMessage("fill.all.fields"));
+                                    }
+
+                                }
+                            });
+
+                            vl.addComponent(nameL);
+                            vl.addComponent(nameTF);
+                            vl.addComponent(descriptionL);
+                            vl.addComponent(descriptionTA);
+
+                            vl.addComponent(saveBtn);
+                            vl.setComponentAlignment(saveBtn, Alignment.BOTTOM_CENTER);
+                            return vl;
+                        }
+                    };
+                    saveDialog.init(400, 300);
+                    saveDialog.setHeightUndefined();
+                    saveDialog.getCloseButton().setVisible(false);
+
+                } else {
+                    Message.showError(getUILocaleUtil().getMessage("no.data"));
+                }
+            }
+        });
+
+        getContent().addComponent(saveToCatalog);
 
         getContent().addComponent(teacherGW);
         getContent().setComponentAlignment(teacherGW, Alignment.MIDDLE_CENTER);

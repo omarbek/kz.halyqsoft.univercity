@@ -202,6 +202,9 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                     else if (entityClass.equals(ROLES.class)) {
                         classASW.setButtonVisible(AbstractToolbar.FILTER_BUTTON, true);
                     }
+                    else if (entityClass.equals(NON_ADMISSION_CAUSE.class)) {
+                        classASW.setButtonVisible(AbstractToolbar.DELETE_BUTTON, false);
+                    }
                 }
                 mainHSP.addComponent(classASW);
             }
@@ -243,30 +246,20 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
             countryFM.getListeners().add(new CountryChangeListener(((ORGANIZATION) e).getRegion(), regionFM));
         } else if (e instanceof ORDER_TYPE) {
             Integer[] ids = {3, 4, 5, 7, 8};
-            if (onEdit(e, ids)) {
-                return false;
-            }
+            return !onEdit(e, ids);
 
         } else if (e instanceof STUDENT_CATEGORY) {
             Integer[] ids = {1, 2, 3};
-            if (onEdit(e, ids)) {
-                return false;
-            }
+            return !onEdit(e, ids);
         } else if (e instanceof STUDENT_STATUS) {
             Integer[] ids = {1, 2, 3, 4, 5, 6, 7, 8};
-            if (onEdit(e, ids)) {
-                return false;
-            }
+            return !onEdit(e, ids);
         } else if (e instanceof STUDY_DIRECT) {
             Integer[] ids = {9};
-            if (onEdit(e, ids)) {
-                return false;
-            }
+            return !onEdit(e, ids);
         } else if (e instanceof EQUIPMENT) {
             Integer[] ids = {3};
-            if (onEdit(e, ids)) {
-                return false;
-            }
+            return !onEdit(e, ids);
         }
 
         return true;

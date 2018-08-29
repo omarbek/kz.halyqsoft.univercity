@@ -103,12 +103,8 @@ public class StreamView extends AbstractTaskView implements EntityListener, Filt
                                         stream.setName("STREAM " + (++z));
                                         stream.setCreated(new Date());
                                         stream.setSemesterData(currentSemesterData);
-                                        if (stream.getSemester() == null) {
-                                            stream.setSemester(getSemester(gr.getStudyYear(),
-                                                    currentSemesterData.getSemesterPeriod()));
-                                            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(stream);
-                                        }
-
+                                        stream.setSemester(getSemester(gr.getStudyYear(),
+                                                currentSemesterData.getSemesterPeriod()));
                                         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(stream);
                                         i = 0;
                                     }
@@ -162,7 +158,10 @@ public class StreamView extends AbstractTaskView implements EntityListener, Filt
 
         try {
             Map<Integer, Object> params = new HashMap<>();
-            String sql = "select * from stream_group sg inner join stream  s on sg.stream_id = s.id  where date_trunc('year',s.created )= date_trunc('year' , now())";
+            String sql = "select * from stream_group sg \n" +
+                    "  inner join stream  s \n" +
+                    "    on sg.stream_id = s.id  \n" +
+                    "where s.semester_data_id = " + CommonUtils.getCurrentSemesterData().getId().getId().longValue();
             List<STREAM_GROUP> streamList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(sql, params, STREAM_GROUP.class);
 
             for (STREAM_GROUP group : streamList) {
@@ -175,7 +174,7 @@ public class StreamView extends AbstractTaskView implements EntityListener, Filt
 
         try {
             Map<Integer, Object> params = new HashMap<>();
-            String sql = "select * from stream where date_trunc('year',created )= date_trunc('year' , now()) ";
+            String sql = "select * from stream where semester_data_id = " + CommonUtils.getCurrentSemesterData().getId().getId().longValue();
             List<STREAM> streamList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(sql, params, STREAM.class);
 
             for (STREAM group : streamList) {

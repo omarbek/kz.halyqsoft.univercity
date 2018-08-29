@@ -1326,15 +1326,8 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         experienceL = new Label();
         experienceL.setCaptionAsHtml(true);
         experienceL.setWidth(800, Unit.PIXELS);
-        if(getSum()!=null&&getList()!=null) {
-            experienceL.setCaption("<html><b>" +
-                    getUILocaleUtil().getCaption("experienceL") + "</b>" + " " +
-                    String.valueOf((getSum().getYears())) +" "+ getUILocaleUtil().getCaption("experienceL.year")
-                    + " " + String.valueOf(getSum().getMonths()) +" "+ getUILocaleUtil().getCaption("experienceL.month"));
-        }else{
-            experienceL.setCaption("<html><b>" +
-                    getUILocaleUtil().getCaption("experienceL") + "</b>");
-        }
+
+        updateExperienceL();
 
         content.addComponent(experienceTW);
         content.setComponentAlignment(experienceTW, Alignment.MIDDLE_CENTER);
@@ -1344,13 +1337,37 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         getTabSheet().addTab(content, getUILocaleUtil().getCaption("experience"));
     }
 
+    private void updateExperienceL() {
+        try{
+            if(getSum()!=null&&getList()!=null) {
+            experienceL.setCaption("<html><b>" +
+                    getUILocaleUtil().getCaption("experienceL") + "</b>" + " " +
+                    String.valueOf((getSum().getYears())) +" "+ getUILocaleUtil().getCaption("experienceL.year")
+                    + " " + String.valueOf(getSum().getMonths()) +" "+ getUILocaleUtil().getCaption("experienceL.month")
+                    + " " + String.valueOf(getSum().getDays()) +" "+ getUILocaleUtil().getCaption("experienceL.day")
+            );
+            }else{
+                experienceL.setCaption("<html><b>" +
+                        getUILocaleUtil().getCaption("experienceL") + "</b>");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void handleEntityEvent(EntityEvent ev) {
         if (ev.getAction() == EntityEvent.CREATED || ev.getAction() == EntityEvent.MERGED
                 || ev.getAction() == EntityEvent.REMOVED) {
             refresh();
             refreshChild();
+
+            if(ev.getSource().equals(experienceTW)){
+                updateExperienceL();
+            }
         }
+
+
     }
 
     private void refresh() {
@@ -1384,7 +1401,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
             employeeId = baseDataFW.getWidgetModel().getEntity().getId();
         }
         Map<Integer, Object> params = new HashMap<>();
-        String sql = "select sum(age(dismiss_date,hire_date))\n" +
+        String sql = "select justify_days( sum(age(case when dismiss_date isnull then now() when dismiss_date NOTNULL THEN dismiss_date END ,hire_date) ) )\n" +
                 "from previous_experience\n" +
                 "where employee_id =" + employeeId;
 
@@ -1412,7 +1429,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
                 "  post_name,\n" +
                 "  hire_date,\n" +
                 "  dismiss_date,\n" +
-                "  age(dismiss_date, hire_date)\n" +
+                "  age(case when dismiss_date isnull then now() when dismiss_date NOTNULL THEN dismiss_date END ,hire_date) \n" +
                 "from previous_experience" +
                 " where employee_id = " + employeeId;
 
@@ -1428,9 +1445,11 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
                     vPreviousExperience.setHireDate((Date)oo[3]);
                     vPreviousExperience.setDismissDate((Date) oo[4]);
                     sum = (PGInterval) oo[5];
-                    vPreviousExperience.setWorkPeriod(String.valueOf(sum.getYears())
-                            +" "+getUILocaleUtil().getCaption("experienceL.year")+" "
-                            +String.valueOf(sum.getMonths())+" "+getUILocaleUtil().getCaption("experienceL.month"));
+                    vPreviousExperience.setWorkPeriod(String.valueOf(
+                            sum.getYears())+" "+getUILocaleUtil().getCaption("experienceL.year")
+                            + " " +String.valueOf(sum.getMonths())+" "+getUILocaleUtil().getCaption("experienceL.month")
+                            + " " +String.valueOf(sum.getDays())+" "+getUILocaleUtil().getCaption("experienceL.day")
+                    );
                     list.add(vPreviousExperience);
                 }
             }

@@ -1155,7 +1155,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
             differenceTW.addEntityListener(this);
             differenceTW.setImmediate(true);
             differenceTW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
-            differenceTW.setButtonVisible(AbstractToolbar.DELETE_BUTTON, false);
+            differenceTW.setButtonVisible(AbstractToolbar.DELETE_BUTTON, true);
 
             DBTableModel educationTM = (DBTableModel) differenceTW.getWidgetModel();
             educationTM.setReadOnly(readOnly);

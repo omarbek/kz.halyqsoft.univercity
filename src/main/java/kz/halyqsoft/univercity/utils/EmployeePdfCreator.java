@@ -111,7 +111,7 @@ public class EmployeePdfCreator {
                             for(String key : map.keySet()){
 
                                 PdfPCell cell = new PdfPCell();
-                                Paragraph paragraph = new Paragraph(key);
+                                Paragraph paragraph = new Paragraph(CommonUtils.getUILocaleUtil().getCaption(key));
                                 paragraph.setFont(font);
                                 cell.addElement(paragraph);
 

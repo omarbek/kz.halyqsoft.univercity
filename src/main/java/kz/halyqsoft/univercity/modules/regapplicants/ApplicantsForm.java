@@ -62,6 +62,7 @@ public final class ApplicantsForm extends UsersForm {
     private Button motherButton, fatherButton;
     private Button contractButton;
     private Button specButton, moreButton;
+    // private Button asd;
 
     private boolean saveSpec/*, saveUnt*/;
     private boolean came = false;
@@ -143,6 +144,7 @@ public final class ApplicantsForm extends UsersForm {
         buttons.add(fatherButton);
         buttons.add(contractButton);
         buttons.add(moreButton);
+        // buttons.add(asd);
         return buttons;
     }
 
@@ -222,10 +224,10 @@ public final class ApplicantsForm extends UsersForm {
             studentEducation.setFaculty(speciality.getDepartment().getParent());
             studentEducation.setChair(speciality.getDepartment());
             studentEducation.setSpeciality(speciality);
+            V_ENTRANT_SPECIALITY entrantSpeciality = (V_ENTRANT_SPECIALITY)specTW.getAllEntities().get(0);
+            studentEducation.setLanguage(entrantSpeciality.getLanguage());
             studentEducation.setStudyYear(SessionFacadeFactory.getSessionFacade(
                     CommonEntityFacadeBean.class).lookup(STUDY_YEAR.class, ID.valueOf(1)));
-            studentEducation.setLanguage(SessionFacadeFactory.getSessionFacade(
-                    CommonEntityFacadeBean.class).lookup(LANGUAGE.class, ID.valueOf(1)));
             studentEducation.setEducationType(SessionFacadeFactory.getSessionFacade(
                     CommonEntityFacadeBean.class).lookup(STUDENT_EDUCATION_TYPE.class, ID.valueOf(1)));
             DateFormat uriDateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -772,7 +774,7 @@ public final class ApplicantsForm extends UsersForm {
 
                         if(text.startsWith("до 25 сентября")
                                 && student.getDiplomaType().toString().equals("Заочный 2-высшее")){
-                          replaced = "до 1 октября – 60000 тенге                     до 1 февраля – 60000 тенге";
+                            replaced = "до 1 октября – 60000 тенге                     до 1 февраля – 60000 тенге";
 
                         } else if( text.startsWith("25 қыркүйекке дейін") &&
                                 student.getDiplomaType().toString().equals("Заочный 2-высшее")){

@@ -8,10 +8,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.enumeration.UserType;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VDepartmentInfo;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VEmployeeInfo;
 import kz.halyqsoft.univercity.modules.reports.MenuColumn;
-import kz.halyqsoft.univercity.modules.userarrival.subview.AbsentAttendance;
-import kz.halyqsoft.univercity.modules.userarrival.subview.GroupAttendance;
-import kz.halyqsoft.univercity.modules.userarrival.subview.MainSection;
-import kz.halyqsoft.univercity.modules.userarrival.subview.SigningSection;
+import kz.halyqsoft.univercity.modules.userarrival.subview.*;
 import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.PrintDialog;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
@@ -78,13 +75,25 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
         String absent = getUILocaleUtil().getCaption("absent");
         String yearlyAttendance = getUILocaleUtil().getCaption("yearlyAttendance");
         String manuallySign = getUILocaleUtil().getCaption("manuallySign");
+        String manuallySignedReport = getUILocaleUtil().getCaption("manuallySign.report");
+
         hierarchicalContainer.addItem(main);
+        hierarchicalContainer.setChildrenAllowed(main, false);
         hierarchicalContainer.addItem(studentAttendance);
+        hierarchicalContainer.setChildrenAllowed(studentAttendance, false);
         hierarchicalContainer.addItem(employeeAttendance);
+        hierarchicalContainer.setChildrenAllowed(employeeAttendance, false);
         hierarchicalContainer.addItem(latecomers);
+        hierarchicalContainer.setChildrenAllowed(latecomers, false);
         hierarchicalContainer.addItem(absent);
+        hierarchicalContainer.setChildrenAllowed(absent, false);
         hierarchicalContainer.addItem(yearlyAttendance);
+        hierarchicalContainer.setChildrenAllowed(yearlyAttendance, false);
         hierarchicalContainer.addItem(manuallySign);
+        hierarchicalContainer.addItem(manuallySignedReport);
+        hierarchicalContainer.setChildrenAllowed(manuallySignedReport, false);
+        hierarchicalContainer.setParent(manuallySignedReport, manuallySign);
+
 
         menuTT.setContainerDataSource(hierarchicalContainer);
         menuTT.setSizeFull();
@@ -140,6 +149,9 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
                         }else if(manuallySign.equalsIgnoreCase(event.getProperty().getValue().toString())){
                             SigningSection signingSection = new SigningSection();
                             mainHL.addComponent(signingSection.getMainVL());
+                        }else if(manuallySignedReport.equalsIgnoreCase(event.getProperty().getValue().toString())){
+                            SigningReport signingReport = new SigningReport();
+                            mainHL.addComponent(signingReport.getMainVL());
                         }
                         mainHSP.addComponent(mainHL);
                     }

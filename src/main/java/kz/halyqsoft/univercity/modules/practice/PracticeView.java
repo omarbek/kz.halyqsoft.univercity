@@ -28,6 +28,7 @@ import org.r3a.common.vaadin.widget.ERefreshType;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 import org.r3a.common.vaadin.widget.filter2.FilterPanelListener;
+import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 
@@ -76,6 +77,12 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
         informationPracticeGM.setMultiSelect(true);
         informationPracticeGM.setRowNumberVisible(true);
         informationPracticeGM.setRowNumberWidth(50);
+        FKFieldModel groupsFM = (FKFieldModel) informationPracticeGM.getFormModel().getFieldModel("groups");
+        groupsFM.getQueryModel().addWhere("deleted" , ECriteria.EQUAL,false);
+
+        FKFieldModel employeeFM = (FKFieldModel) informationPracticeGM.getFormModel().getFieldModel("employee");
+        employeeFM.getQueryModel().addJoin(EJoin.INNER_JOIN , "id", EMPLOYEE.class ,"id");
+        employeeFM.getQueryModel().addWhere("deleted" , ECriteria.EQUAL, false);
     }
 
     private void initFilter() throws Exception{
@@ -89,9 +96,10 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
         groupsCB.setTextInputAllowed(true);
         groupsCB.setFilteringMode(FilteringMode.CONTAINS);
         groupsCB.setWidth(300, Unit.PIXELS);
-        QueryModel<GROUPS> specialityQM = new QueryModel<>(GROUPS.class);
+        QueryModel<GROUPS> groupsQM = new QueryModel<>(GROUPS.class);
+        groupsQM.addWhere("deleted" , ECriteria.EQUAL,false);
         BeanItemContainer<GROUPS> groupsBIC = new BeanItemContainer<>(GROUPS.class,
-                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(specialityQM));
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(groupsQM));
         groupsCB.setContainerDataSource(groupsBIC);
         informationPracticeFP.addFilterComponent("groups", groupsCB);
 
@@ -101,7 +109,8 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
         employeeCB.setFilteringMode(FilteringMode.CONTAINS);
         employeeCB.setWidth(300, Unit.PIXELS);
         QueryModel<USERS> employeeQM = new QueryModel<>(USERS.class);
-        employeeQM.addJoin(EJoin.INNER_JOIN , "id" ,EMPLOYEE.class , "id");
+        employeeQM.addJoin(EJoin.INNER_JOIN, "id", EMPLOYEE.class , "id");
+        employeeQM.addWhere("deleted" , ECriteria.EQUAL, false);
 
         BeanItemContainer<USERS> employeeBIC = new BeanItemContainer<>(USERS.class,
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(employeeQM));
