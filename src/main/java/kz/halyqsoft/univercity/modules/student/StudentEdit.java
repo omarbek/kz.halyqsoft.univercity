@@ -27,6 +27,7 @@ import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.facade.CommonIDFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
+import org.r3a.common.entity.FieldInfo;
 import org.r3a.common.entity.ID;
 import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.file.FileBean;
@@ -882,11 +883,15 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         /* Education doc */
         educationTW = new TableWidget(EDUCATION_DOC.class);
         educationTW.addEntityListener(this);
+
         DBTableModel educationTM = (DBTableModel) educationTW.getWidgetModel();
         educationTM.setReadOnly(readOnly);
         educationTM.getColumnModel("entryYear").setAlignment(Align.CENTER);
         educationTM.getColumnModel("endYear").setAlignment(Align.CENTER);
 
+
+        educationTM.getColumnModel("specialityName").setInTable(false);
+        educationTM.getColumnModel("qualification").setInTable(false);
         QueryModel educationQM = educationTM.getQueryModel();
         educationUDFI = educationQM.addJoin(EJoin.INNER_JOIN, "id", USER_DOCUMENT.class, "id");
         educationQM.addWhere(educationUDFI, "deleted", Boolean.FALSE);
@@ -1515,7 +1520,14 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         udfQM.addWhere("deleted", Boolean.FALSE);
 
         if (source.equals(educationTW)) {
+
             FormModel educationFM = ((DBTableModel) educationTW.getWidgetModel()).getFormModel();
+            educationFM.getFieldModel("specialityName").setInEdit(false);
+            educationFM.getFieldModel("specialityName").setInView(false);
+
+            educationFM.getFieldModel("qualification").setInEdit(false);
+            educationFM.getFieldModel("qualification").setInView(false);
+
             FKFieldModel schoolCountryFieldModel = (FKFieldModel) educationFM.getFieldModel("schoolCountry");
             QueryModel schoolCountryQM = schoolCountryFieldModel.getQueryModel();
             schoolCountryQM.addWhereNull("parent");
@@ -2020,12 +2032,19 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
     private boolean preSaveEducationDoc(Object source, Entity e, boolean isNew, int buttonId) {
         EDUCATION_DOC ed = (EDUCATION_DOC) e;
         FormModel fm = baseDataFW.getWidgetModel();
+
+        fm.getFieldModel("qualification").setInEdit(false);
+        fm.getFieldModel("qualification").setInView(false);
+
+        fm.getFieldModel("specialityName").setInEdit(false);
+        fm.getFieldModel("specialityName").setInView(false);
         if (isNew) {
             try {
                 ed.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USER_DOCUMENT"));
                 ed.setUser((STUDENT) fm.getEntity());
-                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(ed);
 
+
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(ed);
                 QueryModel educationQM = ((DBSelectModel) educationTW.getWidgetModel()).getQueryModel();
                 educationQM.addWhere(educationUDFI, "user", ECriteria.EQUAL, baseDataFW.getWidgetModel().getEntity().getId());
 
