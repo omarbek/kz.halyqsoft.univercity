@@ -11,6 +11,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.view.V_CURRICULUM_AFTER_S
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_SUBJECT_SELECT;
 import kz.halyqsoft.univercity.modules.curriculum.working.AbstractCurriculumPanel;
 import kz.halyqsoft.univercity.modules.curriculum.working.CurriculumView;
+import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
@@ -41,7 +42,7 @@ import java.util.*;
 public class AfterSemesterProgamPanel extends AbstractCurriculumPanel implements EntityListener {
 
     private CURRICULUM curriculum;
-    private GridWidget grid;
+    private GridWidget afterSemGW;
     private CustomGridSelectDialog subjectSelectDlg;
 
     public AfterSemesterProgamPanel(CurriculumView parentView) {
@@ -60,12 +61,12 @@ public class AfterSemesterProgamPanel extends AbstractCurriculumPanel implements
 
     @Override
     public void initPanel() {
-        grid = new GridWidget(V_CURRICULUM_AFTER_SEMESTER.class);
-        grid.setButtonVisible(IconToolbar.EDIT_BUTTON, false);
-        grid.setButtonVisible(IconToolbar.PREVIEW_BUTTON, false);
-        grid.setButtonVisible(IconToolbar.REFRESH_BUTTON, false);
-        grid.addEntityListener(this);
-        DBGridModel gm = (DBGridModel) grid.getWidgetModel();
+        afterSemGW = new GridWidget(V_CURRICULUM_AFTER_SEMESTER.class);
+        afterSemGW.setButtonVisible(IconToolbar.EDIT_BUTTON, false);
+        afterSemGW.setButtonVisible(IconToolbar.PREVIEW_BUTTON, false);
+        afterSemGW.setButtonVisible(IconToolbar.REFRESH_BUTTON, false);
+        afterSemGW.addEntityListener(this);
+        DBGridModel gm = (DBGridModel) afterSemGW.getWidgetModel();
         gm.setHeightMode(HeightMode.ROW);
         gm.setHeightByRows(8);
         gm.setDeferredCreate(false);
@@ -87,26 +88,26 @@ public class AfterSemesterProgamPanel extends AbstractCurriculumPanel implements
         QueryModel qm = gm.getQueryModel();
         qm.addWhere("curriculum", ECriteria.EQUAL, curriculumId);
 
-        FormModel fm = ((DBGridModel) grid.getWidgetModel()).getFormModel();
+        FormModel fm = ((DBGridModel) afterSemGW.getWidgetModel()).getFormModel();
 
         FKFieldModel subjectFM = (FKFieldModel) fm.getFieldModel("subject");
 
         FKFieldModel creditabilityFM = (FKFieldModel) fm.getFieldModel("creditability");
 
-        subjectFM.getListeners().add(new SubjectSelectListener( creditabilityFM));
+        subjectFM.getListeners().add(new SubjectSelectListener(creditabilityFM));
 
-        getContent().addComponent(grid);
+        getContent().addComponent(afterSemGW);
     }
 
     @Override
     public void refresh() throws Exception {
         ID curriculumId = (curriculum != null && curriculum.getId() != null) ? curriculum.getId() : ID.valueOf(-1);
-        QueryModel qm = ((DBGridModel) grid.getWidgetModel()).getQueryModel();
+        QueryModel qm = ((DBGridModel) afterSemGW.getWidgetModel()).getQueryModel();
         qm.addWhere("curriculum", ECriteria.EQUAL, curriculumId);
         qm.addWhere("deleted", Boolean.FALSE);
 
-        grid.getWidgetModel().setReadOnly(curriculum.getCurriculumStatus().getId().equals(ID.valueOf(3)));
-        grid.refresh();
+        afterSemGW.getWidgetModel().setReadOnly(curriculum.getCurriculumStatus().getId().equals(ID.valueOf(3)));
+        afterSemGW.refresh();
         getParentView().setTotalCreditSum();
     }
 
@@ -134,7 +135,8 @@ public class AfterSemesterProgamPanel extends AbstractCurriculumPanel implements
 
         List<CURRICULUM_AFTER_SEMESTER> curriculumAfterSemesters = session.lookup(capQM);
         for (CURRICULUM_AFTER_SEMESTER afterSemester : curriculumAfterSemesters) {
-            SEMESTER_DATA semesterData = afterSemester.getSemesterData();
+            SEMESTER_DATA semesterData = CommonUtils.createSemesterDataBySemester(afterSemester.getSemester(),
+                    curriculum);
             SUBJECT subject = afterSemester.getSubject();
             params.put(3, semesterData.getId().getId());
             params.put(4, subject.getId().getId());
@@ -153,7 +155,8 @@ public class AfterSemesterProgamPanel extends AbstractCurriculumPanel implements
 
         List<CURRICULUM_AFTER_SEMESTER> casList = session.lookup(capQM);
         for (CURRICULUM_AFTER_SEMESTER afterSemester : casList) {
-            SEMESTER_DATA semesterData = afterSemester.getSemesterData();
+            SEMESTER_DATA semesterData = CommonUtils.createSemesterDataBySemester(afterSemester.getSemester(),
+                    curriculum);
             SUBJECT subject = afterSemester.getSubject();
             params.put(3, semesterData.getId().getId());
             params.put(4, subject.getId().getId());
@@ -201,8 +204,8 @@ public class AfterSemesterProgamPanel extends AbstractCurriculumPanel implements
 
     @Override
     public void onCreate(Object source, Entity e, int buttonId) {
-        if (source.equals(grid)) {
-            FormModel fm = ((DBGridModel) grid.getWidgetModel()).getFormModel();
+        if (source.equals(afterSemGW)) {
+            FormModel fm = ((DBGridModel) afterSemGW.getWidgetModel()).getFormModel();
 
             FKFieldModel creditabilityFM = (FKFieldModel) fm.getFieldModel("creditability");
             creditabilityFM.setReadOnly(true);
@@ -293,19 +296,19 @@ public class AfterSemesterProgamPanel extends AbstractCurriculumPanel implements
 
     @Override
     public boolean preSave(Object source, Entity e, boolean isNew, int buttonId) {
-        if (source.equals(grid)) {
+        if (source.equals(afterSemGW)) {
             if (isNew) {
                 V_CURRICULUM_AFTER_SEMESTER afterSemesterView = (V_CURRICULUM_AFTER_SEMESTER) e;
 
                 Map<Integer, Object> params = new HashMap<Integer, Object>();
                 params.put(1, curriculum.getId().getId());
-                params.put(2, afterSemesterView.getSemesterData().getId().getId());
+                params.put(2, afterSemesterView.getSemester().getId().getId());
                 params.put(3, Boolean.FALSE);
                 params.put(4, afterSemesterView.getSubject().getId().getId());
                 String sql = "SELECT count(curr_after_sem.SUBJECT_ID) " +
                         "FROM curriculum_after_semester curr_after_sem " +
                         "WHERE curr_after_sem.CURRICULUM_ID = ?1 " +
-                        "      AND curr_after_sem.semester_data_id = ?2 " +
+                        "      AND curr_after_sem.semester_id = ?2 " +
                         "      AND curr_after_sem.DELETED = ?3 " +
                         "      AND curr_after_sem.SUBJECT_ID = ?4";
 
@@ -318,7 +321,7 @@ public class AfterSemesterProgamPanel extends AbstractCurriculumPanel implements
                     } else {
                         CURRICULUM_AFTER_SEMESTER afterSemester = new CURRICULUM_AFTER_SEMESTER();
                         afterSemester.setCurriculum(curriculum);
-                        afterSemester.setSemesterData(afterSemesterView.getSemesterData());
+                        afterSemester.setSemester(afterSemesterView.getSemester());
                         afterSemester.setCreated(new Date());
                         afterSemester.setCode(afterSemesterView.getSubjectCode());
                         afterSemester.setEducationModuleType(afterSemesterView.getEducationModuleType());
@@ -343,11 +346,13 @@ public class AfterSemesterProgamPanel extends AbstractCurriculumPanel implements
 
         return false;
     }
+
     public final void checkForConform() throws Exception {
         if (getTotalCredit() == 0) {
             throw new Exception(getUILocaleUtil().getCaption("no.programs.after.semester"));
         }
     }
+
     @Override
     public boolean preDelete(Object source, List<Entity> entities, int buttonId) {
         List<SEMESTER_SUBJECT> ssDelList = new ArrayList<>();
@@ -360,31 +365,32 @@ public class AfterSemesterProgamPanel extends AbstractCurriculumPanel implements
             for (Entity e : entities) {
                 CURRICULUM_AFTER_SEMESTER afterSemester = session.lookup(
                         CURRICULUM_AFTER_SEMESTER.class, e.getId());
-                ssQM.addWhere("semesterData", ECriteria.EQUAL, afterSemester.getSemesterData().getId());
+                ssQM.addWhere("semesterData", ECriteria.EQUAL, CommonUtils.createSemesterDataBySemester(
+                        afterSemester.getSemester(), curriculum).getId());
                 ssQM.addWhere("subject", ECriteria.EQUAL, afterSemester.getSubject().getId());
                 SEMESTER_SUBJECT ss = null;
                 try {
                     ss = session.lookupSingle(ssQM);
                 } catch (NoResultException nrex) {
-                    ss=null;
+                    ss = null;
                 }
                 if (ss != null) {
                     String sql = "SELECT count(curr_after_sem.ID) CNT " +
                             "FROM curriculum_after_semester curr_after_sem " +
                             "  INNER JOIN CURRICULUM curr ON curr_after_sem.CURRICULUM_ID = curr.ID " +
                             "WHERE curr_after_sem.CURRICULUM_ID != ?1 " +
-                            "      AND curr_after_sem.SEMESTER_DATA_ID = ?2 " +
+                            "      AND curr_after_sem.SEMESTER_ID = ?2 " +
                             "      AND curr_after_sem.SUBJECT_ID = ?3 AND curr.STATUS_ID = ?4";
                     Map<Integer, Object> params = new HashMap<Integer, Object>(4);
                     params.put(1, curriculum.getId().getId());
-                    params.put(2, afterSemester.getSemesterData().getId().getId());
+                    params.put(2, afterSemester.getSemester().getId().getId());
                     params.put(3, afterSemester.getSubject().getId().getId());
                     params.put(4, 3);
                     Integer sum = null;
                     try {
                         sum = (Integer) session.lookupSingle(sql, params);
                     } catch (NoResultException nrex) {
-                        sum=null;
+                        sum = null;
                     }
                     if (sum != null && sum > 0) {
                         delList.add(afterSemester);
@@ -400,7 +406,7 @@ public class AfterSemesterProgamPanel extends AbstractCurriculumPanel implements
                         } catch (NoResultException nrex) {
                         }
                         if (sum != null && sum > 0) {
-                            notDelList.add( afterSemester.getSubject().getNameRU());
+                            notDelList.add(afterSemester.getSubject().getNameRU());
                         } else {
                             ssDelList.add(ss);
                             delList.add(afterSemester);
@@ -465,13 +471,13 @@ public class AfterSemesterProgamPanel extends AbstractCurriculumPanel implements
     }
 
     public Integer getTotalCredit() {
-        return (Integer) ((DBGridModel) grid.getWidgetModel()).getFooterValue("credit");
+        return (Integer) ((DBGridModel) afterSemGW.getWidgetModel()).getFooterValue("credit");
     }
 
     private class SubjectSelectListener implements Property.ValueChangeListener {
         private final FKFieldModel creditabilityFM;
 
-        public SubjectSelectListener( FKFieldModel creditabilityFM) {
+        public SubjectSelectListener(FKFieldModel creditabilityFM) {
             super();
             this.creditabilityFM = creditabilityFM;
         }

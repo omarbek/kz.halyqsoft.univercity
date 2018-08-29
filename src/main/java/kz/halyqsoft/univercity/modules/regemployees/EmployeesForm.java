@@ -40,10 +40,10 @@ public class EmployeesForm extends UsersForm {
 
     private TableWidget employeeDegreeTW, publicationTW;
     private TableWidget scientificActivityTW, scientificManagementTW;
-    private TableWidget experienceTW, careerTW;
+    private TableWidget experienceTW, careerTW,childTW,magisterTW;
 
     private Button employeeDegreeButton, publicationButton, scientActButton;
-    private Button scientManagemButton, experienceButton, careerButton;
+    private Button scientManagemButton, experienceButton, careerButton,magisterButton,childButton;
 
     private boolean saveCareer;
 
@@ -81,6 +81,8 @@ public class EmployeesForm extends UsersForm {
         careerButton.setEnabled(false);
         scientActButton.setEnabled(false);
         scientManagemButton.setEnabled(false);
+        magisterButton.setEnabled(false);
+        childButton.setEnabled(false);
 
         try {
             EMPLOYEE employee = (EMPLOYEE) dataFM.getEntity();
@@ -122,6 +124,8 @@ public class EmployeesForm extends UsersForm {
         buttons.add(scientManagemButton);
         buttons.add(experienceButton);
         buttons.add(careerButton);
+        buttons.add(childButton);
+        buttons.add(magisterButton);
         return buttons;
     }
 
@@ -229,9 +233,98 @@ public class EmployeesForm extends UsersForm {
                 liveLoadFM.getListeners().add(new LiveLoadChangeListener(rateLoadFM, wageRateFM));
                 wageRateFM.getListeners().add(new WageRateChangeListener(liveLoadFM, rateLoadFM));
 
+                addToLayout(careerTW, childButton, event);
                 setActive(event);
                 contentHL.removeAllComponents();
                 contentHL.addComponent(careerTW);
+            }
+        });
+
+        childButton=createFormButton("child",true);
+        childButton.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                childTW = getTableWidget(CHILD.class, "employee", null);
+                flag = Flag.CHILD;
+
+                EMPLOYEE emp = null;
+                try {
+                    emp = (EMPLOYEE) dataAFW.getWidgetModel().getEntity();
+                } catch (Exception e) {
+                    e.printStackTrace();//TODO catch
+                }
+
+                DBTableModel childTM = (DBTableModel) childTW.getWidgetModel();
+                childTM.setReadOnly(false);
+                childTM.setCrudEntityClass(CHILD.class);
+                QueryModel childQM = childTM.getQueryModel();
+                ID employeeId = ID.valueOf(-1);
+                if (emp != null && emp.getStatus() != null && emp.getStatus().getId().equals(ID.valueOf(5))) {
+                    employeeId = emp.getId();
+                    childTM.getColumnModel("firstName").setInTable(false);
+                    childTM.getColumnModel("lastName").setInTable(false);
+                    childTM.getColumnModel("middleName").setInTable(false);
+                    childTM.getColumnModel("birthDate").setInTable(false);
+                    childTM.getColumnModel("sex").setInTable(false);
+                } else {
+                    childTM.getColumnModel("firstName").setInTable(true);
+                    childTM.getColumnModel("lastName").setInTable(true);
+                    childTM.getColumnModel("middleName").setInTable(true);
+                    childTM.getColumnModel("birthDate").setInTable(true);
+                    childTM.getColumnModel("sex").setInTable(true);
+                }
+                childQM.addWhere("employee", ECriteria.EQUAL, employeeId);
+
+                FormModel childFM = childTM.getFormModel();
+                addToLayout(childTW, magisterButton, clickEvent);
+                setActive(clickEvent);
+                contentHL.removeAllComponents();
+                contentHL.addComponent(childTW);
+            }
+        });
+
+        magisterButton=createFormButton("master",true);
+        magisterButton.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+
+                magisterTW = getTableWidget(MASTER.class, "employee", null);
+                flag = Flag.MAGISTER;
+
+                EMPLOYEE emp = null;
+                try {
+                    emp = (EMPLOYEE) dataAFW.getWidgetModel().getEntity();
+                } catch (Exception e) {
+                    e.printStackTrace();//TODO catch
+                }
+
+                DBTableModel masterTM = (DBTableModel) magisterTW.getWidgetModel();
+                masterTM.setReadOnly(false);
+                masterTM.setCrudEntityClass(MASTER.class);
+                QueryModel masterQM = masterTM.getQueryModel();
+                ID employeeId = ID.valueOf(-1);
+                if (emp != null && emp.getStatus() != null && emp.getStatus().getId().equals(ID.valueOf(5))) {
+                    employeeId = emp.getId();
+                    masterTM.getColumnModel("entranceYear").setInTable(false);
+                    masterTM.getColumnModel("graduationYear").setInTable(false);
+                    masterTM.getColumnModel("university").setInTable(false);
+                    masterTM.getColumnModel("speciality").setInTable(false);
+                    masterTM.getColumnModel("diplomaNumber").setInTable(false);
+
+                } else {
+                    masterTM.getColumnModel("entranceYear").setInTable(true);
+                    masterTM.getColumnModel("graduationYear").setInTable(true);
+                    masterTM.getColumnModel("university").setInTable(true);
+                    masterTM.getColumnModel("speciality").setInTable(true);
+                    masterTM.getColumnModel("diplomaNumber").setInTable(true);
+                }
+                masterQM.addWhere("employee", ECriteria.EQUAL, employeeId);
+
+                FormModel masterFM = masterTM.getFormModel();
+                setActive(clickEvent);
+                contentHL.removeAllComponents();
+                contentHL.addComponent(magisterTW);
+
             }
         });
     }
@@ -331,8 +424,6 @@ public class EmployeesForm extends UsersForm {
                 employeeDegree.setDissertationTopic(vEmployeeDegree.getDissertationTopic());
                 employeeDegree.setCandidate(vEmployeeDegree.getCandidate());
                 employeeDegree.setSpeciality(vEmployeeDegree.getSpeciality());
-                employeeDegree.setQualification(vEmployeeDegree.getQualification());
-                employeeDegree.setEntranceYear(vEmployeeDegree.getEntranceYear());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(employeeDegree);
 
                 QueryModel employeeDegreeQM = ((DBTableModel) employeeDegreeTW.getWidgetModel()).getQueryModel();
@@ -354,8 +445,6 @@ public class EmployeesForm extends UsersForm {
                 employeeDegree.setPlaceOfIssue(vEmployeeDegree.getPlaceOfIssue());
                 employeeDegree.setCandidate(vEmployeeDegree.getCandidate());
                 employeeDegree.setSpeciality(vEmployeeDegree.getSpeciality());
-                employeeDegree.setQualification(vEmployeeDegree.getQualification());
-                employeeDegree.setEntranceYear(vEmployeeDegree.getEntranceYear());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(employeeDegree);
                 employeeDegreeTW.refresh();
                 showSavedNotification();
@@ -549,6 +638,70 @@ public class EmployeesForm extends UsersForm {
         return false;
     }
 
+    private boolean preSaveChild(Entity e,boolean isNew){
+        CHILD child = (CHILD) e;
+        FormModel formModel = dataAFW.getWidgetModel();
+        if(isNew){
+            try {
+                EMPLOYEE employee = (EMPLOYEE) formModel.getEntity();
+                child.setEmployee(employee);
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(child);
+
+                QueryModel childQM = ((DBTableModel)childTW.getWidgetModel()).getQueryModel();
+                childQM.addWhere("employee", ECriteria.EQUAL, employee.getId());
+
+                childTW.refresh();
+                showSavedNotification();
+
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+        }else {
+            try {
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(child);
+                childTW.refresh();
+                showSavedNotification();
+            }catch (Exception ex){
+                CommonUtils.showMessageAndWriteLog("Unable to merge an employee child", ex);
+            }
+        }
+
+        return false;
+    }
+
+    private boolean preSaveMagister(Entity e,boolean isNew){
+        MASTER master = (MASTER) e;
+        FormModel formModel = dataAFW.getWidgetModel();
+        if(isNew){
+            try {
+                EMPLOYEE employee = (EMPLOYEE) formModel.getEntity();
+                master.setEmployee(employee);
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(master);
+
+                QueryModel masterQM = ((DBTableModel)magisterTW.getWidgetModel()).getQueryModel();
+                masterQM.addWhere("employee", ECriteria.EQUAL, employee.getId());
+
+                magisterTW.refresh();
+                showSavedNotification();
+
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+        }else {
+            try {
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(master);
+                magisterTW.refresh();
+                showSavedNotification();
+            }catch (Exception e2){
+                CommonUtils.showMessageAndWriteLog("Unable to merge an employee master", e2);
+            }
+        }
+
+        return false;
+    }
+
+
+
     private boolean preSaveScientificActivity(Entity e, boolean isNew) {
         V_SCIENTIFIC_ACTIVITY vScientificActivity = (V_SCIENTIFIC_ACTIVITY) e;
         SCIENTIFIC_ACTIVITY scientificActivity;
@@ -675,6 +828,10 @@ public class EmployeesForm extends UsersForm {
             return canSave;
         } else if (source.equals(scientificActivityTW)) {
             return canSave();
+        }else if(source.equals(childTW)){
+            return   canSave();
+        }else if(source.equals(magisterTW)){
+            return canSave();
         }
 
         return super.preCreate(source, buttonId);
@@ -705,6 +862,10 @@ public class EmployeesForm extends UsersForm {
             return preSaveScientificActivity(e, isNew);
         } else if (source.equals(scientificManagementTW)) {
             return preSaveScientificManagement(e, isNew);
+        }else if(source.equals(childTW)){
+            return preSaveChild(e,isNew);
+        }else if(source.equals(magisterTW)){
+            return preSaveMagister(e,isNew);
         }
         return super.preSave(source, e, isNew, buttonId);
     }

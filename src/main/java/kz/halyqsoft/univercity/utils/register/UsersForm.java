@@ -179,8 +179,6 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
 
                 registrationHSP.addComponent(contentHL);
                 getContent().addComponent(registrationHSP);
-
-
             }
 
 
@@ -243,14 +241,14 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
             }
         });
 
-        idDocButton = createFormButton("identity.document", true);
+ idDocButton = createFormButton("identity.document", true);
         idDocButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 if( iinTF.getValue().equals("") && iin==null) {
                     Message.showError(getUILocaleUtil().getMessage("error.iin"));
                     f=false;
-                }else if(iinTF.getValue().toString().length()<12){
+                }else if(iinTF.getValue().length()<12){
                     Message.showError(getUILocaleUtil().getMessage("incorrect.iin"));
                     f=false;
                 }else  if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.REG_ADDRESS.equals(flag)))

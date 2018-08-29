@@ -1,8 +1,5 @@
-package kz.halyqsoft.univercity.entity.beans.univercity.view;
+package kz.halyqsoft.univercity.entity.beans.univercity;
 
-import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM;
-import kz.halyqsoft.univercity.entity.beans.univercity.GROUPS;
-import kz.halyqsoft.univercity.entity.beans.univercity.STREAM;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDY_YEAR;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT;
@@ -14,52 +11,52 @@ import javax.persistence.*;
 
 /**
  * @author Omarbek
- * @created on 29.06.2018
+ * @created on 22.08.2018
  */
 @Entity
-public class V_LOAD_TO_CHAIR extends AbstractEntity {
+public class LOAD_TO_CHAIR extends AbstractEntity {
 
-    @FieldInfo(type = EFieldType.FK_DIALOG, order = 2, inGrid = false, columnWidth = 80)
+    @FieldInfo(type = EFieldType.FK_DIALOG, order = 2, columnWidth = 280)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
     private SUBJECT subject;
 
-    @FieldInfo(type = EFieldType.FK_DIALOG, order = 3, inGrid = false, columnWidth = 80)
+    @FieldInfo(type = EFieldType.FK_DIALOG, order = 3, inGrid = false, columnWidth = 80, inEdit = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "CURRICULUM_ID", referencedColumnName = "ID")})
     private CURRICULUM curriculum;
 
-    @FieldInfo(type = EFieldType.FK_DIALOG, order = 3, inGrid = false, columnWidth = 80)
+    @FieldInfo(type = EFieldType.FK_DIALOG, order = 4, columnWidth = 80)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "STUDY_YEAR_ID", referencedColumnName = "ID")})
     private STUDY_YEAR studyYear;
 
-    @FieldInfo(type = EFieldType.FK_DIALOG, order = 6, inGrid = false, columnWidth = 80)
+    @FieldInfo(type = EFieldType.FK_DIALOG, order = 6, columnWidth = 150, inEdit = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "STREAM_ID", referencedColumnName = "ID")})
     private STREAM stream;
 
-    @FieldInfo(type = EFieldType.FK_DIALOG, order = 7, inGrid = false, columnWidth = 80)
+    @FieldInfo(type = EFieldType.FK_DIALOG, order = 7, columnWidth = 100, inEdit = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "GROUP_ID", referencedColumnName = "ID")})
     private GROUPS group;
 
-    @FieldInfo(type = EFieldType.FK_DIALOG, order = 6, inGrid = false, columnWidth = 80)
+    @FieldInfo(type = EFieldType.FK_DIALOG, order = 6, columnWidth = 80)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "SEMESTER_ID", referencedColumnName = "ID")})
     private SEMESTER semester;
 
-    @FieldInfo(type = EFieldType.INTEGER, order = 9)
+    @FieldInfo(type = EFieldType.INTEGER, order = 9, inEdit = false)
     @Column(name = "STUDENT_NUMBER")
     private Integer studentNumber;
 
-    @FieldInfo(type = EFieldType.DOUBLE, order = 10)
+    @FieldInfo(type = EFieldType.DOUBLE, order = 10, inEdit = false)
     @Column(name = "CREDIT")
     private Double credit;
 
@@ -111,7 +108,7 @@ public class V_LOAD_TO_CHAIR extends AbstractEntity {
     @Column(name = "PROTECT_DIPLOMA_COUNT")
     private Double protectDiplomaCount;
 
-    @FieldInfo(type = EFieldType.DOUBLE, order = 23)
+    @FieldInfo(type = EFieldType.DOUBLE, order = 23, inEdit = false)
     @Column(name = "TOTAL_COUNT")
     private Double totalCount;
 

@@ -106,7 +106,13 @@ public class CheckStudentsView extends AbstractTaskView implements EntityListene
                 deleteUserDoc(user, "medical_checkup", 4);
                 deleteUserDoc(user, "preemptive_right", 11);
                 deleteMainTable(user, "user_language", "USER_ID");
-                deleteUserDoc(user, "education_doc", 3);
+
+                String sql = "delete from education_doc where id in " +
+                        "(select id from user_document where user_id = ?1 and document_type_id = 3)";
+                Map<Integer, Object> params = new HashMap<>();
+                params.put(1, user.getId().getId());
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
+
                 deleteUserDoc(user, "user_passport", 1);
                 deleteUserDoc(user, "military_doc", 2);
                 deleteUserDoc(user, "disability_doc", 5);
@@ -223,10 +229,10 @@ public class CheckStudentsView extends AbstractTaskView implements EntityListene
 
     private List<USERS> getStudents() {
 
-        String sql = "select usr.* from users usr " +
-                "INNER JOIN student stu on stu.id=usr.id " +
-                "where usr.id not in (select id from v_student) and usr.user_type_id=2 " +
-                "and stu.category_id=1 and usr.deleted=false";
+    String sql = "select usr.* from users usr " +
+            "INNER JOIN student stu on stu.id=usr.id " +
+            "where usr.id not in (select id from v_student) and usr.user_type_id=2 " +
+            "and stu.category_id=1 and usr.deleted=false";
         List<USERS> list = new ArrayList<>();
         try {
             Map<Integer, Object> params = new HashMap<>();

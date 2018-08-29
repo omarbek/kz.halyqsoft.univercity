@@ -35,6 +35,10 @@ public class V_STREAM extends AbstractEntity {
     @Column(name = "STUDENT_COUNT")
     private Integer studentCount;
 
+    @FieldInfo(type = EFieldType.INTEGER, order = 6, readOnlyFixed = true)
+    @Column(name = "GROUP_COUNT")
+    private Integer groupCount;
+
     public SEMESTER_DATA getSemesterData() {
         return semesterData;
     }
@@ -65,5 +69,13 @@ public class V_STREAM extends AbstractEntity {
 
     public void setStudentCount(Integer studentCount) {
         this.studentCount = studentCount;
+    }
+
+    public Integer getGroupCount() {
+        return groupCount;
+    }
+
+    public void setGroupCount(Integer groupCount) {
+        this.groupCount = groupCount;
     }
 }

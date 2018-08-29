@@ -11,7 +11,7 @@ import java.util.Date;
 @Entity
 public class STREAM_GROUP extends AbstractEntity {
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 1)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 1, inGrid = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "GROUP_ID",  referencedColumnName = "ID", nullable = false)})
