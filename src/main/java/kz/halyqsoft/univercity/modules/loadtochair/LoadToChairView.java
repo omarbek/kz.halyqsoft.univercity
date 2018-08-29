@@ -75,36 +75,37 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
                                 CommonEntityFacadeBean.class).lookup(loadToChairQM);
                         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(loads);
                         try {
-                            String sql = "INSERT INTO load_to_chair\n" +
-                                    "  SELECT\n" +
-                                    "    nextval('s_v_load_to_chair'),\n" +
-                                    "    subject_id,\n" +
-                                    "    curriculum_id,\n" +
-                                    "    study_year,\n" +
-                                    "    stream,\n" +
-                                    "    semester_name,\n" +
-                                    "    student_number,\n" +
-                                    "    credit,\n" +
-                                    "    lc_count,\n" +
-                                    "    pr_count,\n" +
-                                    "    lb_count,\n" +
-                                    "    with_teacher_count,\n" +
-                                    "    rating_count,\n" +
-                                    "    exam_count,\n" +
-                                    "    control_count,\n" +
-                                    "    course_work_count,\n" +
-                                    "    diploma_count,\n" +
-                                    "    practice_count,\n" +
-                                    "    mek,\n" +
-                                    "    protect_diploma_count,\n" +
-                                    "    total_count\n" +
+                            String sql = "INSERT INTO load_to_chair " +
+                                    "  SELECT " +
+                                    "    nextval('s_v_load_to_chair'), " +
+                                    "    subject_id, " +
+                                    "    curriculum_id, " +
+                                    "    study_year_id, " +
+                                    "    case when stream_id=0 then null else stream_id end stream_id, " +
+                                    "    case when group_id=0 then null else group_id end stream_id, " +
+                                    "    semester_id, " +
+                                    "    student_number, " +
+                                    "    credit, " +
+                                    "    lc_count, " +
+                                    "    pr_count, " +
+                                    "    lb_count, " +
+                                    "    with_teacher_count, " +
+                                    "    rating_count, " +
+                                    "    exam_count, " +
+                                    "    control_count, " +
+                                    "    course_work_count, " +
+                                    "    diploma_count, " +
+                                    "    practice_count, " +
+                                    "    mek, " +
+                                    "    protect_diploma_count, " +
+                                    "    total_count " +
                                     "  FROM v_load_to_chair;";
                             SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
                                     lookupItemsList(sql, new HashMap<>());
                         } catch (Exception ignored) {
                         }
                     } catch (Exception e) {
-                        e.printStackTrace();//TODO catch
+                        CommonUtils.showMessageAndWriteLog("Unable to get loads to chair", e);
                     }
                 }
             });

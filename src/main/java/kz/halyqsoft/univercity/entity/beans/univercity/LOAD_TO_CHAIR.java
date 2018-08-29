@@ -1,5 +1,7 @@
 package kz.halyqsoft.univercity.entity.beans.univercity;
 
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDY_YEAR;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
@@ -14,87 +16,99 @@ import javax.persistence.*;
 @Entity
 public class LOAD_TO_CHAIR extends AbstractEntity {
 
-    @FieldInfo(type = EFieldType.FK_DIALOG, order = 2, columnWidth = 80)
+    @FieldInfo(type = EFieldType.FK_DIALOG, order = 2, columnWidth = 280)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
     private SUBJECT subject;
 
-    @FieldInfo(type = EFieldType.FK_DIALOG, order = 3, inGrid = false, columnWidth = 80,inEdit = false)
+    @FieldInfo(type = EFieldType.FK_DIALOG, order = 3, inGrid = false, columnWidth = 80, inEdit = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "CURRICULUM_ID", referencedColumnName = "ID")})
     private CURRICULUM curriculum;
 
-    @FieldInfo(type = EFieldType.INTEGER, order = 5)
-    @Column(name = "STUDY_YEAR")
-    private Integer studyYear;
+    @FieldInfo(type = EFieldType.FK_DIALOG, order = 4, columnWidth = 80)
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "STUDY_YEAR_ID", referencedColumnName = "ID")})
+    private STUDY_YEAR studyYear;
 
-    @FieldInfo(type = EFieldType.TEXT, order = 6,inEdit = false)
-    @Column(name = "STREAM")
-    private String stream;
+    @FieldInfo(type = EFieldType.FK_DIALOG, order = 6, columnWidth = 150, inEdit = false)
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "STREAM_ID", referencedColumnName = "ID")})
+    private STREAM stream;
 
-    @FieldInfo(type = EFieldType.TEXT, order = 7,inEdit = false)
-    @Column(name = "SEMESTER_NAME")
-    private String semesterName;
+    @FieldInfo(type = EFieldType.FK_DIALOG, order = 7, columnWidth = 100, inEdit = false)
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "GROUP_ID", referencedColumnName = "ID")})
+    private GROUPS group;
 
-    @FieldInfo(type = EFieldType.INTEGER, order = 8,inEdit = false)
+    @FieldInfo(type = EFieldType.FK_DIALOG, order = 6, columnWidth = 80)
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "SEMESTER_ID", referencedColumnName = "ID")})
+    private SEMESTER semester;
+
+    @FieldInfo(type = EFieldType.INTEGER, order = 9, inEdit = false)
     @Column(name = "STUDENT_NUMBER")
     private Integer studentNumber;
 
-    @FieldInfo(type = EFieldType.DOUBLE, order = 9,inEdit = false)
+    @FieldInfo(type = EFieldType.DOUBLE, order = 10, inEdit = false)
     @Column(name = "CREDIT")
     private Double credit;
 
-    @FieldInfo(type = EFieldType.DOUBLE, order = 10)
+    @FieldInfo(type = EFieldType.DOUBLE, order = 11)
     @Column(name = "LC_COUNT")
     private Double lcCount;
 
-    @FieldInfo(type = EFieldType.DOUBLE, order = 11)
+    @FieldInfo(type = EFieldType.DOUBLE, order = 12)
     @Column(name = "PR_COUNT")
     private Double prCount;
 
-    @FieldInfo(type = EFieldType.DOUBLE, order = 12)
+    @FieldInfo(type = EFieldType.DOUBLE, order = 13)
     @Column(name = "LB_COUNT")
     private Double lbCount;
 
-    @FieldInfo(type = EFieldType.DOUBLE, order = 13)
+    @FieldInfo(type = EFieldType.DOUBLE, order = 14)
     @Column(name = "WITH_TEACHER_COUNT")
     private Double withTeacherCount;
 
-    @FieldInfo(type = EFieldType.DOUBLE, order = 14)
+    @FieldInfo(type = EFieldType.DOUBLE, order = 15)
     @Column(name = "RATING_COUNT")
     private Double ratingCount;
 
-    @FieldInfo(type = EFieldType.DOUBLE, order = 15)
+    @FieldInfo(type = EFieldType.DOUBLE, order = 16)
     @Column(name = "EXAM_COUNT")
     private Double examCount;
 
-    @FieldInfo(type = EFieldType.DOUBLE, order = 16)
+    @FieldInfo(type = EFieldType.DOUBLE, order = 17)
     @Column(name = "CONTROL_COUNT")
     private Double controlCount;
 
-    @FieldInfo(type = EFieldType.DOUBLE, order = 17)
+    @FieldInfo(type = EFieldType.DOUBLE, order = 18)
     @Column(name = "COURSE_WORK_COUNT")
     private Double courseWorkCount;
 
-    @FieldInfo(type = EFieldType.DOUBLE, order = 18)
+    @FieldInfo(type = EFieldType.DOUBLE, order = 19)
     @Column(name = "DIPLOMA_COUNT")
     private Double diplomaCount;
 
-    @FieldInfo(type = EFieldType.DOUBLE, order = 19)
+    @FieldInfo(type = EFieldType.DOUBLE, order = 20)
     @Column(name = "PRACTICE_COUNT")
     private Double practiceCount;
 
-    @FieldInfo(type = EFieldType.DOUBLE, order = 20)
+    @FieldInfo(type = EFieldType.DOUBLE, order = 21)
     @Column(name = "MEK")
     private Double mek;
 
-    @FieldInfo(type = EFieldType.DOUBLE, order = 21)
+    @FieldInfo(type = EFieldType.DOUBLE, order = 22)
     @Column(name = "PROTECT_DIPLOMA_COUNT")
     private Double protectDiplomaCount;
 
-    @FieldInfo(type = EFieldType.DOUBLE, order = 22,inEdit = false)
+    @FieldInfo(type = EFieldType.DOUBLE, order = 23, inEdit = false)
     @Column(name = "TOTAL_COUNT")
     private Double totalCount;
 
@@ -114,28 +128,36 @@ public class LOAD_TO_CHAIR extends AbstractEntity {
         this.curriculum = curriculum;
     }
 
-    public String getStream() {
+    public STREAM getStream() {
         return stream;
     }
 
-    public void setStream(String stream) {
+    public void setStream(STREAM stream) {
         this.stream = stream;
     }
 
-    public String getSemesterName() {
-        return semesterName;
+    public GROUPS getGroup() {
+        return group;
     }
 
-    public void setSemesterName(String semesterName) {
-        this.semesterName = semesterName;
+    public void setGroup(GROUPS group) {
+        this.group = group;
     }
 
-    public Integer getStudyYear() {
+    public STUDY_YEAR getStudyYear() {
         return studyYear;
     }
 
-    public void setStudyYear(Integer studyYear) {
+    public void setStudyYear(STUDY_YEAR studyYear) {
         this.studyYear = studyYear;
+    }
+
+    public SEMESTER getSemester() {
+        return semester;
+    }
+
+    public void setSemester(SEMESTER semester) {
+        this.semester = semester;
     }
 
     public Integer getStudentNumber() {
