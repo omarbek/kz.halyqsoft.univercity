@@ -6,10 +6,14 @@ import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import kz.halyqsoft.univercity.entity.beans.ROLES;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.USER_ROLES;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_DATA;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_PERIOD;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.facade.CommonIDFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -34,7 +38,6 @@ import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import kz.halyqsoft.univercity.entity.beans.ROLES;
 
 /**
  * @author Omarbek
@@ -309,5 +312,82 @@ public class CommonUtils {
         return SessionFacadeFactory.getSessionFacade(
                 CommonEntityFacadeBean.class).
                 lookup(groupsQM);
+    }
+
+    public static SEMESTER_DATA createSemesterDataBySemester(SEMESTER semester, CURRICULUM curriculum) throws Exception {
+        SEMESTER_DATA sd;
+        ENTRANCE_YEAR studyYear = curriculum.getEntranceYear();
+        if (!semester.getId().equals(ID.valueOf(1)) && !semester.getId().equals(ID.valueOf(2))) {
+            int beginYear = studyYear.getBeginYear();
+            int endYear = studyYear.getEndYear();
+            if (semester.getId().equals(ID.valueOf(3)) || semester.getId().equals(ID.valueOf(4))) {
+                beginYear++;
+                endYear++;
+            } else if (semester.getId().equals(ID.valueOf(5)) || semester.getId().equals(ID.valueOf(6))) {
+                beginYear += 2;
+                endYear += 2;
+            } else if (semester.getId().equals(ID.valueOf(7)) || semester.getId().equals(ID.valueOf(8))) {
+                beginYear += 3;
+                endYear += 3;
+            }
+
+            QueryModel<ENTRANCE_YEAR> syQM = new QueryModel<>(ENTRANCE_YEAR.class);
+            syQM.addWhere("beginYear", ECriteria.EQUAL, beginYear);
+            syQM.addWhereAnd("endYear", ECriteria.EQUAL, endYear);
+
+            try {
+                studyYear = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(syQM);
+            } catch (NoResultException nrex) {
+                studyYear = new ENTRANCE_YEAR();
+                studyYear.setBeginYear(beginYear);
+                studyYear.setEndYear(endYear);
+                studyYear.setEntranceYear(beginYear + "-" + endYear);
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(studyYear);
+            }
+        }
+
+        SEMESTER_PERIOD sp = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(SEMESTER.class, semester.getId()).getSemesterPeriod();
+
+        QueryModel<SEMESTER_DATA> sdQM = new QueryModel<>(SEMESTER_DATA.class);
+        sdQM.addWhere("year", ECriteria.EQUAL, studyYear.getId());
+        sdQM.addWhereAnd("semesterPeriod", ECriteria.EQUAL, sp.getId());
+
+        try {
+            sd = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(sdQM);
+        } catch (NoResultException nrex) {
+            sd = new SEMESTER_DATA();
+            sd.setYear(studyYear);
+            sd.setSemesterPeriod(sp);
+
+            Calendar c = Calendar.getInstance();
+            c.clear();
+            if (sp.getId().equals(ID.valueOf(1))) {
+                c.set(Calendar.DAY_OF_MONTH, 20);
+                c.set(Calendar.MONTH, Calendar.AUGUST);
+                c.set(Calendar.YEAR, studyYear.getBeginYear());
+                sd.setBeginDate(c.getTime());
+
+                c.clear();
+                c.set(Calendar.DAY_OF_MONTH, 31);
+                c.set(Calendar.MONTH, Calendar.DECEMBER);
+                c.set(Calendar.YEAR, studyYear.getBeginYear());
+                sd.setEndDate(c.getTime());
+            } else if (sp.getId().equals(ID.valueOf(2))) {
+                c.set(Calendar.DAY_OF_MONTH, 10);
+                c.set(Calendar.MONTH, Calendar.JANUARY);
+                c.set(Calendar.YEAR, studyYear.getEndYear());
+                sd.setBeginDate(c.getTime());
+
+                c.clear();
+                c.set(Calendar.DAY_OF_MONTH, 25);
+                c.set(Calendar.MONTH, Calendar.MAY);
+                c.set(Calendar.YEAR, studyYear.getEndYear());
+                sd.setEndDate(c.getTime());
+            }
+
+            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(sd);
+        }
+
+        return sd;
     }
 }

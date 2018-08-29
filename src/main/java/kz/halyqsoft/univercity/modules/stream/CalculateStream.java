@@ -17,6 +17,7 @@ public class CalculateStream {
     public List<Map<Entity, List<V_GROUPS_CREATION_NEEDED>>> sortedEntranceYearFromLanguage ;
 
     List<V_GROUPS_CREATION_NEEDED> list;
+
     public CalculateStream(List<V_GROUPS_CREATION_NEEDED> list){
         sortedLanguageFromCorpus = new ArrayList<>();
         sortedEntranceYearFromLanguage = new ArrayList<>();
@@ -30,8 +31,6 @@ public class CalculateStream {
                 getSortedGroupsByEntranceYear(value.get(key));
             }
         }
-
-
     }
 
     private Map<Entity, List<V_GROUPS_CREATION_NEEDED>> getSortedGroupsByCorpus(List<V_GROUPS_CREATION_NEEDED> list){
@@ -45,7 +44,6 @@ public class CalculateStream {
                     sortedGroupsByCorpus.get(group.getCorpus()).add(group);
                 }
             }
-
             for(Entity key : sortedGroupsByCorpus.keySet())
             {
                 getSortedGroupsByLanguage(sortedGroupsByCorpus.get(key));
@@ -57,29 +55,19 @@ public class CalculateStream {
         Map<Entity, List<V_GROUPS_CREATION_NEEDED>> sortedGroupsByCorpus = new HashMap();
 
         for(V_GROUPS_CREATION_NEEDED group : list){
-
-            if(sortedGroupsByCorpus.get(group.getLanguage())!=null)
-            {
+            if(sortedGroupsByCorpus.get(group.getLanguage())!=null){
                 sortedGroupsByCorpus.get(group.getLanguage()).add(group);
             }else{
                 sortedGroupsByCorpus.put(group.getLanguage(), new ArrayList<V_GROUPS_CREATION_NEEDED>());
                 sortedGroupsByCorpus.get(group.getLanguage()).add(group);
             }
-
         }
         sortedLanguageFromCorpus.add(sortedGroupsByCorpus);
-
-
-
-        System.out.println("asd");
-        //return sortedGroupsByCorpus;
     }
 
     private void getSortedGroupsByEntranceYear(List<V_GROUPS_CREATION_NEEDED> list){
         Map<Entity, List<V_GROUPS_CREATION_NEEDED>> sortedGroupsByEntranceYear = new HashMap();
-
         for(V_GROUPS_CREATION_NEEDED group : list){
-
             if(sortedGroupsByEntranceYear.get(group.getEntranceYear())!=null)
             {
                 sortedGroupsByEntranceYear.get(group.getEntranceYear()).add(group);
@@ -87,7 +75,6 @@ public class CalculateStream {
                 sortedGroupsByEntranceYear.put(group.getEntranceYear(), new ArrayList<V_GROUPS_CREATION_NEEDED>());
                 sortedGroupsByEntranceYear.get(group.getEntranceYear()).add(group);
             }
-
         }
         sortedEntranceYearFromLanguage.add(sortedGroupsByEntranceYear);
 

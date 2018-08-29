@@ -270,8 +270,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         refreshChild();
         getTabSheet().addTab(childTW, getUILocaleUtil().getEntityLabel(CHILD.class));
     }
-
-    public List<VChild> getChildList() throws Exception {
+    public List<VChild> getChildList() throws Exception{
 
         ID employeeId = ID.valueOf(-1);
         if (!baseDataFW.getWidgetModel().isCreateNew()) {
@@ -705,8 +704,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
 
         return true;
     }
-
-    private void createDocumentsTab(boolean readOnly) throws Exception {
+        private void createDocumentsTab(boolean readOnly) throws Exception {
         VerticalLayout content = new VerticalLayout();
         content.setSpacing(true);
         content.setSizeFull();
@@ -1329,15 +1327,8 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         experienceL = new Label();
         experienceL.setCaptionAsHtml(true);
         experienceL.setWidth(800, Unit.PIXELS);
-        if (getSum() != null && getList() != null) {
-            experienceL.setCaption("<html><b>" +
-                    getUILocaleUtil().getCaption("experienceL") + "</b>" + " " +
-                    String.valueOf((getSum().getYears())) + " " + getUILocaleUtil().getCaption("experienceL.year")
-                    + " " + String.valueOf(getSum().getMonths()) + " " + getUILocaleUtil().getCaption("experienceL.month"));
-        } else {
-            experienceL.setCaption("<html><b>" +
-                    getUILocaleUtil().getCaption("experienceL") + "</b>");
-        }
+
+        updateExperienceL();
 
         content.addComponent(experienceTW);
         content.setComponentAlignment(experienceTW, Alignment.MIDDLE_CENTER);
@@ -1347,13 +1338,37 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         getTabSheet().addTab(content, getUILocaleUtil().getCaption("experience"));
     }
 
+    private void updateExperienceL() {
+        try{
+            if(getSum()!=null&&getList()!=null) {
+            experienceL.setCaption("<html><b>" +
+                    getUILocaleUtil().getCaption("experienceL") + "</b>" + " " +
+                    String.valueOf((getSum().getYears())) +" "+ getUILocaleUtil().getCaption("experienceL.year")
+                    + " " + String.valueOf(getSum().getMonths()) +" "+ getUILocaleUtil().getCaption("experienceL.month")
+                    + " " + String.valueOf(getSum().getDays()) +" "+ getUILocaleUtil().getCaption("experienceL.day")
+            );
+            }else{
+                experienceL.setCaption("<html><b>" +
+                        getUILocaleUtil().getCaption("experienceL") + "</b>");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void handleEntityEvent(EntityEvent ev) {
         if (ev.getAction() == EntityEvent.CREATED || ev.getAction() == EntityEvent.MERGED
                 || ev.getAction() == EntityEvent.REMOVED) {
             refresh();
             refreshChild();
+
+            if(ev.getSource().equals(experienceTW)){
+                updateExperienceL();
+            }
         }
+
+
     }
 
     private void refresh() {
@@ -1387,7 +1402,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
             employeeId = baseDataFW.getWidgetModel().getEntity().getId();
         }
         Map<Integer, Object> params = new HashMap<>();
-        String sql = "select sum(age(dismiss_date,hire_date))\n" +
+        String sql = "select justify_days( sum(age(case when dismiss_date isnull then now() when dismiss_date NOTNULL THEN dismiss_date END ,hire_date) ) )\n" +
                 "from previous_experience\n" +
                 "where employee_id =" + employeeId;
 
@@ -1415,7 +1430,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
                 "  post_name,\n" +
                 "  hire_date,\n" +
                 "  dismiss_date,\n" +
-                "  age(dismiss_date, hire_date)\n" +
+                "  age(case when dismiss_date isnull then now() when dismiss_date NOTNULL THEN dismiss_date END ,hire_date) \n" +
                 "from previous_experience" +
                 " where employee_id = " + employeeId;
 

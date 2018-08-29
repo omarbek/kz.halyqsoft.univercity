@@ -13,7 +13,6 @@ import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDY_YEAR;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_GROUPS_CREATION_NEEDED;
 import kz.halyqsoft.univercity.filter.FStreamFilter;
 import kz.halyqsoft.univercity.filter.panel.StreamFilterPanel;
-import kz.halyqsoft.univercity.modules.catalog.CatalogEntity;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -34,7 +33,6 @@ import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 
 import java.util.*;
-import java.util.zip.ZipEntry;
 
 public class StreamView extends AbstractTaskView implements EntityListener, FilterPanelListener {
 
@@ -43,7 +41,7 @@ public class StreamView extends AbstractTaskView implements EntityListener, Filt
 
     public StreamView(AbstractTask task) throws Exception {
         super(task);
-     }
+    }
 
     @Override
     public void initView(boolean b) throws Exception {
@@ -65,8 +63,8 @@ public class StreamView extends AbstractTaskView implements EntityListener, Filt
 
                     List<V_GROUPS_CREATION_NEEDED> groupsList = new ArrayList<>();
                     try {
-                        groupsList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
-                                vGroupsCreationNeededQueryModel));
+                        groupsList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                                lookup(vGroupsCreationNeededQueryModel));
 
                         CalculateStream calculateStream = new CalculateStream(groupsList);
                         List<Map<Entity, List<V_GROUPS_CREATION_NEEDED>>> seyfl =
@@ -74,28 +72,30 @@ public class StreamView extends AbstractTaskView implements EntityListener, Filt
 
                         QueryModel<SEMESTER> semesterQueryModel = new QueryModel<>(SEMESTER.class);
 
-                        List<SEMESTER> semesters = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
-                                lookup(semesterQueryModel);
+                        List<SEMESTER> semesters = SessionFacadeFactory.getSessionFacade(
+                                CommonEntityFacadeBean.class).lookup(semesterQueryModel);
                         int z = 1;
                         for (Map<Entity, List<V_GROUPS_CREATION_NEEDED>> value : seyfl) {
                             for (Entity key : value.keySet()) {
                                 STREAM stream = new STREAM();
-                                stream.setName("STREAM "+ z);
+                                stream.setName("STREAM " + z);
                                 stream.setCreated(new Date());
                                 stream.setSemesterData(currentSemesterData);
-                                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(stream);
+                                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                                        create(stream);
                                 int i = 0;
 
                                 for (V_GROUPS_CREATION_NEEDED group : value.get(key)) {
                                     STREAM_GROUP streamGroup = new STREAM_GROUP();
-                                    GROUPS gr = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
-                                            lookup(GROUPS.class, group.getId());
+                                    GROUPS gr = SessionFacadeFactory.getSessionFacade(
+                                            CommonEntityFacadeBean.class).lookup(GROUPS.class, group.getId());
                                     streamGroup.setGroup(gr);
 
                                     if (stream.getSemester() == null) {
                                         stream.setSemester(getSemester(gr.getStudyYear(),
                                                 currentSemesterData.getSemesterPeriod()));
-                                        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(stream);
+                                        SessionFacadeFactory.getSessionFacade(
+                                                CommonEntityFacadeBean.class).merge(stream);
                                     }
                                     streamGroup.setStream(stream);
                                     if (i > 2) {
@@ -103,17 +103,14 @@ public class StreamView extends AbstractTaskView implements EntityListener, Filt
                                         stream.setName("STREAM " + (++z));
                                         stream.setCreated(new Date());
                                         stream.setSemesterData(currentSemesterData);
-                                        if (stream.getSemester() == null) {
-                                            stream.setSemester(getSemester(gr.getStudyYear(),
-                                                    currentSemesterData.getSemesterPeriod()));
-                                            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(stream);
-                                        }
-
+                                        stream.setSemester(getSemester(gr.getStudyYear(),
+                                                currentSemesterData.getSemesterPeriod()));
                                         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(stream);
                                         i = 0;
                                     }
                                     i++;
-                                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(streamGroup);
+                                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                                            create(streamGroup);
                                 }
 
                             }
@@ -146,7 +143,6 @@ public class StreamView extends AbstractTaskView implements EntityListener, Filt
     }
 
 
-
     private SEMESTER getSemester(STUDY_YEAR studyYear, SEMESTER_PERIOD semesterPeriod) throws Exception {
         Integer semesterId;
         if (semesterPeriod.getId().equals(SEMESTER_PERIOD.FALL_ID)) {
@@ -162,7 +158,10 @@ public class StreamView extends AbstractTaskView implements EntityListener, Filt
 
         try {
             Map<Integer, Object> params = new HashMap<>();
-            String sql = "select * from stream_group sg inner join stream  s on sg.stream_id = s.id  where date_trunc('year',s.created )= date_trunc('year' , now())";
+            String sql = "select * from stream_group sg \n" +
+                    "  inner join stream  s \n" +
+                    "    on sg.stream_id = s.id  \n" +
+                    "where s.semester_data_id = " + CommonUtils.getCurrentSemesterData().getId().getId().longValue();
             List<STREAM_GROUP> streamList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(sql, params, STREAM_GROUP.class);
 
             for (STREAM_GROUP group : streamList) {
@@ -175,7 +174,7 @@ public class StreamView extends AbstractTaskView implements EntityListener, Filt
 
         try {
             Map<Integer, Object> params = new HashMap<>();
-            String sql = "select * from stream where date_trunc('year',created )= date_trunc('year' , now()) ";
+            String sql = "select * from stream where semester_data_id = " + CommonUtils.getCurrentSemesterData().getId().getId().longValue();
             List<STREAM> streamList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(sql, params, STREAM.class);
 
             for (STREAM group : streamList) {
@@ -260,7 +259,7 @@ public class StreamView extends AbstractTaskView implements EntityListener, Filt
     public boolean preSave(Object source, Entity e, boolean isNew, int buttonId) {
         STREAM stream = (STREAM) e;
         try {
-            if (e.getId() == null ) {//TODO Assyl this line has error, fix it
+            if (e.getId() == null) {//TODO Assyl this line has error, fix it
                 stream.setCreated(new Date());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(stream);
             } else {

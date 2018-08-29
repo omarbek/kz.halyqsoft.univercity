@@ -230,6 +230,8 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
                                     if (FieldValidator.isNotEmpty(name) && FieldValidator.isNotEmpty(description)) {
 
                                         if (nameTF.getValue().toCharArray()[0] != '$') {
+                                            name = name.trim();
+                                            name = name.replaceAll("\\s+","");
                                             name = "$" + name;
                                         }
 

@@ -140,7 +140,7 @@ public class DetalizationDialog extends AbstractDialog implements EntityListener
 
         String sql = "select * from user_arrival ua " +
                 "\nwhere ua.user_id = "+user.getId().getId().longValue()+" " +
-                "\nand date_trunc('day' , ua.created) = date_trunc('day' , TIMESTAMP '"+formattedDate+"');";
+                "\n ORDER BY ua.created ;";
 
         try {
             List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);

@@ -37,6 +37,11 @@ public class USER_ARRIVAL extends AbstractEntity {
             @JoinColumn(name = "TURNSTILE_TYPE_ID", referencedColumnName = "ID")})
     private TURNSTILE_TYPE turnstileType;
 
+    @FieldInfo(type = EFieldType.BOOLEAN, order = 6, inView = false, inEdit = false ,inGrid = false, required = false)
+    @Column(name = "MANUALLY_SIGNED")
+    private boolean manuallySigned = false;
+
+
     public USERS getUser() {
         return user;
     }
@@ -68,4 +73,13 @@ public class USER_ARRIVAL extends AbstractEntity {
     public void setTurnstileType(TURNSTILE_TYPE turnstileType) {
         this.turnstileType = turnstileType;
     }
+
+    public boolean isManuallySigned() {
+        return manuallySigned;
+    }
+
+    public void setManuallySigned(boolean manuallySigned) {
+        this.manuallySigned = manuallySigned;
+    }
+
 }

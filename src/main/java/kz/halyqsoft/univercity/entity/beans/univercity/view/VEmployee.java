@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
+import org.r3a.common.entity.ID;
 
 /**
  * @author Omarbek
@@ -50,7 +51,13 @@ public final class VEmployee extends AbstractEntity {
 
 	public VEmployee() {
 	}
-	
+
+	@Override
+	@JsonIgnore
+	public ID getId() {
+		return super.getId();
+	}
+
 	public String getCode() {
 		return code;
 	}

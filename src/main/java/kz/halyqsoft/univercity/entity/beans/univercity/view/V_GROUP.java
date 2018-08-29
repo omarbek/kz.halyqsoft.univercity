@@ -81,4 +81,9 @@ public class V_GROUP extends AbstractEntity {
     public void setSpeciality(SPECIALITY speciality) {
         this.speciality = speciality;
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }
