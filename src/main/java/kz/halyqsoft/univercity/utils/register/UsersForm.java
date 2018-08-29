@@ -84,7 +84,7 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
     protected Flag flag;
 
     private TextField iinTF;
-    private boolean f=true;
+    private boolean isFinding = true;
 
     private static final int ADDRESS_REG = 1;
     private static final int ADDRESS_FACT = 2;
@@ -211,14 +211,14 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
 
                 if( iinTF.getValue().equals("") && iin==null) {
                     Message.showError(getUILocaleUtil().getMessage("error.iin"));
-                    f=false;
-                }else if(iinTF.getValue().toString().length()<12){
+                    isFinding =false;
+                }else if(iinTF.getValue().length()<12){
                     Message.showError(getUILocaleUtil().getMessage("incorrect.iin"));
-                    f=false;
+                    isFinding =false;
                 }else if((flagSave(flag, dataFM) && Flag.MAIN_DATA.equals(flag))
                         || !Flag.MAIN_DATA.equals(flag)) {
                         addToLayout(Flag.FACT_ADDRESS, address.getAddressFactGFW(), regAddressButton, event);
-                       f=true;
+                       isFinding =true;
                 }
             }
 
@@ -231,14 +231,14 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
 
                 if( iinTF.getValue().equals("") && iin==null) {
                     Message.showError(getUILocaleUtil().getMessage("error.iin"));
-                    f=false;
-                }else if(iinTF.getValue().toString().length()<12){
+                    isFinding =false;
+                }else if(iinTF.getValue().length()<12){
                     Message.showError(getUILocaleUtil().getMessage("incorrect.iin"));
-                    f=false;
+                    isFinding =false;
                 }else if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.FACT_ADDRESS.equals(flag)))
                         || !(Flag.MAIN_DATA.equals(flag) || Flag.FACT_ADDRESS.equals(flag))) {
                         addToLayout(Flag.REG_ADDRESS, address.getAddressRegGFW(), idDocButton, event);
-                    f=true;
+                    isFinding =true;
                 }
             }
         });
@@ -249,10 +249,10 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
             public void buttonClick(Button.ClickEvent event) {
                 if( iinTF.getValue().equals("") && iin==null) {
                     Message.showError(getUILocaleUtil().getMessage("error.iin"));
-                    f=false;
-                }else if(iinTF.getValue().toString().length()<12){
+                    isFinding =false;
+                }else if(iinTF.getValue().length()<12){
                     Message.showError(getUILocaleUtil().getMessage("incorrect.iin"));
-                    f=false;
+                    isFinding =false;
                 }else  if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.REG_ADDRESS.equals(flag)))
                         || !(Flag.MAIN_DATA.equals(flag) || Flag.REG_ADDRESS.equals(flag))) {
 
@@ -263,7 +263,7 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
                         if(iin!=null) {
                             mainFM.getFieldModel("iin").getField().setValue(iin);
                             mainFM.getFieldModel("iin").getField().setReadOnly(true);
-                            f=true;
+                            isFinding =true;
                     }
                 }
 
@@ -277,14 +277,14 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
 
                 if( iinTF.getValue().equals("") && iin==null) {
                     Message.showError(getUILocaleUtil().getMessage("error.iin"));
-                    f=false;
-                }else if(iinTF.getValue().toString().length()<12){
+                    isFinding =false;
+                }else if(iinTF.getValue().length()<12){
                     Message.showError(getUILocaleUtil().getMessage("incorrect.iin"));
-                    f=false;
+                    isFinding =false;
                 }else if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.ID_DOC.equals(flag)))
                         || !(Flag.MAIN_DATA.equals(flag) || Flag.ID_DOC.equals(flag))) {
                         addToLayout(Flag.MILITARY, military.getMainGFW(), disabilityButton, event);
-                        f=true;
+                        isFinding =true;
 
                 }
             }
@@ -297,15 +297,15 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
 
                 if( iinTF.getValue().equals("") && iin==null) {
                     Message.showError(getUILocaleUtil().getMessage("error.iin"));
-                    f=false;
-                }else if(iinTF.getValue().toString().length()<12){
+                    isFinding =false;
+                }else if(iinTF.getValue().length()<12){
                     Message.showError(getUILocaleUtil().getMessage("incorrect.iin"));
-                    f=false;
+                    isFinding =false;
                 }else   if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.MILITARY.equals(flag)))
                         || !(Flag.MAIN_DATA.equals(flag) || Flag.MILITARY.equals(flag))) {
 
                         addToLayout(Flag.DISABILITY, disability.getMainGFW(), repatriateButton, event);
-                        f=true;
+                        isFinding =true;
 
                 }
             }
@@ -318,15 +318,15 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
 
                 if( iinTF.getValue().equals("") && iin==null) {
                     Message.showError(getUILocaleUtil().getMessage("error.iin"));
-                    f=false;
-                }else if(iinTF.getValue().toString().length()<12){
+                    isFinding =false;
+                }else if(iinTF.getValue().length()<12){
                     Message.showError(getUILocaleUtil().getMessage("incorrect.iin"));
-                    f=false;
+                    isFinding =false;
                 }else if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.DISABILITY.equals(flag)))
                         || !(Flag.MAIN_DATA.equals(flag) || Flag.DISABILITY.equals(flag))) {
 
                         addToLayout(Flag.REPATRIATE, repatriate.getMainGFW(), eduDocButton, event);
-                        f=true;
+                        isFinding =true;
                     }
 
             }
@@ -339,15 +339,15 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
 
                 if( iinTF.getValue().equals("") && iin==null) {
                     Message.showError(getUILocaleUtil().getMessage("error.iin"));
-                    f=false;
-                }else if(iinTF.getValue().toString().length()<12){
+                    isFinding =false;
+                }else if(iinTF.getValue().length()<12){
                     Message.showError(getUILocaleUtil().getMessage("incorrect.iin"));
-                    f=false;
+                    isFinding =false;
                 }else if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.REPATRIATE.equals(flag)))
                         || !(Flag.MAIN_DATA.equals(flag) || Flag.REPATRIATE.equals(flag))) {
 
                         addToLayout(Flag.EDU_DOC, educationDoc.getMainGFW(), eduDocsButton, event);
-                        f=true;
+                        isFinding =true;
                     }
 
             }
@@ -360,10 +360,10 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
 
                 if( iinTF.getValue().equals("") && iin==null) {
                     Message.showError(getUILocaleUtil().getMessage("error.iin"));
-                    f=false;
-                }else if(iinTF.getValue().toString().length()<12){
+                    isFinding =false;
+                }else if(iinTF.getValue().length()<12){
                     Message.showError(getUILocaleUtil().getMessage("incorrect.iin"));
-                    f=false;
+                    isFinding =false;
                 }else  if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.EDU_DOC.equals(flag)))
                         || !(Flag.MAIN_DATA.equals(flag) || Flag.EDU_DOC.equals(flag))) {
 
@@ -394,7 +394,7 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
                         educationQM.addWhereAnd(educationUDFI, "user", ECriteria.EQUAL, userId1);
 
                         addToLayout(eduDocTW, preemRightButton, event);
-                        f=true;
+                        isFinding =true;
                 }
             }
         });
@@ -406,10 +406,10 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
 
                 if( iinTF.getValue().equals("") && iin==null) {
                     Message.showError(getUILocaleUtil().getMessage("error.iin"));
-                    f=false;
-                }else if(iinTF.getValue().toString().length()<12){
+                    isFinding =false;
+                }else if(iinTF.getValue().length()<12){
                     Message.showError(getUILocaleUtil().getMessage("incorrect.iin"));
-                    f=false;
+                    isFinding =false;
                 }else if ((flagSave(flag, dataFM) && Flag.MAIN_DATA.equals(flag))
                         || !Flag.MAIN_DATA.equals(flag)) {
 
@@ -425,7 +425,7 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
                         Button nextButton = createNextButton(medButton, NEXT_BUTTON_CAPTION);
                         contentHL.addComponent(nextButton);
                         contentHL.setComponentAlignment(nextButton, Alignment.MIDDLE_CENTER);
-                        f=true;
+                        isFinding =true;
                 }
             }
         });
@@ -437,10 +437,10 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
 
                 if( iinTF.getValue().equals("") && iin==null) {
                     Message.showError(getUILocaleUtil().getMessage("error.iin"));
-                    f=false;
-                }else if(iinTF.getValue().toString().length()<12){
+                    isFinding =false;
+                }else if(iinTF.getValue().length()<12){
                     Message.showError(getUILocaleUtil().getMessage("incorrect.iin"));
-                    f=false;
+                    isFinding =false;
                 }else  if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.PREEM_RIGHT.equals(flag)))
                         || !(Flag.MAIN_DATA.equals(flag) || Flag.PREEM_RIGHT.equals(flag))) {
 
@@ -468,7 +468,7 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
                         medicalCheckupFM.getFieldModel("allowWork").setInView(false);
 
                         addToLayout(medicalCheckupTW, getAfterMedButton(), event);
-                        f=true;
+                        isFinding =true;
 
                 }
             }
@@ -811,7 +811,7 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
                         if( iinTF.getValue().equals("") && iin==null){
                             Message.showError(getUILocaleUtil().getMessage("error.iin"));
                             return;
-                        }else if(iinTF.getValue().toString().length()<12){
+                        }else if(iinTF.getValue().length()<12){
                              Message.showError(getUILocaleUtil().getMessage("incorrect.iin"));
                     return;
                 }
