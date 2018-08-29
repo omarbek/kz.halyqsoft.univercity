@@ -18,7 +18,7 @@ public final class SubjectFilterPanel extends AbstractFilterPanel {
 	}
 
 	@Override
-	protected void initWidget() throws Exception {
+	protected void initWidget() {
 		HorizontalLayout hl = new HorizontalLayout();
 		hl.setSpacing(true);
 		hl.setWidthUndefined();
@@ -28,13 +28,18 @@ public final class SubjectFilterPanel extends AbstractFilterPanel {
 //			hl.addComponent(af);
 //		}
 //
-//		af = getFilterComponent("subjectName");
-//		if (af != null) {
-//			hl.addComponent(af);
-//		}
+
+
+
 
 		AbstractField af = getFilterComponent("chair");
+
 		if (af != null ) {
+			hl.addComponent(af);
+		}
+
+		af = getFilterComponent("subjectName");
+		if (af != null) {
 			hl.addComponent(af);
 		}
 

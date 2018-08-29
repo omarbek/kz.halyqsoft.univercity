@@ -23,6 +23,7 @@ import org.r3a.common.vaadin.widget.form.field.FieldModel;
 import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class SignDialog extends AbstractDialog{
@@ -79,6 +80,7 @@ public class SignDialog extends AbstractDialog{
                 userArrival.setCreated(createdDF.getValue());
                 userArrival.setUser(user);
                 userArrival.setComeIn(comeInChB.getValue());
+                userArrival.setManuallySigned(true);
                 try{
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(userArrival);
                 }catch (Exception e){

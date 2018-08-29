@@ -68,6 +68,7 @@ class CatalogList {
         addCatalogEntityToList(DEVICE.class);
         addCatalogEntityToList(SKILL.class);
         addCatalogEntityToList(QUALIFICATION.class);
+        addCatalogEntityToList(NON_ADMISSION_CAUSE.class);
 
         return new ArrayList<>(list);
     }

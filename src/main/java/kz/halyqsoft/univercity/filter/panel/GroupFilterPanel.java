@@ -15,7 +15,7 @@ public final class GroupFilterPanel extends AbstractFilterPanel {
 	}
 
 	@Override
-	protected void initWidget() throws Exception {
+	protected void initWidget() {
 		HorizontalLayout hl = new HorizontalLayout();
 		hl.setSpacing(true);
 		hl.setWidthUndefined();
@@ -30,7 +30,7 @@ public final class GroupFilterPanel extends AbstractFilterPanel {
 			hl.addComponent(af);
 		}
 
-		af = getFilterComponent("name");
+		af = getFilterComponent("group");
 		if (af != null) {
 			hl.addComponent(af);
 		}

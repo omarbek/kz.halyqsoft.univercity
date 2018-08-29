@@ -78,4 +78,9 @@ public class STREAM extends AbstractEntity {
     public void setSemester(SEMESTER semester) {
         this.semester = semester;
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

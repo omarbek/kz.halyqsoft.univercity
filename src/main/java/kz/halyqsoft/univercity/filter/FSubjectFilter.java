@@ -12,7 +12,7 @@ public final class FSubjectFilter extends AbstractFilterBean {
 	private static final long serialVersionUID = 3280308708403197770L;
 	
 //	private String code;
-//	private String subjectName;
+	private String subjectName;
 	private DEPARTMENT chair;
 	private CREDITABILITY creditability;
 	private SUBJECT_CYCLE subjectCycle;
@@ -27,13 +27,13 @@ public final class FSubjectFilter extends AbstractFilterBean {
 //		this.code = code;
 //	}
 //
-//	public String getSubjectName() {
-//		return subjectName;
-//	}
-//
-//	public void setSubjectName(String subjectName) {
-//		this.subjectName = subjectName;
-//	}
+	public String getSubjectName() {
+		return subjectName;
+	}
+
+	public void setSubjectName(String subjectName) {
+		this.subjectName = subjectName;
+	}
 
 	public DEPARTMENT getChair() {
 		return chair;
@@ -77,7 +77,7 @@ public final class FSubjectFilter extends AbstractFilterBean {
 
 	@Override
 	public boolean hasFilter() {
-		return (!(/*code == null && subjectName == null &&*/ chair == null && creditability == null
+		return (!(/*code == null &&*/ subjectName == null && chair == null && creditability == null
 				&& subjectCycle == null && level == null && subjectModule == null));
 	}
 }

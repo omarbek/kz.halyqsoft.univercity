@@ -40,7 +40,7 @@ public class PREVIOUS_EXPERIENCE extends AbstractEntity {
     @Temporal(TemporalType.DATE)
     private Date dismissDate;
 	
-	@FieldInfo(type = EFieldType.TEXT, isMemo = true, order = 6, inGrid = false,required = false)
+	@FieldInfo(type = EFieldType.TEXT, isMemo = true, order = 6, inGrid = false, required = false)
 	@Column(name = "DUTY", nullable = false)
 	@Lob
     @Basic(fetch = FetchType.EAGER)

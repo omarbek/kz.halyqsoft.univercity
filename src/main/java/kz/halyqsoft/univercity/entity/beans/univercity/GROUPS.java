@@ -3,6 +3,7 @@ package kz.halyqsoft.univercity.entity.beans.univercity;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.LANGUAGE;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SPECIALITY;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDY_YEAR;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_EMPLOYEE;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
@@ -23,7 +24,7 @@ public class GROUPS extends AbstractEntity {
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "CURATOR_ID", referencedColumnName = "ID")})
-    private EMPLOYEE curator;
+    private V_EMPLOYEE curator;
 
     @FieldInfo(type = EFieldType.FK_COMBO , order = 3)
     @ManyToOne
@@ -113,11 +114,11 @@ public class GROUPS extends AbstractEntity {
         this.studyYear = studyYear;
     }
 
-    public EMPLOYEE getCurator() {
+    public V_EMPLOYEE getCurator() {
         return curator;
     }
 
-    public void setCurator(EMPLOYEE curator) {
+    public void setCurator(V_EMPLOYEE  curator) {
         this.curator = curator;
     }
 

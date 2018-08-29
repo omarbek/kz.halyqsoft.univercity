@@ -62,6 +62,7 @@ public final class ApplicantsForm extends UsersForm {
     private Button motherButton, fatherButton;
     private Button contractButton;
     private Button specButton, moreButton;
+    // private Button asd;
 
     private boolean saveSpec/*, saveUnt*/;
     private boolean came = false;
@@ -143,6 +144,7 @@ public final class ApplicantsForm extends UsersForm {
         buttons.add(fatherButton);
         buttons.add(contractButton);
         buttons.add(moreButton);
+        // buttons.add(asd);
         return buttons;
     }
 

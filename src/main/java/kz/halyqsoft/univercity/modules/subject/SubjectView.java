@@ -5,6 +5,7 @@ import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.TextField;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VSubject;
 import kz.halyqsoft.univercity.filter.FSubjectFilter;
@@ -121,6 +122,12 @@ public class SubjectView extends AbstractTaskView implements FilterPanelListener
         cb.setContainerDataSource(moduleBIC);
         filterPanel.addFilterComponent("subjectModule", cb);
 
+        TextField tf = new TextField();
+        tf.setNullRepresentation("");
+        tf.setImmediate(true);
+        tf.setNullSettingAllowed(true);
+        filterPanel.addFilterComponent("subjectName", tf);
+
         getContent().addComponent(filterPanel);
         getContent().setComponentAlignment(filterPanel, Alignment.TOP_CENTER);
 
@@ -149,8 +156,8 @@ public class SubjectView extends AbstractTaskView implements FilterPanelListener
     @Override
     public void doFilter(AbstractFilterBean filterBean) {
         FSubjectFilter sf = (FSubjectFilter) filterBean;
-        if (sf.getChair() == null) {
-            Message.showInfo(getUILocaleUtil().getMessage("select.chair"));
+        if (sf.getChair() == null && sf.getSubjectName()==null) {
+            Message.showInfo(getUILocaleUtil().getMessage("choose.field.name.or.chair"));
             return;
         }
 
@@ -191,6 +198,15 @@ public class SubjectView extends AbstractTaskView implements FilterPanelListener
                 sb.append(" and ");
             }
             sb.append("subj.MODULE_ID = ?" + i++);
+        }
+
+        if (sf.getSubjectName() != null) {
+            params.put(i, sf.getSubjectName());
+            if (sb.length() > 0) {
+                sb.append(" and ");
+            }
+            sb.append(" subj.NAME_RU ilike '" +sf.getSubjectName().trim() +"%' ");
+            i++;
         }
 
         List<VSubject> list = new ArrayList<>();
@@ -301,7 +317,7 @@ public class SubjectView extends AbstractTaskView implements FilterPanelListener
         }
 
         @Override
-        protected void removeChildrenEntity(List<Entity> delList) throws Exception {
+        protected void removeChildrenEntity(List<Entity> delList) {
         }
 
         @Override
