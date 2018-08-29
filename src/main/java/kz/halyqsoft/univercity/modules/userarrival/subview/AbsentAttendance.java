@@ -5,8 +5,6 @@ import com.vaadin.server.Sizeable;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VAbsents;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.VDepartmentInfo;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.VEmployeeInfo;
 import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.PrintDialog;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
@@ -17,10 +15,7 @@ import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 import org.r3a.common.vaadin.widget.grid.model.GridColumnModel;
 import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static kz.halyqsoft.univercity.utils.CommonUtils.getUILocaleUtil;
 
@@ -121,7 +116,8 @@ public class AbsentAttendance {
                 "  vstudent.speciality_name,\n" +
                 "  vstudent.group_name,\n" +
                 "  date_part('days', now()::date - (max(arrive.created) )\n" +
-                "  ) as                                                                           absentDay\n" +
+                "  ) as                                                                           absentDay,\n" +
+                "  max(arrive.created)\n" +
                 "FROM user_arrival arrive\n" +
                 "  INNER JOIN users u on arrive.user_id = u.id\n" +
                 "  INNER JOIN v_student vstudent on u.id = vstudent.id\n" +
@@ -146,6 +142,7 @@ public class AbsentAttendance {
                     vAbsent.setSpeciality((String) oo[2]);
                     vAbsent.setGroup((String) oo[3]);
                     vAbsent.setAbsentSum((Double) oo[4]);
+                    vAbsent.setLastVisit((Date)oo[5]);
                     list.add(vAbsent);
                 }
             }
