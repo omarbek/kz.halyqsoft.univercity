@@ -261,15 +261,9 @@ public class EmployeesForm extends UsersForm {
                 ID employeeId = ID.valueOf(-1);
                 if (emp != null && emp.getStatus() != null && emp.getStatus().getId().equals(ID.valueOf(5))) {
                     employeeId = emp.getId();
-                    childTM.getColumnModel("firstName").setInTable(false);
-                    childTM.getColumnModel("lastName").setInTable(false);
-                    childTM.getColumnModel("middleName").setInTable(false);
                     childTM.getColumnModel("birthDate").setInTable(false);
                     childTM.getColumnModel("sex").setInTable(false);
                 } else {
-                    childTM.getColumnModel("firstName").setInTable(true);
-                    childTM.getColumnModel("lastName").setInTable(true);
-                    childTM.getColumnModel("middleName").setInTable(true);
                     childTM.getColumnModel("birthDate").setInTable(true);
                     childTM.getColumnModel("sex").setInTable(true);
                 }

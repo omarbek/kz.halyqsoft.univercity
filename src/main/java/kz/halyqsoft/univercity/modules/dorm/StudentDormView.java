@@ -39,6 +39,7 @@ public class StudentDormView extends AbstractTaskView {
     private String faculty;
     private Label alreadyExistL, roomL, addressL, dormL;
     private Label violationL, reasonL;
+    private Label requestSendL, denyL;
 
     public StudentDormView(AbstractTask task) throws Exception {
         super(task);
@@ -213,7 +214,7 @@ public class StudentDormView extends AbstractTaskView {
         dormStudentQM.addWhere(fi, "student", ECriteria.EQUAL, CommonUtils.getCurrentUser().getId());
         dormStudentQM.addWhere("checkOutDate", null);//TODO Raikhan
         dormStudentQM.addWhere("deleted", false);
-        dormStudentQM.addWhere("requestStatus", ECriteria.EQUAL, 1);
+        //dormStudentQM.addWhere("requestStatus", ECriteria.EQUAL, 1);
         List<DORM_STUDENT> dormStudentId = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(dormStudentQM);
         boolean flag = true;
         for (DORM_STUDENT ds : dormStudentId) {
@@ -260,12 +261,12 @@ public class StudentDormView extends AbstractTaskView {
             String sql = "SELECT stu.* " +
                     "FROM dorm_student stu " +
                     "  INNER JOIN student_education stu_edu ON stu.student_id = stu_edu.id AND stu_edu.child_id IS NULL " +
-                    "WHERE stu_edu.student_id = ?1 AND stu.check_in_date IS NOT NULL AND stu.request_status_id = 1";
+                    "WHERE stu_edu.student_id = ?1"; /*AND stu.check_in_date IS NOT NULL AND stu.request_status_id = 1"*/
             Map<Integer, Object> params = new HashMap<>();
             params.put(1,CommonUtils.getCurrentUser().getId().getId());
             DORM_STUDENT ds = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(sql, params,
                     DORM_STUDENT.class);
-            if (ds.getCheckOutDate() == null) {
+            if (ds.getCheckInDate()!=null && ds.getCheckOutDate() == null && ds.getRequestStatus()==1) {
                 getContent().addComponent(alreadyExistL);
                 getContent().setComponentAlignment(alreadyExistL, Alignment.MIDDLE_CENTER);
 
@@ -278,7 +279,7 @@ public class StudentDormView extends AbstractTaskView {
                 getContent().addComponent(roomL);
                 getContent().setComponentAlignment(roomL, Alignment.MIDDLE_CENTER);
 
-            } else {
+            } else if(ds.getCheckInDate()!=null && ds.getCheckOutDate() != null && ds.getRequestStatus()==1){
 
                 QueryModel<DORM_STUDENT_VIOLATION> dormStudentViolationQM = new QueryModel<DORM_STUDENT_VIOLATION>(DORM_STUDENT_VIOLATION.class);
                 dormStudentViolationQM.addWhere("dormStudent", ECriteria.EQUAL, ds.getId());
@@ -312,6 +313,24 @@ public class StudentDormView extends AbstractTaskView {
                 getContent().addComponent(roomL);
                 getContent().setComponentAlignment(roomL, Alignment.MIDDLE_CENTER);
 
+            }else if(ds.getCheckInDate()==null && ds.getCheckOutDate() == null && ds.getRequestStatus()==0){
+                requestSendL = new Label();
+                requestSendL.setCaption(getUILocaleUtil().getCaption("requestSendL"));
+                requestSendL.setWidth(200, Unit.PIXELS);
+
+                inFL.addComponent(requestSendL);
+
+                getContent().addComponent(requestSendL);
+                getContent().setComponentAlignment(requestSendL, Alignment.MIDDLE_CENTER);
+            }else if(ds.getCheckInDate()==null && ds.getCheckOutDate() == null && ds.getRequestStatus()==2){
+                denyL = new Label();
+                denyL.setCaption(getUILocaleUtil().getCaption("denyL"));
+                denyL.setWidth(200, Unit.PIXELS);
+
+                inFL.addComponent(denyL);
+
+                getContent().addComponent(denyL);
+                getContent().setComponentAlignment(denyL, Alignment.MIDDLE_CENTER);
             }
         }
     }
