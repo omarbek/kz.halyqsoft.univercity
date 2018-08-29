@@ -18,17 +18,6 @@ public class CHILD extends AbstractEntity {
 			@JoinColumn(name = "EMPLOYEE_ID", referencedColumnName = "ID", nullable = false)})
 	private EMPLOYEE employee;
 
-	@FieldInfo(type = EFieldType.TEXT, max = 32, order = 2,inGrid = false)
-	@Column(name = "FIRST_NAME", nullable = false)
-	private String firstName;
-
-	@FieldInfo(type = EFieldType.TEXT, max = 32, order = 3,inGrid = false)
-	@Column(name = "LAST_NAME", nullable = false)
-	private String lastName;//
-
-	@FieldInfo(type = EFieldType.TEXT, max = 32, order = 4, required = false,inGrid = false)
-	@Column(name = "MIDDLE_NAME")
-	private String middleName;
 
 	@FieldInfo(type = EFieldType.DATE, order = 5, inGrid = false)
 	@Column(name = "BIRTH_DATE")
@@ -51,30 +40,6 @@ public class CHILD extends AbstractEntity {
 
 	public void setEmployee(EMPLOYEE employee) {
 		this.employee = employee;
-	}
-
-	public String getFirstName() {
-		return firstName;
-	}
-
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-
-	public String getLastName() {
-		return lastName;
-	}
-
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
-
-	public String getMiddleName() {
-		return middleName;
-	}
-
-	public void setMiddleName(String middleName) {
-		this.middleName = middleName;
 	}
 
 	public Date getBirthDate() {
