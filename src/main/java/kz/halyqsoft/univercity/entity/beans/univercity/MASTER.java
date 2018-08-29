@@ -14,36 +14,21 @@ import java.util.Date;
 @Entity
 public class MASTER extends AbstractEntity {
 
-    @FieldInfo(type = EFieldType.DATE, order = 1)
+    @FieldInfo(type = EFieldType.TEXT, order = 1)
     @Column(name = "ENTRANCE_YEAR", nullable = false)
-    @Temporal(TemporalType.DATE)
-    private Date entranceYear;
+    private String entranceYear;
 
-    @FieldInfo(type = EFieldType.DATE, order = 2)
+    @FieldInfo(type = EFieldType.TEXT, order = 2)
     @Column(name = "GRADUATION_YEAR", nullable = false)
-    @Temporal(TemporalType.DATE)
-    private Date graduationYear;
+    private String graduationYear;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 3)
-    @ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "UNIVERSITY_ID", referencedColumnName = "ID")
-    })
-    private UNIVERSITY university;
+    @FieldInfo(type = EFieldType.TEXT, order = 3)
+    @Column(name = "UNIVERSITY_NAME")
+    private String university;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 4)
-    @ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "SPECIALITY_ID", referencedColumnName = "ID")
-    })
-    private SPECIALITY speciality;
-
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 5)
-    @ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "QULIFICATION_ID", referencedColumnName = "ID")
-    })
-    private QUALIFICATION qualification;
+    @FieldInfo(type = EFieldType.TEXT, order = 4)
+    @Column(name = "SPECIALITY_NAME")
+    private String speciality;
 
     @FieldInfo(type = EFieldType.INTEGER, order = 6)
     @Column(name = "DIPLOMA_NUMBER", nullable = false)
@@ -63,44 +48,36 @@ public class MASTER extends AbstractEntity {
     public MASTER() {
     }
 
-    public Date getEntranceYear() {
+    public String getEntranceYear() {
         return entranceYear;
     }
 
-    public void setEntranceYear(Date entranceYear) {
+    public void setEntranceYear(String entranceYear) {
         this.entranceYear = entranceYear;
     }
 
-    public Date getGraduationYear() {
+    public String getGraduationYear() {
         return graduationYear;
     }
 
-    public void setGraduationYear(Date graduationYear) {
+    public void setGraduationYear(String graduationYear) {
         this.graduationYear = graduationYear;
     }
 
-    public UNIVERSITY getUniversity() {
+    public String getUniversity() {
         return university;
     }
 
-    public void setUniversity(UNIVERSITY university) {
+    public void setUniversity(String university) {
         this.university = university;
     }
 
-    public SPECIALITY getSpeciality() {
+    public String getSpeciality() {
         return speciality;
     }
 
-    public void setSpeciality(SPECIALITY speciality) {
+    public void setSpeciality(String speciality) {
         this.speciality = speciality;
-    }
-
-    public QUALIFICATION getQualification() {
-        return qualification;
-    }
-
-    public void setQualification(QUALIFICATION qualification) {
-        this.qualification = qualification;
     }
 
     public int getDiplomaNumber() {

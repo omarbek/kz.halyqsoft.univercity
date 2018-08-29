@@ -23,5 +23,7 @@ public enum Flag {
     FATHER,
     CONTRACT,
     SPECIALITY,
-    CAREER
+    CAREER,
+    CHILD,
+    MAGISTER
 }

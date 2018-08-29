@@ -2,7 +2,6 @@ package kz.halyqsoft.univercity.entity.beans.univercity;
 
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.EDUCATION_MODULE_TYPE;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_DATA;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT;
 import org.r3a.common.entity.AbstractEntity;
 
@@ -23,11 +22,6 @@ public class CURRICULUM_AFTER_SEMESTER extends AbstractEntity {
         @JoinColumn(name = "CURRICULUM_ID", referencedColumnName = "ID")})
     private CURRICULUM curriculum;
 
-	@ManyToOne
-    @JoinColumns({
-        @JoinColumn(name = "SEMESTER_DATA_ID", referencedColumnName = "ID", nullable = false)})
-    private SEMESTER_DATA semesterData;
-
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
@@ -37,6 +31,11 @@ public class CURRICULUM_AFTER_SEMESTER extends AbstractEntity {
 	@JoinColumns({
 			@JoinColumn(name = "EDUCATION_MODULE_TYPE_ID", referencedColumnName = "ID")})
 	private EDUCATION_MODULE_TYPE educationModuleType;
+
+	@ManyToOne
+	@JoinColumns({
+			@JoinColumn(name = "SEMESTER_ID", referencedColumnName = "ID")})
+	private SEMESTER semester;
 
 	@Column(name = "CODE")
 	private String code;
@@ -58,14 +57,6 @@ public class CURRICULUM_AFTER_SEMESTER extends AbstractEntity {
 
 	public void setCurriculum(CURRICULUM curriculum) {
 		this.curriculum = curriculum;
-	}
-
-	public SEMESTER_DATA getSemesterData() {
-		return semesterData;
-	}
-
-	public void setSemesterData(SEMESTER_DATA semesterData) {
-		this.semesterData = semesterData;
 	}
 
 	public SUBJECT getSubject() {
@@ -114,5 +105,13 @@ public class CURRICULUM_AFTER_SEMESTER extends AbstractEntity {
 
 	public void setCode(String code) {
 		this.code = code;
+	}
+
+	public SEMESTER getSemester() {
+		return semester;
+	}
+
+	public void setSemester(SEMESTER semester) {
+		this.semester = semester;
 	}
 }

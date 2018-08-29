@@ -211,7 +211,6 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_STUDENT_DIFFERENCE</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_MASTER</class>
 
-
         <class>kz.halyqsoft.univercity.entity.beans.univercity.AbstractSpiderEntity</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.AbstractStudentEntity</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.AbstractWorkHourEntity</class>
@@ -347,14 +346,14 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.SUBSTITUTION</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.CHILD</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.MASTER</class>
-
         <class>kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_DIFFERENCE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.LOAD_TO_CHAIR</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
         <properties>
             <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
-            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/univerdb"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/loaddb"/>
             <property name="javax.persistence.jdbc.user" value="postgres"/>
             <property name="javax.persistence.jdbc.password" value="ukpu18!"/>
             <!--<property name="javax.persistence.jdbc.user" value="${javax.persistence.jdbc.user}"/>-->

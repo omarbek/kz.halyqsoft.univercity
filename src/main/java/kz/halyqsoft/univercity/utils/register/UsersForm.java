@@ -56,7 +56,7 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
     protected HorizontalLayout contentHL;
     protected QueryModel<USER_DOCUMENT_FILE> udfQM;
     protected AbstractFormWidget dataAFW;
-    public static String iin;
+    public  String iin;
     private TableWidget eduDocTW, languagesTW, medicalCheckupTW;
 
     private Button mainDataButton, regAddressButton;
@@ -222,14 +222,16 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
             }
         });
 
-        idDocButton = createFormButton("identity.document", true);
+ idDocButton = createFormButton("identity.document", true);
         idDocButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.REG_ADDRESS.equals(flag)))
                         || !(Flag.MAIN_DATA.equals(flag) || Flag.REG_ADDRESS.equals(flag))) {
                     addToLayout(Flag.ID_DOC, passport.getMainGFW(), militaryButton, event);
+
                     FormModel mainFM = passport.getMainGFW().getWidgetModel();
+                    mainFM.getFieldModel("iin").setRequired(true);
                     if(iin!=null) {
                         mainFM.getFieldModel("iin").getField().setValue(iin);
                         mainFM.getFieldModel("iin").getField().setReadOnly(true);
@@ -527,6 +529,7 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
         iinTF.setWidth(200, Unit.PIXELS);
         iinTF.setMaxLength(12);
         iinTF.setImmediate(true);
+        iinTF.setRequired(true);
 
         iinTF.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
@@ -585,12 +588,7 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
 
 
         Button nextButton = createNextButton(factAddressButton, NEXT_BUTTON_CAPTION);
-        nextButton.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent clickEvent) {
 
-            }
-        });
 
         Button cancelButton = createCancelButton();
         cancelButton.addClickListener(new Button.ClickListener() {
@@ -712,6 +710,10 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
 
             @Override
             public void buttonClick(Button.ClickEvent event) {
+                        if( iinTF.getValue().equals("") && iin==null){
+                            Message.showError(getUILocaleUtil().getMessage("error.iin"));
+                            return;
+                        }
                 clickButton.click();
             }
         });
