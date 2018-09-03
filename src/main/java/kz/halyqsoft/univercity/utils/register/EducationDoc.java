@@ -6,7 +6,6 @@ import kz.halyqsoft.univercity.entity.beans.univercity.EDUCATION_DOC;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_DOCUMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_DOCUMENT_FILE;
 import kz.halyqsoft.univercity.utils.CommonUtils;
-import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.changelisteners.SchoolCountryChangeListener;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.facade.CommonIDFacadeBean;
@@ -27,10 +26,8 @@ import org.r3a.common.vaadin.widget.form.field.filelist.FileListFieldModel;
 import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 import org.r3a.common.vaadin.widget.table.TableWidget;
 import org.r3a.common.vaadin.widget.table.model.DBTableModel;
-import sun.plugin2.message.Message;
 
 import javax.persistence.NoResultException;
-import java.awt.*;
 
 /**
  * @author Omarbek
@@ -41,8 +38,7 @@ public class EducationDoc {
     private GridFormWidget mainGFW;
     private AbstractFormWidget dataAFW;
     private AbstractFormWidgetView applicantsForm;
-    private TableWidget documentsTW;
-    private FromItem educationUDFI;
+    private TableWidget eduDocTW;
     private FormModel mainFM;
     private boolean saveEduc;
 //    private Long iin;
@@ -56,16 +52,18 @@ public class EducationDoc {
     }
 
     public EducationDoc(AbstractFormWidget dataAFW,
-                        AbstractFormWidgetView applicantsForm, TableWidget documentsTW, FromItem educationUDFI) {
+                        AbstractFormWidgetView applicantsForm) {
         //iin=UsersForm.iin;
 
         this.dataAFW = dataAFW;
         this.applicantsForm = applicantsForm;
-        this.documentsTW = documentsTW;
-        this.educationUDFI = educationUDFI;
     }
 
     public void create(QueryModel<USER_DOCUMENT_FILE> udfQM) throws Exception {
+        eduDocTW = new TableWidget(EDUCATION_DOC.class);
+        eduDocTW.addEntityListener(applicantsForm);
+        eduDocTW.setWidth("667px");
+        eduDocTW.addStyleName("toTop");
 
         StringBuilder sb;
         sb = new StringBuilder();
@@ -126,10 +124,11 @@ public class EducationDoc {
                 ed.setUser((USERS) fm.getEntity());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(ed);
 
-                QueryModel educationQM = ((DBSelectModel) documentsTW.getWidgetModel()).getQueryModel();
+                QueryModel educationQM = ((DBSelectModel) eduDocTW.getWidgetModel()).getQueryModel();
+                FromItem educationUDFI = educationQM.addJoin(EJoin.INNER_JOIN, "id", USER_DOCUMENT.class, "id");
                 educationQM.addWhere(educationUDFI, "user", ECriteria.EQUAL, dataAFW.getWidgetModel().getEntity().getId());
 
-                documentsTW.refresh();
+                eduDocTW.refresh();
                 CommonUtils.showSavedNotification();
             } catch (Exception ex) {
                 CommonUtils.showMessageAndWriteLog("Unable to create a education doc", ex);
@@ -137,14 +136,14 @@ public class EducationDoc {
         } else {
             try {
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(ed);
-                documentsTW.refresh();
+                eduDocTW.refresh();
                 CommonUtils.showSavedNotification();
             } catch (Exception ex) {
                 CommonUtils.showMessageAndWriteLog("Unable to merge a education doc", ex);
             }
         }
 
-        FileListFieldModel flfm = (FileListFieldModel) ((DBTableModel) documentsTW.getWidgetModel()).getFormModel().getFieldModel("fileList");
+        FileListFieldModel flfm = (FileListFieldModel) ((DBTableModel) eduDocTW.getWidgetModel()).getFormModel().getFieldModel("fileList");
         for (FileBean fe : flfm.getFileList()) {
             if (fe.isNewFile()) {
                 USER_DOCUMENT_FILE udf = new USER_DOCUMENT_FILE();
@@ -169,5 +168,9 @@ public class EducationDoc {
             return mainGFW.save();
         }
         return null;
+    }
+
+    public TableWidget getEduDocTW() {
+        return eduDocTW;
     }
 }
