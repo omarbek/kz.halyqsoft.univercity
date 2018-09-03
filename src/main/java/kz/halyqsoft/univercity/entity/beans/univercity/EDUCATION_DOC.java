@@ -87,7 +87,7 @@ public class EDUCATION_DOC extends USER_DOCUMENT {
     private Integer endYear;
 
 	@FieldInfo(type = EFieldType.TEXT, max = 64, order = 19,required=false, inGrid = false)
-	@Column(name = "speciality")
+	@Column(name = "speciality_name")
 	private String specialityName;
 
 	@FieldInfo(type = EFieldType.TEXT, max = 64, order = 22, required = false, inGrid = false)
