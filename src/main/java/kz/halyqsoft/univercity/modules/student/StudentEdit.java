@@ -2033,11 +2033,11 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         EDUCATION_DOC ed = (EDUCATION_DOC) e;
         FormModel fm = baseDataFW.getWidgetModel();
 
-        fm.getFieldModel("qualification").setInEdit(false);
-        fm.getFieldModel("qualification").setInView(false);
-
-        fm.getFieldModel("specialityName").setInEdit(false);
-        fm.getFieldModel("specialityName").setInView(false);
+//        fm.getFieldModel("qualification").setInEdit(false);
+//        fm.getFieldModel("qualification").setInView(false);
+//
+//        fm.getFieldModel("specialityName").setInEdit(false);
+//        fm.getFieldModel("specialityName").setInView(false);
         if (isNew) {
             try {
                 ed.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USER_DOCUMENT"));

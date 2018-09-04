@@ -126,6 +126,7 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
         informationPracticeGW.showToolbar(true);
         informationPracticeGW.addEntityListener(this);
         informationPracticeGW.setMultiSelect(true);
+        informationPracticeGW.setButtonVisible(IconToolbar.REFRESH_BUTTON, false);
 
         informationPracticeGM = (DBGridModel)informationPracticeGW.getWidgetModel();
         informationPracticeGM.setRefreshType(ERefreshType.MANUAL);
@@ -146,6 +147,7 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
         studentPracticeGW.removeEntityListener(studentPracticeGW);
         studentPracticeGW.setMultiSelect(true);
         studentPracticeGW.addEntityListener(this);
+        studentPracticeGW.setButtonVisible(IconToolbar.REFRESH_BUTTON, false);
 
         studentPracticeGM = (DBGridModel) studentPracticeGW.getWidgetModel();
         studentPracticeGM.setRefreshType(ERefreshType.MANUAL);
@@ -195,7 +197,6 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
         employeeCB.setContainerDataSource(employeeBIC);
         informationPracticeFP.addFilterComponent("employee", employeeCB);
 
-
         ComboBox studyYearCB = new ComboBox();
         studyYearCB.setNullSelectionAllowed(true);
         studyYearCB.setTextInputAllowed(true);
@@ -207,7 +208,6 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(studyYearQM));
         studyYearCB.setContainerDataSource(studyYearBIC);
         informationPracticeFP.addFilterComponent("studyYear", studyYearCB);
-
 
         ComboBox entranceYearCB = new ComboBox();
         entranceYearCB.setNullSelectionAllowed(true);
@@ -221,7 +221,6 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
         entranceYearCB.setContainerDataSource(entranceYearBIC);
         informationPracticeFP.addFilterComponent("entranceYear", entranceYearCB);
 
-
         DateField createdDF = new DateField();
         informationPracticeFP.addFilterComponent("created", createdDF);
 
@@ -229,7 +228,6 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
         studentPracticeFP = new StudentPracticeFilterPanel(new FStudentPracticeFilter());
         studentPracticeFP.addFilterPanelListener(this);
         studentPracticeFP.setImmediate(true);
-
 
         ComboBox studentCB = new ComboBox();
         studentCB.setNullSelectionAllowed(true);
@@ -458,25 +456,27 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
 
     @Override
     public void clearFilter() {
-
+        if(studentPracticeFP.isAttached()){
+            doFilter(studentPracticeFP.getFilterBean());
+        }else if(informationPracticeFP.isAttached()) {
+            doFilter(informationPracticeFP.getFilterBean());
+        }
     }
 
     private void refresh(List list) {
-        if(list.size()>0) {
-            if (list.get(0) instanceof PRACTICE_INFORMATION) {
-                informationPracticeGM.setEntities(list);
-                try {
-                    informationPracticeGW.refresh();
-                } catch (Exception ex) {
-                    CommonUtils.showMessageAndWriteLog("Unable to refresh practice information list", ex);
-                }
-            } else if (list.get(0) instanceof PRACTICE_STUDENT) {
-                studentPracticeGM.setEntities(list);
-                try {
-                    studentPracticeGW.refresh();
-                } catch (Exception ex) {
-                    CommonUtils.showMessageAndWriteLog("Unable to refresh practice student list", ex);
-                }
+        if (informationPracticeFP.isAttached()) {
+            informationPracticeGM.setEntities(list);
+            try{
+                informationPracticeGW.refresh();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        } else if (studentPracticeFP.isAttached()) {
+            studentPracticeGM.setEntities(list);
+            try{
+                studentPracticeGW.refresh();
+            }catch (Exception e){
+                e.printStackTrace();
             }
         }
     }
@@ -514,27 +514,28 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
     @Override
     public void onDelete(Object source, List<Entity> entities, int buttonId) {
         super.onDelete(source, entities, buttonId);
-        refresh(source);
+        //refresh(source);
     }
 
     @Override
     public void onCreate(Object source, Entity e, int buttonId) {
         super.onCreate(source, e, buttonId);
-        refresh(source);
+        //refresh(source);
     }
 
     @Override
     public void onRefresh(Object source, List<Entity> entities) {
-        super.onRefresh(source, entities);
+        //refresh(entities);
+        super.onRefresh(source,entities);
     }
 
 
 
-    public void refresh(Object source){
-        if(source.equals(informationPracticeGW)){
-            doFilter(informationPracticeFP.getFilterBean());
-        }else if(source.equals(studentPracticeGW)){
-            doFilter(studentPracticeFP.getFilterBean());
-        }
-    }
+//    public void refresh(Object source){
+//        if(source.equals(informationPracticeGW)){
+//            doFilter(informationPracticeFP.getFilterBean());
+//        }else if(source.equals(studentPracticeGW)){
+//            doFilter(studentPracticeFP.getFilterBean());
+//        }
+//    }
 }
