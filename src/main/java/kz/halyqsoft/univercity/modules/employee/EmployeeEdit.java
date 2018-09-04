@@ -989,6 +989,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
 
         educationTM.getColumnModel("entryYear").setAlignment(Table.Align.CENTER);
         educationTM.getColumnModel("endYear").setAlignment(Table.Align.CENTER);
+
         QueryModel educationQM = educationTM.getQueryModel();
         educationUDFI = educationQM.addJoin(EJoin.INNER_JOIN, "id", USER_DOCUMENT.class, "id");
         educationQM.addWhere(educationUDFI, "deleted", Boolean.FALSE);
@@ -1691,7 +1692,12 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
             FileListFieldModel educationFLFM = (FileListFieldModel) educationFM.getFieldModel("fileList");
             educationFLFM.permitMimeType(FileListFieldModel.JPEG);
 
+            educationFM.getFieldModel("specialityName").setInView(true);
+            educationFM.getFieldModel("specialityName").setInEdit(true);
             educationFM.getFieldModel("specialityName").setRequired(true);
+
+            educationFM.getFieldModel("qualification").setInView(true);
+            educationFM.getFieldModel("qualification").setInEdit(true);
             educationFM.getFieldModel("qualification").setRequired(true);
             educationFM.getFieldModel("entryYear").setRequired(true);
 

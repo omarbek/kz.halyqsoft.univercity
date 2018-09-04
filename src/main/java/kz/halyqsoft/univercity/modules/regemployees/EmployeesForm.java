@@ -49,10 +49,22 @@ public class EmployeesForm extends UsersForm {
 
     EmployeesForm(final FormModel dataFM, ENTRANCE_YEAR entranceYear) throws Exception {
         super(dataFM, entranceYear);
+
         getButtonsVL().removeComponent(getPreemRightButton());
         getEduDocsButton().addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
+
+                FormModel educationFM = ((DBTableModel) getEduDocTW().getWidgetModel()).getFormModel();
+
+                educationFM.getFieldModel("specialityName").setInView(true);
+                educationFM.getFieldModel("specialityName").setInEdit(true);
+                educationFM.getFieldModel("specialityName").setRequired(true);
+
+                educationFM.getFieldModel("qualification").setInView(true);
+                educationFM.getFieldModel("qualification").setInEdit(true);
+                educationFM.getFieldModel("qualification").setRequired(true);
+
                 addToLayout(getEduDocTW(), getMedButton(), clickEvent);
             }
         });
@@ -60,6 +72,7 @@ public class EmployeesForm extends UsersForm {
 
         factAddressButton.setCaption(getUILocaleUtil().getCaption("address.residential"));
         eduDocButton.setCaption(getUILocaleUtil().getCaption("education.document"));
+
     }
 
     @Override

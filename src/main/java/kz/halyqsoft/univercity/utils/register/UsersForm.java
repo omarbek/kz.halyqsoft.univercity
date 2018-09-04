@@ -345,8 +345,17 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
                     isFinding =false;
                 }else if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.REPATRIATE.equals(flag)))
                         || !(Flag.MAIN_DATA.equals(flag) || Flag.REPATRIATE.equals(flag))) {
+                    FormModel educationFM = ((DBTableModel) eduDocTW.getWidgetModel()).getFormModel();
 
-                        addToLayout(Flag.EDU_DOC, educationDoc.getMainGFW(), eduDocsButton, event);
+                    educationFM.getFieldModel("specialityName").setInView(true);
+                    educationFM.getFieldModel("specialityName").setInEdit(true);
+                    educationFM.getFieldModel("specialityName").setRequired(true);
+
+                    educationFM.getFieldModel("qualification").setInView(true);
+                    educationFM.getFieldModel("qualification").setInEdit(true);
+                    educationFM.getFieldModel("qualification").setRequired(true);
+
+                    addToLayout(Flag.EDU_DOC, educationDoc.getMainGFW(), eduDocsButton, event);
                         isFinding =true;
                     }
 
