@@ -25,12 +25,12 @@ public class PRACTICE_STUDENT extends AbstractEntity {
     ORGANIZATION organization;
 
     @FieldInfo(type = EFieldType.DATETIME, order = 3)
-    @Column(name = "come_in_date")
+    @Column(name = "come_in_date", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     Date comeInDate;
 
-    @FieldInfo(type = EFieldType.DATETIME, order = 4)
-    @Column(name = "come_out_date")
+    @FieldInfo(type = EFieldType.DATETIME, order = 4,required = false)
+    @Column(name = "come_out_date", nullable = true)
     @Temporal(TemporalType.TIMESTAMP)
     Date comeOutDate;
 

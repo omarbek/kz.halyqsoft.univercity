@@ -148,3 +148,10 @@ UPDATE tasks SET name = 'KK=Жатақхана;RU=Общежитие;EN=Dorm;', 
 -- INSERT INTO student_status VALUES (nextval('s_student_status' ), 'Оставлен на перекурс');
 
 ALTER TABLE user_arrival ADD COLUMN manually_signed BOOLEAN NULL DEFAULT FALSE;
+
+ALTER TABLE practice_information ADD COLUMN entrance_year_id BIGINT NOT NULL ;
+ALTER TABLE practice_information
+  ADD CONSTRAINT fk_practice_information_entrance_year
+FOREIGN KEY (entrance_year_id) REFERENCES entrance_year(id);
+
+ALTER TABLE practice_information ADD CONSTRAINT  unique_groups_entrance_year UNIQUE (groups_id,entrance_year_id);
