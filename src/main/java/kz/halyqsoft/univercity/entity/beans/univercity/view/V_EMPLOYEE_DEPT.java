@@ -93,13 +93,17 @@ public class V_EMPLOYEE_DEPT extends AbstractEntity {
 
 	@FieldInfo(type = EFieldType.BOOLEAN, order = 16, required = false)
 	@Column(name = "LECTURER", nullable = false)
-	private boolean lecturer;
+	private boolean lecture;
 	
 	@FieldInfo(type = EFieldType.FK_COMBO, order = 17, required = false, inEdit = false, inGrid = false, inView = false)
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "PARENT_ID", referencedColumnName = "ID")})
     private EMPLOYEE_DEPT parent;
+
+	@FieldInfo(type = EFieldType.BOOLEAN, order = 18, required = false)
+	@Column(name = "PRIORITY", nullable = false)
+	private boolean priority;
 	
 	public V_EMPLOYEE_DEPT() {
 	}
@@ -233,10 +237,30 @@ public class V_EMPLOYEE_DEPT extends AbstractEntity {
 	}
 
 	public boolean isLecturer() {
-		return lecturer;
+		return lecture;
 	}
 
 	public void setLecturer(boolean lecturer) {
-		this.lecturer = lecturer;
+		this.lecture = lecturer;
+	}
+
+	public static long getSerialVersionUID() {
+		return serialVersionUID;
+	}
+
+	public boolean isLecture() {
+		return lecture;
+	}
+
+	public void setLecture(boolean lecture) {
+		this.lecture = lecture;
+	}
+
+	public boolean isPriority() {
+		return priority;
+	}
+
+	public void setPriority(boolean priority) {
+		this.priority = priority;
 	}
 }

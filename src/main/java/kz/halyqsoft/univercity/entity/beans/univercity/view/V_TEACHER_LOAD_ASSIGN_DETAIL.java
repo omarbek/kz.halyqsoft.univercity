@@ -28,121 +28,121 @@ public class V_TEACHER_LOAD_ASSIGN_DETAIL extends AbstractEntity {
 
 	private static final long serialVersionUID = -6088012426860605550L;
 
-	@FieldInfo(type = EFieldType.FK_DIALOG, inGrid = false, columnWidth = 80)
+	@FieldInfo(type = EFieldType.FK_COMBO)
+	@ManyToOne
+	@JoinColumns({
+			@JoinColumn(name = "TEACHER_ID", referencedColumnName = "ID")})
+	private EMPLOYEE teacher;
+
+	@FieldInfo(type = EFieldType.FK_DIALOG, inGrid = false, columnWidth = 80,order=2)
 	@ManyToOne
 	@JoinColumns({
 			@JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
 	private SUBJECT subject;
 
-	@FieldInfo(type = EFieldType.TEXT, max = 10,order = 2)
+	@FieldInfo(type = EFieldType.TEXT, max = 10,order = 3)
 	@Column(name = "SUBJECT_NAME")
 	private String subjectName;
 
-	@FieldInfo(type = EFieldType.FK_DIALOG, order = 3, inGrid = false, columnWidth = 80)
+	@FieldInfo(type = EFieldType.FK_DIALOG, order = 4, inGrid = false, columnWidth = 80)
 	@ManyToOne
 	@JoinColumns({
 			@JoinColumn(name = "STREAM_ID", referencedColumnName = "ID")})
 	private STREAM stream;
 
-	@FieldInfo(type = EFieldType.TEXT, order = 4)
+	@FieldInfo(type = EFieldType.TEXT, order = 5)
 	@Column(name = "STREAM_NAME")
 	private String streamName;
 
-	@FieldInfo(type = EFieldType.FK_DIALOG, order = 5, inGrid = false, columnWidth = 80)
+	@FieldInfo(type = EFieldType.FK_DIALOG, order = 6, inGrid = false, columnWidth = 80)
 	@ManyToOne
 	@JoinColumns({
 			@JoinColumn(name = "SEMESTER_ID", referencedColumnName = "ID")})
 	private SEMESTER semester;
 
-	@FieldInfo(type = EFieldType.TEXT, order = 6)
+	@FieldInfo(type = EFieldType.TEXT, order = 7)
 	@Column(name = "SEMESTER_NAME")
 	private String semesterName;
 
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 7,inGrid = false)
+	@FieldInfo(type = EFieldType.FK_COMBO, order = 8,inGrid = false)
 	@ManyToOne
 	@JoinColumns({
 			@JoinColumn(name = "SEMESTER_PERIOD_ID", referencedColumnName = "ID")})
 	private SEMESTER_PERIOD semesterPeriod;
 
-	@FieldInfo(type = EFieldType.TEXT, order = 8)
+	@FieldInfo(type = EFieldType.TEXT, order = 9)
 	@Column(name = "SEMESTER_PERIOD_NAME")
 	private String semesterPeriodName;
 
-	@FieldInfo(type = EFieldType.INTEGER, order = 9)
+	@FieldInfo(type = EFieldType.INTEGER, order = 10)
 	@Column(name = "STUDENT_COUNT")
 	private Integer studentCount;
 	
-	@FieldInfo(type = EFieldType.INTEGER, max = 6, order = 10)
+	@FieldInfo(type = EFieldType.INTEGER, max = 6, order = 11)
 	@Column(name = "CREDIT")
 	private Integer credit;
 	
-	@FieldInfo(type = EFieldType.TEXT, max = 10, order = 11)
+	@FieldInfo(type = EFieldType.TEXT, max = 10, order = 12)
 	@Column(name = "FORMULA")
 	private String formula;
 	
-	@FieldInfo(type = EFieldType.DOUBLE, order = 12)
+	@FieldInfo(type = EFieldType.DOUBLE, order = 13)
 	@Column(name = "LC_HOUR")
 	private Double lcHour;
 
-	@FieldInfo(type = EFieldType.DOUBLE, order = 13)
+	@FieldInfo(type = EFieldType.DOUBLE, order = 14)
 	@Column(name = "LB_HOUR")
 	private Double lbHour;
 	
-	@FieldInfo(type = EFieldType.DOUBLE, order = 14)
+	@FieldInfo(type = EFieldType.DOUBLE, order = 15)
 	@Column(name = "PR_HOUR")
 	private Double prHour;
 
-	@FieldInfo(type = EFieldType.DOUBLE, order = 15)
+	@FieldInfo(type = EFieldType.DOUBLE, order = 16)
 	@Column(name = "WITH_TEACHER_HOUR")
 	private Double withTeacherHour;
 
-	@FieldInfo(type = EFieldType.DOUBLE, order = 16)
+	@FieldInfo(type = EFieldType.DOUBLE, order = 17)
 	@Column(name = "RATING_HOUR")
 	private Double ratingHour;
 
-	@FieldInfo(type = EFieldType.DOUBLE, order = 17)
+	@FieldInfo(type = EFieldType.DOUBLE, order = 18)
 	@Column(name = "EXAM_HOUR")
 	private Double examHour;
 
-	@FieldInfo(type = EFieldType.DOUBLE, order = 18)
+	@FieldInfo(type = EFieldType.DOUBLE, order = 19)
 	@Column(name = "CONTROL_HOUR")
 	private Double controlHour;
 
-	@FieldInfo(type = EFieldType.DOUBLE, order = 19)
+	@FieldInfo(type = EFieldType.DOUBLE, order = 20)
 	@Column(name = "COURSE_WORK_HOUR")
 	private Double courseWorkHour;
 
-	@FieldInfo(type = EFieldType.DOUBLE, order = 20)
+	@FieldInfo(type = EFieldType.DOUBLE, order = 21)
 	@Column(name = "DIPLOMA_HOUR")
 	private Double diplomaHour;
 
-	@FieldInfo(type = EFieldType.DOUBLE, order = 21)
+	@FieldInfo(type = EFieldType.DOUBLE, order = 22)
 	@Column(name = "PRACTICE_HOUR")
 	private Double practiceHour;
 
-	@FieldInfo(type = EFieldType.DOUBLE, order = 22)
+	@FieldInfo(type = EFieldType.DOUBLE, order = 23)
 	@Column(name = "MEK")
 	private Double mek;
 
-	@FieldInfo(type = EFieldType.DOUBLE, order = 23)
+	@FieldInfo(type = EFieldType.DOUBLE, order = 24)
 	@Column(name = "PROTECT_DIPLOMA_HOUR")
 	private Double protectDiplomaHour;
 	
-	@FieldInfo(type = EFieldType.DOUBLE, order = 24)
+	@FieldInfo(type = EFieldType.DOUBLE, order = 25)
 	@Column(name = "TOTAL_HOUR")
 	private Double totalHour;
 
-	@FieldInfo(type = EFieldType.FK_COMBO,order = 25,inGrid = false)
+	@FieldInfo(type = EFieldType.FK_COMBO,order = 26,inGrid = false)
 	@ManyToOne
 	@JoinColumns({
 			@JoinColumn(name = "TEACHER_LOAD_ASSIGN_ID", referencedColumnName = "ID")})
 	private TEACHER_LOAD_ASSIGN teacherLoadAssign;
-
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 26)
-	@ManyToOne
-	@JoinColumns({
-			@JoinColumn(name = "TEACHER_ID", referencedColumnName = "ID")})
-	private EMPLOYEE teacher;
 
 	@FieldInfo(type = EFieldType.FK_COMBO, order = 27)
 	@ManyToOne

@@ -16,10 +16,11 @@ public final class FUserFilter extends AbstractFilterBean {
     private String lastname;
     private USER_TYPE userType;
     private Date date;
+    private String iin;
 
     @Override
     public boolean hasFilter() {
-        return (!(code == null && firstname == null && lastname == null && date == null && userType == null));
+        return (!(code == null && firstname == null && lastname == null && date == null && userType == null && iin == null));
     }
 
     public String getCode() {
@@ -60,5 +61,13 @@ public final class FUserFilter extends AbstractFilterBean {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    public String getIin() {
+        return iin;
+    }
+
+    public void setIin(String iin) {
+        this.iin = iin;
     }
 }

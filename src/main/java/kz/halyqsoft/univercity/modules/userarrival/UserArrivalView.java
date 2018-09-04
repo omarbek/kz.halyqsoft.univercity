@@ -37,6 +37,7 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
 
     private HorizontalSplitPanel mainHSP;
     private HorizontalLayout mainHL, secondHL;
+    private GridWidget absentsGW, lateGW;
     private USER_TYPE userType;
     private HorizontalLayout buttonsHL;
     private VerticalLayout tableVL;
@@ -47,6 +48,12 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
     private GridWidget employeeByDepartmentGW;
     private Long depID;
 
+    private Long emplID;
+    private ComboBox absentDayCB;
+    private Button detalizationBtn;
+    private GridWidget vEmployeeInfoGW;
+    private DBGridModel vEmployeeInfoGM, vGroupGM;
+    private Button backButton;
 
     public UserArrivalView(AbstractTask task) throws Exception {
         super(task);
@@ -118,7 +125,7 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
                         if (main.equals(event.getProperty().getValue().toString())) {
                             MainSection mainSection = new MainSection();
                             mainHL.addComponent(mainSection.getMainVL());
-                        }else if (employeeAttendance.equals(event.getProperty().getValue().toString())) {
+                        } else if (employeeAttendance.equals(event.getProperty().getValue().toString())) {
 
                             date = new DateField();
                             Date currentDate = new Date();
@@ -129,9 +136,10 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
                                     if (date.getValue() != null) {
                                         DateFormat dateFormat = new SimpleDateFormat();
                                         ((DBGridModel) employeeGW.getWidgetModel()).setEntities(getList(dateFormat.format(date.getValue())));
-                                        if(employeeByDepartmentGW!=null){
+                                        if (employeeByDepartmentGW != null) {
                                             ((DBGridModel) employeeByDepartmentGW.getWidgetModel()).
                                                     setEntities(getEmployee(dateFormat.format(date.getValue())));
+                                            //vEmployeeInfoGM.setEntities(getList(getList(dateFormat.format(date.getValue())));
                                         }
                                     } else {
                                         Message.showInfo(getUILocaleUtil().getMessage("error.date"));
@@ -140,16 +148,23 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
                             });
                             setDepartmentInfo();
 
-                        }else if(studentAttendance.equalsIgnoreCase(event.getProperty().getValue().toString())){
+                        } else if (studentAttendance.equalsIgnoreCase(event.getProperty().getValue().toString())) {
                             GroupAttendance groupAttendance = new GroupAttendance();
                             mainHL.addComponent(groupAttendance.getMainVL());
-                        }else if(absent.equalsIgnoreCase(event.getProperty().getValue().toString())){
+                        } else if (absent.equalsIgnoreCase(event.getProperty().getValue().toString())) {
                             AbsentAttendance absentAttendance = new AbsentAttendance(tableVL);
                             mainHL.addComponent(absentAttendance.getAbsentsInfo());
-                        }else if(manuallySign.equalsIgnoreCase(event.getProperty().getValue().toString())){
+                        } else if (manuallySign.equalsIgnoreCase(event.getProperty().getValue().toString())) {
                             SigningSection signingSection = new SigningSection();
                             mainHL.addComponent(signingSection.getMainVL());
-                        }else if(manuallySignedReport.equalsIgnoreCase(event.getProperty().getValue().toString())){
+                            setAbsentsInfo();
+
+                        } else if (latecomers.equalsIgnoreCase(event.getProperty().getValue().toString())) {
+                            GroupLatecomers groupLatecomers = new GroupLatecomers();
+                            mainHL.addComponent(groupLatecomers.getMainVL());
+                            setAbsentsInfo();
+
+                        } else if (manuallySignedReport.equalsIgnoreCase(event.getProperty().getValue().toString())) {
                             SigningReport signingReport = new SigningReport();
                             mainHL.addComponent(signingReport.getMainVL());
                         }
@@ -170,105 +185,51 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
             public void buttonClick(Button.ClickEvent clickEvent) {
 
                 List<String> tableHeader = new ArrayList<>();
-                List<List<String>> tableBody= new ArrayList<>();
+                List<List<String>> tableBody = new ArrayList<>();
 
                 String fileName = "document";
 
-                if(tableVL.getComponentIndex(employeeByDepartmentGW)!=-1){
-                    for(GridColumnModel gcm :((DBGridModel)employeeByDepartmentGW.getWidgetModel()).getColumnModels()){
+                if (tableVL.getComponentIndex(employeeByDepartmentGW) != -1) {
+                    for (GridColumnModel gcm : ((DBGridModel) employeeByDepartmentGW.getWidgetModel()).getColumnModels()) {
                         tableHeader.add(gcm.getLabel());
                     }
-                    for(int i = 0 ; i < employeeByDepartmentGW.getAllEntities().size(); i++){
+                    for (int i = 0; i < employeeByDepartmentGW.getAllEntities().size(); i++) {
                         VEmployeeInfo vEmployeeInfo = (VEmployeeInfo) employeeByDepartmentGW.getAllEntities().get(i);
-                        if(employeeByDepartmentGW.getCaption()!=null){
+                        if (employeeByDepartmentGW.getCaption() != null) {
                             fileName = employeeByDepartmentGW.getCaption();
                         }
                         List<String> list = new ArrayList<>();
                         list.add(vEmployeeInfo.getFIO());
                         list.add(vEmployeeInfo.getCode());
-                        list.add(vEmployeeInfo.getComeIN()!= null ? CommonUtils.getFormattedDate(vEmployeeInfo.getComeIN()) : " ");
-                        list.add(vEmployeeInfo.getComeOUT()!= null ? CommonUtils.getFormattedDate(vEmployeeInfo.getComeOUT()) : " ");
+                        list.add(vEmployeeInfo.getComeIN() != null ? CommonUtils.getFormattedDate(vEmployeeInfo.getComeIN()) : " ");
+                        list.add(vEmployeeInfo.getComeOUT() != null ? CommonUtils.getFormattedDate(vEmployeeInfo.getComeOUT()) : " ");
                         tableBody.add(list);
                     }
-                }else if(tableVL.getComponentIndex(employeeGW)!=-1){
-                    for(GridColumnModel gcm :((DBGridModel)employeeGW.getWidgetModel()).getColumnModels()){
+                } else if (tableVL.getComponentIndex(employeeGW) != -1) {
+                    for (GridColumnModel gcm : ((DBGridModel) employeeGW.getWidgetModel()).getColumnModels()) {
                         tableHeader.add(gcm.getLabel());
                     }
-                    for(int i = 0 ; i < employeeGW.getAllEntities().size(); i++){
+                    for (int i = 0; i < employeeGW.getAllEntities().size(); i++) {
                         VDepartmentInfo vDepartmentInfo = (VDepartmentInfo) employeeGW.getAllEntities().get(i);
-                        if(employeeGW.getCaption()!=null){
+                        if (employeeGW.getCaption() != null) {
                             fileName = employeeGW.getCaption();
                         }
                         List<String> list = new ArrayList<>();
                         list.add(vDepartmentInfo.getDeptName());
                         list.add(vDepartmentInfo.getCount().toString());
                         list.add(vDepartmentInfo.getIsPresent().toString());
-                        list.add(vDepartmentInfo.getPercantage()+" %");
+                        list.add(vDepartmentInfo.getPercantage() + " %");
                         tableBody.add(list);
                     }
                 }
 
-                PrintDialog printDialog = new PrintDialog(tableHeader, tableBody , CommonUtils.getUILocaleUtil().getCaption("print"),fileName);
+                PrintDialog printDialog = new PrintDialog(tableHeader, tableBody, CommonUtils.getUILocaleUtil().getCaption("print"), fileName);
             }
         });
 
         mainHSP.addComponent(menuTT);
         getContent().addComponent(mainHSP);
     }
-
-
-    @Override
-    public void handleEntityEvent(EntityEvent ev) {
-
-        if (ev.getSource().equals(employeeGW)) {
-            if (ev.getAction() == EntityEvent.SELECTED) {
-
-                mainHL.removeAllComponents();
-                employeeByDepartmentGW = new GridWidget(VEmployeeInfo.class);
-                employeeByDepartmentGW.setCaption(getUILocaleUtil().getCaption("employeeByDepartmentGW"));
-                employeeByDepartmentGW.setImmediate(true);
-                employeeByDepartmentGW.showToolbar(false);
-                employeeByDepartmentGW.setButtonVisible(AbstractToolbar.REFRESH_BUTTON, true);
-
-                DBGridModel employeeByDepGM = (DBGridModel) employeeByDepartmentGW.getWidgetModel();
-                employeeByDepGM.setTitleVisible(false);
-                employeeByDepGM.setMultiSelect(false);
-                employeeByDepGM.setEntities(getEmployee(date.getValue().toString()));
-                employeeByDepGM.setRefreshType(ERefreshType.MANUAL);
-
-                Button backButton = new Button(getUILocaleUtil().getCaption("backButton"));
-                backButton.addClickListener(new Button.ClickListener() {
-                    @Override
-                    public void buttonClick(Button.ClickEvent clickEvent) {
-                        tableVL.removeAllComponents();
-                        mainHL.removeAllComponents();
-                        setDepartmentInfo();
-                    }
-                });
-
-                tableVL = new VerticalLayout();
-                secondHL = new HorizontalLayout();
-                secondHL.setSizeFull();
-                secondHL.addComponent(backButton);
-                secondHL.setComponentAlignment(backButton, Alignment.MIDDLE_LEFT);
-
-                HorizontalLayout topHL = CommonUtils.createButtonPanel();
-                topHL.setDefaultComponentAlignment(Alignment.MIDDLE_RIGHT);
-
-
-                topHL.addComponent(date);
-                topHL.addComponent(printBtn);
-
-                secondHL.addComponent(topHL);
-                secondHL.setComponentAlignment(topHL, Alignment.MIDDLE_RIGHT);
-                tableVL.addComponent(secondHL);
-                tableVL.addComponent(employeeByDepartmentGW);
-                mainHL.addComponent(tableVL);
-            }
-        }
-    }
-
-
 
     public List<VDepartmentInfo> getList(String date) {
 
@@ -293,8 +254,6 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
                 " GROUP BY  dep.dept_name,dep.id";
 
         try {
-
-
             List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
             if (!tmpList.isEmpty()) {
                 for (Object o : tmpList) {
@@ -337,15 +296,79 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
         }
     }
 
+    @Override
+    public void handleEntityEvent(EntityEvent ev) {
+
+        if (ev.getSource().equals(employeeGW)) {
+            if (ev.getAction() == EntityEvent.SELECTED) {
+
+                mainHL.removeAllComponents();
+                employeeByDepartmentGW = new GridWidget(VEmployeeInfo.class);
+                employeeByDepartmentGW.setCaption(getUILocaleUtil().getCaption("employeeByDepartmentGW"));
+                employeeByDepartmentGW.setImmediate(true);
+                employeeByDepartmentGW.showToolbar(false);
+                employeeByDepartmentGW.setButtonVisible(AbstractToolbar.REFRESH_BUTTON, true);
+
+                DBGridModel employeeByDepGM = (DBGridModel) employeeByDepartmentGW.getWidgetModel();
+                employeeByDepGM.setTitleVisible(false);
+                employeeByDepGM.setMultiSelect(false);
+                employeeByDepGM.setEntities(getEmployee(date.getValue().toString()));
+                employeeByDepGM.setRefreshType(ERefreshType.MANUAL);
+                Button backButton = new Button(getUILocaleUtil().getCaption("backButton"));
+                backButton.addClickListener(new Button.ClickListener() {
+                    @Override
+                    public void buttonClick(Button.ClickEvent clickEvent) {
+                        tableVL.removeAllComponents();
+                        mainHL.removeAllComponents();
+                        setDepartmentInfo();
+                    }
+                });
+
+                detalizationBtn = new Button(CommonUtils.getUILocaleUtil().getCaption("detalization"));
+                detalizationBtn.setVisible(true);
+                detalizationBtn.addClickListener(new Button.ClickListener() {
+                    @Override
+                    public void buttonClick(Button.ClickEvent clickEvent) {
+                        if (employeeByDepartmentGW.getSelectedEntity() != null) {
+                            DetalizationDialog detalizationDialog = null;
+                            try {
+                                detalizationDialog = new DetalizationDialog(CommonUtils.getUILocaleUtil().getCaption("detalization"), SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(USERS.class, (employeeByDepartmentGW.getSelectedEntity().getId())), date.getValue());
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            Message.showError("chooseARecord");
+                        }
+                    }
+                });
+
+                tableVL = new VerticalLayout();
+                secondHL = new HorizontalLayout();
+                secondHL.setSizeFull();
+                secondHL.addComponent(backButton);
+                secondHL.setComponentAlignment(backButton, Alignment.MIDDLE_LEFT);
+                secondHL.addComponent(date);
+                secondHL.setComponentAlignment(date, Alignment.MIDDLE_CENTER);
+
+                secondHL.addComponent(detalizationBtn);
+                secondHL.setComponentAlignment(detalizationBtn, Alignment.TOP_RIGHT);
+                tableVL.addComponent(secondHL);
+                tableVL.addComponent(employeeByDepartmentGW);
+                mainHL.addComponent(tableVL);
+
+            }
+        }
+    }
+
     public List<VEmployeeInfo> getEmployee(String date) {
         List<VEmployeeInfo> emplList = new ArrayList<>();
 
-        if(employeeGW.getSelectedEntity()!=null) {
+        if (employeeGW.getSelectedEntity() != null) {
             depID = ((VDepartmentInfo) employeeGW.getSelectedEntity()).getDepartmentID();
         }
         Map<Integer, Object> pm = new HashMap<>();
         String sql = "SELECT\n" +
-                "                trim(empl.LAST_NAME || ' ' || empl.FIRST_NAME || ' ' || coalesce(empl.MIDDLE_NAME, '')) FIO,\n" +
+                "                empl.id, trim(empl.LAST_NAME || ' ' || empl.FIRST_NAME || ' ' || coalesce(empl.MIDDLE_NAME, '')) FIO,\n" +
                 "                empl.code,\n" +
                 "                arriv.created,\n" +
                 "                arrivF.created as false\n" +
@@ -365,7 +388,7 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
                 "                  AND come_in = FALSE\n" +
                 "                             GROUP BY arrivF.created,arrivF.user_id)arrivF on arrivF.user_id=empl.id\n" +
                 "                  WHERE empl.dept_id =" + depID + "\n" +
-                "                GROUP BY  FIO, empl.code,empl.created,arriv.created,arrivF.created;";
+                "                GROUP BY  FIO, empl.code,empl.created,arriv.created,arrivF.created, empl.id;";
 
         try {
             List<Object> emplBDList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, pm);
@@ -373,10 +396,11 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
                 for (Object o : emplBDList) {
                     Object[] oo = (Object[]) o;
                     VEmployeeInfo vempl = new VEmployeeInfo();
-                    vempl.setFIO((String) oo[0]);
-                    vempl.setCode((String) oo[1]);
-                    vempl.setComeIN((Date) oo[2]);
-                    vempl.setComeOUT((Date) oo[3]);
+                    vempl.setId(ID.valueOf((long) oo[0]));
+                    vempl.setFIO((String) oo[1]);
+                    vempl.setCode((String) oo[2]);
+                    vempl.setComeIN((Date) oo[3]);
+                    vempl.setComeOUT((Date) oo[4]);
                     emplList.add(vempl);
                 }
             }
@@ -388,6 +412,13 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
         return emplList;
     }
 
+    private void setAbsentsInfo() {
+        absentDayCB = new ComboBox(getUILocaleUtil().getCaption("absentDayCB"));
+        absentDayCB.setNullSelectionAllowed(true);
+        absentDayCB.setTextInputAllowed(true);
+        absentDayCB.setFilteringMode(FilteringMode.CONTAINS);
+        absentDayCB.setWidth(300, Unit.PIXELS);
+    }
 
     public void setDepartmentInfo() {
 

@@ -1,20 +1,10 @@
 package kz.halyqsoft.univercity.entity.beans.univercity;
 
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.COUNTRY;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.EDUCATION_DOC_TYPE;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.EDUCATION_TYPE;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.LANGUAGE;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SCHOOL_CERTIFICATE_TYPE;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SCHOOL_TYPE;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
 
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 /**
  * @author Omarbek
@@ -88,23 +78,33 @@ public class EDUCATION_DOC extends USER_DOCUMENT {
 	@Column(name = "GPA")
     private Double gpa;
 	
-	@FieldInfo(type = EFieldType.INTEGER, order = 17, columnWidth = 130, required = false, inGrid = false, inEdit = false, inView = false)
+	@FieldInfo(type = EFieldType.INTEGER, order = 17, columnWidth = 130, required = false, inGrid = false)
 	@Column(name = "ENTRY_YEAR")
     private Integer entryYear;
 	
 	@FieldInfo(type = EFieldType.INTEGER, order = 18, columnWidth = 130, required = false, inGrid = false)
 	@Column(name = "END_YEAR")
     private Integer endYear;
-	
-	@FieldInfo(type = EFieldType.TEXT, max = 64, order = 19, required = false, inGrid = false)
-	@Column(name = "FACULTY_NAME", nullable = true)
-	private String facultyName;
-	
-	@FieldInfo(type = EFieldType.TEXT, max = 64, order = 20, required = false, inGrid = false)
-	@Column(name = "SPECIALITY_NAME", nullable = true)
+
+	@FieldInfo(type = EFieldType.TEXT, max = 64, order = 19,required=false, inGrid = false)
+	@Column(name = "speciality")
 	private String specialityName;
 
+	@FieldInfo(type = EFieldType.TEXT, max = 64, order = 22, required = false, inGrid = false)
+	@Column(name = "FACULTY_NAME", nullable = true)
+	private String facultyName;
+
+	@FieldInfo(type = EFieldType.FK_COMBO, order = 24, inGrid = false, required = false)
+	@ManyToOne
+	@JoinColumns({
+			@JoinColumn(name = "QUALIFICATION_ID", referencedColumnName = "ID")})
+	private QUALIFICATION qualification;
+
 	public EDUCATION_DOC() {
+	}
+
+	public static long getSerialVersionUID() {
+		return serialVersionUID;
 	}
 
 	public EDUCATION_TYPE getEducationType() {
@@ -186,7 +186,7 @@ public class EDUCATION_DOC extends USER_DOCUMENT {
 	public void setHighGraduated(boolean highGraduated) {
 		this.highGraduated = highGraduated;
 	}
-	
+
 	public boolean isGoldMark() {
 		return goldMark;
 	}
@@ -234,4 +234,13 @@ public class EDUCATION_DOC extends USER_DOCUMENT {
 	public void setSpecialityName(String specialityName) {
 		this.specialityName = specialityName;
 	}
+
+	public QUALIFICATION getQualification() {
+		return qualification;
+	}
+
+	public void setQualification(QUALIFICATION qualification) {
+		this.qualification = qualification;
+	}
+
 }

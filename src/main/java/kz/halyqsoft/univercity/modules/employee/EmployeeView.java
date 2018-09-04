@@ -59,6 +59,7 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
     @Override
     public void initView(boolean b) throws Exception {
         filterPanel.addFilterPanelListener(this);
+
         TextField tf = new TextField();
         tf.setNullRepresentation("");
         tf.setNullSettingAllowed(true);
@@ -316,19 +317,22 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
             sb.append(" and ");
         }
         sb.insert(0, " where ");
-        String sql = "SELECT " +
-                "  empl.ID, " +
-                "  usr.CODE, " +
-                "  trim(usr.LAST_NAME || ' ' || usr.FIRST_NAME || ' ' || coalesce(usr.MIDDLE_NAME, '')) FIO, " +
-                "  dep.DEPT_NAME, " +
-                "  post.POST_NAME " +
-                "FROM EMPLOYEE empl INNER JOIN USERS usr ON empl.ID = usr.ID " +
-                "  LEFT JOIN EMPLOYEE_DEPT empl_dept ON empl_dept.EMPLOYEE_ID = empl.ID AND empl_dept.DISMISS_DATE IS NULL " +
-                "  LEFT JOIN DEPARTMENT dep ON empl_dept.DEPT_ID = dep.ID " +
-                "  LEFT JOIN POST post ON empl_dept.POST_ID = post.id " +
-                " LEFT JOIN child c2 on empl.id = c2.employee_id " + sb.toString() +
-                " usr.id not in (1,2) and usr.deleted = FALSE " +
-                " order by FIO ";
+        String sql = "SELECT  empl.ID,  usr.CODE,\n" +
+                "  trim(usr.LAST_NAME || ' ' || usr.FIRST_NAME || ' ' || coalesce(usr.MIDDLE_NAME, '')) FIO,\n" +
+                "  dep.DEPT_NAME,\n" +
+                "  post.post_name \n" +
+                "FROM EMPLOYEE empl INNER JOIN USERS usr ON empl.ID = usr.ID\n" +
+                "  LEFT JOIN EMPLOYEE_DEPT empl_dept ON empl_dept.EMPLOYEE_ID = empl.ID AND empl_dept.DISMISS_DATE IS NULL\n" +
+                "  LEFT JOIN DEPARTMENT dep ON empl_dept.DEPT_ID = dep.ID\n" +
+                "  LEFT JOIN POST post ON empl_dept.POST_ID = post.id\n" +
+                "  LEFT JOIN child c2 on empl.id = c2.employee_id\n" +sb.toString()+
+                "   usr.id not in (1,2) and usr.deleted = FALSE  \n" +
+                "GROUP BY empl.ID,  usr.CODE,\n" +
+                "  FIO,\n" +
+                "  dep.DEPT_NAME,post.post_name,post.post_name,empl_dept.priority\n" +
+                "  HAVING count(empl_dept.priority)>=0" +
+                " ORDER by FIO,empl_dept.priority DESC\n";
+
         try {
             List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
             if (!tmpList.isEmpty()) {

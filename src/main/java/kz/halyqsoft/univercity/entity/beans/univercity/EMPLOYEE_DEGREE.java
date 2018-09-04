@@ -51,16 +51,6 @@ public class EMPLOYEE_DEGREE extends USER_DOCUMENT {
 			@JoinColumn(name = "SPECIALITY_ID", referencedColumnName = "ID")})
 	private SPECIALITY speciality;
 
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 10)
-	@ManyToOne
-	@JoinColumns({
-			@JoinColumn(name = "QUALIFICATION_ID", referencedColumnName = "ID")})
-	private QUALIFICATION qualification;
-
-	@FieldInfo(type = EFieldType.DATE, max = 2099, order = 11)
-	@Column(name = "ENTRANCE_YEAR", nullable = false)
-	private Date entranceYear;
-
 
 	public EMPLOYEE_DEGREE() {
 	}
@@ -107,21 +97,5 @@ public class EMPLOYEE_DEGREE extends USER_DOCUMENT {
 
 	public void setSpeciality(SPECIALITY speciality) {
 		this.speciality = speciality;
-	}
-
-	public QUALIFICATION getQualification() {
-		return qualification;
-	}
-
-	public void setQualification(QUALIFICATION qualification) {
-		this.qualification = qualification;
-	}
-
-	public Date getEntranceYear() {
-		return entranceYear;
-	}
-
-	public void setEntranceYear(Date entranceYear) {
-		this.entranceYear = entranceYear;
 	}
 }

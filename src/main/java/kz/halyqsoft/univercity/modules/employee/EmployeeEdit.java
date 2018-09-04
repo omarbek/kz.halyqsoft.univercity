@@ -285,7 +285,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
                 "  date_part('year',age(child.birth_date))\n" +
                 "from child\n" +
                 "INNER JOIN sex  on child.sex_id = sex.id\n" +
-                "  WHERE child.employee_id = " + employeeId  +
+                "  WHERE child.employee_id = " + employeeId +
                 " GROUP BY child.id, sex.sex_name,child.birth_date";
 
         try {
@@ -294,9 +294,9 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
                 for (Object o : tmpList) {
                     Object[] oo = (Object[]) o;
                     VChild child = new VChild();
-                    child.setId(ID.valueOf((long)oo[0]));
-                    child.setSex((String)oo[1]);
-                    child.setChildAge((double)oo[2]);
+                    child.setId(ID.valueOf((long) oo[0]));
+                    child.setSex((String) oo[1]);
+                    child.setChildAge((double) oo[2]);
                     list.add(child);
                 }
             }
@@ -316,7 +316,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         }
     }
 
-    private void createMasterTab(boolean readOnly) throws Exception{
+    private void createMasterTab(boolean readOnly) throws Exception {
         masterTW = new TableWidget(MASTER.class);
         masterTW.setButtonVisible(AbstractToolbar.REFRESH_BUTTON, false);
         masterTW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
@@ -986,6 +986,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         educationTW.addEntityListener(this);
         DBTableModel educationTM = (DBTableModel) educationTW.getWidgetModel();
         educationTM.setReadOnly(readOnly);
+
         educationTM.getColumnModel("entryYear").setAlignment(Table.Align.CENTER);
         educationTM.getColumnModel("endYear").setAlignment(Table.Align.CENTER);
         QueryModel educationQM = educationTM.getQueryModel();
@@ -1372,10 +1373,10 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
 
     private void refresh() {
         try {
-                List<VPreviousExperience> previousExperiences = getList();
-                ((DBTableModel) experienceTW.getWidgetModel()).setEntities(previousExperiences);
+            List<VPreviousExperience> previousExperiences = getList();
+            ((DBTableModel) experienceTW.getWidgetModel()).setEntities(previousExperiences);
 
-                experienceTW.refresh();
+            experienceTW.refresh();
 
         } catch (Exception ex) {
             CommonUtils.showMessageAndWriteLog("Unable to refresh experience grid", ex);
@@ -1394,7 +1395,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
     }
 
 
-    public PGInterval getSum() throws Exception{
+    public PGInterval getSum() throws Exception {
         PGInterval sum = null;
         ID employeeId = ID.valueOf(-1);
         if (!baseDataFW.getWidgetModel().isCreateNew()) {
@@ -1407,14 +1408,14 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
 
         try {
             Object o = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(sql, params);
-            sum= (PGInterval)o;
+            sum = (PGInterval) o;
         } catch (Exception ex) {
             CommonUtils.showMessageAndWriteLog("Unable to load sum", ex);
         }
         return sum;
     }
 
-    public List<VPreviousExperience> getList() throws Exception{
+    public List<VPreviousExperience> getList() throws Exception {
         PGInterval sum = null;
         ID employeeId = ID.valueOf(-1);
         if (!baseDataFW.getWidgetModel().isCreateNew()) {
@@ -1439,18 +1440,19 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
                 for (Object o : tmpList) {
                     Object[] oo = (Object[]) o;
                     VPreviousExperience vPreviousExperience = new VPreviousExperience();
-                    vPreviousExperience.setId(ID.valueOf((long)oo[0]));
-                    vPreviousExperience.setOrganizationName((String)oo[1]);
-                    vPreviousExperience.setPostName((String)oo[2]);
-                    vPreviousExperience.setHireDate((Date)oo[3]);
+                    vPreviousExperience.setId(ID.valueOf((long) oo[0]));
+                    vPreviousExperience.setOrganizationName((String) oo[1]);
+                    vPreviousExperience.setPostName((String) oo[2]);
+                    vPreviousExperience.setHireDate((Date) oo[3]);
                     vPreviousExperience.setDismissDate((Date) oo[4]);
                     sum = (PGInterval) oo[5];
-                    vPreviousExperience.setWorkPeriod(String.valueOf(
-                            sum.getYears())+" "+getUILocaleUtil().getCaption("experienceL.year")
-                            + " " +String.valueOf(sum.getMonths())+" "+getUILocaleUtil().getCaption("experienceL.month")
-                            + " " +String.valueOf(sum.getDays())+" "+getUILocaleUtil().getCaption("experienceL.day")
-                    );
-                    list.add(vPreviousExperience);
+                    if (sum != null) {
+                        vPreviousExperience.setWorkPeriod(String.valueOf(sum.getYears())
+                                + " " + getUILocaleUtil().getCaption("experienceL.year") + " "
+                                + String.valueOf(sum.getMonths()) + " " + getUILocaleUtil().getCaption("experienceL.month"));
+                        list.add(vPreviousExperience);
+                    }
+
                 }
             }
         } catch (Exception ex) {
@@ -1486,6 +1488,8 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         careerTM.setCrudEntityClass(EMPLOYEE_DEPT.class);
         QueryModel careerQM = careerTM.getQueryModel();
         ID employeeId = ID.valueOf(-1);
+
+
         if (!baseDataFW.getWidgetModel().isCreateNew()) {
             EMPLOYEE emp = (EMPLOYEE) baseDataFW.getWidgetModel().getEntity();
             if (emp.getStatus().getId().equals(ID.valueOf(5))) {
@@ -1521,6 +1525,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         postFM.getListeners().add(new CareerPostChangeListener(liveLoadFM, wageRateFM, rateLoadFM));
         liveLoadFM.getListeners().add(new LiveLoadChangeListener(rateLoadFM, wageRateFM));
         wageRateFM.getListeners().add(new WageRateChangeListener(liveLoadFM, rateLoadFM));
+
 
         content.addComponent(careerTW);
         content.setComponentAlignment(careerTW, Alignment.MIDDLE_CENTER);
@@ -1676,7 +1681,6 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
             QueryModel schoolCountryQM = schoolCountryFieldModel.getQueryModel();
             schoolCountryQM.addWhereNull("parent");
             schoolCountryQM.addOrder("countryName");
-
             FKFieldModel schoolRegionFieldModel = (FKFieldModel) educationFM.getFieldModel("schoolRegion");
             QueryModel schoolRegionQM = schoolRegionFieldModel.getQueryModel();
             schoolRegionQM.addWhere("parent", ECriteria.EQUAL, ID.valueOf(-1));
@@ -1686,6 +1690,10 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
 
             FileListFieldModel educationFLFM = (FileListFieldModel) educationFM.getFieldModel("fileList");
             educationFLFM.permitMimeType(FileListFieldModel.JPEG);
+
+            educationFM.getFieldModel("specialityName").setRequired(true);
+            educationFM.getFieldModel("qualification").setRequired(true);
+            educationFM.getFieldModel("entryYear").setRequired(true);
 
             educationFLFM.getFileList().clear();
             educationFLFM.getDeleteList().clear();
@@ -1884,28 +1892,27 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
             }
 
             return false;
-        }else if(source.equals(employeeSkillTW)){
+        } else if (source.equals(employeeSkillTW)) {
             if (baseDataFW.getWidgetModel().isCreateNew()) {
                 Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
                 return false;
             }
-        }else if(source.equals(employeeAwardTW)){
+        } else if (source.equals(employeeAwardTW)) {
             if (baseDataFW.getWidgetModel().isCreateNew()) {
                 Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
                 return false;
             }
-        }else if(source.equals(employeeQualificationTW)){
+        } else if (source.equals(employeeQualificationTW)) {
             if (baseDataFW.getWidgetModel().isCreateNew()) {
                 Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
                 return false;
             }
-        }else if(source.equals(childTW)){
+        } else if (source.equals(childTW)) {
             if (baseDataFW.getWidgetModel().isCreateNew()) {
                 Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
                 return false;
             }
-        }
-        else if(source.equals(masterTW)){
+        } else if (source.equals(masterTW)) {
             if (baseDataFW.getWidgetModel().isCreateNew()) {
                 Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
                 return false;
@@ -1930,50 +1937,49 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
             } catch (Exception ex) {
                 CommonUtils.showMessageAndWriteLog("Unable to set employee type", ex);
             }
-        }else if(source.equals(employeeSkillTW)){
-            EMPLOYEE_SKILL employeeSkill = (EMPLOYEE_SKILL)e;
+        } else if (source.equals(employeeSkillTW)) {
+            EMPLOYEE_SKILL employeeSkill = (EMPLOYEE_SKILL) e;
             EMPLOYEE emp = null;
-            try{
+            try {
                 emp = (EMPLOYEE) baseDataFW.getWidgetModel().getEntity();
-            }catch (Exception ex){
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
             employeeSkill.setEmployee(emp);
-        }else if(source.equals(employeeAwardTW)){
-            EMPLOYEE_AWARD employeeAward = (EMPLOYEE_AWARD)e;
+        } else if (source.equals(employeeAwardTW)) {
+            EMPLOYEE_AWARD employeeAward = (EMPLOYEE_AWARD) e;
             EMPLOYEE emp = null;
-            try{
+            try {
                 emp = (EMPLOYEE) baseDataFW.getWidgetModel().getEntity();
-            }catch (Exception ex){
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
             employeeAward.setEmployee(emp);
-        }else if(source.equals(employeeQualificationTW)){
-            EMPLOYEE_QUALIFICATION employeeQualification = (EMPLOYEE_QUALIFICATION)e;
+        } else if (source.equals(employeeQualificationTW)) {
+            EMPLOYEE_QUALIFICATION employeeQualification = (EMPLOYEE_QUALIFICATION) e;
             EMPLOYEE emp = null;
-            try{
+            try {
                 emp = (EMPLOYEE) baseDataFW.getWidgetModel().getEntity();
-            }catch (Exception ex){
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
             employeeQualification.setEmployee(emp);
             employeeQualification.setCreated(new Date());
-        }else if(source.equals(childTW)){
-            CHILD child = (CHILD)e;
+        } else if (source.equals(childTW)) {
+            CHILD child = (CHILD) e;
             EMPLOYEE emp = null;
-            try{
+            try {
                 emp = (EMPLOYEE) baseDataFW.getWidgetModel().getEntity();
-            }catch (Exception ex){
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
             child.setEmployee(emp);
-        }
-        else if(source.equals(masterTW)){
-            MASTER master = (MASTER)e;
+        } else if (source.equals(masterTW)) {
+            MASTER master = (MASTER) e;
             EMPLOYEE emp = null;
-            try{
+            try {
                 emp = (EMPLOYEE) baseDataFW.getWidgetModel().getEntity();
-            }catch (Exception ex){
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
             master.setEmployee(emp);
@@ -2002,6 +2008,10 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
 
             FileListFieldModel educationFLFM = (FileListFieldModel) educationFM.getFieldModel("fileList");
             educationFLFM.permitMimeType(FileListFieldModel.JPEG);
+
+            educationFM.getFieldModel("specialityName").setRequired(true);
+            educationFM.getFieldModel("qualification").setRequired(true);
+            educationFM.getFieldModel("entryYear").setRequired(true);
 
             educationFLFM.getFileList().clear();
             educationFLFM.getDeleteList().clear();
@@ -2140,16 +2150,16 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
             }
 
             return true;
-        }else if(source.equals(employeeQualificationTW)){
+        } else if (source.equals(employeeQualificationTW)) {
             EMPLOYEE_QUALIFICATION employeeQualification = (EMPLOYEE_QUALIFICATION) e;
             employeeQualification.setUpdated(new Date());
-            try{
+            try {
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(employeeQualification);
-            }catch (Exception ex){
+            } catch (Exception ex) {
                 ex.printStackTrace();
             }
             return true;
-        }else if (source.equals(experienceTW)) {
+        } else if (source.equals(experienceTW)) {
             EMPLOYEE emp = null;
             try {
                 emp = (EMPLOYEE) baseDataFW.getWidgetModel().getEntity();
@@ -2341,8 +2351,8 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
             return preSaveLoadByHour(source, e, isNew, buttonId);
         } else if (source.equals(graduateStudentLoadGW)) {
             return preSaveGraduateStudentLoad(source, e, isNew, buttonId);
-        }else if(source.equals(masterTW)){
-          return preSaveMaster(source, e, isNew, buttonId);
+        } else if (source.equals(masterTW)) {
+            return preSaveMaster(source, e, isNew, buttonId);
         }
 
         return super.preSave(source, e, isNew, buttonId);
@@ -2739,6 +2749,16 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
                 QueryModel educationQM = ((DBSelectModel) educationTW.getWidgetModel()).getQueryModel();
                 educationQM.addWhere(educationUDFI, "user", ECriteria.EQUAL, baseDataFW.getWidgetModel().getEntity().getId());
 
+
+                FKFieldModel qualificationFM = (FKFieldModel) fm.getFieldModel("qualification");
+                qualificationFM.setRequired(true);
+
+                FKFieldModel specialityNameFM = (FKFieldModel) fm.getFieldModel("specialityName");
+                specialityNameFM.setRequired(true);
+
+                FKFieldModel entryYearFM = (FKFieldModel) fm.getFieldModel("entryYear");
+                entryYearFM.setRequired(true);
+
                 educationTW.refresh();
                 showSavedNotification();
             } catch (Exception ex) {
@@ -2972,8 +2992,6 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
                 ed.setDissertationTopic(ved.getDissertationTopic());
                 ed.setCandidate(ved.getCandidate());
                 ed.setSpeciality(ved.getSpeciality());
-                ed.setQualification(ved.getQualification());
-                ed.setEntranceYear(ved.getEntranceYear());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(ed);
 
                 QueryModel scientificDegreeQM = ((DBTableModel) scientificDegreeTW.getWidgetModel()).getQueryModel();
@@ -2995,8 +3013,6 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
                 ed.setDissertationTopic(ved.getDissertationTopic());
                 ed.setCandidate(ved.getCandidate());
                 ed.setSpeciality(ved.getSpeciality());
-                ed.setQualification(ved.getQualification());
-                ed.setEntranceYear(ved.getEntranceYear());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(ed);
                 scientificDegreeTW.refresh();
                 showSavedNotification();
@@ -3247,8 +3263,8 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
                 ed.setEmployee(emp);
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(ed);
 
-                QueryModel careerQM = ((DBTableModel) masterTW.getWidgetModel()).getQueryModel();
-                careerQM.addWhere("employee", ECriteria.EQUAL, emp.getId());
+                QueryModel masterQM = ((DBTableModel) masterTW.getWidgetModel()).getQueryModel();
+                masterQM.addWhere("employee", ECriteria.EQUAL, emp.getId());
 
                 masterTW.refresh();
                 showSavedNotification();
@@ -3258,7 +3274,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         } else {
             try {
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(ed);
-                careerTW.refresh();
+                masterTW.refresh();
                 showSavedNotification();
             } catch (Exception ex) {
                 CommonUtils.showMessageAndWriteLog("Unable to merge a master", ex);
@@ -3427,7 +3443,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
             }
 
             return false;
-        }else if (source.equals(roomTW)) {
+        } else if (source.equals(roomTW)) {
             List<TEACHER_ROOM> delList = new ArrayList<TEACHER_ROOM>();
             try {
                 for (Entity e : entities) {
@@ -3440,7 +3456,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
                 CommonUtils.showMessageAndWriteLog("Unable to delete teacher room", ex);
                 Message.showError(ex.toString());
             }
-        }else if (source.equals(masterTW)) {
+        } else if (source.equals(masterTW)) {
             List<MASTER> delList = new ArrayList<MASTER>();
             for (Entity e : entities) {
                 try {

@@ -4,7 +4,10 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.TextField;
 import kz.halyqsoft.univercity.entity.beans.USERS;
+import kz.halyqsoft.univercity.entity.beans.univercity.USER_DOCUMENT;
+import kz.halyqsoft.univercity.entity.beans.univercity.USER_PASSPORT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.USER_TYPE;
 import kz.halyqsoft.univercity.entity.beans.univercity.enumeration.UserType;
 import kz.halyqsoft.univercity.filter.FUserFilter;
@@ -17,6 +20,8 @@ import org.r3a.common.entity.ID;
 import org.r3a.common.entity.beans.AbstractTask;
 import org.r3a.common.entity.event.EntityListener;
 import org.r3a.common.entity.query.QueryModel;
+import org.r3a.common.entity.query.from.EJoin;
+import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.ERefreshType;
@@ -40,8 +45,8 @@ public class DeleteDataView extends AbstractTaskView implements EntityListener, 
     private final UserFilterPanel filterPanel;
     private GridWidget usersGW;
     private ComboBox userTypeCB;
-
     private USER_TYPE userType;
+    private TextField iinTF;
 
     public DeleteDataView(AbstractTask task) throws Exception {
         super(task);
@@ -66,6 +71,11 @@ public class DeleteDataView extends AbstractTaskView implements EntityListener, 
         filterPanel.addFilterComponent("userType", userTypeCB);
         userTypeCB.setValue(userType);
 
+        iinTF = new TextField();
+        iinTF.setNullRepresentation("");
+        iinTF.setNullSettingAllowed(true);
+        filterPanel.addFilterComponent("iin", iinTF);
+
         getContent().addComponent(filterPanel);
         getContent().setComponentAlignment(filterPanel, Alignment.TOP_CENTER);
 
@@ -87,10 +97,16 @@ public class DeleteDataView extends AbstractTaskView implements EntityListener, 
     }
 
     private void refresh(ID userTypeId) {
-        QueryModel<USERS> usersQM = new QueryModel<>(USERS.class);
         List<ID> values = new ArrayList<>();
         values.add(ID.valueOf(1));
         values.add(ID.valueOf(2));
+        QueryModel<USERS> usersQM = new QueryModel<>(USERS.class);
+        String iin = iinTF.getValue();
+        if (iin != null && !iin.isEmpty()) {
+            FromItem userDocFI = usersQM.addJoin(EJoin.INNER_JOIN, "id", USER_DOCUMENT.class, "user");
+            FromItem userPassportFI = userDocFI.addJoin(EJoin.INNER_JOIN, "id", USER_PASSPORT.class, "id");
+            usersQM.addWhere(userPassportFI, "iin", ECriteria.EQUAL, iin);
+        }
         usersQM.addWhereNotIn("id", values);
         if (userTypeId != null) {
             usersQM.addWhere("typeIndex", ECriteria.EQUAL, userTypeId);
@@ -99,7 +115,7 @@ public class DeleteDataView extends AbstractTaskView implements EntityListener, 
         try {
             list = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(usersQM);
         } catch (Exception e) {
-            e.printStackTrace();//TODO catch
+            CommonUtils.showMessageAndWriteLog("Unable to get list", e);
         }
         ((DBGridModel) usersGW.getWidgetModel()).setEntities(list);
         try {
@@ -139,10 +155,10 @@ public class DeleteDataView extends AbstractTaskView implements EntityListener, 
                     }
                     deleteMainTable(user, "user_award", "USER_ID");
                     deleteMainTable(user, "user_social_category", "USER_ID");
-                    deleteUserDoc(user, "medical_checkup", 4);
+                    deleteSomeUserDoc(user, "medical_checkup", 4);
                     deleteUserDoc(user, "preemptive_right", 11);
                     deleteMainTable(user, "user_language", "USER_ID");
-                    deleteUserDoc(user, "education_doc", 3);
+                    deleteSomeUserDoc(user, "education_doc", 3);
                     deleteUserDoc(user, "user_passport", 1);
                     deleteUserDoc(user, "military_doc", 2);
                     deleteUserDoc(user, "disability_doc", 5);
@@ -155,10 +171,21 @@ public class DeleteDataView extends AbstractTaskView implements EntityListener, 
                 }
             } catch (Exception ignored) {
             }
-            refresh(((USER_TYPE) userTypeCB.getValue()).getId());
+            refresh(userType.getId());
             return false;
         }
         return true;
+    }
+
+    private void deleteSomeUserDoc(USERS user, String table, int documentTypeId) throws Exception {
+        try {
+            String sql = "delete from " + table + " where id in " +
+                    "(select id from user_document where user_id = ?1 and document_type_id = " + documentTypeId + ")";
+            Map<Integer, Object> params = new HashMap<>();
+            params.put(1, user.getId().getId());
+            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
+        } catch (Exception ignored) {
+        }
     }
 
     private void deleteUserDocFiles(USERS user) {

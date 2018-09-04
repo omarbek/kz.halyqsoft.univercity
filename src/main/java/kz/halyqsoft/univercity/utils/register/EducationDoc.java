@@ -27,8 +27,10 @@ import org.r3a.common.vaadin.widget.form.field.filelist.FileListFieldModel;
 import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 import org.r3a.common.vaadin.widget.table.TableWidget;
 import org.r3a.common.vaadin.widget.table.model.DBTableModel;
+import sun.plugin2.message.Message;
 
 import javax.persistence.NoResultException;
+import java.awt.*;
 
 /**
  * @author Omarbek
@@ -43,6 +45,7 @@ public class EducationDoc {
     private FromItem educationUDFI;
     private FormModel mainFM;
     private boolean saveEduc;
+//    private Long iin;
 
     public boolean isSaveEduc() {
         return saveEduc;
@@ -54,6 +57,8 @@ public class EducationDoc {
 
     public EducationDoc(AbstractFormWidget dataAFW,
                         AbstractFormWidgetView applicantsForm, TableWidget documentsTW, FromItem educationUDFI) {
+        //iin=UsersForm.iin;
+
         this.dataAFW = dataAFW;
         this.applicantsForm = applicantsForm;
         this.documentsTW = documentsTW;
@@ -61,6 +66,7 @@ public class EducationDoc {
     }
 
     public void create(QueryModel<USER_DOCUMENT_FILE> udfQM) throws Exception {
+
         StringBuilder sb;
         sb = new StringBuilder();
         sb.append(CommonUtils.getUILocaleUtil().getCaption("title.error"));

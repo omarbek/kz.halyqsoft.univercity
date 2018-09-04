@@ -80,6 +80,7 @@ public class Passport {
         QueryModel birthRegionQM = birthRegionFieldModel.getQueryModel();
         birthRegionQM.addWhere("parent", ECriteria.EQUAL, ID.valueOf(-1));
 
+     //   ((USER_PASSPORT) mainFM.getEntity()).setIin(iin);
         mainFM.getFieldModel("iin").getValidators().add(new RegexpValidator("^\\d{12}$", "ИИН должен состоять из 12 цифр"));
 
         FileListFieldModel passportFLFM = (FileListFieldModel) mainFM.getFieldModel("fileList");
@@ -97,6 +98,7 @@ public class Passport {
                 if (userPassport != null) {
                     mainFM.loadEntity(userPassport.getId());
                     birthRegion = ((USER_PASSPORT) mainFM.getEntity()).getBirthRegion();
+
                     udfQM.addWhere("userDocument", ECriteria.EQUAL, userPassport.getId());
                     List udfList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(udfQM);
                     if (!udfList.isEmpty()) {

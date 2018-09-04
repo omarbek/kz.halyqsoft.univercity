@@ -16,6 +16,7 @@ import java.util.List;
  * @author Omarbek
  * @created Nov 20, 2015 4:31:17 PM
  */
+
 @Entity
 public class V_MEDICAL_CHECKUP extends AbstractEntity {
 

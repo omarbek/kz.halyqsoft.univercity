@@ -1,5 +1,6 @@
 package kz.halyqsoft.univercity.entity.beans.univercity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEPARTMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.EMPLOYEE_TYPE;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.POST;
@@ -41,6 +42,7 @@ public class EMPLOYEE_DEPT extends AbstractEntity {
     @JoinColumns({
         @JoinColumn(name = "POST_ID", referencedColumnName = "ID")})
     private POST post;
+
 	
 	@FieldInfo(type = EFieldType.INTEGER, order = 5)
 	@Column(name = "LIVE_LOAD", nullable = false)
@@ -75,7 +77,7 @@ public class EMPLOYEE_DEPT extends AbstractEntity {
 	@FieldInfo(type = EFieldType.BOOLEAN, order = 12, required = false)
 	@Column(name = "LECTURER", nullable = false)
 	private boolean lecturer;
-	
+
 	@FieldInfo(type = EFieldType.FK_COMBO, order = 13, required = false, inEdit = false, inGrid = false, inView = false)
     @ManyToOne
     @JoinColumns({
@@ -85,7 +87,12 @@ public class EMPLOYEE_DEPT extends AbstractEntity {
 	@FieldInfo(type = EFieldType.TEXT, max = 1000, order = 14, required = false, inGrid = false)
 	@Column(name = "DESCR", nullable = false)
 	private String descr;
-	
+
+	@FieldInfo(type = EFieldType.BOOLEAN, max = 1000, order = 15,required = false)
+	@Column(name = "PRIORITY", nullable = false)
+	private boolean priority;
+
+
 	public EMPLOYEE_DEPT() {
 	}
 
@@ -199,5 +206,17 @@ public class EMPLOYEE_DEPT extends AbstractEntity {
 
 	public void setLecturer(boolean lecturer) {
 		this.lecturer = lecturer;
+	}
+
+	public static long getSerialVersionUID() {
+		return serialVersionUID;
+	}
+
+	public boolean isPriority() {
+		return priority;
+	}
+
+	public void setPriority(boolean priority) {
+		this.priority = priority;
 	}
 }

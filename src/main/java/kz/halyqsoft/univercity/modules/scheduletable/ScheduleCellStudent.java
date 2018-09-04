@@ -48,6 +48,7 @@ final class ScheduleCellStudent extends VerticalLayout {
             sb.append(" ");
             LESSON_TYPE lt = scheduleDetail.getLessonType();
             if (lt.getId().equals(ID.valueOf(2))) {
+
                 sb.append(lt.toString().charAt(0) + lt.toString().charAt(2));
             } else {
                 sb.append(scheduleDetail.getLessonType().toString().charAt(0));

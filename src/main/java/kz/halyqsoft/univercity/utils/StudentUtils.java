@@ -432,9 +432,9 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
         }
         if (sf.getLastname() != null && sf.getLastname().trim().length() >= 3) {
             if (sb.length() > 0) {
-                sb.append(" and ");
+                sb.append("  ");
             }
-            sb.append(" and stu.LAST_NAME ilike '");
+            sb.append("  and stu.LAST_NAME ilike '");
             sb.append(sf.getLastname().trim());
             sb.append("%'");
         }
