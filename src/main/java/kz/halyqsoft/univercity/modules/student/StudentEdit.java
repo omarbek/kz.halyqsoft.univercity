@@ -56,7 +56,7 @@ import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
 import javax.persistence.NoResultException;
 import java.util.*;
 
-import static kz.halyqsoft.univercity.modules.regapplicants.ApplicantsForm.createResourceStudent;
+import static kz.halyqsoft.univercity.modules.regapplicants.ApplicantsForm.*;
 
 /**
  * @author Omarbek
@@ -94,6 +94,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
     private static final int UKPU = 1;
 
     private static final String PATH_TO_PHOTO = "/var/www/html/files/photos/";
+    private boolean kz;
 
     public StudentEdit(final FormModel baseDataFM, VerticalLayout mainVL,
                        StudentOrApplicantView studentOrApplicantView)
@@ -357,6 +358,11 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
 
                     if (valueChangeEvent != null && valueChangeEvent.getProperty() != null && valueChangeEvent.getProperty().getValue() != null) {
+                        try {
+                            setKazLanguage(student,true);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                         myResource = createResourceStudent("90", student);
                         fileDownloader = new FileDownloader(myResource);
                         myResource.setMIMEType("application/pdf");
@@ -369,7 +375,11 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
             rusCheckBox.addValueChangeListener(new Property.ValueChangeListener() {
                 @Override
                 public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
-
+                    try {
+                        setRusLanguage(student,true);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     myResource = createResourceStudent("85", student);
                     fileDownloader = new FileDownloader(myResource);
                     myResource.setMIMEType("application/pdf");
@@ -417,6 +427,23 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         }
         createDifferenceTab(readOnly);
     }
+
+    private static ACCOUNTANT_PRICE getAccountantPrice(STUDENT student, int contractPaymentTypeId) throws Exception {
+        ACCOUNTANT_PRICE accountantPrice;
+        QueryModel<ACCOUNTANT_PRICE> accountantPriceQueryModel = new QueryModel<>(ACCOUNTANT_PRICE.class);
+        accountantPriceQueryModel.addWhere("diplomaType", ECriteria.EQUAL, student.getDiplomaType().getId());
+        accountantPriceQueryModel.addWhere("level", ECriteria.EQUAL, student.getLevel().getId());
+        accountantPriceQueryModel.addWhere("contractPaymentType", ECriteria.EQUAL, ID.valueOf(contractPaymentTypeId));
+        accountantPriceQueryModel.addWhere("deleted", ECriteria.EQUAL, false);
+        try {
+            accountantPrice = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(accountantPriceQueryModel);
+        } catch (NoResultException e) {
+            accountantPrice = null;
+        }
+
+        return accountantPrice;
+    }
+
 
     public static void studentEditPdfDownload(STUDENT student) {
 

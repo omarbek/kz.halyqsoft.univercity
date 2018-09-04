@@ -47,6 +47,10 @@ public class ACCOUNTANT_PRICE extends AbstractEntity {
     @Column(name = "DELETED", nullable = false)
     private boolean deleted;
 
+    @FieldInfo(type = EFieldType.TEXT, order = 7, inGrid = false)
+    @Column(name = "PRICE_IN_LETTERS_KAZ", nullable = false)
+    private String priceInLettersKaz;
+
     public ACCOUNTANT_PRICE() {
     }
 
@@ -96,5 +100,13 @@ public class ACCOUNTANT_PRICE extends AbstractEntity {
 
     public void setContractPaymentType(CONTRACT_PAYMENT_TYPE contractPaymentType) {
         this.contractPaymentType = contractPaymentType;
+    }
+
+    public String getPriceInLettersKaz() {
+        return priceInLettersKaz;
+    }
+
+    public void setPriceInLettersKaz(String priceInLettersKaz) {
+        this.priceInLettersKaz = priceInLettersKaz;
     }
 }

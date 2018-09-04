@@ -53,6 +53,8 @@ import java.util.List;
 public final class ApplicantsForm extends UsersForm {
 
     private static String replaced;
+    private static String inLettersEdu;
+    private static String moneyForEducation;
     private Button untNextButton;
 
     private TableWidget specTW;
@@ -62,7 +64,6 @@ public final class ApplicantsForm extends UsersForm {
     private Button motherButton, fatherButton;
     private Button contractButton;
     private Button specButton, moreButton;
-    // private Button asd;
 
     private boolean saveSpec/*, saveUnt*/;
     private boolean came = false;
@@ -144,7 +145,6 @@ public final class ApplicantsForm extends UsersForm {
         buttons.add(fatherButton);
         buttons.add(contractButton);
         buttons.add(moreButton);
-        // buttons.add(asd);
         return buttons;
     }
 
@@ -305,7 +305,7 @@ public final class ApplicantsForm extends UsersForm {
         conditionsMap.put(getUILocaleUtil().getMessage("info.save.address"), !saveFactAddress);
         conditionsMap.put(getUILocaleUtil().getMessage("info.save.speciality"), !saveSpec);
         conditionsMap.put(getUILocaleUtil().getMessage("info.save.educ"), !saveEduc);
-//        conditionsMap.put(getUILocaleUtil().getMessage("info.save.unt"), !saveUnt);
+
         return conditionsMap;
     }
 
@@ -774,15 +774,12 @@ public final class ApplicantsForm extends UsersForm {
 
                         if(text.startsWith("до 25 сентября")
                                 && student.getDiplomaType().toString().equals("Заочный 2-высшее")){
-                            replaced = "до 1 октября – 65000 тенге                     до 1 февраля – 65000 тенге";
-
+                            replaced = "до 1 октября – 60000 тенге                     до 1 февраля – 60000 тенге";
                         } else if( text.startsWith("25 қыркүйекке дейін") &&
                                 student.getDiplomaType().toString().equals("Заочный 2-высшее")){
-                            replaced = "1 қазанға дейін – 65000 тенге                   1 ақпанға дейін – 65000 тенге";
-
-                        }else if ((text.startsWith("до 25 сентября") ) && student.getDiplomaType().toString().equals("Заочный после колледжа")) {
-                            replaced = "до 1 октября – 65000 тенге                     до 1 февраля – 65000 тенге";
-
+                            replaced = "1 қазанға дейін – 60000 тенге                   1 ақпанға дейін – 60000 тенге";
+                        }else if (text.startsWith("до 25 сентября") && student.getDiplomaType().toString().equals("Заочный после колледжа")) {
+                            replaced ="до 1 октября – 65000 тенге                     до 1 февраля – 65000 тенге";
                         }else if (text.startsWith("25 қыркүйекке дейін") && student.getDiplomaType().toString().equals("Заочный после колледжа")) {
                             replaced = "1 қазанға дейін – 65000 тенге                   1 ақпанға дейін – 65000 тенге";
                         }else if(text.startsWith("6) в случае пропуска занятий по уважительным причинам предоставить ") &&
@@ -889,6 +886,51 @@ public final class ApplicantsForm extends UsersForm {
         }, fileName);
     }
 
+    public static void setKazLanguage(STUDENT student,boolean kz) throws Exception {
+
+         inLettersEdu = "";
+        moneyForEducation = "";
+        ACCOUNTANT_PRICE accountantPrice = getAccountantPrice(student, 2);
+
+        if (accountantPrice != null) {
+            inLettersEdu = accountantPrice.getPriceInLettersKaz();
+            moneyForEducation = String.valueOf(accountantPrice.getPrice());
+        } else {
+            moneyForEducation = "0";
+        }
+
+        String inLettersDorn = "";
+        ACCOUNTANT_PRICE accountantPriceDorm = getAccountantPrice(student, 1);
+        if (accountantPriceDorm != null) {
+            inLettersDorn = accountantPriceDorm.getPriceInLettersKaz();
+        } else {
+            inLettersDorn = "0";
+        }
+    }
+
+    public static void setRusLanguage(STUDENT student,boolean ru) throws Exception {
+
+         inLettersEdu = "";
+         moneyForEducation = "";
+
+        ACCOUNTANT_PRICE accountantPrice = getAccountantPrice(student, 2);
+        if (accountantPrice != null) {
+            inLettersEdu = accountantPrice.getPriceInLetters();
+            moneyForEducation = String.valueOf(accountantPrice.getPrice());
+        } else {
+            moneyForEducation = "0";
+        }
+
+        String inLettersDorn = "";
+        String moneyForDorm = "";
+        ACCOUNTANT_PRICE accountantPriceDorm = getAccountantPrice(student, 1);
+        if (accountantPriceDorm != null) {
+            inLettersDorn = accountantPriceDorm.getPriceInLetters();
+        } else {
+            moneyForDorm = "0";
+        }
+    }
+
     private static void setReplaced(String text, STUDENT student) throws Exception {
 
         Date date = Calendar.getInstance().getTime();
@@ -926,16 +968,6 @@ public final class ApplicantsForm extends UsersForm {
             untCertificate = null;
         }
 
-        String inLettersEdu = "";
-        String moneyForEducation = "";
-        ACCOUNTANT_PRICE accountantPrice = getAccountantPrice(student, 2);
-        if (accountantPrice != null) {
-            moneyForEducation = String.valueOf(accountantPrice.getPrice());
-            inLettersEdu = accountantPrice.getPriceInLetters();
-        } else {
-            moneyForEducation = "0";
-        }
-
         String inLettersDorn = "";
         String moneyForDorm = "";
         ACCOUNTANT_PRICE accountantPriceDorm = getAccountantPrice(student, 1);
@@ -946,7 +978,7 @@ public final class ApplicantsForm extends UsersForm {
             moneyForDorm = "0";
         }
         String answerDorm = String.valueOf(Double.valueOf(moneyForDorm) / 8);
-        String answerEdu = String.valueOf(Double.valueOf(moneyForEducation) / 8);
+       String answerEdu = String.valueOf(Double.valueOf(moneyForEducation) / 8);
 
         String ochnii = student.getDiplomaType().toString();
         DateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
@@ -962,9 +994,6 @@ public final class ApplicantsForm extends UsersForm {
         String pdfProperty = "";
         String tableType = "ansEdu тенге ";
 
-
-
-//        DateFormat form = new SimpleDateFormat("E MMM dd HH:mm:ss Z yyyy");
         DateFormat form = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.US);
 
         Date dateBirth = form.parse(student.getBirthDate().toString());
@@ -1042,7 +1071,6 @@ public final class ApplicantsForm extends UsersForm {
             e.printStackTrace();
         }
 
-
         String iin = "";
         String passportNumber = "";
         if (user_passport != null) {
@@ -1070,7 +1098,7 @@ public final class ApplicantsForm extends UsersForm {
         USERS tecnhik = CommonUtils.getEmployee(params);
         replaced = text.replaceAll("\\$fio", student.toString())
                 .replaceAll("\\$money", moneyForEducation)
-                //.replaceAll(tableType, pdfProperty)
+             //   .replaceAll(tableType, pdfProperty)
                 .replaceAll("\\$ansEdu", answerEdu)
                 .replaceAll("\\$ansDorm", answerDorm)
                 .replaceAll("\\$firstCourseMoney", firstCourseMoney)
