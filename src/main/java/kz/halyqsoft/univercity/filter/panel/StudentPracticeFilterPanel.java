@@ -3,14 +3,14 @@ package kz.halyqsoft.univercity.filter.panel;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.HorizontalLayout;
-import kz.halyqsoft.univercity.filter.FGroupFilter;
 import kz.halyqsoft.univercity.filter.FInformationPracticeFilter;
+import kz.halyqsoft.univercity.filter.FStudentPracticeFilter;
 import org.r3a.common.vaadin.widget.filter2.panel.AbstractFilterPanel;
 
 @SuppressWarnings("serial")
-public final class InformationPracticeFilterPanel extends AbstractFilterPanel {
+public final class StudentPracticeFilterPanel extends AbstractFilterPanel {
 
-	public InformationPracticeFilterPanel(FInformationPracticeFilter filterBean) {
+	public StudentPracticeFilterPanel(FStudentPracticeFilter filterBean) {
 		super(filterBean);
 	}
 
@@ -20,36 +20,27 @@ public final class InformationPracticeFilterPanel extends AbstractFilterPanel {
 		hl.setSpacing(true);
 		hl.setWidthUndefined();
 		
-		AbstractField af = getFilterComponent("groups");
+		AbstractField af = getFilterComponent("student");
 		if (af != null) {
 			hl.addComponent(af);
 		}
 
-		af = getFilterComponent("code");
+		af = getFilterComponent("organization");
 		if (af != null) {
 			hl.addComponent(af);
 		}
 
-		af = getFilterComponent("employee");
+		af = getFilterComponent("comeInDate");
 		if (af != null) {
 			hl.addComponent(af);
 		}
 
 		
-		af = getFilterComponent("studyYear");
+		af = getFilterComponent("comeOutDate");
 		if (af != null) {
 			hl.addComponent(af);
 		}
 
-		af = getFilterComponent("entranceYear");
-		if (af != null) {
-			hl.addComponent(af);
-		}
-
-		af = getFilterComponent("created");
-		if (af != null) {
-			hl.addComponent(af);
-		}
 
 		getContent().addComponent(hl);
 		getContent().setComponentAlignment(hl, Alignment.MIDDLE_CENTER);

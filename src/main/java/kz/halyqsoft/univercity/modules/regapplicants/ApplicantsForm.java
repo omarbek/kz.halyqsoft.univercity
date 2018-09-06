@@ -625,7 +625,7 @@ public final class ApplicantsForm extends UsersForm {
                         pdfDocumentQueryModel.addWhere("id", ECriteria.EQUAL, value);
                         pdf_document = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(pdfDocumentQueryModel);
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        e.printStackTrace();//TODO no docs
                     }
 
                     if (value.equals("32")) {
@@ -856,6 +856,7 @@ public final class ApplicantsForm extends UsersForm {
 
 
                         }  else {
+
                             if (student != null) {
                                 setReplaced(text, student);
                             }
@@ -948,14 +949,23 @@ public final class ApplicantsForm extends UsersForm {
         QueryModel<USER_ADDRESS> userAddressQueryModel = new QueryModel<>(USER_ADDRESS.class);
         userAddressQueryModel.addWhere("user", ECriteria.EQUAL, student.getId());
         userAddressQueryModel.addWhereAnd("addressType", ECriteria.EQUAL, ID.valueOf(ADDRESS_FACT));
-        userAddress = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(userAddressQueryModel);
-
+        try{
+            userAddress = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(userAddressQueryModel);//TODO no user address
+        }catch (NoResultException nre)
+        {
+            userAddress = null;
+        }
         QueryModel<EDUCATION_DOC> educationDocQueryModel = new QueryModel<>(EDUCATION_DOC.class);
 
         EDUCATION_DOC educationDoc;
         FromItem sc = educationDocQueryModel.addJoin(EJoin.INNER_JOIN, "id", USER_DOCUMENT.class, "id");
         educationDocQueryModel.addWhere(sc, "user", ECriteria.EQUAL, student.getId());
-        educationDoc = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(educationDocQueryModel);
+        List<EDUCATION_DOC> educationDocs = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(educationDocQueryModel);//TODO no edu doc
+        if(educationDocs.size()==0){
+            educationDoc = null;
+        }else {
+            educationDoc = educationDocs.get(educationDocs.size() - 1);
+        }
 
         UNT_CERTIFICATE untCertificate;
         QueryModel<UNT_CERTIFICATE> untCertificateQueryModel = new QueryModel<>(UNT_CERTIFICATE.class);
@@ -1003,7 +1013,12 @@ public final class ApplicantsForm extends UsersForm {
         Date date1 = formatter.parse(birthdayDate);
         String birthday = formatter.format(date1);
 
-        Date dateDocument = form.parse(educationDoc.getIssueDate().toString());
+        Date dateDocument = null;
+        if(educationDoc!=null) {
+            dateDocument = form.parse(educationDoc.getIssueDate().toString());
+        }else{
+            dateDocument = new Date();
+        }
         Calendar cal1 = Calendar.getInstance();
         cal1.setTime(dateDocument);
         String formatDate = cal1.get(Calendar.DATE) + "." + (cal1.get(Calendar.MONTH) + 1) + "." + cal1.get(Calendar.YEAR);
@@ -1031,8 +1046,10 @@ public final class ApplicantsForm extends UsersForm {
         if (student.getCoordinator() == null) {
             student.setCoordinator(coordinator);
         }
-        if (educationDoc.getEndYear() == null) {
-            educationDoc.setEndYear(Calendar.getInstance().get(Calendar.YEAR));
+        if(educationDoc!=null){
+            if (educationDoc.getEndYear() == null) {
+                educationDoc.setEndYear(Calendar.getInstance().get(Calendar.YEAR));
+            }
         }
         if (studentRelativeFather.getPhoneMobile() == null) {
             studentRelativeFather.setPhoneMobile("***");
@@ -1078,14 +1095,16 @@ public final class ApplicantsForm extends UsersForm {
             passportNumber = user_passport.getDocumentNo();
         }
         String fullAddress = "";
-        if (userAddress.getCountry() != null)
-            fullAddress += " " + userAddress.getCountry();
-        if (userAddress.getRegion() != null)
-            fullAddress += " " + userAddress.getRegion();
-        if (userAddress.getCity() != null)
-            fullAddress += " " + userAddress.getCity();
-        if (userAddress.getStreet() != null)
-            fullAddress += " " + userAddress.getStreet();
+        if(userAddress!=null) {
+            if (userAddress.getCountry() != null)
+                fullAddress += " " + userAddress.getCountry();
+            if (userAddress.getRegion() != null)
+                fullAddress += " " + userAddress.getRegion();
+            if (userAddress.getCity() != null)
+                fullAddress += " " + userAddress.getCity();
+            if (userAddress.getStreet() != null)
+                fullAddress += " " + userAddress.getStreet();
+        }
         String firstCourseMoney = moneyForEducation;
         String secondCourseMoney = moneyForEducation;
 
@@ -1116,8 +1135,8 @@ public final class ApplicantsForm extends UsersForm {
                 .replaceAll("\\$DataMonthYear", today + " года")
                 .replaceAll("\\$formaobuch", ochnii)
                 .replaceAll("\\$data\\$month\\$year", today)
-                .replaceAll("\\$email", userAddress.getPostalCode())
-                .replaceAll("\\$rekvizit", userAddress.getStreet())
+                .replaceAll("\\$email", userAddress!=null ? userAddress.getPostalCode() : "")
+                .replaceAll("\\$rekvizit", userAddress!=null ? userAddress.getStreet() : "")
                 .replaceAll("\\$phone", "+7" + student.getPhoneMobile())
                 .replaceAll("\\$InLetters", inLettersEdu)
                 .replaceAll("\\$Obshaga", moneyForDorm)
@@ -1132,8 +1151,8 @@ public final class ApplicantsForm extends UsersForm {
                 .replaceAll("\\$gender", student.getSex().toString())
                 .replaceAll("\\$birthYear", birthday)
                 .replaceAll("\\$nationality", student.getNationality().toString())
-                .replaceAll("\\$info", educationDoc.getEndYear().toString() + ", "
-                        + educationDoc.getEducationType() + ", " + educationDoc.getSchoolName())
+                .replaceAll("\\$info", educationDoc!=null ? educationDoc.getEndYear().toString() + ", "
+                        + educationDoc.getEducationType() + ", " + educationDoc.getSchoolName(): "" )
                 .replaceAll("\\$speciality", specialityName)
                 .replaceAll("\\$parentsAddress", studentRelativeFather.getFio() + ", "
                         + studentRelativeFather.getWorkPlace() + "    "
@@ -1145,18 +1164,16 @@ public final class ApplicantsForm extends UsersForm {
                 .replaceAll("\\$name", student.getFirstName())
                 .replaceAll("\\$surname", student.getLastName())
                 .replaceAll("\\$firstName", student.getMiddleName())
-                .replaceAll("\\$education", educationDoc.getEducationType().toString())
+                .replaceAll("\\$education", educationDoc!=null ? educationDoc.getEducationType().toString() : "")
                 .replaceAll("\\$technic", tecnhik.toString())
                 .replaceAll("\\$attestat", attestationDate)
-                .replaceAll("\\$nomer", educationDoc.getDocumentNo())
+                .replaceAll("\\$nomer", educationDoc!=null ? educationDoc.getDocumentNo() : "")
                 .replaceAll("\\$ent", untCertificate == null ? "" : untCertificate.getDocumentNo())
 //                .replaceAll("\\$document", createdDate)
                 .replaceAll("\\$document", "_______")
                 .replaceAll("\\$diplomaType", student.getDiplomaType().toString())
                 .replaceAll("\\$group", "")
                 .replaceAll("қажет, қажет емес", dorm);
-
-
     }
 
     private static ACCOUNTANT_PRICE getAccountantPrice(STUDENT student, int contractPaymentTypeId) throws Exception {

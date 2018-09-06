@@ -1,29 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="univerdb@78.40.108.39" uuid="eb414dcc-76aa-4860-abbb-985ec34f16dd">
+    <data-source source="LOCAL" name="univerdb@78.40.108.39" uuid="9cd8f89a-ea05-471f-82e3-fa51f10a62f4">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://78.40.108.39:5432/univerdb</jdbc-url>
     </data-source>
-    <data-source source="LOCAL" name="up_lamq@78.40.108.39" uuid="28ef74eb-bc02-4806-92b4-c0010720422b">
-      <driver-ref>postgresql</driver-ref>
-      <synchronize>true</synchronize>
-      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://78.40.108.39:5432/up_lamq</jdbc-url>
-    </data-source>
-    <data-source source="LOCAL" name="univerdbb@localhost" uuid="96cdddf2-f7da-4a64-883d-c71a78f0597d">
-      <driver-ref>postgresql</driver-ref>
-      <synchronize>true</synchronize>
-      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost:5432/univerdbb</jdbc-url>
-    </data-source>
-    <data-source source="LOCAL" name="loaddb@localhost" uuid="03b1ef6b-9923-4823-be3c-7ca22619f289">
+    <data-source source="LOCAL" name="loaddb@localhost" uuid="d59a46a0-bbce-4226-818e-642964077115">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://localhost:5432/loaddb</jdbc-url>
+      <driver-properties>
+        <property name="ApplicationName" value="DataGrip" />
+      </driver-properties>
+    </data-source>
+    <data-source source="LOCAL" name="univerdb@89.40.60.206" uuid="d741b660-e4f3-46db-94b8-68b883973036">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://89.40.60.206:5432/univerdb</jdbc-url>
+      <driver-properties>
+        <property name="ApplicationName" value="DataGrip" />
+      </driver-properties>
+    </data-source>
+    <data-source source="LOCAL" name="univerdb@localhost" uuid="fe7f3558-5528-4f70-8dba-834143fa0bcb">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:5432/univerdb</jdbc-url>
       <driver-properties>
         <property name="ApplicationName" value="DataGrip" />
       </driver-properties>

@@ -2,6 +2,7 @@ package kz.halyqsoft.univercity.filter;
 
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.GROUPS;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SPECIALITY;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDY_YEAR;
 import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
@@ -15,6 +16,7 @@ public final class FInformationPracticeFilter extends AbstractFilterBean {
     private USERS employee;
     private Date created;
     private STUDY_YEAR studyYear;
+    private ENTRANCE_YEAR entranceYear;
 
     public String getCode() {
         return code;
@@ -56,11 +58,19 @@ public final class FInformationPracticeFilter extends AbstractFilterBean {
         this.studyYear = studyYear;
     }
 
+    public ENTRANCE_YEAR getEntranceYear() {
+        return entranceYear;
+    }
+
+    public void setEntranceYear(ENTRANCE_YEAR entranceYear) {
+        this.entranceYear = entranceYear;
+    }
+
     public FInformationPracticeFilter() {
     }
 
     @Override
     public boolean hasFilter() {
-        return !(code == null && groups == null && employee== null && created ==null);
+        return !(code == null && groups == null && employee== null && created ==null && entranceYear==null );
     }
 }

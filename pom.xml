@@ -52,7 +52,16 @@
 	</dependencyManagement>
 
 	<dependencies>
-
+		<dependency>
+			<groupId>com.google.cloud</groupId>
+			<artifactId>google-cloud-speech</artifactId>
+			<version>0.23.1-alpha</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.api-client</groupId>
+			<artifactId>google-api-client</artifactId>
+			<version>1.8.0-beta</version>
+		</dependency>
 
 		<dependency>
 			<groupId>com.byteowls</groupId>
@@ -178,11 +187,6 @@
 			<artifactId>httpclient</artifactId>
 			<version>4.5.5</version>
 		</dependency>
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-push</artifactId>
-			<version>8.4.2</version>
-		</dependency>
 		<!--<dependency>-->
 		<!--<groupId>javax.json</groupId>-->
 		<!--<artifactId>javax.json-api</artifactId>-->
@@ -203,6 +207,11 @@
 			<artifactId>postgresql</artifactId>
 			<version>9.4-1200-jdbc41</version>
 		</dependency>
+		<!--<dependency>-->
+			<!--<groupId>com.vaadin</groupId>-->
+			<!--<artifactId>vaadin-push</artifactId>-->
+			<!--<version>8.5.1</version>-->
+		<!--</dependency>-->
 
 		<!--last-->
 	</dependencies>

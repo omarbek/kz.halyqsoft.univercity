@@ -1,6 +1,7 @@
 package kz.halyqsoft.univercity.entity.beans.univercity;
 
 import kz.halyqsoft.univercity.entity.beans.USERS;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.LANGUAGE;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SPECIALITY;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDY_YEAR;
@@ -18,18 +19,25 @@ public class PRACTICE_INFORMATION extends AbstractEntity {
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "groups_id", referencedColumnName = "ID", nullable = false)})
-    GROUPS groups;
+    private GROUPS groups;
 
     @FieldInfo(type = EFieldType.FK_COMBO, order = 2)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "teacher_id", referencedColumnName = "ID", nullable = false)})
-    USERS employee;
+    private USERS employee;
 
-    @FieldInfo(type = EFieldType.DATETIME, order = 3)
+    @FieldInfo(type = EFieldType.DATETIME, order = 3, inView = false, inGrid = false, inEdit = false)
     @Column(name = "created")
     @Temporal(TemporalType.TIMESTAMP)
-    Date created;
+    private Date created;
+
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 4)
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name="ENTRANCE_YEAR_ID", referencedColumnName = "ID", nullable = false)
+    })
+    private ENTRANCE_YEAR entranceYear;
 
     public PRACTICE_INFORMATION() {
     }
@@ -56,5 +64,13 @@ public class PRACTICE_INFORMATION extends AbstractEntity {
 
     public void setCreated(Date created) {
         this.created = created;
+    }
+
+    public ENTRANCE_YEAR getEntranceYear() {
+        return entranceYear;
+    }
+
+    public void setEntranceYear(ENTRANCE_YEAR entranceYear) {
+        this.entranceYear = entranceYear;
     }
 }
