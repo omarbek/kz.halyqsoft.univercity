@@ -27,7 +27,6 @@ import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.facade.CommonIDFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
-import org.r3a.common.entity.FieldInfo;
 import org.r3a.common.entity.ID;
 import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.file.FileBean;
@@ -2033,11 +2032,11 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         EDUCATION_DOC ed = (EDUCATION_DOC) e;
         FormModel fm = baseDataFW.getWidgetModel();
 
-        fm.getFieldModel("qualification").setInEdit(false);
-        fm.getFieldModel("qualification").setInView(false);
-
-        fm.getFieldModel("specialityName").setInEdit(false);
-        fm.getFieldModel("specialityName").setInView(false);
+//        fm.getFieldModel("qualification").setInEdit(false);
+//        fm.getFieldModel("qualification").setInView(false);
+//
+//        fm.getFieldModel("specialityName").setInEdit(false);
+//        fm.getFieldModel("specialityName").setInView(false);
         if (isNew) {
             try {
                 ed.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USER_DOCUMENT"));

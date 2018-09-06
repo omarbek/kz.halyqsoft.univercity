@@ -1,84 +1,75 @@
 package kz.halyqsoft.univercity.modules.test;
 
-import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.ui.*;
-import kz.halyqsoft.univercity.entity.beans.USERS;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.USER_TYPE;
-import org.json.JSONObject;
-import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
-import org.r3a.common.dblink.utils.SessionFacadeFactory;
+import com.vaadin.ui.Grid;
 import org.r3a.common.entity.beans.AbstractTask;
-import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.vaadin.view.AbstractTaskView;
-import org.r3a.common.vaadin.widget.dialog.Message;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Calendar;
-import java.util.Set;
 
 public class TestView extends AbstractTaskView {
 
-    private TextField firstNameTF;
-    private TextField surnameTF;
-    private ComboBox rolesCB;
+//    private TextField firstNameTF;
+//    private TextField surnameTF;
+//    private ComboBox rolesCB;
+//
+//    private final static String AUTH_KEY_FCM = "";//TODO
+//    private final static String API_URL_FCM = "https://fcm.googleapis.com/fcm/send";
 
     public TestView(AbstractTask task) throws Exception {
         super(task);
     }
 
-    private final static String AUTH_KEY_FCM = "";//TODO
-    private final static String API_URL_FCM = "https://fcm.googleapis.com/fcm/send";
+    @Override
+    public void initView(boolean b) throws Exception {
+//        GridWidget awardGW=new GridWidget(AWARD.class);
+//        getContent().addComponent(awardGW);
+        Grid grid=new Grid();
 
-    public static String sendPushNotification(String pushId)
-            throws IOException {
-        String result;
-        URL url = new URL(API_URL_FCM);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-
-        conn.setUseCaches(false);
-        conn.setDoInput(true);
-        conn.setDoOutput(true);
-
-        conn.setRequestMethod("POST");
-        conn.setRequestProperty("Authorization", "key=" + AUTH_KEY_FCM);
-        conn.setRequestProperty("Content-Type", "application/json");
-
-        JSONObject json = new JSONObject();
-
-        json.put("to", pushId.trim());
-        JSONObject info = new JSONObject();
-        info.put("title", "notification title"); // Notification title
-        info.put("body", "message body"); // Notification
-        // body
-        json.put("notification", info);
-        try {
-            OutputStreamWriter wr = new OutputStreamWriter(
-                    conn.getOutputStream());
-            wr.write(json.toString());
-            wr.flush();
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(
-                    (conn.getInputStream())));
-
-            String output;
-            System.out.println("Output from Server .... \n");
-            while ((output = br.readLine()) != null) {
-                System.out.println(output);
-            }
-            result = "SUCCESS";
-        } catch (Exception e) {
-            e.printStackTrace();
-            result = "FAILURE";
-        }
-        System.out.println("GCM Notification is sent successfully");
-
-        return result;
     }
+
+//    public static String sendPushNotification(String pushId)
+//            throws IOException {
+//        String result;
+//        URL url = new URL(API_URL_FCM);
+//        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+//
+//        conn.setUseCaches(false);
+//        conn.setDoInput(true);
+//        conn.setDoOutput(true);
+//
+//        conn.setRequestMethod("POST");
+//        conn.setRequestProperty("Authorization", "key=" + AUTH_KEY_FCM);
+//        conn.setRequestProperty("Content-Type", "application/json");
+//
+//        JSONObject json = new JSONObject();
+//
+//        json.put("to", pushId.trim());
+//        JSONObject info = new JSONObject();
+//        info.put("title", "notification title"); // Notification title
+//        info.put("body", "message body"); // Notification
+//        // body
+//        json.put("notification", info);
+//        try {
+//            OutputStreamWriter wr = new OutputStreamWriter(
+//                    conn.getOutputStream());
+//            wr.write(json.toString());
+//            wr.flush();
+//
+//            BufferedReader br = new BufferedReader(new InputStreamReader(
+//                    (conn.getInputStream())));
+//
+//            String output;
+//            System.out.println("Output from Server .... \n");
+//            while ((output = br.readLine()) != null) {
+//                System.out.println(output);
+//            }
+//            result = "SUCCESS";
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            result = "FAILURE";
+//        }
+//        System.out.println("GCM Notification is sent successfully");
+//
+//        return result;
+//    }
 
     public static void main(String[] args) {
 //        List<Integer> repeatedIds=new ArrayList<>();
@@ -111,101 +102,100 @@ public class TestView extends AbstractTaskView {
 //        System.out.println(getFirstMonday(2018, Calendar.AUGUST));
     }
 
-    private static int getFirstMonday(int year, int month) {
-        Calendar cacheCalendar = Calendar.getInstance();
-        cacheCalendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-        cacheCalendar.set(Calendar.DAY_OF_WEEK_IN_MONTH, 1);
-        cacheCalendar.set(Calendar.MONTH, month);
-        cacheCalendar.set(Calendar.YEAR, year);
-        return cacheCalendar.get(Calendar.DATE);
-    }
+//    private static int getFirstMonday(int year, int month) {
+//        Calendar cacheCalendar = Calendar.getInstance();
+//        cacheCalendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+//        cacheCalendar.set(Calendar.DAY_OF_WEEK_IN_MONTH, 1);
+//        cacheCalendar.set(Calendar.MONTH, month);
+//        cacheCalendar.set(Calendar.YEAR, year);
+//        return cacheCalendar.get(Calendar.DATE);
+//    }
 
-    private static Integer getId(Set<Integer> ids, Integer id) {
-        if (ids.contains(id)) {
-            id = getId(ids, ++id);
-        } else {
-            ids.add(id);
-        }
-        return id;
-    }
+//    private static Integer getId(Set<Integer> ids, Integer id) {
+//        if (ids.contains(id)) {
+//            id = getId(ids, ++id);
+//        } else {
+//            ids.add(id);
+//        }
+//        return id;
+//    }
 
-    @Override
-    public void initView(boolean b) throws Exception {
-        firstNameTF = new TextField(getUILocaleUtil().getCaption("firstNameTF"));
-        firstNameTF.setImmediate(true);
-        firstNameTF.setRequired(true);
-
-        surnameTF = new TextField(getUILocaleUtil().getCaption("surnameTF"));
-        surnameTF.setImmediate(true);
-        surnameTF.setRequired(true);
-
-        HorizontalLayout mainHL = new HorizontalLayout();
-        mainHL.addComponent(firstNameTF);
-        mainHL.addComponent(surnameTF);
-        getContent().addComponent(mainHL);
-        getContent().setComponentAlignment(mainHL, Alignment.MIDDLE_CENTER);
-
-        rolesCB = new ComboBox(getUILocaleUtil().getCaption("rolesCB"));
-        rolesCB.setRequired(true);
-        QueryModel<USER_TYPE> typeQM = new QueryModel<>(USER_TYPE.class);
-        BeanItemContainer<USER_TYPE> typeB = new BeanItemContainer<>(USER_TYPE.class,
-                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(typeQM));
-        rolesCB.setContainerDataSource(typeB);
-
-        HorizontalLayout saveHL = new HorizontalLayout();
-        saveHL.addComponent(rolesCB);
-        getContent().addComponent(saveHL);
-        getContent().setComponentAlignment(saveHL, Alignment.MIDDLE_CENTER);
-
-        Button saveBtn = new Button(getUILocaleUtil().getCaption("saveBtn"));
-
-        saveBtn.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent clickEvent) {
-                String firstName = firstNameTF.getValue();
-                String lastName = surnameTF.getValue();
-                USER_TYPE userType = (USER_TYPE) rolesCB.getValue();
-
-
-                if (firstName == null || firstName.isEmpty() || lastName == null || lastName.isEmpty()
-                        || userType == null) {
-                    Message.showError(getUILocaleUtil().getMessage("error.required.fields"));
-                } else {
-                    Message.showInfo(getUILocaleUtil().getCaption("firstNameTF") + ":" + firstName
-                            + "\n" + getUILocaleUtil().getCaption("surnameTF") + ":" + lastName
-                            + "\n" + getUILocaleUtil().getCaption("rolesCB") + ":" + userType);
-                }
-            }
-
-        });
-
-        Button clearBtn = new Button(getUILocaleUtil().getCaption("clearBtn"));
-
-        clearBtn.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent clickEvent) {
-                firstNameTF.clear();
-                surnameTF.clear();
-                rolesCB.clear();
-            }
-
-        });
-
-
-        HorizontalLayout componentHL = new HorizontalLayout();
-        componentHL.addComponent(saveBtn);
-        componentHL.addComponent(clearBtn);
-        getContent().addComponent(componentHL);
-        getContent().setComponentAlignment(componentHL, Alignment.MIDDLE_CENTER);
-
-        Button usersToLower = new Button("to Lower");
-        usersToLower.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent event) {
-                QueryModel<USERS> usersQM = new QueryModel<>(USERS.class);
-//                usersQM.addWhere();
-            }
-        });
-        getContent().addComponent(usersToLower);
-    }
+//    private void ss() throws Exception {
+//        firstNameTF = new TextField(getUILocaleUtil().getCaption("firstNameTF"));
+//        firstNameTF.setImmediate(true);
+//        firstNameTF.setRequired(true);
+//
+//        surnameTF = new TextField(getUILocaleUtil().getCaption("surnameTF"));
+//        surnameTF.setImmediate(true);
+//        surnameTF.setRequired(true);
+//
+//        HorizontalLayout mainHL = new HorizontalLayout();
+//        mainHL.addComponent(firstNameTF);
+//        mainHL.addComponent(surnameTF);
+//        getContent().addComponent(mainHL);
+//        getContent().setComponentAlignment(mainHL, Alignment.MIDDLE_CENTER);
+//
+//        rolesCB = new ComboBox(getUILocaleUtil().getCaption("rolesCB"));
+//        rolesCB.setRequired(true);
+//        QueryModel<USER_TYPE> typeQM = new QueryModel<>(USER_TYPE.class);
+//        BeanItemContainer<USER_TYPE> typeB = new BeanItemContainer<>(USER_TYPE.class,
+//                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(typeQM));
+//        rolesCB.setContainerDataSource(typeB);
+//
+//        HorizontalLayout saveHL = new HorizontalLayout();
+//        saveHL.addComponent(rolesCB);
+//        getContent().addComponent(saveHL);
+//        getContent().setComponentAlignment(saveHL, Alignment.MIDDLE_CENTER);
+//
+//        Button saveBtn = new Button(getUILocaleUtil().getCaption("saveBtn"));
+//
+//        saveBtn.addClickListener(new Button.ClickListener() {
+//            @Override
+//            public void buttonClick(Button.ClickEvent clickEvent) {
+//                String firstName = firstNameTF.getValue();
+//                String lastName = surnameTF.getValue();
+//                USER_TYPE userType = (USER_TYPE) rolesCB.getValue();
+//
+//
+//                if (firstName == null || firstName.isEmpty() || lastName == null || lastName.isEmpty()
+//                        || userType == null) {
+//                    Message.showError(getUILocaleUtil().getMessage("error.required.fields"));
+//                } else {
+//                    Message.showInfo(getUILocaleUtil().getCaption("firstNameTF") + ":" + firstName
+//                            + "\n" + getUILocaleUtil().getCaption("surnameTF") + ":" + lastName
+//                            + "\n" + getUILocaleUtil().getCaption("rolesCB") + ":" + userType);
+//                }
+//            }
+//
+//        });
+//
+//        Button clearBtn = new Button(getUILocaleUtil().getCaption("clearBtn"));
+//
+//        clearBtn.addClickListener(new Button.ClickListener() {
+//            @Override
+//            public void buttonClick(Button.ClickEvent clickEvent) {
+//                firstNameTF.clear();
+//                surnameTF.clear();
+//                rolesCB.clear();
+//            }
+//
+//        });
+//
+//
+//        HorizontalLayout componentHL = new HorizontalLayout();
+//        componentHL.addComponent(saveBtn);
+//        componentHL.addComponent(clearBtn);
+//        getContent().addComponent(componentHL);
+//        getContent().setComponentAlignment(componentHL, Alignment.MIDDLE_CENTER);
+//
+//        Button usersToLower = new Button("to Lower");
+//        usersToLower.addClickListener(new Button.ClickListener() {
+//            @Override
+//            public void buttonClick(Button.ClickEvent event) {
+//                QueryModel<USERS> usersQM = new QueryModel<>(USERS.class);
+////                usersQM.addWhere();
+//            }
+//        });
+//        getContent().addComponent(usersToLower);
+//    }
 }

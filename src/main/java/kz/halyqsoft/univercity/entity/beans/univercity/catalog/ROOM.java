@@ -17,7 +17,7 @@ public class ROOM extends AbstractEntity {
 
 	private static final long serialVersionUID = -3807935418223922884L;
 
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 1)
+	@FieldInfo(type = EFieldType.FK_COMBO)
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "CORPUS_ID", referencedColumnName = "ID")})
@@ -51,7 +51,11 @@ public class ROOM extends AbstractEntity {
 	@Column(name = "DESCR")
 	private String descr;
 
-
+	@FieldInfo(type = EFieldType.FK_COMBO, order = 9, required = false)
+	@ManyToOne
+	@JoinColumns({
+			@JoinColumn(name = "DEVICE_ID", referencedColumnName = "ID")})
+	private DEVICE device;
 
 	@FieldInfo(type = EFieldType.BOOLEAN, order = 10, required = false, inEdit = false, inGrid = false, inView = false)
 	@Column(name = "DELETED", nullable = false)
@@ -148,6 +152,14 @@ public class ROOM extends AbstractEntity {
 
 	public void setUpdated(Date updated) {
 		this.updated = updated;
+	}
+
+	public DEVICE getDevice() {
+		return device;
+	}
+
+	public void setDevice(DEVICE device) {
+		this.device = device;
 	}
 
 	@Override
