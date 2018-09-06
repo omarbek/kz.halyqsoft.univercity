@@ -76,34 +76,24 @@ public class CommonUtils {
         return null;
     }
 
-    public static List<ROLES> getCurrentUserRolesList(){
+    public static List<ROLES> getCurrentUserRolesList() {
         ArrayList<ROLES> roles = new ArrayList<>();
         QueryModel<USER_ROLES> userRolesQM = new QueryModel<>(USER_ROLES.class);
-        userRolesQM.addWhere("user", ECriteria.EQUAL , getCurrentUser().getId());
+        userRolesQM.addWhere("user", ECriteria.EQUAL, getCurrentUser().getId());
 
         List<USER_ROLES> userRoles = new ArrayList<>();
-        try{
+        try {
             userRoles.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(userRolesQM));
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
-        for(USER_ROLES ur : userRoles){
+        for (USER_ROLES ur : userRoles) {
             roles.add(ur.getRole());
         }
 
         return roles;
     }
-
-    public static boolean isCurrentUserAdmin(){
-        for(ROLES role : getCurrentUserRolesList()){
-            if(role.getId().getId().longValue()==3){
-                return true;
-            }
-        }
-        return false;
-    }
-
 
     private static STUDENT getStudent(Map<String, Object> params) {
         try {
@@ -261,9 +251,9 @@ public class CommonUtils {
         return login;
     }
 
-    public static String getFormattedDate(Date date){
+    public static String getFormattedDate(Date date) {
         DateFormat formatter = new SimpleDateFormat(DATETIME);
-        return  formatter.format(date);
+        return formatter.format(date);
     }
 
     public static String getCode(String beginYear) {
@@ -297,18 +287,20 @@ public class CommonUtils {
             return null;
         }
     }
+
     public static Label getSemesterIsGoingNowLabel() {
         Label semIsNotGoingNowLabel = new Label();
         semIsNotGoingNowLabel.setCaption(getUILocaleUtil().getMessage("semester.not.going.now"));
         semIsNotGoingNowLabel.setWidthUndefined();
         return semIsNotGoingNowLabel;
     }
+
     public static List<GROUPS> getGroupsByStream(STREAM stream) throws Exception {
         QueryModel<GROUPS> groupsQM = new QueryModel<>(GROUPS.class);
         FromItem streamGroupFI = groupsQM.addJoin(EJoin.INNER_JOIN, "id", STREAM_GROUP.class,
                 "group");
         groupsQM.addWhere(streamGroupFI, "stream", ECriteria.EQUAL, stream.getId());
-        groupsQM.addWhere("deleted",Boolean.FALSE);
+        groupsQM.addWhere("deleted", Boolean.FALSE);
         return SessionFacadeFactory.getSessionFacade(
                 CommonEntityFacadeBean.class).
                 lookup(groupsQM);
@@ -389,5 +381,13 @@ public class CommonUtils {
         }
 
         return sd;
+    }
+
+    public static boolean isAdmin() {
+        if (getCurrentUser().getId().getId().intValue() == 1
+                || getCurrentUser().getId().getId().intValue() == 2) {
+            return true;
+        }
+        return false;
     }
 }

@@ -75,4 +75,18 @@ public class EMPLOYEE extends USERS {
 	public void setEmployeeDepts(Set<EMPLOYEE_DEPT> employeeDepts) {
 		this.employeeDepts = employeeDepts;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(getLastName());
+		sb.append(" ");
+		sb.append(getFirstName());
+		if (getMiddleName() != null) {
+			sb.append(" ");
+			sb.append(getMiddleName());
+		}
+
+		return sb.toString();
+	}
 }

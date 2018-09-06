@@ -18,6 +18,8 @@ import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.ID;
 import org.r3a.common.entity.query.QueryModel;
+import org.r3a.common.entity.query.from.EJoin;
+import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.select.EAggregate;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.view.AbstractCommonView;
@@ -94,6 +96,18 @@ public final class RoomEdit extends AbstractFormWidgetView {
         FKFieldModel equipmentFM1 = (FKFieldModel) equipmentFM.getFieldModel("equipment");
         QueryModel equipmentQM1 = equipmentFM1.getQueryModel();
         equipmentQM1.addOrder("equipmentName");
+
+        QueryModel<ROOM> roomQM = new QueryModel<>(ROOM.class);
+        FromItem deviceFI = roomQM.addJoin(EJoin.INNER_JOIN, "device", DEVICE.class, "id");
+        roomQM.addWhere("deleted", false);
+        List<ROOM> rooms = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(roomQM);
+        List<ID> ids = new ArrayList<>();
+        for (ROOM room : rooms) {
+            ids.add(room.getDevice().getId());
+        }
+        FKFieldModel deviceFKFM = (FKFieldModel) baseDataFM.getFieldModel("device");
+        QueryModel deviceQM = deviceFKFM.getQueryModel();
+        deviceQM.addWhereNotIn("id", ids);
 
         equipContent.addComponent(equipmentTW);
         equipContent.setComponentAlignment(equipmentTW, Alignment.MIDDLE_CENTER);
@@ -245,7 +259,7 @@ public final class RoomEdit extends AbstractFormWidgetView {
                     lookup(ROOM_WORK_HOUR.class, rwh.getId());
             rwhList.add(rwh1);
         }
-        whw = new WorkHourWidget(rwhList, readOnly,baseDataFW.getWidgetModel());
+        whw = new WorkHourWidget(rwhList, readOnly, baseDataFW.getWidgetModel());
         whw.setCaption(getUILocaleUtil().getCaption("time.limit.setting"));
         whw.setLegend1Resource("available");
         whw.setLegend2Resource("not.available");
