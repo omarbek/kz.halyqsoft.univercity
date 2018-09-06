@@ -25,11 +25,11 @@
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://89.40.60.206:5432/univerdb</jdbc-url>
     </data-source>
-    <data-source source="LOCAL" name="univer@localhost" uuid="c5b361e7-1629-4549-9a5b-cf1773eab016">
+    <data-source source="LOCAL" name="vuz@localhost" uuid="c5b361e7-1629-4549-9a5b-cf1773eab016">
       <driver-ref>mysql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.mysql.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql://localhost:3306/univer</jdbc-url>
+      <jdbc-url>jdbc:mysql://localhost:3306/vuz</jdbc-url>
       <driver-properties>
         <property name="autoReconnect" value="true" />
         <property name="zeroDateTimeBehavior" value="convertToNull" />

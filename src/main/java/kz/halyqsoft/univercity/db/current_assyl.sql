@@ -155,3 +155,13 @@ ALTER TABLE practice_information
 FOREIGN KEY (entrance_year_id) REFERENCES entrance_year(id);
 
 ALTER TABLE practice_information ADD CONSTRAINT  unique_groups_entrance_year UNIQUE (groups_id,entrance_year_id);
+
+INSERT INTO nationality
+VALUES
+  (nextval('s_nationality') , 'Карачаевец');
+INSERT INTO nationality
+VALUES
+  (nextval('s_nationality') , 'Ингуш');
+INSERT INTO nationality
+VALUES
+  (nextval('s_nationality') , 'Араб');
