@@ -187,11 +187,6 @@
 			<artifactId>httpclient</artifactId>
 			<version>4.5.5</version>
 		</dependency>
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-push</artifactId>
-			<version>8.4.2</version>
-		</dependency>
 		<!--<dependency>-->
 		<!--<groupId>javax.json</groupId>-->
 		<!--<artifactId>javax.json-api</artifactId>-->
@@ -212,6 +207,11 @@
 			<artifactId>postgresql</artifactId>
 			<version>9.4-1200-jdbc41</version>
 		</dependency>
+		<!--<dependency>-->
+			<!--<groupId>com.vaadin</groupId>-->
+			<!--<artifactId>vaadin-push</artifactId>-->
+			<!--<version>8.5.1</version>-->
+		<!--</dependency>-->
 
 		<!--last-->
 	</dependencies>

@@ -335,7 +335,10 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
                         if (employeeByDepartmentGW.getSelectedEntity() != null) {
                             DetalizationDialog detalizationDialog = null;
                             try {
-                                detalizationDialog = new DetalizationDialog(CommonUtils.getUILocaleUtil().getCaption("detalization"), SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(USERS.class, (employeeByDepartmentGW.getSelectedEntity().getId())), date.getValue());
+                                detalizationDialog = new DetalizationDialog(CommonUtils.getUILocaleUtil().
+                                        getCaption("detalization"), SessionFacadeFactory.getSessionFacade(
+                                        CommonEntityFacadeBean.class).lookup(USERS.class,
+                                        (employeeByDepartmentGW.getSelectedEntity().getId())), date.getValue());
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }

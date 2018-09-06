@@ -1,8 +1,6 @@
 package kz.halyqsoft.univercity.modules.individualeducationplan.mass;
 
 import com.vaadin.data.Container;
-import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.SelectionEvent;
 import com.vaadin.event.SelectionEvent.SelectionListener;
@@ -648,7 +646,7 @@ public class RegistrationView extends AbstractTaskView {
                     "a.ID = c.STUDENT_ID and c.CHILD_ID is null inner join DEPARTMENT d on c.FACULTY_ID = d.ID " +
                     "inner join SPECIALITY e on c.SPECIALITY_ID = e.ID where exists (select 1 from STUDENT_SUBJECT f " +
                     "where f.STUDENT_ID = c.ID and f.SUBJECT_ID = ?1 and f.DELETED = ?2) ";
-            if(!CommonUtils.isCurrentUserAdmin()){
+            if(!CommonUtils.isAdmin()){
                 sql = sql + " and a.advisor_id = " + CommonUtils.getCurrentUser().getId().getId().longValue();
             }
 

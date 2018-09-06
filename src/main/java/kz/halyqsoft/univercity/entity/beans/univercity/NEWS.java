@@ -1,18 +1,13 @@
 package kz.halyqsoft.univercity.entity.beans.univercity;
 
+import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEPARTMENT;
 import org.r3a.common.entity.AbstractEntity;
+import org.r3a.common.entity.EFieldType;
+import org.r3a.common.entity.FieldInfo;
 
+import javax.persistence.*;
 import java.util.Date;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 /**
  * @author Omarbek
@@ -20,127 +15,135 @@ import javax.persistence.TemporalType;
  */
 @Entity
 public class NEWS extends AbstractEntity {
-	
-	private static final long serialVersionUID = 3206193597609281983L;
 
-	@ManyToOne
+    private static final long serialVersionUID = 3206193597609281983L;
+
+    @FieldInfo(type = EFieldType.FK_COMBO, inEdit = false)
+    @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "DEPT_ID", referencedColumnName = "ID")})
+            @JoinColumn(name = "DEPT_ID", referencedColumnName = "ID")})
     private DEPARTMENT department;
-	
-	@ManyToOne
+
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 2, inEdit = false)
+    @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "USER_ID", referencedColumnName = "ID", nullable = false)})
-    private EMPLOYEE employee;
-	
-	@Column(name = "TOPIC", nullable = false)
-	private String topic;
-	
-	@Column(name = "NEWS_BODY", nullable = false)
+            @JoinColumn(name = "USER_ID", referencedColumnName = "ID", nullable = false)})
+    private USERS user;
+
+    @FieldInfo(type = EFieldType.TEXT, order = 3)
+    @Column(name = "TOPIC", nullable = false)
+    private String topic;
+
+    @FieldInfo(type = EFieldType.TEXT, order = 4)
+    @Column(name = "NEWS_BODY", nullable = false)
     @Lob
     private String newsBody;
-	
-	@Column(name = "LINK")
-	private String link;
-	
-	@Column(name = "GLOBAL_NEWS", nullable = false)
-    private boolean globalNews;
-	
-	@Column(name = "CREATED", nullable = false)
+
+    @FieldInfo(type = EFieldType.TEXT, order = 5, required = false)
+    @Column(name = "LINK")
+    private String link;
+
+    @FieldInfo(type = EFieldType.DATETIME, order = 7, inEdit = false)
+    @Column(name = "CREATED", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date created;
-	
-	@Column(name = "UPDATED")
+
+    @Column(name = "UPDATED")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updated;
-	
-	@Column(name = "EXPIRE_DATE")
+
+    @FieldInfo(type = EFieldType.DATETIME, order = 8)
+    @Column(name = "EXPIRE_DATE")
     @Temporal(TemporalType.TIMESTAMP)
     private Date expireDate;
-	
-	@Column(name = "DELETED", nullable = false)
+
+    @FieldInfo(type = EFieldType.BOOLEAN, order = 9, required = false)
+    @Column(name = "GLOBAL_NEWS", nullable = false)
+    private boolean globalNews;
+
+    @Column(name = "DELETED", nullable = false)
     private boolean deleted;
 
-	public NEWS() {
-	}
+    public NEWS() {
+    }
 
-	public DEPARTMENT getDepartment() {
-		return department;
-	}
+    public DEPARTMENT getDepartment() {
+        return department;
+    }
 
-	public void setDepartment(DEPARTMENT department) {
-		this.department = department;
-	}
+    public void setDepartment(DEPARTMENT department) {
+        this.department = department;
+    }
 
-	public EMPLOYEE getEmployee() {
-		return employee;
-	}
+    public USERS getUser() {
+        return user;
+    }
 
-	public void setEmployee(EMPLOYEE employee) {
-		this.employee = employee;
-	}
+    public void setUser(USERS user) {
+        this.user = user;
+    }
 
-	public String getTopic() {
-		return topic;
-	}
+    public String getTopic() {
+        return topic;
+    }
 
-	public void setTopic(String topic) {
-		this.topic = topic;
-	}
+    public void setTopic(String topic) {
+        this.topic = topic;
+    }
 
-	public String getNewsBody() {
-		return newsBody;
-	}
+    public String getNewsBody() {
+        return newsBody;
+    }
 
-	public void setNewsBody(String newsBody) {
-		this.newsBody = newsBody;
-	}
+    public void setNewsBody(String newsBody) {
+        this.newsBody = newsBody;
+    }
 
-	public String getLink() {
-		return link;
-	}
+    public String getLink() {
+        return link;
+    }
 
-	public void setLink(String link) {
-		this.link = link;
-	}
+    public void setLink(String link) {
+        this.link = link;
+    }
 
-	public boolean isGlobalNews() {
-		return globalNews;
-	}
+    public boolean isGlobalNews() {
+        return globalNews;
+    }
 
-	public void setGlobalNews(boolean globalNews) {
-		this.globalNews = globalNews;
-	}
+    public void setGlobalNews(boolean globalNews) {
+        this.globalNews = globalNews;
+    }
 
-	public Date getCreated() {
-		return created;
-	}
+    public Date getCreated() {
+        return created;
+    }
 
-	public void setCreated(Date created) {
-		this.created = created;
-	}
+    public void setCreated(Date created) {
+        this.created = created;
+    }
 
-	public Date getUpdated() {
-		return updated;
-	}
+    public Date getUpdated() {
+        return updated;
+    }
 
-	public void setUpdated(Date updated) {
-		this.updated = updated;
-	}
+    public void setUpdated(Date updated) {
+        this.updated = updated;
+    }
 
-	public Date getExpireDate() {
-		return expireDate;
-	}
+    public Date getExpireDate() {
+        return expireDate;
+    }
 
-	public void setExpireDate(Date expireDate) {
-		this.expireDate = expireDate;
-	}
+    public void setExpireDate(Date expireDate) {
+        this.expireDate = expireDate;
+    }
 
-	public boolean isDeleted() {
-		return deleted;
-	}
+    public boolean isDeleted() {
+        return deleted;
+    }
 
-	public void setDeleted(boolean deleted) {
-		this.deleted = deleted;
-	}
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
 }

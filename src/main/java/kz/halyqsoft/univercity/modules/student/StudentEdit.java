@@ -27,7 +27,6 @@ import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.facade.CommonIDFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
-import org.r3a.common.entity.FieldInfo;
 import org.r3a.common.entity.ID;
 import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.file.FileBean;
@@ -889,9 +888,6 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         educationTM.getColumnModel("entryYear").setAlignment(Align.CENTER);
         educationTM.getColumnModel("endYear").setAlignment(Align.CENTER);
 
-
-        educationTM.getColumnModel("specialityName").setInTable(false);
-        educationTM.getColumnModel("qualification").setInTable(false);
         QueryModel educationQM = educationTM.getQueryModel();
         educationUDFI = educationQM.addJoin(EJoin.INNER_JOIN, "id", USER_DOCUMENT.class, "id");
         educationQM.addWhere(educationUDFI, "deleted", Boolean.FALSE);
@@ -1522,11 +1518,6 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         if (source.equals(educationTW)) {
 
             FormModel educationFM = ((DBTableModel) educationTW.getWidgetModel()).getFormModel();
-            educationFM.getFieldModel("specialityName").setInEdit(false);
-            educationFM.getFieldModel("specialityName").setInView(false);
-
-            educationFM.getFieldModel("qualification").setInEdit(false);
-            educationFM.getFieldModel("qualification").setInView(false);
 
             FKFieldModel schoolCountryFieldModel = (FKFieldModel) educationFM.getFieldModel("schoolCountry");
             QueryModel schoolCountryQM = schoolCountryFieldModel.getQueryModel();

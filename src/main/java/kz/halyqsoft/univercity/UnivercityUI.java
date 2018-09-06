@@ -1,6 +1,7 @@
 package kz.halyqsoft.univercity;
 
 import com.vaadin.annotations.Theme;
+import com.vaadin.ui.Label;
 import kz.halyqsoft.univercity.entity.beans.*;
 import org.r3a.common.dblink.lifecycle.LifecycleManager;
 import org.r3a.common.dblink.utils.DBLink;
@@ -18,10 +19,13 @@ import java.util.Locale;
  * @author Omarbek
  * Created: 09.03.2018 22:49
  */
+//@Push
 @Theme("univercity")
 public class UnivercityUI extends AbstractSecureWebUI {
 
     private static final Logger LOG = LoggerFactory.getLogger(UnivercityUI.class);
+
+    Label label = new Label("Now : ");
 
     @Override
     public void attach() {
@@ -36,6 +40,56 @@ public class UnivercityUI extends AbstractSecureWebUI {
             LifecycleManager.getInstance().start(SETTINGS.class);
         } catch (Exception ex) {
             LOG.error("Unable to start application: ", ex);
+        }
+//        setContent( this.label );
+//
+//        Start the data feed thread
+//        new FeederThread().start();
+    }
+
+    public void tellTime ()
+    {
+        label.setValue( "Now : " + new java.util.Date() ); // If Java 8, use: Instant.now(). Or, in Joda-Time: DateTime.now().
+    }
+
+    class FeederThread extends Thread
+    {
+
+        int count = 0;
+
+        @Override
+        public void run ()
+        {
+            try {
+                // Update the data for a while
+                while ( count < 100 ) {
+                    Thread.sleep( 1000 );
+
+                    // Calling special 'access' method on UI object, for inter-thread communication.
+                    access( new Runnable()
+                    {
+                        @Override
+                        public void run ()
+                        {
+                            count ++;
+                            tellTime();
+                        }
+                    } );
+                }
+
+                // Inform that we have stopped running
+                // Calling special 'access' method on UI object, for inter-thread communication.
+                access( new Runnable()
+                {
+                    @Override
+                    public void run ()
+                    {
+                        label.setValue( "Done." );
+                    }
+                } );
+            } catch ( InterruptedException e ) {
+                e.printStackTrace();
+            }
         }
     }
 

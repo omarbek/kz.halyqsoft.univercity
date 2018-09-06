@@ -64,8 +64,9 @@ public class ReportView extends AbstractTaskView {
     private static final String SELECTION_COMMITTEE = "selection_committee";
     private static final String B = "b";
 
-    private static final String JASPER_REPORT_URL = "http://78.40.108.39:8080/jasperreport/GenerateReport";
+//    private static final String JASPER_REPORT_URL = "http://185.22.64.89:8080/jasperreport/GenerateReport";
 //    private static final String JASPER_REPORT_URL = "http://localhost:8080/jasperreport/GenerateReport";
+    private static final String JASPER_REPORT_URL = "http://89.40.60.206:8080/jasperreport/GenerateReport";
 
     public ReportView(AbstractTask task) throws Exception {
         super(task);
@@ -281,7 +282,7 @@ public class ReportView extends AbstractTaskView {
                     bytes = Base64.decodeBase64(jsonObject.get("byteArrayOutputStream").toString());
 
                 } catch (Exception e) {
-                    CommonUtils.showMessageAndWriteLog("Unable send params or get bytes", e);
+                    CommonUtils.showMessageAndWriteLog("Unable to send params or get bytes", e);
                 }
                 return new ByteArrayInputStream(bytes);
             }

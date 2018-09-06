@@ -16,34 +16,32 @@ import java.util.Date;
 @Entity
 public class V_STUDENT extends AbstractEntity {
 
-    private static final long serialVersionUID = -3396080148467585560L;
-
-    @FieldInfo(type = EFieldType.TEXT, max = 12, order = 1, required = false, columnWidth = 120)
+    @FieldInfo(type = EFieldType.TEXT, max = 12, required = false, columnWidth = 120)
     @Column(name = "USER_CODE")
     private String userCode;
-
-    @FieldInfo(type = EFieldType.TEXT, max = 32, order = 3, required = false)
-    @Column(name = "FIRST_NAME", nullable = false)
-    private String firstName;
 
     @FieldInfo(type = EFieldType.TEXT, max = 32, order = 2, required = false)
     @Column(name = "LAST_NAME", nullable = false)
     private String lastName;
 
-    @FieldInfo(type = EFieldType.TEXT, max = 32, order = 4, required = false, inGrid = false, inEdit = false, inView = false)
-    @Column(name = "MIDDLE_NAME", nullable = true)
-    private String middleName;
+    @FieldInfo(type = EFieldType.TEXT, max = 32, order = 3, required = false)
+    @Column(name = "FIRST_NAME", nullable = false)
+    private String firstName;
 
-    @FieldInfo(type = EFieldType.TEXT_LATIN, max = 32, order = 6, inGrid = false, inEdit = false, inView = false)
-    @Column(name = "FIRST_NAME_EN", nullable = false)
-    private String firstNameEN;
+    @FieldInfo(type = EFieldType.TEXT, max = 32, order = 4, required = false, inGrid = false, inEdit = false, inView = false)
+    @Column(name = "MIDDLE_NAME")
+    private String middleName;
 
     @FieldInfo(type = EFieldType.TEXT_LATIN, max = 32, order = 5, inGrid = false, inEdit = false, inView = false)
     @Column(name = "LAST_NAME_EN", nullable = false)
     private String lastNameEN;
 
+    @FieldInfo(type = EFieldType.TEXT_LATIN, max = 32, order = 6, inGrid = false, inEdit = false, inView = false)
+    @Column(name = "FIRST_NAME_EN", nullable = false)
+    private String firstNameEN;
+
     @FieldInfo(type = EFieldType.TEXT_LATIN, max = 32, order = 7, required = false, inGrid = false, inEdit = false, inView = false)
-    @Column(name = "MIDDLE_NAME_EN", nullable = true)
+    @Column(name = "MIDDLE_NAME_EN")
     private String middleNameEN;
 
     @FieldInfo(type = EFieldType.DATE, order = 8, inGrid = false, inEdit = false, inView = false)
@@ -261,22 +259,55 @@ public class V_STUDENT extends AbstractEntity {
     @Column(name = "GROUP_NAME", nullable = false)
     private String groupName;
 
-    @FieldInfo(type = EFieldType.BOOLEAN, order = 53, required = false, inEdit = false, inGrid = false, inView = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 53, inGrid = false, required = false)
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "DIPLOMA_TYPE_ID", referencedColumnName = "ID")})
+    private STUDENT_DIPLOMA_TYPE diplomaType;
+
+    @FieldInfo(type = EFieldType.TEXT, order = 54, inEdit = false, inView = false)
+    @Column(name = "DIPLOMA_TYPE_NAME", nullable = false)
+    private String diplomaTypeName;
+
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 55, inGrid = false, required = false)
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "ADVISOR_ID", referencedColumnName = "ID")})
+    private V_ADVISOR advisor;
+
+    @FieldInfo(type = EFieldType.TEXT, order = 56, inEdit = false, inView = false)
+    @Column(name = "ADVISOR", nullable = false)
+    private String advisorName;
+
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 57, inGrid = false, required = false)
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "COORDINATOR_ID", referencedColumnName = "ID")})
+    private V_COORDINATOR coordinator;
+
+    @FieldInfo(type = EFieldType.TEXT, order = 58, inEdit = false, inView = false)
+    @Column(name = "COORDINATOR", nullable = false)
+    private String coordinatorName;
+
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 59, inGrid = false, required = false)
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "LANGUAGE_ID", referencedColumnName = "ID")})
+    private LANGUAGE language;
+
+    @FieldInfo(type = EFieldType.BOOLEAN, order = 60, required = false, inEdit = false, inGrid = false, inView = false)
     @Column(name = "DELETED", nullable = false)
     private boolean deleted;
 
-    @FieldInfo(type = EFieldType.DATETIME, order = 54, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false)
+    @FieldInfo(type = EFieldType.DATETIME, order = 61, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false)
     @Column(name = "CREATED")
     @Temporal(TemporalType.TIMESTAMP)
     private Date created;
 
-    @FieldInfo(type = EFieldType.DATETIME, order = 55, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false)
+    @FieldInfo(type = EFieldType.DATETIME, order = 62, required = false, readOnlyFixed = true, inGrid = false, inEdit = false, inView = false)
     @Column(name = "UPDATED")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updated;
-
-    public V_STUDENT() {
-    }
 
     public String getFirstName() {
         return firstName;
@@ -716,6 +747,22 @@ public class V_STUDENT extends AbstractEntity {
 
     public void setGroupName(String groupName) {
         this.groupName = groupName;
+    }
+
+    public STUDENT_DIPLOMA_TYPE getDiplomaType() {
+        return diplomaType;
+    }
+
+    public void setDiplomaType(STUDENT_DIPLOMA_TYPE diplomaType) {
+        this.diplomaType = diplomaType;
+    }
+
+    public String getDiplomaTypeName() {
+        return diplomaTypeName;
+    }
+
+    public void setDiplomaTypeName(String diplomaTypeName) {
+        this.diplomaTypeName = diplomaTypeName;
     }
 
     @Override

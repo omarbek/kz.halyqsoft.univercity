@@ -53,7 +53,7 @@ public class StudentDormView extends AbstractTaskView {
 
         QueryModel<STUDENT_EDUCATION> studentQM = new QueryModel<STUDENT_EDUCATION>(STUDENT_EDUCATION.class);
         studentQM.addWhere("student", ECriteria.EQUAL, CommonUtils.getCurrentUser().getId());
-        studentQM.addWhereNull("child");
+        studentQM.addWhereNullAnd("child");
 
         buildingCB = new ComboBox(getUILocaleUtil().getCaption("building"));
         buildingCB.setRequired(true);
@@ -261,8 +261,7 @@ public class StudentDormView extends AbstractTaskView {
             String sql = "SELECT stu.* " +
                     "FROM dorm_student stu " +
                     "  INNER JOIN student_education stu_edu ON stu.student_id = stu_edu.id AND stu_edu.child_id IS NULL " +
-                    //"WHERE stu_edu.student_id = ?1"; /*AND stu.check_in_date IS NOT NULL AND stu.request_status_id = 1"*/
-                    "WHERE stu_edu.student_id = ?1 AND stu.check_in_date IS NOT NULL AND stu.request_status_id = 1 AND stu.deleted = FALSE ";
+                    "WHERE stu_edu.student_id = ?1 AND stu.deleted = FALSE AND stu.check_in_date IS NOT NULL AND stu.request_status_id = 1";
             Map<Integer, Object> params = new HashMap<>();
             params.put(1,CommonUtils.getCurrentUser().getId().getId());
             DORM_STUDENT ds = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(sql, params,

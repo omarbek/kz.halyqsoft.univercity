@@ -86,7 +86,7 @@ public class EDUCATION_DOC extends USER_DOCUMENT {
 	@Column(name = "END_YEAR")
     private Integer endYear;
 
-	@FieldInfo(type = EFieldType.TEXT, max = 64, order = 19,required=false, inGrid = false)
+	@FieldInfo(type = EFieldType.TEXT, max = 64, order = 19,required=false, inGrid = false,inView = false, inEdit = false)
 	@Column(name = "speciality_name")
 	private String specialityName;
 
@@ -94,7 +94,7 @@ public class EDUCATION_DOC extends USER_DOCUMENT {
 	@Column(name = "FACULTY_NAME", nullable = true)
 	private String facultyName;
 
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 24, inGrid = false, required = false)
+	@FieldInfo(type = EFieldType.FK_COMBO, order = 24, inGrid = false, required = false, inView = false, inEdit = false)
 	@ManyToOne
 	@JoinColumns({
 			@JoinColumn(name = "QUALIFICATION_ID", referencedColumnName = "ID")})
