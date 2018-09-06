@@ -40,3 +40,6 @@ ALTER TABLE student_attendance_log
   ADD CONSTRAINT fk_student_attendance_log_room FOREIGN KEY (room_id)
 REFERENCES room (id)
 ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE accountant_price
+  ADD price_in_letters_kaz VARCHAR(255) NOT NULL DEFAULT 0;
