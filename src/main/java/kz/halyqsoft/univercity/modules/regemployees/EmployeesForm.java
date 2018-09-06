@@ -51,6 +51,24 @@ public class EmployeesForm extends UsersForm {
         super(dataFM, entranceYear);
 
         getButtonsVL().removeComponent(getPreemRightButton());
+
+        getEduDocButton().addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                FormModel educationFM = getEducationDoc().getMainGFW().getWidgetModel();
+
+                educationFM.getFieldModel("specialityName").setInView(true);
+                educationFM.getFieldModel("specialityName").setInEdit(true);
+                educationFM.getFieldModel("specialityName").setRequired(true);
+
+                educationFM.getFieldModel("qualification").setInView(true);
+                educationFM.getFieldModel("qualification").setInEdit(true);
+                educationFM.getFieldModel("qualification").setRequired(true);
+
+                addToLayout(Flag.EDU_DOC, getEducationDoc().getMainGFW(), getEduDocsButton(), clickEvent);
+            }
+        });
+
         getEduDocsButton().addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {

@@ -367,7 +367,7 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
                 } else if (iinTF.getValue().length() < 12) {
                     Message.showError(getUILocaleUtil().getMessage("incorrect.iin"));
                     isFinding = false;
-                } else if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.EDU_DOC.equals(flag)))
+                 } else if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.EDU_DOC.equals(flag)))
                         || !(Flag.MAIN_DATA.equals(flag) || Flag.EDU_DOC.equals(flag))) {
 
                     flag = Flag.EDU_DOCS;
@@ -1333,5 +1333,17 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
 
     public Button getMedButton() {
         return medButton;
+    }
+
+    public Button getEduDocButton() {
+        return eduDocButton;
+    }
+
+    public void setEduDocButton(Button eduDocButton) {
+        this.eduDocButton = eduDocButton;
+    }
+
+    public EducationDoc getEducationDoc() {
+        return educationDoc;
     }
 }
