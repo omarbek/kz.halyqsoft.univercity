@@ -43,3 +43,20 @@ ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 ALTER TABLE accountant_price
   ADD price_in_letters_kaz VARCHAR(255) NOT NULL DEFAULT 0;
+
+ALTER TABLE practice_information ADD COLUMN entrance_year_id BIGINT NOT NULL ;
+ALTER TABLE practice_information
+  ADD CONSTRAINT fk_practice_information_entrance_year
+FOREIGN KEY (entrance_year_id) REFERENCES entrance_year(id);
+
+ALTER TABLE practice_information ADD CONSTRAINT  unique_groups_entrance_year UNIQUE (groups_id,entrance_year_id);
+
+INSERT INTO nationality
+VALUES
+  (nextval('s_nationality') , 'Карачаевец');
+INSERT INTO nationality
+VALUES
+  (nextval('s_nationality') , 'Ингуш');
+INSERT INTO nationality
+VALUES
+  (nextval('s_nationality') , 'Араб');
