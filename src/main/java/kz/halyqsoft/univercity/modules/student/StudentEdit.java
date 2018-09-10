@@ -2432,7 +2432,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
             }
 
             try {
-                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(delList);
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(delList);
                 differenceTW.refresh();
             } catch (Exception ex) {
                 LOG.error("Unable to delete subject: ", ex);

@@ -1450,7 +1450,8 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
                     if (sum != null) {
                         vPreviousExperience.setWorkPeriod(String.valueOf(sum.getYears())
                                 + " " + getUILocaleUtil().getCaption("experienceL.year") + " "
-                                + String.valueOf(sum.getMonths()) + " " + getUILocaleUtil().getCaption("experienceL.month"));
+                                + String.valueOf(sum.getMonths()) + " " + getUILocaleUtil().getCaption("experienceL.month")+" "
+                                + String.valueOf(sum.getDays()) + " " + getUILocaleUtil().getCaption("experienceL.day"));
                         list.add(vPreviousExperience);
                     }
 

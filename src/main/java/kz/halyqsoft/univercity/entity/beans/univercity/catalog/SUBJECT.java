@@ -1,5 +1,6 @@
 package kz.halyqsoft.univercity.entity.beans.univercity.catalog;
 
+import kz.halyqsoft.univercity.entity.beans.univercity.PRACTICE_TYPE;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
@@ -26,6 +27,12 @@ public class SUBJECT extends AbstractEntity {
     @FieldInfo(type = EFieldType.TEXT, max = 256, order = 3)
     @Column(name = "NAME_RU", nullable = false)
     private String nameRU;
+
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 4, inGrid = false,required = false)
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "PRACTICE_TYPE_ID", referencedColumnName = "ID")})
+    private PRACTICE_TYPE practiceType;
 
     @FieldInfo(type = EFieldType.FK_DIALOG, order = 5, inGrid = false)
     @ManyToOne
@@ -336,5 +343,13 @@ public class SUBJECT extends AbstractEntity {
 
     public void setWeekNumber(Integer weekNumber) {
         this.weekNumber = weekNumber;
+    }
+
+    public PRACTICE_TYPE getPracticeType() {
+        return practiceType;
+    }
+
+    public void setPracticeType(PRACTICE_TYPE practiceType) {
+        this.practiceType = practiceType;
     }
 }
