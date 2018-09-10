@@ -9,8 +9,11 @@ import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_ARRIVAL;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.TURNSTILE_TYPE;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.USER_TYPE;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.VDepartmentInfo;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.VEmployeeInfo;
 import kz.halyqsoft.univercity.filter.FUserFilter;
 import kz.halyqsoft.univercity.filter.panel.UserFilterPanel;
+import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.PrintDialog;
 import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.SignDialog;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.SampleEntityListener;
@@ -36,6 +39,7 @@ public class SigningReport extends SampleEntityListener implements FilterPanelLi
     private VerticalLayout mainVL;
     private GridWidget usersGW;
     private DBGridModel usersGM;
+    private Button printBtn;
     List <ID> restrictedIDs = new ArrayList();
     public SigningReport(){
         restrictedIDs.add(ID.valueOf(1));
@@ -65,9 +69,9 @@ public class SigningReport extends SampleEntityListener implements FilterPanelLi
         usersGM.setHeightMode(HeightMode.CSS);
 
 
-        usersGM.getColumnModel("manuallySigned").setInGrid(true);
+        usersGM.getColumnModel("manuallySigned").setInGrid(false);
+        usersGM.getColumnModel("comeIn").setInGrid(false);
         usersGM.getColumnModel("user").setInGrid(true);
-        usersGM.getColumnModel("comeIn").setInGrid(true);
 
         for(GridColumnModel gcm : usersGM.getColumnModels()){
             gcm.setInGrid(true);
@@ -75,10 +79,41 @@ public class SigningReport extends SampleEntityListener implements FilterPanelLi
 
         usersGM.getFormModel().getFieldModel("manuallySigned").setInView(true);
         usersGM.getFormModel().getFieldModel("manuallySigned").setInEdit(true);
-        usersGM.getFormModel().getFieldModel("user").setInView(true);
-        usersGM.getFormModel().getFieldModel("user").setInEdit(true);
         usersGM.getFormModel().getFieldModel("comeIn").setInView(true);
         usersGM.getFormModel().getFieldModel("comeIn").setInEdit(true);
+
+
+        printBtn = new Button(CommonUtils.getUILocaleUtil().getCaption("export"));
+        printBtn.setImmediate(true);
+        printBtn.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                List<String> tableHeader = new ArrayList<>();
+                List<List<String>> tableBody = new ArrayList<>();
+
+                String fileName = "document";
+
+                if (mainVL.getComponentIndex(usersGW) != -1) {
+                    for (GridColumnModel gcm : usersGM.getColumnModels()) {
+                        tableHeader.add(gcm.getLabel());
+                    }
+                    for (int i = 0; i < usersGW.getAllEntities().size(); i++) {
+                        USER_ARRIVAL userArrival = (USER_ARRIVAL) usersGW.getAllEntities().get(i);
+                        if (usersGW.getCaption() != null) {
+                            fileName = usersGW.getCaption();
+                        }
+                        List<String> list = new ArrayList<>();
+                        list.add(userArrival.getUser().toString());
+                        list.add(userArrival.getCreated().toString());
+                        list.add(userArrival.getTurnstileType().toString());
+                        tableBody.add(list);
+                    }
+
+                    PrintDialog printDialog = new PrintDialog(tableHeader, tableBody, CommonUtils.getUILocaleUtil().getCaption("print"), fileName);
+
+                }
+            }
+        });
 
         FUserFilter fUserFilter = (FUserFilter) filterPanel.getFilterBean();
         if (fUserFilter.hasFilter()) {
@@ -92,6 +127,8 @@ public class SigningReport extends SampleEntityListener implements FilterPanelLi
         mainVL.addComponent(filterPanel);
         mainVL.setComponentAlignment(filterPanel, Alignment.MIDDLE_CENTER);
 
+        mainVL.addComponent(printBtn);
+        mainVL.setComponentAlignment(printBtn, Alignment.TOP_RIGHT);
         mainVL.addComponent(usersGW);
         doFilter(filterPanel.getFilterBean()
         );
@@ -107,8 +144,7 @@ public class SigningReport extends SampleEntityListener implements FilterPanelLi
         return super.preCreate(o, i);
     }
 
-    public VerticalLayout getMainVL() {
-        return mainVL;
+    public VerticalLayout getMainVL() { return mainVL;
     }
 
     @Override

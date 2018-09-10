@@ -335,10 +335,7 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
                         if (employeeByDepartmentGW.getSelectedEntity() != null) {
                             DetalizationDialog detalizationDialog = null;
                             try {
-                                detalizationDialog = new DetalizationDialog(CommonUtils.getUILocaleUtil().
-                                        getCaption("detalization"), SessionFacadeFactory.getSessionFacade(
-                                        CommonEntityFacadeBean.class).lookup(USERS.class,
-                                        (employeeByDepartmentGW.getSelectedEntity().getId())), date.getValue());
+                                detalizationDialog = new DetalizationDialog(CommonUtils.getUILocaleUtil().getCaption("detalization"), SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(USERS.class, (employeeByDepartmentGW.getSelectedEntity().getId())), date.getValue());
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -354,10 +351,13 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
                 secondHL.addComponent(backButton);
                 secondHL.setComponentAlignment(backButton, Alignment.MIDDLE_LEFT);
                 secondHL.addComponent(date);
-                secondHL.setComponentAlignment(date, Alignment.MIDDLE_CENTER);
+                secondHL.setComponentAlignment(date, Alignment.TOP_CENTER);
 
                 secondHL.addComponent(detalizationBtn);
                 secondHL.setComponentAlignment(detalizationBtn, Alignment.TOP_RIGHT);
+
+                secondHL.addComponent(printBtn);
+                secondHL.setComponentAlignment(printBtn, Alignment.TOP_RIGHT);
                 tableVL.addComponent(secondHL);
                 tableVL.addComponent(employeeByDepartmentGW);
                 mainHL.addComponent(tableVL);
@@ -424,6 +424,7 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
         absentDayCB.setTextInputAllowed(true);
         absentDayCB.setFilteringMode(FilteringMode.CONTAINS);
         absentDayCB.setWidth(300, Unit.PIXELS);
+
     }
 
     public void setDepartmentInfo() {

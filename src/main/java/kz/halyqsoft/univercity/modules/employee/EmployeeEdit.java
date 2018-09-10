@@ -1193,7 +1193,6 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         regionFactFM.getListeners().add(new RegionChangeListener(cityFact, cityFactFM));
         cityFactFM.getListeners().add(new CityChangeListener(villageFact, villageFactFM));
 
-        formsGL.addComponent(addressFactFW);
 
         content.addComponent(formsGL);
         content.setComponentAlignment(formsGL, Alignment.MIDDLE_CENTER);

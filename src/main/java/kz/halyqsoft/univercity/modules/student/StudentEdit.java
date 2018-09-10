@@ -1174,7 +1174,6 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
             differenceTW.addEntityListener(this);
             differenceTW.setImmediate(true);
             differenceTW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
-            differenceTW.setButtonVisible(AbstractToolbar.DELETE_BUTTON, true);
 
             DBTableModel educationTM = (DBTableModel) differenceTW.getWidgetModel();
             educationTM.setReadOnly(readOnly);
@@ -2420,12 +2419,13 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
 
             return false;
         }else if (source.equals(differenceTW)) {
+
             List<STUDENT_DIFFERENCE> delList = new ArrayList<>();
             for (Entity e : entities) {
                 try {
-                    STUDENT_DIFFERENCE mc = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(STUDENT_DIFFERENCE.class, e.getId());
-                    delList.add(mc);
-                    differenceTW.refresh();
+                    STUDENT_DIFFERENCE studentDifference = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(STUDENT_DIFFERENCE.class, e.getId());
+                    studentDifference.setDeleted(true);
+                    delList.add(studentDifference);
                 } catch (Exception ex) {
                     CommonUtils.showMessageAndWriteLog("Unable to delete subject", ex);
                 }

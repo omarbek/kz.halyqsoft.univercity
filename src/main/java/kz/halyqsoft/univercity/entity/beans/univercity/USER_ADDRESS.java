@@ -30,7 +30,7 @@ public class USER_ADDRESS extends AbstractEntity {
             @JoinColumn(name = "ADDRESS_TYPE_ID", referencedColumnName = "ID")})
     private ADDRESS_TYPE addressType;
 
-    @FieldInfo(type = EFieldType.TEXT, order = 3, required = false, max = 6)
+    @FieldInfo(type = EFieldType.TEXT, order = 3, required = false, max = 7)
     @Column(name = "POSTAL_CODE")
     private String postalCode;
 
