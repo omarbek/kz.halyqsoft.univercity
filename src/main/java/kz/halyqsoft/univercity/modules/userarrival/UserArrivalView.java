@@ -66,7 +66,6 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
 
     @Override
     public void initView(boolean b) throws Exception {
-
         mainHSP = new HorizontalSplitPanel();
         mainHSP.setSizeFull();
         mainHSP.setSplitPosition(20);
