@@ -1349,4 +1349,16 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
     public Button getMedButton() {
         return medButton;
     }
+
+    public Button getEduDocButton() {
+        return eduDocButton;
+    }
+
+    public void setEduDocButton(Button eduDocButton) {
+        this.eduDocButton = eduDocButton;
+    }
+
+    public EducationDoc getEducationDoc() {
+        return educationDoc;
+    }
 }
