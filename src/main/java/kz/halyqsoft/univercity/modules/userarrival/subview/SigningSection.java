@@ -107,7 +107,11 @@ public class SigningSection extends SampleEntityListener implements FilterPanelL
                         list.add(users.getLogin());
                         list.add(users.getLastName());
                         list.add(users.getFirstName());
-                        list.add(users.getMiddleName());
+                        if(users.getMiddleName()!=null) {
+                            list.add(users.getMiddleName());
+                        }else{
+                            list.add("");
+                        }
                         tableBody.add(list);
                     }
 

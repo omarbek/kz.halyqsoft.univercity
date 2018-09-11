@@ -32,6 +32,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static java.lang.Boolean.FALSE;
+
 /**
  * @author Omarbek
  * @created on 16.04.2018
@@ -40,6 +42,7 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
 
     private HorizontalSplitPanel mainHSP;
     private HorizontalLayout mainHL, secondHL;
+    private HorizontalLayout buttonPanel;
     private GridWidget absentsGW, lateGW;
     private USER_TYPE userType;
     private HorizontalLayout buttonsHL;
@@ -74,6 +77,8 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
         mainHL = new HorizontalLayout();
         mainHL.setSpacing(true);
         mainHL.setSizeFull();
+
+        buttonPanel = CommonUtils.createButtonPanel();
 
         final TreeTable menuTT = new TreeTable();
 
@@ -230,6 +235,25 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
             }
         });
 
+
+        detalizationBtn = new Button(CommonUtils.getUILocaleUtil().getCaption("detalization"));
+        detalizationBtn.setVisible(true);
+        detalizationBtn.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                if (employeeByDepartmentGW.getSelectedEntity() != null) {
+                    DetalizationDialog detalizationDialog = null;
+                    try {
+                        detalizationDialog = new DetalizationDialog(CommonUtils.getUILocaleUtil().getCaption("detalization"), SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(USERS.class, (employeeByDepartmentGW.getSelectedEntity().getId())), date.getValue());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    Message.showError("chooseARecord");
+                }
+            }
+        });
+
         mainHSP.addComponent(menuTT);
         getContent().addComponent(mainHSP);
     }
@@ -327,37 +351,25 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
                     }
                 });
 
-                detalizationBtn = new Button(CommonUtils.getUILocaleUtil().getCaption("detalization"));
-                detalizationBtn.setVisible(true);
-                detalizationBtn.addClickListener(new Button.ClickListener() {
-                    @Override
-                    public void buttonClick(Button.ClickEvent clickEvent) {
-                        if (employeeByDepartmentGW.getSelectedEntity() != null) {
-                            DetalizationDialog detalizationDialog = null;
-                            try {
-                                detalizationDialog = new DetalizationDialog(CommonUtils.getUILocaleUtil().getCaption("detalization"), SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(USERS.class, (employeeByDepartmentGW.getSelectedEntity().getId())), date.getValue());
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        } else {
-                            Message.showError("chooseARecord");
-                        }
-                    }
-                });
 
                 tableVL = new VerticalLayout();
                 secondHL = new HorizontalLayout();
                 secondHL.setSizeFull();
                 secondHL.addComponent(backButton);
                 secondHL.setComponentAlignment(backButton, Alignment.MIDDLE_LEFT);
-                secondHL.addComponent(date);
-                secondHL.setComponentAlignment(date, Alignment.TOP_CENTER);
 
-                secondHL.addComponent(detalizationBtn);
-                secondHL.setComponentAlignment(detalizationBtn, Alignment.TOP_RIGHT);
+                buttonPanel.addComponent(date);
+                buttonPanel.setComponentAlignment(date, Alignment.MIDDLE_CENTER);
 
-                secondHL.addComponent(printBtn);
-                secondHL.setComponentAlignment(printBtn, Alignment.TOP_RIGHT);
+                buttonPanel.addComponent(printBtn);
+                buttonPanel.setComponentAlignment(printBtn, Alignment.MIDDLE_CENTER);
+
+                buttonPanel.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
+                buttonPanel.addComponent(detalizationBtn);
+
+                secondHL.addComponent(buttonPanel);
+                secondHL.setComponentAlignment(buttonPanel, Alignment.TOP_RIGHT);
+
                 tableVL.addComponent(secondHL);
                 tableVL.addComponent(employeeByDepartmentGW);
                 mainHL.addComponent(tableVL);
@@ -441,6 +453,7 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
         employeeGM.setMultiSelect(false);
         employeeGM.setEntities(getList(date.getValue().toString()));
         employeeGM.setRefreshType(ERefreshType.MANUAL);
+        employeeGM.getFormModel().getFieldModel("departmentID").setInView(FALSE);
 
         tableVL = new VerticalLayout();
         HorizontalLayout topHL = CommonUtils.createButtonPanel();

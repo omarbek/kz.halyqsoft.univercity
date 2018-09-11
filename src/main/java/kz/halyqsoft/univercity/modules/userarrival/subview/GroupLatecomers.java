@@ -25,6 +25,7 @@ import java.util.*;
 public class GroupLatecomers implements EntityListener {
     private VerticalLayout mainVL;
     private HorizontalLayout topHL;
+    private HorizontalLayout buttonPanel;
     private GridWidget vGroupGW;
     private DateField dateField;
     private DBGridModel vGroupGM;
@@ -38,6 +39,8 @@ public class GroupLatecomers implements EntityListener {
     public GroupLatecomers() {
         mainVL = new VerticalLayout();
         mainVL.setImmediate(true);
+
+        buttonPanel = CommonUtils.createButtonPanel();
 
         topHL = new HorizontalLayout();
         topHL.setImmediate(true);
@@ -75,8 +78,8 @@ public class GroupLatecomers implements EntityListener {
             }
         });
 
-        topHL.addComponent(dateField);
-        topHL.setComponentAlignment(dateField, Alignment.TOP_RIGHT);
+        buttonPanel.addComponent(dateField);
+        buttonPanel.setComponentAlignment(dateField, Alignment.MIDDLE_CENTER);
 
         vGroupGW = new GridWidget(VLatecomers.class);
         vGroupGW.setImmediate(true);
@@ -115,6 +118,7 @@ public class GroupLatecomers implements EntityListener {
                         list.add(vLatecomers.getTime());
                         list.add(String.valueOf((vLatecomers.getAllStudents()).longValue()));
                         list.add(String.valueOf((vLatecomers.getIsLate()).longValue()));
+                        list.add(String.valueOf(((Double) vLatecomers.getPercantage()).doubleValue()));
                         tableBody.add(list);
                     }
                 } else if (mainVL.getComponentIndex(vStudentInfoGW) != -1) {
@@ -139,11 +143,13 @@ public class GroupLatecomers implements EntityListener {
         });
 
 
+        buttonPanel.addComponent(printBtn);
+        buttonPanel.setComponentAlignment(printBtn, Alignment.MIDDLE_CENTER);
+
+        topHL.addComponent(buttonPanel);
         topHL.addComponent(backButton);
         topHL.setComponentAlignment(backButton, Alignment.TOP_LEFT);
 
-        topHL.addComponent(printBtn);
-        topHL.setComponentAlignment(printBtn, Alignment.TOP_CENTER);
         mainVL.addComponent(topHL);
         mainVL.setComponentAlignment(topHL, Alignment.MIDDLE_RIGHT);
         mainVL.addComponent(vGroupGW);
@@ -326,7 +332,6 @@ public class GroupLatecomers implements EntityListener {
                     vStudentInfoGW.showToolbar(false);
                     vStudentInfoGW.addEntityListener(this);
                     vStudentInfoGW.setImmediate(true);
-                    //vStudentInfoGW.getCapti
 
                     vStudentInfoGM = (DBGridModel) vStudentInfoGW.getWidgetModel();
                     vStudentInfoGM.setRowNumberVisible(true);
