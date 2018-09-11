@@ -118,7 +118,6 @@ public class ManualCreationTab extends AbstractCommonView implements EntityListe
 
     @Override
     public void handleEntityEvent(EntityEvent entityEvent) {
-
     }
 
     @Override

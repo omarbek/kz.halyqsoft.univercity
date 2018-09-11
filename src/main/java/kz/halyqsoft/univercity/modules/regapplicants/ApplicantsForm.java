@@ -954,6 +954,7 @@ public final class ApplicantsForm extends UsersForm {
         }catch (NoResultException nre)
         {
             userAddress = null;
+            nre.printStackTrace();
         }
         QueryModel<EDUCATION_DOC> educationDocQueryModel = new QueryModel<>(EDUCATION_DOC.class);
 
@@ -976,6 +977,7 @@ public final class ApplicantsForm extends UsersForm {
                     .lookupSingle(untCertificateQueryModel);
         } catch (NoResultException ex) {
             untCertificate = null;
+            ex.printStackTrace();
         }
 
         String inLettersDorn = "";

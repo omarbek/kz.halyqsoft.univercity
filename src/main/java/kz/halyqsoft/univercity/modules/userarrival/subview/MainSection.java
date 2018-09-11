@@ -40,15 +40,18 @@ import java.util.*;
 
 public class MainSection {
     private VerticalLayout mainVL;
-    private HorizontalLayout mainHL;
     private DateField dateField;
 
     private Long allUsers = 0L;
     private Long allStudents = 0L;
     private Long allEmployees = 0L;
-    GridWidget topTenGroup;
 
     public MainSection() {
+        mainVL = new VerticalLayout();
+        mainVL.setImmediate(true);
+        mainVL.setSizeFull();
+        mainVL.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
+
         dateField = new DateField();
         dateField.setImmediate(true);
         dateField.addValueChangeListener(new Property.ValueChangeListener() {
@@ -59,87 +62,10 @@ public class MainSection {
         });
         dateField.setValue(new Date());
 
-        mainVL = new VerticalLayout();
-        mainVL.setImmediate(true);
-        mainVL.setSizeFull();
-        mainVL.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
+        mainVL.addComponent(dateField);
+        mainVL.setComponentAlignment(dateField,Alignment.TOP_RIGHT);
 
-        mainHL = new HorizontalLayout();
-        mainHL.setImmediate(true);
-        mainHL.setSizeFull();
-        mainHL.setSpacing(true);
-        mainHL.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
-
-        GridLayout gridLayout = new GridLayout();
-        gridLayout.setSizeFull();
-        gridLayout.setColumns(2);
-        gridLayout.setRows(1);
-        gridLayout.setSpacing(true);
-
-        GridLayout gridLayoutNO = new GridLayout();
-        gridLayoutNO.setSizeFull();
-        gridLayoutNO.setColumns(2);
-        gridLayoutNO.setRows(1);
-        gridLayoutNO.setSpacing(true);
-
-        VerticalLayout verticalLayout = new VerticalLayout();
-        verticalLayout.setSizeFull();
-
-//        Component verticalBar = getVerticalBar(dateField.getValue());
-//        verticalBar.setSizeFull();
-//
-//        Component verticalBar1 = getVerticalBar1();
-//        verticalBar1.setSizeFull();
-//
-//        Component verticalBar2 = getVerticalBar2();
-//        verticalBar1.setSizeFull();
-//
-//        Component verticalBar3 = getVerticalBar3();
-//        verticalBar1.setSizeFull();
-//
-//        Component verticalBar4 = getVerticalBar4();
-//        verticalBar1.setSizeFull();
-//
-//        Component verticalBar5 = getVerticalBar5();
-//        verticalBar1.setSizeFull();
-//
-//        Component tablewidget = setTopTen();
-//        tablewidget.setSizeFull();
-//////        tablewidget.setCaption("Top student");
-////
-////        Component tablewidget1 = setTopGroup();
-////        tablewidget1.setSizeFull();
-////        tablewidget1.setCaption("Top group");
-//
-//        mainVL.addComponent(dateField);
-//        mainVL.setComponentAlignment(dateField ,Alignment.TOP_RIGHT);
-//        setValues();
-//        mainVL.addComponent(mainHL);
-//
-//        gridLayout.addComponent(verticalBar,0,0);
-//        gridLayout.addComponent(verticalBar1);
-//        mainVL.addComponent(gridLayout);
-
-        //Component verticalBar = getVerticalBar(dateField.getValue());
-        //verticalBar.setSizeFull();
-        Component pieChart = getPieChart();
-        pieChart.setSizeFull();
-
-//        verticalLayout.addComponent(verticalBar2);
-//        verticalLayout.addComponent(verticalBar3);
-//        verticalLayout.addComponent(verticalBar4);
-//        verticalLayout.addComponent(verticalBar5);
-//        mainVL.addComponent(verticalLayout);
-//
-//        gridLayoutNO.addComponent(tablewidget);
-//        gridLayoutNO.addComponent(tablewidget1);
-        mainVL.addComponent(gridLayoutNO);
-
-        //mainVL.addComponent(verticalBar);
-        mainVL.addComponent(pieChart);
-
-
-//        setFooterTables();
+        setValues();
     }
 
     public List<VTopGroupArrival> getList(Date date) {
@@ -195,7 +121,6 @@ public class MainSection {
         } catch (Exception ex) {
             CommonUtils.showMessageAndWriteLog("Unable to load vgroup list", ex);
         }
-        refreshList(groupList);
         return groupList;
     }
 
@@ -252,55 +177,50 @@ public class MainSection {
         return chart;
     }
 
-    public void setFooterTables() {
-        GridLayout gridLayoutNO = new GridLayout();
-        gridLayoutNO.setSizeFull();
-        gridLayoutNO.setColumns(2);
-        gridLayoutNO.setRows(1);
-        gridLayoutNO.setSpacing(true);
+    public Component setFooterTables() {
+        VerticalLayout innerVL = new VerticalLayout();
+        innerVL.setSizeFull();
+        innerVL.setImmediate(true);
 
-        Component tablewidget = setTopTen();
-        tablewidget.setSizeFull();
-        tablewidget.setCaption("Top student");
+        Label label = new Label(CommonUtils.getUILocaleUtil().getCaption("best.attendance"));
+        label.setSizeFull();
 
-        Component tablewidget1 = setTopGroup();
-        tablewidget1.setSizeFull();
-        tablewidget1.setCaption("Top group");
+        GridLayout topPerformanceGL = new GridLayout();
+        topPerformanceGL.setSizeFull();
+        topPerformanceGL.setColumns(2);
+        topPerformanceGL.setRows(1);
+        topPerformanceGL.setSpacing(true);
 
-        gridLayoutNO.addComponent(tablewidget);
-        gridLayoutNO.addComponent(tablewidget1);
-        mainVL.addComponent(gridLayoutNO);
+        GridWidget bestStudentsGW = new GridWidget(VTopUserArrival.class);
+        bestStudentsGW.setSizeFull();
+        bestStudentsGW.showToolbar(false);
+        bestStudentsGW.setCaption(CommonUtils.getUILocaleUtil().getCaption("top.ten.students"));
+
+        DBGridModel bestStudentsGM = (DBGridModel) bestStudentsGW.getWidgetModel();
+        bestStudentsGM.setRefreshType(ERefreshType.MANUAL);
+        //bestStudentsGM.setEntities(getList(dateField.getValue()));
+
+
+
+        GridWidget bestGroupsGW = new GridWidget(VTopGroupArrival.class);
+        bestGroupsGW.setSizeFull();
+        bestGroupsGW.showToolbar(false);
+        bestGroupsGW.setCaption(CommonUtils.getUILocaleUtil().getCaption("top.ten.groups"));
+
+        DBGridModel bestGroupsGM = (DBGridModel) bestGroupsGW.getWidgetModel();
+        bestGroupsGM.setRefreshType(ERefreshType.MANUAL);
+        bestGroupsGM.setEntities(getList(dateField.getValue()));
+
+
+        topPerformanceGL.addComponent(bestStudentsGW);
+        topPerformanceGL.addComponent(bestGroupsGW);
+
+        innerVL.addComponent(label);
+        innerVL.addComponent(topPerformanceGL);
+
+        return innerVL;
     }
 
-    public Component setTopTen() {
-        GridWidget topTen = new GridWidget(VTopUserArrival.class);
-        topTen.setSizeFull();
-
-        DBGridModel topTenMOdel = (DBGridModel) topTen.getWidgetModel();
-        topTenMOdel.setRefreshType(ERefreshType.MANUAL);
-
-        return topTen;
-    }
-
-    public Component setTopGroup() {
-        topTenGroup = new GridWidget(VTopGroupArrival.class);
-        topTenGroup.setSizeFull();
-
-        DBGridModel topTenMOdel = (DBGridModel) topTenGroup.getWidgetModel();
-        topTenMOdel.setRefreshType(ERefreshType.MANUAL);
-//        topTenMOdel.setEntities(getList(dateField.getValue()));
-
-        return topTenGroup;
-    }
-
-    private void refreshList(List<VTopGroupArrival> list) {
-        ((DBGridModel) topTenGroup.getWidgetModel()).setEntities(list);
-        try {
-            topTenGroup.refresh();
-        } catch (Exception ex) {
-            CommonUtils.showMessageAndWriteLog("Unable to refresh vgroup list", ex);
-        }
-    }
 
     private Component getPieChart() {
         PieChartConfig config = new PieChartConfig();
@@ -626,15 +546,24 @@ public class MainSection {
 
     private void setValues() {
         try {
-            if (mainHL != null) {
-                if (mainHL.getComponentCount() > 0) {
-                    mainHL.removeAllComponents();
-                }
-                mainHL.addComponent(setStudents());
-                mainHL.addComponent(setLaters());
-                mainHL.addComponent(setEmployees());
-                mainHL.addComponent(setNoCards());
+            if(mainVL.getComponentCount()>0){
+                mainVL.removeAllComponents();
             }
+            HorizontalLayout mainHL;
+            mainHL = new HorizontalLayout();
+            mainHL.setImmediate(true);
+            mainHL.setSizeFull();
+            mainHL.setSpacing(true);
+            mainHL.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
+
+            mainHL.addComponent(setStudents());
+            mainHL.addComponent(setLaters());
+            mainHL.addComponent(setEmployees());
+            mainHL.addComponent(setNoCards());
+
+            mainVL.addComponent(mainHL);
+            mainVL.addComponent(setFooterTables());
+
         } catch (Exception e) {
             e.printStackTrace();
         }
