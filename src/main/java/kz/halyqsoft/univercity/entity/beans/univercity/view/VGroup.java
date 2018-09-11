@@ -30,7 +30,7 @@ public class VGroup extends AbstractEntity {
     @FieldInfo(type = EFieldType.INTEGER, order = 7, inGrid = false, inView = false, inEdit = false)
     private Long groupID;
 
-    @FieldInfo(type = EFieldType.INTEGER, order = 8 )
+    @FieldInfo(type = EFieldType.INTEGER, order = 8, inGrid = false, inView = false, inEdit = false )
     private String time;
 
     public String getGroupName() {

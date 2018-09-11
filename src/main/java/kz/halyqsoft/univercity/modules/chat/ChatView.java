@@ -6,7 +6,10 @@ import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.CHAT;
 import kz.halyqsoft.univercity.entity.beans.univercity.MESSAGE;
+import kz.halyqsoft.univercity.filter.FAccountantFilter;
+import kz.halyqsoft.univercity.modules.accountant.AccountantView;
 import kz.halyqsoft.univercity.modules.reports.MenuColumn;
+import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
@@ -21,6 +24,7 @@ import org.r3a.common.vaadin.AbstractSecureWebUI;
 import org.r3a.common.vaadin.AbstractWebUI;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.dialog.Message;
+import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 import org.r3a.common.vaadin.widget.toolbar.IconToolbar;
 import org.r3a.common.vaadin.widget.tree.CommonTreeWidget;
 import org.r3a.common.vaadin.widget.tree.model.UOTreeModel;
@@ -28,6 +32,8 @@ import org.r3a.common.vaadin.widget.tree.model.UOTreeModel;
 import javax.persistence.NoResultException;
 import java.math.BigInteger;
 import java.util.*;
+
+import static java.lang.Boolean.FALSE;
 
 public class ChatView extends AbstractTaskView implements EntityListener  {
 
@@ -91,7 +97,6 @@ public class ChatView extends AbstractTaskView implements EntityListener  {
             }
         }
 
-
         menuTT.setContainerDataSource(hierarchicalContainer);
         menuTT.setSizeFull();
         menuTT.addStyleName("schedule");
@@ -121,7 +126,7 @@ public class ChatView extends AbstractTaskView implements EntityListener  {
 
                                 CHAT chat = new CHAT();
                                 chat.setFirst_user(getCurrentUser());
-                                chat.setSecond_user((USERS) getUserByLogin((String)event.getItemId()));
+                                chat.setSecond_user(getUserByLogin((String)event.getItemId()));
                                 chat = searchForChat(chat);
                                 if(chat!= null)
                                 {
@@ -249,7 +254,7 @@ public class ChatView extends AbstractTaskView implements EntityListener  {
                         }
 
                         @Override
-                        public boolean preSave(Object o, Entity entity, boolean b, int i) throws Exception {
+                        public boolean preSave(Object o, Entity entity, boolean b, int i) {
                             return false;
                         }
 
@@ -379,9 +384,10 @@ public class ChatView extends AbstractTaskView implements EntityListener  {
         chatBodyTextArea.clear();
         chatBodyTextArea.setValue(result);
         chatBodyTextArea.setReadOnly(true);
+        chatBodyTextArea.setHeight("630");
         USERS anotherUser = getAnotherUserFromChat(chat);
         Label label = new Label(anotherUser.getFirstName() + " " + anotherUser.getLastName());
-
+        label.setWidth("500");
 
         upperSideLayout.addComponent(label);
 
@@ -393,11 +399,14 @@ public class ChatView extends AbstractTaskView implements EntityListener  {
 
         TextArea textArea = new TextArea();
         textArea.setSizeFull();
+        textArea.setWidth("200");
 
         textArea.setWordwrap(true);
         textArea.setImmediate(true);
 
         Button sendMessage = new Button("Send");
+        Button refreshButton = new Button("Refresh");
+
         sendMessage.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
@@ -427,6 +436,33 @@ public class ChatView extends AbstractTaskView implements EntityListener  {
                     }
                 }
             }
+
+        });
+
+        refreshButton.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                mainHSP.removeComponent(mainLayout);
+
+                    if(chat!= null)
+                    {
+                        if(chat.getAccepted())
+                        {
+                            chatBodyTextArea = new TextArea();
+                            chatBodyTextArea.setValue("");
+                            mainLayout = initChatView(chat);
+                        }else if(chat.getFirst_user().getLogin().equals(getCurrentUser().getLogin())) {
+                            mainLayout = initWaitingForResponseView();
+                        }else{
+                            mainLayout = initChatAcceptRequestView(chat);
+                        }
+                    }else{
+                        mainLayout = initChatSendRequestView();
+                    }
+
+                    mainHSP.addComponent(mainLayout);
+                }
+
         });
         sendMessage.setImmediate(true);
 
@@ -436,6 +472,9 @@ public class ChatView extends AbstractTaskView implements EntityListener  {
 
         lowerSideLayout.addComponent(sendMessage);
         lowerSideLayout.setComponentAlignment(sendMessage , Alignment.MIDDLE_CENTER);
+
+        lowerSideLayout.addComponent(refreshButton);
+        lowerSideLayout.setComponentAlignment(refreshButton , Alignment.MIDDLE_RIGHT);
 
         contentVerticalLayout.addComponent(upperSideLayout);
         contentVerticalLayout.addComponent(lowerSideLayout);
@@ -451,6 +490,7 @@ public class ChatView extends AbstractTaskView implements EntityListener  {
         try{
             QueryModel<MESSAGE> qm = new QueryModel<>(MESSAGE.class);
             qm.addWhere("chat" , ECriteria.EQUAL , chat.getId());
+            qm.addOrderDesc("created");
             List<MESSAGE> messageList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(qm);
             Collections.reverse(messageList);
             for(MESSAGE message : messageList)
@@ -500,7 +540,7 @@ public class ChatView extends AbstractTaskView implements EntityListener  {
         {
             Message.showError(e.getMessage());
             e.printStackTrace();
-        };
+        }
         return null;
     }
 
@@ -520,7 +560,7 @@ public class ChatView extends AbstractTaskView implements EntityListener  {
             {
                 Message.showError(e.getMessage());
                 e.printStackTrace();
-            };
+            }
         }
         return null;
     }
@@ -537,7 +577,7 @@ public class ChatView extends AbstractTaskView implements EntityListener  {
             {
                 Message.showError(e.getMessage());
                 e.printStackTrace();
-            };
+            }
         }
         return null;
     }
@@ -545,6 +585,7 @@ public class ChatView extends AbstractTaskView implements EntityListener  {
     private USERS getUserByLogin(String login){
             QueryModel<USERS> qm = new QueryModel<>(USERS.class);
             qm.addWhere("login" , ECriteria.EQUAL ,login);
+            qm.addWhereAnd("deleted" , ECriteria.EQUAL ,FALSE);
             USERS u = null;
             try {
                 u = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(qm);
@@ -556,7 +597,7 @@ public class ChatView extends AbstractTaskView implements EntityListener  {
             {
                 Message.showError(e.getMessage());
                 e.printStackTrace();
-            };
+            }
 
         return null;
     }
@@ -578,7 +619,7 @@ public class ChatView extends AbstractTaskView implements EntityListener  {
         {
             Message.showError(e.getMessage());
             e.printStackTrace();
-        };
+        }
 
         return false;
     }
@@ -599,7 +640,7 @@ public class ChatView extends AbstractTaskView implements EntityListener  {
         catch (Exception e)
         {
             e.printStackTrace();
-        };
+        }
         return chatList;
     }
 

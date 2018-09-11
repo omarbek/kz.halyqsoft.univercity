@@ -142,3 +142,22 @@ ALTER TABLE ONLY question
 ALTER TABLE ONLY question
   ADD CONSTRAINT fk_question FOREIGN KEY (created_by) REFERENCES users (id) ON
 UPDATE RESTRICT ON DELETE RESTRICT;
+
+INSERT INTO non_admission_cause VALUES (1, 'Успеваемость ниже 50%');
+INSERT INTO non_admission_cause VALUES (2, 'Посещаемость ниже 80%');
+INSERT INTO non_admission_cause VALUES (3, 'За неоплату');
+
+ALTER TABLE non_admission_exam
+  DROP COLUMN semester_data_id;
+
+ALTER TABLE non_admission_exam
+  DROP COLUMN student_id;
+
+ALTER TABLE non_admission_exam
+  ADD COLUMN student_education_id BIGINT NOT NULL;
+
+ALTER TABLE ONLY non_admission_exam
+  ADD CONSTRAINT fk_non_admission_exam_student_education
+FOREIGN KEY (student_education_id)
+REFERENCES student_education (id)
+ON UPDATE RESTRICT ON DELETE RESTRICT;

@@ -55,6 +55,7 @@ public final class ApplicantsForm extends UsersForm {
     private static String replaced;
     private static String inLettersEdu;
     private static String moneyForEducation;
+    private static String answerEdu;
     private Button untNextButton;
 
     private TableWidget specTW;
@@ -148,6 +149,7 @@ public final class ApplicantsForm extends UsersForm {
         return buttons;
     }
 
+
     private void setAdviser(FormModel dataFM, String field) {
         FKFieldModel advisorFM = (FKFieldModel) dataFM.getFieldModel(field);
         advisorFM.setSelectType(ESelectType.CUSTOM_GRID);
@@ -213,6 +215,35 @@ public final class ApplicantsForm extends UsersForm {
         downloadContractButton.setCaption(getUILocaleUtil().getCaption("download.contract"));
 
         Button downloadButtonRegisterButton = new Button();
+        downloadButtonRegisterButton.addClickListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                STUDENT student = new STUDENT();
+                try {
+                    student = (STUDENT) dataFM.getEntity();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                String inLettersEdu = "";
+                String moneyForEducation = "";
+                ACCOUNTANT_PRICE accountantPrice = null;
+                try {
+                    accountantPrice = getAccountantPrice(student, 2);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                if (accountantPrice != null) {
+                    moneyForEducation = String.valueOf(accountantPrice.getPrice());
+                    inLettersEdu = accountantPrice.getPriceInLetters();
+                } else {
+                    moneyForEducation = "0";
+                }
+                answerEdu = String.valueOf(Double.valueOf(moneyForEducation) / 8);
+
+            }
+        });
+
         downloadButtonRegisterButton.setCaption(getUILocaleUtil().getCaption("download.contract.register"));
 
 
@@ -598,7 +629,7 @@ public final class ApplicantsForm extends UsersForm {
             fileName = "Қолхат_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
         } else if (value.equals("82")) {//TODO Assyl check all docs, not only yours
             fileName = "Договор магистрант_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
-        }else if (value.equals("90")) {
+        } else if (value.equals("90")) {
             fileName = "келісім-шарт_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
         } else {
             fileName = "Өтініш_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
@@ -625,7 +656,7 @@ public final class ApplicantsForm extends UsersForm {
                         pdfDocumentQueryModel.addWhere("id", ECriteria.EQUAL, value);
                         pdf_document = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(pdfDocumentQueryModel);
                     } catch (Exception e) {
-                        e.printStackTrace();//TODO no docs
+                        e.printStackTrace();
                     }
 
                     if (value.equals("32")) {
@@ -657,7 +688,7 @@ public final class ApplicantsForm extends UsersForm {
                             Rectangle rectImage = new Rectangle(86, 685, 187, 790);
 
                             image.setAbsolutePosition(86, 685);
-                            image.scaleAbsolute(rectImage.getWidth(),rectImage.getHeight());
+                            image.scaleAbsolute(rectImage.getWidth(), rectImage.getHeight());
                             canvas.addImage(image);
                         }
 
@@ -772,91 +803,90 @@ public final class ApplicantsForm extends UsersForm {
 
                         String text = property.getText();
 
-                        if(text.startsWith("до 25 сентября")
-                                && student.getDiplomaType().toString().equals("Заочный 2-высшее")){
+                        if (text.startsWith("до 25 сентября")
+                                && student.getDiplomaType().toString().equals("Заочный 2-высшее")) {
                             replaced = "до 1 октября – 60000 тенге                     до 1 февраля – 60000 тенге";
-                        } else if( text.startsWith("25 қыркүйекке дейін") &&
-                                student.getDiplomaType().toString().equals("Заочный 2-высшее")){
+                        } else if (text.startsWith("25 қыркүйекке дейін") &&
+                                student.getDiplomaType().toString().equals("Заочный 2-высшее")) {
                             replaced = "1 қазанға дейін – 60000 тенге                   1 ақпанға дейін – 60000 тенге";
-                        }else if (text.startsWith("до 25 сентября") && student.getDiplomaType().toString().equals("Заочный после колледжа")) {
-                            replaced ="до 1 октября – 65000 тенге                     до 1 февраля – 65000 тенге";
-                        }else if (text.startsWith("25 қыркүйекке дейін") && student.getDiplomaType().toString().equals("Заочный после колледжа")) {
+                        } else if (text.startsWith("до 25 сентября") && student.getDiplomaType().toString().equals("Заочный после колледжа")) {
+                            replaced = "до 1 октября – 65000 тенге                     до 1 февраля – 65000 тенге";
+                        } else if (text.startsWith("25 қыркүйекке дейін") && student.getDiplomaType().toString().equals("Заочный после колледжа")) {
                             replaced = "1 қазанға дейін – 65000 тенге                   1 ақпанға дейін – 65000 тенге";
-                        }else if(text.startsWith("6) в случае пропуска занятий по уважительным причинам предоставить ") &&
+                        } else if (text.startsWith("6) в случае пропуска занятий по уважительным причинам предоставить ") &&
                                 student.getDiplomaType().toString().equals("Заочный 2-высшее")) {
-                            replaced ="6) в случае пропуска занятий по уважительным причинам предоставить документы, подтверждающие пропуск;\n" +
+                            replaced = "6) в случае пропуска занятий по уважительным причинам предоставить документы, подтверждающие пропуск;\n" +
                                     "7) по требованию администрации вуза предоставить письменное объяснение по вопросам соблюдения условий настоящего Договора. Правил внутреннего распорядка и иных нормативных документов вуза.\n" +
                                     "8) ОБУЧАЮЩИЙСЯ на заочной форме обучения обязан до начала сессии оплатить оплату в размере 50% от годовой  суммы оплаты за  обучение \n" +
                                     "9) ОБУЧАЮЩИЙСЯ, нуждающий в общежитии  обязан ежемесячно производить оплату в размере 12,5%  до 5 числа текущего месяца. ";
 
-                        }else if(text.startsWith("6) Себепті жағдайлармен міндетті сабақтарға ") &&
+                        } else if (text.startsWith("6) Себепті жағдайлармен міндетті сабақтарға ") &&
                                 student.getDiplomaType().toString().equals("Заочный 2-высшее")) {
-                            replaced ="6) Себепті жағдайлармен міндетті сабақтарға қатыса алмаған жағдайда ресми айғақты құжаттар тапсыруға;\n" +
+                            replaced = "6) Себепті жағдайлармен міндетті сабақтарға қатыса алмаған жағдайда ресми айғақты құжаттар тапсыруға;\n" +
                                     "7) Университет әкімшілігінің  талаптарына сәйкес осы келісім-шартты, ішкі тәртіпті орындау жөнінде жазбаша түсініктеме беруге;\n" +
-                                    "8) Сырттай оқу түрінде БІЛІМ АЛУШЫ оқу ақысын сессия басталғанға дейін жылдық оқу ақысының 50% мөлшерінде төлем  сомасын төлеуге міндетті;\n"+
+                                    "8) Сырттай оқу түрінде БІЛІМ АЛУШЫ оқу ақысын сессия басталғанға дейін жылдық оқу ақысының 50% мөлшерінде төлем  сомасын төлеуге міндетті;\n" +
                                     "9) Жатақхана қажет ететін БІЛІМ АЛУШЫ ағымдағы айдың 5-жұлдызына дейін 12,5%-н  төлеп отыруға міндетті.";
 
 
-                        }else if(text.startsWith("6) в случае пропуска занятий по уважительным причинам предоставить") &&
+                        } else if (text.startsWith("6) в случае пропуска занятий по уважительным причинам предоставить") &&
                                 student.getDiplomaType().toString().equals("Заочный после колледжа")) {
-                            replaced ="6) в случае пропуска занятий по уважительным причинам предоставить документы, подтверждающие пропуск;\n" +
+                            replaced = "6) в случае пропуска занятий по уважительным причинам предоставить документы, подтверждающие пропуск;\n" +
                                     "7) по требованию администрации вуза предоставить письменное объяснение по вопросам соблюдения условий настоящего Договора. Правил внутреннего распорядка и иных нормативных документов вуза.\n" +
                                     "8) ОБУЧАЮЩИЙСЯ на заочной форме обучения обязан до начала сессии оплатить оплату в размере 50% от годовой  суммы оплаты за  обучение \n" +
                                     "9) ОБУЧАЮЩИЙСЯ, нуждающий в общежитии  обязан ежемесячно производить оплату в размере 12,5%  до 5 числа текущего месяца. ";
 
-                        }else if(text.startsWith("6) Себепті жағдайлармен міндетті сабақтарға ") &&
+                        } else if (text.startsWith("6) Себепті жағдайлармен міндетті сабақтарға ") &&
                                 student.getDiplomaType().toString().equals("Заочный после колледжа")) {
-                            replaced ="6) Себепті жағдайлармен міндетті сабақтарға қатыса алмаған жағдайда ресми айғақты құжаттар тапсыруға;\n" +
+                            replaced = "6) Себепті жағдайлармен міндетті сабақтарға қатыса алмаған жағдайда ресми айғақты құжаттар тапсыруға;\n" +
                                     "7) Университет әкімшілігінің  талаптарына сәйкес осы келісім-шартты, ішкі тәртіпті орындау жөнінде жазбаша түсініктеме беруге;\n" +
-                                    "8) Сырттай оқу түрінде БІЛІМ АЛУШЫ оқу ақысын сессия басталғанға дейін жылдық оқу ақысының 50% мөлшерінде төлем  сомасын төлеуге міндетті;\n"+
+                                    "8) Сырттай оқу түрінде БІЛІМ АЛУШЫ оқу ақысын сессия басталғанға дейін жылдық оқу ақысының 50% мөлшерінде төлем  сомасын төлеуге міндетті;\n" +
                                     "9) Жатақхана қажет ететін БІЛІМ АЛУШЫ ағымдағы айдың 5-жұлдызына дейін 12,5%-н  төлеп отыруға міндетті.";
 
-                        }else if(text.startsWith("6) в случае пропуска занятий по уважительным причинам предоставить ") &&
+                        } else if (text.startsWith("6) в случае пропуска занятий по уважительным причинам предоставить ") &&
                                 student.getDiplomaType().toString().equals("Очный")) {
-                            replaced ="6) в случае пропуска занятий по уважительным причинам предоставить документы, подтверждающие пропуск;\n" +
+                            replaced = "6) в случае пропуска занятий по уважительным причинам предоставить документы, подтверждающие пропуск;\n" +
                                     "7) по требованию администрации вуза предоставить письменное объяснение по вопросам соблюдения условий настоящего Договора. Правил внутреннего распорядка и иных нормативных документов вуза.\n" +
                                     "8) ОБУЧАЮЩИЙСЯ на дневной (вечерней) форме обучения обязан ежемесячно производить оплату в размере 12,5% от годовой суммы оплаты за обучение до 25 числа текущего месяца \n" +
                                     "9) ОБУЧАЮЩИЙСЯ, нуждающий в общежитии  обязан ежемесячно производить оплату в размере 12,5%  до 5 числа текущего месяца. ";
 
-                        }else if(text.startsWith("6) Себепті жағдайлармен міндетті сабақтарға ") &&
+                        } else if (text.startsWith("6) Себепті жағдайлармен міндетті сабақтарға ") &&
                                 student.getDiplomaType().toString().equals("Очный")) {
-                            replaced ="6) Себепті жағдайлармен міндетті сабақтарға қатыса алмаған жағдайда ресми айғақты құжаттар тапсыруға;\n" +
+                            replaced = "6) Себепті жағдайлармен міндетті сабақтарға қатыса алмаған жағдайда ресми айғақты құжаттар тапсыруға;\n" +
                                     "7) Университет әкімшілігінің  талаптарына сәйкес осы келісім-шартты, ішкі тәртіпті орындау жөнінде жазбаша түсініктеме беруге;\n" +
-                                    "8) Күндізгі (кешкі ) оқу түрінде БІЛІМ АЛУШЫ ағымдағы айдың 25 жұлдызына дейін, әр ай сайын жылдық төлемақы сомасының 12,5%-н төлеп отыруға міндетті;\n"+
+                                    "8) Күндізгі (кешкі ) оқу түрінде БІЛІМ АЛУШЫ ағымдағы айдың 25 жұлдызына дейін, әр ай сайын жылдық төлемақы сомасының 12,5%-н төлеп отыруға міндетті;\n" +
                                     "9) Жатақхана қажет ететін БІЛІМ АЛУШЫ ағымдағы айдың 5-жұлдызына дейін 12,5%-н  төлеп отыруға міндетті.";
 
 
-                        }else if(text.startsWith("6) в случае пропуска занятий по уважительным причинам предоставить") &&
+                        } else if (text.startsWith("6) в случае пропуска занятий по уважительным причинам предоставить") &&
                                 student.getDiplomaType().toString().equals("Вечерний")) {
-                            replaced ="6) в случае пропуска занятий по уважительным причинам предоставить документы, подтверждающие пропуск;\n" +
+                            replaced = "6) в случае пропуска занятий по уважительным причинам предоставить документы, подтверждающие пропуск;\n" +
                                     "7) по требованию администрации вуза предоставить письменное объяснение по вопросам соблюдения условий настоящего Договора. Правил внутреннего распорядка и иных нормативных документов вуза.\n" +
                                     "8) ОБУЧАЮЩИЙСЯ на дневной (вечерней) форме обучения обязан ежемесячно производить оплату в размере 12,5% от годовой суммы оплаты за обучение до 25 числа текущего месяца \n" +
                                     "9) ОБУЧАЮЩИЙСЯ, нуждающий в общежитии  обязан ежемесячно производить оплату в размере 12,5%  до 5 числа текущего месяца. ";
 
-                        }else if(text.startsWith("6) Себепті жағдайлармен міндетті сабақтарға ") &&
+                        } else if (text.startsWith("6) Себепті жағдайлармен міндетті сабақтарға ") &&
                                 student.getDiplomaType().toString().equals("Вечерний")) {
-                            replaced ="6) Себепті жағдайлармен міндетті сабақтарға қатыса алмаған жағдайда ресми айғақты құжаттар тапсыруға;\n" +
+                            replaced = "6) Себепті жағдайлармен міндетті сабақтарға қатыса алмаған жағдайда ресми айғақты құжаттар тапсыруға;\n" +
                                     "7) Университет әкімшілігінің  талаптарына сәйкес осы келісім-шартты, ішкі тәртіпті орындау жөнінде жазбаша түсініктеме беруге;\n" +
-                                    "8) Күндізгі (кешкі ) оқу түрінде БІЛІМ АЛУШЫ ағымдағы айдың 25 жұлдызына дейін, әр ай сайын жылдық төлемақы сомасының 12,5%-н төлеп отыруға міндетті;\n"+
+                                    "8) Күндізгі (кешкі ) оқу түрінде БІЛІМ АЛУШЫ ағымдағы айдың 25 жұлдызына дейін, әр ай сайын жылдық төлемақы сомасының 12,5%-н төлеп отыруға міндетті;\n" +
                                     "9) Жатақхана қажет ететін БІЛІМ АЛУШЫ ағымдағы айдың 5-жұлдызына дейін 12,5%-н  төлеп отыруға міндетті.";
 
-                        }else if(text.startsWith("6) в случае пропуска занятий по уважительным причинам предоставить ") &&
+                        } else if (text.startsWith("6) в случае пропуска занятий по уважительным причинам предоставить ") &&
                                 student.getDiplomaType().toString().equals("Очный после колледжа")) {
-                            replaced ="6) в случае пропуска занятий по уважительным причинам предоставить документы, подтверждающие пропуск;\n" +
+                            replaced = "6) в случае пропуска занятий по уважительным причинам предоставить документы, подтверждающие пропуск;\n" +
                                     "7) по требованию администрации вуза предоставить письменное объяснение по вопросам соблюдения условий настоящего Договора. Правил внутреннего распорядка и иных нормативных документов вуза.\n" +
                                     "8) ОБУЧАЮЩИЙСЯ на дневной (вечерней) форме обучения обязан ежемесячно производить оплату в размере 12,5% от годовой суммы оплаты за обучение до 25 числа текущего месяца \n" +
                                     "9) ОБУЧАЮЩИЙСЯ, нуждающий в общежитии  обязан ежемесячно производить оплату в размере 12,5%  до 5 числа текущего месяца. ";
 
-                        }else if(text.startsWith("6) Себепті жағдайлармен міндетті сабақтарға ") &&
+                        } else if (text.startsWith("6) Себепті жағдайлармен міндетті сабақтарға ") &&
                                 student.getDiplomaType().toString().equals("Очный после колледжа")) {
-                            replaced ="6) Себепті жағдайлармен міндетті сабақтарға қатыса алмаған жағдайда ресми айғақты құжаттар тапсыруға;\n" +
+                            replaced = "6) Себепті жағдайлармен міндетті сабақтарға қатыса алмаған жағдайда ресми айғақты құжаттар тапсыруға;\n" +
                                     "7) Университет әкімшілігінің  талаптарына сәйкес осы келісім-шартты, ішкі тәртіпті орындау жөнінде жазбаша түсініктеме беруге;\n" +
-                                    "8) Күндізгі (кешкі ) оқу түрінде БІЛІМ АЛУШЫ ағымдағы айдың 25 жұлдызына дейін, әр ай сайын жылдық төлемақы сомасының 12,5%-н төлеп отыруға міндетті;\n"+
+                                    "8) Күндізгі (кешкі ) оқу түрінде БІЛІМ АЛУШЫ ағымдағы айдың 25 жұлдызына дейін, әр ай сайын жылдық төлемақы сомасының 12,5%-н төлеп отыруға міндетті;\n" +
                                     "9) Жатақхана қажет ететін БІЛІМ АЛУШЫ ағымдағы айдың 5-жұлдызына дейін 12,5%-н  төлеп отыруға міндетті.";
 
 
-                        }  else {
-
+                        } else {
                             if (student != null) {
                                 setReplaced(text, student);
                             }
@@ -887,9 +917,9 @@ public final class ApplicantsForm extends UsersForm {
         }, fileName);
     }
 
-    public static void setKazLanguage(STUDENT student,boolean kz) throws Exception {
+    public static void setKazLanguage(STUDENT student, boolean kz) throws Exception {
 
-         inLettersEdu = "";
+        inLettersEdu = "";
         moneyForEducation = "";
         ACCOUNTANT_PRICE accountantPrice = getAccountantPrice(student, 2);
 
@@ -909,10 +939,10 @@ public final class ApplicantsForm extends UsersForm {
         }
     }
 
-    public static void setRusLanguage(STUDENT student,boolean ru) throws Exception {
+    public static void setRusLanguage(STUDENT student, boolean ru) throws Exception {
 
-         inLettersEdu = "";
-         moneyForEducation = "";
+        inLettersEdu = "";
+        moneyForEducation = "";
 
         ACCOUNTANT_PRICE accountantPrice = getAccountantPrice(student, 2);
         if (accountantPrice != null) {
@@ -930,6 +960,7 @@ public final class ApplicantsForm extends UsersForm {
         } else {
             moneyForDorm = "0";
         }
+        answerEdu = String.valueOf(Double.valueOf(moneyForEducation) / 8);
     }
 
     private static void setReplaced(String text, STUDENT student) throws Exception {
@@ -949,24 +980,14 @@ public final class ApplicantsForm extends UsersForm {
         QueryModel<USER_ADDRESS> userAddressQueryModel = new QueryModel<>(USER_ADDRESS.class);
         userAddressQueryModel.addWhere("user", ECriteria.EQUAL, student.getId());
         userAddressQueryModel.addWhereAnd("addressType", ECriteria.EQUAL, ID.valueOf(ADDRESS_FACT));
-        try{
-            userAddress = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(userAddressQueryModel);//TODO no user address
-        }catch (NoResultException nre)
-        {
-            userAddress = null;
-            nre.printStackTrace();
-        }
+        userAddress = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(userAddressQueryModel);
+
         QueryModel<EDUCATION_DOC> educationDocQueryModel = new QueryModel<>(EDUCATION_DOC.class);
 
         EDUCATION_DOC educationDoc;
         FromItem sc = educationDocQueryModel.addJoin(EJoin.INNER_JOIN, "id", USER_DOCUMENT.class, "id");
         educationDocQueryModel.addWhere(sc, "user", ECriteria.EQUAL, student.getId());
-        List<EDUCATION_DOC> educationDocs = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(educationDocQueryModel);//TODO no edu doc
-        if(educationDocs.size()==0){
-            educationDoc = null;
-        }else {
-            educationDoc = educationDocs.get(educationDocs.size() - 1);
-        }
+        educationDoc = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(educationDocQueryModel);
 
         UNT_CERTIFICATE untCertificate;
         QueryModel<UNT_CERTIFICATE> untCertificateQueryModel = new QueryModel<>(UNT_CERTIFICATE.class);
@@ -977,7 +998,6 @@ public final class ApplicantsForm extends UsersForm {
                     .lookupSingle(untCertificateQueryModel);
         } catch (NoResultException ex) {
             untCertificate = null;
-            ex.printStackTrace();
         }
 
         String inLettersDorn = "";
@@ -990,7 +1010,6 @@ public final class ApplicantsForm extends UsersForm {
             moneyForDorm = "0";
         }
         String answerDorm = String.valueOf(Double.valueOf(moneyForDorm) / 8);
-       String answerEdu = String.valueOf(Double.valueOf(moneyForEducation) / 8);
 
         String ochnii = student.getDiplomaType().toString();
         DateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
@@ -998,7 +1017,7 @@ public final class ApplicantsForm extends UsersForm {
         if (student.getDiplomaType().toString().equals("Очный")) {
             ochnii = "очной";
         } else if (student.getDiplomaType().toString().equals("Заочный") ||
-                student.getDiplomaType().toString().equals("Заочный после колледжа")||
+                student.getDiplomaType().toString().equals("Заочный после колледжа") ||
                 student.getDiplomaType().toString().equals("Заочный 2-высшее")) {
             ochnii = "заочной";
         }
@@ -1015,12 +1034,7 @@ public final class ApplicantsForm extends UsersForm {
         Date date1 = formatter.parse(birthdayDate);
         String birthday = formatter.format(date1);
 
-        Date dateDocument = null;
-        if(educationDoc!=null) {
-            dateDocument = form.parse(educationDoc.getIssueDate().toString());
-        }else{
-            dateDocument = new Date();
-        }
+        Date dateDocument = form.parse(educationDoc.getIssueDate().toString());
         Calendar cal1 = Calendar.getInstance();
         cal1.setTime(dateDocument);
         String formatDate = cal1.get(Calendar.DATE) + "." + (cal1.get(Calendar.MONTH) + 1) + "." + cal1.get(Calendar.YEAR);
@@ -1048,10 +1062,8 @@ public final class ApplicantsForm extends UsersForm {
         if (student.getCoordinator() == null) {
             student.setCoordinator(coordinator);
         }
-        if(educationDoc!=null){
-            if (educationDoc.getEndYear() == null) {
-                educationDoc.setEndYear(Calendar.getInstance().get(Calendar.YEAR));
-            }
+        if (educationDoc.getEndYear() == null) {
+            educationDoc.setEndYear(Calendar.getInstance().get(Calendar.YEAR));
         }
         if (studentRelativeFather.getPhoneMobile() == null) {
             studentRelativeFather.setPhoneMobile("***");
@@ -1097,16 +1109,14 @@ public final class ApplicantsForm extends UsersForm {
             passportNumber = user_passport.getDocumentNo();
         }
         String fullAddress = "";
-        if(userAddress!=null) {
-            if (userAddress.getCountry() != null)
-                fullAddress += " " + userAddress.getCountry();
-            if (userAddress.getRegion() != null)
-                fullAddress += " " + userAddress.getRegion();
-            if (userAddress.getCity() != null)
-                fullAddress += " " + userAddress.getCity();
-            if (userAddress.getStreet() != null)
-                fullAddress += " " + userAddress.getStreet();
-        }
+        if (userAddress.getCountry() != null)
+            fullAddress += " " + userAddress.getCountry();
+        if (userAddress.getRegion() != null)
+            fullAddress += " " + userAddress.getRegion();
+        if (userAddress.getCity() != null)
+            fullAddress += " " + userAddress.getCity();
+        if (userAddress.getStreet() != null)
+            fullAddress += " " + userAddress.getStreet();
         String firstCourseMoney = moneyForEducation;
         String secondCourseMoney = moneyForEducation;
 
@@ -1119,7 +1129,7 @@ public final class ApplicantsForm extends UsersForm {
         USERS tecnhik = CommonUtils.getEmployee(params);
         replaced = text.replaceAll("\\$fio", student.toString())
                 .replaceAll("\\$money", moneyForEducation)
-             //   .replaceAll(tableType, pdfProperty)
+                //   .replaceAll(tableType, pdfProperty)
                 .replaceAll("\\$ansEdu", answerEdu)
                 .replaceAll("\\$ansDorm", answerDorm)
                 .replaceAll("\\$firstCourseMoney", firstCourseMoney)
@@ -1137,8 +1147,8 @@ public final class ApplicantsForm extends UsersForm {
                 .replaceAll("\\$DataMonthYear", today + " года")
                 .replaceAll("\\$formaobuch", ochnii)
                 .replaceAll("\\$data\\$month\\$year", today)
-                .replaceAll("\\$email", userAddress!=null ? userAddress.getPostalCode() : "")
-                .replaceAll("\\$rekvizit", userAddress!=null ? userAddress.getStreet() : "")
+                .replaceAll("\\$email", userAddress.getPostalCode())
+                .replaceAll("\\$rekvizit", userAddress.getStreet())
                 .replaceAll("\\$phone", "+7" + student.getPhoneMobile())
                 .replaceAll("\\$InLetters", inLettersEdu)
                 .replaceAll("\\$Obshaga", moneyForDorm)
@@ -1153,8 +1163,8 @@ public final class ApplicantsForm extends UsersForm {
                 .replaceAll("\\$gender", student.getSex().toString())
                 .replaceAll("\\$birthYear", birthday)
                 .replaceAll("\\$nationality", student.getNationality().toString())
-                .replaceAll("\\$info", educationDoc!=null ? educationDoc.getEndYear().toString() + ", "
-                        + educationDoc.getEducationType() + ", " + educationDoc.getSchoolName(): "" )
+                .replaceAll("\\$info", educationDoc.getEndYear().toString() + ", "
+                        + educationDoc.getEducationType() + ", " + educationDoc.getSchoolName())
                 .replaceAll("\\$speciality", specialityName)
                 .replaceAll("\\$parentsAddress", studentRelativeFather.getFio() + ", "
                         + studentRelativeFather.getWorkPlace() + "    "
@@ -1166,10 +1176,10 @@ public final class ApplicantsForm extends UsersForm {
                 .replaceAll("\\$name", student.getFirstName())
                 .replaceAll("\\$surname", student.getLastName())
                 .replaceAll("\\$firstName", student.getMiddleName())
-                .replaceAll("\\$education", educationDoc!=null ? educationDoc.getEducationType().toString() : "")
+                .replaceAll("\\$education", educationDoc.getEducationType().toString())
                 .replaceAll("\\$technic", tecnhik.toString())
                 .replaceAll("\\$attestat", attestationDate)
-                .replaceAll("\\$nomer", educationDoc!=null ? educationDoc.getDocumentNo() : "")
+                .replaceAll("\\$nomer", educationDoc.getDocumentNo())
                 .replaceAll("\\$ent", untCertificate == null ? "" : untCertificate.getDocumentNo())
 //                .replaceAll("\\$document", createdDate)
                 .replaceAll("\\$document", "_______")
@@ -1427,7 +1437,7 @@ public final class ApplicantsForm extends UsersForm {
                 return false;
             }
 
-            if(specTW.getAllEntities().size()>0){
+            if (specTW.getAllEntities().size() > 0) {
                 Message.showInfo(getUILocaleUtil().getMessage("more.records.not.required"));
                 return false;
             }

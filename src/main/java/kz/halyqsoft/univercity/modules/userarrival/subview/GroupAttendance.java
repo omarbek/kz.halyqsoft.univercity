@@ -10,6 +10,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.view.VStudent;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VStudentInfo;
 import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.DetalizationDialog;
 import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.PrintDialog;
+import org.apache.commons.io.filefilter.FalseFileFilter;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
@@ -28,6 +29,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import kz.halyqsoft.univercity.utils.CommonUtils;
+
+import static java.lang.Boolean.FALSE;
 
 public class GroupAttendance implements EntityListener{
     private VerticalLayout mainVL;
@@ -102,6 +105,7 @@ public class GroupAttendance implements EntityListener{
                         list.add(Math.round(vGroup.getPercantage())+"%");
                         tableBody.add(list);
                     }
+
                 }else if(mainVL.getComponentIndex(vStudentInfoGW)!=-1){
                     for(GridColumnModel gcm : vStudentInfoGM.getColumnModels()){
                         tableHeader.add(gcm.getLabel());
@@ -180,6 +184,7 @@ public class GroupAttendance implements EntityListener{
         vGroupGM.setMultiSelect(false);
         vGroupGM.setEntities(getList(dateField.getValue()));
         vGroupGM.setRefreshType(ERefreshType.MANUAL);
+        vGroupGM.getFormModel().getFieldModel("time").setInView(FALSE);
 
 
         mainVL.addComponent(topHL);
