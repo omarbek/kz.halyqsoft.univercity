@@ -11,6 +11,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.enumeration.UserType;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VUser;
 import kz.halyqsoft.univercity.filter.FUserFilter;
 import kz.halyqsoft.univercity.filter.panel.UserFilterPanel;
+import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.PrintDialog;
 import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.SignDialog;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.SampleEntityListener;
@@ -27,6 +28,7 @@ import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 import org.r3a.common.vaadin.widget.filter2.FilterPanelListener;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
+import org.r3a.common.vaadin.widget.grid.model.GridColumnModel;
 import org.r3a.common.vaadin.widget.toolbar.IconToolbar;
 
 import java.math.BigDecimal;
@@ -41,6 +43,7 @@ public class SigningSection extends SampleEntityListener implements FilterPanelL
     private VerticalLayout mainVL;
     private GridWidget usersGW;
     private DBGridModel usersGM;
+    private Button printBtn;
     List <ID> restrictedIDs = new ArrayList();
     public SigningSection(){
         restrictedIDs.add(ID.valueOf(1));
@@ -80,8 +83,51 @@ public class SigningSection extends SampleEntityListener implements FilterPanelL
         }catch (Exception e){
             e.printStackTrace();
         }
+
+        printBtn = new Button(CommonUtils.getUILocaleUtil().getCaption("export"));
+        printBtn.setImmediate(true);
+        printBtn.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                List<String> tableHeader = new ArrayList<>();
+                List<List<String>> tableBody = new ArrayList<>();
+
+                String fileName = "document";
+
+                if (mainVL.getComponentIndex(usersGW) != -1) {
+                    for (GridColumnModel gcm : usersGM.getColumnModels()) {
+                        tableHeader.add(gcm.getLabel());
+                    }
+                    for (int i = 0; i < usersGW.getAllEntities().size(); i++) {
+                        USERS users = (USERS) usersGW.getAllEntities().get(i);
+                        if (usersGW.getCaption() != null) {
+                            fileName = usersGW.getCaption();
+                        }
+                        List<String> list = new ArrayList<>();
+                        list.add(users.getLogin());
+                        list.add(users.getLastName());
+                        list.add(users.getFirstName());
+                        if(users.getMiddleName()!=null) {
+                            list.add(users.getMiddleName());
+                        }else{
+                            list.add("");
+                        }
+                        tableBody.add(list);
+                    }
+
+                    PrintDialog printDialog = new PrintDialog(tableHeader, tableBody, CommonUtils.getUILocaleUtil().getCaption("print"), fileName);
+
+                }
+            }
+        });
+
+
         mainVL.addComponent(filterPanel);
         mainVL.setComponentAlignment(filterPanel, Alignment.MIDDLE_CENTER);
+
+
+        mainVL.addComponent(printBtn);
+        mainVL.setComponentAlignment(printBtn, Alignment.MIDDLE_RIGHT);
 
         mainVL.addComponent(usersGW);
         doFilter(filterPanel.getFilterBean()
