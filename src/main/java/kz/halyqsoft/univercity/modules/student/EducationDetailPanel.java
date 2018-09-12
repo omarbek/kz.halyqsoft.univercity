@@ -660,7 +660,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
         }
     }
 
-    private void generateSubjectDifference(ID studentId){
+    private void generateSubjectDifference(ID studentId) {
 
         List<SUBJECT> randSubject = new ArrayList<>();
         List<SUBJECT> subject = new ArrayList<>();
@@ -671,15 +671,15 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
                 "SELECT student_education.student_id FROM student_education\n" +
                 "  INNER JOIN student s2 ON student_education.student_id = s2.id\n" +
                 "  INNER JOIN speciality s3 ON student_education.speciality_id = s3.id\n" +
-                "WHERE s3.id=" +studentEducation.getSpeciality().getId()+
+                "WHERE s3.id=" + studentEducation.getSpeciality().getId() +
                 " GROUP BY student_education.student_id\n" +
                 "having count(student_education.student_id)=1\n" +
                 "ORDER BY RANDOM()\n" +
                 "LIMIT 1;";
 
         Long stuId = null;
-        try{
-            stuId=(Long) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(randStudentSql,
+        try {
+            stuId = (Long) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(randStudentSql,
                     new HashMap<>());
 
         } catch (Exception e) {
@@ -687,7 +687,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
         }
 
 
-        String randStudentSubjectSql="select * from subject\n" +
+        String randStudentSubjectSql = "select * from subject\n" +
                 " INNER JOIN student_subject ss on subject.id=ss.subject_id\n" +
                 "INNER JOIN student_education se ON ss.student_id = se.id\n" +
                 "  INNER JOIN speciality s2 ON se.speciality_id = s2.id\n" +
@@ -699,63 +699,62 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
         try {
             List tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(randStudentSubjectSql, params);
 
-            if(!tmpList.isEmpty()){
-                for(Object o : tmpList){
-                    Object[] oo =(Object[]) o;
+            if (!tmpList.isEmpty()) {
+                for (Object o : tmpList) {
+                    Object[] oo = (Object[]) o;
                     SUBJECT studentSubject = new SUBJECT();
-                    studentSubject.setId(ID.valueOf((Long)oo[0]));
-                    studentSubject.setNameKZ((String)oo[1]);
-                    studentSubject.setNameEN((String)oo[2]);
-                    studentSubject.setNameRU((String)oo[3]);
+                    studentSubject.setId(ID.valueOf((Long) oo[0]));
+                    studentSubject.setNameKZ((String) oo[1]);
+                    studentSubject.setNameEN((String) oo[2]);
+                    studentSubject.setNameRU((String) oo[3]);
 
                     randSubject.add(studentSubject);
 
                 }
-            }else {
+            } else {
                 System.out.print("nothing in randStudentSubject!");
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
-        String studentSubjectSql="select * from subject\n" +
+        String studentSubjectSql = "select * from subject\n" +
                 " INNER JOIN student_subject ss on subject.id=ss.subject_id\n" +
                 "INNER JOIN student_education se ON ss.student_id = se.id\n" +
                 "  INNER JOIN speciality s2 ON se.speciality_id = s2.id\n" +
-                "WHERE ss.student_id="+studentId.getId();
+                "WHERE ss.student_id=" + studentId.getId();
 
         Map<Integer, Object> par = new HashMap<>();
-
 
 
         try {
             List tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(studentSubjectSql, par);
 
-           // List qwe = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(SEMESTER_DATA.class, ID.valueOf());
+            // List qwe = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(SEMESTER_DATA.class, ID.valueOf());
 
-            if(!tmpList.isEmpty()){
-                for(Object o : tmpList){
-                    Object[] oo =(Object[]) o;
+            if (!tmpList.isEmpty()) {
+                for (Object o : tmpList) {
+                    Object[] oo = (Object[]) o;
                     SUBJECT studentSubject = new SUBJECT();
-                    studentSubject.setId(ID.valueOf((Long)oo[0]));
-                    studentSubject.setNameKZ((String)oo[1]);
-                    studentSubject.setNameEN((String)oo[2]);
-                    studentSubject.setNameRU((String)oo[3]);
+                    studentSubject.setId(ID.valueOf((Long) oo[0]));
+                    studentSubject.setNameKZ((String) oo[1]);
+                    studentSubject.setNameEN((String) oo[2]);
+                    studentSubject.setNameRU((String) oo[3]);
                     subject.add(studentSubject);
                 }
-            }else {
+            } else {
                 System.out.print("nothing in StudentSubject!");
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
-                randSubject.removeAll(subject);
+        randSubject.removeAll(subject);
 
         List<STUDENT_DIFFERENCE> studentDifferences = new ArrayList<>();
-        for(SUBJECT s:randSubject){
-            STUDENT_DIFFERENCE studentDifference=new STUDENT_DIFFERENCE();
+        for (SUBJECT s : randSubject) {
+            STUDENT_DIFFERENCE studentDifference = new STUDENT_DIFFERENCE();
             studentDifference.setStudentEducation(studentEducation);
             studentDifference.setSubject(s);
             try {
@@ -765,7 +764,7 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
                 CommonUtils.showMessageAndWriteLog("Unable to save subject", e);
             }
         }
-}
+    }
 
     private void refreshGroups(ID specId) {
         QueryModel<GROUPS> groupsQM = new QueryModel<GROUPS>(GROUPS.class);
@@ -1183,6 +1182,8 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
                 ss = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(STUDENT_STATUS.class, ID.valueOf(7));
             } else if (!languageCB.getValue().equals(studentEducation.getLanguage())) {
                 ss = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(STUDENT_STATUS.class, ID.valueOf(8));
+            } else if (!groupCB.getValue().equals(studentEducation.getGroups())) {
+                ss = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(STUDENT_STATUS.class, ID.valueOf(10));
             }
 
             if (ss == null) {
@@ -1545,10 +1546,10 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
 //            STUDENT student = (STUDENT) ev.getProperty().getValue();
             if (speciality != null) {
                 refreshGroups(speciality.getId());
-            //    generateSubjectDifference(student.getId());
+                //    generateSubjectDifference(student.getId());
             } else {
                 refreshGroups(ID.valueOf(-1));
-               // generateSubjectDifference(ID.valueOf(-1));
+                // generateSubjectDifference(ID.valueOf(-1));
             }
         }
     }
