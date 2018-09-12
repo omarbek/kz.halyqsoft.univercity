@@ -18,7 +18,7 @@ public class VDepartmentInfo extends AbstractEntity {
     @FieldInfo(type = EFieldType.DOUBLE, order = 4)
     private double percantage;
 
-    @FieldInfo(type = EFieldType.INTEGER, order = 5, inGrid = false)
+    @FieldInfo(type = EFieldType.INTEGER, order = 5, inGrid = false, inView = false, inEdit = false)
     private Long departmentID;
 
     public String getDeptName() {

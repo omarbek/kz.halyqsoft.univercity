@@ -29,6 +29,7 @@ import org.r3a.common.vaadin.widget.ERefreshType;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 import org.r3a.common.vaadin.widget.filter2.FilterPanelListener;
+import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 
@@ -149,6 +150,8 @@ public class AutoCreationTab extends AbstractCommonView  implements FilterPanelL
         dbGridModel.setRowNumberVisible(true);
         dbGridModel.setRowNumberWidth(50);
         dbGridModel.getColumnModel("deleted").setInGrid(false);
+        FKFieldModel specialityFM =  (FKFieldModel) dbGridModel.getFormModel().getFieldModel("speciality");
+        specialityFM.getQueryModel().addWhere("deleted" , ECriteria.EQUAL , false);
     }
 
     private List<LANGUAGE> getLanguageList(List<ID> ids){
@@ -364,6 +367,9 @@ public class AutoCreationTab extends AbstractCommonView  implements FilterPanelL
 
     @Override
     public boolean preSave(Object o, Entity entity, boolean b, int i) throws Exception {
+        if(entity instanceof GROUPS){
+            ((GROUPS) entity).setCreated(new Date());
+        }
         return true;
     }
 
