@@ -52,8 +52,10 @@ public class CanceledLessons extends AbstractTaskView implements EntityListener 
         lessonFM.getFieldModel("finishDate").setInView(false);
         lessonFM.getFieldModel("finishDate").setInEdit(false);
 
+        lessonFM.getFieldModel("cancelReason").setInView(false);
+        lessonFM.getFieldModel("cancelReason").setInEdit(false);
+
         lessonFM.getFieldModel("canceled").setRequired(false);
-        lessonFM.getFieldModel("cancelReason").setRequired(false);
 
         getContent().addComponent(lessonGW);
     }
