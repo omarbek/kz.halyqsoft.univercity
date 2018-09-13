@@ -92,7 +92,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
 
     private static final int UKPU = 1;
 
-    private static final String PATH_TO_PHOTO = "/var/www/html/files/photos/";
+    private static final String PATH_TO_PHOTO = "/files/photos/";
     private boolean kz;
 
     public StudentEdit(final FormModel baseDataFM, VerticalLayout mainVL,

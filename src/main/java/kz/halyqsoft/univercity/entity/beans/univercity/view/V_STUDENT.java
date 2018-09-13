@@ -276,7 +276,7 @@ public class V_STUDENT extends AbstractEntity {
     private V_ADVISOR advisor;
 
     @FieldInfo(type = EFieldType.TEXT, order = 56, inEdit = false, inView = false)
-    @Column(name = "ADVISOR", nullable = false)
+    @Column(name = "ADVISOR_NAME", nullable = false)
     private String advisorName;
 
     @FieldInfo(type = EFieldType.FK_COMBO, order = 57, inGrid = false, required = false)
@@ -286,7 +286,7 @@ public class V_STUDENT extends AbstractEntity {
     private V_COORDINATOR coordinator;
 
     @FieldInfo(type = EFieldType.TEXT, order = 58, inEdit = false, inView = false)
-    @Column(name = "COORDINATOR", nullable = false)
+    @Column(name = "COORDINATOR_NAME", nullable = false)
     private String coordinatorName;
 
     @FieldInfo(type = EFieldType.FK_COMBO, order = 59, inGrid = false, required = false)
@@ -777,5 +777,45 @@ public class V_STUDENT extends AbstractEntity {
         }
 
         return sb.toString();
+    }
+
+    public V_ADVISOR getAdvisor() {
+        return advisor;
+    }
+
+    public void setAdvisor(V_ADVISOR advisor) {
+        this.advisor = advisor;
+    }
+
+    public String getAdvisorName() {
+        return advisorName;
+    }
+
+    public void setAdvisorName(String advisorName) {
+        this.advisorName = advisorName;
+    }
+
+    public V_COORDINATOR getCoordinator() {
+        return coordinator;
+    }
+
+    public void setCoordinator(V_COORDINATOR coordinator) {
+        this.coordinator = coordinator;
+    }
+
+    public String getCoordinatorName() {
+        return coordinatorName;
+    }
+
+    public void setCoordinatorName(String coordinatorName) {
+        this.coordinatorName = coordinatorName;
+    }
+
+    public LANGUAGE getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(LANGUAGE language) {
+        this.language = language;
     }
 }
