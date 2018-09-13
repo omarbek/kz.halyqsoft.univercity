@@ -145,7 +145,8 @@ public class ScheduleView extends AbstractTaskView {
                     lesson.setLessonDate(dateByWeekDay);
                     lesson.setBeginDate(getDateByTime(dateByWeekDay, scheduleDetail.getLessonTime().getBeginTime()));
                     lesson.setFinishDate(getDateByTime(dateByWeekDay, scheduleDetail.getLessonTime().getEndTime()));
-                    lesson.setCanceled(false);
+                    lesson.setCanceled(true);
+                    lesson.setCancelReason("Учитель не пришел на урок");
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(lesson);
 
                     QueryModel<STUDENT_EDUCATION> studentEducationQM = new QueryModel<>(STUDENT_EDUCATION.class);

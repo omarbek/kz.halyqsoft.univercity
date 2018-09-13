@@ -67,7 +67,7 @@ public class BindingElectiveSubjectDialog extends WindowUtils {
 //            }
 
             ComboBox subjectCB = new ComboBox();
-            subjectCB.setCaption(getUILocaleUtil().getEntityFieldLabel(PAIR_SUBJECT.class,"subject"));
+            subjectCB.setCaption(getUILocaleUtil().getEntityFieldLabel(PAIR_SUBJECT.class, "subject"));
             subjectCB.setNullSelectionAllowed(true);
             subjectCB.setTextInputAllowed(true);
             subjectCB.setFilteringMode(FilteringMode.CONTAINS);
@@ -85,12 +85,12 @@ public class BindingElectiveSubjectDialog extends WindowUtils {
             mainVL.setComponentAlignment(subjectCB, Alignment.MIDDLE_CENTER);
 
             TextField pairTF = new TextField();
-            pairTF.setCaption(getUILocaleUtil().getEntityFieldLabel(PAIR_SUBJECT.class,"pairNumber"));
+            pairTF.setCaption(getUILocaleUtil().getEntityFieldLabel(PAIR_SUBJECT.class, "pairNumber"));
             mainVL.addComponent(pairTF);
             mainVL.setComponentAlignment(pairTF, Alignment.MIDDLE_CENTER);
 
             TextField descriptionTF = new TextField();
-            descriptionTF.setCaption(getUILocaleUtil().getEntityFieldLabel(PAIR_SUBJECT.class,"description"));
+            descriptionTF.setCaption(getUILocaleUtil().getEntityFieldLabel(PAIR_SUBJECT.class, "description"));
             mainVL.addComponent(descriptionTF);
             mainVL.setComponentAlignment(descriptionTF, Alignment.MIDDLE_CENTER);
 
@@ -121,17 +121,20 @@ public class BindingElectiveSubjectDialog extends WindowUtils {
                                 SEMESTER_SUBJECT semesterSubject = new SEMESTER_SUBJECT();
                                 semesterSubject.setSubject(modifiedPairSubject.getSubject());
                                 QueryModel<SEMESTER_DATA> semesterDataQM = new QueryModel<>(SEMESTER_DATA.class);
-                                semesterDataQM.addWhere("year" , ECriteria.EQUAL, electiveBindedSubject.getCatalogElectiveSubjects().getEntranceYear().getId()) ;
-                                semesterDataQM.addWhere("semesterPeriod" , ECriteria.EQUAL, electiveBindedSubject.getSemester().getSemesterPeriod().getId()) ;
+                                semesterDataQM.addWhere("year", ECriteria.EQUAL, electiveBindedSubject.getCatalogElectiveSubjects().getEntranceYear().getId());
+                                semesterDataQM.addWhere("semesterPeriod", ECriteria.EQUAL, electiveBindedSubject.getSemester().getSemesterPeriod().getId());
                                 SEMESTER_DATA semesterData = null;
-                                try{
+                                try {
                                     semesterData = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(semesterDataQM);
-                                }catch (Exception e){
+                                } catch (Exception e) {
                                     e.printStackTrace();
                                 }
-                                if(semesterData!=null){
+                                if (semesterData != null) {
                                     semesterSubject.setSemesterData(semesterData);
-                                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(semesterSubject);
+                                    try {
+                                        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(semesterSubject);
+                                    } catch (Exception ignored) {
+                                    }
                                 }
                             }
 

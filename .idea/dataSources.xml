@@ -16,11 +16,11 @@
         <property name="ApplicationName" value="DataGrip" />
       </driver-properties>
     </data-source>
-    <data-source source="LOCAL" name="univerdbb@localhost" uuid="fe7f3558-5528-4f70-8dba-834143fa0bcb">
+    <data-source source="LOCAL" name="realdb@localhost" uuid="fe7f3558-5528-4f70-8dba-834143fa0bcb">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost:5432/univerdbb</jdbc-url>
+      <jdbc-url>jdbc:postgresql://localhost:5432/realdb</jdbc-url>
       <driver-properties>
         <property name="ApplicationName" value="DataGrip" />
       </driver-properties>
@@ -30,15 +30,6 @@
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://185.146.3.79:5432/pserver</jdbc-url>
-    </data-source>
-    <data-source source="LOCAL" name="univerdb@185.22.64.89" uuid="11469e62-8dec-4721-9e93-c2e4828c1f75">
-      <driver-ref>postgresql</driver-ref>
-      <synchronize>true</synchronize>
-      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://185.22.64.89:5432/univerdb</jdbc-url>
-      <driver-properties>
-        <property name="ApplicationName" value="DataGrip" />
-      </driver-properties>
     </data-source>
   </component>
 </project>

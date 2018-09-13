@@ -72,7 +72,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
     private CommonFormWidget grantDocFW;
     private TableWidget educationTW, languageTW, medicalCheckupTW, differenceTW;
     private FromItem educationUDFI;
-    private Label lockLabel, lockReasonLabel, createdBylabel;
+    private Label lockLabel, lockReasonLabel, createdBylabel,label;
     private Button lockUnlockButton;
     private LockDialog lockDialog;
     private STUDENT student;
@@ -92,7 +92,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
 
     private static final int UKPU = 1;
 
-    private static final String PATH_TO_PHOTO = "/var/www/html/files/photos/";
+    private static final String PATH_TO_PHOTO = "/files/photos/";
     private boolean kz;
 
     public StudentEdit(final FormModel baseDataFM, VerticalLayout mainVL,
@@ -2575,7 +2575,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
             educationFL.setMargin(new MarginInfo(false, false, false, true));
             educationFL.setCaption(getUILocaleUtil().getCaption("education.info"));
 
-            Label label = new Label();
+            label = new Label();
             label.addStyleName("bold");
             label.setCaption(getUILocaleUtil().getEntityFieldLabel(STUDENT_EDUCATION.class, "faculty"));
             label.setValue(studentEducation.getFaculty().toString());
@@ -2609,17 +2609,42 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
 
             label = new Label();
             label.addStyleName("bold");
+            label.setCaption(getUILocaleUtil().getEntityFieldLabel(STUDENT_EDUCATION.class, "language"));
+            label.setValue(studentEducation.getLanguage().toString());
+            label.setImmediate(true);
+
+            educationFL.addComponent(label);
+
+            if (!mainBaseDataFM.isReadOnly()) {
+                Button editButton = new NativeButton();
+                editButton.setCaption(getUILocaleUtil().getCaption("edit"));
+                editButton.addClickListener(new ClickListener() {
+
+                    @Override
+                    public void buttonClick(ClickEvent ev) {
+                        try {
+                            StudentChangeLanguage studentChangeLanguage = new StudentChangeLanguage(studentEducation,StudentEdit.this);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                educationFL.addComponent(editButton);
+            }
+
+            label = new Label();
+            label.addStyleName("bold");
             label.setCaption(getUILocaleUtil().getEntityFieldLabel(STUDENT_EDUCATION.class, "studyYear"));
             label.setImmediate(true);
             label.setValue(studentEducation.getStudyYear().toString());
             educationFL.addComponent(label);
 
             label = new Label();
-
             label.setImmediate(true);
             label.addStyleName("bold");
             label.setCaption(getUILocaleUtil().getEntityFieldLabel(STUDENT_EDUCATION.class, "status"));
             label.setValue(studentEducation.getStatus().toString());
+
             educationFL.addComponent(label);
 
             lockLabel = new Label();
@@ -2679,6 +2704,8 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 createdBylabel.setValue(user.toString());
             }
             educationFL.addComponent(createdBylabel);
+
+
 
             return educationFL;
 
