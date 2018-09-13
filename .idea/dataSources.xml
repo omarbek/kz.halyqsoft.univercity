@@ -16,11 +16,11 @@
         <property name="ApplicationName" value="DataGrip" />
       </driver-properties>
     </data-source>
-    <data-source source="LOCAL" name="loaddb@localhost" uuid="fe7f3558-5528-4f70-8dba-834143fa0bcb">
+    <data-source source="LOCAL" name="realdb@localhost" uuid="fe7f3558-5528-4f70-8dba-834143fa0bcb">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost:5432/loaddb</jdbc-url>
+      <jdbc-url>jdbc:postgresql://localhost:5432/realdb</jdbc-url>
       <driver-properties>
         <property name="ApplicationName" value="DataGrip" />
       </driver-properties>
