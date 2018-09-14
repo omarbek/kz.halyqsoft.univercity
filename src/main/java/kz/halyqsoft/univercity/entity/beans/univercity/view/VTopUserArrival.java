@@ -12,8 +12,8 @@ public class VTopUserArrival extends AbstractEntity {
     @FieldInfo(type = EFieldType.TEXT, order=2 )
     private String group;
 
-    @FieldInfo(type = EFieldType.INTEGER, order=3 )
-    private long sum;
+    @FieldInfo(type = EFieldType.DOUBLE, order=3 )
+    private Double percentage;
 
     public String getFio() {
         return fio;
@@ -31,11 +31,11 @@ public class VTopUserArrival extends AbstractEntity {
         this.group = group;
     }
 
-    public long getSum() {
-        return sum;
+    public Double getPercentage() {
+        return percentage;
     }
 
-    public void setSum(long sum) {
-        this.sum = sum;
+    public void setPercentage(Double percentage) {
+        this.percentage = percentage;
     }
 }

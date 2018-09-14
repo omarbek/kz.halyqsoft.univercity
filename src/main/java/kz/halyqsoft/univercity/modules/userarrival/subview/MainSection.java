@@ -8,21 +8,25 @@ import com.byteowls.vaadin.chartjs.data.Dataset;
 import com.byteowls.vaadin.chartjs.data.PieDataset;
 import com.byteowls.vaadin.chartjs.options.InteractionMode;
 import com.byteowls.vaadin.chartjs.options.Position;
+import com.byteowls.vaadin.chartjs.options.elements.Rectangle;
 import com.byteowls.vaadin.chartjs.options.scale.Axis;
 import com.byteowls.vaadin.chartjs.options.scale.LinearScale;
 import com.byteowls.vaadin.chartjs.utils.ColorUtils;
 import com.vaadin.data.Property;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.MouseEvents;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
+import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE;
 import kz.halyqsoft.univercity.entity.beans.univercity.GROUPS;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEPARTMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDY_YEAR;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.VTopGroupArrival;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.VTopUserArrival;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.V_EMPLOYEE;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.V_STUDENT;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.*;
+import kz.halyqsoft.univercity.filter.FStatisticsFilter;
+import kz.halyqsoft.univercity.filter.panel.StatisticsFilterPanel;
+import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.PrintDialog;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -32,13 +36,17 @@ import org.r3a.common.entity.query.select.EAggregate;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.widget.ERefreshType;
 import org.r3a.common.vaadin.widget.dialog.Message;
+import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
+import org.r3a.common.vaadin.widget.filter2.FilterPanelListener;
+import org.r3a.common.vaadin.widget.filter2.panel.AbstractFilterPanel;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
+import org.r3a.common.vaadin.widget.grid.model.GridColumnModel;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class MainSection {
+public class MainSection implements FilterPanelListener {
     private VerticalLayout mainVL;
     private DateField dateField;
 
@@ -62,13 +70,65 @@ public class MainSection {
         });
         dateField.setValue(new Date());
 
-        mainVL.addComponent(dateField);
-        mainVL.setComponentAlignment(dateField,Alignment.TOP_RIGHT);
-
         setValues();
     }
 
-    public List<VTopGroupArrival> getList(Date date) {
+    public List<VTopUserArrival> getUserList(Date date) {
+        List<VTopUserArrival> userList = new ArrayList<>();
+
+        Map<Integer, Object> params = new HashMap<>();
+        String formattedDate = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS").format(date);
+
+        String sql = "SELECT\n" +
+                "  id,\n" +
+                "  fio ,\n" +
+                "  (CASE WHEN present_lesson > 0 THEN all_lessons/present_lesson*100 ELSE 0 END)::DOUBLE PRECISION  as percentage,\n" +
+                "  group_name \n" +
+                "  from (SELECT\n" +
+                "  vs.id,\n" +
+                "  concat(vs.first_name, ' ', vs.last_name, ' ', vs.middle_name) AS fio,\n" +
+                "  l.lesson_date,\n" +
+                "  count(l.id)                                                   AS all_lessons,\n" +
+                "  sum(CASE WHEN ld.attendance_mark = 1\n" +
+                "    THEN 1\n" +
+                "      ELSE 0 END)                                               AS present_lesson,\n" +
+                "  sum(CASE WHEN ld.attendance_mark = 0\n" +
+                "    THEN 1\n" +
+                "      ELSE 0 END)                                               AS absent_lesson,\n" +
+                "  vs.group_name\n" +
+                "FROM v_student vs\n" +
+                "  INNER JOIN student_education se\n" +
+                "    ON vs.id = se.student_id\n" +
+                "  INNER JOIN lesson_detail ld\n" +
+                "    ON se.id = ld.student_id\n" +
+                "  INNER JOIN lesson l\n" +
+                "    ON ld.lesson_id = l.id\n" +
+                "WHERE date_trunc('month', l.lesson_date) IN (date_trunc('month', TIMESTAMP '"+CommonUtils.getFormattedDate(date)+"'))\n" +
+                "      AND l.canceled = FALSE\n" +
+                "GROUP BY vs.id, fio, l.lesson_date, vs.group_name) newselect ORDER BY CASE WHEN present_lesson > 0\n" +
+                "    THEN all_lessons / present_lesson * 100\n" +
+                "   ELSE 0 END DESC;";
+
+        try {
+            List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
+            if (!tmpList.isEmpty()) {
+                for (Object o : tmpList) {
+                    Object[] oo = (Object[]) o;
+                    VTopUserArrival topUser = new VTopUserArrival();
+                    topUser.setId(ID.valueOf((Long) oo[0]));
+                    topUser.setFio((String) oo[1]);
+                    topUser.setPercentage((Double) oo[2]);
+                    topUser.setGroup((String) oo[3]);
+                    userList.add(topUser);
+                }
+            }
+        } catch (Exception ex) {
+            CommonUtils.showMessageAndWriteLog("Unable to load vgroup list", ex);
+        }
+        return userList;
+    }
+
+    public List<VTopGroupArrival> getGroupList(Date date) {
         List<VTopGroupArrival> groupList = new ArrayList<>();
 
         Map<Integer, Object> params = new HashMap<>();
@@ -106,7 +166,7 @@ public class MainSection {
                     if (oo[1] != null) {
                         EMPLOYEE employee = null;
                         try {
-                            employee = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(EMPLOYEE.class, (ID) oo[2]);
+                            employee = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(EMPLOYEE.class, ID.valueOf((Long)oo[2]));
                             topGroup.setTeacher(employee.toString());
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -125,70 +185,119 @@ public class MainSection {
     }
 
 
-    private Component getVerticalBar1() {
-        QueryModel<STUDY_YEAR> group = new QueryModel<STUDY_YEAR>(STUDY_YEAR.class);
-        List<STUDY_YEAR> course = null;
-        try {
-            course = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(group);
-        } catch (Exception e) {
+    private Component getStatistics() {
+        VerticalLayout mainVL = new VerticalLayout();
+        mainVL.setSizeFull();
+        mainVL.setImmediate(true);
+        mainVL.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
+
+        Label label = new Label();
+        label.setSizeFull();
+        label.setCaptionAsHtml(true);
+        label.setImmediate(true);
+        label.setCaption("<h2>    " + CommonUtils.getUILocaleUtil().getCaption("attendance") + "</h2>" );
+        mainVL.addComponent(label);
+        try{
+            mainVL.addComponent(getFilter());
+        }catch (Exception e){
             e.printStackTrace();
         }
+
+        mainVL.addComponent(getVerticalBar());
+
+        return mainVL;
+    }
+
+    private AbstractFilterPanel getFilter() throws Exception{
+        StatisticsFilterPanel statisticsFP = new StatisticsFilterPanel(new FStatisticsFilter());
+        statisticsFP.addFilterPanelListener(this);
+        statisticsFP.setImmediate(true);
+
+        ComboBox facultyCB = new ComboBox();
+        facultyCB.setNullSelectionAllowed(false);
+        facultyCB.setTextInputAllowed(true);
+        facultyCB.setFilteringMode(FilteringMode.CONTAINS);
+        facultyCB.setWidth(200, Sizeable.Unit.PIXELS);
+        QueryModel<DEPARTMENT> facultyQM = new QueryModel<>(DEPARTMENT.class);
+        facultyQM.addWhere("deleted" , ECriteria.EQUAL,false);
+        facultyQM.addWhereNullAnd("parent");
+        BeanItemContainer<DEPARTMENT> facultyBIC = new BeanItemContainer<>(DEPARTMENT.class,
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(facultyQM));
+        facultyCB.setContainerDataSource(facultyBIC);
+        statisticsFP.addFilterComponent("department", facultyCB);
+
+        DateField startingDateDF = new DateField();
+        statisticsFP.addFilterComponent("startingDate", startingDateDF);
+
+        DateField endingDateDF = new DateField();
+        statisticsFP.addFilterComponent("endingDate", endingDateDF);
+        return statisticsFP;
+    }
+
+    private Component getVerticalBar(){
         BarChartConfig barConfig = new BarChartConfig();
-        for (STUDY_YEAR year : course) {
-            barConfig.
-                    data()
-                    .labels("info about course attend in day")
-                    .addDataset(
-                            new BarDataset().backgroundColor(
-                                    ColorUtils.randomColor(1.0)).label(year.getStudyYear().toString()).yAxisID("y-axis-1"))
-                    .and();
-            barConfig.
-                    options()
-                    .responsive(true)
-                    .hover()
-                    .mode(InteractionMode.INDEX)
-                    .intersect(true)
-                    .animationDuration(400)
-                    .and()
-                    .title()
-                    .display(true)
-                    .text("by week")
-                    .and()
-                    .scales()
-                    .add(Axis.Y, new LinearScale().display(true).position(Position.LEFT).id("y-axis-1"))
-                    .and()
-                    .done();
-        }
+        barConfig.horizontal();
+        barConfig.
+                data()
+                .labels("January", "February", "March", "April", "May", "June", "July")
+                .addDataset(new BarDataset().backgroundColor("rgba(220,220,220,0.5)").label("Dataset 1"))
+                .addDataset(new BarDataset().backgroundColor("rgba(151,187,205,0.5)").label("Dataset 2").hidden(true))
+                .addDataset(new BarDataset().backgroundColor("rgba(151,187,205,0.5)").label("Dataset 3"))
+                .and()
+                .options()
+                .responsive(true)
+                .title()
+                .display(true)
+                .text("Chart.js Horizontal Bar Chart")
+                .and()
+                .elements()
+                .rectangle()
+                .borderWidth(2)
+                .borderColor("rgb(0, 255, 0)")
+                .borderSkipped(Rectangle.RectangleEdge.LEFT)
+                .and()
+                .and()
+                .legend()
+                .fullWidth(false)
+                .position(Position.LEFT)
+                .and()
+                .done();
 
         List<String> labels = barConfig.data().getLabels();
         for (Dataset<?, ?> ds : barConfig.data().getDatasets()) {
             BarDataset lds = (BarDataset) ds;
-
             List<Double> data = new ArrayList<>();
             for (int i = 0; i < labels.size(); i++) {
-                data.add(i, 3.0);
+                data.add((Math.random() > 0.5 ? 1.0 : -1.0) * Math.round(Math.random() * 100));
             }
             lds.dataAsList(data);
         }
 
         ChartJs chart = new ChartJs(barConfig);
         chart.setJsLoggingEnabled(true);
+        chart.setImmediate(true);
         chart.setSizeFull();
+
         return chart;
     }
 
     public Component setFooterTables() {
         VerticalLayout innerVL = new VerticalLayout();
+        innerVL.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
         innerVL.setSizeFull();
         innerVL.setImmediate(true);
 
-        Label label = new Label(CommonUtils.getUILocaleUtil().getCaption("best.attendance"));
+        Label label = new Label();
+        label.setImmediate(true);
+        label.setCaptionAsHtml(true);
+        label.setCaption("<h2>    " + CommonUtils.getUILocaleUtil().getCaption("best.attendance") +"</h2>");
         label.setSizeFull();
+
 
         GridLayout topPerformanceGL = new GridLayout();
         topPerformanceGL.setSizeFull();
         topPerformanceGL.setColumns(2);
-        topPerformanceGL.setRows(1);
+        topPerformanceGL.setRows(2);
         topPerformanceGL.setSpacing(true);
 
         GridWidget bestStudentsGW = new GridWidget(VTopUserArrival.class);
@@ -198,7 +307,7 @@ public class MainSection {
 
         DBGridModel bestStudentsGM = (DBGridModel) bestStudentsGW.getWidgetModel();
         bestStudentsGM.setRefreshType(ERefreshType.MANUAL);
-        //bestStudentsGM.setEntities(getList(dateField.getValue()));
+        bestStudentsGM.setEntities(getUserList(dateField.getValue()));
 
 
 
@@ -209,9 +318,73 @@ public class MainSection {
 
         DBGridModel bestGroupsGM = (DBGridModel) bestGroupsGW.getWidgetModel();
         bestGroupsGM.setRefreshType(ERefreshType.MANUAL);
-        bestGroupsGM.setEntities(getList(dateField.getValue()));
+        bestGroupsGM.setEntities(getGroupList(dateField.getValue()));
+
+        Button printBtn1 = new Button(CommonUtils.getUILocaleUtil().getCaption("export"));
+        printBtn1.setImmediate(true);
+        printBtn1.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+
+                List<String> tableHeader = new ArrayList<>();
+                List<List<String>> tableBody= new ArrayList<>();
+
+                String fileName = "document";
+
+                for(GridColumnModel gcm : bestStudentsGM.getColumnModels()){
+                    tableHeader.add(gcm.getLabel());
+                }
+                for(int i = 0 ; i < bestStudentsGW.getAllEntities().size(); i++){
+                    VTopUserArrival vUser = (VTopUserArrival) bestStudentsGW.getAllEntities().get(i);
+                    if(bestStudentsGW.getCaption()!=null){
+                        fileName = bestStudentsGW.getCaption();
+                    }
+                    List<String> list = new ArrayList<>();
+                    list.add(vUser.getFio());
+                    list.add(vUser.getGroup());
+                    list.add(vUser.getPercentage().toString());
+                    tableBody.add(list);
+                }
 
 
+
+                PrintDialog printDialog = new PrintDialog(tableHeader, tableBody , CommonUtils.getUILocaleUtil().getCaption("print"),fileName);
+            }
+        });
+
+        Button printBtn2 = new Button(CommonUtils.getUILocaleUtil().getCaption("export"));
+        printBtn2.setImmediate(true);
+        printBtn2.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+
+                List<String> tableHeader = new ArrayList<>();
+                List<List<String>> tableBody= new ArrayList<>();
+
+                String fileName = "document";
+
+                for(GridColumnModel gcm : bestGroupsGM.getColumnModels()){
+                    tableHeader.add(gcm.getLabel());
+                }
+                for(int i = 0 ; i < bestGroupsGW.getAllEntities().size(); i++){
+                    VTopGroupArrival vGroup = (VTopGroupArrival) bestGroupsGW.getAllEntities().get(i);
+                    if(bestGroupsGW.getCaption()!=null){
+                        fileName = bestGroupsGW.getCaption();
+                    }
+                    List<String> list = new ArrayList<>();
+                    list.add(vGroup.getGroup());
+                    list.add(vGroup.getTeacher());
+                    list.add(vGroup.getAttend()+"");
+                    list.add(vGroup.getPercent()+"");
+                    list.add(vGroup.getSumOfStudent()+"");
+                    tableBody.add(list);
+                }
+                PrintDialog printDialog = new PrintDialog(tableHeader, tableBody , CommonUtils.getUILocaleUtil().getCaption("print"),fileName);
+            }
+        });
+
+        topPerformanceGL.addComponent(printBtn1);
+        topPerformanceGL.addComponent(printBtn2);
         topPerformanceGL.addComponent(bestStudentsGW);
         topPerformanceGL.addComponent(bestGroupsGW);
 
@@ -222,333 +395,16 @@ public class MainSection {
     }
 
 
-    private Component getPieChart() {
-        PieChartConfig config = new PieChartConfig();
-        config
-                .data()
-                .labels("All", "Green", "Yellow", "Grey", "Dark Grey")
-                .addDataset(new PieDataset().label("Dataset 1"))
-                .and();
-
-        config.
-                options()
-                .responsive(true)
-                .title()
-                .display(true)
-                .text("Chart.js Single Pie Chart")
-                .and()
-                .animation()
-                .animateScale(true)
-                .animateRotate(true)
-                .and()
-                .done();
-
-        List<String> labels = config.data().getLabels();
-        for (Dataset<?, ?> ds : config.data().getDatasets()) {
-            PieDataset lds = (PieDataset) ds;
-            List<Double> data = new ArrayList<>();
-            List<String> colors = new ArrayList<>();
-            for (int i = 0; i < labels.size(); i++) {
-                data.add((double) (Math.round(Math.random() * 100)));
-                colors.add(ColorUtils.randomColor(0.7));
-            }
-            lds.backgroundColor(colors.toArray(new String[colors.size()]));
-            lds.dataAsList(data);
-        }
-
-        ChartJs chart = new ChartJs(config);
-        chart.setJsLoggingEnabled(true);
-
-        return chart;
-    }
-
-    private Component getVerticalBar(Date date) {
-
-        String formattedDate = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS").format(date);
-        Map<Integer, Object> params = new HashMap<>();
-        BarChartConfig barConfig = new BarChartConfig();
-
-        String sql = "select sum(come_in_all) , sum(come_in_true),sum(come_in_false) from (select\n" +
-                "  count(ua.come_in) as come_in_all,\n" +
-                "  count(nullif(ua.come_in = false, true)) as come_in_true,\n" +
-                "  count(nullif(ua.come_in = true, true)) as come_in_false\n" +
-                "from student s\n" +
-                "  inner join user_arrival ua\n" +
-                "    on ua.user_id = s.id\n" +
-                "  inner join users u\n" +
-                "    on s.id = u.id\n" +
-                "where date_trunc('day', ua.created) = date_trunc('day', timestamp '" + formattedDate + "')\n" +
-                "      and u.deleted = true\n" +
-                "group by s.id) newselect";
-
-        try {
-            List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
-            if (!tmpList.isEmpty()) {
-                for (Object o : tmpList) {
-                    Object[] oo = (Object[]) o;
-                    barConfig.
-                            data()
-                            .labels("student attends")
-                            .addDataset(
-                                    new BarDataset().backgroundColor(
-                                            ColorUtils.randomColor(1.0)).label(oo[1] + "").yAxisID("y-axis-1"))
-                            .and();
-                }
-            }
-        } catch (Exception ex) {
-            CommonUtils.showMessageAndWriteLog("Unable to load vgroup list", ex);
-        }
-        barConfig.
-                options()
-                .responsive(true)
-                .hover()
-                .mode(InteractionMode.INDEX)
-                .intersect(true)
-                .animationDuration(400)
-                .and()
-                .title()
-                .display(true)
-                .text("by day")
-                .and()
-                .scales()
-                .add(Axis.Y, new LinearScale().display(true).position(Position.LEFT).id("y-axis-1"))
-                .and()
-                .done();
-
-        List<String> labels = barConfig.data().getLabels();
-        for (Dataset<?, ?> ds : barConfig.data().getDatasets()) {
-            BarDataset lds = (BarDataset) ds;
-
-            List<Double> data = new ArrayList<>();
-            for (int i = 0; i < labels.size(); i++) {
-                data.add(i, 3.0);
-            }
-            lds.dataAsList(data);
-        }
-        ChartJs chart = new ChartJs(barConfig);
-        chart.setJsLoggingEnabled(true);
-        chart.setSizeFull();
-        return chart;
-    }
-
-    private Component getVerticalBar2() {
-        QueryModel<STUDY_YEAR> group = new QueryModel<STUDY_YEAR>(STUDY_YEAR.class);
-        List<STUDY_YEAR> course = null;
-        try {
-            course = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(group);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        BarChartConfig barConfig = new BarChartConfig();
-        for (STUDY_YEAR year : course) {
-            barConfig.
-                    data()
-                    .labels("info about course attend in week")
-                    .addDataset(
-                            new BarDataset().backgroundColor(
-                                    ColorUtils.randomColor(1.0)).label(year.getStudyYear().toString()).yAxisID("y-axis-1"))
-                    .and();
-            barConfig.
-                    options()
-                    .responsive(true)
-                    .hover()
-                    .mode(InteractionMode.INDEX)
-                    .intersect(true)
-                    .animationDuration(400)
-                    .and()
-                    .title()
-                    .display(true)
-                    .text("Chart.js Bar Chart - Multi Axis")
-                    .and()
-                    .scales()
-                    .add(Axis.Y, new LinearScale().display(true).position(Position.LEFT).id("y-axis-1"))
-                    .and()
-                    .done();
-        }
-
-        List<String> labels = barConfig.data().getLabels();
-        for (Dataset<?, ?> ds : barConfig.data().getDatasets()) {
-            BarDataset lds = (BarDataset) ds;
-
-            List<Double> data = new ArrayList<>();
-            for (int i = 0; i < labels.size(); i++) {
-                data.add(i, 7.0);
-            }
-            lds.dataAsList(data);
-        }
-
-        ChartJs chart = new ChartJs(barConfig);
-        chart.setJsLoggingEnabled(true);
-        chart.setSizeFull();
-        return chart;
-    }
-
-    private Component getVerticalBar3() {
-        QueryModel<GROUPS> groupQM = new QueryModel<GROUPS>(GROUPS.class);
-        groupQM.addWhere("deleted", ECriteria.EQUAL, false);
-        List<GROUPS> groups = null;
-        try {
-            groups = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(groupQM);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        BarChartConfig barConfig = new BarChartConfig();
-        for (GROUPS gr : groups) {
-            barConfig.
-                    data()
-                    .labels("info about groups attend in day")
-                    .addDataset(
-                            new BarDataset().backgroundColor(
-                                    ColorUtils.randomColor(1.0)).label(gr.getName()).yAxisID("y-axis-1"))
-                    .and();
-            barConfig.
-                    options()
-                    .responsive(true)
-                    .hover()
-                    .mode(InteractionMode.INDEX)
-                    .intersect(true)
-                    .animationDuration(400)
-                    .and()
-                    .title()
-                    .display(true)
-                    .text("Chart.js Bar Chart - Multi Axis")
-                    .and()
-                    .scales()
-                    .add(Axis.Y, new LinearScale().display(true).position(Position.LEFT).id("y-axis-1"))
-                    .add(Axis.Y, new LinearScale().display(false).position(Position.LEFT).id("y-axis-2"))
-                    .add(Axis.Y, new LinearScale().display(false).position(Position.LEFT).id("y-axis-3"))
-                    .and()
-                    .done();
-        }
-
-        List<String> labels = barConfig.data().getLabels();
-        for (Dataset<?, ?> ds : barConfig.data().getDatasets()) {
-            BarDataset lds = (BarDataset) ds;
-
-            List<Double> data = new ArrayList<>();
-            for (int i = 0; i < labels.size(); i++) {
-                data.add(i, 7.0);
-            }
-            lds.dataAsList(data);
-        }
-
-        ChartJs chart = new ChartJs(barConfig);
-        chart.setJsLoggingEnabled(true);
-        chart.setSizeFull();
-        return chart;
-    }
-
-    private Component getVerticalBar4() {
-        QueryModel<GROUPS> groupQM = new QueryModel<GROUPS>(GROUPS.class);
-        groupQM.addWhere("deleted", ECriteria.EQUAL, false);
-        List<GROUPS> groups = null;
-        try {
-            groups = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(groupQM);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        BarChartConfig barConfig = new BarChartConfig();
-        for (GROUPS gr : groups) {
-            barConfig.
-                    data()
-                    .labels("info about groups attend in week")
-                    .addDataset(
-                            new BarDataset().backgroundColor(
-                                    ColorUtils.randomColor(1.0)).label(gr.getName()).yAxisID("y-axis-1"))
-                    .and();
-            barConfig.
-                    options()
-                    .responsive(true)
-                    .hover()
-                    .mode(InteractionMode.INDEX)
-                    .intersect(true)
-                    .animationDuration(400)
-                    .and()
-                    .title()
-                    .display(true)
-                    .text("Chart.js Bar Chart - Multi Axis")
-                    .and()
-                    .scales()
-                    .add(Axis.Y, new LinearScale().display(true).position(Position.LEFT).id("y-axis-1"))
-                    .add(Axis.Y, new LinearScale().display(false).position(Position.LEFT).id("y-axis-2"))
-                    .add(Axis.Y, new LinearScale().display(false).position(Position.LEFT).id("y-axis-3"))
-                    .and()
-                    .done();
-        }
-
-        List<String> labels = barConfig.data().getLabels();
-        for (Dataset<?, ?> ds : barConfig.data().getDatasets()) {
-            BarDataset lds = (BarDataset) ds;
-
-            List<Double> data = new ArrayList<>();
-            for (int i = 0; i < labels.size(); i++) {
-                data.add(i, 7.0);
-            }
-            lds.dataAsList(data);
-        }
-
-        ChartJs chart = new ChartJs(barConfig);
-        chart.setJsLoggingEnabled(true);
-        chart.setSizeFull();
-        return chart;
-    }
-
-    private Component getVerticalBar5() {
-        BarChartConfig barConfig = new BarChartConfig();
-        barConfig.
-                data()
-                .labels("January", "February", "March", "April", "May", "June", "July")
-                .
-                        addDataset(
-                                new BarDataset().backgroundColor(
-                                        ColorUtils.randomColor(1.0)).label("INFO").yAxisID("y-axis-1"))
-                .addDataset(
-                        new BarDataset().backgroundColor(
-                                ColorUtils.randomColor(2.0)).label("INFO").yAxisID("y-axis-2"))
-                .addDataset(
-                        new BarDataset().backgroundColor(
-                                ColorUtils.randomColor(3.0)).label("INFO").yAxisID("y-axis-3"))
-                .and();
-        barConfig.
-                options()
-                .responsive(true)
-                .hover()
-                .mode(InteractionMode.INDEX)
-                .intersect(true)
-                .animationDuration(400)
-                .and()
-                .title()
-                .display(true)
-                .text("Chart.js Bar Chart - Multi Axis")
-                .and()
-                .scales()
-                .add(Axis.Y, new LinearScale().display(true).position(Position.LEFT).id("y-axis-1"))
-                .add(Axis.Y, new LinearScale().display(false).position(Position.LEFT).id("y-axis-2"))
-                .add(Axis.Y, new LinearScale().display(false).position(Position.LEFT).id("y-axis-3"))
-                .and()
-                .done();
-
-        List<String> labels = barConfig.data().getLabels();
-        for (Dataset<?, ?> ds : barConfig.data().getDatasets()) {
-            BarDataset lds = (BarDataset) ds;
-            List<Double> data = new ArrayList<>();
-            for (int i = 0; i < labels.size(); i++) {
-                data.add(i, 7.0);
-            }
-            lds.dataAsList(data);
-        }
-
-        ChartJs chart = new ChartJs(barConfig);
-        chart.setJsLoggingEnabled(true);
-        chart.setSizeFull();
-        return chart;
-    }
-
     private void setValues() {
+
         try {
             if(mainVL.getComponentCount()>0){
                 mainVL.removeAllComponents();
             }
+
+            mainVL.addComponent(dateField);
+            mainVL.setComponentAlignment(dateField,Alignment.TOP_RIGHT);
+
             HorizontalLayout mainHL;
             mainHL = new HorizontalLayout();
             mainHL.setImmediate(true);
@@ -562,6 +418,7 @@ public class MainSection {
             mainHL.addComponent(setNoCards());
 
             mainVL.addComponent(mainHL);
+            mainVL.addComponent(getStatistics());
             mainVL.addComponent(setFooterTables());
 
         } catch (Exception e) {
@@ -690,5 +547,15 @@ public class MainSection {
             }
         });
         return studentsPanel;
+    }
+
+    @Override
+    public void doFilter(AbstractFilterBean abstractFilterBean) {
+
+    }
+
+    @Override
+    public void clearFilter() {
+
     }
 }
