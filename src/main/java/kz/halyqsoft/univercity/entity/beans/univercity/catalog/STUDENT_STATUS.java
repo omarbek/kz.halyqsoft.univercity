@@ -21,6 +21,7 @@ public class STUDENT_STATUS extends AbstractStatusEntity {
 	public static final ID CHANGED_TO_ANOTHER_TYPE_OF_STUDY_ID = ID.valueOf(7);
 	public static final ID CHANGED_TO_ANOTHER_LANGUAGE_ID = ID.valueOf(8);
 	public static final ID RETAKE_ID = ID.valueOf(9);
+	public static final ID MOVED_TO_ANOTHER_GROUP_ID = ID.valueOf(10);
 
 	public STUDENT_STATUS() {
 	}
