@@ -1,9 +1,7 @@
 package kz.halyqsoft.univercity.modules.individualeducationplan.student;
 
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.OptionGroup;
+import com.vaadin.data.Item;
+import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.utils.CommonUtils;
@@ -26,6 +24,7 @@ public class SemesterPanel extends AbstractCommonPanel {
     private STUDENT_EDUCATION studentEducation;
     private SEMESTER s;
     private List<SEMESTER_DATA> semesterData;
+    private   HorizontalLayout layout;
 
     public SemesterPanel(IndividualEducationPlanView registrationView, SEMESTER s) throws Exception {
         this.s = s;
@@ -38,9 +37,38 @@ public class SemesterPanel extends AbstractCommonPanel {
     }
 
     public void initPanel() throws Exception {
-        HorizontalLayout HL = new HorizontalLayout();
-        setHeight("400");
+        HorizontalSplitPanel HL = new HorizontalSplitPanel();
+        HL.setSplitPosition(50);
+        HL.setHeight("300");
 
+        QueryModel<SUBJECT> subjectQM = new QueryModel<>(SUBJECT.class);
+        subjectQM.addWhere("chair",ECriteria.EQUAL,studentEducation.getChair().getId());
+        subjectQM.addWhere("deleted",false);
+        subjectQM.addWhere("mandatory",true);
+        List<SUBJECT> subject = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                lookup(subjectQM);
+
+        VerticalLayout vl = new VerticalLayout();
+        vl.setSpacing(true);
+        OptionGroup subjectOG = new OptionGroup(getUILocaleUtil().getCaption("subjectOG"));
+        subjectOG.setMultiSelect(true);
+        subjectOG.setNullSelectionAllowed(false);
+        subjectOG.setImmediate(true);
+
+        for(SUBJECT sub: subject) {
+            Item item = subjectOG.addItem(sub);
+            subjectOG.addListener(new Listener() {
+                @Override
+                public void componentEvent(Event event) {
+                    subjectOG.getValue();
+                }
+            });
+            vl.addComponent(subjectOG);
+        }
+        HL.addComponent(vl);
+
+        VerticalLayout vl2  = new VerticalLayout();
+        vl2.setSpacing(true);
         QueryModel<PAIR_SUBJECT> subjectsQM = new QueryModel<>(PAIR_SUBJECT.class);
         FromItem FI = subjectsQM.addJoin(EJoin.INNER_JOIN, "electiveBindedSubject",
                 ELECTIVE_BINDED_SUBJECT.class,"id");
@@ -56,13 +84,13 @@ public class SemesterPanel extends AbstractCommonPanel {
 
         Map<Integer , ArrayList<SUBJECT>> map = new HashMap<>();
 
-        for(PAIR_SUBJECT subject : subjects){
-            if(map.get(subject.getPairNumber())==null){
+        for(PAIR_SUBJECT pairSubject : subjects){
+            if(map.get(pairSubject.getPairNumber())==null){
                 ArrayList<SUBJECT> arrayList = new ArrayList<>();
-                arrayList.add(subject.getSubject());
-                map.put(subject.getPairNumber() , arrayList);
+                arrayList.add(pairSubject.getSubject());
+                map.put(pairSubject.getPairNumber() , arrayList);
             }else {
-                map.get(subject.getPairNumber()).add(subject.getSubject());
+                map.get(pairSubject.getPairNumber()).add(pairSubject.getSubject());
             }
         }
         ArrayList<OptionGroup> optionGroups = new ArrayList<>();
@@ -71,8 +99,8 @@ public class SemesterPanel extends AbstractCommonPanel {
             subjectsOG.setMultiSelect(false);
             subjectsOG.setNullSelectionAllowed(false);
             subjectsOG.setImmediate(true);
-            for(SUBJECT subject : e.getValue() ) {
-                subjectsOG.addItem(subject);
+            for(SUBJECT subjectOfElective : e.getValue() ) {
+                subjectsOG.addItem(subjectOfElective);
             }
             subjectsOG.addListener(new Listener() {
                 @Override
@@ -81,8 +109,9 @@ public class SemesterPanel extends AbstractCommonPanel {
                 }
             });
             optionGroups.add(subjectsOG);
-            getContent().addComponent(subjectsOG);
+            vl2.addComponent(subjectsOG);
         }
+        HL.addComponent(vl2);
 
         Button saveButton = CommonUtils.createSaveButton();
         saveButton.addClickListener(new Button.ClickListener() {
@@ -100,8 +129,6 @@ public class SemesterPanel extends AbstractCommonPanel {
                     public void buttonClick(Button.ClickEvent clickEvent) {
                         QueryModel<SEMESTER_SUBJECT> semesterSubjectQM = new QueryModel<>(SEMESTER_SUBJECT.class);
                         QueryModel<SEMESTER_DATA> semesterDataQM = new QueryModel<>(SEMESTER_DATA.class);
-
-
 
                         ArrayList<STUDENT_SUBJECT>studentSubjects = new ArrayList<>();
 
@@ -138,10 +165,48 @@ public class SemesterPanel extends AbstractCommonPanel {
                             studentSubjects.add(studentSubject);
                         }
 
-                        if(!studentSubjects.isEmpty()){
+                        ArrayList<STUDENT_SUBJECT>studentSubjectAll = new ArrayList<>();
+
+                            ENTRANCE_YEAR entranceYear = CommonUtils.getCurrentSemesterData().getYear();
+                            SEMESTER_PERIOD semesterPeriod = null;
+                            for(PAIR_SUBJECT pairSubject:subjects) {
+                                semesterPeriod = pairSubject.getElectveBindedSubject().getSemester().getSemesterPeriod();
+                            }
+
+                        Set<SUBJECT> subjects=(Set<SUBJECT>) subjectOG.getValue();
+                        for(SUBJECT s: subjects) {
+                            semesterDataQM.addWhere("year", ECriteria.EQUAL, entranceYear.getId());
+                            semesterDataQM.addWhere("semesterPeriod", ECriteria.EQUAL, semesterPeriod.getId());
+                            SEMESTER_DATA semesterData = null;
+                            try {
+                                semesterData = getSemesterData(semesterDataQM, entranceYear, semesterPeriod);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            STUDENT_SUBJECT subjectOfStudent = new STUDENT_SUBJECT();
+
+                                semesterSubjectQM.addWhere("subject", ECriteria.EQUAL, s.getId());
+                                semesterSubjectQM.addWhere("semesterData", ECriteria.EQUAL, semesterData.getId());
+                                SEMESTER_SUBJECT semesterSubject = null;
+                                try {
+                                    semesterSubject = getSemesterSubject(semesterSubjectQM, semesterData, s);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                subjectOfStudent.setSemesterData(semesterData);
+                                subjectOfStudent.setStudentEducation(studentEducation);
+                                subjectOfStudent.setRegDate(new Date());
+                                subjectOfStudent.setSubject(semesterSubject);
+
+                                studentSubjectAll.add(subjectOfStudent);
+                            }
+
+                        if(!studentSubjects.isEmpty() && !studentSubjectAll.isEmpty()){
                             try {
                                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
                                         create(studentSubjects);
+                                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                                        create(studentSubjectAll);
                                 saveButton.setEnabled(false);
                             } catch (Exception e) {
                                 CommonUtils.showMessageAndWriteLog("Unable to save subject", e);
@@ -161,8 +226,11 @@ public class SemesterPanel extends AbstractCommonPanel {
 
         }catch (NoResultException e) {
             System.out.println(e.getMessage());
-
         }
+
+        HL.setFirstComponent(vl2);
+        HL.setFirstComponent(vl);
+        getContent().addComponent(HL);
 
         if(studentSubjects.size()==0){
             getContent().addComponent(saveButton);
@@ -178,9 +246,6 @@ public class SemesterPanel extends AbstractCommonPanel {
                 }
             }
         }
-
-
-
     }
 
     private SEMESTER_SUBJECT getSemesterSubject(QueryModel<SEMESTER_SUBJECT> semesterSubjectQM,
