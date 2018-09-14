@@ -28,7 +28,7 @@ public class SUBJECT extends AbstractEntity {
     @Column(name = "NAME_RU", nullable = false)
     private String nameRU;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 4, inGrid = false,required = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 4, inGrid = false, required = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "PRACTICE_TYPE_ID", referencedColumnName = "ID")})
@@ -326,7 +326,7 @@ public class SUBJECT extends AbstractEntity {
     }
 
     public String toString() {
-        return nameRU;
+        return nameRU + " - " + chair;
     }
 
     public boolean isCourseWork() {

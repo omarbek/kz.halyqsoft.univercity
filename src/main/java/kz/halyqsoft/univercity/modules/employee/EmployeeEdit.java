@@ -97,8 +97,10 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
     private VerticalLayout mainVL;
     private EmployeeView employeeView;
     private Label experienceL;
+    private EMPLOYEE employee;
 
     private static final int DOES_NOT_WORK = 2;
+    private static final String PATH_TO_PHOTO = "/files/photos/";
 
     EmployeeEdit(final FormModel baseDataFM, VerticalLayout mainVL, EmployeeView employeeView)
             throws Exception {
@@ -161,6 +163,8 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         content.setComponentAlignment(hl, Alignment.MIDDLE_CENTER);
         content.setExpandRatio(hl, 1);
 
+        employee = (EMPLOYEE) baseDataFM.getEntity();
+
         if (!baseDataFM.isReadOnly()) {
             HorizontalLayout buttonPanel = createButtonPanel();
             Button save = createSaveButton();
@@ -169,6 +173,28 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
                 @Override
                 public void buttonClick(Button.ClickEvent ev) {
                     baseDataFW.save();
+                    if (userPhotoChanged) {
+                        try {
+                            if (userPhoto == null) {
+                                userPhoto = new USER_PHOTO();
+                                USERS s = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                                        lookup(USERS.class, employee.getId());
+                                userPhoto.setUser(s);
+                            }
+                            userPhoto.setFileName(userPhotoFilename);
+                            userPhoto.setPhoto(userPhotoBytes);
+
+                            if (userPhoto.getId() == null) {
+                                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                                        create(userPhoto);
+                            } else {
+                                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                                        merge(userPhoto);
+                            }
+                        } catch (Exception e) {
+                            CommonUtils.showMessageAndWriteLog("Unable to load user photo", e);
+                        }
+                    }
                 }
             });
             buttonPanel.addComponent(save);
@@ -270,7 +296,8 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         refreshChild();
         getTabSheet().addTab(childTW, getUILocaleUtil().getEntityLabel(CHILD.class));
     }
-    public List<VChild> getChildList() throws Exception{
+
+    public List<VChild> getChildList() throws Exception {
 
         ID employeeId = ID.valueOf(-1);
         if (!baseDataFW.getWidgetModel().isCreateNew()) {
@@ -704,7 +731,8 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
 
         return true;
     }
-        private void createDocumentsTab(boolean readOnly) throws Exception {
+
+    private void createDocumentsTab(boolean readOnly) throws Exception {
         VerticalLayout content = new VerticalLayout();
         content.setSpacing(true);
         content.setSizeFull();
@@ -1339,19 +1367,19 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
     }
 
     private void updateExperienceL() {
-        try{
-            if(getSum()!=null&&getList()!=null) {
-            experienceL.setCaption("<html><b>" +
-                    getUILocaleUtil().getCaption("experienceL") + "</b>" + " " +
-                    String.valueOf((getSum().getYears())) +" "+ getUILocaleUtil().getCaption("experienceL.year")
-                    + " " + String.valueOf(getSum().getMonths()) +" "+ getUILocaleUtil().getCaption("experienceL.month")
-                    + " " + String.valueOf(getSum().getDays()) +" "+ getUILocaleUtil().getCaption("experienceL.day")
-            );
-            }else{
+        try {
+            if (getSum() != null && getList() != null) {
+                experienceL.setCaption("<html><b>" +
+                        getUILocaleUtil().getCaption("experienceL") + "</b>" + " " +
+                        String.valueOf((getSum().getYears())) + " " + getUILocaleUtil().getCaption("experienceL.year")
+                        + " " + String.valueOf(getSum().getMonths()) + " " + getUILocaleUtil().getCaption("experienceL.month")
+                        + " " + String.valueOf(getSum().getDays()) + " " + getUILocaleUtil().getCaption("experienceL.day")
+                );
+            } else {
                 experienceL.setCaption("<html><b>" +
                         getUILocaleUtil().getCaption("experienceL") + "</b>");
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -1363,7 +1391,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
             refresh();
             refreshChild();
 
-            if(ev.getSource().equals(experienceTW)){
+            if (ev.getSource().equals(experienceTW)) {
                 updateExperienceL();
             }
         }
@@ -1449,7 +1477,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
                     if (sum != null) {
                         vPreviousExperience.setWorkPeriod(String.valueOf(sum.getYears())
                                 + " " + getUILocaleUtil().getCaption("experienceL.year") + " "
-                                + String.valueOf(sum.getMonths()) + " " + getUILocaleUtil().getCaption("experienceL.month")+" "
+                                + String.valueOf(sum.getMonths()) + " " + getUILocaleUtil().getCaption("experienceL.month") + " "
                                 + String.valueOf(sum.getDays()) + " " + getUILocaleUtil().getCaption("experienceL.day"));
                         list.add(vPreviousExperience);
                     }
@@ -1664,7 +1692,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
     public void handlePhotoWidgetEvent(PhotoWidgetEvent ev) {
         if (ev.getEvent() == PhotoWidgetEvent.CHANGED) {
             userPhotoBytes = ev.getBytes();
-            userPhotoFilename = ev.getFilename();
+            userPhotoFilename = PATH_TO_PHOTO + ev.getFilename();
             userPhotoChanged = true;
         }
     }
