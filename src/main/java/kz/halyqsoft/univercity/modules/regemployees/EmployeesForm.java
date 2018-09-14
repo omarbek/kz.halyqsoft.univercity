@@ -52,23 +52,6 @@ public class EmployeesForm extends UsersForm {
 
         getButtonsVL().removeComponent(getPreemRightButton());
 
-        getEduDocButton().addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent clickEvent) {
-                FormModel educationFM = getEducationDoc().getMainGFW().getWidgetModel();
-
-                educationFM.getFieldModel("specialityName").setInView(true);
-                educationFM.getFieldModel("specialityName").setInEdit(true);
-                educationFM.getFieldModel("specialityName").setRequired(true);
-
-                educationFM.getFieldModel("qualification").setInView(true);
-                educationFM.getFieldModel("qualification").setInEdit(true);
-                educationFM.getFieldModel("qualification").setRequired(true);
-
-                addToLayout(Flag.EDU_DOC, getEducationDoc().getMainGFW(), getEduDocsButton(), clickEvent);
-            }
-        });
-
         getEduDocsButton().addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
@@ -89,7 +72,7 @@ public class EmployeesForm extends UsersForm {
         dataAFW.setCaption(getUILocaleUtil().getCaption("regapplicant.main.data"));
 
         factAddressButton.setCaption(getUILocaleUtil().getCaption("address.residential"));
-        eduDocButton.setCaption(getUILocaleUtil().getCaption("education.document"));
+        //eduDocButton.setCaption(getUILocaleUtil().getCaption("education.document"));
 
     }
 
@@ -142,7 +125,6 @@ public class EmployeesForm extends UsersForm {
         Map<String, Boolean> conditionsMap = new HashMap<>();
         conditionsMap.put(getUILocaleUtil().getMessage("info.save.base.data.first"), !saveData);
         conditionsMap.put(getUILocaleUtil().getMessage("info.save.passport"), !savePass);
-        conditionsMap.put(getUILocaleUtil().getMessage("info.save.career"), !saveCareer);
         return conditionsMap;
     }
 
@@ -212,144 +194,30 @@ public class EmployeesForm extends UsersForm {
             }
         });
 
-        careerButton = createFormButton("career", true);
+        careerButton = createFormButton("career", false);
         careerButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                careerTW = getTableWidget(V_EMPLOYEE_DEPT.class, "employee", null);
-                flag = Flag.CAREER;
-
-                EMPLOYEE emp = null;
-                try {
-                    emp = (EMPLOYEE) dataAFW.getWidgetModel().getEntity();
-                } catch (Exception e) {
-                    e.printStackTrace();//TODO catch
-                }
-
-                DBTableModel careerTM = (DBTableModel) careerTW.getWidgetModel();
-                careerTM.setReadOnly(false);
-                careerTM.setCrudEntityClass(EMPLOYEE_DEPT.class);
-                QueryModel careerQM = careerTM.getQueryModel();
-                ID employeeId = ID.valueOf(-1);
-                if (emp != null && emp.getStatus() != null && emp.getStatus().getId().equals(ID.valueOf(5))) {
-                    employeeId = emp.getId();
-                    careerTM.getColumnModel("liveLoad").setInTable(false);
-                    careerTM.getColumnModel("wageRate").setInTable(false);
-                    careerTM.getColumnModel("rateLoad").setInTable(false);
-                    careerTM.getColumnModel("hourCount").setInTable(true);
-                } else {
-                    careerTM.getColumnModel("liveLoad").setInTable(true);
-                    careerTM.getColumnModel("wageRate").setInTable(true);
-                    careerTM.getColumnModel("rateLoad").setInTable(true);
-                    careerTM.getColumnModel("hourCount").setInTable(false);
-                }
-                careerQM.addWhere("employee", ECriteria.EQUAL, employeeId);
-
-                FormModel careerFM = careerTM.getFormModel();
-
-                FKFieldModel departmentFM = (FKFieldModel) careerFM.getFieldModel("department");
-                departmentFM.setDialogWidth(400);
-                departmentFM.setDialogHeight(400);
-                QueryModel departmentQM = departmentFM.getQueryModel();
-                departmentQM.addWhere("deleted", Boolean.FALSE);
-                departmentQM.addWhereNotNull("parent");
-
-                FKFieldModel postFM = (FKFieldModel) careerFM.getFieldModel("post");
-
-                FieldModel liveLoadFM = careerFM.getFieldModel("liveLoad");
-                FieldModel wageRateFM = careerFM.getFieldModel("wageRate");
-                FieldModel rateLoadFM = careerFM.getFieldModel("rateLoad");
-
-                postFM.getListeners().add(new CareerPostChangeListener(liveLoadFM, wageRateFM, rateLoadFM));
-                liveLoadFM.getListeners().add(new LiveLoadChangeListener(rateLoadFM, wageRateFM));
-                wageRateFM.getListeners().add(new WageRateChangeListener(liveLoadFM, rateLoadFM));
-
+                careerTW = getTableWidget(EMPLOYEE_DEPT.class, "employee", null);
                 addToLayout(careerTW, childButton, event);
-                setActive(event);
-                contentHL.removeAllComponents();
-                contentHL.addComponent(careerTW);
             }
         });
 
-        childButton = createFormButton("child", true);
+        childButton = createFormButton("child", false);
         childButton.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent clickEvent) {
+            public void buttonClick(Button.ClickEvent event) {
                 childTW = getTableWidget(CHILD.class, "employee", null);
-                flag = Flag.CHILD;
-
-                EMPLOYEE emp = null;
-                try {
-                    emp = (EMPLOYEE) dataAFW.getWidgetModel().getEntity();
-                } catch (Exception e) {
-                    e.printStackTrace();//TODO catch
-                }
-
-                DBTableModel childTM = (DBTableModel) childTW.getWidgetModel();
-                childTM.setReadOnly(false);
-                childTM.setCrudEntityClass(CHILD.class);
-                QueryModel childQM = childTM.getQueryModel();
-                ID employeeId = ID.valueOf(-1);
-                if (emp != null && emp.getStatus() != null && emp.getStatus().getId().equals(ID.valueOf(5))) {
-                    employeeId = emp.getId();
-                    childTM.getColumnModel("birthDate").setInTable(false);
-                    childTM.getColumnModel("sex").setInTable(false);
-                } else {
-                    childTM.getColumnModel("birthDate").setInTable(true);
-                    childTM.getColumnModel("sex").setInTable(true);
-                }
-                childQM.addWhere("employee", ECriteria.EQUAL, employeeId);
-
-                FormModel childFM = childTM.getFormModel();
-                addToLayout(childTW, magisterButton, clickEvent);
-                setActive(clickEvent);
-                contentHL.removeAllComponents();
-                contentHL.addComponent(childTW);
+                addToLayout(childTW, magisterButton, event);
             }
         });
 
-        magisterButton = createFormButton("master", true);
+        magisterButton = createFormButton("master", false);
         magisterButton.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent clickEvent) {
-
+            public void buttonClick(Button.ClickEvent event) {
                 magisterTW = getTableWidget(MASTER.class, "employee", null);
-                flag = Flag.MAGISTER;
-
-                EMPLOYEE emp = null;
-                try {
-                    emp = (EMPLOYEE) dataAFW.getWidgetModel().getEntity();
-                } catch (Exception e) {
-                    e.printStackTrace();//TODO catch
-                }
-
-                DBTableModel masterTM = (DBTableModel) magisterTW.getWidgetModel();
-                masterTM.setReadOnly(false);
-                masterTM.setCrudEntityClass(MASTER.class);
-                QueryModel masterQM = masterTM.getQueryModel();
-                ID employeeId = ID.valueOf(-1);
-                if (emp != null && emp.getStatus() != null && emp.getStatus().getId().equals(ID.valueOf(5))) {
-                    employeeId = emp.getId();
-                    masterTM.getColumnModel("entranceYear").setInTable(false);
-                    masterTM.getColumnModel("graduationYear").setInTable(false);
-                    masterTM.getColumnModel("university").setInTable(false);
-                    masterTM.getColumnModel("speciality").setInTable(false);
-                    masterTM.getColumnModel("diplomaNumber").setInTable(false);
-
-                } else {
-                    masterTM.getColumnModel("entranceYear").setInTable(true);
-                    masterTM.getColumnModel("graduationYear").setInTable(true);
-                    masterTM.getColumnModel("university").setInTable(true);
-                    masterTM.getColumnModel("speciality").setInTable(true);
-                    masterTM.getColumnModel("diplomaNumber").setInTable(true);
-                }
-                masterQM.addWhere("employee", ECriteria.EQUAL, employeeId);
-
-                FormModel masterFM = masterTM.getFormModel();
-                setActive(clickEvent);
-                contentHL.removeAllComponents();
-                contentHL.addComponent(magisterTW);
-
+                addToLayout(magisterTW, magisterButton, event);
             }
         });
     }
@@ -379,16 +247,10 @@ public class EmployeesForm extends UsersForm {
     protected boolean checkFlag(Flag flag) {
         Boolean saved;
         switch (flag) {
-            case CAREER:
-                if (careerTW.getEntityCount() > 0) {
-                    saveCareer = true;
-                }
-                break;
         }
 
         return false;
     }
-
 
     private Button createFormButton(Class<? extends Entity> entityClass) {
         Button temp = new Button();
@@ -635,29 +497,65 @@ public class EmployeesForm extends UsersForm {
     }
 
     private boolean preSaveCareer(Entity e, boolean isNew) {
-        EMPLOYEE_DEPT employeeDept = (EMPLOYEE_DEPT) e;
+        EMPLOYEE_DEPT previousExperience = (EMPLOYEE_DEPT) e;
+        EMPLOYEE_DEPT newExperience;
         FormModel fm = dataAFW.getWidgetModel();
         if (isNew) {
+            newExperience = new EMPLOYEE_DEPT();
             try {
-                EMPLOYEE employee = (EMPLOYEE) fm.getEntity();
-                employeeDept.setEmployee(employee);
-                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(employeeDept);
+                EMPLOYEE s = (EMPLOYEE) fm.getEntity();
+                newExperience.setEmployee(s);
+                newExperience.setEmployeeType(previousExperience.getEmployeeType());
+                newExperience.setDepartment(previousExperience.getDepartment());
+                newExperience.setPost(previousExperience.getPost());
+                newExperience.setLiveLoad(previousExperience.getLiveLoad());
+                newExperience.setWageRate(previousExperience.getWageRate());
+
+                newExperience.setRateLoad(previousExperience.getRateLoad());
+                newExperience.setHourCount(previousExperience.getHourCount());
+                newExperience.setHireDate(previousExperience.getHireDate());
+                newExperience.setDismissDate(previousExperience.getDismissDate());
+                newExperience.setAdviser(previousExperience.isAdviser());
+                newExperience.setLecturer(previousExperience.isLecturer());
+                newExperience.setParent(previousExperience.getParent());
+                newExperience.setDescr(previousExperience.getDescr());
+                newExperience.setPriority(previousExperience.isPriority());
+                newExperience.setCoordinator(previousExperience.isCoordinator());
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(newExperience);
 
                 QueryModel expQM = ((DBTableModel) careerTW.getWidgetModel()).getQueryModel();
-                expQM.addWhere("employee", ECriteria.EQUAL, employee.getId());
+                expQM.addWhere("employee", ECriteria.EQUAL, s.getId());
 
                 careerTW.refresh();
                 showSavedNotification();
             } catch (Exception ex) {
-                CommonUtils.showMessageAndWriteLog("Unable to create an employee dept", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to create an experience", ex);
             }
         } else {
             try {
-                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(employeeDept);
+                newExperience = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(EMPLOYEE_DEPT.class, previousExperience.getId());
+                //newExperience.setEmployee(s);
+                newExperience.setEmployeeType(previousExperience.getEmployeeType());
+                newExperience.setDepartment(previousExperience.getDepartment());
+                newExperience.setPost(previousExperience.getPost());
+                newExperience.setLiveLoad(previousExperience.getLiveLoad());
+                newExperience.setWageRate(previousExperience.getWageRate());
+
+                newExperience.setRateLoad(previousExperience.getRateLoad());
+                newExperience.setHourCount(previousExperience.getHourCount());
+                newExperience.setHireDate(previousExperience.getHireDate());
+                newExperience.setDismissDate(previousExperience.getDismissDate());
+                newExperience.setAdviser(previousExperience.isAdviser());
+                newExperience.setLecturer(previousExperience.isLecturer());
+                newExperience.setParent(previousExperience.getParent());
+                newExperience.setDescr(previousExperience.getDescr());
+                newExperience.setPriority(previousExperience.isPriority());
+                newExperience.setCoordinator(previousExperience.isCoordinator());
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(newExperience);
                 careerTW.refresh();
                 showSavedNotification();
             } catch (Exception ex) {
-                CommonUtils.showMessageAndWriteLog("Unable to merge an employee dept", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to merge an experience", ex);
             }
         }
         return false;
@@ -665,21 +563,19 @@ public class EmployeesForm extends UsersForm {
 
     private boolean preSaveChild(Entity e, boolean isNew) {
         CHILD child = (CHILD) e;
-        FormModel formModel = dataAFW.getWidgetModel();
+        FormModel fm = dataAFW.getWidgetModel();
         if (isNew) {
             try {
-                EMPLOYEE employee = (EMPLOYEE) formModel.getEntity();
+                EMPLOYEE employee = (EMPLOYEE) fm.getEntity();
                 child.setEmployee(employee);
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(child);
-
-                QueryModel childQM = ((DBTableModel) childTW.getWidgetModel()).getQueryModel();
-                childQM.addWhere("employee", ECriteria.EQUAL, employee.getId());
+                QueryModel expQM = ((DBTableModel) childTW.getWidgetModel()).getQueryModel();
+                expQM.addWhere("employee", ECriteria.EQUAL, employee.getId());
 
                 childTW.refresh();
                 showSavedNotification();
-
-            } catch (Exception e1) {
-                e1.printStackTrace();
+            } catch (Exception ex) {
+                CommonUtils.showMessageAndWriteLog("Unable to create a child", ex);
             }
         } else {
             try {
@@ -687,10 +583,9 @@ public class EmployeesForm extends UsersForm {
                 childTW.refresh();
                 showSavedNotification();
             } catch (Exception ex) {
-                CommonUtils.showMessageAndWriteLog("Unable to merge an employee child", ex);
+                CommonUtils.showMessageAndWriteLog("Unable to merge a child", ex);
             }
         }
-
         return false;
     }
 
@@ -831,25 +726,6 @@ public class EmployeesForm extends UsersForm {
             return canSave();
         } else if (source.equals(careerTW)) {
             boolean canSave = canSave();
-            try {
-                if (canSave) {
-                    DBTableModel careerTM = (DBTableModel) careerTW.getWidgetModel();
-                    FormModel careerFM = careerTM.getFormModel();
-
-                    EMPLOYEE employee = (EMPLOYEE) dataAFW.getWidgetModel().getEntity();
-                    if (!employee.getStatus().getId().equals(ID.valueOf(5))) {
-                        careerFM.getFieldModel("hourCount").setInEdit(false);
-                    } else {
-                        careerFM.getFieldModel("liveLoad").setInEdit(false);
-                        careerFM.getFieldModel("wageRate").setInEdit(false);
-                        careerFM.getFieldModel("rateLoad").setInEdit(false);
-                    }
-                    careerTW.refresh();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();//TODO catch
-            }
-            return canSave;
         } else if (source.equals(scientificActivityTW)) {
             return canSave();
         } else if (source.equals(childTW)) {
