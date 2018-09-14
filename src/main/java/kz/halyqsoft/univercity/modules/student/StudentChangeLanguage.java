@@ -16,6 +16,8 @@ import org.r3a.common.vaadin.widget.dialog.AbstractDialog;
 
 public class StudentChangeLanguage extends AbstractDialog {
     private StudentEdit studentEdit;
+    private ComboBox lessonCB;
+    private STUDENT_EDUCATION studentEducation;
 
     StudentChangeLanguage(STUDENT_EDUCATION studentEducation,StudentEdit studentEdit) throws Exception {
         this.studentEdit = studentEdit;
@@ -29,8 +31,7 @@ public class StudentChangeLanguage extends AbstractDialog {
         HorizontalLayout scheduleHL = new HorizontalLayout();
         scheduleHL.setSizeFull();
 
-        ComboBox lessonCB = new ComboBox();
-
+        lessonCB = new ComboBox(getUILocaleUtil().getCaption("lessonCB"));
         QueryModel<LANGUAGE> specialityQM = new QueryModel<>(LANGUAGE.class);
         BeanItemContainer<LANGUAGE> specialityBIC = new BeanItemContainer<>(LANGUAGE.class,
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(specialityQM));
@@ -38,7 +39,6 @@ public class StudentChangeLanguage extends AbstractDialog {
         lessonCB.setPageLength(0);
         lessonCB.setWidth(400, Unit.PIXELS);
         lessonCB.setNullSelectionAllowed(false);
-        lessonCB.setValue(studentEducation.getLanguage().getLangName());
 
         scheduleHL.addComponent(lessonCB);
         getContent().addComponent(scheduleHL);
@@ -72,7 +72,7 @@ public class StudentChangeLanguage extends AbstractDialog {
         });
 
         HorizontalLayout buttonsHL = CommonUtils.createButtonPanel();
-        buttonsHL.addComponents(saveButton, cancelButton);
+        buttonsHL.addComponents(saveButton,cancelButton);
         buttonsHL.setComponentAlignment(saveButton, Alignment.MIDDLE_CENTER);
         buttonsHL.setComponentAlignment(cancelButton, Alignment.MIDDLE_CENTER);
         getContent().addComponent(buttonsHL);
