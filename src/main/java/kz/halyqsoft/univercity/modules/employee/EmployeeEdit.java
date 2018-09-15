@@ -237,7 +237,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         try {
             employeeView.getTeacherGW().refresh();
         } catch (Exception e) {
-            e.printStackTrace();//TODO catch
+            CommonUtils.showMessageAndWriteLog("Unable to refresh teacher's grid widget", e);
         }
         mainVL.removeComponent(this);
         mainVL.addComponent(employeeView.getFilterPanel());
@@ -1646,7 +1646,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
                 try {
                     employeeId = baseDataFW.getWidgetModel().getEntity().getId();
                 } catch (Exception e) {
-                    e.printStackTrace();//TODO catch
+                    CommonUtils.showMessageAndWriteLog("Unable to get employee id", e);
                 }
             }
             String sql = "select gr_st_load.ID, lvl.LEVEL_NAME, gr_st_load.STUDENT_COUNT, gr_st_load.LEVEL_ID " +
@@ -1757,7 +1757,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
             try {
                 params.put(1, baseDataFW.getWidgetModel().getEntity().getId().getId());
             } catch (Exception e) {
-                e.printStackTrace();//TODO catch
+                CommonUtils.showMessageAndWriteLog("Unable to get employee id", e);
             }
 
             try {
@@ -1851,7 +1851,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
             try {
                 emp = (EMPLOYEE) baseDataFW.getWidgetModel().getEntity();
             } catch (Exception e) {
-                e.printStackTrace();//TODO catch
+                CommonUtils.showMessageAndWriteLog("Unable to get employee", e);
             }
             FormModel careerFM = ((DBSelectModel) careerTW.getWidgetModel()).getFormModel();
             FieldModel liveLoadFM = careerFM.getFieldModel("liveLoad");
@@ -1961,8 +1961,6 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         if (source.equals(careerTW)) {
             EMPLOYEE_DEPT ed = (EMPLOYEE_DEPT) e;
             try {
-                ed.setEmployeeType(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
-                        lookup(EMPLOYEE_TYPE.class, ID.valueOf(2)));//TODO
                 ed.setLiveLoad(0);
                 ed.setWageRate(1.0);
                 ed.setRateLoad(0.0);
@@ -2168,7 +2166,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
             try {
                 emp = (EMPLOYEE) baseDataFW.getWidgetModel().getEntity();
             } catch (Exception ex) {
-                ex.printStackTrace();//TODO catch
+                CommonUtils.showMessageAndWriteLog("Unable to get employee", ex);
             }
             FormModel careerFM = ((DBSelectModel) careerTW.getWidgetModel()).getFormModel();
             FieldModel liveLoadFM = careerFM.getFieldModel("liveLoad");
@@ -2202,7 +2200,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
             try {
                 emp = (EMPLOYEE) baseDataFW.getWidgetModel().getEntity();
             } catch (Exception ex) {
-                ex.printStackTrace();//TODO catch
+                CommonUtils.showMessageAndWriteLog("Unable to get employee", ex);
             }
             FormModel careerFM = ((DBSelectModel) experienceTW.getWidgetModel()).getFormModel();
             return true;

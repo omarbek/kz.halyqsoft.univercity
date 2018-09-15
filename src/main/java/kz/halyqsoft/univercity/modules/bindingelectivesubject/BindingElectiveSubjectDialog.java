@@ -8,6 +8,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.PAIR_SUBJECT;
 import kz.halyqsoft.univercity.entity.beans.univercity.SEMESTER_SUBJECT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_DATA;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SPECIALITY;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.WindowUtils;
@@ -15,6 +16,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.query.QueryModel;
+import org.r3a.common.entity.query.from.EJoin;
+import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.widget.dialog.Message;
 
@@ -74,10 +77,13 @@ public class BindingElectiveSubjectDialog extends WindowUtils {
             subjectCB.setPageLength(0);
             subjectCB.setWidth(300, Unit.PIXELS);
             QueryModel<SUBJECT> subjectQM = new QueryModel<>(SUBJECT.class);
+            FromItem specFI = subjectQM.addJoin(EJoin.INNER_JOIN, "chair", SPECIALITY.class, "department");
             subjectQM.addWhereNotNull("subjectCycle");
             subjectQM.addWhereAnd("deleted", Boolean.FALSE);
             subjectQM.addWhereAnd("mandatory", Boolean.FALSE);
-//            subjectQM.addWhereNotInAnd("id", chosenIDs);
+            subjectQM.addWhere(specFI, "deleted", false);
+            subjectQM.addWhere(specFI, "id", ECriteria.EQUAL, electiveBindedSubject.getCatalogElectiveSubjects().
+                    getSpeciality().getId());
             BeanItemContainer<SUBJECT> subjectBIC = new BeanItemContainer<>(SUBJECT.class,
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(subjectQM));
             subjectCB.setContainerDataSource(subjectBIC);
@@ -144,14 +150,14 @@ public class BindingElectiveSubjectDialog extends WindowUtils {
                             Message.showError(getUILocaleUtil().getMessage("write.number"));
                         }
                     } catch (Exception e) {
-                        e.printStackTrace();//TODO catch
+                        CommonUtils.showMessageAndWriteLog("Unable to save", e);
                     }
                 }
             });
             mainVL.addComponent(saveButton);
             mainVL.setComponentAlignment(saveButton, Alignment.MIDDLE_CENTER);
         } catch (Exception e) {
-            e.printStackTrace();//TODO catch
+            CommonUtils.showMessageAndWriteLog("Unable to open vertical layout", e);
         }
         return mainVL;
     }

@@ -5,6 +5,7 @@ import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.EDUCATION_MODULE_TYPE;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT_CYCLE;
+import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
@@ -51,7 +52,7 @@ final class ElectiveSubjectSelectDialog extends CustomGridSelectDialog {
             eduModuleBIC = new BeanItemContainer<>(EDUCATION_MODULE_TYPE.class, SessionFacadeFactory.
                     getSessionFacade(CommonEntityFacadeBean.class).lookup(eduModuleQM));
         } catch (Exception e) {
-            e.printStackTrace();//TODO catch
+            CommonUtils.showMessageAndWriteLog("Unable to get education module type container",e);
         }
         educationModuleCB.setContainerDataSource(eduModuleBIC);
         paramsFL.addComponent(educationModuleCB);

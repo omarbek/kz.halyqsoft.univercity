@@ -326,7 +326,7 @@ public class SUBJECT extends AbstractEntity {
     }
 
     public String toString() {
-        return nameRU + " - " + chair;
+        return nameKZ + " - " + chair;
     }
 
     public boolean isCourseWork() {
