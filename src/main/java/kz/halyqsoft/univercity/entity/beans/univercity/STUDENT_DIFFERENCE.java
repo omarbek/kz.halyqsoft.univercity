@@ -26,13 +26,6 @@ public class STUDENT_DIFFERENCE extends AbstractEntity {
             @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
     private SUBJECT subject;
 
-
-    @Column(name = "DELETED", nullable = false)
-    private boolean deleted;
-
-    public STUDENT_DIFFERENCE() {
-    }
-
     public static long getSerialVersionUID() {
         return serialVersionUID;
     }
@@ -52,16 +45,6 @@ public class STUDENT_DIFFERENCE extends AbstractEntity {
     public void setSubject(SUBJECT subject) {
         this.subject = subject;
     }
-
-    public boolean isDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
-    }
-
-
 
     @Override
     public String toString() {

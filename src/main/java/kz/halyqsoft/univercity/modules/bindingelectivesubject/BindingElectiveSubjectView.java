@@ -131,7 +131,7 @@ public class BindingElectiveSubjectView extends AbstractTaskView implements Filt
                         getId());
                 list = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(electiveBindedSubjectQM);
                 electiveSubjectsGW.setButtonEnabled(IconToolbar.ADD_BUTTON, true);
-                electiveSubjectsGW.setButtonEnabled(IconToolbar.EDIT_BUTTON,true);
+                electiveSubjectsGW.setButtonEnabled(IconToolbar.EDIT_BUTTON, true);
             } catch (Exception ex) {
                 CommonUtils.showMessageAndWriteLog("Unable to load elective subject list", ex);
             }
@@ -168,7 +168,7 @@ public class BindingElectiveSubjectView extends AbstractTaskView implements Filt
         @Override
         protected void init(Object source, Entity e, boolean isNew) throws Exception {
             ELECTIVE_BINDED_SUBJECT electiveBinded = (ELECTIVE_BINDED_SUBJECT) e;
-            new BindingElectiveSubjectEdit(electiveBinded, isNew,BindingElectiveSubjectView.this);
+            new BindingElectiveSubjectEdit(electiveBinded, isNew, BindingElectiveSubjectView.this);
         }
 
         @Override
