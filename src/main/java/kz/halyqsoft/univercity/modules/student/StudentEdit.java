@@ -2424,7 +2424,6 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
             for (Entity e : entities) {
                 try {
                     STUDENT_DIFFERENCE studentDifference = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(STUDENT_DIFFERENCE.class, e.getId());
-                    studentDifference.setDeleted(true);
                     delList.add(studentDifference);
                 } catch (Exception ex) {
                     CommonUtils.showMessageAndWriteLog("Unable to delete subject", ex);

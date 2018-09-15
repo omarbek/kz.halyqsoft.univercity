@@ -117,8 +117,8 @@ public class SemesterPanel extends AbstractCommonPanel {
         saveButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                for(OptionGroup sub:optionGroups){
-                    if(sub.getValue()==null){
+                for (OptionGroup sub : optionGroups) {
+                    if (sub.getValue() == null) {
                         Message.showError(getUILocaleUtil().getMessage("select.subject"));
                         return;
                     }
@@ -132,10 +132,10 @@ public class SemesterPanel extends AbstractCommonPanel {
 
                         ArrayList<STUDENT_SUBJECT>studentSubjects = new ArrayList<>();
 
-                        for(OptionGroup sub:optionGroups) {
+                        for (OptionGroup sub : optionGroups) {
                             ENTRANCE_YEAR entranceYear = CommonUtils.getCurrentSemesterData().getYear();
                             SEMESTER_PERIOD semesterPeriod = null;
-                            for(PAIR_SUBJECT pairSubject:subjects) {
+                            for (PAIR_SUBJECT pairSubject : subjects) {
                                 semesterPeriod = pairSubject.getElectveBindedSubject().getSemester().getSemesterPeriod();
                             }
                             semesterDataQM.addWhere("year", ECriteria.EQUAL, entranceYear.getId());

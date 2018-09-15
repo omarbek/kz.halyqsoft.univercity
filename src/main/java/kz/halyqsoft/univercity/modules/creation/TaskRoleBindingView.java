@@ -97,7 +97,6 @@ public class TaskRoleBindingView extends AbstractTaskView implements EntityListe
 
 
         rolesCB = new ComboBox();
-//        rolesCB.setCaption(getUILocaleUtil().getCaption(""));//TODO
         rolesCB.setNullSelectionAllowed(true);
         rolesCB.setTextInputAllowed(true);
         rolesCB.setFilteringMode(FilteringMode.CONTAINS);

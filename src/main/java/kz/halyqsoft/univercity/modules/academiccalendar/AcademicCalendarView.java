@@ -1,15 +1,13 @@
 package kz.halyqsoft.univercity.modules.academiccalendar;
 
-import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.Phrase;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
-import com.itextpdf.text.pdf.PdfWriter;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.*;
-import com.vaadin.server.StreamResource.StreamSource;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
@@ -18,10 +16,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.ACADEMIC_CALENDAR;
 import kz.halyqsoft.univercity.entity.beans.univercity.ACADEMIC_CALENDAR_DETAIL;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ACADEMIC_CALENDAR_FACULTY;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ACADEMIC_CALENDAR_ITEM;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEPARTMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
-import kz.halyqsoft.univercity.modules.academiccalendar.item.AbstractACItem;
-import kz.halyqsoft.univercity.modules.academiccalendar.item.TwoDateItem;
 import kz.halyqsoft.univercity.modules.academiccalendar.layout.AcademicCalendarLayout;
 import kz.halyqsoft.univercity.modules.academiccalendar.layout.AllFacultyLayout;
 import kz.halyqsoft.univercity.utils.CommonUtils;
@@ -32,14 +27,10 @@ import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -59,7 +50,6 @@ AcademicCalendarView extends AbstractTaskView {
     private Button saveButton;
     private Button confirmButton;
     private Button approveButton;
-    private Button printButton;
     private AcademicCalendarLayout layout;
 
     public AcademicCalendarView(AbstractTask task) throws Exception {
@@ -214,357 +204,11 @@ AcademicCalendarView extends AbstractTaskView {
             }
         });
         toolbar.addComponent(approveButton);
-        printButton = new Button();
-        printButton.setCaption(getUILocaleUtil().getCaption("print"));
-        printButton.setWidth(120, Unit.PIXELS);
-        printButton.setIcon(new ThemeResource("img/button/printer.png"));
-        printButton.addStyleName("print");
-        printButton.setVisible(false);
-//        toolbar.addComponent(printButton);
 
-        String filename = String.valueOf(new Random().nextDouble()) + ".pdf";
-        final StreamResource resource = new StreamResource(new StreamSource() {
-            @Override
-            public InputStream getStream() {
-                return getDownloadInputStream(academicCalendar);
-            }
-        }, filename);
-        resource.setCacheTime(0);
-        resource.setMIMEType("application/pdf");
-        final BrowserWindowOpener opener = new BrowserWindowOpener(resource);
-
-        printButton.addClickListener(new ClickListener() {
-
-            @Override
-            public void buttonClick(ClickEvent event) {
-                opener.setResource(null);
-                resource.setFilename(String.valueOf(new Random().nextDouble()) + ".pdf");
-                opener.setResource(resource);
-
-            }
-        });
-        opener.extend(printButton);
         getContent().addComponent(toolbar);
         getContent().setComponentAlignment(toolbar, Alignment.TOP_CENTER);
 
         initContent();
-    }
-
-    protected InputStream getDownloadInputStream(ACADEMIC_CALENDAR academicCalendar) {
-        int fontSize;
-        int bigFontSize;
-        BaseFont timesNewRoman;
-        ByteArrayOutputStream baos = null;
-        Font font = null;
-        Font boldFont = null;
-
-        try {
-            String fontPath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath() + "/WEB-INF/fonts";
-            fontSize = 12;
-            bigFontSize = 10;
-            timesNewRoman = BaseFont.createFont(fontPath + "/TimesNewRoman/times.ttf", BaseFont.IDENTITY_H,
-                    BaseFont.EMBEDDED);
-            font = new Font(timesNewRoman, fontSize);
-            boldFont = new Font(timesNewRoman, bigFontSize, Font.BOLD);
-
-            if (layout != null) {
-                List<AbstractACItem> list = layout.getItems();
-                if (layout instanceof AllFacultyLayout) {
-                    for (AbstractACItem i : list) {
-                        ACADEMIC_CALENDAR_ITEM aci = i.getAcademicCalendarDetail().getAcademicCalendarItem();
-                        String text = aci.getItemName();
-                        if (aci.getItemType().equals("a")) {
-                            TwoDateItem tdi = (TwoDateItem) i;
-                            @SuppressWarnings("unused")
-                            Date date1 = tdi.getDate1();
-                            @SuppressWarnings("unused")
-                            Date date2 = tdi.getDate2();
-
-                        } else if (aci.getItemType().equals("b")) {
-                            TwoDateItem tdi = (TwoDateItem) i;
-                            @SuppressWarnings("unused")
-                            Date date1 = tdi.getDate1();
-                            @SuppressWarnings("unused")
-                            Date date2 = tdi.getDate2();
-                        }
-                    }
-                    // TODO: ALll
-                }
-            }
-        } catch (DocumentException e) {
-            LOG.error("Unable to download font: ", e);
-        } catch (IOException e) {
-            LOG.error("Unable to reach: ", e);
-            e.printStackTrace();
-        }
-
-        try {
-
-            Document document = new Document();
-            // document.setMargins(-20, -20, 20, 20);
-            baos = new ByteArrayOutputStream();
-            PdfWriter.getInstance(document, baos);
-
-            QueryModel<ACADEMIC_CALENDAR_DETAIL> acdQM = new QueryModel<>(ACADEMIC_CALENDAR_DETAIL.class);
-            acdQM.addWhere("academicCalendar", ECriteria.EQUAL, academicCalendar.getId());
-            acdQM.addOrder("academicCalendarItem");
-            List<ACADEMIC_CALENDAR_DETAIL> tmpList = SessionFacadeFactory.getSessionFacade(
-                    CommonEntityFacadeBean.class).lookup(acdQM);
-
-            List<ACADEMIC_CALENDAR_DETAIL> acdList = new ArrayList<ACADEMIC_CALENDAR_DETAIL>();
-            for (ACADEMIC_CALENDAR_DETAIL acd : tmpList) {
-                acdList.add(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
-                        ACADEMIC_CALENDAR_DETAIL.class, acd.getId()));
-            }
-
-            QueryModel<DEPARTMENT> deptQM = new QueryModel<>(DEPARTMENT.class);
-            List<DEPARTMENT> tempList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
-                    lookup(deptQM);
-
-            List<DEPARTMENT> deptList = new ArrayList<DEPARTMENT>();
-            for (DEPARTMENT acd : tempList) {
-                deptList.add(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
-                        DEPARTMENT.class, acd.getId()));
-            }
-
-            document.open();
-
-            // Number of columns
-            int tableColspan = 2;
-            PdfPTable table = new PdfPTable(tableColspan);
-            PdfPCell cell;
-
-            addCell(getUILocaleUtil().getCaption("pdf.academic.calendar.prorector") + "\n"
-                    + getUILocaleUtil().getCaption("pdf.academic.calendar.vice.director") + "\n"
-                    + getUILocaleUtil().getCaption("pdf.academic.calendar.prorector.name"), table, 1, boldFont);
-            cell = new PdfPCell(new Phrase(getUILocaleUtil().getCaption("pdf.academic.calendar.rector")
-                    + "\n" + getUILocaleUtil().getCaption("pdf.academic.calendar.rector.name"), boldFont));
-            cell.setColspan(2);
-            cell.setPaddingLeft(80);
-            cell.setBorder(PdfPCell.NO_BORDER);
-            cell.setPaddingBottom(10);
-            table.addCell(cell);
-            addCell(getUILocaleUtil().getCaption("pdf.academic.calendar.date") + String.valueOf(
-                    Calendar.getInstance().get(Calendar.YEAR))
-                    + getUILocaleUtil().getCaption("pdf.academic.calendar.date.year"), table, 1, boldFont);
-            cell = new PdfPCell(new Phrase(getUILocaleUtil().getCaption("pdf.academic.calendar.date")
-                    + String.valueOf(Calendar.getInstance().get(Calendar.YEAR))
-                    + getUILocaleUtil().getCaption("pdf.academic.calendar.date.year"), boldFont));
-            cell.setColspan(2);
-            cell.setPaddingLeft(80);
-            cell.setBorder(PdfPCell.NO_BORDER);
-            cell.setPaddingBottom(10);
-            table.addCell(cell);
-            document.add(table);
-
-            PdfPTable tableForCalendar = new PdfPTable(1);
-
-            StringBuilder depts = new StringBuilder();
-            for (DEPARTMENT dept : deptList) {
-                if (!dept.hasParent() && !dept.isDeleted()) {
-                    depts.append(dept.getDeptShortName()).append(", ");
-                }
-            }
-            depts = new StringBuilder(depts.substring(0, depts.length() - 2));
-
-            cell = new PdfPCell(new Phrase(depts + "\n" + getUILocaleUtil().getCaption("pdf.academic.calendar")
-                    + "\n" + String.valueOf(Calendar.getInstance().get(Calendar.YEAR)) + " - "
-                    + String.valueOf((Calendar.getInstance().get(Calendar.YEAR) + 1)), boldFont));
-            cell.setPaddingLeft(120);
-            cell.setPaddingRight(120);
-            cell.setBorder(PdfPCell.NO_BORDER);
-            cell.setPaddingBottom(10);
-            cell.setHorizontalAlignment(Element.ALIGN_MIDDLE);
-            cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-            tableForCalendar.addCell(cell);
-
-            document.add(tableForCalendar);
-
-            PdfPTable tableForDates = new PdfPTable(2);
-            DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-
-            cell = new PdfPCell(new Phrase(getUILocaleUtil().getCaption("pdf.academic.calendar.order"), font));
-            tableForDates.addCell(cell);
-            cell = new PdfPCell(new Phrase(getUILocaleUtil().getCaption("pdf.academic.calendar.period"), font));
-            tableForDates.addCell(cell);
-
-            String caption, item, itemName;
-            int beginYear, endYear;
-            // dealing with temporary common variables for cycles works faster
-            // switch works as hashtable or lookup table if cases > 5, constant
-            // time for all elements
-            for (ACADEMIC_CALENDAR_DETAIL acd : acdList) {
-                item = acd.getAcademicCalendarItem().getItemType();
-                itemName = acd.getAcademicCalendarItem().getItemName();
-                caption = null;
-                switch (item) {
-                    case "c":
-                    case "e":
-                    case "13":
-                    case "29":
-                    case "37":
-                    case "40":
-                        cell = new PdfPCell(new Phrase(String.format(itemName, academicCalendar.getYear().toString()), font));
-                        break;
-                    case "f":
-                    case "48":
-                    case "118":
-                        beginYear = academicCalendar.getYear().getBeginYear() + 1;
-                        endYear = academicCalendar.getYear().getEndYear() + 1;
-                        cell = new PdfPCell(new Phrase(String.format(itemName, beginYear + "-" + endYear), font));
-                        break;
-                    case "k":
-                    case "l":
-                        cell = new PdfPCell(new Phrase(getUILocaleUtil().getCaption("examination.session") + ": "
-                                + itemName, font));
-                        break;
-                    case "m":
-                        cell = new PdfPCell(new Phrase("��������: asd" + itemName, font));
-                        break;
-                    case "n":
-                    case "o":
-                    case "p":
-                    case "75":
-                    case "76":
-                    case "77":
-                        cell = new PdfPCell(new Phrase(getUILocaleUtil().getCaption("summer.break") + ": "
-                                + itemName, font));
-                        break;
-                    case "s":
-                    case "t":
-                        cell = new PdfPCell(new Phrase(getUILocaleUtil().getCaption("undergraduate.practice")
-                                + ": " + itemName, font));
-                        break;
-                    case "u":
-                    case "v":
-                        cell = new PdfPCell(new Phrase(getUILocaleUtil().getCaption("undergraduate.defense")
-                                + ": " + itemName, font));
-                        break;
-                    case "y":
-                    case "z":
-                        cell = new PdfPCell(new Phrase(getUILocaleUtil().getCaption("diploma.defense") + ": "
-                                + itemName, font));
-                        break;
-                    case "0":
-                    case "16":
-                    case "55":
-                    case "64":
-                        cell = new PdfPCell(new Phrase(String.format(itemName,
-                                academicCalendar.getYear().getEndYear()), font));
-                        break;
-                    case "8":
-                    case "9":
-                    case "72":
-                    case "73":
-                        cell = new PdfPCell(new Phrase(getUILocaleUtil().getCaption("summer.semester") + ": "
-                                + itemName, font));
-                        break;
-                    case "10":
-                        cell = new PdfPCell(new Phrase(getUILocaleUtil().getCaption("summer.semester.bs") + ": "
-                                + itemName, font));
-                        break;
-                    case "11":
-                        caption = getUILocaleUtil().getCaption("fall.semester").toUpperCase();
-                        break;
-                    case "39":
-                        caption = getUILocaleUtil().getCaption("spring.semester").toUpperCase();
-                        break;
-                    case "127":
-                        caption = "KMA Entrance Exams I Period";
-                        break;
-                    case "129":
-                        caption = "KMA Entrance Exams II Period";
-                        break;
-                    case "78":
-                    case "131":
-                        caption = "FALL SEMESTER";
-                        break;
-                    case "97":
-                    case "155":
-                        caption = "SPRING SEMESTER";
-                        break;
-                    case "175":
-                        caption = "SUMMER SEMESTER";
-                        break;
-                    default:
-                        cell = new PdfPCell(new Phrase(itemName, font));
-                        break;
-                }
-                if (caption != null) {
-                    cell = new PdfPCell(new Phrase(caption, boldFont));
-                    cell.setBorder(PdfPCell.NO_BORDER);
-                    cell.setPaddingTop(10);
-                    cell.setPaddingBottom(10);
-                    tableForDates.addCell(cell);
-
-                    cell = new PdfPCell(new Phrase("", font));
-                    cell.setBorder(PdfPCell.NO_BORDER);
-                    tableForDates.addCell(cell);
-                    cell = new PdfPCell(new Phrase(itemName, font));
-                }
-                tableForDates.addCell(cell);
-
-                String dates = "";
-                if (acd.getDate1() != null) {
-                    dates = dates + dateFormat.format(acd.getDate1());
-                }
-                if (acd.getDate2() != null) {
-                    dates = dates + " - " + dateFormat.format(acd.getDate2());
-                }
-                if (acd.getDate3() != null) {
-                    dates = dates + " " + dateFormat.format(acd.getDate3());
-                }
-                if (acd.getDate4() != null) {
-                    dates = dates + " - " + dateFormat.format(acd.getDate4());
-                }
-                cell = new PdfPCell(new Phrase(dates, font));
-                tableForDates.addCell(cell);
-            }
-            document.add(tableForDates);
-
-            if (academicCalendar.getFaculty().getFacultyName().contains("���")) {
-                PdfPTable tableLast = new PdfPTable(1);
-                addCell(getUILocaleUtil().getCaption("pdf.academic.calendar.ise.director") + "                                                      " + getUILocaleUtil().getCaption("pdf.academic.calendar.ise.director.name"), tableLast, 1, boldFont);
-                document.add(tableLast);
-            } else if (academicCalendar.getFaculty().getFacultyName().contains("���")) {
-                PdfPTable tableLast = new PdfPTable(1);
-                addCell(getUILocaleUtil().getCaption("pdf.academic.calendar.kma.director") + "                                                      " + getUILocaleUtil().getCaption("pdf.academic.calendar.kma.director.name"), tableLast, 1, boldFont);
-                addCell(getUILocaleUtil().getCaption("pdf.academic.calendar.kma.sign")
-                        + String.valueOf(Calendar.getInstance().get(Calendar.YEAR)), tableLast, 1, boldFont);
-                document.add(tableLast);
-            } else if (academicCalendar.getFaculty().getFacultyName().contains("���")) {
-                PdfPTable tableForDeans = new PdfPTable(2);
-                addCell(getUILocaleUtil().getCaption("pdf.academic.calendar.dean.bf"), tableForDeans, 1, boldFont);
-                addCell(getUILocaleUtil().getCaption("pdf.academic.calendar.dean.bf.name"), tableForDeans, 2, boldFont);
-                addCell(getUILocaleUtil().getCaption("pdf.academic.calendar.dean.fengi"), tableForDeans, 1, boldFont);
-                addCell(getUILocaleUtil().getCaption("pdf.academic.calendar.dean.fengi.name"), tableForDeans, 2, boldFont);
-                addCell(getUILocaleUtil().getCaption("pdf.academic.calendar.dean.bs"), tableForDeans, 1, boldFont);
-                addCell(getUILocaleUtil().getCaption("pdf.academic.calendar.dean.bs.name"), tableForDeans, 2, boldFont);
-                addCell(getUILocaleUtil().getCaption("pdf.academic.calendar.dean.fit"), tableForDeans, 1, boldFont);
-                addCell(getUILocaleUtil().getCaption("pdf.academic.calendar.dean.fit.name"), tableForDeans, 2, boldFont);
-                addCell(getUILocaleUtil().getCaption("pdf.academic.calendar.dean.chemistry"), tableForDeans, 1, boldFont);
-                addCell(getUILocaleUtil().getCaption("pdf.academic.calendar.dean.chemistry.name"), tableForDeans, 2, boldFont);
-                addCell(getUILocaleUtil().getCaption("pdf.academic.calendar.dean.math"), tableForDeans, 1, boldFont);
-                addCell(getUILocaleUtil().getCaption("pdf.academic.calendar.dean.math.name"), tableForDeans, 2, boldFont);
-                addCell(getUILocaleUtil().getCaption("pdf.academic.calendar.dean.or"), tableForDeans, 1, boldFont);
-                addCell(getUILocaleUtil().getCaption("pdf.academic.calendar.dean.or.name"), tableForDeans, 2, boldFont);
-                document.add(tableForDeans);
-            }
-
-            document.close();
-            return new ByteArrayInputStream(baos.toByteArray());
-        } catch (Exception ex) {
-            CommonUtils.showMessageAndWriteLog("Unable to download pdf file", ex);
-        } finally {
-            if (baos != null) {
-                try {
-                    baos.close();
-                } catch (IOException ex) {
-                    ex.printStackTrace();//TODO
-                }
-            }
-        }
-        return null;
     }
 
     private void addCell(String a, PdfPTable table, int colspan, Font font) {
@@ -1801,7 +1445,6 @@ AcademicCalendarView extends AbstractTaskView {
             saveButton.setVisible(false);
             confirmButton.setVisible(false);
             approveButton.setVisible(false);
-            printButton.setVisible(false);
         } else {
             showErrorLabel(false);
             createButton.setVisible(false);
@@ -1811,7 +1454,6 @@ AcademicCalendarView extends AbstractTaskView {
             confirmButton.setEnabled(academicCalendar.getStatus() == 1);
             approveButton.setVisible(true);
             approveButton.setEnabled(academicCalendar.getStatus() != 3);
-            printButton.setVisible(true);
         }
 
         initContent();
