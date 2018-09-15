@@ -81,7 +81,7 @@ public class AccountantEdit extends AbstractDialog {
                 try {
                     accountantView.refresh();
                 } catch (Exception e) {
-                    e.printStackTrace();//TODO catch
+                    CommonUtils.showMessageAndWriteLog("Unable to refresh accountant view",e);
                 }
             }
         });

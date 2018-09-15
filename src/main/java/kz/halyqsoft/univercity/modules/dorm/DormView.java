@@ -4,6 +4,7 @@ import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.MenuBar;
+import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.entity.beans.AbstractTask;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 
@@ -30,7 +31,7 @@ public class DormView extends AbstractTaskView {
                     StudentView studentView = new StudentView(3, new HorizontalLayout());
                     new DormDialog(studentView);
                 } catch (Exception e) {
-                    e.printStackTrace();//TODO catch
+                    CommonUtils.showMessageAndWriteLog("Unable to open dorm dialog",e);
                 }
             }
         }).setIcon(new ThemeResource("img/users.png"));
