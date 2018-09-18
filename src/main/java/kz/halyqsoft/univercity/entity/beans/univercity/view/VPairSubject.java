@@ -10,23 +10,38 @@ import org.r3a.common.entity.FieldInfo;
  */
 public final class VPairSubject extends AbstractEntity {
 
-	@FieldInfo(type = EFieldType.TEXT)
+	@FieldInfo(type = EFieldType.INTEGER,order = 1)
+	private long code;
+
+	@FieldInfo(type = EFieldType.TEXT,order = 2)
 	private String subjectName;
 
-	@FieldInfo(type = EFieldType.TEXT, order = 2)
+	@FieldInfo(type = EFieldType.TEXT, order = 3)
 	private Integer credit;
 
-	@FieldInfo(type = EFieldType.TEXT, order = 3)
+	@FieldInfo(type = EFieldType.TEXT, order = 4)
 	private Integer ects;
 
-	@FieldInfo(type = EFieldType.TEXT, order = 4)
-	private String semesterName;
-
 	@FieldInfo(type = EFieldType.TEXT, order = 5)
-	private String description;
+	private String semesterName;
 
 	@FieldInfo(type = EFieldType.TEXT, order = 6)
 	private Long pairNumber;
+
+	@FieldInfo(type = EFieldType.TEXT, order = 7)
+	private String postrequisite;
+
+	@FieldInfo(type = EFieldType.TEXT, order = 8)
+	private String prerequisite;
+
+	@FieldInfo(type = EFieldType.TEXT, order = 9)
+	private String aim;
+
+	@FieldInfo(type = EFieldType.TEXT, order = 10)
+	private String description;
+
+	@FieldInfo(type = EFieldType.TEXT, order = 11)
+	private String competence;
 
 	public String getSubjectName() {
 		return subjectName;
@@ -74,5 +89,45 @@ public final class VPairSubject extends AbstractEntity {
 
 	public void setPairNumber(Long pairNumber) {
 		this.pairNumber = pairNumber;
+	}
+
+	public long getCode() {
+		return code;
+	}
+
+	public void setCode(long code) {
+		this.code = code;
+	}
+
+	public String getAim() {
+		return aim;
+	}
+
+	public void setAim(String aim) {
+		this.aim = aim;
+	}
+
+	public String getPostrequisite() {
+		return postrequisite;
+	}
+
+	public void setPostrequisite(String postrequisite) {
+		this.postrequisite = postrequisite;
+	}
+
+	public String getPrerequisite() {
+		return prerequisite;
+	}
+
+	public void setPrerequisite(String prerequisite) {
+		this.prerequisite = prerequisite;
+	}
+
+	public String getCompetence() {
+		return competence;
+	}
+
+	public void setCompetence(String competence) {
+		this.competence = competence;
 	}
 }
