@@ -10,8 +10,8 @@ import org.r3a.common.entity.FieldInfo;
  */
 public final class VPairSubject extends AbstractEntity {
 
-	@FieldInfo(type = EFieldType.INTEGER,order = 1)
-	private long code;
+	@FieldInfo(type = EFieldType.TEXT,order = 1)
+	private String code;
 
 	@FieldInfo(type = EFieldType.TEXT,order = 2)
 	private String subjectName;
@@ -91,11 +91,11 @@ public final class VPairSubject extends AbstractEntity {
 		this.pairNumber = pairNumber;
 	}
 
-	public long getCode() {
+	public String getCode() {
 		return code;
 	}
 
-	public void setCode(long code) {
+	public void setCode(String code) {
 		this.code = code;
 	}
 

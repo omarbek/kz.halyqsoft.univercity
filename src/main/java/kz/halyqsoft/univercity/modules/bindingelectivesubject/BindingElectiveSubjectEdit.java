@@ -146,7 +146,7 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
                     Object[] oo = (Object[]) o;
                     VPairSubject pairSubject = new VPairSubject();
                     pairSubject.setId(ID.valueOf((long) oo[0]));
-                    pairSubject.setCode((long)oo[1]);
+                    pairSubject.setCode((String)oo[1]);
                     pairSubject.setSubjectName((String) oo[2]);
                     pairSubject.setCredit(((BigDecimal) oo[3]).intValue());
                     pairSubject.setEcts(((BigDecimal) oo[4]).intValue());
@@ -237,6 +237,7 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
         studentElectiveSubjectGM.setMultiSelect(false);
         studentElectiveSubjectGM.setRefreshType(ERefreshType.MANUAL);
         studentElectiveSubjectGM.setCrudEntityClass(PAIR_SUBJECT.class);//TODO here
+
 
         return studentElectiveSubjectGW;
     }
