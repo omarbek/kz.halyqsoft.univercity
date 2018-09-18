@@ -31,6 +31,7 @@ public class CreateExcel {
             fileName = title + ".xlsx";
         }
         mainFile = new File(fileName);
+
         FileOutputStream out = new FileOutputStream( mainFile);
         XSSFSheet sheet = workbook.createSheet();
         for(int i = 0;i<=tableBody.size();i++){
@@ -56,9 +57,6 @@ public class CreateExcel {
         mainFile.delete();
         System.out.println(fileName + " written successfully" );
     }
-
-
-
 
     private void getList(XSSFWorkbook workbook){
         Map<Integer, List<String>> hashmap = new HashMap<Integer , List<String>>();

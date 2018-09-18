@@ -931,20 +931,21 @@ public final class ApplicantsForm extends UsersForm {
         }
 
         String inLettersDorn = "";
+        String moneyForDorm = "";
         ACCOUNTANT_PRICE accountantPriceDorm = getAccountantPrice(student, 1);
         if (accountantPriceDorm != null) {
-            inLettersDorn = accountantPriceDorm.getPriceInLettersKaz();
+            moneyForDorm = accountantPriceDorm.getPriceInLettersKaz();
         } else {
-            inLettersDorn = "0";
+            moneyForDorm = "0";
         }
+        answerEdu = String.valueOf(Double.valueOf(moneyForEducation) / 8);
     }
 
     public static void setRusLanguage(STUDENT student, boolean ru) throws Exception {
-
         inLettersEdu = "";
         moneyForEducation = "";
-
         ACCOUNTANT_PRICE accountantPrice = getAccountantPrice(student, 2);
+
         if (accountantPrice != null) {
             inLettersEdu = accountantPrice.getPriceInLetters();
             moneyForEducation = String.valueOf(accountantPrice.getPrice());
@@ -956,7 +957,7 @@ public final class ApplicantsForm extends UsersForm {
         String moneyForDorm = "";
         ACCOUNTANT_PRICE accountantPriceDorm = getAccountantPrice(student, 1);
         if (accountantPriceDorm != null) {
-            inLettersDorn = accountantPriceDorm.getPriceInLetters();
+            moneyForDorm = accountantPriceDorm.getPriceInLetters();
         } else {
             moneyForDorm = "0";
         }
