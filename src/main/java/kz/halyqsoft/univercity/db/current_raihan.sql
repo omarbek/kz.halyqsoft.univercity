@@ -1,0 +1,1 @@
+ALTER TABLE pair_subject ADD column teacher_id BIGINT NULL;

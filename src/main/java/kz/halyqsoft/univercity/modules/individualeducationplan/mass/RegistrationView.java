@@ -163,8 +163,8 @@ public class RegistrationView extends AbstractTaskView {
         subjectGrid = new Grid();
         subjectGrid.setCaption(getUILocaleUtil().getCaption("found.subjects"));
         subjectGrid.setWidth(100, Unit.PERCENTAGE);
-        subjectGrid.setColumns("subjectName","pairNumber" , "chairName", "levelName", "cycleShortName", "credit",
-                "formula", "controlTypeName" );
+        subjectGrid.setColumns("subjectName", "pairNumber", "chairName", "levelName", "cycleShortName", "credit",
+                "formula", "controlTypeName");
         subjectGrid.getColumn("subjectName").setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(V_SUBJECT_SELECT.class,
                 "nameRU")).setWidthUndefined();
         subjectGrid.getColumn("pairNumber").setHeaderCaption(getUILocaleUtil().getEntityFieldLabel(
@@ -433,7 +433,7 @@ public class RegistrationView extends AbstractTaskView {
                 "    INNER JOIN speciality s2 ON d2.id = s2.chair_id " +
                 "  WHERE subj.mandatory = FALSE AND subj.subject_cycle_id\n" +
                 "  IS NOT NULL AND\n" +
-                "        subj.deleted = FALSE AND  subj.mandatory = FALSE  AND sem.study_year_id = ?1 AND ss.semester_data_id = "+CommonUtils.getCurrentSemesterData().getId().getId().longValue();
+                "        subj.deleted = FALSE AND  subj.mandatory = FALSE  AND sem.study_year_id = ?1 AND ss.semester_data_id = " + CommonUtils.getCurrentSemesterData().getId().getId().longValue();
 
         String subjectName = subjectNameTF.getValue();
         CommonUtils.getCurrentSemesterData();
@@ -443,9 +443,9 @@ public class RegistrationView extends AbstractTaskView {
             sql = sql + "%'";
         }
         int i = 1;
-        if (specialityCB.getValue()!=null) {
-            sql = sql + " AND s2.id  = ?"+(++i);
-            params.put(i , ((SPECIALITY)specialityCB.getValue()).getId().getId());
+        if (specialityCB.getValue() != null) {
+            sql = sql + " AND s2.id  = ?" + (++i);
+            params.put(i, ((SPECIALITY) specialityCB.getValue()).getId().getId());
         }
 
         try {
@@ -467,12 +467,11 @@ public class RegistrationView extends AbstractTaskView {
         }
         boolean filterSet = false;
 
-        if(subjectGrid.getSelectedRow()!=null){
+        if (subjectGrid.getSelectedRow() != null) {
             filterSet = true;
         }
 
         Map<Integer, Object> params = new HashMap<>();
-        params.put(1, currentUser.getId().getId());
         String sql = "SELECT " +
                 "  a.ID, " +
                 "  b.CODE            STUDENT_CODE, " +
@@ -485,8 +484,17 @@ public class RegistrationView extends AbstractTaskView {
                 "  INNER JOIN DEPARTMENT d ON c.FACULTY_ID = d.ID " +
                 "  INNER JOIN SPECIALITY e ON c.SPECIALITY_ID = e.ID " +
                 "  INNER JOIN USER_DOCUMENT f on a.ID = f.USER_ID inner join EDUCATION_DOC g on f.ID = g.ID ";
-        int i = 2;
+        int i = 1;
         StringBuilder sb = new StringBuilder();
+        sb.append(" where c.STUDENT_STATUS_ID = ?");
+        sb.append(i);
+        params.put(i++, 1);
+
+        if (!CommonUtils.isAdmin()) {
+            sb.append(" and a.advisor_id = ?");
+            sb.append(i);
+            params.put(i++, currentUser.getId().getId());
+        }
         if (schoolEducationLanguage.getValue() != null) {
             sb.append(" and f.DOCUMENT_TYPE_ID = ?");
             sb.append(i);
@@ -564,10 +572,6 @@ public class RegistrationView extends AbstractTaskView {
         }
 
         try {
-            sb.append(" and c.STUDENT_STATUS_ID = ?");
-            sb.append(i);
-            params.put(i, 1);//the last param
-            sb.insert(0, " where a.advisor_id = ?1  ");
             sql = sql + sb.toString() + " order by b.LAST_NAME, b.FIRST_NAME";
             List<V_STUDENT_SELECT> list = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(sql,
                     params, V_STUDENT_SELECT.class);
@@ -579,10 +583,10 @@ public class RegistrationView extends AbstractTaskView {
                 list.remove(studentSelect);
             }
 
-            for (Iterator<V_STUDENT_SELECT> it = list.iterator(); it.hasNext();) {
+            for (Iterator<V_STUDENT_SELECT> it = list.iterator(); it.hasNext(); ) {
                 V_STUDENT_SELECT studentSelect = it.next();
-                if(subjectGrid.getSelectedRow()!=null){
-                    if(checkIfHasPairSubject(studentSelect)){
+                if (subjectGrid.getSelectedRow() != null) {
+                    if (checkIfHasPairSubject(studentSelect)) {
                         it.remove();
                     }
                 }
@@ -595,14 +599,14 @@ public class RegistrationView extends AbstractTaskView {
         }
     }
 
-    private boolean checkIfHasPairSubject(V_STUDENT_SELECT studentSelect){
+    private boolean checkIfHasPairSubject(V_STUDENT_SELECT studentSelect) {
 
-        Integer pairNumber = ((V_SEMESTER_SUBJECT)subjectGrid.getSelectedRow()).getPairNumber();
-        ID semesterSubjectId =((V_SEMESTER_SUBJECT)subjectGrid.getSelectedRow()).getId();
+        Integer pairNumber = ((V_SEMESTER_SUBJECT) subjectGrid.getSelectedRow()).getPairNumber();
+        ID semesterSubjectId = ((V_SEMESTER_SUBJECT) subjectGrid.getSelectedRow()).getId();
         SEMESTER_SUBJECT semesterSubject = null;
-        try{
-            semesterSubject = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(SEMESTER_SUBJECT.class , semesterSubjectId);
-        }catch (Exception e){
+        try {
+            semesterSubject = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(SEMESTER_SUBJECT.class, semesterSubjectId);
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -619,18 +623,18 @@ public class RegistrationView extends AbstractTaskView {
                 "    ON semSub.subject_id = sub.id\n" +
                 "INNER JOIN pair_subject pairSub\n" +
                 "    ON sub.id = pairSub.subject_id\n" +
-                "WHERE semSub.semester_data_id = "+semesterSubject.getSemesterData().getId()+" \n" +
+                "WHERE semSub.semester_data_id = " + semesterSubject.getSemesterData().getId() + " \n" +
                 "      AND\n" +
-                "      studEdu.student_id = "+ studentSelect.getId() +" \n" +
+                "      studEdu.student_id = " + studentSelect.getId() + " \n" +
                 "      AND\n" +
-                "      pairSub.pair_number = "+pairNumber+" ";
+                "      pairSub.pair_number = " + pairNumber + " ";
 
-        try{
+        try {
             List o = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
-            if(o.size()>0){
+            if (o.size() > 0) {
                 return true;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -646,7 +650,7 @@ public class RegistrationView extends AbstractTaskView {
                     "a.ID = c.STUDENT_ID and c.CHILD_ID is null inner join DEPARTMENT d on c.FACULTY_ID = d.ID " +
                     "inner join SPECIALITY e on c.SPECIALITY_ID = e.ID where exists (select 1 from STUDENT_SUBJECT f " +
                     "where f.STUDENT_ID = c.ID and f.SUBJECT_ID = ?1 and f.DELETED = ?2) ";
-            if(!CommonUtils.isAdmin()){
+            if (!CommonUtils.isAdmin()) {
                 sql = sql + " and a.advisor_id = " + CommonUtils.getCurrentUser().getId().getId().longValue();
             }
 
@@ -771,7 +775,7 @@ public class RegistrationView extends AbstractTaskView {
         public void buttonClick(ClickEvent ev) {
             List<STUDENT_SUBJECT> delList = new ArrayList<>();
             try {
-                 SEMESTER_SUBJECT ss = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
+                SEMESTER_SUBJECT ss = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
                         SEMESTER_SUBJECT.class, semesterSubjectId);
                 QueryModel<STUDENT_SUBJECT> ssQM = new QueryModel<>(STUDENT_SUBJECT.class);
                 FromItem ssFI = ssQM.addJoin(EJoin.INNER_JOIN, "studentEducation", STUDENT_EDUCATION.class, "id");

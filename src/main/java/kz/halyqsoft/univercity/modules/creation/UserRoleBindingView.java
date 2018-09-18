@@ -68,7 +68,6 @@ UserRoleBindingView extends AbstractTaskView implements EntityListener, FilterPa
 
 
         usersCB = new ComboBox();
-//        usersCB.setCaption(getUILocaleUtil().getCaption(""));//TODO
         usersCB.setNullSelectionAllowed(true);
         usersCB.setTextInputAllowed(true);
         usersCB.setFilteringMode(FilteringMode.CONTAINS);

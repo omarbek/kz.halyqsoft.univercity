@@ -101,7 +101,7 @@ public class CreativeExamEdit extends AbstractDialog {
                 try {
                     creativeExamView.refresh();
                 } catch (Exception e) {
-                    e.printStackTrace();//TODO catch
+                    CommonUtils.showMessageAndWriteLog("Unable to refresh creative exam view",e);
                 }
             }
         });
@@ -357,7 +357,7 @@ public class CreativeExamEdit extends AbstractDialog {
                 try {
                     studentCreativeExam = (STUDENT_CREATIVE_EXAM) studentCreativeExamCFW.getWidgetModel().getEntity();
                 } catch (Exception e) {
-                    e.printStackTrace();//TODO catch
+                    CommonUtils.showMessageAndWriteLog("Unable to get student creative exam",e);
                 }
                 if (studentCreativeExam != null && studentCreativeExam.getId() != null) {
                     int rate = 0;
@@ -439,6 +439,6 @@ public class CreativeExamEdit extends AbstractDialog {
 
     @Override
     protected String createTitle() {
-        return "Creative Exam";//TODO
+        return "Creative Exam";//TODO resource
     }
 }

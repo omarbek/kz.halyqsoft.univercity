@@ -1,11 +1,27 @@
-DROP INDEX idx_t_student_education;
+ALTER TABLE pair_subject
+  ADD COLUMN prerequisite_id BIGINT NULL;
+ALTER TABLE pair_subject
+  ADD COLUMN postrequisite_id BIGINT NULL;
+ALTER TABLE pair_subject
+  ADD COLUMN aim BIGINT NULL;
+ALTER TABLE pair_subject
+  ADD COLUMN competence BIGINT NULL;
 
-CREATE UNIQUE INDEX idx_t_student_education
-  ON student_education (
-    student_id ASC,
-    faculty_id ASC,
-    chair_id ASC,
-    speciality_id ASC,
-    study_year_id ASC,
-    groups_id ASC
-  );
+ALTER TABLE pair_subject
+  ALTER COLUMN aim TYPE VARCHAR(255);
+ALTER TABLE pair_subject
+  ALTER COLUMN competence TYPE VARCHAR(255);
+
+ALTER TABLE pair_subject
+  ADD COLUMN code BIGINT NULL;
+
+ALTER TABLE ONLY pair_subject
+  ADD CONSTRAINT fk_pair_subject_postrequisite FOREIGN KEY (postrequisite_id)
+REFERENCES subject (id) ON UPDATE RESTRICT ON DELETE RESTRICT;
+
+ALTER TABLE ONLY pair_subject
+  ADD CONSTRAINT fk_pair_subject_prerequisite FOREIGN KEY (prerequisite_id)
+REFERENCES subject (id) ON UPDATE RESTRICT ON DELETE RESTRICT;
+--raikhan
+ALTER TABLE pair_subject
+  ALTER COLUMN code TYPE VARCHAR(255);

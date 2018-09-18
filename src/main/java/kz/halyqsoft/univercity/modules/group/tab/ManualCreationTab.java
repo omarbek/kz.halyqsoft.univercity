@@ -72,7 +72,7 @@ public class ManualCreationTab extends AbstractCommonView implements EntityListe
         studentGM.setRefreshType(ERefreshType.MANUAL);
         studentGM.setMultiSelect(false);
         studentGM.setRowNumberVisible(true);
-        studentGM.setRowNumberWidth(50);
+        studentGM.setRowNumberWidth(100);
         studentGM.getColumnModel("category").setInGrid(false);
 
         FormModel formModel = studentGM.getFormModel();

@@ -365,7 +365,7 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                 } else if ("50".equals(minutes)) {
                     time.setTimeValue(hoursInDouble + 0.83);
                 } else {
-                    Message.showError("you should choose minutes with interval of 10 mins");//TODO
+                    Message.showError("you should choose minutes with interval of 10 mins");//TODO resource
                     return false;
                 }
             }

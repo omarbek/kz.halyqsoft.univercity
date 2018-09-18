@@ -705,7 +705,7 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
             try {
                 save();
                 QueryModel<DEPARTMENT> chairQM = new QueryModel<DEPARTMENT>(DEPARTMENT.class);
-//				chairQM.addWhere("type", ECriteria.EQUAL, T_DEPARTMENT_TYPE.CHAIR_ID);//TODO
+                chairQM.addWhereNotNull("parent");
                 chairQM.addWhereAnd("deleted", Boolean.FALSE);
                 chairQM.addOrder("deptName");
                 BeanItemContainer<DEPARTMENT> chairBIC = new BeanItemContainer<DEPARTMENT>(DEPARTMENT.class, SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(chairQM));
