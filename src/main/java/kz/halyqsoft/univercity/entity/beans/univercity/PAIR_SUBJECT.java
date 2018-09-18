@@ -10,9 +10,9 @@ import javax.persistence.*;
 @Entity
 public class PAIR_SUBJECT extends AbstractEntity {
 
-    @FieldInfo(type = EFieldType.INTEGER,  max = 4000, required = false, order = 1, inGrid = false)
+    @FieldInfo(type = EFieldType.TEXT,  max = 255, required = false)
     @Column(name = "CODE")
-    private int code;
+    private String code;
 
     @FieldInfo(type = EFieldType.FK_COMBO, order = 2, inEdit = false, inGrid = false, inView = false)
     @ManyToOne
@@ -28,7 +28,7 @@ public class PAIR_SUBJECT extends AbstractEntity {
 
     @FieldInfo(type = EFieldType.INTEGER, max = 5, order = 4)
     @Column(name = "PAIR_NUMBER")
-    private int pairNumber;
+    private Integer pairNumber;
 
     @FieldInfo(type = EFieldType.FK_COMBO, order = 5)
     @ManyToOne
@@ -50,18 +50,10 @@ public class PAIR_SUBJECT extends AbstractEntity {
     @Column(name = "DESCRIPTION")
     private String description;
 
-
     @FieldInfo(type = EFieldType.TEXT, isMemo = true, max = 4000, required = false, order = 9, inGrid = false)
     @Column(name = "COMPETENCE")
     private String competence;
 
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
-    }
 
     public SUBJECT getPrerequisite() {
         return prerequisite;
@@ -95,9 +87,6 @@ public class PAIR_SUBJECT extends AbstractEntity {
         this.competence = competence;
     }
 
-    public PAIR_SUBJECT() {
-    }
-
     public SUBJECT getSubject() {
         return subject;
     }
@@ -114,14 +103,6 @@ public class PAIR_SUBJECT extends AbstractEntity {
         this.electiveBindedSubject = electveBindedSubject;
     }
 
-    public int getPairNumber() {
-        return pairNumber;
-    }
-
-    public void setPairNumber(int pairNumber) {
-        this.pairNumber = pairNumber;
-    }
-
     public ELECTIVE_BINDED_SUBJECT getElectiveBindedSubject() {
         return electiveBindedSubject;
     }
@@ -136,5 +117,21 @@ public class PAIR_SUBJECT extends AbstractEntity {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public Integer getPairNumber() {
+        return pairNumber;
+    }
+
+    public void setPairNumber(Integer pairNumber) {
+        this.pairNumber = pairNumber;
     }
 }

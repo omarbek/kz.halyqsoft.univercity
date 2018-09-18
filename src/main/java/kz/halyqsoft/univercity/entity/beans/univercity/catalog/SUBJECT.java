@@ -326,7 +326,7 @@ public class SUBJECT extends AbstractEntity {
     }
 
     public String toString() {
-        return nameKZ;
+        return nameKZ + "-" + chair.getDeptShortName();
     }
 
     public boolean isCourseWork() {

@@ -7,7 +7,13 @@ ALTER TABLE pair_subject
 ALTER TABLE pair_subject
   ADD COLUMN competence BIGINT NULL;
 
-ALTER TABLE pair_subject ADD COLUMN code BIGINT NULL;
+ALTER TABLE pair_subject
+  ALTER COLUMN aim TYPE VARCHAR(255);
+ALTER TABLE pair_subject
+  ALTER COLUMN competence TYPE VARCHAR(255);
+
+ALTER TABLE pair_subject
+  ADD COLUMN code BIGINT NULL;
 
 ALTER TABLE ONLY pair_subject
   ADD CONSTRAINT fk_pair_subject_postrequisite FOREIGN KEY (postrequisite_id)
@@ -16,3 +22,6 @@ REFERENCES subject (id) ON UPDATE RESTRICT ON DELETE RESTRICT;
 ALTER TABLE ONLY pair_subject
   ADD CONSTRAINT fk_pair_subject_prerequisite FOREIGN KEY (prerequisite_id)
 REFERENCES subject (id) ON UPDATE RESTRICT ON DELETE RESTRICT;
+--raikhan
+ALTER TABLE pair_subject
+  ALTER COLUMN code TYPE VARCHAR(255);
