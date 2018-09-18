@@ -2,6 +2,8 @@ package kz.halyqsoft.univercity.entity.beans.univercity;
 
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import org.r3a.common.entity.AbstractEntity;
+import org.r3a.common.entity.EFieldType;
+import org.r3a.common.entity.FieldInfo;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -18,12 +20,15 @@ public class COMPLAINT extends AbstractEntity {
     @JoinColumns({@JoinColumn(name = "USER_ID", referencedColumnName = "ID")})
     private USERS user;
 
+    @FieldInfo(type = EFieldType.TEXT)
     @Column(name = "SHORT_DESCRIPTION", length = 50, nullable = false)
     private String shortDescription;
 
+    @FieldInfo(type = EFieldType.TEXT, order = 2)
     @Column(name = "DESCRIPTION", length = 2048, nullable = false)
     private String description;
 
+    @FieldInfo(type = EFieldType.DATETIME, order = 3,inEdit = false)
     @Column(name = "CREATE_DATE", nullable = false)
     @Temporal(TemporalType.DATE)
     private Date createDate;
