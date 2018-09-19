@@ -196,7 +196,7 @@ public class FileView extends AbstractTaskView {
 //        docTable.setColumnAlignment(OPEN_BUTTON, Table.Align.CENTER);
     }
 
-    private void setAllColumnWidth() {//TODO
+    private void setAllColumnWidth() {
         docTable.setColumnWidth(TITLE, 805);//370
         docTable.setColumnWidth(FILE_NAME, 500);//333
 //        docTable.setColumnWidth(OPEN_DOC_BUTTON, 150);

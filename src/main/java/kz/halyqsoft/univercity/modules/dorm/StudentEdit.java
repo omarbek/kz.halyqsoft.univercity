@@ -432,8 +432,9 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                     FromItem fi = roomQM.addJoin(EJoin.INNER_JOIN, "dorm", DORM.class, "id");
                     roomQM.addWhere("deleted", Boolean.FALSE);
                     roomQM.addWhere(fi, "deleted", Boolean.FALSE);
-                    roomQM.addWhere(fi, "name", ECriteria.EQUAL, buildingCB.getValue().toString());
-                    roomQM.addWhere("roomNo", ECriteria.EQUAL, event.getProperty().getValue().toString());
+                    roomQM.addWhere(fi, "name", ECriteria.EQUAL, buildingCB.getValue().toString().toLowerCase().trim());
+                    roomQM.addWhere("roomNo", ECriteria.EQUAL, event.getProperty().getValue().toString().toLowerCase().
+                            trim());
                     List<DORM_ROOM> dormRooms = null;
                     try {
                         dormRooms = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(roomQM);
@@ -527,7 +528,6 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
 
                                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(dormStudent);
                                 AbstractWebUI.getInstance().showNotificationInfo(getUILocaleUtil().getMessage("info.record.saved"));
-//                                DormUI.getInstance().openCommonView(new StudentView(filter));//TODO
                             } else {
                                 QueryModel<DORM_STUDENT> dormStudentQM = new QueryModel<DORM_STUDENT>(DORM_STUDENT.class);
                                 dormStudentQM.addWhere("student", ECriteria.EQUAL, STUDENT_EDUCATION.getId());
@@ -833,8 +833,8 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                                     "FROM DORM_STUDENT t0 INNER JOIN STUDENT_EDUCATION t1 ON t0.STUDENT_ID = t1.ID " +
                                     "WHERE t1.STUDENT_ID = ?1 AND t1.CHILD_ID IS NULL AND t0.CHECK_OUT_DATE IS NULL " +
                                     "AND t0.DELETED = FALSE and t0.request_status_id=1;";
-                            Map<Integer, Object> params=new HashMap<>();
-                            params.put(1,student.getId().getId());
+                            Map<Integer, Object> params = new HashMap<>();
+                            params.put(1, student.getId().getId());
                             dormStudent = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(
                                     sql, params, DORM_STUDENT.class);
                         } catch (NoResultException e) {
@@ -850,7 +850,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                                 DORM_STUDENT_VIOLATION.setViolationDate(violationDF.getValue());
                                 DORM_STUDENT_VIOLATION.setEvicted(false);
 
-                                DORM_RULE_VIOLATION_TYPE violationType = (DORM_RULE_VIOLATION_TYPE )violationTypeCB.getValue();
+                                DORM_RULE_VIOLATION_TYPE violationType = (DORM_RULE_VIOLATION_TYPE) violationTypeCB.getValue();
                                 DORM_STUDENT_VIOLATION.setViolationType(violationType);
 
                                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(DORM_STUDENT_VIOLATION);
@@ -865,7 +865,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                                 DORM_STUDENT_VIOLATION.setViolationDate(outDF.getValue());
                                 DORM_STUDENT_VIOLATION.setEvicted(true);
 
-                                DORM_RULE_VIOLATION_TYPE violationType = (DORM_RULE_VIOLATION_TYPE )outTypeCB.getValue();
+                                DORM_RULE_VIOLATION_TYPE violationType = (DORM_RULE_VIOLATION_TYPE) outTypeCB.getValue();
                                 DORM_STUDENT_VIOLATION.setViolationType(violationType);
 
                                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(DORM_STUDENT_VIOLATION);
@@ -874,7 +874,6 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(dormStudent);
 
                                 AbstractWebUI.getInstance().showNotificationInfo(getUILocaleUtil().getMessage("info.record.saved"));
-//                                DormUI.getInstance().openCommonView(new StudentView(filter));//TODO
                             }
 
                         }
