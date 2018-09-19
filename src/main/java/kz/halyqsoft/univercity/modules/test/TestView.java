@@ -1,8 +1,15 @@
 package kz.halyqsoft.univercity.modules.test;
 
+import com.vaadin.data.util.BeanContainer;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Grid;
+import com.vaadin.ui.OptionGroup;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.CORPUS;
 import org.r3a.common.entity.beans.AbstractTask;
 import org.r3a.common.vaadin.view.AbstractTaskView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TestView extends AbstractTaskView {
 
@@ -21,7 +28,16 @@ public class TestView extends AbstractTaskView {
     public void initView(boolean b) throws Exception {
 //        GridWidget awardGW=new GridWidget(AWARD.class);
 //        getContent().addComponent(awardGW);
-        Grid grid=new Grid();
+        OptionGroup mainOG=new OptionGroup("asd");
+        mainOG.setMultiSelect(true);
+        String zxc = "zxc";
+        mainOG.addItem(zxc);
+        mainOG.addItem("qwe");
+        mainOG.select(zxc);
+//        mainOG.setValue(zxc);
+//        mainOG.setItemEnabled(zxc,true);
+
+        getContent().addComponent(mainOG);
 
     }
 
