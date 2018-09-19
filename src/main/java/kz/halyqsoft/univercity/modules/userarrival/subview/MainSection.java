@@ -2,14 +2,17 @@ package kz.halyqsoft.univercity.modules.userarrival.subview;
 
 import com.byteowls.vaadin.chartjs.ChartJs;
 import com.byteowls.vaadin.chartjs.config.BarChartConfig;
+import com.byteowls.vaadin.chartjs.config.LineChartConfig;
 import com.byteowls.vaadin.chartjs.config.PieChartConfig;
 import com.byteowls.vaadin.chartjs.data.BarDataset;
 import com.byteowls.vaadin.chartjs.data.Dataset;
+import com.byteowls.vaadin.chartjs.data.LineDataset;
 import com.byteowls.vaadin.chartjs.data.PieDataset;
 import com.byteowls.vaadin.chartjs.options.InteractionMode;
 import com.byteowls.vaadin.chartjs.options.Position;
 import com.byteowls.vaadin.chartjs.options.elements.Rectangle;
 import com.byteowls.vaadin.chartjs.options.scale.Axis;
+import com.byteowls.vaadin.chartjs.options.scale.CategoryScale;
 import com.byteowls.vaadin.chartjs.options.scale.LinearScale;
 import com.byteowls.vaadin.chartjs.utils.ColorUtils;
 import com.vaadin.data.Property;
@@ -27,6 +30,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.view.*;
 import kz.halyqsoft.univercity.filter.FStatisticsFilter;
 import kz.halyqsoft.univercity.filter.panel.StatisticsFilterPanel;
 import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.PrintDialog;
+import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.SimpleStatistics;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -50,11 +54,70 @@ public class MainSection implements FilterPanelListener {
     private VerticalLayout mainVL;
     private DateField dateField;
 
+    private StatisticsFilterPanel statisticsFilterPanel;
+
     private Long allUsers = 0L;
     private Long allStudents = 0L;
     private Long allEmployees = 0L;
+    private ChartJs chart;
 
     public MainSection() {
+
+        BarChartConfig barConfig = new BarChartConfig();
+        barConfig.
+                data()
+                .labels()
+                .addDataset(
+                        new BarDataset().backgroundColor("rgba(220,220,220,0.5)").label("Dataset 1").yAxisID("y-axis-1"))
+                .addDataset(
+                        new BarDataset().backgroundColor("rgba(151,187,205,0.5)").label("Dataset 2").yAxisID("y-axis-2").hidden(true))
+                .addDataset(
+                        new BarDataset().backgroundColor(
+                                ColorUtils.randomColor(0.7), ColorUtils.randomColor(0.7), ColorUtils.randomColor(0.7),
+                                ColorUtils.randomColor(0.7), ColorUtils.randomColor(0.7), ColorUtils.randomColor(0.7),
+                                ColorUtils.randomColor(0.7)).label("Dataset 3").yAxisID("y-axis-1"))
+                .and();
+        barConfig.
+                options()
+                .responsive(true)
+                .hover()
+                .mode(InteractionMode.INDEX)
+                .intersect(true)
+                .animationDuration(400)
+                .and()
+                .title()
+                .display(true)
+                .text("Chart.js Bar Chart - Multi Axis")
+                .and()
+                .scales()
+                .add(Axis.Y, new LinearScale().display(true).position(Position.LEFT).id("y-axis-1"))
+                .add(Axis.Y, new LinearScale().display(true).position(Position.RIGHT).id("y-axis-2").gridLines().drawOnChartArea(false).and())
+                .and()
+                .done();
+
+        List<String> labels = barConfig.data().getLabels();
+        for (Dataset<?, ?> ds : barConfig.data().getDatasets()) {
+            BarDataset lds = (BarDataset) ds;
+            List<Double> data = new ArrayList<>();
+            for (int i = 0; i < labels.size(); i++) {
+                data.add((Math.random() > 0.5 ? 1.0 : -1.0) * Math.round(Math.random() * 100));
+            }
+            lds.dataAsList(data);
+        }
+
+        chart = new ChartJs();
+        chart.setJsLoggingEnabled(true);
+        chart.setImmediate(true);
+        chart.setResponsive(true);
+        chart.setSizeFull();
+        chart.configure(barConfig);
+
+
+        try{
+            statisticsFilterPanel = (StatisticsFilterPanel) getFilter();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         mainVL = new VerticalLayout();
         mainVL.setImmediate(true);
         mainVL.setSizeFull();
@@ -134,27 +197,27 @@ public class MainSection implements FilterPanelListener {
         Map<Integer, Object> params = new HashMap<>();
         String formattedDate = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS").format(date);
 
-        String sql = "SELECT\n" +
-                "  g.name as group_name,\n" +
-                "  g.curator_id as curator_id,\n" +
-                "  COUNT(DISTINCT se2.student_id) AS count_students_in_the_group,\n" +
-                "  count(DISTINCT ua.user_id) AS come_in_students,\n" +
-                "  CAST ((  (count(DISTINCT ua.user_id)*100) )as FLOAT) /CAST ((   (COUNT (DISTINCT se2.student_id))  ) as FLOAT)  as percentage_of_come_in_students\n" +
-                "FROM groups g\n" +
-                "  INNER JOIN student_education se\n" +
-                "    ON g.id = se.groups_id\n" +
-                "  INNER JOIN user_arrival ua\n" +
-                "    ON ua.user_id = se.student_id\n" +
-                "  INNER JOIN student_education se2\n" +
-                "    ON g.id = se2.groups_id\n" +
-                "WHERE\n" +
-                "  date_trunc('day', ua.created) = date_trunc('day' , TIMESTAMP '" + formattedDate + "')\n" +
-                "  AND\n" +
-                "  ua.come_in = TRUE\n" +
-                "  AND\n" +
-                "  ua.created = (select max(ua2.created) from user_arrival ua2 " +
-                "WHERE date_trunc('day', ua2.created)= date_trunc('day' , TIMESTAMP '" + formattedDate + "') and ua2.user_id = ua.user_id)\n" +
-                "GROUP BY g.name, curator_id, g.id";
+        String sql = "SELECT foo.group_name ,foo.advisor , count(foo.count) all_student, sum(foo.data) all_coming ,\n" +
+                "  (CASE WHEN sum(foo.data) > 0 THEN sum(foo.data)* 100/count(foo.count) ELSE 0 END)::DOUBLE PRECISION as percentage\n" +
+                "\n" +
+                "from ( SELECT\n" +
+                "                vs.advisor,\n" +
+                "                 vs.group_name,\n" +
+                "\n" +
+                "                  CASE WHEN exists(SELECT *\n" +
+                "                                   FROM user_arrival ua\n" +
+                "                                   WHERE ua.user_id = vs.id AND\n" +
+                "                                         date_trunc('day', ua.created) IN (date_trunc('day', TIMESTAMP '"+CommonUtils.getFormattedDate(date)+"')))\n" +
+                "                    THEN 1\n" +
+                "                  ELSE 0 END as data,\n" +
+                "\n" +
+                "                 count(exists(SELECT *\n" +
+                "                                        FROM user_arrival ua\n" +
+                "                                        WHERE ua.user_id = vs.id AND\n" +
+                "                                              date_trunc('day', ua.created) IN (date_trunc('day', TIMESTAMP '"+CommonUtils.getFormattedDate(date)+"'))))\n" +
+                "               FROM v_student vs\n" +
+                "               WHERE vs.group_name NOTNULL\n" +
+                "               GROUP BY vs.group_name, vs.id,vs.advisor ORDER BY vs.group_name ) as foo GROUP BY foo.group_name , foo.advisor;";
 
         try {
             List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
@@ -163,15 +226,7 @@ public class MainSection implements FilterPanelListener {
                     Object[] oo = (Object[]) o;
                     VTopGroupArrival topGroup = new VTopGroupArrival();
                     topGroup.setGroup((String) oo[0]);
-                    if (oo[1] != null) {
-                        EMPLOYEE employee = null;
-                        try {
-                            employee = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(EMPLOYEE.class, ID.valueOf((Long)oo[2]));
-                            topGroup.setTeacher(employee.toString());
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
+                    topGroup.setTeacher((String) oo[1]);
                     topGroup.setSumOfStudent((Long) oo[2]);
                     topGroup.setAttend((Long) oo[3]);
                     topGroup.setPercent((double) oo[4]);
@@ -184,6 +239,51 @@ public class MainSection implements FilterPanelListener {
         return groupList;
     }
 
+    public List<SimpleStatistics> getStatisticList(Long id, Date startingDate , Date endingDate) {
+        List<SimpleStatistics> simpleStatistics = new ArrayList<>();
+        Map<Integer, Object> params = new HashMap<>();
+
+        String sql = "SELECT\n" +
+                "  foo.group_name,\n" +
+                "  (CASE WHEN sum(foo.data) > 0\n" +
+                "    THEN sum(foo.data) * 100 / count(foo.count)\n" +
+                "  ELSE 0 END)::DOUBLE PRECISION AS percentage\n" +
+                "FROM (SELECT\n" +
+                "        vs.group_name,\n" +
+                "\n" +
+                "        CASE WHEN exists(SELECT *\n" +
+                "                         FROM user_arrival ua\n" +
+                "                         WHERE ua.user_id = vs.id AND\n" +
+                "                               (ua.created BETWEEN '"+CommonUtils.getFormattedDate(startingDate)+"'::TIMESTAMP AND '"+CommonUtils.getFormattedDate(endingDate)+"'::TIMESTAMP))\n" +
+                "          THEN 1\n" +
+                "        ELSE 0 END AS data,\n" +
+                "\n" +
+                "        count(exists(SELECT *\n" +
+                "                     FROM user_arrival ua\n" +
+                "                     WHERE ua.user_id = vs.id AND\n" +
+                "                           (ua.created BETWEEN '"+CommonUtils.getFormattedDate(startingDate)+"'::TIMESTAMP AND '"+CommonUtils.getFormattedDate(endingDate)+"'::TIMESTAMP)))\n" +
+                "      FROM v_student vs\n" +
+                "      WHERE vs.group_name NOTNULL AND vs.faculty_id = "+ id +" \n" +
+                "      GROUP BY vs.group_name, vs.id\n" +
+                "      HAVING count(vs.id) > 0 " +
+                "      ORDER BY vs.group_name) AS foo\n" +
+                "GROUP BY foo.group_name ;";
+        try {
+            List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
+            if (!tmpList.isEmpty()) {
+                for (Object o : tmpList) {
+                    Object[] oo = (Object[]) o;
+                    SimpleStatistics simpleStatistic = new SimpleStatistics();
+                    simpleStatistic.setGroupName((String)oo[0]);
+                    simpleStatistic.setPercentage((Double) oo[1]);
+                    simpleStatistics.add(simpleStatistic);
+                }
+            }
+        } catch (Exception ex) {
+            CommonUtils.showMessageAndWriteLog("Unable to load statistics list", ex);
+        }
+        return simpleStatistics;
+    }
 
     private Component getStatistics() {
         VerticalLayout mainVL = new VerticalLayout();
@@ -198,12 +298,11 @@ public class MainSection implements FilterPanelListener {
         label.setCaption("<h2>    " + CommonUtils.getUILocaleUtil().getCaption("attendance") + "</h2>" );
         mainVL.addComponent(label);
         try{
-            mainVL.addComponent(getFilter());
+            mainVL.addComponent(statisticsFilterPanel);
         }catch (Exception e){
             e.printStackTrace();
         }
-
-        mainVL.addComponent(getVerticalBar());
+        mainVL.addComponent(chart);
 
         return mainVL;
     }
@@ -234,52 +333,6 @@ public class MainSection implements FilterPanelListener {
         return statisticsFP;
     }
 
-    private Component getVerticalBar(){
-        BarChartConfig barConfig = new BarChartConfig();
-        barConfig.horizontal();
-        barConfig.
-                data()
-                .labels("January", "February", "March", "April", "May", "June", "July")
-                .addDataset(new BarDataset().backgroundColor("rgba(220,220,220,0.5)").label("Dataset 1"))
-                .addDataset(new BarDataset().backgroundColor("rgba(151,187,205,0.5)").label("Dataset 2").hidden(true))
-                .addDataset(new BarDataset().backgroundColor("rgba(151,187,205,0.5)").label("Dataset 3"))
-                .and()
-                .options()
-                .responsive(true)
-                .title()
-                .display(true)
-                .text("Chart.js Horizontal Bar Chart")
-                .and()
-                .elements()
-                .rectangle()
-                .borderWidth(2)
-                .borderColor("rgb(0, 255, 0)")
-                .borderSkipped(Rectangle.RectangleEdge.LEFT)
-                .and()
-                .and()
-                .legend()
-                .fullWidth(false)
-                .position(Position.LEFT)
-                .and()
-                .done();
-
-        List<String> labels = barConfig.data().getLabels();
-        for (Dataset<?, ?> ds : barConfig.data().getDatasets()) {
-            BarDataset lds = (BarDataset) ds;
-            List<Double> data = new ArrayList<>();
-            for (int i = 0; i < labels.size(); i++) {
-                data.add((Math.random() > 0.5 ? 1.0 : -1.0) * Math.round(Math.random() * 100));
-            }
-            lds.dataAsList(data);
-        }
-
-        ChartJs chart = new ChartJs(barConfig);
-        chart.setJsLoggingEnabled(true);
-        chart.setImmediate(true);
-        chart.setSizeFull();
-
-        return chart;
-    }
 
     public Component setFooterTables() {
         VerticalLayout innerVL = new VerticalLayout();
@@ -292,7 +345,6 @@ public class MainSection implements FilterPanelListener {
         label.setCaptionAsHtml(true);
         label.setCaption("<h2>    " + CommonUtils.getUILocaleUtil().getCaption("best.attendance") +"</h2>");
         label.setSizeFull();
-
 
         GridLayout topPerformanceGL = new GridLayout();
         topPerformanceGL.setSizeFull();
@@ -308,8 +360,6 @@ public class MainSection implements FilterPanelListener {
         DBGridModel bestStudentsGM = (DBGridModel) bestStudentsGW.getWidgetModel();
         bestStudentsGM.setRefreshType(ERefreshType.MANUAL);
         bestStudentsGM.setEntities(getUserList(dateField.getValue()));
-
-
 
         GridWidget bestGroupsGW = new GridWidget(VTopGroupArrival.class);
         bestGroupsGW.setSizeFull();
@@ -551,11 +601,30 @@ public class MainSection implements FilterPanelListener {
 
     @Override
     public void doFilter(AbstractFilterBean abstractFilterBean) {
+        FStatisticsFilter fStatisticsFilter = (FStatisticsFilter) abstractFilterBean;
+        List<SimpleStatistics> simpleStatistics = new ArrayList<>();
+        if(fStatisticsFilter.getDepartment()!= null && fStatisticsFilter.getEndingDate()!=null && fStatisticsFilter.getStartingDate()!=null ){
+            simpleStatistics.addAll(getStatisticList(fStatisticsFilter.getDepartment().getId().getId().longValue(), fStatisticsFilter.getStartingDate(), fStatisticsFilter.getEndingDate()));
+        }
+        refresh(simpleStatistics);
+    }
 
+    private void refresh(List<SimpleStatistics> list) {
+        BarChartConfig barConfig = (BarChartConfig) chart.getConfig();
+        //TODO
+        chart.configure(barConfig);
+        chart.update();
+    }
+
+    public void refresh() {
+        FStatisticsFilter ef = (FStatisticsFilter) statisticsFilterPanel.getFilterBean();
+        if (ef.hasFilter()) {
+            doFilter(ef);
+        }
     }
 
     @Override
     public void clearFilter() {
-
+        refresh(new ArrayList());
     }
 }
