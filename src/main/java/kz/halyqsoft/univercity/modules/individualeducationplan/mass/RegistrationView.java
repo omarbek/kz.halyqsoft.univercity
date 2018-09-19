@@ -433,7 +433,8 @@ public class RegistrationView extends AbstractTaskView {
                 "    INNER JOIN speciality s2 ON d2.id = s2.chair_id " +
                 "  WHERE subj.mandatory = FALSE AND subj.subject_cycle_id\n" +
                 "  IS NOT NULL AND\n" +
-                "        subj.deleted = FALSE AND  subj.mandatory = FALSE  AND sem.study_year_id = ?1 AND ss.semester_data_id = " + CommonUtils.getCurrentSemesterData().getId().getId().longValue();
+                "        subj.deleted = FALSE AND  subj.mandatory = FALSE  AND sem.study_year_id = ?1 " +
+                "AND ss.semester_data_id = " + CommonUtils.getCurrentSemesterData().getId().getId().longValue();
 
         String subjectName = subjectNameTF.getValue();
         CommonUtils.getCurrentSemesterData();
@@ -462,9 +463,6 @@ public class RegistrationView extends AbstractTaskView {
 
     private void refreshFoundStudentGrid() {
         USERS currentUser = CommonUtils.getCurrentUser();
-        if (currentUser != null) {
-            //TODO
-        }
         boolean filterSet = false;
 
         if (subjectGrid.getSelectedRow() != null) {

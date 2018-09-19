@@ -18,6 +18,7 @@ import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.event.EntityListener;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.from.EJoin;
+import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.AbstractWebUI;
 import org.r3a.common.vaadin.widget.ERefreshType;
@@ -41,13 +42,15 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
     private ID studentBindingElectiveId;
     private BindingElectiveSubjectView bindingElectiveSubjectView;
     private ELECTIVE_BINDED_SUBJECT electiveBindedSubject;
+    private SPECIALITY speciality;
     private final boolean isNew;
 
-    BindingElectiveSubjectEdit(ELECTIVE_BINDED_SUBJECT electiveBindedSubject, boolean isNew,
+    BindingElectiveSubjectEdit(SPECIALITY speciality, ELECTIVE_BINDED_SUBJECT electiveBindedSubject, boolean isNew,
                                BindingElectiveSubjectView electiveSubjectView) throws Exception {
         this.isNew = isNew;
         this.bindingElectiveSubjectView = electiveSubjectView;
         this.electiveBindedSubject = electiveBindedSubject;
+        this.speciality = speciality;
 
         if (electiveBindedSubject != null) {
             studentBindingElectiveId = electiveBindedSubject.getId();
@@ -126,6 +129,8 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
                 "                  pair.competence\n" +
                 "                FROM pair_subject pair\n" +
                 "                  INNER JOIN subject subj ON subj.id = pair.subject_id\n" +
+                "                  INNER JOIN subject pre ON pre.id = pair.prerequisite_id\n" +
+                "                  INNER JOIN subject post ON post.id = pair.postrequisite_id\n" +
                 "                  INNER JOIN creditability credit ON credit.id = subj.creditability_id\n" +
                 "                  INNER JOIN ects ects ON ects.id = subj.ects_id\n" +
                 "                  INNER JOIN elective_binded_subject elect_bind ON elect_bind.id = pair.elective_binded_subject_id\n" +
@@ -146,17 +151,17 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
                     Object[] oo = (Object[]) o;
                     VPairSubject pairSubject = new VPairSubject();
                     pairSubject.setId(ID.valueOf((long) oo[0]));
-                    pairSubject.setCode((String)oo[1]);
+                    pairSubject.setCode((String) oo[1]);
                     pairSubject.setSubjectName((String) oo[2]);
                     pairSubject.setCredit(((BigDecimal) oo[3]).intValue());
                     pairSubject.setEcts(((BigDecimal) oo[4]).intValue());
                     pairSubject.setSemesterName((String) oo[5]);
                     pairSubject.setPairNumber((Long) oo[6]);
-                    pairSubject.setPostrequisite((String)oo[7]);
-                    pairSubject.setPrerequisite((String)oo[8]);
-                    pairSubject.setAim((String)oo[9]);
+                    pairSubject.setPostrequisite((String) oo[7]);
+                    pairSubject.setPrerequisite((String) oo[8]);
+                    pairSubject.setAim((String) oo[9]);
                     pairSubject.setDescription(((String) oo[10]));
-                    pairSubject.setCompetence((String)oo[11]);
+                    pairSubject.setCompetence((String) oo[11]);
                     list.add(pairSubject);
                 }
             }
@@ -236,10 +241,24 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
         studentElectiveSubjectGM.setTitleVisible(false);
         studentElectiveSubjectGM.setMultiSelect(false);
         studentElectiveSubjectGM.setRefreshType(ERefreshType.MANUAL);
-        studentElectiveSubjectGM.setCrudEntityClass(PAIR_SUBJECT.class);//TODO here
+        studentElectiveSubjectGM.setCrudEntityClass(PAIR_SUBJECT.class);
 
+        filterSubjects(studentElectiveSubjectGM, "subject");
+        filterSubjects(studentElectiveSubjectGM, "prerequisite");
+        filterSubjects(studentElectiveSubjectGM, "postrequisite");
 
         return studentElectiveSubjectGW;
+    }
+
+    private void filterSubjects(DBGridModel studentElectiveSubjectGM, String fieldName) {
+        QueryModel subjectQM = ((FKFieldModel) studentElectiveSubjectGM.getFormModel().getFieldModel(fieldName)).
+                getQueryModel();
+        FromItem specFI = subjectQM.addJoin(EJoin.INNER_JOIN, "chair", SPECIALITY.class, "department");
+        subjectQM.addWhereNotNull("subjectCycle");
+        subjectQM.addWhereAnd("deleted", Boolean.FALSE);
+        subjectQM.addWhereAnd("mandatory", Boolean.FALSE);
+        subjectQM.addWhere(specFI, "deleted", false);
+        subjectQM.addWhere(specFI, "id", ECriteria.EQUAL, speciality.getId());
     }
 
     private class StudentCreativeExamListener implements EntityListener {
@@ -423,6 +442,11 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
 
         @Override
         public void handleEntityEvent(EntityEvent entityEvent) {
+            if(entityEvent.getAction()==EntityEvent.CREATED
+                    ||entityEvent.getAction()==EntityEvent.CREATED
+                    ||entityEvent.getAction()==EntityEvent.CREATED){
+                refresh(electiveBindedSubject);
+            }
         }
 
         @Override

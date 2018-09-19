@@ -89,4 +89,9 @@ public class TEACHER_SUBJECT extends AbstractEntity {
 	public void setLoadPerHours(boolean loadPerHours) {
 		this.loadPerHours = loadPerHours;
 	}
+
+	@Override
+	public String toString() {
+		return employee.toString();
+	}
 }
