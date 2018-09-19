@@ -2,18 +2,11 @@ package kz.halyqsoft.univercity.entity.beans.univercity;
 
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.CANDIDATE;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEGREE;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.QUALIFICATION;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SPECIALITY;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
 
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.ManyToOne;
-import java.util.Date;
+import javax.persistence.*;
 
 /**
  * @author Omarbek
@@ -42,7 +35,7 @@ public class EMPLOYEE_DEGREE extends USER_DOCUMENT {
 	@FieldInfo(type = EFieldType.FK_COMBO, order = 8)
 	@ManyToOne
 	@JoinColumns({
-			@JoinColumn(name = "CANDIDATE_ID", referencedColumnName = "ID")})
+			@JoinColumn(name = "CONDIDATE_ID", referencedColumnName = "ID")})
 	private CANDIDATE candidate;
 
 	@FieldInfo(type = EFieldType.FK_COMBO, order = 9)
