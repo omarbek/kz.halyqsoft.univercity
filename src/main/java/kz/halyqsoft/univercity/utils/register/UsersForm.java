@@ -274,7 +274,7 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
                     FormModel mainFM = passport.getMainGFW().getWidgetModel();
                     mainFM.getFieldModel("iin").setRequired(true);
                     if (iin != null) {
-                        mainFM.getFieldModel("iin").getField().setValue(iin);
+                        mainFM.getFieldModel("iin").getField().setValue(iinTF.getValue());
                         mainFM.getFieldModel("iin").getField().setReadOnly(true);
                         isFinding = true;
                     }
@@ -1362,5 +1362,13 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
 
     public EducationDoc getEducationDoc() {
         return educationDoc;
+    }
+
+    public TextField getIinTF() {
+        return iinTF;
+    }
+
+    public void setIinTF(TextField iinTF) {
+        this.iinTF = iinTF;
     }
 }

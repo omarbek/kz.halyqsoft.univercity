@@ -42,7 +42,7 @@ public class ComplaintsEdit extends AbstractFormWidgetView {
     ComplaintsEdit() {
         setBackButtonVisible(false);
         buildComplaintsEditTab();
-        buildMyComplaintsEditTab();//TODO
+        buildMyComplaintsEditTab();
     }
 
     @Override

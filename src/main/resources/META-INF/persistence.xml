@@ -354,6 +354,7 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_DIFFERENCE</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.LOAD_TO_CHAIR</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_ATTENDANCE_LOG</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_TEACHER_SUBJECT</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
