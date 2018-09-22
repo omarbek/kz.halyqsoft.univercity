@@ -30,13 +30,13 @@ public class PAIR_SUBJECT extends AbstractEntity {
     @Column(name = "PAIR_NUMBER")
     private Integer pairNumber;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 5)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 5,required = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "PREREQUISITE_ID", referencedColumnName = "ID")})
     private SUBJECT prerequisite;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 6)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 6,required = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "POSTREQUISITE_ID", referencedColumnName = "ID")})
@@ -46,14 +46,13 @@ public class PAIR_SUBJECT extends AbstractEntity {
     @Column(name = "AIM")
     private String aim;
 
-    @FieldInfo(type = EFieldType.TEXT,  max = 4000, required = false, order = 8, inGrid = false)
+    @FieldInfo(type = EFieldType.TEXT,  max = 4000,  order = 8, inGrid = false)
     @Column(name = "DESCRIPTION")
     private String description;
 
     @FieldInfo(type = EFieldType.TEXT, isMemo = true, max = 4000, required = false, order = 9, inGrid = false)
     @Column(name = "COMPETENCE")
     private String competence;
-
 
     public SUBJECT getPrerequisite() {
         return prerequisite;

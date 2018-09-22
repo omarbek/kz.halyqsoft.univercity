@@ -76,14 +76,14 @@ public class StudentSubjectView extends AbstractTaskView implements EntityListen
         try {
             if (student != null) {
                 String sql = "SELECT " +
-                        " stu_subj.id," +
+                        "  stu_subj.id, " +
                         "  'code'                   code, " +
                         "  module.module_short_name moduleType, " +
                         "  subj.name_kz             subjectName, " +
                         "  credit.credit, " +
                         "  ects.ects, " +
                         "  sem.semester_name        semester, " +
-                        "  'tutor'                  tutor, " +
+                        "  teacher.fio              tutor, " +
                         "  control.type_name        examType " +
                         "FROM student_subject stu_subj " +
                         "  INNER JOIN student_education stu_edu ON stu_subj.student_id = stu_edu.id " +
@@ -98,6 +98,12 @@ public class StudentSubjectView extends AbstractTaskView implements EntityListen
                         "  INNER JOIN ects ON subj.ects_id = ects.id " +
                         "  INNER JOIN subject_module module ON subj.module_id = module.id " +
                         "  INNER JOIN control_type control ON subj.control_type_id = control.id " +
+                        "  INNER JOIN teacher_subject teach_subj ON subj.id = teach_subj.subject_id " +
+                        "  INNER JOIN student_teacher_subject stu_teach_subj ON stu_teach_subj.teacher_subject_id = teach_subj.id " +
+                        "  INNER JOIN (SELECT " +
+                        "                id, " +
+                        "                trim(LAST_NAME || ' ' || FIRST_NAME || ' ' || coalesce(MIDDLE_NAME, '')) fio " +
+                        "              FROM users) teacher ON teacher.id = teach_subj.employee_id " +
                         "WHERE CURRENT_DATE BETWEEN sem_data.begin_date AND sem_data.end_date " +
                         "      AND usr.deleted = FALSE AND usr.locked = FALSE AND usr.id = ?1";
                 Map<Integer, Object> params = new HashMap<>();

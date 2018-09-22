@@ -38,6 +38,7 @@ import java.util.List;
  * @created on 19.06.2018
  */
 public class BindingElectiveSubjectView extends AbstractTaskView implements FilterPanelListener {
+
     private ElectiveFilterPanel filterPanel;
     private ComboBox specCB;
     private ComboBox yearCB;
@@ -168,7 +169,8 @@ public class BindingElectiveSubjectView extends AbstractTaskView implements Filt
         @Override
         protected void init(Object source, Entity e, boolean isNew) throws Exception {
             ELECTIVE_BINDED_SUBJECT electiveBinded = (ELECTIVE_BINDED_SUBJECT) e;
-            new BindingElectiveSubjectEdit(electiveBinded, isNew, BindingElectiveSubjectView.this);
+            new BindingElectiveSubjectEdit((SPECIALITY) specCB.getValue(), electiveBinded, isNew,
+                    BindingElectiveSubjectView.this);
         }
 
         @Override
