@@ -1,5 +1,8 @@
 package kz.halyqsoft.univercity.modules.student;
 
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.pdf.PdfPTable;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.FileDownloader;
@@ -53,6 +56,7 @@ import org.r3a.common.vaadin.widget.table.model.DBTableModel;
 import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
 
 import javax.persistence.NoResultException;
+import javax.swing.text.Document;
 import java.util.*;
 
 import static kz.halyqsoft.univercity.modules.regapplicants.ApplicantsForm.*;
@@ -74,6 +78,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
     private FromItem educationUDFI;
     private Label lockLabel, lockReasonLabel, createdBylabel,label;
     private Button lockUnlockButton;
+    private Button downloadTableButton,downloadTableRusButton;
     private LockDialog lockDialog;
     private STUDENT student;
     private USERS users;
@@ -331,9 +336,42 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         kazCheckBox.setValue(false);
         rusCheckBox.setValue(false);
 
+
+        downloadTableButton=new Button("TKaz");
+        downloadTableButton.setWidth("60");
+        hl.addComponent(downloadTableButton);
+
+        downloadTableRusButton=new Button("TRus");
+        downloadTableRusButton.setWidth("60");
+        hl.addComponent(downloadTableRusButton);
+
         hl.addComponents(kazCheckBox, rusCheckBox);
         hl.setComponentAlignment(kazCheckBox, Alignment.MIDDLE_LEFT);
         hl.setComponentAlignment(rusCheckBox, Alignment.MIDDLE_LEFT);
+        hl.setComponentAlignment(downloadTableButton, Alignment.MIDDLE_LEFT);
+        hl.setComponentAlignment(downloadTableRusButton, Alignment.TOP_LEFT);
+
+        downloadTableButton.addClickListener(new ClickListener() {
+             @Override
+             public void buttonClick(ClickEvent clickEvent) {
+                 myResource = createResourceStudent("154", student);
+                 fileDownloader = new FileDownloader(myResource);
+                 myResource.setMIMEType("application/pdf");
+                 fileDownloader.extend(downloadTableButton);
+             }
+         }
+        );
+
+        downloadTableRusButton.addClickListener(new ClickListener() {
+                                                 @Override
+                                                 public void buttonClick(ClickEvent clickEvent) {
+                                                     myResource = createResourceStudent("155", student);
+                                                     fileDownloader = new FileDownloader(myResource);
+                                                     myResource.setMIMEType("application/pdf");
+                                                     fileDownloader.extend(downloadTableRusButton);
+                                                 }
+                                             }
+        );
 
 
         pdfDownload = createDownloadButton();
