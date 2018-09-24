@@ -1,5 +1,6 @@
 package kz.halyqsoft.univercity.filter;
 
+import kz.halyqsoft.univercity.entity.beans.univercity.GROUPS;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 
@@ -23,6 +24,7 @@ public final class FStudentFilter extends AbstractFilterBean {
     private String dormStatus;
     private CARD card;
     private STUDENT_DIPLOMA_TYPE studentDiplomaType;
+    private GROUPS group;
 
     public FStudentFilter() {
     }
@@ -123,10 +125,23 @@ public final class FStudentFilter extends AbstractFilterBean {
         this.studentDiplomaType = studentDiplomaType;
     }
 
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
+    public GROUPS getGroup() {
+        return group;
+    }
+
+    public void setGroup(GROUPS group) {
+        this.group = group;
+    }
+
     @Override
     public boolean hasFilter() {
         return !(code == null && firstname == null && lastname == null && studentStatus == null
                 && lockReason == null && faculty == null && speciality == null && studyYear == null
-                && educationType == null && dormStatus == null && card == null && studentDiplomaType == null);
+                && educationType == null && dormStatus == null && card == null && studentDiplomaType == null
+        && group == null);
     }
 }
