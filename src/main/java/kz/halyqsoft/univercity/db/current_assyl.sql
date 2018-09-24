@@ -14,3 +14,9 @@ CREATE UNIQUE INDEX idx_t_student_education
     groups_id ASC,
     child_id
   );
+
+ALTER TABLE non_admission_exam ADD COLUMN respectful_reason BOOLEAN DEFAULT FALSE;
+
+insert into student_status values (nextval('s_student_status') , 'Оставлен на перекурс');
+
+
