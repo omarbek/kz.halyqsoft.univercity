@@ -16,7 +16,7 @@ import javax.persistence.*;
 @Entity
 public class LOAD_TO_CHAIR extends AbstractEntity {
 
-    @FieldInfo(type = EFieldType.FK_DIALOG, order = 2, columnWidth = 280)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 2, columnWidth = 280)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})

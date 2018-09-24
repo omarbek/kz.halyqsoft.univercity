@@ -13,6 +13,7 @@ import kz.halyqsoft.univercity.filter.panel.ChairFilterPanel;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
+import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.beans.AbstractTask;
 import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.query.QueryModel;
@@ -23,6 +24,7 @@ import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.ERefreshType;
 import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 import org.r3a.common.vaadin.widget.filter2.FilterPanelListener;
+import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
@@ -48,6 +50,9 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
         super(task);
         filterPanel = new ChairFilterPanel(new FChairFilter());
     }
+
+    QueryModel subjectQM;
+    ComboBox chairCB;
 
     @Override
     public void initView(boolean b) throws Exception {
@@ -120,7 +125,7 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
             chairQM.addOrder("deptName");
             BeanItemContainer<DEPARTMENT> chairBIC = new BeanItemContainer<>(DEPARTMENT.class,
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(chairQM));
-            ComboBox chairCB = new ComboBox();
+            chairCB = new ComboBox();
             chairCB.setContainerDataSource(chairBIC);
             chairCB.setImmediate(true);
             chairCB.setNullSelectionAllowed(true);
@@ -163,12 +168,15 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
 
             loadGW = new GridWidget(LOAD_TO_CHAIR.class);
             loadGW.addEntityListener(this);
-            loadGW.setButtonVisible(AbstractToolbar.ADD_BUTTON, false);
+            loadGW.setButtonEnabled(AbstractToolbar.ADD_BUTTON, false);
 
             DBGridModel loadGM = (DBGridModel) loadGW.getWidgetModel();
             loadGM.setTitleVisible(false);
             loadGM.setMultiSelect(false);
             loadGM.setRefreshType(ERefreshType.MANUAL);
+
+            subjectQM = ((FKFieldModel) loadGM.getFormModel().getFieldModel("subject")).getQueryModel();
+            subjectQM.addWhere("deleted", false);
 
             countGW = new GridWidget(V_LOAD_TO_CHAIR_COUNT.class);
             countGW.showToolbar(false);
@@ -279,6 +287,7 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
         FChairFilter chairFilter = (FChairFilter) abstractFilterBean;
         if (chairFilter.getChair() != null && chairFilter.getStudentDiplomaType() != null
                 && chairFilter.getStudyYear() != null) {
+            loadGW.setButtonEnabled(AbstractToolbar.ADD_BUTTON, true);
             List<LOAD_TO_CHAIR> loads = getLoads(chairFilter.getChair(), chairFilter.getStudentDiplomaType(),
                     chairFilter.getStudyYear());
             List<V_LOAD_TO_CHAIR_COUNT> loadCounts = getLoadCount(chairFilter.getChair(),
@@ -286,6 +295,8 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
             List<V_LOAD_TO_CHAIR_COUNT_ALL> loadAllCounts = getLoadAllCount(chairFilter.getChair(),
                     chairFilter.getStudentDiplomaType());
             refresh(loads, loadCounts, loadAllCounts);
+        } else {
+            loadGW.setButtonEnabled(AbstractToolbar.ADD_BUTTON, false);
         }
     }
 
@@ -300,4 +311,21 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
             doFilter(filterPanel.getFilterBean());
         }
     }
+
+    @Override
+    public boolean onEdit(Object source, Entity e, int buttonId) {
+        subjectQM.addWhere("chair", ECriteria.EQUAL, ((DEPARTMENT) chairCB.getValue()).getId());
+        return true;
+    }
+
+    @Override
+    public void onCreate(Object source, Entity e, int buttonId) {
+        subjectQM.addWhere("chair", ECriteria.EQUAL, ((DEPARTMENT) chairCB.getValue()).getId());
+    }
+
+    //    @Override
+//    public boolean preSave(Object source, Entity e, boolean isNew, int buttonId) {
+//        LOAD_TO_CHAIR
+//        return super.preSave(source, e, isNew, buttonId);
+//    }
 }
