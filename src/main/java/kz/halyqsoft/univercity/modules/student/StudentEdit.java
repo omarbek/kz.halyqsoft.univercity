@@ -328,7 +328,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         getTabSheet().addTab(content, getMasterTabTitle());
 
         HorizontalLayout hl = new HorizontalLayout();
-        hl.setWidth(15, Unit.PERCENTAGE);
+        hl.setWidth(30, Unit.PERCENTAGE);
         kazCheckBox = new CheckBox();
         rusCheckBox = new CheckBox();
         rusCheckBox.setCaption(getUILocaleUtil().getCaption("ru.short"));
@@ -337,17 +337,21 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         rusCheckBox.setValue(false);
 
 
-        downloadTableButton=new Button("TKaz");
-        downloadTableButton.setWidth("60");
+        downloadTableButton=new Button();
+        downloadTableButton.setImmediate(true);
+        downloadTableButton.setWidth("80");
+        downloadTableButton.setCaption(getUILocaleUtil().getCaption("iups"));
         hl.addComponent(downloadTableButton);
 
-        downloadTableRusButton=new Button("TRus");
-        downloadTableRusButton.setWidth("60");
+        downloadTableRusButton=new Button();
+        downloadTableRusButton.setImmediate(true);
+        downloadTableRusButton.setWidth("80");
+        downloadTableRusButton.setCaption(getUILocaleUtil().getCaption("iupsrus"));
         hl.addComponent(downloadTableRusButton);
 
         hl.addComponents(kazCheckBox, rusCheckBox);
-        hl.setComponentAlignment(kazCheckBox, Alignment.MIDDLE_LEFT);
-        hl.setComponentAlignment(rusCheckBox, Alignment.MIDDLE_LEFT);
+        hl.setComponentAlignment(kazCheckBox, Alignment.MIDDLE_CENTER);
+        hl.setComponentAlignment(rusCheckBox, Alignment.MIDDLE_CENTER);
         hl.setComponentAlignment(downloadTableButton, Alignment.MIDDLE_LEFT);
         hl.setComponentAlignment(downloadTableRusButton, Alignment.TOP_LEFT);
 
@@ -363,14 +367,14 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         );
 
         downloadTableRusButton.addClickListener(new ClickListener() {
-                                                 @Override
-                                                 public void buttonClick(ClickEvent clickEvent) {
-                                                     myResource = createResourceStudent("155", student);
-                                                     fileDownloader = new FileDownloader(myResource);
-                                                     myResource.setMIMEType("application/pdf");
-                                                     fileDownloader.extend(downloadTableRusButton);
-                                                 }
-                                             }
+             @Override
+             public void buttonClick(ClickEvent clickEvent) {
+                 myResource = createResourceStudent("155", student);
+                 fileDownloader = new FileDownloader(myResource);
+                 myResource.setMIMEType("application/pdf");
+                 fileDownloader.extend(downloadTableRusButton);
+             }
+         }
         );
 
 

@@ -634,7 +634,12 @@ public final class ApplicantsForm extends UsersForm {
             fileName = "Договор магистрант_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
         } else if (value.equals("90")) {
             fileName = "келісім-шарт_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
-        } else {
+        }  else if (value.equals("154")) {
+            fileName = "ИУПС_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
+        } else if (value.equals("155")) {
+            fileName = "ИУСП_рус_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
+        }
+        else {
             fileName = "Өтініш_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
         }
         return new StreamResource(new StreamResource.StreamSource() {

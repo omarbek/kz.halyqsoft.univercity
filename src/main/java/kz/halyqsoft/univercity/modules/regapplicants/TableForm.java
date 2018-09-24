@@ -64,24 +64,34 @@ public class TableForm {
             Font font = new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD, BaseColor.WHITE);
 
 
-            String sql = "SELECT  stu_subj.id,  'code'\n" +
-                    "  code,   module.module_short_name moduleType,   subj.name_kz\n" +
-                    "  subjectName,   credit.credit,   ects.ects,   sem.semester_name        semester,\n" +
-                    "  'tutor'                  tutor,\n" +
-                    "  control.type_name        examType\n" +
+            String sql = "SELECT\n" +
+                    "  s4.code,\n" +
+                    "  module.module_short_name moduleType,\n" +
+                    "  subj.name_RU                                                                   subjectName,\n" +
+                    "  credit.credit,\n" +
+                    "  ects.ects,\n" +
+                    "  sem.semester_name   ,\n" +
+                    "  trim(u.LAST_NAME || ' ' || u.FIRST_NAME || ' ' || coalesce(u.MIDDLE_NAME, '')) FIO\n" +
                     "FROM student_subject stu_subj\n" +
                     "  INNER JOIN student_education stu_edu ON stu_subj.student_id = stu_edu.id\n" +
                     "  INNER JOIN student ON stu_edu.student_id = student.id AND stu_edu.child_id IS NULL\n" +
                     "  INNER JOIN users usr ON student.id = usr.id\n" +
                     "  INNER JOIN semester_subject sem_subj ON stu_subj.subject_id = sem_subj.id\n" +
                     "  INNER JOIN semester_data sem_data ON sem_subj.semester_data_id = sem_data.id\n" +
-                    "  INNER JOIN semester sem     ON sem.study_year_id = stu_edu.study_year_id AND sem.semester_period_id = sem_data.semester_period_id\n" +
+                    "  INNER JOIN semester sem\n" +
+                    "    ON sem.study_year_id = stu_edu.study_year_id AND sem.semester_period_id = sem_data.semester_period_id\n" +
                     "  INNER JOIN subject subj ON sem_subj.subject_id = subj.id\n" +
                     "  INNER JOIN creditability credit ON subj.creditability_id = credit.id\n" +
                     "  INNER JOIN ects ON subj.ects_id = ects.id\n" +
                     "  INNER JOIN subject_module module ON subj.module_id = module.id\n" +
                     "  INNER JOIN control_type control ON subj.control_type_id = control.id\n" +
-                    "WHERE   sem_data.semester_period_id=1\n" +
+                    "  LEFT JOIN teacher_subject ts ON ts.subject_id = subj.id\n" +
+                    "  LEFT JOIN subject sbj ON ts.subject_id = sbj.id\n" +
+                    "  LEFT JOIN users u ON u.id = ts.employee_id\n" +
+                    "  LEFT JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
+                    "\n" +
+                    "  LEFT JOIN pair_subject s4 ON subj.id = s4.subject_id" +
+                    "   WHERE   sem_data.semester_period_id=1\n" +
                     "      AND usr.deleted = FALSE AND\n" +
                     "      subj.subject_cycle_id IS NOT NULL " +
                     "  AND subj.module_id  != 3\n " +
@@ -95,14 +105,9 @@ public class TableForm {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
 
-                        insertCell(table, ((String)oo[1]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table, ((String)oo[2]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table, ((String)oo[3]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table, (String.valueOf(oo[4])), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table, (String.valueOf(oo[5])), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table, ((String)oo[6]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table, ((String)oo[7]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-
+                        for(int i = 0 ; i < 7;i++){
+                            insertCell(table,oo[i]!=null ? oo[i] instanceof String ? (String)oo[i]: String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        }
                     }
                 }
             } catch (Exception ex) {
@@ -110,24 +115,34 @@ public class TableForm {
             }
             insertCell(table, "Студенттің таңдаған пәндері:", Element.ALIGN_LEFT, 7,  EmployeePdfCreator.getFont(12, Font.BOLD));
 
-            String sql1 = "SELECT  stu_subj.id,  'code'\n" +
-                    "  code,   module.module_short_name moduleType,   subj.name_kz\n" +
-                    "  subjectName,   credit.credit,   ects.ects,   sem.semester_name        semester,\n" +
-                    "  'tutor'                  tutor,\n" +
-                    "  control.type_name        examType\n" +
+            String sql1 = "SELECT\n" +
+                    "  s4.code,\n" +
+                    "  module.module_short_name moduleType,\n" +
+                    "  subj.name_RU                                                                   subjectName,\n" +
+                    "  credit.credit,\n" +
+                    "  ects.ects,\n" +
+                    "  sem.semester_name   ,\n" +
+                    "  trim(u.LAST_NAME || ' ' || u.FIRST_NAME || ' ' || coalesce(u.MIDDLE_NAME, '')) FIO\n" +
                     "FROM student_subject stu_subj\n" +
                     "  INNER JOIN student_education stu_edu ON stu_subj.student_id = stu_edu.id\n" +
                     "  INNER JOIN student ON stu_edu.student_id = student.id AND stu_edu.child_id IS NULL\n" +
                     "  INNER JOIN users usr ON student.id = usr.id\n" +
                     "  INNER JOIN semester_subject sem_subj ON stu_subj.subject_id = sem_subj.id\n" +
                     "  INNER JOIN semester_data sem_data ON sem_subj.semester_data_id = sem_data.id\n" +
-                    "  INNER JOIN semester sem     ON sem.study_year_id = stu_edu.study_year_id AND sem.semester_period_id = sem_data.semester_period_id\n" +
+                    "  INNER JOIN semester sem\n" +
+                    "    ON sem.study_year_id = stu_edu.study_year_id AND sem.semester_period_id = sem_data.semester_period_id\n" +
                     "  INNER JOIN subject subj ON sem_subj.subject_id = subj.id\n" +
                     "  INNER JOIN creditability credit ON subj.creditability_id = credit.id\n" +
                     "  INNER JOIN ects ON subj.ects_id = ects.id\n" +
                     "  INNER JOIN subject_module module ON subj.module_id = module.id\n" +
                     "  INNER JOIN control_type control ON subj.control_type_id = control.id\n" +
-                    "WHERE   sem_data.semester_period_id=1\n" +
+                    "  LEFT JOIN teacher_subject ts ON ts.subject_id = subj.id\n" +
+                    "  LEFT JOIN subject sbj ON ts.subject_id = sbj.id\n" +
+                    "  LEFT JOIN users u ON u.id = ts.employee_id\n" +
+                    "  LEFT JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
+                    "\n" +
+                    "  LEFT JOIN pair_subject s4 ON subj.id = s4.subject_id" +
+                    "   WHERE   sem_data.semester_period_id=1\n" +
                     "      AND usr.deleted = FALSE AND\n" +
                     "      subj.subject_cycle_id IS NOT NULL\n" +
                     "  AND subj.mandatory=FALSE AND " +
@@ -140,13 +155,9 @@ public class TableForm {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
 
-                        insertCell(table, ((String)oo[1]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table, ((String)oo[2]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table, ((String)oo[3]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table, (String.valueOf(oo[4])), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table, (String.valueOf(oo[5])), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table, ((String)oo[6]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table, ((String)oo[7]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        for(int i = 0 ; i < 7;i++){
+                            insertCell(table,oo[i]!=null ? oo[i] instanceof String ? (String)oo[i]: String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        }
 
                     }
                 }
@@ -156,24 +167,33 @@ public class TableForm {
 
             insertCell(table, "Студенттің қосымша пәндері:\t", Element.ALIGN_LEFT, 7,  EmployeePdfCreator.getFont(12, Font.BOLD));
 
-            String sql2 = "SELECT  stu_subj.id,  'code'\n" +
-                    "  code,   module.module_short_name moduleType,   subj.name_kz\n" +
-                    "  subjectName,   credit.credit,   ects.ects,   sem.semester_name        semester,\n" +
-                    "  'tutor'                  tutor,\n" +
-                    "  control.type_name        examType,\n" +
-                    "  stu_subj.student_id,usr.id\n" +
+            String sql2 = "SELECT\n" +
+                    "  s4.code,\n" +
+                    "  module.module_short_name moduleType,\n" +
+                    "  subj.name_RU                                                                   subjectName,\n" +
+                    "  credit.credit,\n" +
+                    "  ects.ects,\n" +
+                    "  sem.semester_name   ,\n" +
+                    "  trim(u.LAST_NAME || ' ' || u.FIRST_NAME || ' ' || coalesce(u.MIDDLE_NAME, '')) FIO\n" +
                     "FROM student_subject stu_subj\n" +
                     "  INNER JOIN student_education stu_edu ON stu_subj.student_id = stu_edu.id\n" +
                     "  INNER JOIN student ON stu_edu.student_id = student.id AND stu_edu.child_id IS NULL\n" +
                     "  INNER JOIN users usr ON student.id = usr.id\n" +
                     "  INNER JOIN semester_subject sem_subj ON stu_subj.subject_id = sem_subj.id\n" +
                     "  INNER JOIN semester_data sem_data ON sem_subj.semester_data_id = sem_data.id\n" +
-                    "  INNER JOIN semester sem     ON sem.study_year_id = stu_edu.study_year_id AND sem.semester_period_id = sem_data.semester_period_id\n" +
+                    "  INNER JOIN semester sem\n" +
+                    "    ON sem.study_year_id = stu_edu.study_year_id AND sem.semester_period_id = sem_data.semester_period_id\n" +
                     "  INNER JOIN subject subj ON sem_subj.subject_id = subj.id\n" +
                     "  INNER JOIN creditability credit ON subj.creditability_id = credit.id\n" +
                     "  INNER JOIN ects ON subj.ects_id = ects.id\n" +
                     "  INNER JOIN subject_module module ON subj.module_id = module.id\n" +
                     "  INNER JOIN control_type control ON subj.control_type_id = control.id\n" +
+                    "  LEFT JOIN teacher_subject ts ON ts.subject_id = subj.id\n" +
+                    "  LEFT JOIN subject sbj ON ts.subject_id = sbj.id\n" +
+                    "  LEFT JOIN users u ON u.id = ts.employee_id\n" +
+                    "  LEFT JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
+                    "\n" +
+                    "  LEFT JOIN pair_subject s4 ON subj.id = s4.subject_id \n" +
                     "WHERE  usr.deleted = FALSE AND\n" +
                     "      subj.subject_cycle_id IS NOT NULL\n" +
                     "AND subj.module_id=3\n" +
@@ -185,13 +205,9 @@ public class TableForm {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
 
-                        insertCell(table, ((String)oo[1]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table, ((String)oo[2]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table, ((String)oo[3]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table, (String.valueOf(oo[4])), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table, (String.valueOf(oo[5])), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table, ((String)oo[6]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table, ((String)oo[7]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        for(int i = 0 ; i < 7;i++){
+                            insertCell(table,oo[i]!=null ? oo[i] instanceof String ? (String)oo[i]: String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        }
 
                     }
                 }
@@ -206,12 +222,19 @@ public class TableForm {
                     "  INNER JOIN users usr ON student.id = usr.id\n" +
                     "  INNER JOIN semester_subject sem_subj ON stu_subj.subject_id = sem_subj.id\n" +
                     "  INNER JOIN semester_data sem_data ON sem_subj.semester_data_id = sem_data.id\n" +
-                    "  INNER JOIN semester sem     ON sem.study_year_id = stu_edu.study_year_id AND sem.semester_period_id = sem_data.semester_period_id\n" +
+                    "  INNER JOIN semester sem\n" +
+                    "    ON sem.study_year_id = stu_edu.study_year_id AND sem.semester_period_id = sem_data.semester_period_id\n" +
                     "  INNER JOIN subject subj ON sem_subj.subject_id = subj.id\n" +
                     "  INNER JOIN creditability credit ON subj.creditability_id = credit.id\n" +
                     "  INNER JOIN ects ON subj.ects_id = ects.id\n" +
                     "  INNER JOIN subject_module module ON subj.module_id = module.id\n" +
                     "  INNER JOIN control_type control ON subj.control_type_id = control.id\n" +
+                    "  LEFT JOIN teacher_subject ts ON ts.subject_id = subj.id\n" +
+                    "  LEFT JOIN subject sbj ON ts.subject_id = sbj.id\n" +
+                    "  LEFT JOIN users u ON u.id = ts.employee_id\n" +
+                    "  LEFT JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
+                    "\n" +
+                    "  LEFT JOIN pair_subject s4 ON subj.id = s4.subject_id\n" +
                     "WHERE\n" +
                     "  usr.id =  " +studentId+
                     " AND sem_data.semester_period_id=1";
@@ -225,8 +248,9 @@ public class TableForm {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
 
-                        insertCell(table, (String.valueOf(oo[0])), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table, (String.valueOf(oo[1])), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        for(int i = 0 ; i < 2;i++){
+                            insertCell(table,oo[i]!=null ? oo[i] instanceof String ? (String)oo[i]: String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        }
 
                     }
                 }
@@ -251,24 +275,33 @@ public class TableForm {
 
 
             insertCell(table, "Міндетті түрде оқытылатын пәндер:", Element.ALIGN_LEFT, 7,  EmployeePdfCreator.getFont(12, Font.BOLD));
-            String sqlSem2 = "SELECT  stu_subj.id,  'code'\n" +
-                    "  code,   module.module_short_name moduleType,   subj.name_kz\n" +
-                    "  subjectName,   credit.credit,   ects.ects,   sem.semester_name        semester,\n" +
-                    "  'tutor'                  tutor,\n" +
-                    "  control.type_name        examType\n" +
+            String sqlSem2 = "SELECT\n" +
+                    "  s4.code,\n" +
+                    "  module.module_short_name moduleType,\n" +
+                    "  subj.name_RU                                                                   subjectName,\n" +
+                    "  credit.credit,\n" +
+                    "  ects.ects,\n" +
+                    "  sem.semester_name   ,\n" +
+                    "  trim(u.LAST_NAME || ' ' || u.FIRST_NAME || ' ' || coalesce(u.MIDDLE_NAME, '')) FIO\n" +
                     "FROM student_subject stu_subj\n" +
                     "  INNER JOIN student_education stu_edu ON stu_subj.student_id = stu_edu.id\n" +
                     "  INNER JOIN student ON stu_edu.student_id = student.id AND stu_edu.child_id IS NULL\n" +
                     "  INNER JOIN users usr ON student.id = usr.id\n" +
                     "  INNER JOIN semester_subject sem_subj ON stu_subj.subject_id = sem_subj.id\n" +
                     "  INNER JOIN semester_data sem_data ON sem_subj.semester_data_id = sem_data.id\n" +
-                    "  INNER JOIN semester sem     ON sem.study_year_id = stu_edu.study_year_id AND sem.semester_period_id = sem_data.semester_period_id\n" +
+                    "  INNER JOIN semester sem\n" +
+                    "    ON sem.study_year_id = stu_edu.study_year_id AND sem.semester_period_id = sem_data.semester_period_id\n" +
                     "  INNER JOIN subject subj ON sem_subj.subject_id = subj.id\n" +
                     "  INNER JOIN creditability credit ON subj.creditability_id = credit.id\n" +
                     "  INNER JOIN ects ON subj.ects_id = ects.id\n" +
                     "  INNER JOIN subject_module module ON subj.module_id = module.id\n" +
                     "  INNER JOIN control_type control ON subj.control_type_id = control.id\n" +
-                    "WHERE   sem_data.semester_period_id=2\n" +
+                    "  LEFT JOIN teacher_subject ts ON ts.subject_id = subj.id\n" +
+                    "  LEFT JOIN subject sbj ON ts.subject_id = sbj.id\n" +
+                    "  LEFT JOIN users u ON u.id = ts.employee_id\n" +
+                    "  LEFT JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
+                    "  LEFT JOIN pair_subject s4 ON subj.id = s4.subject_id " +
+                    "   WHERE   sem_data.semester_period_id=2\n" +
                     "      AND usr.deleted = FALSE AND\n" +
                     "      subj.subject_cycle_id IS NOT NULL " +
                     "  AND subj.module_id  != 3\n " +
@@ -280,13 +313,9 @@ public class TableForm {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
 
-                        insertCell(table, ((String)oo[1]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table, ((String)oo[2]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table, ((String)oo[3]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table, (String.valueOf(oo[4])), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table, (String.valueOf(oo[5])), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table, ((String)oo[6]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table, ((String)oo[7]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        for(int i = 0 ; i < 7;i++){
+                            insertCell(table,oo[i]!=null ? oo[i] instanceof String ? (String)oo[i]: String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        }
 
                     }
                 }
@@ -295,24 +324,33 @@ public class TableForm {
             }
             insertCell(table, "Студенттің таңдаған пәндері:", Element.ALIGN_LEFT, 7,  EmployeePdfCreator.getFont(12, Font.BOLD));
 
-            String sqlAdd = "SELECT  stu_subj.id,  'code'\n" +
-                    "  code,   module.module_short_name moduleType,   subj.name_kz\n" +
-                    "  subjectName,   credit.credit,   ects.ects,   sem.semester_name        semester,\n" +
-                    "  'tutor'                  tutor,\n" +
-                    "  control.type_name        examType\n" +
+            String sqlAdd = "SELECT\n" +
+                    "  s4.code,\n" +
+                    "  module.module_short_name moduleType,\n" +
+                    "  subj.name_RU                                                                   subjectName,\n" +
+                    "  credit.credit,\n" +
+                    "  ects.ects,\n" +
+                    "  sem.semester_name   ,\n" +
+                    "  trim(u.LAST_NAME || ' ' || u.FIRST_NAME || ' ' || coalesce(u.MIDDLE_NAME, '')) FIO\n" +
                     "FROM student_subject stu_subj\n" +
                     "  INNER JOIN student_education stu_edu ON stu_subj.student_id = stu_edu.id\n" +
                     "  INNER JOIN student ON stu_edu.student_id = student.id AND stu_edu.child_id IS NULL\n" +
                     "  INNER JOIN users usr ON student.id = usr.id\n" +
                     "  INNER JOIN semester_subject sem_subj ON stu_subj.subject_id = sem_subj.id\n" +
                     "  INNER JOIN semester_data sem_data ON sem_subj.semester_data_id = sem_data.id\n" +
-                    "  INNER JOIN semester sem     ON sem.study_year_id = stu_edu.study_year_id AND sem.semester_period_id = sem_data.semester_period_id\n" +
+                    "  INNER JOIN semester sem\n" +
+                    "    ON sem.study_year_id = stu_edu.study_year_id AND sem.semester_period_id = sem_data.semester_period_id\n" +
                     "  INNER JOIN subject subj ON sem_subj.subject_id = subj.id\n" +
                     "  INNER JOIN creditability credit ON subj.creditability_id = credit.id\n" +
                     "  INNER JOIN ects ON subj.ects_id = ects.id\n" +
                     "  INNER JOIN subject_module module ON subj.module_id = module.id\n" +
                     "  INNER JOIN control_type control ON subj.control_type_id = control.id\n" +
-                    "WHERE   sem_data.semester_period_id=2\n" +
+                    "  LEFT JOIN teacher_subject ts ON ts.subject_id = subj.id\n" +
+                    "  LEFT JOIN subject sbj ON ts.subject_id = sbj.id\n" +
+                    "  LEFT JOIN users u ON u.id = ts.employee_id\n" +
+                    "  LEFT JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
+                    "  LEFT JOIN pair_subject s4 ON subj.id = s4.subject_id\n" +
+                    "   WHERE   sem_data.semester_period_id=2\n" +
                     "      AND usr.deleted = FALSE AND\n" +
                     "      subj.subject_cycle_id IS NOT NULL\n" +
                     "  AND subj.mandatory=FALSE AND " +
@@ -324,14 +362,9 @@ public class TableForm {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
 
-                        insertCell(table, ((String)oo[1]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table, ((String)oo[2]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table, ((String)oo[3]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table, (String.valueOf(oo[4])), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table, (String.valueOf(oo[5])), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table, ((String)oo[6]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table, ((String)oo[7]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-
+                        for(int i = 0 ; i < 7;i++){
+                            insertCell(table,oo[i]!=null ? oo[i] instanceof String ? (String)oo[i]: String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        }
                     }
                 }
             } catch (Exception ex) {
@@ -340,25 +373,33 @@ public class TableForm {
 
             insertCell(table, "Студенттің қосымша пәндері:", Element.ALIGN_LEFT, 7,  EmployeePdfCreator.getFont(12, Font.BOLD));
 
-            String sqlStud = "SELECT  stu_subj.id,  'code'\n" +
-                    "  code,   module.module_short_name moduleType,   subj.name_kz\n" +
-                    "  subjectName,   credit.credit,   ects.ects,   sem.semester_name        semester,\n" +
-                    "  'tutor'                  tutor,\n" +
-                    "  control.type_name        examType,\n" +
-                    "  stu_subj.student_id,usr.id\n" +
+            String sqlStud = "SELECT\n" +
+                    "  s4.code,\n" +
+                    "  module.module_short_name moduleType,\n" +
+                    "  subj.name_RU                                                                   subjectName,\n" +
+                    "  credit.credit,\n" +
+                    "  ects.ects,\n" +
+                    "  sem.semester_name   ,\n" +
+                    "  trim(u.LAST_NAME || ' ' || u.FIRST_NAME || ' ' || coalesce(u.MIDDLE_NAME, '')) FIO\n" +
                     "FROM student_subject stu_subj\n" +
                     "  INNER JOIN student_education stu_edu ON stu_subj.student_id = stu_edu.id\n" +
                     "  INNER JOIN student ON stu_edu.student_id = student.id AND stu_edu.child_id IS NULL\n" +
                     "  INNER JOIN users usr ON student.id = usr.id\n" +
                     "  INNER JOIN semester_subject sem_subj ON stu_subj.subject_id = sem_subj.id\n" +
                     "  INNER JOIN semester_data sem_data ON sem_subj.semester_data_id = sem_data.id\n" +
-                    "  INNER JOIN semester sem     ON sem.study_year_id = stu_edu.study_year_id AND sem.semester_period_id = sem_data.semester_period_id\n" +
+                    "  INNER JOIN semester sem\n" +
+                    "    ON sem.study_year_id = stu_edu.study_year_id AND sem.semester_period_id = sem_data.semester_period_id\n" +
                     "  INNER JOIN subject subj ON sem_subj.subject_id = subj.id\n" +
                     "  INNER JOIN creditability credit ON subj.creditability_id = credit.id\n" +
                     "  INNER JOIN ects ON subj.ects_id = ects.id\n" +
                     "  INNER JOIN subject_module module ON subj.module_id = module.id\n" +
                     "  INNER JOIN control_type control ON subj.control_type_id = control.id\n" +
-                    "WHERE  usr.deleted = FALSE AND\n" +
+                    "  LEFT JOIN teacher_subject ts ON ts.subject_id = subj.id\n" +
+                    "  LEFT JOIN subject sbj ON ts.subject_id = sbj.id\n" +
+                    "  LEFT JOIN users u ON u.id = ts.employee_id\n" +
+                    "  LEFT JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
+                    "  LEFT JOIN pair_subject s4 ON subj.id = s4.subject_id" +
+                    "   WHERE  usr.deleted = FALSE AND\n" +
                     "      subj.subject_cycle_id IS NOT NULL\n" +
                     "AND subj.module_id=3\n" +
                     "  AND usr.locked = FALSE AND usr.id = "+studentId;
@@ -368,14 +409,9 @@ public class TableForm {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
 
-                        insertCell(table, ((String)oo[1]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table, ((String)oo[2]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table, ((String)oo[3]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table, (String.valueOf(oo[4])), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table, (String.valueOf(oo[5])), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table, ((String)oo[6]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table, ((String)oo[7]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-
+                        for(int i = 0 ; i < 7;i++){
+                            insertCell(table,oo[i]!=null ? oo[i] instanceof String ? (String)oo[i]: String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        }
                     }
                 }
             } catch (Exception ex) {
@@ -383,19 +419,25 @@ public class TableForm {
             }
 
             String sqlSum = "SELECT  sum( credit.credit) credit, sum( ects.ects) ects\n" +
-                    "FROM student_subject stu_subj\n" +
-                    "  INNER JOIN student_education stu_edu ON stu_subj.student_id = stu_edu.id\n" +
+                    "FROM student_subject stu_subj " +
+                    " INNER JOIN student_education stu_edu ON stu_subj.student_id = stu_edu.id\n" +
                     "  INNER JOIN student ON stu_edu.student_id = student.id AND stu_edu.child_id IS NULL\n" +
                     "  INNER JOIN users usr ON student.id = usr.id\n" +
                     "  INNER JOIN semester_subject sem_subj ON stu_subj.subject_id = sem_subj.id\n" +
                     "  INNER JOIN semester_data sem_data ON sem_subj.semester_data_id = sem_data.id\n" +
-                    "  INNER JOIN semester sem     ON sem.study_year_id = stu_edu.study_year_id AND sem.semester_period_id = sem_data.semester_period_id\n" +
+                    "  INNER JOIN semester sem\n" +
+                    "    ON sem.study_year_id = stu_edu.study_year_id AND sem.semester_period_id = sem_data.semester_period_id\n" +
                     "  INNER JOIN subject subj ON sem_subj.subject_id = subj.id\n" +
                     "  INNER JOIN creditability credit ON subj.creditability_id = credit.id\n" +
                     "  INNER JOIN ects ON subj.ects_id = ects.id\n" +
                     "  INNER JOIN subject_module module ON subj.module_id = module.id\n" +
                     "  INNER JOIN control_type control ON subj.control_type_id = control.id\n" +
-                    "WHERE\n" +
+                    "  LEFT JOIN teacher_subject ts ON ts.subject_id = subj.id\n" +
+                    "  LEFT JOIN subject sbj ON ts.subject_id = sbj.id\n" +
+                    "  LEFT JOIN users u ON u.id = ts.employee_id\n" +
+                    "  LEFT JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
+                    "  LEFT JOIN pair_subject s4 ON subj.id = s4.subject_id\n" +
+                    "   WHERE\n" +
                     "  usr.id = " +studentId+
                     "  AND sem_data.semester_period_id=2";
 
@@ -407,9 +449,9 @@ public class TableForm {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
 
-                        insertCell(table, (String.valueOf(oo[0])), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table, (String.valueOf(oo[1])), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-
+                        for(int i = 0 ; i < 2;i++){
+                            insertCell(table,oo[i]!=null ? oo[i] instanceof String ? (String)oo[i]: String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        }
                     }
                 }
             } catch (Exception ex) {
@@ -440,24 +482,32 @@ public class TableForm {
             insertCell(table1, "Міндетті түрде оқытылатын пәндер:", Element.ALIGN_LEFT, 6,  EmployeePdfCreator.getFont(12, Font.BOLD));
             table1.setWidthPercentage(100);
 
-            String sqlTeacherSem1 = "SELECT  stu_subj.id,  'code'\n" +
-                    "                           code,    subj.name_kz subjectName,\n" +
-                    "                              credit.credit,   ects.ects,\n" +
-                    "  'tutor'                  tutor,\n" +
-                    "  control.type_name        examType\n" +
+            String sqlTeacherSem1 = "SELECT\n" +
+                    "  s4.code,\n" +
+                    "  subj.name_kz                                                                   subjectName,\n" +
+                    "  credit.credit,\n" +
+                    "  ects.ects,\n" +
+                    "  trim(u.LAST_NAME || ' ' || u.FIRST_NAME || ' ' || coalesce(u.MIDDLE_NAME, '')) FIO,\n" +
+                    "  control.type_name                                                              examType\n" +
                     "FROM student_subject stu_subj\n" +
                     "  INNER JOIN student_education stu_edu ON stu_subj.student_id = stu_edu.id\n" +
                     "  INNER JOIN student ON stu_edu.student_id = student.id AND stu_edu.child_id IS NULL\n" +
                     "  INNER JOIN users usr ON student.id = usr.id\n" +
                     "  INNER JOIN semester_subject sem_subj ON stu_subj.subject_id = sem_subj.id\n" +
                     "  INNER JOIN semester_data sem_data ON sem_subj.semester_data_id = sem_data.id\n" +
-                    "  INNER JOIN semester sem     ON sem.study_year_id = stu_edu.study_year_id AND sem.semester_period_id = sem_data.semester_period_id\n" +
+                    "  INNER JOIN semester sem\n" +
+                    "    ON sem.study_year_id = stu_edu.study_year_id AND sem.semester_period_id = sem_data.semester_period_id\n" +
                     "  INNER JOIN subject subj ON sem_subj.subject_id = subj.id\n" +
                     "  INNER JOIN creditability credit ON subj.creditability_id = credit.id\n" +
                     "  INNER JOIN ects ON subj.ects_id = ects.id\n" +
                     "  INNER JOIN subject_module module ON subj.module_id = module.id\n" +
                     "  INNER JOIN control_type control ON subj.control_type_id = control.id\n" +
-                    "WHERE\n" +
+                    "  LEFT JOIN teacher_subject ts ON ts.subject_id = subj.id\n" +
+                    "  LEFT JOIN subject sbj ON ts.subject_id = sbj.id\n" +
+                    "  LEFT JOIN users u ON u.id = ts.employee_id\n" +
+                    "  LEFT JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
+                    "  LEFT JOIN pair_subject s4 ON subj.id = s4.subject_id " +
+                    "   WHERE\n" +
                     "  sem_data.semester_period_id=1 AND\n" +
                     "       usr.deleted = FALSE AND\n" +
                     "      subj.subject_cycle_id IS NOT NULL   AND subj.module_id  != 3\n" +
@@ -469,13 +519,9 @@ public class TableForm {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
 
-                        insertCell(table1, ((String)oo[1]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table1, ((String)oo[2]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table1, (String.valueOf(oo[3])), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table1, (String.valueOf(oo[4])), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table1, ((String)oo[5]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table1, ((String)oo[6]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-
+                        for(int i = 0 ; i < 6;i++){
+                            insertCell(table1,oo[i]!=null ? oo[i] instanceof String ? (String)oo[i]: String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        }
                     }
                 }
             } catch (Exception ex) {
@@ -483,24 +529,32 @@ public class TableForm {
             }
             insertCell(table1, "Студенттің таңдаған пәндері:", Element.ALIGN_LEFT, 7,  EmployeePdfCreator.getFont(12, Font.BOLD));
 
-            String sqlTeaAdd = "SELECT  stu_subj.id,  'code'\n" +
-                    "                           code,    subj.name_kz subjectName,\n" +
-                    "                              credit.credit,   ects.ects,\n" +
-                    "  'tutor'                  tutor,\n" +
-                    "  control.type_name        examType\n" +
+            String sqlTeaAdd = "SELECT\n" +
+                    "  s4.code,\n" +
+                    "  subj.name_kz                                                                   subjectName,\n" +
+                    "  credit.credit,\n" +
+                    "  ects.ects,\n" +
+                    "  trim(u.LAST_NAME || ' ' || u.FIRST_NAME || ' ' || coalesce(u.MIDDLE_NAME, '')) FIO,\n" +
+                    "  control.type_name                                                              examType\n" +
                     "FROM student_subject stu_subj\n" +
                     "  INNER JOIN student_education stu_edu ON stu_subj.student_id = stu_edu.id\n" +
                     "  INNER JOIN student ON stu_edu.student_id = student.id AND stu_edu.child_id IS NULL\n" +
                     "  INNER JOIN users usr ON student.id = usr.id\n" +
                     "  INNER JOIN semester_subject sem_subj ON stu_subj.subject_id = sem_subj.id\n" +
                     "  INNER JOIN semester_data sem_data ON sem_subj.semester_data_id = sem_data.id\n" +
-                    "  INNER JOIN semester sem     ON sem.study_year_id = stu_edu.study_year_id AND sem.semester_period_id = sem_data.semester_period_id\n" +
+                    "  INNER JOIN semester sem\n" +
+                    "    ON sem.study_year_id = stu_edu.study_year_id AND sem.semester_period_id = sem_data.semester_period_id\n" +
                     "  INNER JOIN subject subj ON sem_subj.subject_id = subj.id\n" +
                     "  INNER JOIN creditability credit ON subj.creditability_id = credit.id\n" +
                     "  INNER JOIN ects ON subj.ects_id = ects.id\n" +
                     "  INNER JOIN subject_module module ON subj.module_id = module.id\n" +
                     "  INNER JOIN control_type control ON subj.control_type_id = control.id\n" +
-                    "WHERE\n" +
+                    "  LEFT JOIN teacher_subject ts ON ts.subject_id = subj.id\n" +
+                    "  LEFT JOIN subject sbj ON ts.subject_id = sbj.id\n" +
+                    "  LEFT JOIN users u ON u.id = ts.employee_id\n" +
+                    "  LEFT JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
+                    "  LEFT JOIN pair_subject s4 ON subj.id = s4.subject_id " +
+                    "   WHERE\n" +
                     "  sem_data.semester_period_id=1\n" +
                     "  AND usr.deleted = FALSE AND\n" +
                     "  subj.subject_cycle_id IS NOT NULL\n" +
@@ -513,12 +567,10 @@ public class TableForm {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
 
-                        insertCell(table1, ((String)oo[1]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table1, ((String)oo[2]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table1, (String.valueOf(oo[3])), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table1, (String.valueOf(oo[4])), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table1, ((String)oo[5]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table1, ((String)oo[6]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        for(int i = 0 ; i < 6;i++){
+                            insertCell(table1,oo[i]!=null ? oo[i] instanceof String ? (String)oo[i]: String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        }
+
 
                     }
                 }
@@ -528,24 +580,32 @@ public class TableForm {
 
             insertCell(table1, "Студенттің қосымша пәндері:", Element.ALIGN_LEFT, 7,  EmployeePdfCreator.getFont(12, Font.BOLD));
 
-            String sqlTeachAdd = "SELECT  stu_subj.id,  'code'\n" +
-                    "                           code,    subj.name_kz subjectName,\n" +
-                    "                              credit.credit,   ects.ects,\n" +
-                    "  'tutor'                  tutor,\n" +
-                    "  control.type_name        examType\n" +
+            String sqlTeachAdd = "SELECT\n" +
+                    "  s4.code,\n" +
+                    "  subj.name_kz                                                                   subjectName,\n" +
+                    "  credit.credit,\n" +
+                    "  ects.ects,\n" +
+                    "  trim(u.LAST_NAME || ' ' || u.FIRST_NAME || ' ' || coalesce(u.MIDDLE_NAME, '')) FIO,\n" +
+                    "  control.type_name                                                              examType\n" +
                     "FROM student_subject stu_subj\n" +
                     "  INNER JOIN student_education stu_edu ON stu_subj.student_id = stu_edu.id\n" +
                     "  INNER JOIN student ON stu_edu.student_id = student.id AND stu_edu.child_id IS NULL\n" +
                     "  INNER JOIN users usr ON student.id = usr.id\n" +
                     "  INNER JOIN semester_subject sem_subj ON stu_subj.subject_id = sem_subj.id\n" +
                     "  INNER JOIN semester_data sem_data ON sem_subj.semester_data_id = sem_data.id\n" +
-                    "  INNER JOIN semester sem     ON sem.study_year_id = stu_edu.study_year_id AND sem.semester_period_id = sem_data.semester_period_id\n" +
+                    "  INNER JOIN semester sem\n" +
+                    "    ON sem.study_year_id = stu_edu.study_year_id AND sem.semester_period_id = sem_data.semester_period_id\n" +
                     "  INNER JOIN subject subj ON sem_subj.subject_id = subj.id\n" +
                     "  INNER JOIN creditability credit ON subj.creditability_id = credit.id\n" +
                     "  INNER JOIN ects ON subj.ects_id = ects.id\n" +
                     "  INNER JOIN subject_module module ON subj.module_id = module.id\n" +
                     "  INNER JOIN control_type control ON subj.control_type_id = control.id\n" +
-                    "WHERE\n" +
+                    "  LEFT JOIN teacher_subject ts ON ts.subject_id = subj.id\n" +
+                    "  LEFT JOIN subject sbj ON ts.subject_id = sbj.id\n" +
+                    "  LEFT JOIN users u ON u.id = ts.employee_id\n" +
+                    "  LEFT JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
+                    "  LEFT JOIN pair_subject s4 ON subj.id = s4.subject_id \n" +
+                    "   WHERE\n" +
                     "  usr.deleted = FALSE AND\n" +
                     "  subj.subject_cycle_id IS NOT NULL AND subj.module_id=3\n" +
                     "AND\n" +
@@ -556,12 +616,10 @@ public class TableForm {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
 
-                        insertCell(table1, ((String)oo[1]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table1, ((String)oo[2]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table1, (String.valueOf(oo[3])), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table1, (String.valueOf(oo[4])), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table1, ((String)oo[5]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table1, ((String)oo[6]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        for(int i = 0 ; i < 6;i++){
+                            insertCell(table1,oo[i]!=null ? oo[i] instanceof String ? (String)oo[i]: String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        }
+
 
                     }
                 }
@@ -571,18 +629,24 @@ public class TableForm {
 
             String sqlTeachSum = "SELECT  sum( credit.credit) credit, sum( ects.ects) ects\n" +
                     "FROM student_subject stu_subj\n" +
-                    "  INNER JOIN student_education stu_edu ON stu_subj.student_id = stu_edu.id\n" +
+                    " INNER JOIN student_education stu_edu ON stu_subj.student_id = stu_edu.id\n" +
                     "  INNER JOIN student ON stu_edu.student_id = student.id AND stu_edu.child_id IS NULL\n" +
                     "  INNER JOIN users usr ON student.id = usr.id\n" +
                     "  INNER JOIN semester_subject sem_subj ON stu_subj.subject_id = sem_subj.id\n" +
                     "  INNER JOIN semester_data sem_data ON sem_subj.semester_data_id = sem_data.id\n" +
-                    "  INNER JOIN semester sem     ON sem.study_year_id = stu_edu.study_year_id AND sem.semester_period_id = sem_data.semester_period_id\n" +
+                    "  INNER JOIN semester sem\n" +
+                    "    ON sem.study_year_id = stu_edu.study_year_id AND sem.semester_period_id = sem_data.semester_period_id\n" +
                     "  INNER JOIN subject subj ON sem_subj.subject_id = subj.id\n" +
                     "  INNER JOIN creditability credit ON subj.creditability_id = credit.id\n" +
                     "  INNER JOIN ects ON subj.ects_id = ects.id\n" +
                     "  INNER JOIN subject_module module ON subj.module_id = module.id\n" +
                     "  INNER JOIN control_type control ON subj.control_type_id = control.id\n" +
-                    "WHERE\n" +
+                    "  LEFT JOIN teacher_subject ts ON ts.subject_id = subj.id\n" +
+                    "  LEFT JOIN subject sbj ON ts.subject_id = sbj.id\n" +
+                    "  LEFT JOIN users u ON u.id = ts.employee_id\n" +
+                    "  LEFT JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
+                    "  LEFT JOIN pair_subject s4 ON subj.id = s4.subject_id " +
+                    "   WHERE\n" +
                     "  usr.id = " +studentId+
                     " AND sem_data.semester_period_id=1";
 
@@ -594,9 +658,9 @@ public class TableForm {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
 
-                        insertCell(table1, (String.valueOf(oo[0])), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table1, (String.valueOf(oo[1])), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-
+                        for(int i = 0 ; i < 2;i++){
+                            insertCell(table1,oo[i]!=null ? oo[i] instanceof String ? (String)oo[i]: String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        }
                     }
                 }
             } catch (Exception ex) {
@@ -619,24 +683,32 @@ public class TableForm {
             insertCell(table1, "           Міндетті түрде оқытылатын пәндер:", Element.ALIGN_LEFT, 6,  EmployeePdfCreator.getFont(12, Font.BOLD));
 
 
-            String sqlTeacherSem2 = "SELECT  stu_subj.id,  'code'\n" +
-                    "                           code,    subj.name_kz subjectName,\n" +
-                    "                              credit.credit,   ects.ects,\n" +
-                    "  'tutor'                  tutor,\n" +
-                    "  control.type_name        examType\n" +
+            String sqlTeacherSem2 = "SELECT\n" +
+                    "  s4.code,\n" +
+                    "  subj.name_kz                                                                   subjectName,\n" +
+                    "  credit.credit,\n" +
+                    "  ects.ects,\n" +
+                    "  trim(u.LAST_NAME || ' ' || u.FIRST_NAME || ' ' || coalesce(u.MIDDLE_NAME, '')) FIO,\n" +
+                    "  control.type_name                                                              examType\n" +
                     "FROM student_subject stu_subj\n" +
                     "  INNER JOIN student_education stu_edu ON stu_subj.student_id = stu_edu.id\n" +
                     "  INNER JOIN student ON stu_edu.student_id = student.id AND stu_edu.child_id IS NULL\n" +
                     "  INNER JOIN users usr ON student.id = usr.id\n" +
                     "  INNER JOIN semester_subject sem_subj ON stu_subj.subject_id = sem_subj.id\n" +
                     "  INNER JOIN semester_data sem_data ON sem_subj.semester_data_id = sem_data.id\n" +
-                    "  INNER JOIN semester sem     ON sem.study_year_id = stu_edu.study_year_id AND sem.semester_period_id = sem_data.semester_period_id\n" +
+                    "  INNER JOIN semester sem\n" +
+                    "    ON sem.study_year_id = stu_edu.study_year_id AND sem.semester_period_id = sem_data.semester_period_id\n" +
                     "  INNER JOIN subject subj ON sem_subj.subject_id = subj.id\n" +
                     "  INNER JOIN creditability credit ON subj.creditability_id = credit.id\n" +
                     "  INNER JOIN ects ON subj.ects_id = ects.id\n" +
                     "  INNER JOIN subject_module module ON subj.module_id = module.id\n" +
                     "  INNER JOIN control_type control ON subj.control_type_id = control.id\n" +
-                    "WHERE\n" +
+                    "  LEFT JOIN teacher_subject ts ON ts.subject_id = subj.id\n" +
+                    "  LEFT JOIN subject sbj ON ts.subject_id = sbj.id\n" +
+                    "  LEFT JOIN users u ON u.id = ts.employee_id\n" +
+                    "  LEFT JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
+                    "  LEFT JOIN pair_subject s4 ON subj.id = s4.subject_id\n" +
+                    "   WHERE\n" +
                     "  sem_data.semester_period_id=2 AND\n" +
                     "       usr.deleted = FALSE AND\n" +
                     "      subj.subject_cycle_id IS NOT NULL   AND subj.module_id  != 3\n" +
@@ -648,12 +720,10 @@ public class TableForm {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
 
-                        insertCell(table1, ((String)oo[1]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table1, ((String)oo[2]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table1, (String.valueOf(oo[3])), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table1, (String.valueOf(oo[4])), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table1, ((String)oo[5]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table1, ((String)oo[6]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        for(int i = 0 ; i < 6;i++){
+                            insertCell(table1,oo[i]!=null ? oo[i] instanceof String ? (String)oo[i]: String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        }
+
 
                     }
                 }
@@ -662,24 +732,32 @@ public class TableForm {
             }
             insertCell(table1, "Студенттің таңдаған пәндері:", Element.ALIGN_LEFT, 7,  EmployeePdfCreator.getFont(12, Font.BOLD));
 
-            String sqlTeaAdd2 = "SELECT  stu_subj.id,  'code'\n" +
-                    "                           code,    subj.name_kz subjectName,\n" +
-                    "                              credit.credit,   ects.ects,\n" +
-                    "  'tutor'                  tutor,\n" +
-                    "  control.type_name        examType\n" +
+            String sqlTeaAdd2 = "SELECT\n" +
+                    "  s4.code,\n" +
+                    "  subj.name_kz                                                                   subjectName,\n" +
+                    "  credit.credit,\n" +
+                    "  ects.ects,\n" +
+                    "  trim(u.LAST_NAME || ' ' || u.FIRST_NAME || ' ' || coalesce(u.MIDDLE_NAME, '')) FIO,\n" +
+                    "  control.type_name                                                              examType\n" +
                     "FROM student_subject stu_subj\n" +
                     "  INNER JOIN student_education stu_edu ON stu_subj.student_id = stu_edu.id\n" +
                     "  INNER JOIN student ON stu_edu.student_id = student.id AND stu_edu.child_id IS NULL\n" +
                     "  INNER JOIN users usr ON student.id = usr.id\n" +
                     "  INNER JOIN semester_subject sem_subj ON stu_subj.subject_id = sem_subj.id\n" +
                     "  INNER JOIN semester_data sem_data ON sem_subj.semester_data_id = sem_data.id\n" +
-                    "  INNER JOIN semester sem     ON sem.study_year_id = stu_edu.study_year_id AND sem.semester_period_id = sem_data.semester_period_id\n" +
+                    "  INNER JOIN semester sem\n" +
+                    "    ON sem.study_year_id = stu_edu.study_year_id AND sem.semester_period_id = sem_data.semester_period_id\n" +
                     "  INNER JOIN subject subj ON sem_subj.subject_id = subj.id\n" +
                     "  INNER JOIN creditability credit ON subj.creditability_id = credit.id\n" +
                     "  INNER JOIN ects ON subj.ects_id = ects.id\n" +
                     "  INNER JOIN subject_module module ON subj.module_id = module.id\n" +
                     "  INNER JOIN control_type control ON subj.control_type_id = control.id\n" +
-                    "WHERE\n" +
+                    "  LEFT JOIN teacher_subject ts ON ts.subject_id = subj.id\n" +
+                    "  LEFT JOIN subject sbj ON ts.subject_id = sbj.id\n" +
+                    "  LEFT JOIN users u ON u.id = ts.employee_id\n" +
+                    "  LEFT JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
+                    "  LEFT JOIN pair_subject s4 ON subj.id = s4.subject_id\n" +
+                    "   WHERE\n" +
                     "  sem_data.semester_period_id=2\n" +
                     "  AND usr.deleted = FALSE AND\n" +
                     "  subj.subject_cycle_id IS NOT NULL\n" +
@@ -692,12 +770,9 @@ public class TableForm {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
 
-                        insertCell(table1, ((String)oo[1]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table1, ((String)oo[2]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table1, (String.valueOf(oo[3])), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table1, (String.valueOf(oo[4])), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table1, ((String)oo[5]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table1, ((String)oo[6]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        for(int i = 0 ; i < 6;i++){
+                            insertCell(table1,oo[i]!=null ? oo[i] instanceof String ? (String)oo[i]: String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        }
 
                     }
                 }
@@ -707,24 +782,32 @@ public class TableForm {
 
             insertCell(table1, "Студенттің қосымша пәндері:", Element.ALIGN_LEFT, 7,  EmployeePdfCreator.getFont(12, Font.BOLD));
 
-            String sqlTeachAdd2 = "SELECT  stu_subj.id,  'code'\n" +
-                    "                           code,    subj.name_kz subjectName,\n" +
-                    "                              credit.credit,   ects.ects,\n" +
-                    "  'tutor'                  tutor,\n" +
-                    "  control.type_name        examType\n" +
+            String sqlTeachAdd2 = "SELECT\n" +
+                    "  s4.code,\n" +
+                    "  subj.name_kz                                                                   subjectName,\n" +
+                    "  credit.credit,\n" +
+                    "  ects.ects,\n" +
+                    "  trim(u.LAST_NAME || ' ' || u.FIRST_NAME || ' ' || coalesce(u.MIDDLE_NAME, '')) FIO,\n" +
+                    "  control.type_name                                                              examType\n" +
                     "FROM student_subject stu_subj\n" +
                     "  INNER JOIN student_education stu_edu ON stu_subj.student_id = stu_edu.id\n" +
                     "  INNER JOIN student ON stu_edu.student_id = student.id AND stu_edu.child_id IS NULL\n" +
                     "  INNER JOIN users usr ON student.id = usr.id\n" +
                     "  INNER JOIN semester_subject sem_subj ON stu_subj.subject_id = sem_subj.id\n" +
                     "  INNER JOIN semester_data sem_data ON sem_subj.semester_data_id = sem_data.id\n" +
-                    "  INNER JOIN semester sem     ON sem.study_year_id = stu_edu.study_year_id AND sem.semester_period_id = sem_data.semester_period_id\n" +
+                    "  INNER JOIN semester sem\n" +
+                    "    ON sem.study_year_id = stu_edu.study_year_id AND sem.semester_period_id = sem_data.semester_period_id\n" +
                     "  INNER JOIN subject subj ON sem_subj.subject_id = subj.id\n" +
                     "  INNER JOIN creditability credit ON subj.creditability_id = credit.id\n" +
                     "  INNER JOIN ects ON subj.ects_id = ects.id\n" +
                     "  INNER JOIN subject_module module ON subj.module_id = module.id\n" +
                     "  INNER JOIN control_type control ON subj.control_type_id = control.id\n" +
-                    "WHERE\n" +
+                    "  LEFT JOIN teacher_subject ts ON ts.subject_id = subj.id\n" +
+                    "  LEFT JOIN subject sbj ON ts.subject_id = sbj.id\n" +
+                    "  LEFT JOIN users u ON u.id = ts.employee_id\n" +
+                    "  LEFT JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
+                    "  LEFT JOIN pair_subject s4 ON subj.id = s4.subject_id\n" +
+                    "   WHERE\n" +
                     "  usr.deleted = FALSE AND\n" +
                     "  subj.subject_cycle_id IS NOT NULL AND subj.module_id=3\n" +
                     "AND\n" +
@@ -734,13 +817,9 @@ public class TableForm {
                 if (!tmpList.isEmpty()) {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
-
-                        insertCell(table1, ((String)oo[1]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table1, ((String)oo[2]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table1, (String.valueOf(oo[3])), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table1, (String.valueOf(oo[4])), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table1, ((String)oo[5]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table1, ((String)oo[6]), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        for(int i = 0 ; i < 6;i++){
+                            insertCell(table1,oo[i]!=null ? oo[i] instanceof String ? (String)oo[i]: String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        }
 
                     }
                 }
@@ -755,13 +834,19 @@ public class TableForm {
                     "  INNER JOIN users usr ON student.id = usr.id\n" +
                     "  INNER JOIN semester_subject sem_subj ON stu_subj.subject_id = sem_subj.id\n" +
                     "  INNER JOIN semester_data sem_data ON sem_subj.semester_data_id = sem_data.id\n" +
-                    "  INNER JOIN semester sem     ON sem.study_year_id = stu_edu.study_year_id AND sem.semester_period_id = sem_data.semester_period_id\n" +
+                    "  INNER JOIN semester sem\n" +
+                    "    ON sem.study_year_id = stu_edu.study_year_id AND sem.semester_period_id = sem_data.semester_period_id\n" +
                     "  INNER JOIN subject subj ON sem_subj.subject_id = subj.id\n" +
                     "  INNER JOIN creditability credit ON subj.creditability_id = credit.id\n" +
                     "  INNER JOIN ects ON subj.ects_id = ects.id\n" +
                     "  INNER JOIN subject_module module ON subj.module_id = module.id\n" +
                     "  INNER JOIN control_type control ON subj.control_type_id = control.id\n" +
-                    "WHERE\n" +
+                    "  LEFT JOIN teacher_subject ts ON ts.subject_id = subj.id\n" +
+                    "  LEFT JOIN subject sbj ON ts.subject_id = sbj.id\n" +
+                    "  LEFT JOIN users u ON u.id = ts.employee_id\n" +
+                    "  LEFT JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
+                    "  LEFT JOIN pair_subject s4 ON subj.id = s4.subject_id \n" +
+                    "   WHERE\n" +
                     "  usr.id = " +studentId+
                     "  AND sem_data.semester_period_id=2";
 
@@ -773,9 +858,9 @@ public class TableForm {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
 
-                        insertCell(table1, (String.valueOf(oo[0])), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-                        insertCell(table1, (String.valueOf(oo[1])), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-
+                        for(int i = 0 ; i < 2;i++){
+                            insertCell(table1,oo[i]!=null ? oo[i] instanceof String ? (String)oo[i]: String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        }
                     }
                 }
             } catch (Exception ex) {
