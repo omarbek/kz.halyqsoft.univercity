@@ -4,8 +4,6 @@ import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
 
-import java.util.Date;
-
 public class VEmployeeInfo extends AbstractEntity {
 
     @FieldInfo(type=EFieldType.TEXT, order = 1)
@@ -14,11 +12,11 @@ public class VEmployeeInfo extends AbstractEntity {
     @FieldInfo(type = EFieldType.TEXT, order = 2)
     private String code;
 
-    @FieldInfo(type = EFieldType.DATETIME, order = 3)
-    private Date comeIN;
+    @FieldInfo(type = EFieldType.TEXT, order = 3)
+    private String comeIN;
 
-    @FieldInfo(type = EFieldType.DATETIME, order = 4)
-    private Date comeOUT;
+    @FieldInfo(type = EFieldType.TEXT, order = 4)
+    private String comeOUT;
 
     public String getFIO() {
         return FIO;
@@ -36,19 +34,19 @@ public class VEmployeeInfo extends AbstractEntity {
         this.code = code;
     }
 
-    public Date getComeIN() {
+    public String getComeIN() {
         return comeIN;
     }
 
-    public void setComeIN(Date comeIN) {
+    public void setComeIN(String comeIN) {
         this.comeIN = comeIN;
     }
 
-    public Date getComeOUT() {
+    public String getComeOUT() {
         return comeOUT;
     }
 
-    public void setComeOUT(Date comeOUT) {
+    public void setComeOUT(String comeOUT) {
         this.comeOUT = comeOUT;
     }
 }

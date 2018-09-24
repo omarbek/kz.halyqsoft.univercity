@@ -208,8 +208,8 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
                         List<String> list = new ArrayList<>();
                         list.add(vEmployeeInfo.getFIO());
                         list.add(vEmployeeInfo.getCode());
-                        list.add(vEmployeeInfo.getComeIN() != null ? CommonUtils.getFormattedDate(vEmployeeInfo.getComeIN()) : " ");
-                        list.add(vEmployeeInfo.getComeOUT() != null ? CommonUtils.getFormattedDate(vEmployeeInfo.getComeOUT()) : " ");
+                        list.add(vEmployeeInfo.getComeIN() != null ? vEmployeeInfo.getComeIN() : " ");
+                        list.add(vEmployeeInfo.getComeOUT() != null ? vEmployeeInfo.getComeOUT() : " ");
                         tableBody.add(list);
                     }
                 } else if (tableVL.getComponentIndex(employeeGW) != -1) {
@@ -387,8 +387,8 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
         String sql = "SELECT\n" +
                 "                empl.id, trim(empl.LAST_NAME || ' ' || empl.FIRST_NAME || ' ' || coalesce(empl.MIDDLE_NAME, '')) FIO,\n" +
                 "                empl.code,\n" +
-                "                arriv.created,\n" +
-                "                arrivF.created as false\n" +
+                "                (arriv.created::time)::text,\n" +
+                "                (arrivF.created::time)::text as false\n" +
                 "                FROM v_employee empl\n" +
                 "                  left join (SELECT\n" +
                 "                     arriv.created,\n" +
@@ -416,8 +416,8 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
                     vempl.setId(ID.valueOf((long) oo[0]));
                     vempl.setFIO((String) oo[1]);
                     vempl.setCode((String) oo[2]);
-                    vempl.setComeIN((Date) oo[3]);
-                    vempl.setComeOUT((Date) oo[4]);
+                    vempl.setComeIN((String) oo[3]);
+                    vempl.setComeOUT((String) oo[4]);
                     emplList.add(vempl);
                 }
             }
