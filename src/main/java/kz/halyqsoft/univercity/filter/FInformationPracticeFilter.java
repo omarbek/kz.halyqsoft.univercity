@@ -5,6 +5,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.GROUPS;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SPECIALITY;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDY_YEAR;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_EMPLOYEE;
 import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 
 import java.util.Date;
@@ -13,7 +14,7 @@ public final class FInformationPracticeFilter extends AbstractFilterBean {
 
     private String code;
     private GROUPS groups;
-    private USERS employee;
+    private V_EMPLOYEE employee;
     private Date created;
     private STUDY_YEAR studyYear;
     private ENTRANCE_YEAR entranceYear;
@@ -34,11 +35,11 @@ public final class FInformationPracticeFilter extends AbstractFilterBean {
         this.groups = groups;
     }
 
-    public USERS getEmployee() {
+    public V_EMPLOYEE getEmployee() {
         return employee;
     }
 
-    public void setEmployee(USERS employee) {
+    public void setEmployee(V_EMPLOYEE employee) {
         this.employee = employee;
     }
 

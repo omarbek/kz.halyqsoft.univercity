@@ -13,6 +13,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDY_YEAR;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_GROUPS_CREATION_NEEDED;
 import kz.halyqsoft.univercity.filter.FStreamFilter;
 import kz.halyqsoft.univercity.filter.panel.StreamFilterPanel;
+import kz.halyqsoft.univercity.modules.stream.dialogs.DetailDialog;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -27,6 +28,7 @@ import org.r3a.common.vaadin.AbstractWebUI;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.ERefreshType;
 import org.r3a.common.vaadin.widget.dialog.AbstractDialog;
+import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 import org.r3a.common.vaadin.widget.filter2.FilterPanelListener;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
@@ -125,13 +127,21 @@ public class StreamView extends AbstractTaskView implements EntityListener, Filt
                 }
             });
 
+            Button openBtn = new Button((getUILocaleUtil().getCaption("open")));
+            openBtn.addClickListener(new Button.ClickListener() {
+                @Override
+                public void buttonClick(Button.ClickEvent clickEvent) {
+                    if(ssGW.getSelectedEntity()!=null){
+                        DetailDialog detailDialog = new DetailDialog((STREAM) ssGW.getSelectedEntity());
+                    }else{
+                        Message.showError(getUILocaleUtil().getMessage("choose.field"));
+                    }
+                }
+            });
             mainVL.addComponent(streamFilterPanel);
-
-            mainVL.addComponent(generateBtn);
-            mainVL.setComponentAlignment(generateBtn, Alignment.MIDDLE_CENTER);
-
             mainVL.addComponent(ssGW);
-
+            ssGW.getToolbarPanel().addComponent(openBtn);
+            ssGW.getToolbarPanel().setComponentAlignment(openBtn, Alignment.MIDDLE_LEFT);
             getContent().addComponent(mainVL);
 
             refresh();
@@ -190,7 +200,6 @@ public class StreamView extends AbstractTaskView implements EntityListener, Filt
     private void initGridWidget() {
         ssGW = new GridWidget(STREAM.class);
         ssGW.setSizeFull();
-        ssGW.setMultiSelect(true);
         ssGW.setImmediate(true);
         ssGW.addEntityListener(this);
 
@@ -202,39 +211,7 @@ public class StreamView extends AbstractTaskView implements EntityListener, Filt
 
     @Override
     public boolean onPreview(Object source, Entity e, int buttonId) {
-        STREAM stream = (STREAM) e;
-        AbstractDialog abstractDialog = new AbstractDialog() {
-            @Override
-            protected String createTitle() {
-                return getUILocaleUtil().getCaption("preview");
-            }
-
-        };
-        abstractDialog.setWidth(90, Unit.PERCENTAGE);
-        abstractDialog.getContent().removeAllComponents();
-
-        abstractDialog.center();
-
-        GridWidget sgGW = new GridWidget(STREAM_GROUP.class);
-        sgGW.setMultiSelect(true);
-        DBGridModel sgGridModel = (DBGridModel) sgGW.getWidgetModel();
-        sgGridModel.setEntities(getStreamGroupByStream(stream));
-        sgGridModel.getQueryModel().addWhere("stream", ECriteria.EQUAL, e.getId());
-        abstractDialog.getContent().addComponent(sgGW);
-
-        Button closeButton = new Button(getUILocaleUtil().getCaption("close"));
-        closeButton.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent clickEvent) {
-                abstractDialog.close();
-            }
-        });
-        abstractDialog.getContent().addComponent(closeButton);
-        abstractDialog.getContent().setComponentAlignment(closeButton, Alignment.MIDDLE_CENTER);
-
-        AbstractWebUI.getInstance().addWindow(abstractDialog);
-
-        return false;
+        return true;
     }
 
     private List<STREAM_GROUP> getStreamGroupByStream(STREAM stream) {

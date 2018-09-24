@@ -220,7 +220,6 @@ public class PdfAccess extends AbstractCommonView implements EntityListener{
 
     @Override
     public boolean preSave(Object o, Entity entity, boolean b, int i) throws Exception {
-        Message.showError("Asdasdasdasd");
         return false;
     }
 
