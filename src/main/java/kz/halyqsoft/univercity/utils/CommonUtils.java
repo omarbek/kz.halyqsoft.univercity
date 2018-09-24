@@ -47,7 +47,7 @@ public class CommonUtils {
 
     public static final String PDF_MIME_TYPE = "application/pdf";
 
-    public static final String DATETIME = "yyyy-MM-dd' 'HH:mm:ss.SSS";
+    public static final String DATETIME = "yyyy-MM-dd' 'HH:mm:ss";
     public static final String DATE = "dd.MM.yyyy";
 
     public static final Logger LOG = LoggerFactory.getLogger("ROOT");
@@ -256,6 +256,11 @@ public class CommonUtils {
         return formatter.format(date);
     }
 
+    public static String getFormattedDateWithoutTime(Date date) {
+        DateFormat formatter = new SimpleDateFormat(DATE);
+        return formatter.format(date);
+    }
+
     public static String getCode(String beginYear) {
         String code = null;
         try {
@@ -384,10 +389,7 @@ public class CommonUtils {
     }
 
     public static boolean isAdmin() {
-        if (getCurrentUser().getId().getId().intValue() == 1
-                || getCurrentUser().getId().getId().intValue() == 2) {
-            return true;
-        }
-        return false;
+        return getCurrentUser().getId().getId().intValue() == 1
+                || getCurrentUser().getId().getId().intValue() == 2;
     }
 }

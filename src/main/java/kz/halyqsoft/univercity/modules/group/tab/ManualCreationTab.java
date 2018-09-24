@@ -66,8 +66,9 @@ public class ManualCreationTab extends AbstractCommonView implements EntityListe
         studentGroupsGW.addEntityListener(this);
 
         DBGridModel studentGM = (DBGridModel) studentGroupsGW.getWidgetModel();
-        studentGM.getQueryModel().addWhere("category" ,ECriteria.EQUAL, STUDENT_CATEGORY.STUDENT_ID);
-        studentGM.getQueryModel().addWhere("studentStatus" ,ECriteria.EQUAL, STUDENT_STATUS.STUDYING_ID);
+        QueryModel studentQM = studentGM.getQueryModel();
+        studentQM.addWhere("category" ,ECriteria.EQUAL, STUDENT_CATEGORY.STUDENT_ID);
+        studentQM.addWhere("studentStatus" ,ECriteria.EQUAL, STUDENT_STATUS.STUDYING_ID);
 
         studentGM.setRefreshType(ERefreshType.MANUAL);
         studentGM.setMultiSelect(false);
@@ -398,7 +399,8 @@ public class ManualCreationTab extends AbstractCommonView implements EntityListe
                 "  INNER JOIN student st on st.id = stu.id\n" +
                 "  INNER JOIN student_diploma_type t on st.diploma_type_id = t.id" +
                 sb.toString() +
-                " ORDER BY FIO";
+                " ORDER BY FIO" +
+                " limit 20";
         try {
             List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(
                     sql, params);

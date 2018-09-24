@@ -252,7 +252,7 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
             Integer[] ids = {1, 2, 3};
             return !onEdit(e, ids);
         } else if (e instanceof STUDENT_STATUS) {
-            Integer[] ids = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+            Integer[] ids = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10,11};
             return !onEdit(e, ids);
         } else if (e instanceof STUDY_DIRECT) {
             Integer[] ids = {9};

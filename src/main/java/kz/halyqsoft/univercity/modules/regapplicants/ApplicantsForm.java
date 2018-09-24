@@ -634,9 +634,9 @@ public final class ApplicantsForm extends UsersForm {
             fileName = "Договор магистрант_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
         } else if (value.equals("90")) {
             fileName = "келісім-шарт_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
-        }  else if (value.equals("154")) {
+        }  else if (value.equals("99")) {
             fileName = "ИУПС_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
-        } else if (value.equals("155")) {
+        } else if (value.equals("98")) {
             fileName = "ИУСП_рус_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
         }
         else {

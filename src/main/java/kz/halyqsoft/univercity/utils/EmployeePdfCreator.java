@@ -208,7 +208,9 @@ public class EmployeePdfCreator {
             .replaceAll("\\$status", employee.getMaritalStatus().toString())
             .replaceAll("\\$gender", employee.getSex().toString())
             .replaceAll("\\$nationality", employee.getNationality().toString())
-            .replaceAll("\\$currentDate", CommonUtils.getFormattedDate(new Date()));
+            .replaceAll("\\$currentDate", CommonUtils.getFormattedDateWithoutTime(new Date()))
+            .replaceAll("\\$currentDateTime", CommonUtils.getFormattedDate(new Date()));
+
         return result;
     }
 

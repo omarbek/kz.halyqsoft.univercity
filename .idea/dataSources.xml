@@ -10,5 +10,14 @@
         <property name="ApplicationName" value="DataGrip" />
       </driver-properties>
     </data-source>
+    <data-source source="LOCAL" name="univerdb@89.40.60.206" uuid="c00a16b9-deaa-4ebf-8e4f-cc32e6dd933a">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://89.40.60.206:5432/univerdb</jdbc-url>
+      <driver-properties>
+        <property name="ApplicationName" value="DataGrip" />
+      </driver-properties>
+    </data-source>
   </component>
 </project>

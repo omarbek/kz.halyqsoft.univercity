@@ -41,6 +41,8 @@ import org.r3a.common.vaadin.widget.toolbar.IconToolbar;
 import javax.persistence.NoResultException;
 import java.util.*;
 
+import static kz.halyqsoft.univercity.utils.CommonUtils.getUILocaleUtil;
+
 public class PracticeView extends AbstractTaskView implements FilterPanelListener, EntityListener{
     private VerticalLayout mainVL;
 
@@ -55,6 +57,8 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
     private HorizontalSplitPanel mainHSP;
     private static String FIRST_ROW = getUILocaleUtil().getEntityLabel(PRACTICE_INFORMATION.class);
     private static String SECOND_ROW = getUILocaleUtil().getEntityLabel(PRACTICE_STUDENT.class);
+    private String REPORT = getUILocaleUtil().getCaption("report");
+    private Button reportBtn;
 
     public PracticeView(AbstractTask task) throws Exception {
         super(task);
@@ -87,7 +91,6 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
 
         sideMenu.setChildrenAllowed(FIRST_ROW, false);
         sideMenu.setChildrenAllowed(SECOND_ROW, false);
-
         MenuColumn firstColumn = new MenuColumn();
         sideMenu.addGeneratedColumn("first" , firstColumn);
         sideMenu.setColumnHeader("first" , getUILocaleUtil().getCaption("menu"));
@@ -115,10 +118,20 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
         mainHSP.setFirstComponent(sideMenu);
         mainHSP.setSecondComponent(mainVL);
         getContent().addComponent(mainHSP);
-        sideMenu.select(FIRST_ROW);
     }
 
     private void initGridWidget(){
+        reportBtn = new Button(this.REPORT);
+        reportBtn.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                if(informationPracticeGW.getSelectedEntities()!=null && informationPracticeGW.getSelectedEntities().size()> 0){
+                    ReportDialog reportDialog = new ReportDialog(informationPracticeGW.getSelectedEntities());
+                }else{
+                    Message.showError(getUILocaleUtil().getCaption("chooseARecord"));
+                }
+            }
+        });
         informationPracticeGW = new GridWidget(PRACTICE_INFORMATION.class);
         informationPracticeGW.setImmediate(true);
         informationPracticeGW.setSizeFull();
@@ -127,6 +140,8 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
         informationPracticeGW.addEntityListener(this);
         informationPracticeGW.setMultiSelect(true);
         informationPracticeGW.setButtonVisible(IconToolbar.REFRESH_BUTTON, false);
+
+        informationPracticeGW.getToolbarPanel().addComponent(reportBtn);
 
         informationPracticeGM = (DBGridModel)informationPracticeGW.getWidgetModel();
         informationPracticeGM.setRefreshType(ERefreshType.MANUAL);
@@ -160,9 +175,10 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
         FromItem fi2 = fi1.addJoin( EJoin.INNER_JOIN,"id", STUDENT_EDUCATION.class, "student_id");
         FromItem fi3 = fi2.addJoin(EJoin.INNER_JOIN,"groups_id", GROUPS.class, "id");
         FromItem fi4 = fi3.addJoin(EJoin.INNER_JOIN, "id", PRACTICE_INFORMATION.class,"groups_id");
+
         studentFM.getQueryModel().addWhere("deleted" , ECriteria.EQUAL, false);
-        studentFM.getQueryModel().addWhereNullAnd(fi2, "child");
         studentFM.getQueryModel().addWhereAnd(fi3, "deleted" , ECriteria.EQUAL ,false);
+        studentFM.getQueryModel().addWhereNullAnd(fi2, "child");
     }
 
     private void initFilter() throws Exception{
@@ -487,55 +503,84 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
             PRACTICE_INFORMATION pi = ((PRACTICE_INFORMATION)e);
             if(isNew){
                 pi.setCreated(new Date());
-            }
-            QueryModel<PRACTICE_INFORMATION> practiceInformationQM = new QueryModel<>(PRACTICE_INFORMATION.class);
-            practiceInformationQM.addWhere("groups", ECriteria.EQUAL,pi.getGroups().getId());
-            practiceInformationQM.addWhereAnd("entranceYear", ECriteria.EQUAL,pi.getEntranceYear().getId());
-            try{
-                if(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(practiceInformationQM).size()>0){
-                    Message.showError(getUILocaleUtil().getMessage("practice.already.exists.for.this.year"));
-                    return false;
+                QueryModel<PRACTICE_INFORMATION> practiceInformationQM = new QueryModel<>(PRACTICE_INFORMATION.class);
+                practiceInformationQM.addWhere("groups", ECriteria.EQUAL,pi.getGroups().getId());
+                practiceInformationQM.addWhereAnd("entranceYear", ECriteria.EQUAL,pi.getEntranceYear().getId());
+                try{
+                    if(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(practiceInformationQM).size()>0){
+                        Message.showError(getUILocaleUtil().getMessage("practice.already.exists.for.this.year"));
+                        return false;
+                    }
+
+                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(e);
+                }catch (NoResultException nre){
+                    System.out.println("GOOD");
+                }catch (Exception ex){
+                    ex.printStackTrace();
                 }
-            }catch (NoResultException nre){
-                System.out.println("GOOD");
-            }catch (Exception ex){
-                ex.printStackTrace();
+            }else{
+                try{
+                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(e);
+                }catch (Exception e1){
+                    e1.printStackTrace();
+                }
+            }
+
+
+        }else if(source.equals(studentPracticeGW)){
+            try{
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(e);
+            }catch (Exception e1){
+                e1.printStackTrace();
             }
         }
 
-        return super.preSave(source, e, isNew, buttonId);
+        try{
+            refresh(source);
+        }catch (Exception e1){
+            e1.printStackTrace();
+        }
+
+        return false;
     }
+
+
 
     @Override
     public void handleEntityEvent(EntityEvent ev) {
         super.handleEntityEvent(ev);
     }
 
-    @Override
-    public void onDelete(Object source, List<Entity> entities, int buttonId) {
-        super.onDelete(source, entities, buttonId);
-        //refresh(source);
-    }
-
-    @Override
-    public void onCreate(Object source, Entity e, int buttonId) {
-        super.onCreate(source, e, buttonId);
-        //refresh(source);
-    }
 
     @Override
     public void onRefresh(Object source, List<Entity> entities) {
-        //refresh(entities);
         super.onRefresh(source,entities);
     }
 
 
+    @Override
+    public boolean preDelete(Object source, List<Entity> entities, int buttonId) {
+        try{
+            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(entities);
+            refresh(source);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
-//    public void refresh(Object source){
-//        if(source.equals(informationPracticeGW)){
-//            doFilter(informationPracticeFP.getFilterBean());
-//        }else if(source.equals(studentPracticeGW)){
-//            doFilter(studentPracticeFP.getFilterBean());
-//        }
-//    }
+        return false;
+    }
+
+    @Override
+    public boolean onEdit(Object source, Entity e, int buttonId) {
+
+        return true;
+    }
+
+    public void refresh(Object source){
+        if(source.equals(informationPracticeGW)){
+            doFilter(informationPracticeFP.getFilterBean());
+        }else if(source.equals(studentPracticeGW)){
+            doFilter(studentPracticeFP.getFilterBean());
+        }
+    }
 }

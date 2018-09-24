@@ -221,7 +221,7 @@ public class GroupAttendance implements EntityListener{
                 "  AND\n" +
                 "  ua.come_in = TRUE\n" +
                 "  AND\n" +
-                "  ua.created = (select max(ua2.created) from user_arrival ua2 " +
+                "  g.deleted = false AND ua.created = (select max(ua2.created) from user_arrival ua2 " +
                 "WHERE date_trunc('day', ua2.created)= date_trunc('day' , TIMESTAMP '"+formattedDate+"') and ua2.user_id = ua.user_id)\n" +
                 "GROUP BY g.name, curator_id, g.id";
 
@@ -262,7 +262,7 @@ public class GroupAttendance implements EntityListener{
                  "  0 as percentage_of_come_in_students\n" +
                  "FROM groups g\n" +
                  "  LEFT JOIN student_education se\n" +
-                 "    ON g.id = se.groups_id\n" +
+                 "    ON g.id = se.groups_id WHERE g.deleted = false \n" +
                  "GROUP BY g.name, curator_id, g.id;";
 
         try {
@@ -276,7 +276,7 @@ public class GroupAttendance implements EntityListener{
                     if(oo[2]!=null){
                         EMPLOYEE employee = null;
                         try{
-                            employee = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(EMPLOYEE.class, (ID) oo[2] );
+                            employee = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(EMPLOYEE.class, ID.valueOf((Long) oo[2] ));
                             vg.setCurator(employee);
                         }catch (Exception e){
                             e.printStackTrace();

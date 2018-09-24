@@ -28,6 +28,10 @@ public class NON_ADMISSION_EXAM extends AbstractEntity {
     @Temporal(TemporalType.TIMESTAMP)
     private Date created = new Date();
 
+    @FieldInfo(type = EFieldType.BOOLEAN, order = 4)
+    @Column(name = "respectful_reason", nullable = false)
+    private boolean respectfulReason;
+
     public NON_ADMISSION_CAUSE getNonAdmissionCause() {
         return nonAdmissionCause;
     }
@@ -50,5 +54,13 @@ public class NON_ADMISSION_EXAM extends AbstractEntity {
 
     public void setStudentEducation(STUDENT_EDUCATION studentEducation) {
         this.studentEducation = studentEducation;
+    }
+
+    public boolean isRespectfulReason() {
+        return respectfulReason;
+    }
+
+    public void setRespectfulReason(boolean respectfulReason) {
+        this.respectfulReason = respectfulReason;
     }
 }
