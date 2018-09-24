@@ -161,7 +161,7 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
         FromItem fi3 = fi2.addJoin(EJoin.INNER_JOIN,"groups_id", GROUPS.class, "id");
         FromItem fi4 = fi3.addJoin(EJoin.INNER_JOIN, "id", PRACTICE_INFORMATION.class,"groups_id");
         studentFM.getQueryModel().addWhere("deleted" , ECriteria.EQUAL, false);
-        studentFM.getQueryModel().addWhereNullAnd(fi2, "chair");
+        studentFM.getQueryModel().addWhereNullAnd(fi2, "child");
         studentFM.getQueryModel().addWhereAnd(fi3, "deleted" , ECriteria.EQUAL ,false);
     }
 

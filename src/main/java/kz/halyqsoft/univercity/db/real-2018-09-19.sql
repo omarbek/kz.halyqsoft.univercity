@@ -11,7 +11,7 @@ REFERENCES subject (id) ON UPDATE RESTRICT ON DELETE RESTRICT;
 --raikhan
 ALTER TABLE pair_subject
   ALTER COLUMN code TYPE VARCHAR(255);
-
+--damira
 CREATE TABLE student_teacher_subject (
   id                   BIGINT NOT NULL,
   student_education_id BIGINT NOT NULL,
