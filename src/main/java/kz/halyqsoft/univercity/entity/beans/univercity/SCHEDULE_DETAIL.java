@@ -2,6 +2,8 @@ package kz.halyqsoft.univercity.entity.beans.univercity;
 
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import org.r3a.common.entity.AbstractEntity;
+import org.r3a.common.entity.EFieldType;
+import org.r3a.common.entity.FieldInfo;
 
 import javax.persistence.*;
 
@@ -14,41 +16,51 @@ public class SCHEDULE_DETAIL extends AbstractEntity {
 
 	private static final long serialVersionUID = 1602572739711557773L;
 
+	@FieldInfo(type = EFieldType.FK_COMBO,order = 1)
 	@ManyToOne
     @JoinColumns({
         @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
     private SUBJECT subject;
-	
+
+	@FieldInfo(type = EFieldType.FK_COMBO,order = 2)
 	@ManyToOne
     @JoinColumns({
         @JoinColumn(name = "LESSON_TYPE_ID", referencedColumnName = "ID")})
     private LESSON_TYPE lessonType;
-	
+
+	@FieldInfo(type = EFieldType.FK_COMBO,order = 3)
 	@ManyToOne
     @JoinColumns({
         @JoinColumn(name = "TEACHER_ID", referencedColumnName = "ID")})
     private EMPLOYEE teacher;
-	
+
+
+	@FieldInfo(type = EFieldType.FK_COMBO,order = 4 , inView = false, inEdit = false, inGrid = false)
 	@ManyToOne
     @JoinColumns({
         @JoinColumn(name = "WEEK_DAY_ID", referencedColumnName = "ID")})
     private WEEK_DAY weekDay;
 
+	@FieldInfo(type = EFieldType.FK_COMBO,order = 5)
 	@ManyToOne
 	@JoinColumns({
 			@JoinColumn(name = "LESSON_TIME_ID", referencedColumnName = "ID")})
 	private LESSON_TIME lessonTime;
 
+	@FieldInfo(type = EFieldType.FK_COMBO,order = 6)
 	@ManyToOne
     @JoinColumns({
         @JoinColumn(name = "ROOM_ID", referencedColumnName = "ID")})
     private ROOM room;
 
+
+	@FieldInfo(type = EFieldType.FK_COMBO,order = 7, inGrid = false, inView = false,inEdit = false)
 	@ManyToOne
 	@JoinColumns({
 			@JoinColumn(name = "SEMESTER_DATA_ID", referencedColumnName = "ID")})
 	private SEMESTER_DATA semesterData;
 
+	@FieldInfo(type = EFieldType.FK_COMBO,order = 8)
 	@ManyToOne
 	@JoinColumns({
 			@JoinColumn(name = "GROUP_ID",  referencedColumnName = "ID")})
@@ -89,6 +101,14 @@ public class SCHEDULE_DETAIL extends AbstractEntity {
 		this.weekDay = weekDay;
 	}
 
+	public LESSON_TIME getLessonTime() {
+		return lessonTime;
+	}
+
+	public void setLessonTime(LESSON_TIME lessonTime) {
+		this.lessonTime = lessonTime;
+	}
+
 	public ROOM getRoom() {
 		return room;
 	}
@@ -103,14 +123,6 @@ public class SCHEDULE_DETAIL extends AbstractEntity {
 
 	public void setSemesterData(SEMESTER_DATA semesterData) {
 		this.semesterData = semesterData;
-	}
-
-	public LESSON_TIME getLessonTime() {
-		return lessonTime;
-	}
-
-	public void setLessonTime(LESSON_TIME lessonTime) {
-		this.lessonTime = lessonTime;
 	}
 
 	public GROUPS getGroup() {

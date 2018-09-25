@@ -10,19 +10,22 @@ import kz.halyqsoft.univercity.entity.beans.univercity.catalog.LESSON_TYPE;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.entity.ID;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 @SuppressWarnings({"serial"})
 final class ScheduleCellTeacher extends VerticalLayout {
 
-    private final SCHEDULE_DETAIL scheduleDetail;
+    private final List<SCHEDULE_DETAIL> scheduleDetails = new ArrayList<>();
     private final Label text;
 
-    ScheduleCellTeacher(SCHEDULE_DETAIL scheduleDetail) {
+    ScheduleCellTeacher(List<SCHEDULE_DETAIL> scheduleDetails) {
         super();
-        this.scheduleDetail = scheduleDetail;
+        this.scheduleDetails.addAll(scheduleDetails);
 
-        if (scheduleDetail != null && (scheduleDetail.getLessonTime().getEndTime().getTimeValue()
-                - scheduleDetail.getLessonTime().getBeginTime().getTimeValue() == 2)) {
+        if (scheduleDetails.size() > 0 && (scheduleDetails.get(0).getLessonTime().getEndTime().getTimeValue()
+                - scheduleDetails.get(0).getLessonTime().getBeginTime().getTimeValue() == 2)) {
             setHeight(200, Unit.PIXELS);
         } else {
             setHeight(100, Unit.PIXELS);
@@ -43,20 +46,26 @@ final class ScheduleCellTeacher extends VerticalLayout {
     private void refresh() {
         StringBuilder sb = new StringBuilder();
         sb.append("<center>");
-        if (scheduleDetail != null && scheduleDetail.getId() != null) {
-            sb.append(scheduleDetail.getSubject().toString());
-            sb.append(" ");
-            LESSON_TYPE lt = scheduleDetail.getLessonType();
-            if (lt.getId().equals(ID.valueOf(2))) {
-                sb.append(lt.toString().charAt(0) + lt.toString().charAt(2));
-            } else {
-                sb.append(scheduleDetail.getLessonType().toString().charAt(0));
+        if (scheduleDetails.size() > 0) {
+            boolean flag = true;
+            for(SCHEDULE_DETAIL scheduleDetail : scheduleDetails){
+                if(flag){
+                    sb.append(scheduleDetail.getSubject().toString());
+                    sb.append(" ");
+                    LESSON_TYPE lt = scheduleDetail.getLessonType();
+                    if (lt.getId().equals(ID.valueOf(2))) {
+                        sb.append(lt.toString().charAt(0) + lt.toString().charAt(2));
+                    } else {
+                        sb.append(scheduleDetail.getLessonType().toString().charAt(0));
+                    }
+                    sb.append(" ");
+                    sb.append(scheduleDetail.getRoom().getRoomNo());
+                    flag = false;
+                }
+                sb.append(" ");
+                GROUPS group = scheduleDetail.getGroup();
+                sb.append(group.getName());
             }
-            sb.append(" ");
-            GROUPS group = scheduleDetail.getGroup();
-            sb.append(group.getName());
-            sb.append(" ");
-            sb.append(scheduleDetail.getRoom().getRoomNo());
             addStyleName("schedule-cell-full");
         } else {
             sb.append(CommonUtils.getUILocaleUtil().getCaption("no.lesson"));

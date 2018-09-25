@@ -20,7 +20,7 @@ public class WEEK_DAY extends AbstractEntity {
 	@Column(name = "DAY_NAME_RU", nullable = false)
 	private String dayNameRU;
 	
-	@FieldInfo(type = EFieldType.TEXT, max = 2, order = 2)
+	@FieldInfo(type = EFieldType.TEXT, max = 2, order = 2, inGrid = false)
 	@Column(name = "DAY_SHORT_NAME_RU", nullable = false)
 	private String dayShortNameRU;
 	
@@ -28,7 +28,7 @@ public class WEEK_DAY extends AbstractEntity {
 	@Column(name = "DAY_NAME_KZ", nullable = false)
 	private String dayNameKZ;
 	
-	@FieldInfo(type = EFieldType.TEXT, max = 2, order = 4)
+	@FieldInfo(type = EFieldType.TEXT, max = 2, order = 4, inGrid = false)
 	@Column(name = "DAY_SHORT_NAME_KZ", nullable = false)
 	private String dayShortNameKZ;
 	
@@ -36,7 +36,7 @@ public class WEEK_DAY extends AbstractEntity {
 	@Column(name = "DAY_NAME_EN", nullable = false)
 	private String dayNameEN;
 	
-	@FieldInfo(type = EFieldType.TEXT, max = 2, order = 6)
+	@FieldInfo(type = EFieldType.TEXT, max = 2, order = 6, inGrid = false)
 	@Column(name = "DAY_SHORT_NAME_EN", nullable = false)
 	private String dayShortNameEN;
 
