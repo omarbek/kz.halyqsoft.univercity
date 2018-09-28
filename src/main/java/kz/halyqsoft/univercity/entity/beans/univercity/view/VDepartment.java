@@ -4,7 +4,7 @@ import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
 
-public class VDepartmentInfo extends AbstractEntity {
+public class VDepartment extends AbstractEntity {
 
     @FieldInfo(type=EFieldType.TEXT, order = 1)
     private String deptName;
