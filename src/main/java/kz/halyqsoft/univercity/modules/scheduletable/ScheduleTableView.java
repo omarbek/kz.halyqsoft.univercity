@@ -155,6 +155,7 @@ public class ScheduleTableView extends AbstractTaskView {
                 groupCB.addValueChangeListener(new Property.ValueChangeListener() {
                     @Override
                     public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
+                        matrixGL.removeAllComponents();
                         times.removeAll(times);
                         try{
                             QueryModel<LESSON_TIME> lessonTimeQM = new QueryModel<>(LESSON_TIME.class);
