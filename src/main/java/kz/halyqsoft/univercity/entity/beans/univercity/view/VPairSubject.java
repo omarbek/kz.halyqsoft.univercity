@@ -4,6 +4,8 @@ import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
 
+import java.util.List;
+
 /**
  * @author Omarbek
  * @created 18.07.2018
@@ -29,10 +31,10 @@ public final class VPairSubject extends AbstractEntity {
 	private Long pairNumber;
 
 	@FieldInfo(type = EFieldType.TEXT, order = 7)
-	private String postrequisite;
+	private List<String> postrequisites;
 
 	@FieldInfo(type = EFieldType.TEXT, order = 8)
-	private String prerequisite;
+	private List<String> prerequisites;
 
 	@FieldInfo(type = EFieldType.TEXT, order = 9)
 	private String aim;
@@ -107,20 +109,20 @@ public final class VPairSubject extends AbstractEntity {
 		this.aim = aim;
 	}
 
-	public String getPostrequisite() {
-		return postrequisite;
+	public List<String> getPostrequisites() {
+		return postrequisites;
 	}
 
-	public void setPostrequisite(String postrequisite) {
-		this.postrequisite = postrequisite;
+	public void setPostrequisites(List<String> postrequisites) {
+		this.postrequisites = postrequisites;
 	}
 
-	public String getPrerequisite() {
-		return prerequisite;
+	public List<String> getPrerequisites() {
+		return prerequisites;
 	}
 
-	public void setPrerequisite(String prerequisite) {
-		this.prerequisite = prerequisite;
+	public void setPrerequisites(List<String> prerequisites) {
+		this.prerequisites = prerequisites;
 	}
 
 	public String getCompetence() {

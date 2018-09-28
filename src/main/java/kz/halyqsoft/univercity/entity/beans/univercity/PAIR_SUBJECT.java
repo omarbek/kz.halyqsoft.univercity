@@ -30,18 +30,6 @@ public class PAIR_SUBJECT extends AbstractEntity {
     @Column(name = "PAIR_NUMBER")
     private Integer pairNumber;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 5,required = false)
-    @ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "PREREQUISITE_ID", referencedColumnName = "ID")})
-    private SUBJECT prerequisite;
-
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 6,required = false)
-    @ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "POSTREQUISITE_ID", referencedColumnName = "ID")})
-    private SUBJECT postrequisite;
-
     @FieldInfo(type = EFieldType.TEXT, max = 4000, required = false, order = 7, inGrid = false)
     @Column(name = "AIM")
     private String aim;
@@ -53,22 +41,6 @@ public class PAIR_SUBJECT extends AbstractEntity {
     @FieldInfo(type = EFieldType.TEXT, isMemo = true, max = 4000, required = false, order = 9, inGrid = false)
     @Column(name = "COMPETENCE")
     private String competence;
-
-    public SUBJECT getPrerequisite() {
-        return prerequisite;
-    }
-
-    public void setPrerequisite(SUBJECT prerequisite) {
-        this.prerequisite = prerequisite;
-    }
-
-    public SUBJECT getPostrequisite() {
-        return postrequisite;
-    }
-
-    public void setPostrequisite(SUBJECT postrequisite) {
-        this.postrequisite = postrequisite;
-    }
 
     public String getAim() {
         return aim;

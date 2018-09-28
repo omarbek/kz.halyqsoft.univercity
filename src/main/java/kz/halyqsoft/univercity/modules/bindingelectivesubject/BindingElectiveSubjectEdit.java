@@ -4,13 +4,11 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_DATA;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SPECIALITY;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VPairSubject;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
+import org.r3a.common.dblink.facade.CommonIDFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.ID;
@@ -39,6 +37,7 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
 
     private CommonFormWidget studentBindingElectiveCFW;
     private GridWidget pairSubjectGW;
+    private GridWidget requisitesGW;
     private ID studentBindingElectiveId;
     private BindingElectiveSubjectView bindingElectiveSubjectView;
     private ELECTIVE_BINDED_SUBJECT electiveBindedSubject;
@@ -55,8 +54,7 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
         if (electiveBindedSubject != null) {
             studentBindingElectiveId = electiveBindedSubject.getId();
         }
-        setWidth(900, Unit.PIXELS);
-        setHeight(500, Unit.PIXELS);
+        setSizeFull();
         center();
 
         studentBindingElectiveCFW = createStudentElectiveBindedSubject();
@@ -122,15 +120,11 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
                 "                  ects.ects,\n" +
                 "                  sem.semester_name semesterName,\n" +
                 "                  pair.pair_number    pairNumber,\n" +
-                "                  subj.name_ru prerequisite,\n" +
-                "                   subj.name_ru prerequisite,\n" +
                 "                  pair.aim,\n" +
                 "                   pair.description   description,\n" +
                 "                  pair.competence\n" +
                 "                FROM pair_subject pair\n" +
                 "                  INNER JOIN subject subj ON subj.id = pair.subject_id\n" +
-                "                  INNER JOIN subject pre ON pre.id = pair.prerequisite_id\n" +
-                "                  INNER JOIN subject post ON post.id = pair.postrequisite_id\n" +
                 "                  INNER JOIN creditability credit ON credit.id = subj.creditability_id\n" +
                 "                  INNER JOIN ects ects ON ects.id = subj.ects_id\n" +
                 "                  INNER JOIN elective_binded_subject elect_bind ON elect_bind.id = pair.elective_binded_subject_id\n" +
@@ -150,18 +144,35 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
                 for (Object o : tmpList) {
                     Object[] oo = (Object[]) o;
                     VPairSubject pairSubject = new VPairSubject();
-                    pairSubject.setId(ID.valueOf((long) oo[0]));
+                    ID pairSubjectId = ID.valueOf((long) oo[0]);
+                    pairSubject.setId(pairSubjectId);
                     pairSubject.setCode((String) oo[1]);
                     pairSubject.setSubjectName((String) oo[2]);
                     pairSubject.setCredit(((BigDecimal) oo[3]).intValue());
                     pairSubject.setEcts(((BigDecimal) oo[4]).intValue());
                     pairSubject.setSemesterName((String) oo[5]);
                     pairSubject.setPairNumber((Long) oo[6]);
-                    pairSubject.setPostrequisite((String) oo[7]);
-                    pairSubject.setPrerequisite((String) oo[8]);
-                    pairSubject.setAim((String) oo[9]);
-                    pairSubject.setDescription(((String) oo[10]));
-                    pairSubject.setCompetence((String) oo[11]);
+                    pairSubject.setAim((String) oo[7]);
+                    pairSubject.setDescription(((String) oo[8]));
+                    pairSubject.setCompetence((String) oo[9]);
+
+                    List<String> preRequisites = new ArrayList<>();
+                    List<String> postRequisites = new ArrayList<>();
+
+                    QueryModel<SUBJECT_REQUISITE> requisistesQM = new QueryModel<>(SUBJECT_REQUISITE.class);
+                    requisistesQM.addWhere("pairSubject", ECriteria.EQUAL, pairSubject.getId());
+                    List<SUBJECT_REQUISITE> requisites = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                            lookup(requisistesQM);
+                    for (SUBJECT_REQUISITE requisite : requisites) {
+                        if (requisite.isPreRequisite()) {
+                            preRequisites.add(requisite.getSubject().toString());
+                        } else {
+                            postRequisites.add(requisite.getSubject().toString());
+                        }
+                    }
+                    pairSubject.setPrerequisites(preRequisites);
+                    pairSubject.setPostrequisites(postRequisites);
+
                     list.add(pairSubject);
                 }
             }
@@ -235,6 +246,19 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
         }
         studentElectiveSubjectGW.setButtonVisible(AbstractToolbar.REFRESH_BUTTON, false);
         studentElectiveSubjectGW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
+        studentElectiveSubjectGW.setButtonVisible(AbstractToolbar.HELP_BUTTON, true);
+        studentElectiveSubjectGW.setButtonDescription(AbstractToolbar.HELP_BUTTON, "add.requisites");
+        studentElectiveSubjectGW.addButtonClickListener(AbstractToolbar.HELP_BUTTON, new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                if (studentElectiveSubjectGW.getSelectedEntities().isEmpty()) {
+                    Message.showInfo(getUILocaleUtil().getMessage("info.noentityedit"));
+                } else {
+                    new RequisitesDialog(BindingElectiveSubjectEdit.this, electiveBindedSubject, speciality,
+                            (VPairSubject) studentElectiveSubjectGW.getSelectedEntity());
+                }
+            }
+        });
         studentElectiveSubjectGW.addEntityListener(new StudentCreativeExamSubjectListener());
 
         DBGridModel studentElectiveSubjectGM = (DBGridModel) studentElectiveSubjectGW.getWidgetModel();
@@ -243,15 +267,7 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
         studentElectiveSubjectGM.setRefreshType(ERefreshType.MANUAL);
         studentElectiveSubjectGM.setCrudEntityClass(PAIR_SUBJECT.class);
 
-        filterSubjects(studentElectiveSubjectGM, "subject");
-        filterSubjects(studentElectiveSubjectGM, "prerequisite");
-        filterSubjects(studentElectiveSubjectGM, "postrequisite");
-
-        return studentElectiveSubjectGW;
-    }
-
-    private void filterSubjects(DBGridModel studentElectiveSubjectGM, String fieldName) {
-        QueryModel subjectQM = ((FKFieldModel) studentElectiveSubjectGM.getFormModel().getFieldModel(fieldName)).
+        QueryModel subjectQM = ((FKFieldModel) studentElectiveSubjectGM.getFormModel().getFieldModel("subject")).
                 getQueryModel();
         FromItem specFI = subjectQM.addJoin(EJoin.INNER_JOIN, "chair", SPECIALITY.class, "department");
         subjectQM.addWhereNotNull("subjectCycle");
@@ -259,6 +275,8 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
         subjectQM.addWhereAnd("mandatory", Boolean.FALSE);
         subjectQM.addWhere(specFI, "deleted", false);
         subjectQM.addWhere(specFI, "id", ECriteria.EQUAL, speciality.getId());
+
+        return studentElectiveSubjectGW;
     }
 
     private class StudentCreativeExamListener implements EntityListener {
@@ -394,6 +412,7 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
                     CommonUtils.showMessageAndWriteLog("Unable to merge student binding elective subject", ex);
                 }
             }
+            refresh(electiveBindedSubject);
             return false;
         }
 
@@ -442,9 +461,9 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
 
         @Override
         public void handleEntityEvent(EntityEvent entityEvent) {
-            if(entityEvent.getAction()==EntityEvent.CREATED
-                    ||entityEvent.getAction()==EntityEvent.CREATED
-                    ||entityEvent.getAction()==EntityEvent.CREATED){
+            if (entityEvent.getAction() == EntityEvent.CREATED
+                    || entityEvent.getAction() == EntityEvent.MERGED
+                    || entityEvent.getAction() == EntityEvent.REMOVED) {
                 refresh(electiveBindedSubject);
             }
         }

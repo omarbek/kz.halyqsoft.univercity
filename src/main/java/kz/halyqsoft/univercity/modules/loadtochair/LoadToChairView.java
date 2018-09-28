@@ -6,6 +6,7 @@ import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM;
 import kz.halyqsoft.univercity.entity.beans.univercity.LOAD_TO_CHAIR;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_GROUP;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_LOAD_TO_CHAIR_COUNT;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_LOAD_TO_CHAIR_COUNT_ALL;
 import kz.halyqsoft.univercity.filter.FChairFilter;
@@ -46,13 +47,18 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
     private GridWidget countGW;
     private GridWidget totalCountGW;
 
+    private QueryModel subjectQM;
+    private QueryModel semesterQM;
+
+    private ComboBox chairCB;
+    private ComboBox studyYearCB;
+    private ComboBox diplomaTypeCB;
+
     public LoadToChairView(AbstractTask task) throws Exception {
         super(task);
         filterPanel = new ChairFilterPanel(new FChairFilter());
     }
 
-    QueryModel subjectQM;
-    ComboBox chairCB;
 
     @Override
     public void initView(boolean b) throws Exception {
@@ -139,7 +145,7 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
             BeanItemContainer<STUDENT_DIPLOMA_TYPE> diplomaTypeBIC = new BeanItemContainer<>(
                     STUDENT_DIPLOMA_TYPE.class, SessionFacadeFactory.getSessionFacade(
                     CommonEntityFacadeBean.class).lookup(diplomaTypeQM));
-            ComboBox diplomaTypeCB = new ComboBox();
+             diplomaTypeCB = new ComboBox();
             diplomaTypeCB.setContainerDataSource(diplomaTypeBIC);
             diplomaTypeCB.setImmediate(true);
             diplomaTypeCB.setNullSelectionAllowed(true);
@@ -153,7 +159,7 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
             BeanItemContainer<STUDY_YEAR> studyYearBIC = new BeanItemContainer<>(
                     STUDY_YEAR.class, SessionFacadeFactory.getSessionFacade(
                     CommonEntityFacadeBean.class).lookup(studyYearQM));
-            ComboBox studyYearCB = new ComboBox();
+            studyYearCB = new ComboBox();
             studyYearCB.setContainerDataSource(studyYearBIC);
             studyYearCB.setImmediate(true);
             studyYearCB.setNullSelectionAllowed(true);
@@ -177,6 +183,8 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
 
             subjectQM = ((FKFieldModel) loadGM.getFormModel().getFieldModel("subject")).getQueryModel();
             subjectQM.addWhere("deleted", false);
+
+            semesterQM = ((FKFieldModel) loadGM.getFormModel().getFieldModel("semester")).getQueryModel();
 
             countGW = new GridWidget(V_LOAD_TO_CHAIR_COUNT.class);
             countGW.showToolbar(false);
@@ -315,17 +323,37 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
     @Override
     public boolean onEdit(Object source, Entity e, int buttonId) {
         subjectQM.addWhere("chair", ECriteria.EQUAL, ((DEPARTMENT) chairCB.getValue()).getId());
+        semesterQM.addWhere("studyYear", ECriteria.EQUAL, ((STUDY_YEAR) studyYearCB.getValue()).getId());
         return true;
     }
 
     @Override
     public void onCreate(Object source, Entity e, int buttonId) {
         subjectQM.addWhere("chair", ECriteria.EQUAL, ((DEPARTMENT) chairCB.getValue()).getId());
+        semesterQM.addWhere("studyYear", ECriteria.EQUAL, ((STUDY_YEAR) studyYearCB.getValue()).getId());
     }
 
-    //    @Override
-//    public boolean preSave(Object source, Entity e, boolean isNew, int buttonId) {
-//        LOAD_TO_CHAIR
-//        return super.preSave(source, e, isNew, buttonId);
-//    }
+    @Override
+    public boolean preSave(Object source, Entity e, boolean isNew, int buttonId) {
+        try {
+//            QueryModel<CURRICULUM> curriculumQM=new QueryModel<>(CURRICULUM.class);
+//            FromItem specFI=curriculumQM.addJoin(EJoin.INNER_JOIN,"speciality",SPECIALITY.class,"id");
+//            FromItem depFI=curriculumQM.addJoin(EJoin.INNER_JOIN,"department",DEPARTMENT.class,"id");
+//            curriculumQM.addWhere("deleted",false);
+//            curriculumQM.addWhere("diplomaType",ECriteria.EQUAL,((STUDENT_DIPLOMA_TYPE)diplomaTypeCB.getValue()).getId());
+//            curriculumQM.addWhere("entranceYear",ECriteria.EQUAL,((ENTRANCE_YEAR)diplomaTypeCB.getValue()).getId());
+            LOAD_TO_CHAIR loadToChair = (LOAD_TO_CHAIR) e;
+//            loadToChair.setCurriculum();
+            loadToChair.setTotalCount(loadToChair.getLcCount() + loadToChair.getPrCount() + loadToChair.getLbCount()
+                    + loadToChair.getWithTeacherCount() + loadToChair.getRatingCount() + loadToChair.getExamCount()
+                    + loadToChair.getControlCount() + loadToChair.getCourseWorkCount() + loadToChair.getDiplomaCount()
+                    + loadToChair.getPracticeCount() + loadToChair.getMek() + loadToChair.getProtectDiplomaCount());
+            loadToChair.setCredit(loadToChair.getSubject().getCreditability().getCredit().doubleValue());
+            loadToChair.setStudentNumber(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
+                    V_GROUP.class, loadToChair.getGroup().getId()).getStudentCount());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return super.preSave(source, e, isNew, buttonId);//TODO
+    }
 }

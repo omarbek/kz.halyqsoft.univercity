@@ -16,37 +16,37 @@ import javax.persistence.*;
 @Entity
 public class LOAD_TO_CHAIR extends AbstractEntity {
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 2, columnWidth = 280)
+    @FieldInfo(type = EFieldType.FK_COMBO,  columnWidth = 280)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
     private SUBJECT subject;
 
-    @FieldInfo(type = EFieldType.FK_DIALOG, order = 3, inGrid = false, columnWidth = 80, inEdit = false)
+    @FieldInfo(type = EFieldType.FK_DIALOG, order = 2, inGrid = false, columnWidth = 80)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "CURRICULUM_ID", referencedColumnName = "ID")})
     private CURRICULUM curriculum;
 
-    @FieldInfo(type = EFieldType.FK_DIALOG, order = 4, columnWidth = 80)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 3, columnWidth = 80)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "STUDY_YEAR_ID", referencedColumnName = "ID")})
     private STUDY_YEAR studyYear;
 
-    @FieldInfo(type = EFieldType.FK_DIALOG, order = 6, columnWidth = 150, inEdit = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 4, columnWidth = 150)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "STREAM_ID", referencedColumnName = "ID")})
     private STREAM stream;
 
-    @FieldInfo(type = EFieldType.FK_DIALOG, order = 7, columnWidth = 100, inEdit = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 5, columnWidth = 100)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "GROUP_ID", referencedColumnName = "ID")})
     private GROUPS group;
 
-    @FieldInfo(type = EFieldType.FK_DIALOG, order = 6, columnWidth = 80)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 6, columnWidth = 80)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "SEMESTER_ID", referencedColumnName = "ID")})
@@ -108,7 +108,7 @@ public class LOAD_TO_CHAIR extends AbstractEntity {
     @Column(name = "PROTECT_DIPLOMA_COUNT")
     private Double protectDiplomaCount;
 
-    @FieldInfo(type = EFieldType.DOUBLE, order = 23, inEdit = false)
+    @FieldInfo(type = EFieldType.DOUBLE, order = 23,inEdit = false)
     @Column(name = "TOTAL_COUNT")
     private Double totalCount;
 
