@@ -409,6 +409,7 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
                     addToLayout(eduDocTW, preemRightButton, event);
                     isFinding = true;
                 }
+
             }
         });
 
@@ -518,7 +519,7 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
                 disabilityButton.setEnabled(false);
                 repatriateButton.setEnabled(false);
                 eduDocButton.setEnabled(false);
-                eduDocsButton.setEnabled(false);
+                //eduDocsButton.setEnabled(false);
                 preemRightButton.setEnabled(false);
                 medButton.setEnabled(false);
                 finishButton.setEnabled(false);

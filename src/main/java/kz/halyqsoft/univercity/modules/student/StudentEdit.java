@@ -1,5 +1,8 @@
 package kz.halyqsoft.univercity.modules.student;
 
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.pdf.PdfPTable;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.FileDownloader;
@@ -53,6 +56,7 @@ import org.r3a.common.vaadin.widget.table.model.DBTableModel;
 import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
 
 import javax.persistence.NoResultException;
+import javax.swing.text.Document;
 import java.util.*;
 
 import static kz.halyqsoft.univercity.modules.regapplicants.ApplicantsForm.*;
@@ -74,6 +78,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
     private FromItem educationUDFI;
     private Label lockLabel, lockReasonLabel, createdBylabel,label;
     private Button lockUnlockButton;
+    private Button downloadTableButton,downloadTableRusButton;
     private LockDialog lockDialog;
     private STUDENT student;
     private USERS users;
@@ -323,7 +328,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         getTabSheet().addTab(content, getMasterTabTitle());
 
         HorizontalLayout hl = new HorizontalLayout();
-        hl.setWidth(15, Unit.PERCENTAGE);
+        hl.setWidth(30, Unit.PERCENTAGE);
         kazCheckBox = new CheckBox();
         rusCheckBox = new CheckBox();
         rusCheckBox.setCaption(getUILocaleUtil().getCaption("ru.short"));
@@ -331,9 +336,46 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         kazCheckBox.setValue(false);
         rusCheckBox.setValue(false);
 
+
+        downloadTableButton=new Button();
+        downloadTableButton.setImmediate(true);
+        downloadTableButton.setWidth("80");
+        downloadTableButton.setCaption(getUILocaleUtil().getCaption("iups"));
+        hl.addComponent(downloadTableButton);
+
+        downloadTableRusButton=new Button();
+        downloadTableRusButton.setImmediate(true);
+        downloadTableRusButton.setWidth("80");
+        downloadTableRusButton.setCaption(getUILocaleUtil().getCaption("iupsrus"));
+        hl.addComponent(downloadTableRusButton);
+
         hl.addComponents(kazCheckBox, rusCheckBox);
-        hl.setComponentAlignment(kazCheckBox, Alignment.MIDDLE_LEFT);
-        hl.setComponentAlignment(rusCheckBox, Alignment.MIDDLE_LEFT);
+        hl.setComponentAlignment(kazCheckBox, Alignment.MIDDLE_CENTER);
+        hl.setComponentAlignment(rusCheckBox, Alignment.MIDDLE_CENTER);
+        hl.setComponentAlignment(downloadTableButton, Alignment.MIDDLE_LEFT);
+        hl.setComponentAlignment(downloadTableRusButton, Alignment.TOP_LEFT);
+
+        downloadTableButton.addClickListener(new ClickListener() {
+             @Override
+             public void buttonClick(ClickEvent clickEvent) {
+                 myResource = createResourceStudent("99", student);
+                 fileDownloader = new FileDownloader(myResource);
+                 myResource.setMIMEType("application/pdf");
+                 fileDownloader.extend(downloadTableButton);
+             }
+         }
+        );
+
+        downloadTableRusButton.addClickListener(new ClickListener() {
+             @Override
+             public void buttonClick(ClickEvent clickEvent) {
+                 myResource = createResourceStudent("98", student);
+                 fileDownloader = new FileDownloader(myResource);
+                 myResource.setMIMEType("application/pdf");
+                 fileDownloader.extend(downloadTableRusButton);
+             }
+         }
+        );
 
 
         pdfDownload = createDownloadButton();

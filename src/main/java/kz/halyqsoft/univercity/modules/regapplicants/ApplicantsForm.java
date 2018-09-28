@@ -2,19 +2,19 @@ package kz.halyqsoft.univercity.modules.regapplicants;
 
 import com.itextpdf.text.*;
 import com.itextpdf.text.Image;
-import com.itextpdf.text.pdf.BaseFont;
-import com.itextpdf.text.pdf.PdfContentByte;
-import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.text.pdf.*;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.*;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.*;
+import com.vaadin.ui.TextField;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.enumeration.Flag;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.*;
 import kz.halyqsoft.univercity.utils.CommonUtils;
+import kz.halyqsoft.univercity.utils.EmployeePdfCreator;
 import kz.halyqsoft.univercity.utils.register.*;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.facade.CommonIDFacadeBean;
@@ -39,12 +39,15 @@ import javax.persistence.NoResultException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.Calendar;
 import java.util.List;
+
+import kz.halyqsoft.univercity.modules.pdf.CustomField;
 
 /**
  * @author Omarbek
@@ -631,7 +634,12 @@ public final class ApplicantsForm extends UsersForm {
             fileName = "Договор магистрант_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
         } else if (value.equals("90")) {
             fileName = "келісім-шарт_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
-        } else {
+        }  else if (value.equals("99")) {
+            fileName = "ИУПС_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
+        } else if (value.equals("98")) {
+            fileName = "ИУСП_рус_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
+        }
+        else {
             fileName = "Өтініш_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
         }
         return new StreamResource(new StreamResource.StreamSource() {
@@ -888,7 +896,15 @@ public final class ApplicantsForm extends UsersForm {
 
                         } else {
                             if (student != null) {
-                                setReplaced(text, student);
+                                if(text.contains("$table")) {
+                                    ID studentID = student.getId();
+                                    TableForm tableForm = new TableForm(docum,studentID);
+                                }else  if(text.contains("$rus")) {
+                                    ID studentID = student.getId();
+                                    TableFormRus tableFormRus = new TableFormRus(docum,studentID);
+                                }else{
+                                    setReplaced(text, student);
+                                }
                             }
                         }
                         Paragraph paragraph = new Paragraph(replaced,
@@ -931,20 +947,21 @@ public final class ApplicantsForm extends UsersForm {
         }
 
         String inLettersDorn = "";
+        String moneyForDorm = "";
         ACCOUNTANT_PRICE accountantPriceDorm = getAccountantPrice(student, 1);
         if (accountantPriceDorm != null) {
-            inLettersDorn = accountantPriceDorm.getPriceInLettersKaz();
+            moneyForDorm = accountantPriceDorm.getPriceInLettersKaz();
         } else {
-            inLettersDorn = "0";
+            moneyForDorm = "0";
         }
+        answerEdu = String.valueOf(Double.valueOf(moneyForEducation) / 8);
     }
 
     public static void setRusLanguage(STUDENT student, boolean ru) throws Exception {
-
         inLettersEdu = "";
         moneyForEducation = "";
-
         ACCOUNTANT_PRICE accountantPrice = getAccountantPrice(student, 2);
+
         if (accountantPrice != null) {
             inLettersEdu = accountantPrice.getPriceInLetters();
             moneyForEducation = String.valueOf(accountantPrice.getPrice());
@@ -956,7 +973,7 @@ public final class ApplicantsForm extends UsersForm {
         String moneyForDorm = "";
         ACCOUNTANT_PRICE accountantPriceDorm = getAccountantPrice(student, 1);
         if (accountantPriceDorm != null) {
-            inLettersDorn = accountantPriceDorm.getPriceInLetters();
+            moneyForDorm = accountantPriceDorm.getPriceInLetters();
         } else {
             moneyForDorm = "0";
         }
@@ -967,11 +984,9 @@ public final class ApplicantsForm extends UsersForm {
 
         Date date = Calendar.getInstance().getTime();
 
-        STUDENT_EDUCATION studentEducation = new STUDENT_EDUCATION();
-        studentEducation.setStudent(student);
+        STUDENT_EDUCATION studentEducation =student.getLastEducation();
 
         SPECIALITY speciality = student.getEntrantSpecialities().iterator().next().getSpeciality();
-        studentEducation.setFaculty(speciality.getDepartment().getParent());
 
         STUDENT_RELATIVE studentRelativeMother = getStudent_relative(student, MOTHER);
         STUDENT_RELATIVE studentRelativeFather = getStudent_relative(student, FATHER);
@@ -1131,7 +1146,10 @@ public final class ApplicantsForm extends UsersForm {
                 .replaceAll("\\$money", moneyForEducation)
                 //   .replaceAll(tableType, pdfProperty)
                 .replaceAll("\\$ansEdu", answerEdu)
+                .replaceAll("\\$educode", studentEducation.getSpeciality().getCode())
+                .replaceAll("\\$language", studentEducation.getLanguage().getLangName())
                 .replaceAll("\\$ansDorm", answerDorm)
+    //            .replaceAll("\\$code", student.getCode())
                 .replaceAll("\\$firstCourseMoney", firstCourseMoney)
                 .replaceAll("\\$secondCourseMoney", secondCourseMoney)
 //                .replaceAll("\\$year", now.getYear() + "")
@@ -1162,6 +1180,7 @@ public final class ApplicantsForm extends UsersForm {
                 .replaceAll("\\$numMother", "+7 " + studentRelativeMother.getPhoneMobile())
                 .replaceAll("\\$gender", student.getSex().toString())
                 .replaceAll("\\$birthYear", birthday)
+                .replaceAll("\\$language", educationDoc.getLanguage().getLangName())
                 .replaceAll("\\$nationality", student.getNationality().toString())
                 .replaceAll("\\$info", educationDoc.getEndYear().toString() + ", "
                         + educationDoc.getEducationType() + ", " + educationDoc.getSchoolName())
@@ -1179,14 +1198,20 @@ public final class ApplicantsForm extends UsersForm {
                 .replaceAll("\\$education", educationDoc.getEducationType().toString())
                 .replaceAll("\\$technic", tecnhik.toString())
                 .replaceAll("\\$attestat", attestationDate)
+                .replaceAll("\\$course", String.valueOf(educationDoc.getEntryYear()))
                 .replaceAll("\\$nomer", educationDoc.getDocumentNo())
                 .replaceAll("\\$ent", untCertificate == null ? "" : untCertificate.getDocumentNo())
 //                .replaceAll("\\$document", createdDate)
                 .replaceAll("\\$document", "_______")
                 .replaceAll("\\$diplomaType", student.getDiplomaType().toString())
-                .replaceAll("\\$group", "")
-                .replaceAll("қажет, қажет емес", dorm);
+               // .replaceAll("\\$group", sdf())
+                .replaceAll("қажет, қажет емес", dorm)
+                //.replaceAll("$educode", studentEducation.getSpeciality().getCode());
+                      //  .replaceAll("$language", studentEducation.getLanguage().getLangName())
+                        .replaceAll("\\$code", student.getCode());
     }
+
+
 
     private static ACCOUNTANT_PRICE getAccountantPrice(STUDENT student, int contractPaymentTypeId) throws Exception {
         ACCOUNTANT_PRICE accountantPrice;
@@ -1203,6 +1228,7 @@ public final class ApplicantsForm extends UsersForm {
 
         return accountantPrice;
     }
+
 
     private static String getStringBeforeSlash(String name) {
         String returnName;

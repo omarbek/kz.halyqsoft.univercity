@@ -262,23 +262,23 @@ public class GroupAttendance implements EntityListener{
         } catch (Exception ex) {
             CommonUtils.showMessageAndWriteLog("Unable to load vgroup list", ex);
         }
-         sql = "SELECT\n" +
-                 "  g.name as group_name,\n" +
-                 "  g.id as group_id,\n" +
-                 "  g.curator_id as curator_id,\n" +
-                 "  COUNT(DISTINCT se.student_id) AS count_students_in_the_group,\n" +
-                 "  0 AS come_in_students,\n" +
-                 "  COUNT(DISTINCT se.student_id) AS  do_not_come_students,\n" +
-                 "  0 as percentage_of_come_in_students\n" +
-                 " FROM groups g\n" +
-                 "  LEFT JOIN student_education se\n" +
-                 "    ON g.id = se.groups_id\n" +
-                 "  INNER JOIN speciality s2\n" +
-                 "      ON g.speciality_id = s2.id\n" +
-                 " INNER JOIN department d2\n" +
-                 "      on s2.chair_id = d2.id" +
-                 " WHERE  d2.parent_id = " + vFaculty.getFacultyID() +
-                 " GROUP BY g.name, curator_id, g.id;";
+        sql = "SELECT\n" +
+                "  g.name as group_name,\n" +
+                "  g.id as group_id,\n" +
+                "  g.curator_id as curator_id,\n" +
+                "  COUNT(DISTINCT se.student_id) AS count_students_in_the_group,\n" +
+                "  0 AS come_in_students,\n" +
+                "  COUNT(DISTINCT se.student_id) AS  do_not_come_students,\n" +
+                "  0 as percentage_of_come_in_students\n" +
+                " FROM groups g\n" +
+                "  LEFT JOIN student_education se\n" +
+                "    ON g.id = se.groups_id\n" +
+                "  INNER JOIN speciality s2\n" +
+                "      ON g.speciality_id = s2.id\n" +
+                " INNER JOIN department d2\n" +
+                "      on s2.chair_id = d2.id" +
+                " WHERE  d2.parent_id = " + vFaculty.getFacultyID() +
+                " GROUP BY g.name, curator_id, g.id;";
 
         try {
             List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
@@ -353,17 +353,17 @@ public class GroupAttendance implements EntityListener{
                         String sqlMax = "select max(created), come_in from user_arrival where user_id = "+vs.getId()+" and date_trunc('day', created)= date_trunc('day' , TIMESTAMP '"+formattedDate+"') GROUP BY come_in;";
                         String sqlMin = "select min(created), come_in from user_arrival where user_id = "+vs.getId()+" and date_trunc('day', created)= date_trunc('day' , TIMESTAMP '"+formattedDate+"') GROUP BY come_in;";
                         List<Object> tmpMaxList = new ArrayList<>();
-                                try{
-                                    tmpMaxList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlMax, params));
-                                }catch (Exception e){
-                                    e.printStackTrace();
-                                }
+                        try{
+                            tmpMaxList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlMax, params));
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
                         List<Object> tmpMinList =new ArrayList<>();
-                                try{
-                                    tmpMinList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlMin, params));
-                                }catch (Exception e){
-                                    e.printStackTrace();
-                                }
+                        try{
+                            tmpMinList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlMin, params));
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
                         for(Object oMax : tmpMaxList){
                             Object[] ooMax = (Object[]) oMax;
                             if(!(boolean) ooMax[1]){

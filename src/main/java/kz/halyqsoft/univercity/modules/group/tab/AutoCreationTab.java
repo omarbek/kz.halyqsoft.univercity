@@ -187,7 +187,7 @@ public class AutoCreationTab extends AbstractCommonView  implements FilterPanelL
         studentQueryModel.addWhereNullAnd(fi , "child" );
         studentQueryModel.addWhereAnd("category" , ECriteria.EQUAL , STUDENT_CATEGORY.STUDENT_ID);
         List students = new ArrayList<STUDENT>();
-
+        deleteExtra();
         try{
             students.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(studentQueryModel));
         }catch (Exception e)
@@ -402,7 +402,8 @@ public class AutoCreationTab extends AbstractCommonView  implements FilterPanelL
             for(GROUPS group : groupsList)
             {
                 try{
-                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(group);
+                    group.setDeleted(true);
+                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(group);
                 }catch (Exception e){
                     e.printStackTrace();
                 }

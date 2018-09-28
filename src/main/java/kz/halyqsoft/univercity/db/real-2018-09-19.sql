@@ -41,3 +41,6 @@ ALTER TABLE student_teacher_subject
   ADD CONSTRAINT fk_student_teacher_subject_semester FOREIGN KEY (semester_id)
 REFERENCES semester (id)
 ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE dorm_room
+    ALTER COLUMN bed_count TYPE NUMERIC(2);

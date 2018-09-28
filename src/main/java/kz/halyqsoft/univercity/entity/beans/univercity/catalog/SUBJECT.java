@@ -353,4 +353,8 @@ public class SUBJECT extends AbstractEntity {
     public void setPracticeType(PRACTICE_TYPE practiceType) {
         this.practiceType = practiceType;
     }
+
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
 }

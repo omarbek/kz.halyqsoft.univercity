@@ -6,6 +6,7 @@ import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM;
 import kz.halyqsoft.univercity.entity.beans.univercity.LOAD_TO_CHAIR;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_GROUP;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_LOAD_TO_CHAIR_COUNT;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_LOAD_TO_CHAIR_COUNT_ALL;
 import kz.halyqsoft.univercity.filter.FChairFilter;
@@ -13,6 +14,7 @@ import kz.halyqsoft.univercity.filter.panel.ChairFilterPanel;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
+import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.beans.AbstractTask;
 import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.query.QueryModel;
@@ -23,6 +25,7 @@ import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.ERefreshType;
 import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 import org.r3a.common.vaadin.widget.filter2.FilterPanelListener;
+import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
@@ -44,10 +47,18 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
     private GridWidget countGW;
     private GridWidget totalCountGW;
 
+    private QueryModel subjectQM;
+    private QueryModel semesterQM;
+
+    private ComboBox chairCB;
+    private ComboBox studyYearCB;
+    private ComboBox diplomaTypeCB;
+
     public LoadToChairView(AbstractTask task) throws Exception {
         super(task);
         filterPanel = new ChairFilterPanel(new FChairFilter());
     }
+
 
     @Override
     public void initView(boolean b) throws Exception {
@@ -120,7 +131,7 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
             chairQM.addOrder("deptName");
             BeanItemContainer<DEPARTMENT> chairBIC = new BeanItemContainer<>(DEPARTMENT.class,
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(chairQM));
-            ComboBox chairCB = new ComboBox();
+            chairCB = new ComboBox();
             chairCB.setContainerDataSource(chairBIC);
             chairCB.setImmediate(true);
             chairCB.setNullSelectionAllowed(true);
@@ -134,7 +145,7 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
             BeanItemContainer<STUDENT_DIPLOMA_TYPE> diplomaTypeBIC = new BeanItemContainer<>(
                     STUDENT_DIPLOMA_TYPE.class, SessionFacadeFactory.getSessionFacade(
                     CommonEntityFacadeBean.class).lookup(diplomaTypeQM));
-            ComboBox diplomaTypeCB = new ComboBox();
+             diplomaTypeCB = new ComboBox();
             diplomaTypeCB.setContainerDataSource(diplomaTypeBIC);
             diplomaTypeCB.setImmediate(true);
             diplomaTypeCB.setNullSelectionAllowed(true);
@@ -148,7 +159,7 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
             BeanItemContainer<STUDY_YEAR> studyYearBIC = new BeanItemContainer<>(
                     STUDY_YEAR.class, SessionFacadeFactory.getSessionFacade(
                     CommonEntityFacadeBean.class).lookup(studyYearQM));
-            ComboBox studyYearCB = new ComboBox();
+            studyYearCB = new ComboBox();
             studyYearCB.setContainerDataSource(studyYearBIC);
             studyYearCB.setImmediate(true);
             studyYearCB.setNullSelectionAllowed(true);
@@ -163,12 +174,17 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
 
             loadGW = new GridWidget(LOAD_TO_CHAIR.class);
             loadGW.addEntityListener(this);
-            loadGW.setButtonVisible(AbstractToolbar.ADD_BUTTON, false);
+            loadGW.setButtonEnabled(AbstractToolbar.ADD_BUTTON, false);
 
             DBGridModel loadGM = (DBGridModel) loadGW.getWidgetModel();
             loadGM.setTitleVisible(false);
             loadGM.setMultiSelect(false);
             loadGM.setRefreshType(ERefreshType.MANUAL);
+
+            subjectQM = ((FKFieldModel) loadGM.getFormModel().getFieldModel("subject")).getQueryModel();
+            subjectQM.addWhere("deleted", false);
+
+            semesterQM = ((FKFieldModel) loadGM.getFormModel().getFieldModel("semester")).getQueryModel();
 
             countGW = new GridWidget(V_LOAD_TO_CHAIR_COUNT.class);
             countGW.showToolbar(false);
@@ -279,6 +295,7 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
         FChairFilter chairFilter = (FChairFilter) abstractFilterBean;
         if (chairFilter.getChair() != null && chairFilter.getStudentDiplomaType() != null
                 && chairFilter.getStudyYear() != null) {
+            loadGW.setButtonEnabled(AbstractToolbar.ADD_BUTTON, true);
             List<LOAD_TO_CHAIR> loads = getLoads(chairFilter.getChair(), chairFilter.getStudentDiplomaType(),
                     chairFilter.getStudyYear());
             List<V_LOAD_TO_CHAIR_COUNT> loadCounts = getLoadCount(chairFilter.getChair(),
@@ -286,6 +303,8 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
             List<V_LOAD_TO_CHAIR_COUNT_ALL> loadAllCounts = getLoadAllCount(chairFilter.getChair(),
                     chairFilter.getStudentDiplomaType());
             refresh(loads, loadCounts, loadAllCounts);
+        } else {
+            loadGW.setButtonEnabled(AbstractToolbar.ADD_BUTTON, false);
         }
     }
 
@@ -299,5 +318,42 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
         if (ev.getAction() == EntityEvent.REMOVED || ev.getAction() == EntityEvent.MERGED) {
             doFilter(filterPanel.getFilterBean());
         }
+    }
+
+    @Override
+    public boolean onEdit(Object source, Entity e, int buttonId) {
+        subjectQM.addWhere("chair", ECriteria.EQUAL, ((DEPARTMENT) chairCB.getValue()).getId());
+        semesterQM.addWhere("studyYear", ECriteria.EQUAL, ((STUDY_YEAR) studyYearCB.getValue()).getId());
+        return true;
+    }
+
+    @Override
+    public void onCreate(Object source, Entity e, int buttonId) {
+        subjectQM.addWhere("chair", ECriteria.EQUAL, ((DEPARTMENT) chairCB.getValue()).getId());
+        semesterQM.addWhere("studyYear", ECriteria.EQUAL, ((STUDY_YEAR) studyYearCB.getValue()).getId());
+    }
+
+    @Override
+    public boolean preSave(Object source, Entity e, boolean isNew, int buttonId) {
+        try {
+//            QueryModel<CURRICULUM> curriculumQM=new QueryModel<>(CURRICULUM.class);
+//            FromItem specFI=curriculumQM.addJoin(EJoin.INNER_JOIN,"speciality",SPECIALITY.class,"id");
+//            FromItem depFI=curriculumQM.addJoin(EJoin.INNER_JOIN,"department",DEPARTMENT.class,"id");
+//            curriculumQM.addWhere("deleted",false);
+//            curriculumQM.addWhere("diplomaType",ECriteria.EQUAL,((STUDENT_DIPLOMA_TYPE)diplomaTypeCB.getValue()).getId());
+//            curriculumQM.addWhere("entranceYear",ECriteria.EQUAL,((ENTRANCE_YEAR)diplomaTypeCB.getValue()).getId());
+            LOAD_TO_CHAIR loadToChair = (LOAD_TO_CHAIR) e;
+//            loadToChair.setCurriculum();
+            loadToChair.setTotalCount(loadToChair.getLcCount() + loadToChair.getPrCount() + loadToChair.getLbCount()
+                    + loadToChair.getWithTeacherCount() + loadToChair.getRatingCount() + loadToChair.getExamCount()
+                    + loadToChair.getControlCount() + loadToChair.getCourseWorkCount() + loadToChair.getDiplomaCount()
+                    + loadToChair.getPracticeCount() + loadToChair.getMek() + loadToChair.getProtectDiplomaCount());
+            loadToChair.setCredit(loadToChair.getSubject().getCreditability().getCredit().doubleValue());
+            loadToChair.setStudentNumber(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
+                    V_GROUP.class, loadToChair.getGroup().getId()).getStudentCount());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return super.preSave(source, e, isNew, buttonId);//TODO
     }
 }

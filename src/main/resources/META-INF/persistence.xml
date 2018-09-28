@@ -38,6 +38,7 @@
         <class>kz.halyqsoft.univercity.entity.beans.TASKS</class>
         <class>kz.halyqsoft.univercity.entity.beans.USER_ROLES</class>
         <class>kz.halyqsoft.univercity.entity.beans.USERS</class>
+        <class>kz.halyqsoft.univercity.entity.beans.M_USERS</class>
 
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.AbstractCategoryEntity</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.AbstractStatusEntity</class>
@@ -360,7 +361,7 @@
         <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
         <properties>
             <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
-            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/univerdb"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/realdb"/>
             <property name="javax.persistence.jdbc.user" value="postgres"/>
             <property name="javax.persistence.jdbc.password" value="ukpu18!"/>
             <!--<property name="javax.persistence.jdbc.user" value="${javax.persistence.jdbc.user}"/>-->

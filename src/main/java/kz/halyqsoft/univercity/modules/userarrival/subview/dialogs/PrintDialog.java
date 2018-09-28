@@ -93,33 +93,35 @@ public class PrintDialog extends AbstractDialog{
         XSSFSheet my_worksheet = my_xls_workbook.getSheetAt(0);
         Iterator<Row> rowIterator = my_worksheet.iterator();
         Document iText_xls_2_pdf = new Document();
-        PdfWriter.getInstance(iText_xls_2_pdf, byteArrayOutputStream);
-        iText_xls_2_pdf.open();
-        PdfPTable my_table = new PdfPTable(createExcel.getTableHeader().size());
-        PdfPCell table_cell;
-        while(rowIterator.hasNext()) {
-            Row row = rowIterator.next();
-            Iterator<Cell> cellIterator = row.cellIterator();
-            while(cellIterator.hasNext()) {
-                Cell cell = cellIterator.next();
-                switch(cell.getCellTypeEnum()) {
+            PdfWriter.getInstance(iText_xls_2_pdf, byteArrayOutputStream);
+            iText_xls_2_pdf.open();
+            PdfPTable my_table = new PdfPTable(createExcel.getTableHeader().size());
+            PdfPCell table_cell;
 
-                    case STRING:
+            while (rowIterator.hasNext()) {
+                Row row = rowIterator.next();
+                Iterator<Cell> cellIterator = row.cellIterator();
+                while (cellIterator.hasNext()) {
+                    Cell cell = cellIterator.next();
+                    switch (cell.getCellTypeEnum()) {
 
-                        Paragraph paragraph = new Paragraph(cell.getStringCellValue(), EmployeePdfCreator.getFont(12, Font.BOLD));
-                        table_cell=new PdfPCell(paragraph);
+                        case STRING:
 
-                        //table_cell=new PdfPCell(new Phrase(cell.getStringCellValue()));
-                        my_table.addCell(table_cell);
-                        break;
+                            Paragraph paragraph = new Paragraph(cell.getStringCellValue(), EmployeePdfCreator.getFont(12, Font.BOLD));
+                            table_cell = new PdfPCell(paragraph);
+
+                                //table_cell=new PdfPCell(new Phrase(cell.getStringCellValue()));
+                                my_table.addCell(table_cell);
+                                break;
+
+                    }
                 }
+
             }
+            iText_xls_2_pdf.add(my_table);
+            iText_xls_2_pdf.close();
 
-        }
-        iText_xls_2_pdf.add(my_table);
-        iText_xls_2_pdf.close();
-
-        bais.close();
+            bais.close();
 
         return byteArrayOutputStream.toByteArray();
     }
