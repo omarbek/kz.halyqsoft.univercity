@@ -22,7 +22,6 @@ public class M_USERS extends AbstractUser {
             @JoinColumn(name = "TASK_ID", referencedColumnName = "ID")})
     private TASKS task;
 
-
     @FieldInfo(type = EFieldType.FK_COMBO, order = 5, required = false)
     @ManyToOne
     @JoinColumns({
@@ -102,12 +101,6 @@ public class M_USERS extends AbstractUser {
     @Column(name = "PHONE_INTERNAL")
     private String phoneInternal;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 18, required = false)
-    @ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "CARD_ID", referencedColumnName = "ID")})
-    private CARD card;
-
     @FieldInfo(type = EFieldType.BOOLEAN, order = 19, required = false, inEdit = false, inGrid = false, inView = false)
     @Column(name = "LOCKED", nullable = false)
     private boolean locked;
@@ -127,23 +120,8 @@ public class M_USERS extends AbstractUser {
     @Temporal(TemporalType.TIMESTAMP)
     private Date created;
 
-    @Column(name = "USER_TYPE_ID", insertable = false, updatable = false)
-    private int typeIndex;
-
-    @FieldInfo(type = EFieldType.DATETIME, order = 23, required = false, readOnlyFixed = true, inGrid = false,
-            inEdit = false, inView = false)
-    @Column(name = "UPDATED")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updated;
-
-    @Column(name = "UPDATED_BY")
-    private String updatedBy;
-
     @Column(name = "CREATED_BY")
     private String createdBy;
-
-    @Column(name = "REASON")
-    private String reason;
 
     public M_USERS() {
     }
@@ -292,22 +270,6 @@ public class M_USERS extends AbstractUser {
         this.created = created;
     }
 
-    public int getTypeIndex() {
-        return typeIndex;
-    }
-
-    public void setTypeIndex(int typeIndex) {
-        this.typeIndex = typeIndex;
-    }
-
-    public CARD getCard() {
-        return card;
-    }
-
-    public void setCard(CARD card) {
-        this.card = card;
-    }
-
     @Override
     public TASKS getTask() {
         return task;
@@ -354,37 +316,12 @@ public class M_USERS extends AbstractUser {
         this.login = login;
     }
 
-    public Date getUpdated() {
-        return updated;
-    }
-
-    public void setUpdated(Date updated) {
-        this.updated = updated;
-    }
-
-    public String getUpdatedBy() {
-        return updatedBy;
-    }
-
-    public void setUpdatedBy(String updatedBy) {
-        this.updatedBy = updatedBy;
-    }
-
-
     public String getCreatedBy() {
         return createdBy;
     }
 
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
-    }
-
-    public String getReason() {
-        return reason;
-    }
-
-    public void setReason(String reason) {
-        this.reason = reason;
     }
 
     public USER_TYPE getUserType() {

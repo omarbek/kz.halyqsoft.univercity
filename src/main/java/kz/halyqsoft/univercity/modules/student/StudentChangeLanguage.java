@@ -31,7 +31,7 @@ public class StudentChangeLanguage extends AbstractDialog {
         HorizontalLayout scheduleHL = new HorizontalLayout();
         scheduleHL.setSizeFull();
 
-        lessonCB = new ComboBox(getUILocaleUtil().getCaption("lessonCB"));
+        lessonCB = new ComboBox();
         QueryModel<LANGUAGE> specialityQM = new QueryModel<>(LANGUAGE.class);
         BeanItemContainer<LANGUAGE> specialityBIC = new BeanItemContainer<>(LANGUAGE.class,
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(specialityQM));
