@@ -124,8 +124,8 @@ public class GroupAttendance implements EntityListener{
                         List<String> list = new ArrayList<>();
                         list.add(vStudentInfo.getStudent().toString());
                         list.add(vStudentInfo.getCode());
-                        list.add(vStudentInfo.getComeIN()!=null ? CommonUtils.getFormattedDate(vStudentInfo.getComeIN()): "");
-                        list.add(vStudentInfo.getComeOUT()!=null ? CommonUtils.getFormattedDate(vStudentInfo.getComeOUT()): "");
+                        list.add(vStudentInfo.getComeIN()!=null ? (vStudentInfo.getComeIN()): "");
+                        list.add(vStudentInfo.getComeOUT()!=null ? (vStudentInfo.getComeOUT()): "");
                         tableBody.add(list);
                     }
                 }
@@ -350,8 +350,8 @@ public class GroupAttendance implements EntityListener{
 
                     Boolean flag = (Boolean) oo[2];
                     if(flag){
-                        String sqlMax = "select max(created), come_in from user_arrival where user_id = "+vs.getId()+" and date_trunc('day', created)= date_trunc('day' , TIMESTAMP '"+formattedDate+"') GROUP BY come_in;";
-                        String sqlMin = "select min(created), come_in from user_arrival where user_id = "+vs.getId()+" and date_trunc('day', created)= date_trunc('day' , TIMESTAMP '"+formattedDate+"') GROUP BY come_in;";
+                        String sqlMax = "select (date_trunc('second', max(created))::time)::text, come_in from user_arrival where user_id = "+vs.getId()+" and date_trunc('day', created)= date_trunc('day' , TIMESTAMP '"+formattedDate+"') and come_in = false GROUP BY come_in;";
+                        String sqlMin = "select (date_trunc('second', min(created))::time)::text, come_in from user_arrival where user_id = "+vs.getId()+" and date_trunc('day', created)= date_trunc('day' , TIMESTAMP '"+formattedDate+"') and come_in = true GROUP BY come_in;";
                         List<Object> tmpMaxList = new ArrayList<>();
                         try{
                             tmpMaxList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlMax, params));
@@ -367,13 +367,13 @@ public class GroupAttendance implements EntityListener{
                         for(Object oMax : tmpMaxList){
                             Object[] ooMax = (Object[]) oMax;
                             if(!(boolean) ooMax[1]){
-                                vs.setComeOUT((Date)ooMax[0]);
+                                vs.setComeOUT((String)ooMax[0]);
                             }
                         }
                         for(Object oMin : tmpMinList){
                             Object[] ooMin = (Object[]) oMin;
                             if((boolean) ooMin[1]){
-                                vs.setComeIN((Date)ooMin[0]);
+                                vs.setComeIN((String)ooMin[0]);
                             }
                         }
                     }

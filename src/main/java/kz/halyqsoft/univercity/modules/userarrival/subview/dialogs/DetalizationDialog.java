@@ -23,6 +23,7 @@ import org.r3a.common.vaadin.widget.photo.PhotoWidget;
 import org.r3a.common.vaadin.widget.table.TableWidget;
 import org.r3a.common.vaadin.widget.table.model.DBTableModel;
 
+import javax.persistence.NoResultException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -69,6 +70,8 @@ public class DetalizationDialog extends AbstractDialog implements EntityListener
         userPhotoQM.addWhere("user" , ECriteria.EQUAL , user.getId());
         try{
             userPhoto = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(userPhotoQM);
+        }catch (NoResultException nre){
+
         }catch (Exception e){
             e.printStackTrace();
         }
