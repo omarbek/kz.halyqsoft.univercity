@@ -357,7 +357,7 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
                         "  WHERE s.practice_type_id!=null and pi.groups_id= "+pi.getGroups().getId();
 
                 try {
-                    for (PRACTICE_STUDENT ps : practiceStudents1) {
+
 
                         PdfWriter.getInstance(document, byteArr);
                         document.open();
@@ -366,24 +366,46 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
                         Paragraph title1 = new Paragraph("ВЕДОМОСТЬ № 290\n" +
                                 "Іс тәжірибе туралы/ по практике", EmployeePdfCreator.getFont(15, Font.BOLD));
                         title1.setAlignment(Element.ALIGN_CENTER);
+                    document.add(title);
+                    document.add(title1);
+                    if(practiceStudents1.size()==0){
 
                         Paragraph content = new Paragraph("Факультет: " + pi.getGroups().getSpeciality().getSpecName() + //pi.getSpeciality().getSpecName() +
                                 "\nТобы/группа: " + pi.getGroups().getName() +
-                                "\nБаза аты/Вид базы:" + ps.getOrganization().getOrganizationName() +
-                                "      База аты/Наименование базы:" + ps.getOrganization().getAddress() +
+                                "\nБаза аты/Вид базы:" + " "+
+                                "      База аты/Наименование базы:" + " " +
                                 "\nСтуденттің іс тәжірибесінің мерзімі/" +
-                                "Срок практики студентов " + ps.getComeInDate() + "     " + ps.getComeOutDate() +
+                                "Срок практики студентов " +  "     "  +
                                 "\n Кафедраның іс тәжірибе жетекшісі /" +
                                 "Руководитель практики от кафедры " + pi.getEmployee().getLastName() + " " +
                                 pi.getEmployee().getFirstName().toUpperCase().charAt(0) + "." +
                                 (pi.getEmployee().getMiddleName() != null ?
                                         pi.getEmployee().getMiddleName().toUpperCase().charAt(0) : "") + " " +
-                                "\nІс тәжірибе түрі/Наименование практики: Производственная(педагогическая) практика " +
-                                "\nКредиттер саны/Количество кредитов ", EmployeePdfCreator.getFont(15, Font.NORMAL));
+                                "\nІс тәжірибе түрі/Наименование практики: Производственная(педагогическая) практика \n", EmployeePdfCreator.getFont(15, Font.NORMAL));
 
-                        document.add(title);
-                        document.add(title1);
+
                         document.add(content);
+                    }else {
+
+                        for (PRACTICE_STUDENT ps : practiceStudents1) {
+                            Paragraph content = new Paragraph("Факультет: " + pi.getGroups().getSpeciality().getSpecName() + //pi.getSpeciality().getSpecName() +
+                                    "\nТобы/группа: " + pi.getGroups().getName() +
+                                    "\nБаза аты/Вид базы:" + ps.getOrganization().getOrganizationName() +
+                                    "      База аты/Наименование базы:" + ps.getOrganization().getAddress() +
+                                    "\nСтуденттің іс тәжірибесінің мерзімі/" +
+                                    "Срок практики студентов " + ps.getComeInDate() + "     " + ps.getComeOutDate() +
+                                    "\n Кафедраның іс тәжірибе жетекшісі /" +
+                                    "Руководитель практики от кафедры " + pi.getEmployee().getLastName() + " " +
+                                    pi.getEmployee().getFirstName().toUpperCase().charAt(0) + "." +
+                                    (pi.getEmployee().getMiddleName() != null ?
+                                            pi.getEmployee().getMiddleName().toUpperCase().charAt(0) : "") + " " +
+                                    "\nІс тәжірибе түрі/Наименование практики: Производственная(педагогическая) практика " +
+                                    "\nКредиттер саны/Количество кредитов ", EmployeePdfCreator.getFont(15, Font.NORMAL));
+
+
+                            document.add(content);
+                        }
+                    }
 
                         PdfPTable table = new PdfPTable(8);
 
@@ -445,7 +467,6 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
                             CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
                         }
                         document.add(table);
-                    }
                 } catch (Exception e) {
                     CommonUtils.showMessageAndWriteLog("Unable to load absents list", e);
                 }

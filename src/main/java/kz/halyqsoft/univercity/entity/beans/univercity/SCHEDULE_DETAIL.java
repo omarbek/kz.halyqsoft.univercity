@@ -2,6 +2,8 @@ package kz.halyqsoft.univercity.entity.beans.univercity;
 
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import org.r3a.common.entity.AbstractEntity;
+import org.r3a.common.entity.EFieldType;
+import org.r3a.common.entity.FieldInfo;
 
 import javax.persistence.*;
 
@@ -12,112 +14,122 @@ import javax.persistence.*;
 @Entity
 public class SCHEDULE_DETAIL extends AbstractEntity {
 
-	private static final long serialVersionUID = 1602572739711557773L;
+    private static final long serialVersionUID = 1602572739711557773L;
 
-	@ManyToOne
+    @FieldInfo(type = EFieldType.FK_COMBO,order = 1)
+    @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
+            @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
     private SUBJECT subject;
-	
-	@ManyToOne
+
+    @FieldInfo(type = EFieldType.FK_COMBO,order = 2)
+    @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "LESSON_TYPE_ID", referencedColumnName = "ID")})
+            @JoinColumn(name = "LESSON_TYPE_ID", referencedColumnName = "ID")})
     private LESSON_TYPE lessonType;
-	
-	@ManyToOne
+
+    @FieldInfo(type = EFieldType.FK_COMBO,order = 3)
+    @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "TEACHER_ID", referencedColumnName = "ID")})
+            @JoinColumn(name = "TEACHER_ID", referencedColumnName = "ID")})
     private EMPLOYEE teacher;
-	
-	@ManyToOne
+
+
+    @FieldInfo(type = EFieldType.FK_COMBO,order = 4 , inView = false, inEdit = false, inGrid = false)
+    @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "WEEK_DAY_ID", referencedColumnName = "ID")})
+            @JoinColumn(name = "WEEK_DAY_ID", referencedColumnName = "ID")})
     private WEEK_DAY weekDay;
 
-	@ManyToOne
-	@JoinColumns({
-			@JoinColumn(name = "LESSON_TIME_ID", referencedColumnName = "ID")})
-	private LESSON_TIME lessonTime;
-
-	@ManyToOne
+    @FieldInfo(type = EFieldType.FK_COMBO,order = 5)
+    @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "ROOM_ID", referencedColumnName = "ID")})
+            @JoinColumn(name = "LESSON_TIME_ID", referencedColumnName = "ID")})
+    private LESSON_TIME lessonTime;
+
+    @FieldInfo(type = EFieldType.FK_COMBO,order = 6)
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "ROOM_ID", referencedColumnName = "ID")})
     private ROOM room;
 
-	@ManyToOne
-	@JoinColumns({
-			@JoinColumn(name = "SEMESTER_DATA_ID", referencedColumnName = "ID")})
-	private SEMESTER_DATA semesterData;
 
-	@ManyToOne
-	@JoinColumns({
-			@JoinColumn(name = "GROUP_ID",  referencedColumnName = "ID")})
-	private GROUPS group;
-	
-	public SCHEDULE_DETAIL() {
-	}
+    @FieldInfo(type = EFieldType.FK_COMBO,order = 7, inGrid = false, inView = false,inEdit = false)
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "SEMESTER_DATA_ID", referencedColumnName = "ID")})
+    private SEMESTER_DATA semesterData;
 
-	public SUBJECT getSubject() {
-		return subject;
-	}
+    @FieldInfo(type = EFieldType.FK_COMBO,order = 8)
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "GROUP_ID",  referencedColumnName = "ID")})
+    private GROUPS group;
 
-	public void setSubject(SUBJECT subject) {
-		this.subject = subject;
-	}
+    public SCHEDULE_DETAIL() {
+    }
 
-	public LESSON_TYPE getLessonType() {
-		return lessonType;
-	}
+    public SUBJECT getSubject() {
+        return subject;
+    }
 
-	public void setLessonType(LESSON_TYPE lessonType) {
-		this.lessonType = lessonType;
-	}
+    public void setSubject(SUBJECT subject) {
+        this.subject = subject;
+    }
 
-	public EMPLOYEE getTeacher() {
-		return teacher;
-	}
+    public LESSON_TYPE getLessonType() {
+        return lessonType;
+    }
 
-	public void setTeacher(EMPLOYEE teacher) {
-		this.teacher = teacher;
-	}
+    public void setLessonType(LESSON_TYPE lessonType) {
+        this.lessonType = lessonType;
+    }
 
-	public WEEK_DAY getWeekDay() {
-		return weekDay;
-	}
+    public EMPLOYEE getTeacher() {
+        return teacher;
+    }
 
-	public void setWeekDay(WEEK_DAY weekDay) {
-		this.weekDay = weekDay;
-	}
+    public void setTeacher(EMPLOYEE teacher) {
+        this.teacher = teacher;
+    }
 
-	public ROOM getRoom() {
-		return room;
-	}
+    public WEEK_DAY getWeekDay() {
+        return weekDay;
+    }
 
-	public void setRoom(ROOM room) {
-		this.room = room;
-	}
+    public void setWeekDay(WEEK_DAY weekDay) {
+        this.weekDay = weekDay;
+    }
 
-	public SEMESTER_DATA getSemesterData() {
-		return semesterData;
-	}
+    public LESSON_TIME getLessonTime() {
+        return lessonTime;
+    }
 
-	public void setSemesterData(SEMESTER_DATA semesterData) {
-		this.semesterData = semesterData;
-	}
+    public void setLessonTime(LESSON_TIME lessonTime) {
+        this.lessonTime = lessonTime;
+    }
 
-	public LESSON_TIME getLessonTime() {
-		return lessonTime;
-	}
+    public ROOM getRoom() {
+        return room;
+    }
 
-	public void setLessonTime(LESSON_TIME lessonTime) {
-		this.lessonTime = lessonTime;
-	}
+    public void setRoom(ROOM room) {
+        this.room = room;
+    }
 
-	public GROUPS getGroup() {
-		return group;
-	}
+    public SEMESTER_DATA getSemesterData() {
+        return semesterData;
+    }
 
-	public void setGroup(GROUPS group) {
-		this.group = group;
-	}
+    public void setSemesterData(SEMESTER_DATA semesterData) {
+        this.semesterData = semesterData;
+    }
+
+    public GROUPS getGroup() {
+        return group;
+    }
+
+    public void setGroup(GROUPS group) {
+        this.group = group;
+    }
 }
