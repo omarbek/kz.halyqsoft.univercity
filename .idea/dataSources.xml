@@ -21,5 +21,23 @@
         <property name="yearIsDateType" value="false" />
       </driver-properties>
     </data-source>
+    <data-source source="LOCAL" name="univerdbb@localhost" uuid="e6f18269-3786-477d-946b-505d94c98efa">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:5432/univerdbb</jdbc-url>
+    </data-source>
+    <data-source source="LOCAL" name="college@185.146.3.193" uuid="12bdc91f-d690-444d-bf23-27810abbfc59">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://185.146.3.193:5432/college</jdbc-url>
+    </data-source>
+    <data-source source="LOCAL" name="univerdb@ukpu-systems.kz" uuid="0dc20a76-b93f-42c0-81d6-26502c6f925f">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://ukpu-systems.kz:5432/univerdb</jdbc-url>
+    </data-source>
   </component>
 </project>

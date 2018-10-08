@@ -37,16 +37,16 @@ import static java.lang.Boolean.FALSE;
 
 public class ChatView extends AbstractTaskView implements EntityListener  {
 
-    private static String FRIENDS = "Друзья";
-    private static String OUTCOMING_REQUEST = "Исходящие запросы";
-    private static String INCOMING_REQUESTS = "Входящие запросы";
+    private static String FRIENDS = getUILocaleUtil().getCaption("chat.friends");
+    private static String OUTCOMING_REQUEST = getUILocaleUtil().getCaption("chat.outcoming.request");
+    private static String INCOMING_REQUESTS = getUILocaleUtil().getCaption("chat.incoming.request");
 
     private HorizontalSplitPanel mainHSP;
 
     private CommonTreeWidget usersCTW;
     private AbstractLayout mainLayout;
     private CHAT mainChat;
-    private  TextArea chatBodyTextArea;
+    private TextArea chatBodyTextArea;
     private CustomSearchTreeVerticalLayout customSearchTreeVerticalLayout;
     private HierarchicalContainer hierarchicalContainer;
     public ChatView(AbstractTask task) throws Exception{
@@ -108,7 +108,7 @@ public class ChatView extends AbstractTaskView implements EntityListener  {
         menuTT.setPageLength(20);
         MenuColumn menuColumn = new MenuColumn();
         menuTT.addGeneratedColumn("users", menuColumn);
-        menuTT.setColumnHeader("users", "Пользователи");
+        menuTT.setColumnHeader("users", getUILocaleUtil().getEntityLabel(USERS.class));
 
         menuTT.addItemClickListener(new ItemClickEvent.ItemClickListener() {
             @Override
@@ -155,8 +155,8 @@ public class ChatView extends AbstractTaskView implements EntityListener  {
         customSearchTreeVerticalLayout = new CustomSearchTreeVerticalLayout(menuTT);
         customSearchTreeVerticalLayout.setResponsive(true);
         customSearchTreeVerticalLayout.setImmediate(true);
-        customSearchTreeVerticalLayout.getSearchButton().setCaption("Search");
-        customSearchTreeVerticalLayout.getLoginLabel().setValue("Login:");
+        customSearchTreeVerticalLayout.getSearchButton().setCaption(getUILocaleUtil().getCaption("search"));
+        customSearchTreeVerticalLayout.getLoginLabel().setValue(getUILocaleUtil().getEntityFieldLabel(USERS.class, "login"));
         customSearchTreeVerticalLayout.getSearchButton().addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
@@ -170,6 +170,7 @@ public class ChatView extends AbstractTaskView implements EntityListener  {
                     }
                     UOTreeModel uoTreeModel=new UOTreeModel(usersArrayList);
                     usersCTW = new CommonTreeWidget(uoTreeModel);
+
                     usersCTW.setButtonVisible(IconToolbar.REFRESH_BUTTON , false);
                     usersCTW.setButtonVisible(IconToolbar.EDIT_BUTTON , false);
                     usersCTW.setButtonVisible(IconToolbar.DELETE_BUTTON , false);
@@ -300,7 +301,7 @@ public class ChatView extends AbstractTaskView implements EntityListener  {
 
         Label label = new Label();
         label.setValue("Someone sending you a request to have a conversation!");
-        Button button = new Button("ACCEPT");
+        Button button = new Button(getUILocaleUtil().getCaption("acceptB"));
         button.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {

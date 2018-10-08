@@ -39,27 +39,15 @@ public class CustomSearchTreeVerticalLayout extends VerticalLayout{
 
     public CustomSearchTreeVerticalLayout(TreeTable treeTable){
         horizontalLayout = new HorizontalLayout();
-
-        ArrayList<Entity> arrayList = new ArrayList<>();
-        UOTreeModel uoTreeModel = new UOTreeModel(arrayList);
-        usersCTW = new CommonTreeWidget(uoTreeModel);
-
         this.treeTable = treeTable;
         searchButton = new Button();
         searchTextField = new TextField();
         loginLabel = new Label();
 
-        init();
     }
 
     public CustomSearchTreeVerticalLayout(){
         horizontalLayout = new HorizontalLayout();
-
-        ArrayList<Entity> arrayList = new ArrayList<>();
-        UOTreeModel uoTreeModel = new UOTreeModel(arrayList);
-
-        usersCTW = new CommonTreeWidget(uoTreeModel);
-
 
         treeTable = new TreeTable();
         searchButton = new Button();
@@ -75,6 +63,8 @@ public class CustomSearchTreeVerticalLayout extends VerticalLayout{
     public void setUsersCTW(CommonTreeWidget usersCTW) {
         this.replaceComponent(this.usersCTW , usersCTW);
         this.usersCTW = usersCTW;
+
+        init();
     }
 
     public Label getLoginLabel() {

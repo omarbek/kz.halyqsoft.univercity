@@ -149,7 +149,7 @@ public class AttestationView extends AbstractTaskView{
                     attestationsGM.getQueryModel().addWhere("semesterData" , ECriteria.EQUAL , semesterDataGW.getSelectedEntity().getId());
                     attestationsGM.getQueryModel().addOrderDesc("id");
 
-                    Button generateSem = new Button("Generate attestation");
+                    Button generateSem = new Button(getUILocaleUtil().getCaption("generate.attestation"));
                     innerVL.addComponent(generateSem);
                     generateSem.addClickListener(new Button.ClickListener() {
                         @Override
@@ -164,7 +164,7 @@ public class AttestationView extends AbstractTaskView{
 
                             if(!semesterData.getBeginDate().after(semesterData.getEndDate())){
                                 while (true){
-                                    cal.set(Calendar.DATE, cal.getActualMaximum(Calendar.DAY_OF_MONTH)-7);
+                                    cal.set(Calendar.DATE, 1);
                                     ATTESTATION attestation = new ATTESTATION();
                                     attestation.setSemesterData(semesterData);
                                     attestation.setBeginDate(cal.getTime());
