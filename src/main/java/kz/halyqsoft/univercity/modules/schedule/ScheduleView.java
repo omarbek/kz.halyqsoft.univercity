@@ -72,7 +72,18 @@ public class ScheduleView extends AbstractTaskView {
     public void initView(boolean b) throws Exception {
         getContent().setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
         getContent().setSizeFull();
-
+        Button generateLessonsButton = new Button(getUILocaleUtil().getCaption("generate.lessons"));
+        generateLessonsButton.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                try {
+                    generateLessons();
+                } catch (Exception e) {
+                    CommonUtils.showMessageAndWriteLog("Unable to generate lessons", e);
+                }
+            }
+        });
+        getContent().addComponent(generateLessonsButton);
         HorizontalLayout mainHL = new HorizontalLayout();
         mainHL.setSizeFull();
 
@@ -164,6 +175,28 @@ public class ScheduleView extends AbstractTaskView {
                 lookupItems(scheduleDetailQM);
         return subject.getCreditability().getCredit() == countOfLessons;
     }
+
+    private Date getDateByTime(Date dateByWeekDay, TIME time) {
+        TimeUtils clock = new TimeUtils(time);
+        if (clock.isError()) return null;
+        String hours = clock.getHours();
+        String minutes = clock.getMinutes();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(dateByWeekDay);
+        cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(hours));
+        cal.set(Calendar.MINUTE, Integer.parseInt(minutes));
+        return cal.getTime();
+    }
+
+    private Date getDateByWeekDay(int week, SEMESTER_DATA currentSemesterData, int weekDay) {
+        LocalDate localDate = currentSemesterData.getBeginDate().toInstant().atZone(ZoneId.systemDefault()).
+                toLocalDate();
+        for (int i = 0; i < week; i++) {
+            localDate = localDate.with(TemporalAdjusters.next(DayOfWeek.of(weekDay)));
+        }
+        return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+    }
+
 
     private ROOM getRoom(WEEK_DAY weekDay, LESSON_TIME time, int roomType, int numberOfStudents,
                          boolean notComputer) throws Exception {
@@ -314,6 +347,61 @@ public class ScheduleView extends AbstractTaskView {
         groupsQM.addWhere("studyYear", ECriteria.EQUAL, shiftStudyYear.getStudyYear().getId());
         return SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(groupsQM);
     }
+
+
+    private void generateLessons() throws Exception {
+        SEMESTER_DATA currentSemesterData = CommonUtils.getCurrentSemesterData();
+        if (currentSemesterData != null) {
+            QueryModel<SCHEDULE_DETAIL> scheduleDetailQM = new QueryModel<>(SCHEDULE_DETAIL.class);
+            scheduleDetailQM.addWhere("semesterData", ECriteria.EQUAL, currentSemesterData.getId());
+            List<SCHEDULE_DETAIL> scheduleDetails = SessionFacadeFactory.getSessionFacade(
+                    CommonEntityFacadeBean.class).lookup(scheduleDetailQM);
+            for (SCHEDULE_DETAIL scheduleDetail : scheduleDetails) {
+                QueryModel<LESSON> lessonQM = new QueryModel<>(LESSON.class);
+                lessonQM.addWhere("scheduleDetail", ECriteria.EQUAL, scheduleDetail.getId());
+                List<LESSON> lessons = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                        lookup(lessonQM);
+                for (LESSON lesson : lessons) {
+                    QueryModel<LESSON_DETAIL> lessonDetailQM = new QueryModel<>(LESSON_DETAIL.class);
+                    lessonDetailQM.addWhere("lesson", ECriteria.EQUAL, lesson.getId());
+                    List<LESSON_DETAIL> lessonDetails = SessionFacadeFactory.getSessionFacade(
+                            CommonEntityFacadeBean.class).lookup(lessonDetailQM);
+                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(lessonDetails);
+                }
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(lessons);
+
+                for (int i = 0; i < 15; i++) {
+                    LESSON lesson = new LESSON();
+                    lesson.setScheduleDetail(scheduleDetail);
+                    Date dateByWeekDay = getDateByWeekDay(i + 1, currentSemesterData, scheduleDetail.getWeekDay().
+                            getId().getId().intValue());
+                    lesson.setLessonDate(dateByWeekDay);
+                    lesson.setBeginDate(getDateByTime(dateByWeekDay, scheduleDetail.getLessonTime().getBeginTime()));
+                    lesson.setFinishDate(getDateByTime(dateByWeekDay, scheduleDetail.getLessonTime().getEndTime()));
+                    lesson.setCanceled(false);
+                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(lesson);
+
+                    QueryModel<STUDENT_EDUCATION> studentEducationQM = new QueryModel<>(STUDENT_EDUCATION.class);
+                    studentEducationQM.addWhere("groups", ECriteria.EQUAL, scheduleDetail.getGroup().getId());
+                    studentEducationQM.addWhereNull("child");
+                    List<STUDENT_EDUCATION> studentEducations = SessionFacadeFactory.getSessionFacade(
+                            CommonEntityFacadeBean.class).lookup(studentEducationQM);
+                    for (STUDENT_EDUCATION studentEducation : studentEducations) {
+                        LESSON_DETAIL lessonDetail = new LESSON_DETAIL();
+                        lessonDetail.setAttendanceMark(0);
+                        lessonDetail.setLesson(lesson);
+                        lessonDetail.setStudentEducation(studentEducation);
+                        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(lessonDetail);
+                    }
+
+                }
+
+            }
+        } else {
+            Message.showInfo(CommonUtils.getSemesterIsGoingNowLabel().getValue());
+        }
+    }
+
 
     @Override
     public void handleEntityEvent(EntityEvent ev) {
