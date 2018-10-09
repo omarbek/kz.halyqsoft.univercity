@@ -24,7 +24,6 @@ import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.ID;
-import org.r3a.common.entity.beans.AbstractTask;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.from.EJoin;
 import org.r3a.common.vaadin.widget.ERefreshType;
@@ -33,14 +32,12 @@ import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 import org.r3a.common.vaadin.widget.filter2.FilterPanelListener;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
-import org.w3c.dom.views.DocumentView;
-import sun.plugin.dom.views.AbstractView;
 
 import java.util.*;
 
 import static kz.halyqsoft.univercity.utils.CommonUtils.getUILocaleUtil;
 
-public class OrdinaryStudentsView  implements FilterPanelListener{
+public class OrdinaryStudentsView implements FilterPanelListener {
 
     private GridWidget studentGW;
     public ChangeToNextYearGroupFilterPanel changeToNextYearGroupFilterPanel;
@@ -51,9 +48,9 @@ public class OrdinaryStudentsView  implements FilterPanelListener{
 
     public OrdinaryStudentsView() {
         mainVL = new VerticalLayout();
-        try{
+        try {
             initView();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -77,39 +74,39 @@ public class OrdinaryStudentsView  implements FilterPanelListener{
         changeStudyYearBtn.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
-                if(studentGW.getSelectedEntities().size()>0){
+                if (studentGW.getSelectedEntities().size() > 0) {
                     List<ID> ids = new ArrayList<>();
-                    for(Entity entity: studentGW.getSelectedEntities()){
+                    for (Entity entity : studentGW.getSelectedEntities()) {
                         ids.add(entity.getId());
                     }
 
-                    QueryModel<STUDENT_EDUCATION>studentEducationQM = new QueryModel<>(STUDENT_EDUCATION.class);
+                    QueryModel<STUDENT_EDUCATION> studentEducationQM = new QueryModel<>(STUDENT_EDUCATION.class);
                     studentEducationQM.addWhereNull("child");
-                    studentEducationQM.addWhereInAnd("student" ,ids);
-                    studentEducationQM.addWhereNotNullAnd("studyYear" );
+                    studentEducationQM.addWhereInAnd("student", ids);
+                    studentEducationQM.addWhereNotNullAnd("studyYear");
 
                     List<STUDENT_EDUCATION> studentEducations = new ArrayList<>();
 
-                    try{
+                    try {
                         studentEducations.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(studentEducationQM));
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                     STUDENT_STATUS graduated = null;
-                    try{
-                        graduated = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(STUDENT_STATUS.class,STUDENT_STATUS.GRADUATED_ID);
-                    }catch (Exception e){
+                    try {
+                        graduated = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(STUDENT_STATUS.class, STUDENT_STATUS.GRADUATED_ID);
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
 
                     Set<GROUPS> groupsSet = new HashSet<>();
 
-                    for(STUDENT_EDUCATION se : studentEducations){
+                    for (STUDENT_EDUCATION se : studentEducations) {
                         STUDY_YEAR studyYear = calculateStudyYear(se.getStudyYear());
-                        if(se.getStudyYear().getStudyYear()==se.getGroups().getStudyYear().getStudyYear()){
+                        if (se.getStudyYear().getStudyYear() == se.getGroups().getStudyYear().getStudyYear()) {
                             groupsSet.add(se.getGroups());
                         }
-                        if(studyYear!=null){
+                        if (studyYear != null) {
 
                             STUDENT_EDUCATION newSE = new STUDENT_EDUCATION();
                             newSE.setCreated(new Date());
@@ -125,9 +122,9 @@ public class OrdinaryStudentsView  implements FilterPanelListener{
                             newSE.setSpeciality(se.getSpeciality());
                             newSE.setStatus(se.getStatus());
 
-                            try{
+                            try {
                                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(newSE);
-                            }catch (Exception e){
+                            } catch (Exception e) {
                                 e.printStackTrace();
                             }
 
@@ -135,34 +132,34 @@ public class OrdinaryStudentsView  implements FilterPanelListener{
                             se.setUpdated(new Date());
                             se.setStatus(getStudentStatusById(STUDENT_STATUS.CHANGED_TO_NEXT_YEAR_ID));
 
-                        }else{
+                        } else {
                             se.setStatus(graduated);
                             se.setEndDate(new Date());
                         }
                     }
 
-                    for(GROUPS group : groupsSet){
+                    for (GROUPS group : groupsSet) {
                         STUDY_YEAR studyYear = calculateStudyYear(group.getStudyYear());
                         group.setStudyYear(studyYear);
                     }
 
-                    try{
+                    try {
                         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(studentEducations);
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
 
-                    if(groupsSet.size()>0){
-                        try{
+                    if (groupsSet.size() > 0) {
+                        try {
                             SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(new ArrayList<>(groupsSet));
-                        }catch (Exception e){
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
 
                     doFilter(changeToNextYearGroupFilterPanel.getFilterBean());
                     CommonUtils.showSavedNotification();
-                }else{
+                } else {
                     Message.showError(getUILocaleUtil().getCaption("chooseARecord"));
                 }
             }
@@ -174,20 +171,20 @@ public class OrdinaryStudentsView  implements FilterPanelListener{
         doFilter(changeToNextYearGroupFilterPanel.getFilterBean());
     }
 
-    public STUDENT_STATUS getStudentStatusById(ID id){
-        for(STUDENT_STATUS ss: studentStatuses){
-            if(ss.getId().getId().longValue()==id.getId().longValue()){
+    public STUDENT_STATUS getStudentStatusById(ID id) {
+        for (STUDENT_STATUS ss : studentStatuses) {
+            if (ss.getId().getId().longValue() == id.getId().longValue()) {
                 return ss;
             }
         }
         return null;
     }
 
-    public STUDY_YEAR calculateStudyYear(STUDY_YEAR studyYear){
-        for(int i = 0 ; i < studyYears.size();i++){
-            if(studyYears.size() >i+1){
-                if(studyYear.getStudyYear() ==studyYears.get(i).getStudyYear()){
-                    return studyYears.get(i+1);
+    public STUDY_YEAR calculateStudyYear(STUDY_YEAR studyYear) {
+        for (int i = 0; i < studyYears.size(); i++) {
+            if (studyYears.size() > i + 1) {
+                if (studyYear.getStudyYear() == studyYears.get(i).getStudyYear()) {
+                    return studyYears.get(i + 1);
                 }
             }
         }
@@ -195,7 +192,7 @@ public class OrdinaryStudentsView  implements FilterPanelListener{
         return null;
     }
 
-    public void initGridWidget(){
+    public void initGridWidget() {
         studentGW = new GridWidget(VChangeToNextYearStudent.class);
         studentGW.removeEntityListener(studentGW);
         studentGW.setImmediate(true);
@@ -203,11 +200,11 @@ public class OrdinaryStudentsView  implements FilterPanelListener{
         studentGW.setMultiSelect(true);
         studentGW.showToolbar(false);
 
-        studentGM = (DBGridModel)studentGW.getWidgetModel();
+        studentGM = (DBGridModel) studentGW.getWidgetModel();
         studentGM.setRefreshType(ERefreshType.MANUAL);
     }
 
-    public void initFilter() throws Exception{
+    public void initFilter() throws Exception {
         changeToNextYearGroupFilterPanel = new ChangeToNextYearGroupFilterPanel(new FChangeToNextYearGroupFilter());
         changeToNextYearGroupFilterPanel.addFilterPanelListener(this);
         changeToNextYearGroupFilterPanel.setImmediate(true);
@@ -218,7 +215,7 @@ public class OrdinaryStudentsView  implements FilterPanelListener{
         specialityComboBox.setFilteringMode(FilteringMode.CONTAINS);
         specialityComboBox.setWidth(300, Sizeable.Unit.PIXELS);
         QueryModel<SPECIALITY> specialityQM = new QueryModel<>(SPECIALITY.class);
-        specialityQM.addJoin(EJoin.INNER_JOIN, "id" , V_STUDENT.class , "speciality");
+        specialityQM.addJoin(EJoin.INNER_JOIN, "id", V_STUDENT.class, "speciality");
         BeanItemContainer<SPECIALITY> specialityBIC = new BeanItemContainer<>(SPECIALITY.class,
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(specialityQM));
         specialityComboBox.setContainerDataSource(specialityBIC);
@@ -244,14 +241,14 @@ public class OrdinaryStudentsView  implements FilterPanelListener{
         BeanItemContainer<STUDY_YEAR> studyYearBIC = new BeanItemContainer<>(STUDY_YEAR.class, SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(studyYearQM));
         studyYearCB.setContainerDataSource(studyYearBIC);
 
-        for(Object o : studyYearCB.getItemIds()){
+        for (Object o : studyYearCB.getItemIds()) {
             studyYears.add((STUDY_YEAR) o);
         }
 
-        for(int i = 0 ; i < studyYears.size() ; i++){
-            for(int j=0; j < studyYears.size();j++){
-                if(studyYears.get(i).getStudyYear() < studyYears.get(j).getStudyYear()){
-                    Collections.swap(studyYears,i,j);
+        for (int i = 0; i < studyYears.size(); i++) {
+            for (int j = 0; j < studyYears.size(); j++) {
+                if (studyYears.get(i).getStudyYear() < studyYears.get(j).getStudyYear()) {
+                    Collections.swap(studyYears, i, j);
                 }
             }
         }
@@ -261,7 +258,7 @@ public class OrdinaryStudentsView  implements FilterPanelListener{
 
     @Override
     public void doFilter(AbstractFilterBean abstractFilterBean) {
-        FChangeToNextYearGroupFilter fctngf = (FChangeToNextYearGroupFilter)abstractFilterBean;
+        FChangeToNextYearGroupFilter fctngf = (FChangeToNextYearGroupFilter) abstractFilterBean;
         Map<Integer, Object> params = new HashMap<>();
         int i = 1;
         StringBuilder sb = new StringBuilder();
@@ -272,7 +269,7 @@ public class OrdinaryStudentsView  implements FilterPanelListener{
 
         }
 
-        if (fctngf.getSpeciality()!=null) {
+        if (fctngf.getSpeciality() != null) {
             sb.append(" and ");
             params.put(i, fctngf.getSpeciality().getId().getId());
             sb.append(" vs.speciality_id = ?" + i++);
@@ -287,9 +284,9 @@ public class OrdinaryStudentsView  implements FilterPanelListener{
             sb.append(" vs.study_year_id = ?" + i++);
 
         }
-        List<VChangeToNextYearStudent > list = new ArrayList<>();
+        List<VChangeToNextYearStudent> list = new ArrayList<>();
 
-        sb.insert(0, " where se.child_id isnull and vs.category_id = "+ STUDENT_CATEGORY.STUDENT_ID.getId()+" and vs.student_status_id in ( "+ STUDENT_STATUS.STUDYING_ID.getId()+" ," +STUDENT_STATUS.DEDUCTED_ID +") and vs.study_year_id NOTNULL and vs.groups_id NOTNULL ");
+        sb.insert(0, " where se.child_id isnull and vs.category_id = " + STUDENT_CATEGORY.STUDENT_ID.getId() + " and vs.student_status_id in ( " + STUDENT_STATUS.STUDYING_ID.getId() + " ," + STUDENT_STATUS.DEDUCTED_ID + ") and vs.study_year_id NOTNULL and vs.groups_id NOTNULL ");
         String sql = "SELECT vs.id , vs.first_name , vs.middle_name,  vs.last_name , vs.faculty_name , vs.speciality_name , vs.study_year_id ,vs.group_name , l.lang_name ,vs.student_status_name " +
                 " from v_student  vs " +
                 " inner join student_education se on vs.id = se.student_id " +
@@ -301,15 +298,15 @@ public class OrdinaryStudentsView  implements FilterPanelListener{
             if (!tmpList.isEmpty()) {
                 for (Object o : tmpList) {
                     Object[] oo = (Object[]) o;
-                    VChangeToNextYearStudent vStudent = new VChangeToNextYearStudent ();
+                    VChangeToNextYearStudent vStudent = new VChangeToNextYearStudent();
                     vStudent.setId(ID.valueOf((long) oo[0]));
-                    vStudent.setFio(oo[1] + " " + ((oo[2] !=null)? (String) oo[2] : "") +" "+ oo[3]);
-                    vStudent.setFacultyName((String)oo[4]);
-                    vStudent.setSpeciality((String)oo[5]);
-                    vStudent.setStudyYear(((Long)oo[6]).intValue());
-                    vStudent.setGroupName((String)oo[7]);
-                    vStudent.setLanguageName((String)oo[8]);
-                    vStudent.setStatus((String)oo[9]);
+                    vStudent.setFio(oo[1] + " " + ((oo[2] != null) ? (String) oo[2] : "") + " " + oo[3]);
+                    vStudent.setFacultyName((String) oo[4]);
+                    vStudent.setSpeciality((String) oo[5]);
+                    vStudent.setStudyYear(((Long) oo[6]).intValue());
+                    vStudent.setGroupName((String) oo[7]);
+                    vStudent.setLanguageName((String) oo[8]);
+                    vStudent.setStatus((String) oo[9]);
 
                     list.add(vStudent);
                 }
@@ -326,7 +323,7 @@ public class OrdinaryStudentsView  implements FilterPanelListener{
         doFilter(changeToNextYearGroupFilterPanel.getFilterBean());
     }
 
-    private void refresh(List<VChangeToNextYearStudent > list) {
+    private void refresh(List<VChangeToNextYearStudent> list) {
         studentGM.setEntities(list);
         try {
             studentGW.refresh();

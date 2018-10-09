@@ -5,12 +5,12 @@ import com.vaadin.server.Sizeable;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.VFaculty;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VGroup;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.VStudent;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VStudentInfo;
 import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.DetalizationDialog;
 import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.PrintDialog;
-import org.apache.commons.io.filefilter.FalseFileFilter;
+import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
@@ -28,8 +28,6 @@ import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import kz.halyqsoft.univercity.utils.CommonUtils;
-
 import static java.lang.Boolean.FALSE;
 
 public class GroupAttendance implements EntityListener{
@@ -40,12 +38,18 @@ public class GroupAttendance implements EntityListener{
     private DateField dateField;
     private Button printBtn;
     private DBGridModel vGroupGM;
-    private Button backButton;
+    private Button backButton, backButtonFaculty;
     private GridWidget vStudentInfoGW;
     private DBGridModel vStudentInfoGM;
     private Button detalizationBtn;
+    private VFaculty vFaculty;
+    private FacultyAttendance facultyAttendance;
 
-    public GroupAttendance(){
+    public GroupAttendance(VFaculty vFaculty,FacultyAttendance facultyAttendance){
+
+        this.vFaculty = vFaculty;
+        this.facultyAttendance = facultyAttendance;
+
         mainVL = new VerticalLayout();
         mainVL.setImmediate(true);
 
@@ -59,6 +63,7 @@ public class GroupAttendance implements EntityListener{
     }
 
     private void init(){
+
         backButton = new Button(CommonUtils.getUILocaleUtil().getCaption("backButton"));
         backButton.setImmediate(true);
         backButton.setVisible(false);
@@ -69,6 +74,7 @@ public class GroupAttendance implements EntityListener{
                 mainVL.addComponent(vGroupGW);
                 backButton.setVisible(false);
                 detalizationBtn.setVisible(false);
+                facultyAttendance.getBackButtonFaculty().setVisible(true);
             }
         });
 
@@ -118,12 +124,11 @@ public class GroupAttendance implements EntityListener{
                         List<String> list = new ArrayList<>();
                         list.add(vStudentInfo.getStudent().toString());
                         list.add(vStudentInfo.getCode());
-                        list.add(vStudentInfo.getComeIN()!=null ? CommonUtils.getFormattedDate(vStudentInfo.getComeIN()): "");
-                        list.add(vStudentInfo.getComeOUT()!=null ? CommonUtils.getFormattedDate(vStudentInfo.getComeOUT()): "");
+                        list.add(vStudentInfo.getComeIN()!=null ? (vStudentInfo.getComeIN()): "");
+                        list.add(vStudentInfo.getComeOUT()!=null ? (vStudentInfo.getComeOUT()): "");
                         tableBody.add(list);
                     }
                 }
-
                 PrintDialog printDialog = new PrintDialog(tableHeader, tableBody , CommonUtils.getUILocaleUtil().getCaption("print"),fileName);
             }
         });
@@ -132,7 +137,7 @@ public class GroupAttendance implements EntityListener{
         topHL.setComponentAlignment(backButton, Alignment.TOP_LEFT);
 
         dateField = new DateField();
-        dateField.setValue(new Date());
+        dateField.setValue(facultyAttendance.getDateField().getValue());
 
         dateField.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
@@ -159,6 +164,7 @@ public class GroupAttendance implements EntityListener{
                 }
             }
         });
+
         buttonPanel.addComponent(dateField);
         buttonPanel.setComponentAlignment(dateField, Alignment.MIDDLE_CENTER);
 
@@ -185,7 +191,6 @@ public class GroupAttendance implements EntityListener{
         vGroupGM.setEntities(getList(dateField.getValue()));
         vGroupGM.setRefreshType(ERefreshType.MANUAL);
         vGroupGM.getFormModel().getFieldModel("time").setInView(FALSE);
-
 
         mainVL.addComponent(topHL);
         mainVL.addComponent(vGroupGW);
@@ -216,14 +221,19 @@ public class GroupAttendance implements EntityListener{
                 "    ON ua.user_id = se.student_id\n" +
                 "  INNER JOIN student_education se2\n" +
                 "    ON g.id = se2.groups_id\n" +
-                "WHERE\n" +
+                "  INNER JOIN speciality s2\n" +
+                "      ON g.speciality_id = s2.id\n" +
+                "  INNER JOIN department d2\n" +
+                "      on s2.chair_id = d2.id" +
+                " WHERE\n" +
                 "  date_trunc('day', ua.created) = date_trunc('day' , TIMESTAMP '"+formattedDate+"')\n" +
                 "  AND\n" +
                 "  ua.come_in = TRUE\n" +
                 "  AND\n" +
-                "  g.deleted = false AND ua.created = (select max(ua2.created) from user_arrival ua2 " +
+                "  ua.created = (select max(ua2.created) from user_arrival ua2 " +
                 "WHERE date_trunc('day', ua2.created)= date_trunc('day' , TIMESTAMP '"+formattedDate+"') and ua2.user_id = ua.user_id)\n" +
-                "GROUP BY g.name, curator_id, g.id";
+                " and d2.parent_id = " + vFaculty.getFacultyID() +
+                " GROUP BY g.name, curator_id, g.id";
 
         try {
             List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
@@ -252,18 +262,23 @@ public class GroupAttendance implements EntityListener{
         } catch (Exception ex) {
             CommonUtils.showMessageAndWriteLog("Unable to load vgroup list", ex);
         }
-         sql = "SELECT\n" +
-                 "  g.name as group_name,\n" +
-                 "  g.id as group_id,\n" +
-                 "  g.curator_id as curator_id,\n" +
-                 "  COUNT(DISTINCT se.student_id) AS count_students_in_the_group,\n" +
-                 "  0 AS come_in_students,\n" +
-                 "  COUNT(DISTINCT se.student_id) AS  do_not_come_students,\n" +
-                 "  0 as percentage_of_come_in_students\n" +
-                 "FROM groups g\n" +
-                 "  LEFT JOIN student_education se\n" +
-                 "    ON g.id = se.groups_id WHERE g.deleted = false \n" +
-                 "GROUP BY g.name, curator_id, g.id;";
+        sql = "SELECT\n" +
+                "  g.name as group_name,\n" +
+                "  g.id as group_id,\n" +
+                "  g.curator_id as curator_id,\n" +
+                "  COUNT(DISTINCT se.student_id) AS count_students_in_the_group,\n" +
+                "  0 AS come_in_students,\n" +
+                "  COUNT(DISTINCT se.student_id) AS  do_not_come_students,\n" +
+                "  0 as percentage_of_come_in_students\n" +
+                " FROM groups g\n" +
+                "  LEFT JOIN student_education se\n" +
+                "    ON g.id = se.groups_id\n" +
+                "  INNER JOIN speciality s2\n" +
+                "      ON g.speciality_id = s2.id\n" +
+                " INNER JOIN department d2\n" +
+                "      on s2.chair_id = d2.id" +
+                " WHERE  d2.parent_id = " + vFaculty.getFacultyID() +
+                " GROUP BY g.name, curator_id, g.id;";
 
         try {
             List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
@@ -276,7 +291,7 @@ public class GroupAttendance implements EntityListener{
                     if(oo[2]!=null){
                         EMPLOYEE employee = null;
                         try{
-                            employee = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(EMPLOYEE.class, ID.valueOf((Long) oo[2] ));
+                            employee = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(EMPLOYEE.class, ID.valueOf((Long) oo[2]) );
                             vg.setCurator(employee);
                         }catch (Exception e){
                             e.printStackTrace();
@@ -335,30 +350,30 @@ public class GroupAttendance implements EntityListener{
 
                     Boolean flag = (Boolean) oo[2];
                     if(flag){
-                        String sqlMax = "select max(created), come_in from user_arrival where user_id = "+vs.getId()+" and date_trunc('day', created)= date_trunc('day' , TIMESTAMP '"+formattedDate+"') GROUP BY come_in;";
-                        String sqlMin = "select min(created), come_in from user_arrival where user_id = "+vs.getId()+" and date_trunc('day', created)= date_trunc('day' , TIMESTAMP '"+formattedDate+"') GROUP BY come_in;";
+                        String sqlMax = "select (date_trunc('second', max(created))::time)::text, come_in from user_arrival where user_id = "+vs.getId()+" and date_trunc('day', created)= date_trunc('day' , TIMESTAMP '"+formattedDate+"') and come_in = false GROUP BY come_in;";
+                        String sqlMin = "select (date_trunc('second', min(created))::time)::text, come_in from user_arrival where user_id = "+vs.getId()+" and date_trunc('day', created)= date_trunc('day' , TIMESTAMP '"+formattedDate+"') and come_in = true GROUP BY come_in;";
                         List<Object> tmpMaxList = new ArrayList<>();
-                                try{
-                                    tmpMaxList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlMax, params));
-                                }catch (Exception e){
-                                    e.printStackTrace();
-                                }
+                        try{
+                            tmpMaxList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlMax, params));
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
                         List<Object> tmpMinList =new ArrayList<>();
-                                try{
-                                    tmpMinList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlMin, params));
-                                }catch (Exception e){
-                                    e.printStackTrace();
-                                }
+                        try{
+                            tmpMinList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlMin, params));
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
                         for(Object oMax : tmpMaxList){
                             Object[] ooMax = (Object[]) oMax;
                             if(!(boolean) ooMax[1]){
-                                vs.setComeOUT((Date)ooMax[0]);
+                                vs.setComeOUT((String)ooMax[0]);
                             }
                         }
                         for(Object oMin : tmpMinList){
                             Object[] ooMin = (Object[]) oMin;
                             if((boolean) ooMin[1]){
-                                vs.setComeIN((Date)ooMin[0]);
+                                vs.setComeIN((String)ooMin[0]);
                             }
                         }
                     }
@@ -398,10 +413,11 @@ public class GroupAttendance implements EntityListener{
                     vStudentInfoGM.setRowNumberWidth(30);
                     vStudentInfoGM.setRefreshType(ERefreshType.MANUAL);
                     vStudentInfoGM.setEntities(getList((VGroup) vGroupGW.getSelectedEntity(), dateField.getValue()));
-                    mainVL.addComponent(vStudentInfoGW);
 
+                    mainVL.addComponent(vStudentInfoGW);
                     backButton.setVisible(true);
                     detalizationBtn.setVisible(true);
+                    facultyAttendance.getBackButtonFaculty().setVisible(false);
                 }
             }
         }

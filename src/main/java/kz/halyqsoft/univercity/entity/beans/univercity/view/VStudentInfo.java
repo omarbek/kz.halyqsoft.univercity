@@ -6,6 +6,8 @@ import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
 
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import java.util.Date;
 
 public class VStudentInfo extends AbstractEntity {
@@ -16,11 +18,11 @@ public class VStudentInfo extends AbstractEntity {
     @FieldInfo(type = EFieldType.TEXT, order = 2)
     private String code;
 
-    @FieldInfo(type = EFieldType.DATETIME, order = 3)
-    private Date comeIN;
+    @FieldInfo(type = EFieldType.TEXT, order = 3)
+    private String comeIN;
 
-    @FieldInfo(type = EFieldType.DATETIME, order = 4)
-    private Date comeOUT;
+    @FieldInfo(type = EFieldType.TEXT, order = 4)
+    private String comeOUT;
 
     public USERS getStudent() {
         return student;
@@ -38,19 +40,23 @@ public class VStudentInfo extends AbstractEntity {
         this.code = code;
     }
 
-    public Date getComeIN() {
+    public String getComeIN() {
         return comeIN;
     }
 
-    public void setComeIN(Date comeIN) {
+    public void setComeIN(String comeIN) {
         this.comeIN = comeIN;
     }
 
-    public Date getComeOUT() {
+    public String getComeOUT() {
         return comeOUT;
     }
 
-    public void setComeOUT(Date comeOUT) {
+    public void setComeOUT(String comeOUT) {
         this.comeOUT = comeOUT;
+    }
+
+    public VStudentInfo(){
+
     }
 }

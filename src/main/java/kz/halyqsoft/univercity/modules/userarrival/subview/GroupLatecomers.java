@@ -133,7 +133,7 @@ public class GroupLatecomers implements EntityListener {
                         List<String> list = new ArrayList<>();
                         list.add(vStudentInfo.getStudent().toString());
                         list.add(vStudentInfo.getCode());
-                        list.add(vStudentInfo.getComeIN() != null ? CommonUtils.getFormattedDate(vStudentInfo.getComeIN()) : "");
+                        list.add(vStudentInfo.getComeIN() != null ? (vStudentInfo.getComeIN()) : "");
                         tableBody.add(list);
                     }
                 }
@@ -246,7 +246,7 @@ public class GroupLatecomers implements EntityListener {
         String formattedDate = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS").format(date);
 
         String sql = "\n" +
-                "SELECT  u.id, u.code, min(ua.created) as sdf\n" +
+                "SELECT  u.id, u.code, (date_trunc('second',min(ua.created))::time)::text as sdf\n" +
                 "FROM groups g\n" +
                 "INNER JOIN student_education se\n" +
                 "ON g.id = se.groups_id\n" +
@@ -301,7 +301,7 @@ public class GroupLatecomers implements EntityListener {
                     vs.setId(ID.valueOf((Long) oo[0]));
                     vs.setStudent(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(STUDENT.class, vs.getId()));
                     vs.setCode((String) oo[1]);
-                    vs.setComeIN((Date) oo[2]);
+                    vs.setComeIN((String) oo[2]);
                     groupList.add(vs);
                 }
             }

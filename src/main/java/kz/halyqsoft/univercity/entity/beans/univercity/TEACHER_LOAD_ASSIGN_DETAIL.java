@@ -14,7 +14,7 @@ import javax.persistence.*;
 @Entity
 public class TEACHER_LOAD_ASSIGN_DETAIL extends AbstractEntity {
 
-    @FieldInfo(type = EFieldType.FK_COMBO,inGrid=false)
+    @FieldInfo(type = EFieldType.FK_COMBO, inGrid = false, inEdit = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "TEACHER_LOAD_ASSIGN_ID", referencedColumnName = "ID")})
@@ -38,19 +38,19 @@ public class TEACHER_LOAD_ASSIGN_DETAIL extends AbstractEntity {
             @JoinColumn(name = "SEMESTER_PERIOD_ID", referencedColumnName = "ID")})
     private SEMESTER_PERIOD semesterPeriod;
 
-    @FieldInfo(type = EFieldType.FK_DIALOG, order = 5)
+    @FieldInfo(type = EFieldType.FK_DIALOG, order = 5, required = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "STREAM_ID", referencedColumnName = "ID")})
     private STREAM stream;
 
-    @FieldInfo(type = EFieldType.FK_DIALOG, order = 6)
+    @FieldInfo(type = EFieldType.FK_DIALOG, order = 6, required = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "GROUP_ID", referencedColumnName = "ID")})
     private GROUPS group;
 
-    @FieldInfo(type = EFieldType.FK_DIALOG, order = 7)
+    @FieldInfo(type = EFieldType.FK_DIALOG, order = 7, readOnlyFixed = true)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "STUDY_YEAR_ID", referencedColumnName = "ID")})
@@ -68,11 +68,11 @@ public class TEACHER_LOAD_ASSIGN_DETAIL extends AbstractEntity {
             @JoinColumn(name = "STUDENT_DIPLOMA_TYPE_ID", referencedColumnName = "ID")})
     private STUDENT_DIPLOMA_TYPE studentDiplomaType;
 
-    @FieldInfo(type = EFieldType.INTEGER, order = 10)
-    @Column(name = "STUDENT_COUNT")
+    @FieldInfo(type = EFieldType.INTEGER, order = 10, inEdit = false)
+    @Column(name = "STUDENT_COUNT", nullable = false)
     private Integer studentCount;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 11)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 11, inEdit = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "CREDITABILITY_ID", referencedColumnName = "ID")})
@@ -126,8 +126,8 @@ public class TEACHER_LOAD_ASSIGN_DETAIL extends AbstractEntity {
     @Column(name = "PROTECT_DIPLOMA_HOUR")
     private Double protectDiplomaHour;
 
-    @FieldInfo(type = EFieldType.DOUBLE, order = 24)
-    @Column(name = "TOTAL_HOUR")
+    @FieldInfo(type = EFieldType.DOUBLE, order = 24, inEdit = false)
+    @Column(name = "TOTAL_HOUR", nullable = false)
     private Double totalHour;
 
     public TEACHER_LOAD_ASSIGN getTeacherLoadAssign() {

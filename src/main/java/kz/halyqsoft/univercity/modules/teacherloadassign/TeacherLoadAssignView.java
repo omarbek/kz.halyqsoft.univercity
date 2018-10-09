@@ -5,6 +5,7 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.*;
+import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_TEACHER_LOAD_ASSIGN_DETAIL;
@@ -22,6 +23,7 @@ import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.ERefreshType;
 import org.r3a.common.vaadin.widget.dialog.AbstractYesButtonListener;
 import org.r3a.common.vaadin.widget.dialog.Message;
+import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 
@@ -51,6 +53,9 @@ public class TeacherLoadAssignView extends AbstractTaskView {
 
     private ENTRANCE_YEAR currentYear;
     private SEMESTER_DATA currentSemesterData;
+
+    private QueryModel subjectQM;
+    private QueryModel teacherQM;
 
     private static final int DOES_NOT_WORK = 4;
     private static final int TEACHER = 2;
@@ -264,12 +269,25 @@ public class TeacherLoadAssignView extends AbstractTaskView {
                 lookup(teacherLoadAssignDetailQM);
         if (!list.isEmpty()) {
             GridWidget loadGW = new GridWidget(TEACHER_LOAD_ASSIGN_DETAIL.class);
-            loadGW.showToolbar(false);
+            loadGW.addEntityListener(this);
 
             DBGridModel loadGM = (DBGridModel) loadGW.getWidgetModel();
             loadGM.setTitleVisible(false);
             loadGM.setMultiSelect(false);
             loadGM.setRefreshType(ERefreshType.MANUAL);
+
+            subjectQM = ((FKFieldModel) loadGM.getFormModel().getFieldModel("subject")).getQueryModel();
+            subjectQM.addWhere("deleted", false);
+
+            QueryModel groupQM = ((FKFieldModel) loadGM.getFormModel().getFieldModel("group")).getQueryModel();
+            groupQM.addWhere("deleted", false);
+
+            teacherQM = ((FKFieldModel) loadGM.getFormModel().getFieldModel("teacher")).getQueryModel();
+            FromItem usersFI = teacherQM.addJoin(EJoin.INNER_JOIN, "id", USERS.class, "id");
+            teacherQM.addWhere(usersFI, "deleted", false);
+
+            QueryModel semesterQM = ((FKFieldModel) loadGM.getFormModel().getFieldModel("semester")).getQueryModel();
+            QueryModel streamQM = ((FKFieldModel) loadGM.getFormModel().getFieldModel("stream")).getQueryModel();
 
             loadGM.setEntities(list);
             loadGW.refresh();
@@ -565,6 +583,50 @@ public class TeacherLoadAssignView extends AbstractTaskView {
         loadQM.addWhere(specFI, "department", ECriteria.EQUAL, ((DEPARTMENT) chairCB.getValue()).getId());
         loadQM.addWhere(curriculumFI, "entranceYear", ECriteria.EQUAL, currentYear.getId());
         return SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(loadQM);
+    }
+
+    @Override
+    public boolean onEdit(Object source, Entity e, int buttonId) {
+        onCreateOrEdit((TEACHER_LOAD_ASSIGN_DETAIL) e);
+        return true;
+    }
+
+    @Override
+    public void onCreate(Object source, Entity e, int buttonId) {
+        onCreateOrEdit((TEACHER_LOAD_ASSIGN_DETAIL) e);
+    }
+
+    private void onCreateOrEdit(TEACHER_LOAD_ASSIGN_DETAIL teacherLoadAssignDetail) {
+        try {
+            QueryModel<TEACHER_LOAD_ASSIGN> teacherLoadAssignQM = new QueryModel<>(TEACHER_LOAD_ASSIGN.class);
+            ID departmentId = ((DEPARTMENT) chairCB.getValue()).getId();
+            teacherLoadAssignQM.addWhere("department", ECriteria.EQUAL, departmentId);
+            teacherLoadAssignQM.addWhere("entranceYear", ECriteria.EQUAL, ((ENTRANCE_YEAR) entranceYearCB.getValue()).
+                    getId());
+            teacherLoadAssignQM.addWhere("deleted", false);
+            TEACHER_LOAD_ASSIGN teacherLoadAssign = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                    lookupSingle(teacherLoadAssignQM);
+
+            teacherLoadAssignDetail.setTeacherLoadAssign(teacherLoadAssign);
+
+            FromItem employeeDeptFI=teacherQM.addJoin(EJoin.INNER_JOIN,"id",EMPLOYEE_DEPT.class,"employee");
+            teacherQM.addWhere(employeeDeptFI, "employeeType", ECriteria.EQUAL,2);
+            teacherQM.addWhere(employeeDeptFI, "department", ECriteria.EQUAL,departmentId);//TODO check
+
+            subjectQM.addWhere("chair", ECriteria.EQUAL, departmentId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public boolean preSave(Object source, Entity e, boolean isNew, int buttonId) {
+        try {
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return true;
     }
 
     private class ChairChangeListener implements Property.ValueChangeListener {

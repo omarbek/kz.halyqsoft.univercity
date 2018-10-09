@@ -273,7 +273,9 @@ public class CommonUtils {
                 code = beginYear + "0" + usersCode;
             } else if (usersCode < 10000) {
                 code = beginYear + usersCode;
-            } else {
+            } else if(usersCode < 100000){
+                code = beginYear + usersCode;
+            }else {
                 SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USERS_CODE").
                         setId(BigInteger.valueOf(0));//TODO check
                 code = getCode(beginYear);
