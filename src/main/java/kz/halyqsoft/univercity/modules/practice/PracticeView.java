@@ -173,7 +173,10 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
         informationPracticeGW.setButtonVisible(IconToolbar.REFRESH_BUTTON, false);
 
         informationPracticeGW.getToolbarPanel().addComponent(reportBtn);
+        informationPracticeGW.getToolbarPanel().setComponentAlignment(reportBtn,Alignment.MIDDLE_CENTER);
         informationPracticeGW.getToolbarPanel().addComponent(downloadTableBtn);
+        informationPracticeGW.getToolbarPanel().setComponentAlignment(downloadTableBtn,Alignment.MIDDLE_RIGHT);
+
 
         informationPracticeGM = (DBGridModel)informationPracticeGW.getWidgetModel();
         informationPracticeGM.setRefreshType(ERefreshType.MANUAL);
@@ -400,7 +403,7 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
                                     (pi.getEmployee().getMiddleName() != null ?
                                             pi.getEmployee().getMiddleName().toUpperCase().charAt(0) : "") + " " +
                                     "\nІс тәжірибе түрі/Наименование практики: Производственная(педагогическая) практика " +
-                                    "\nКредиттер саны/Количество кредитов ", EmployeePdfCreator.getFont(15, Font.NORMAL));
+                                    "\nКредиттер саны/Количество кредитов \n", EmployeePdfCreator.getFont(15, Font.NORMAL));
 
 
                             document.add(content);
