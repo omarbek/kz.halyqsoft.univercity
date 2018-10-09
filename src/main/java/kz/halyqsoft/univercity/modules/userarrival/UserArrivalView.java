@@ -150,6 +150,8 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
 
         mainHSP.addComponent(menuTT);
         getContent().addComponent(mainHSP);
+
+        menuTT.select(main);
     }
 
     private void setAbsentsInfo() {
