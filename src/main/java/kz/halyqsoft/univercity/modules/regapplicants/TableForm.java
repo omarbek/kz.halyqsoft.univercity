@@ -20,44 +20,43 @@ import java.util.List;
 import java.util.Map;
 
 
-
 public class TableForm {
     private Document document;
     private PdfPTable pdfPTable;
     private ByteArrayOutputStream byteArrayOutputStream;
     private ID studentId;
 
-    public TableForm(Document document, ID studentID){
+    public TableForm(Document document, ID studentID) {
         this.document = document;
-        this.studentId=studentID;
+        this.studentId = studentID;
         initialize();
     }
 
     public void initialize() {
         try {
             PdfWriter pdfWriter = PdfWriter.getInstance(this.document, byteArrayOutputStream);
-           // pdfWriter.open();
+            // pdfWriter.open();
             document.open();
 
             PdfPTable table = new PdfPTable(7);
             document.add(new Paragraph(" Семестрде оқылатын пәндер тізімі:", EmployeePdfCreator.getFont(12, Font.BOLD)));
 
-            insertCell(table, "СЕМЕСТР 1", Element.ALIGN_CENTER, 7,  EmployeePdfCreator.getFont(12, Font.BOLD));
-            insertCell(table, "Міндетті түрде оқытылатын пәндер:", Element.ALIGN_LEFT, 7,  EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table, "СЕМЕСТР 1", Element.ALIGN_CENTER, 7, EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table, "Міндетті түрде оқытылатын пәндер:", Element.ALIGN_LEFT, 7, EmployeePdfCreator.getFont(12, Font.BOLD));
 
-            insertCell(table, "Пәннің коды", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table, "Пәннің коды", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.BOLD));
 
-            insertCell(table, "Модуль түрлері", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table, "Модуль түрлері", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.BOLD));
 
-            insertCell(table, "Пәннің толық атауы", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table, "Пәннің толық атауы", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.BOLD));
 
-            insertCell(table, "Кредит саны", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table, "Кредит саны", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.BOLD));
 
-            insertCell(table, "ЕСТS", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table, "ЕСТS", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.BOLD));
 
-            insertCell(table, "Семестр", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table, "Семестр", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.BOLD));
 
-            insertCell(table, "Тьютордың аты-жөні", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table, "Тьютордың аты-жөні", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.BOLD));
 
             table.setWidthPercentage(100);
 
@@ -96,7 +95,7 @@ public class TableForm {
                     "      subj.subject_cycle_id IS NOT NULL " +
                     "  AND subj.module_id  != 3\n " +
                     "  AND subj.mandatory=TRUE AND\n" +
-                    "      usr.locked = FALSE AND usr.id = "+studentId;
+                    "      usr.locked = FALSE AND usr.id = " + studentId;
 
             Map<Integer, Object> params = new HashMap<>();
             try {
@@ -105,15 +104,15 @@ public class TableForm {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
 
-                        for(int i = 0 ; i < 7;i++){
-                            insertCell(table,oo[i]!=null ? oo[i] instanceof String ? (String)oo[i]: String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        for (int i = 0; i < 7; i++) {
+                            insertCell(table, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.NORMAL));
                         }
                     }
                 }
             } catch (Exception ex) {
                 CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
             }
-            insertCell(table, "Студенттің таңдаған пәндері:", Element.ALIGN_LEFT, 7,  EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table, "Студенттің таңдаған пәндері:", Element.ALIGN_LEFT, 7, EmployeePdfCreator.getFont(12, Font.BOLD));
 
             String sql1 = "SELECT\n" +
                     "  s4.code,\n" +
@@ -147,7 +146,7 @@ public class TableForm {
                     "      subj.subject_cycle_id IS NOT NULL\n" +
                     "  AND subj.mandatory=FALSE AND " +
                     "  subj.module_id  != 3 AND \n" +
-                    "      usr.locked = FALSE AND usr.id = "+studentId;
+                    "      usr.locked = FALSE AND usr.id = " + studentId;
             Map<Integer, Object> param = new HashMap<>();
             try {
                 java.util.List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql1, param);
@@ -155,8 +154,8 @@ public class TableForm {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
 
-                        for(int i = 0 ; i < 7;i++){
-                            insertCell(table,oo[i]!=null ? oo[i] instanceof String ? (String)oo[i]: String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        for (int i = 0; i < 7; i++) {
+                            insertCell(table, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.NORMAL));
                         }
 
                     }
@@ -165,7 +164,7 @@ public class TableForm {
                 CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
             }
 
-            insertCell(table, "Студенттің қосымша пәндері:\t", Element.ALIGN_LEFT, 7,  EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table, "Студенттің қосымша пәндері:\t", Element.ALIGN_LEFT, 7, EmployeePdfCreator.getFont(12, Font.BOLD));
 
             String sql2 = "SELECT\n" +
                     "  s4.code,\n" +
@@ -197,7 +196,7 @@ public class TableForm {
                     "WHERE  usr.deleted = FALSE AND\n" +
                     "      subj.subject_cycle_id IS NOT NULL\n" +
                     "AND subj.module_id=3\n" +
-                    "  AND usr.locked = FALSE AND usr.id = "+studentId;
+                    "  AND usr.locked = FALSE AND usr.id = " + studentId;
             Map<Integer, Object> para = new HashMap<>();
             try {
                 java.util.List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql2, para);
@@ -205,8 +204,8 @@ public class TableForm {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
 
-                        for(int i = 0 ; i < 7;i++){
-                            insertCell(table,oo[i]!=null ? oo[i] instanceof String ? (String)oo[i]: String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        for (int i = 0; i < 7; i++) {
+                            insertCell(table, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.NORMAL));
                         }
 
                     }
@@ -236,10 +235,10 @@ public class TableForm {
                     "\n" +
                     "  LEFT JOIN pair_subject s4 ON subj.id = s4.subject_id\n" +
                     "WHERE\n" +
-                    "  usr.id =  " +studentId+
+                    "  usr.id =  " + studentId +
                     " AND sem_data.semester_period_id=1";
 
-            insertCell(table, ("Семестрде барлығы"), Element.ALIGN_LEFT, 3,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+            insertCell(table, ("Семестрде барлығы"), Element.ALIGN_LEFT, 3, EmployeePdfCreator.getFont(12, Font.NORMAL));
 
             Map<Integer, Object> par = new HashMap<>();
             try {
@@ -248,8 +247,8 @@ public class TableForm {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
 
-                        for(int i = 0 ; i < 2;i++){
-                            insertCell(table,oo[i]!=null ? oo[i] instanceof String ? (String)oo[i]: String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        for (int i = 0; i < 2; i++) {
+                            insertCell(table, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.NORMAL));
                         }
 
                     }
@@ -258,23 +257,11 @@ public class TableForm {
                 CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
             }
 
-            insertCell(table, (" "), Element.ALIGN_LEFT, 2,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-            insertCell(table, "СЕМЕСТР 2", Element.ALIGN_CENTER, 7,  EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table, (" "), Element.ALIGN_LEFT, 2, EmployeePdfCreator.getFont(12, Font.NORMAL));
+            insertCell(table, "СЕМЕСТР 2", Element.ALIGN_CENTER, 7, EmployeePdfCreator.getFont(12, Font.BOLD));
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-            insertCell(table, "Міндетті түрде оқытылатын пәндер:", Element.ALIGN_LEFT, 7,  EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table, "Міндетті түрде оқытылатын пәндер:", Element.ALIGN_LEFT, 7, EmployeePdfCreator.getFont(12, Font.BOLD));
             String sqlSem2 = "SELECT\n" +
                     "  s4.code,\n" +
                     "  module.module_short_name moduleType,\n" +
@@ -306,15 +293,15 @@ public class TableForm {
                     "      subj.subject_cycle_id IS NOT NULL " +
                     "  AND subj.module_id  != 3\n " +
                     "  AND subj.mandatory=TRUE AND\n" +
-                    "      usr.locked = FALSE AND usr.id = "+studentId;
+                    "      usr.locked = FALSE AND usr.id = " + studentId;
             try {
                 java.util.List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlSem2, params);
                 if (!tmpList.isEmpty()) {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
 
-                        for(int i = 0 ; i < 7;i++){
-                            insertCell(table,oo[i]!=null ? oo[i] instanceof String ? (String)oo[i]: String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        for (int i = 0; i < 7; i++) {
+                            insertCell(table, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.NORMAL));
                         }
 
                     }
@@ -322,7 +309,7 @@ public class TableForm {
             } catch (Exception ex) {
                 CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
             }
-            insertCell(table, "Студенттің таңдаған пәндері:", Element.ALIGN_LEFT, 7,  EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table, "Студенттің таңдаған пәндері:", Element.ALIGN_LEFT, 7, EmployeePdfCreator.getFont(12, Font.BOLD));
 
             String sqlAdd = "SELECT\n" +
                     "  s4.code,\n" +
@@ -355,15 +342,15 @@ public class TableForm {
                     "      subj.subject_cycle_id IS NOT NULL\n" +
                     "  AND subj.mandatory=FALSE AND " +
                     "  subj.module_id  != 3 AND \n" +
-                    "      usr.locked = FALSE AND usr.id = "+studentId;
+                    "      usr.locked = FALSE AND usr.id = " + studentId;
             try {
                 java.util.List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlAdd, param);
                 if (!tmpList.isEmpty()) {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
 
-                        for(int i = 0 ; i < 7;i++){
-                            insertCell(table,oo[i]!=null ? oo[i] instanceof String ? (String)oo[i]: String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        for (int i = 0; i < 7; i++) {
+                            insertCell(table, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.NORMAL));
                         }
                     }
                 }
@@ -371,7 +358,7 @@ public class TableForm {
                 CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
             }
 
-            insertCell(table, "Студенттің қосымша пәндері:", Element.ALIGN_LEFT, 7,  EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table, "Студенттің қосымша пәндері:", Element.ALIGN_LEFT, 7, EmployeePdfCreator.getFont(12, Font.BOLD));
 
             String sqlStud = "SELECT\n" +
                     "  s4.code,\n" +
@@ -402,15 +389,15 @@ public class TableForm {
                     "   WHERE  usr.deleted = FALSE AND\n" +
                     "      subj.subject_cycle_id IS NOT NULL\n" +
                     "AND subj.module_id=3\n" +
-                    "  AND usr.locked = FALSE AND usr.id = "+studentId;
+                    "  AND usr.locked = FALSE AND usr.id = " + studentId;
             try {
                 java.util.List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlStud, para);
                 if (!tmpList.isEmpty()) {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
 
-                        for(int i = 0 ; i < 7;i++){
-                            insertCell(table,oo[i]!=null ? oo[i] instanceof String ? (String)oo[i]: String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        for (int i = 0; i < 7; i++) {
+                            insertCell(table, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.NORMAL));
                         }
                     }
                 }
@@ -438,10 +425,10 @@ public class TableForm {
                     "  LEFT JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
                     "  LEFT JOIN pair_subject s4 ON subj.id = s4.subject_id\n" +
                     "   WHERE\n" +
-                    "  usr.id = " +studentId+
+                    "  usr.id = " + studentId +
                     "  AND sem_data.semester_period_id=2";
 
-            insertCell(table, ("Семестрде барлығы"), Element.ALIGN_LEFT, 3,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+            insertCell(table, ("Семестрде барлығы"), Element.ALIGN_LEFT, 3, EmployeePdfCreator.getFont(12, Font.NORMAL));
 
             try {
                 java.util.List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlSum, par);
@@ -449,8 +436,8 @@ public class TableForm {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
 
-                        for(int i = 0 ; i < 2;i++){
-                            insertCell(table,oo[i]!=null ? oo[i] instanceof String ? (String)oo[i]: String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        for (int i = 0; i < 2; i++) {
+                            insertCell(table, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.NORMAL));
                         }
                     }
                 }
@@ -458,28 +445,18 @@ public class TableForm {
                 CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
             }
 
-            insertCell(table, (" "), Element.ALIGN_LEFT, 2,  EmployeePdfCreator.getFont(12, Font.NORMAL));
-
-
-
-
-
-
-
-
-
-
+            insertCell(table, (" "), Element.ALIGN_LEFT, 2, EmployeePdfCreator.getFont(12, Font.NORMAL));
 
 
             PdfPTable table1 = new PdfPTable(6);
-            insertCell(table1, "Пәннің коды", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.BOLD));
-            insertCell(table1, "Пәннің толық атауы", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.BOLD));
-            insertCell(table1, "Кредит саны", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.BOLD));
-            insertCell(table1, "ECTS", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.BOLD));
-            insertCell(table1, "Оқытушының аты-жөні", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.BOLD));
-            insertCell(table1, "Емтихан", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.BOLD));
-            insertCell(table1, "СЕМЕСТР 1", Element.ALIGN_CENTER, 6,  EmployeePdfCreator.getFont(12, Font.BOLD));
-            insertCell(table1, "Міндетті түрде оқытылатын пәндер:", Element.ALIGN_LEFT, 6,  EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table1, "Пәннің коды", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table1, "Пәннің толық атауы", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table1, "Кредит саны", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table1, "ECTS", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table1, "Оқытушының аты-жөні", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table1, "Емтихан", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table1, "СЕМЕСТР 1", Element.ALIGN_CENTER, 6, EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table1, "Міндетті түрде оқытылатын пәндер:", Element.ALIGN_LEFT, 6, EmployeePdfCreator.getFont(12, Font.BOLD));
             table1.setWidthPercentage(100);
 
             String sqlTeacherSem1 = "SELECT\n" +
@@ -512,22 +489,22 @@ public class TableForm {
                     "       usr.deleted = FALSE AND\n" +
                     "      subj.subject_cycle_id IS NOT NULL   AND subj.module_id  != 3\n" +
                     "      AND subj.mandatory=TRUE AND\n" +
-                    "      usr.locked = FALSE AND usr.id = "+studentId;
+                    "      usr.locked = FALSE AND usr.id = " + studentId;
             try {
                 java.util.List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlTeacherSem1, params);
                 if (!tmpList.isEmpty()) {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
 
-                        for(int i = 0 ; i < 6;i++){
-                            insertCell(table1,oo[i]!=null ? oo[i] instanceof String ? (String)oo[i]: String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        for (int i = 0; i < 6; i++) {
+                            insertCell(table1, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.NORMAL));
                         }
                     }
                 }
             } catch (Exception ex) {
                 CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
             }
-            insertCell(table1, "Студенттің таңдаған пәндері:", Element.ALIGN_LEFT, 7,  EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table1, "Студенттің таңдаған пәндері:", Element.ALIGN_LEFT, 7, EmployeePdfCreator.getFont(12, Font.BOLD));
 
             String sqlTeaAdd = "SELECT\n" +
                     "  s4.code,\n" +
@@ -560,15 +537,15 @@ public class TableForm {
                     "  subj.subject_cycle_id IS NOT NULL\n" +
                     "  AND subj.mandatory=FALSE AND\n" +
                     "  subj.module_id  != 3 AND\n" +
-                    "  usr.locked = FALSE AND usr.id = "+studentId;
+                    "  usr.locked = FALSE AND usr.id = " + studentId;
             try {
                 java.util.List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlTeaAdd, param);
                 if (!tmpList.isEmpty()) {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
 
-                        for(int i = 0 ; i < 6;i++){
-                            insertCell(table1,oo[i]!=null ? oo[i] instanceof String ? (String)oo[i]: String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        for (int i = 0; i < 6; i++) {
+                            insertCell(table1, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.NORMAL));
                         }
 
 
@@ -578,7 +555,7 @@ public class TableForm {
                 CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
             }
 
-            insertCell(table1, "Студенттің қосымша пәндері:", Element.ALIGN_LEFT, 7,  EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table1, "Студенттің қосымша пәндері:", Element.ALIGN_LEFT, 7, EmployeePdfCreator.getFont(12, Font.BOLD));
 
             String sqlTeachAdd = "SELECT\n" +
                     "  s4.code,\n" +
@@ -609,15 +586,15 @@ public class TableForm {
                     "  usr.deleted = FALSE AND\n" +
                     "  subj.subject_cycle_id IS NOT NULL AND subj.module_id=3\n" +
                     "AND\n" +
-                    "  usr.locked = FALSE AND usr.id = "+studentId;
+                    "  usr.locked = FALSE AND usr.id = " + studentId;
             try {
                 java.util.List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlTeachAdd, para);
                 if (!tmpList.isEmpty()) {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
 
-                        for(int i = 0 ; i < 6;i++){
-                            insertCell(table1,oo[i]!=null ? oo[i] instanceof String ? (String)oo[i]: String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        for (int i = 0; i < 6; i++) {
+                            insertCell(table1, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.NORMAL));
                         }
 
 
@@ -647,10 +624,10 @@ public class TableForm {
                     "  LEFT JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
                     "  LEFT JOIN pair_subject s4 ON subj.id = s4.subject_id " +
                     "   WHERE\n" +
-                    "  usr.id = " +studentId+
+                    "  usr.id = " + studentId +
                     " AND sem_data.semester_period_id=1";
 
-            insertCell(table1, ("Семестрде барлығы"), Element.ALIGN_LEFT, 2,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+            insertCell(table1, ("Семестрде барлығы"), Element.ALIGN_LEFT, 2, EmployeePdfCreator.getFont(12, Font.NORMAL));
 
             try {
                 java.util.List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlTeachSum, par);
@@ -658,8 +635,8 @@ public class TableForm {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
 
-                        for(int i = 0 ; i < 2;i++){
-                            insertCell(table1,oo[i]!=null ? oo[i] instanceof String ? (String)oo[i]: String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        for (int i = 0; i < 2; i++) {
+                            insertCell(table1, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.NORMAL));
                         }
                     }
                 }
@@ -667,20 +644,11 @@ public class TableForm {
                 CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
             }
 
-            insertCell(table1, (" "), Element.ALIGN_LEFT, 2,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+            insertCell(table1, (" "), Element.ALIGN_LEFT, 2, EmployeePdfCreator.getFont(12, Font.NORMAL));
 
 
-
-
-
-
-
-
-
-
-
-            insertCell(table1, "СЕМЕСТР 2", Element.ALIGN_CENTER, 6,  EmployeePdfCreator.getFont(12, Font.BOLD));
-            insertCell(table1, "           Міндетті түрде оқытылатын пәндер:", Element.ALIGN_LEFT, 6,  EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table1, "СЕМЕСТР 2", Element.ALIGN_CENTER, 6, EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table1, "           Міндетті түрде оқытылатын пәндер:", Element.ALIGN_LEFT, 6, EmployeePdfCreator.getFont(12, Font.BOLD));
 
 
             String sqlTeacherSem2 = "SELECT\n" +
@@ -713,15 +681,15 @@ public class TableForm {
                     "       usr.deleted = FALSE AND\n" +
                     "      subj.subject_cycle_id IS NOT NULL   AND subj.module_id  != 3\n" +
                     "      AND subj.mandatory=TRUE AND\n" +
-                    "      usr.locked = FALSE AND usr.id = "+studentId;
+                    "      usr.locked = FALSE AND usr.id = " + studentId;
             try {
                 java.util.List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlTeacherSem2, params);
                 if (!tmpList.isEmpty()) {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
 
-                        for(int i = 0 ; i < 6;i++){
-                            insertCell(table1,oo[i]!=null ? oo[i] instanceof String ? (String)oo[i]: String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        for (int i = 0; i < 6; i++) {
+                            insertCell(table1, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.NORMAL));
                         }
 
 
@@ -730,7 +698,7 @@ public class TableForm {
             } catch (Exception ex) {
                 CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
             }
-            insertCell(table1, "Студенттің таңдаған пәндері:", Element.ALIGN_LEFT, 7,  EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table1, "Студенттің таңдаған пәндері:", Element.ALIGN_LEFT, 7, EmployeePdfCreator.getFont(12, Font.BOLD));
 
             String sqlTeaAdd2 = "SELECT\n" +
                     "  s4.code,\n" +
@@ -763,15 +731,15 @@ public class TableForm {
                     "  subj.subject_cycle_id IS NOT NULL\n" +
                     "  AND subj.mandatory=FALSE AND\n" +
                     "  subj.module_id  != 3 AND\n" +
-                    "  usr.locked = FALSE AND usr.id = "+studentId;
+                    "  usr.locked = FALSE AND usr.id = " + studentId;
             try {
                 java.util.List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlTeaAdd2, param);
                 if (!tmpList.isEmpty()) {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
 
-                        for(int i = 0 ; i < 6;i++){
-                            insertCell(table1,oo[i]!=null ? oo[i] instanceof String ? (String)oo[i]: String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        for (int i = 0; i < 6; i++) {
+                            insertCell(table1, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.NORMAL));
                         }
 
                     }
@@ -780,7 +748,7 @@ public class TableForm {
                 CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
             }
 
-            insertCell(table1, "Студенттің қосымша пәндері:", Element.ALIGN_LEFT, 7,  EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table1, "Студенттің қосымша пәндері:", Element.ALIGN_LEFT, 7, EmployeePdfCreator.getFont(12, Font.BOLD));
 
             String sqlTeachAdd2 = "SELECT\n" +
                     "  s4.code,\n" +
@@ -811,14 +779,14 @@ public class TableForm {
                     "  usr.deleted = FALSE AND\n" +
                     "  subj.subject_cycle_id IS NOT NULL AND subj.module_id=3\n" +
                     "AND\n" +
-                    "  usr.locked = FALSE AND usr.id = "+studentId;
+                    "  usr.locked = FALSE AND usr.id = " + studentId;
             try {
                 java.util.List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlTeachAdd2, para);
                 if (!tmpList.isEmpty()) {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
-                        for(int i = 0 ; i < 6;i++){
-                            insertCell(table1,oo[i]!=null ? oo[i] instanceof String ? (String)oo[i]: String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        for (int i = 0; i < 6; i++) {
+                            insertCell(table1, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.NORMAL));
                         }
 
                     }
@@ -847,10 +815,10 @@ public class TableForm {
                     "  LEFT JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
                     "  LEFT JOIN pair_subject s4 ON subj.id = s4.subject_id \n" +
                     "   WHERE\n" +
-                    "  usr.id = " +studentId+
+                    "  usr.id = " + studentId +
                     "  AND sem_data.semester_period_id=2";
 
-            insertCell(table1, ("Семестрде барлығы"), Element.ALIGN_LEFT, 2,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+            insertCell(table1, ("Семестрде барлығы"), Element.ALIGN_LEFT, 2, EmployeePdfCreator.getFont(12, Font.NORMAL));
 
             try {
                 List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlTeachSum2, par);
@@ -858,8 +826,8 @@ public class TableForm {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
 
-                        for(int i = 0 ; i < 2;i++){
-                            insertCell(table1,oo[i]!=null ? oo[i] instanceof String ? (String)oo[i]: String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                        for (int i = 0; i < 2; i++) {
+                            insertCell(table1, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.NORMAL));
                         }
                     }
                 }
@@ -867,7 +835,7 @@ public class TableForm {
                 CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
             }
 
-            insertCell(table1, (" "), Element.ALIGN_LEFT, 2,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+            insertCell(table1, (" "), Element.ALIGN_LEFT, 2, EmployeePdfCreator.getFont(12, Font.NORMAL));
 
 
             document.add(new Paragraph("\n"));
@@ -877,23 +845,46 @@ public class TableForm {
 
 
             document.add(new Paragraph("\n"));
-            document.add(new Paragraph("\n")); document.add(new Paragraph("\n")); document.add(new Paragraph("\n"));
-            document.add(new Paragraph("\n")); document.add(new Paragraph("\n")); document.add(new Paragraph("\n"));
-            document.add(new Paragraph("\n")); document.add(new Paragraph("\n")); document.add(new Paragraph("\n")); document.add(new Paragraph("\n")); document.add(new Paragraph("\n"));
-            document.add(new Paragraph("\n")); document.add(new Paragraph("\n")); document.add(new Paragraph("\n")); document.add(new Paragraph("\n"));
+            document.add(new Paragraph("\n"));
+            document.add(new Paragraph("\n"));
+            document.add(new Paragraph("\n"));
+            document.add(new Paragraph("\n"));
+            document.add(new Paragraph("\n"));
+            document.add(new Paragraph("\n"));
+            document.add(new Paragraph("\n"));
+            document.add(new Paragraph("\n"));
+            document.add(new Paragraph("\n"));
+            document.add(new Paragraph("\n"));
+            document.add(new Paragraph("\n"));
+            document.add(new Paragraph("\n"));
+            document.add(new Paragraph("\n"));
+            document.add(new Paragraph("\n"));
+            document.add(new Paragraph("\n"));
             //document.add(new Paragraph("Студенттің қолы .............................................       Күні   «.......»........................... 20......ж.\n", EmployeePdfCreator.getFont(12, Font.NORMAL)));
 
 
-
-            document.add(new Paragraph("\n")); document.add(new Paragraph("\n")); document.add(new Paragraph("\n"));
+            document.add(new Paragraph("\n"));
+            document.add(new Paragraph("\n"));
+            document.add(new Paragraph("\n"));
 
 
             document.add(table);
 
-            document.add(new Paragraph("\n")); document.add(new Paragraph("\n")); document.add(new Paragraph("\n"));
-            document.add(new Paragraph("\n")); document.add(new Paragraph("\n")); document.add(new Paragraph("\n"));
-            document.add(new Paragraph("\n")); document.add(new Paragraph("\n")); document.add(new Paragraph("\n")); document.add(new Paragraph("\n")); document.add(new Paragraph("\n"));
-            document.add(new Paragraph("\n")); document.add(new Paragraph("\n")); document.add(new Paragraph("\n")); document.add(new Paragraph("\n"));
+            document.add(new Paragraph("\n"));
+            document.add(new Paragraph("\n"));
+            document.add(new Paragraph("\n"));
+            document.add(new Paragraph("\n"));
+            document.add(new Paragraph("\n"));
+            document.add(new Paragraph("\n"));
+            document.add(new Paragraph("\n"));
+            document.add(new Paragraph("\n"));
+            document.add(new Paragraph("\n"));
+            document.add(new Paragraph("\n"));
+            document.add(new Paragraph("\n"));
+            document.add(new Paragraph("\n"));
+            document.add(new Paragraph("\n"));
+            document.add(new Paragraph("\n"));
+            document.add(new Paragraph("\n"));
 
             document.add(table1);
             document.add(new Paragraph("\n"));
@@ -909,13 +900,13 @@ public class TableForm {
 
             pdfWriter.close();
 
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
 
-    private void insertCell(PdfPTable table, String text, int align, int colspan, Font font){
+    private void insertCell(PdfPTable table, String text, int align, int colspan, Font font) {
 
         //create a new cell with the specified Text and Font
         PdfPCell cell = new PdfPCell(new Phrase(text.trim(), font));
@@ -924,7 +915,7 @@ public class TableForm {
         //set the cell column span in case you want to merge two or more cells
         cell.setColspan(colspan);
         //in case there is no text and you wan to create an empty row
-        if(text.trim().equalsIgnoreCase("")){
+        if (text.trim().equalsIgnoreCase("")) {
             cell.setMinimumHeight(10f);
         }
         //add the call to the table

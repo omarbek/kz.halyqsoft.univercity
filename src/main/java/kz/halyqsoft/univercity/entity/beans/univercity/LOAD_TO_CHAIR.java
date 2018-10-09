@@ -16,7 +16,7 @@ import javax.persistence.*;
 @Entity
 public class LOAD_TO_CHAIR extends AbstractEntity {
 
-    @FieldInfo(type = EFieldType.FK_COMBO,  columnWidth = 280)
+    @FieldInfo(type = EFieldType.FK_COMBO, columnWidth = 280)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
@@ -28,19 +28,19 @@ public class LOAD_TO_CHAIR extends AbstractEntity {
             @JoinColumn(name = "CURRICULUM_ID", referencedColumnName = "ID")})
     private CURRICULUM curriculum;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 3, columnWidth = 80)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 3, columnWidth = 80,readOnlyFixed = true)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "STUDY_YEAR_ID", referencedColumnName = "ID")})
     private STUDY_YEAR studyYear;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 4, columnWidth = 150)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 4, columnWidth = 150, required = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "STREAM_ID", referencedColumnName = "ID")})
     private STREAM stream;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 5, columnWidth = 100)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 5, columnWidth = 100, required = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "GROUP_ID", referencedColumnName = "ID")})
@@ -53,11 +53,11 @@ public class LOAD_TO_CHAIR extends AbstractEntity {
     private SEMESTER semester;
 
     @FieldInfo(type = EFieldType.INTEGER, order = 9, inEdit = false)
-    @Column(name = "STUDENT_NUMBER")
+    @Column(name = "STUDENT_NUMBER",nullable = false)
     private Integer studentNumber;
 
     @FieldInfo(type = EFieldType.DOUBLE, order = 10, inEdit = false)
-    @Column(name = "CREDIT")
+    @Column(name = "CREDIT",nullable = false)
     private Double credit;
 
     @FieldInfo(type = EFieldType.DOUBLE, order = 11)
@@ -108,8 +108,8 @@ public class LOAD_TO_CHAIR extends AbstractEntity {
     @Column(name = "PROTECT_DIPLOMA_COUNT")
     private Double protectDiplomaCount;
 
-    @FieldInfo(type = EFieldType.DOUBLE, order = 23,inEdit = false)
-    @Column(name = "TOTAL_COUNT")
+    @FieldInfo(type = EFieldType.DOUBLE, order = 23, inEdit = false)
+    @Column(name = "TOTAL_COUNT",nullable = false)
     private Double totalCount;
 
     public SUBJECT getSubject() {

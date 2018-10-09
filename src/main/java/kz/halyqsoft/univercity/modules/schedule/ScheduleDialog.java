@@ -170,13 +170,13 @@ public class ScheduleDialog extends WindowUtils {
                                     scheduleDetail.getWeekDay(), lessonTime, scheduleDetail.getLessonType());
                             boolean addOld = false;
                             for (GROUPS group : groups) {
-                                if (ScheduleView.scheduleAlreadyHas(teacher, group, weekDay, lessonTime)) {
+                                if (ScheduleAuto.scheduleAlreadyHas(teacher, group, weekDay, lessonTime)) {
                                     Message.showError("this teacher or room is busy at " + weekDay.toString() + " "
                                             + lessonTime.toString());//TODO
                                     addOld = true;
                                     break;
                                 }
-                                if (ScheduleView.groupHasEnoughLessons(group, subject)) {
+                                if (ScheduleAuto.groupHasEnoughLessons(group, subject)) {
                                     Message.showError("this group has enough lessons in " + subject.toString());//TODO
                                     addOld = true;
                                     break;

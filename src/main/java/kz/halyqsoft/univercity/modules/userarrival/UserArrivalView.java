@@ -87,10 +87,12 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
         hierarchicalContainer.setChildrenAllowed(absent, false);
         hierarchicalContainer.addItem(yearlyAttendance);
         hierarchicalContainer.setChildrenAllowed(yearlyAttendance, false);
-        hierarchicalContainer.addItem(manuallySign);
-        hierarchicalContainer.addItem(manuallySignedReport);
-        hierarchicalContainer.setChildrenAllowed(manuallySignedReport, false);
-        hierarchicalContainer.setParent(manuallySignedReport, manuallySign);
+        if (CommonUtils.getCurrentUser().getId().getId().longValue() == 2) {
+            hierarchicalContainer.addItem(manuallySign);
+            hierarchicalContainer.addItem(manuallySignedReport);
+            hierarchicalContainer.setChildrenAllowed(manuallySignedReport, false);
+            hierarchicalContainer.setParent(manuallySignedReport, manuallySign);
+        }
 
 
         menuTT.setContainerDataSource(hierarchicalContainer);

@@ -1,12 +1,18 @@
 package kz.halyqsoft.univercity.modules.practice;
 
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.HierarchicalContainer;
+import com.vaadin.server.FileDownloader;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEPARTMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ORGANIZATION;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDY_YEAR;
@@ -17,6 +23,7 @@ import kz.halyqsoft.univercity.filter.panel.StudentPracticeFilterPanel;
 import kz.halyqsoft.univercity.modules.reports.MenuColumn;
 import kz.halyqsoft.univercity.modules.workflow.MyItem;
 import kz.halyqsoft.univercity.utils.CommonUtils;
+import kz.halyqsoft.univercity.utils.EmployeePdfCreator;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
@@ -33,13 +40,17 @@ import org.r3a.common.vaadin.widget.ERefreshType;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 import org.r3a.common.vaadin.widget.filter2.FilterPanelListener;
+import org.r3a.common.vaadin.widget.form.FormModel;
 import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 import org.r3a.common.vaadin.widget.toolbar.IconToolbar;
 
 import javax.persistence.NoResultException;
+import javax.persistence.criteria.From;
+import java.io.ByteArrayOutputStream;
 import java.util.*;
+import java.util.List;
 
 import static kz.halyqsoft.univercity.utils.CommonUtils.getUILocaleUtil;
 
@@ -59,6 +70,9 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
     private static String SECOND_ROW = getUILocaleUtil().getEntityLabel(PRACTICE_STUDENT.class);
     private String REPORT = getUILocaleUtil().getCaption("report");
     private Button reportBtn;
+    private Button downloadTableBtn;
+    FileDownloader fileDownloaderr = null;
+    List<Entity> practiceInformations;
 
     public PracticeView(AbstractTask task) throws Exception {
         super(task);
@@ -113,8 +127,6 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
         initGridWidget();
         initFilter();
 
-
-
         mainHSP.setFirstComponent(sideMenu);
         mainHSP.setSecondComponent(mainVL);
         getContent().addComponent(mainHSP);
@@ -132,6 +144,25 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
                 }
             }
         });
+        downloadTableBtn = new Button(getUILocaleUtil().getCaption("downloadTable"));
+        downloadTableBtn.setEnabled(true);
+        downloadTableBtn.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                try {
+                    if(informationPracticeGW.getSelectedEntities()!=null && informationPracticeGW.getSelectedEntities().size()>0){
+                        createTable(informationPracticeGW.getSelectedEntities());
+                    }else{
+                        Message.showError(getUILocaleUtil().getCaption("chooseARecord"));
+                    }
+
+                } catch (DocumentException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
         informationPracticeGW = new GridWidget(PRACTICE_INFORMATION.class);
         informationPracticeGW.setImmediate(true);
         informationPracticeGW.setSizeFull();
@@ -142,6 +173,7 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
         informationPracticeGW.setButtonVisible(IconToolbar.REFRESH_BUTTON, false);
 
         informationPracticeGW.getToolbarPanel().addComponent(reportBtn);
+        informationPracticeGW.getToolbarPanel().addComponent(downloadTableBtn);
 
         informationPracticeGM = (DBGridModel)informationPracticeGW.getWidgetModel();
         informationPracticeGM.setRefreshType(ERefreshType.MANUAL);
@@ -277,6 +309,223 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
         DateField comeOutDF = new DateField();
         studentPracticeFP.addFilterComponent("comeOutDate", comeOutDF);
     }
+
+    public void createTable(List entities) throws Exception {
+
+        List<PRACTICE_INFORMATION> practiceInformations = (List<PRACTICE_INFORMATION>) entities;
+
+        Document document = new Document();
+
+        QueryModel<PRACTICE_STUDENT> psQM = new QueryModel<>(PRACTICE_STUDENT.class);
+        FromItem oItem = psQM.addJoin(EJoin.INNER_JOIN,"organization",ORGANIZATION.class,"id");
+        psQM.addWhere("student",ECriteria.EQUAL,CommonUtils.getCurrentUser().getId());
+        ByteArrayOutputStream byteArr = new ByteArrayOutputStream();
+
+        List<PRACTICE_STUDENT> practiceStudents = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(psQM);
+
+        try {
+            for (PRACTICE_INFORMATION pi : practiceInformations) {
+
+
+                String sql2 = "  SELECT c.credit,sd.year_id  FROM subject s\n" +
+                        "    INNER JOIN creditability c on s.creditability_id=c.id\n" +
+                        "    INNER JOIN student_subject ss on s.id=ss.subject_id\n" +
+                        "    INNER JOIN student_education se ON ss.student_id = se.id\n" +
+                        "    INNER JOIN practice_student ps on  s.id = ps.student_id\n" +
+                        "    INNER JOIN semester_data sd ON ss.semester_data_id = sd.id\n" +
+                        "    INNER JOIN practice_information pi on  pi.groups_id=se.groups_id\n" +
+                        "  WHERE s.practice_type_id!=null and pi.groups_id= "+pi.getGroups().getId();
+
+
+
+                QueryModel<PRACTICE_STUDENT> practiceStudentQM = new QueryModel<>(PRACTICE_STUDENT.class);
+                FromItem orgItem = practiceStudentQM.addJoin(EJoin.INNER_JOIN, "organization", ORGANIZATION.class, "id");
+                FromItem sItem = practiceStudentQM.addJoin(EJoin.INNER_JOIN, "student", STUDENT.class, "id");
+                FromItem seItem = sItem.addJoin(EJoin.INNER_JOIN, "id", STUDENT_EDUCATION.class, "student");
+                FromItem piItem = seItem.addJoin(EJoin.INNER_JOIN, "groups", PRACTICE_INFORMATION.class, "groups");
+                practiceStudentQM.addWhere(seItem, "groups", ECriteria.EQUAL, pi.getGroups().getId());
+
+                List<PRACTICE_STUDENT> practiceStudents1 = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(practiceStudentQM);
+
+                String sql = "  SELECT c.credit,sd.year_id  FROM subject s\n" +
+                        "    INNER JOIN creditability c on s.creditability_id=c.id\n" +
+                        "    INNER JOIN student_subject ss on s.id=ss.subject_id\n" +
+                        "    INNER JOIN student_education se ON ss.student_id = se.id\n" +
+                        "    INNER JOIN practice_student ps on  s.id = ps.student_id\n" +
+                        "    INNER JOIN semester_data sd ON ss.semester_data_id = sd.id\n" +
+                        "    INNER JOIN practice_information pi on  pi.groups_id=se.groups_id\n" +
+                        "  WHERE s.practice_type_id!=null and pi.groups_id= "+pi.getGroups().getId();
+
+                try {
+
+
+                        PdfWriter.getInstance(document, byteArr);
+                        document.open();
+                        Paragraph title = new Paragraph("ЮЖНО-КАЗАХСТАНСКИЙ ПЕДАГОГИЧЕСКИЙ УНИВЕРСИТЕТ", EmployeePdfCreator.getFont(15, Font.BOLD));
+                        title.setAlignment(Element.ALIGN_CENTER);
+                        Paragraph title1 = new Paragraph("ВЕДОМОСТЬ № 290\n" +
+                                "Іс тәжірибе туралы/ по практике", EmployeePdfCreator.getFont(15, Font.BOLD));
+                        title1.setAlignment(Element.ALIGN_CENTER);
+                    document.add(title);
+                    document.add(title1);
+                    if(practiceStudents1.size()==0){
+
+                        Paragraph content = new Paragraph("Факультет: " + pi.getGroups().getSpeciality().getSpecName() + //pi.getSpeciality().getSpecName() +
+                                "\nТобы/группа: " + pi.getGroups().getName() +
+                                "\nБаза аты/Вид базы:" + " "+
+                                "      База аты/Наименование базы:" + " " +
+                                "\nСтуденттің іс тәжірибесінің мерзімі/" +
+                                "Срок практики студентов " +  "     "  +
+                                "\n Кафедраның іс тәжірибе жетекшісі /" +
+                                "Руководитель практики от кафедры " + pi.getEmployee().getLastName() + " " +
+                                pi.getEmployee().getFirstName().toUpperCase().charAt(0) + "." +
+                                (pi.getEmployee().getMiddleName() != null ?
+                                        pi.getEmployee().getMiddleName().toUpperCase().charAt(0) : "") + " " +
+                                "\nІс тәжірибе түрі/Наименование практики: Производственная(педагогическая) практика \n", EmployeePdfCreator.getFont(15, Font.NORMAL));
+
+
+                        document.add(content);
+                    }else {
+
+                        for (PRACTICE_STUDENT ps : practiceStudents1) {
+                            Paragraph content = new Paragraph("Факультет: " + pi.getGroups().getSpeciality().getSpecName() + //pi.getSpeciality().getSpecName() +
+                                    "\nТобы/группа: " + pi.getGroups().getName() +
+                                    "\nБаза аты/Вид базы:" + ps.getOrganization().getOrganizationName() +
+                                    "      База аты/Наименование базы:" + ps.getOrganization().getAddress() +
+                                    "\nСтуденттің іс тәжірибесінің мерзімі/" +
+                                    "Срок практики студентов " + ps.getComeInDate() + "     " + ps.getComeOutDate() +
+                                    "\n Кафедраның іс тәжірибе жетекшісі /" +
+                                    "Руководитель практики от кафедры " + pi.getEmployee().getLastName() + " " +
+                                    pi.getEmployee().getFirstName().toUpperCase().charAt(0) + "." +
+                                    (pi.getEmployee().getMiddleName() != null ?
+                                            pi.getEmployee().getMiddleName().toUpperCase().charAt(0) : "") + " " +
+                                    "\nІс тәжірибе түрі/Наименование практики: Производственная(педагогическая) практика " +
+                                    "\nКредиттер саны/Количество кредитов ", EmployeePdfCreator.getFont(15, Font.NORMAL));
+
+
+                            document.add(content);
+                        }
+                    }
+
+                        PdfPTable table = new PdfPTable(8);
+
+                        insertCell(table, "№:", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.BOLD));
+
+                        insertCell(table, "Тегі, аты жөні / Фамилия, имя, отчество", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.BOLD));
+
+                        insertCell(table, "Өндірістік бөлім/Производственная часть", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.BOLD));
+
+                        insertCell(table, "Есептік бөлім/Отчетная часть", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.BOLD));
+
+                        insertCell(table, "Қорытынды балы/Итоговый баллы", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.BOLD));
+
+                        insertCell(table, "Әріптік жүйедегі бағасы/ Оценка по буквенной системе", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.BOLD));
+
+                        insertCell(table, "Дәстүрлі бағасы/Тадиционная оценка", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.BOLD));
+
+                        insertCell(table, "Оқытушының қолы/Подпись преподавателя", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.BOLD));
+
+                        table.setWidthPercentage(100);
+
+                        Font font = new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD, BaseColor.WHITE);
+
+                        String sql1 = "SELECT   ROW_NUMBER() OVER(ORDER BY vs.id ASC) AS Row,trim(vs.LAST_NAME || ' ' || vs.FIRST_NAME || ' ' || coalesce(vs.MIDDLE_NAME, '')) FIO,\n" +
+                                "  vs.group_name,\n" +
+                                "ser.total_rk,ser.final,((ser.total_rk)*0.6+(ser.final)*0.4) final,\n" +
+                                "  CASE WHEN (final=100) THEN  'A'\n" +
+                                "    WHEN (final BETWEEN 90 AND 94) THEN  'A-'\n" +
+                                "  WHEN (final BETWEEN 85 AND 89) THEN  'B+'\n" +
+                                "  WHEN (final BETWEEN 80 AND 84) THEN  'B'\n" +
+                                "  WHEN (final BETWEEN 75 AND 79) THEN  'B-'\n" +
+                                "  WHEN (final BETWEEN 70 AND 74) THEN  'C+'\n" +
+                                "  WHEN (final BETWEEN 65 AND 69) THEN  'C'\n" +
+                                "  WHEN (final BETWEEN 60 AND 64) THEN  'C-'\n" +
+                                "  WHEN (final BETWEEN 55 AND 59) THEN  'D+'\n" +
+                                "  WHEN (final BETWEEN 50 AND 54) THEN  'D'\n" +
+                                "    ELSE 'F' END letter,\n" +
+                                "  CASE  WHEN (final BETWEEN 90 AND 100) THEN  '5'\n" +
+                                "  WHEN (final BETWEEN 75 AND 89) THEN  '4'\n" +
+                                "  WHEN (final BETWEEN 50 AND 74) THEN  '3'\n" +
+                                "  ELSE '2' END point\n" +
+                                "FROM  v_student vs\n" +
+                                "INNER JOIN student_edu_rate ser on vs.id=ser.student_id\n" +
+                                "WHERE vs.groups_id=" + pi.getGroups().getId();
+//
+                        Map<Integer, Object> params = new HashMap<>();
+                        try {
+                            List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql1, params);
+                            if (!tmpList.isEmpty()) {
+                                for (Object o : tmpList) {
+                                    Object[] oo = (Object[]) o;
+
+                                    for (int i = 0; i < 8; i++) {
+                                        insertCell(table, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.NORMAL));
+                                    }
+                                }
+                            }
+                        } catch (Exception ex) {
+                            CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
+                        }
+                        document.add(table);
+                } catch (Exception e) {
+                    CommonUtils.showMessageAndWriteLog("Unable to load absents list", e);
+                }
+
+            }
+
+            Paragraph content2 = new Paragraph("Кафедраның іс тәжірибе жетекшісі/\n" +
+                    "Руководитель практики от кафедры____________\n " +
+                    "Іс тәжірибе бойынша униыерситет аға әдіскері/\n" +
+                    "Ст.методист университета по практике____________\n" +
+                    "Факультет деканы/\n" +
+                    "Декан факультета____________", EmployeePdfCreator.getFont(15, Font.NORMAL));
+
+            //   }
+            document.add(content2);
+
+        }catch (Exception e1) {
+            e1.printStackTrace();
+        }
+
+
+
+
+        document.close();
+
+        if(fileDownloaderr==null){
+            try{
+                fileDownloaderr = new FileDownloader(EmployeePdfCreator.getStreamResourceFromByte(byteArr.toByteArray(), REPORT +".pdf"));
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            if(fileDownloaderr!=null){
+            }
+        }else{
+            fileDownloaderr.setFileDownloadResource(EmployeePdfCreator.getStreamResourceFromByte(byteArr.toByteArray() , REPORT +".pdf"));
+        }
+        fileDownloaderr.extend(downloadTableBtn);
+
+
+    }
+
+
+    private void insertCell(PdfPTable table, String text, int align, int colspan, Font font){
+
+        //create a new cell with the specified Text and Font
+        PdfPCell cell = new PdfPCell(new Phrase(text.trim(), font));
+        //set the cell alignment
+        cell.setHorizontalAlignment(align);
+        //set the cell column span in case you want to merge two or more cells
+        cell.setColspan(colspan);
+        //in case there is no text and you wan to create an empty row
+        if(text.trim().equalsIgnoreCase("")){
+            cell.setMinimumHeight(2f);
+        }
+        //add the call to the table
+        table.addCell(cell);
+
+    }
+
 
     @Override
     public void doFilter(AbstractFilterBean abstractFilterBean) {

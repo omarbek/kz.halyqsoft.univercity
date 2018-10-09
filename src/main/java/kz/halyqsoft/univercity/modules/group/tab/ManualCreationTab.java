@@ -7,6 +7,7 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import kz.halyqsoft.univercity.entity.beans.USERS;
+import kz.halyqsoft.univercity.entity.beans.univercity.GROUPS;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_EDUCATION;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_STUDENT;
@@ -92,6 +93,7 @@ public class ManualCreationTab extends AbstractCommonView implements EntityListe
         formModel.getFieldModel("educationTypeName").setInEdit(false);
         formModel.getFieldModel("studentStatus").setInEdit(false);
         formModel.getFieldModel("card").setInEdit(false);
+        formModel.getFieldModel("groupName").setInEdit(false);
 
         doFilter(filterPanel.getFilterBean());
 
@@ -324,6 +326,17 @@ public class ManualCreationTab extends AbstractCommonView implements EntityListe
         cb.setContainerDataSource(diplomaTypeBIC);
         studentFilterPanel.addFilterComponent("studentDiplomaType", cb);
 
+        cb = new ComboBox();
+        cb.setNullSelectionAllowed(true);
+        cb.setTextInputAllowed(false);
+        cb.setFilteringMode(FilteringMode.STARTSWITH);
+        cb.setPageLength(0);
+        QueryModel<GROUPS> groupsQM = new QueryModel<>(GROUPS.class);
+        BeanItemContainer<GROUPS> groupsBIC = new BeanItemContainer<>(GROUPS.class,
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(groupsQM));
+        cb.setContainerDataSource(groupsBIC);
+        studentFilterPanel.addFilterComponent("group", cb);
+
 
         return studentFilterPanel;
     }
@@ -352,7 +365,7 @@ public class ManualCreationTab extends AbstractCommonView implements EntityListe
             if (sb.length() > 0) {
                 sb.append(" and ");
             }
-            sb.append(" and stu.LAST_NAME ilike '");
+            sb.append("  stu.LAST_NAME ilike '");
             sb.append(sf.getLastname().trim());
             sb.append("%'");
         }
@@ -385,6 +398,11 @@ public class ManualCreationTab extends AbstractCommonView implements EntityListe
             params.put(i, sf.getStudentDiplomaType().getId().getId());
             sb.append(" and st.diploma_type_id = ?" + i++);
         }
+        if (sf.getGroup() != null) {
+            params.put(i, sf.getGroup().getId().getId());
+            sb.append(" and stu.groups_id = ?"+i++ );
+        }
+
 
         List<V_STUDENT> list = new ArrayList<>();
         sb.insert(0, " where stu.category_id = " + STUDENT_CATEGORY.STUDENT_ID);

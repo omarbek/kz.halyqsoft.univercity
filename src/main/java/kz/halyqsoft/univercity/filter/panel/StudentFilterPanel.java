@@ -18,7 +18,7 @@ public final class StudentFilterPanel extends AbstractFilterPanel {
 	}
 
 	@Override
-	protected void initWidget() throws Exception {
+	protected void initWidget() {
 		HorizontalLayout hl = new HorizontalLayout();
 		hl.setSpacing(true);
 		hl.setWidthUndefined();
@@ -81,6 +81,11 @@ public final class StudentFilterPanel extends AbstractFilterPanel {
 		}
 
 		af = getFilterComponent("studentDiplomaType");
+		if (af != null) {
+			hl.addComponent(af);
+		}
+
+		af = getFilterComponent("group");
 		if (af != null) {
 			hl.addComponent(af);
 		}
