@@ -390,6 +390,16 @@ public class CommonUtils {
         return sd;
     }
 
+    public static boolean isCurrentUserHasAdminPrivileges(){
+        List<USER_ROLES> userRoles = getCurrentUser().getUserRoles();
+        for(USER_ROLES userRole : userRoles){
+            if(userRole.getId().getId().longValue() == 3){
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static boolean isAdmin() {
         return getCurrentUser().getId().getId().intValue() == 1
                 || getCurrentUser().getId().getId().intValue() == 2;

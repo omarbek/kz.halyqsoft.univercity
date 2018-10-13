@@ -66,7 +66,7 @@ public class MainSection implements FilterPanelListener {
                 .responsive(true)
                 .hover()
                 .mode(InteractionMode.INDEX)
-                .intersect(true)
+                .intersect(false)
                 .animationDuration(400)
                 .and()
                 .title()
@@ -170,11 +170,11 @@ public class MainSection implements FilterPanelListener {
         Map<Integer, Object> params = new HashMap<>();
         String formattedDate = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS").format(date);
 
-        String sql = "SELECT foo.group_name ,foo.advisor , count(foo.count) all_student, sum(foo.data) all_coming ,\n" +
+        String sql = "SELECT foo.group_name ,foo.advisor_name , count(foo.count) all_student, sum(foo.data) all_coming ,\n" +
                 "  (CASE WHEN sum(foo.data) > 0 THEN sum(foo.data)* 100/count(foo.count) ELSE 0 END)::DOUBLE PRECISION as percentage\n" +
                 "\n" +
                 "from ( SELECT\n" +
-                "                vs.advisor,\n" +
+                "                vs.advisor_name,\n" +
                 "                 vs.group_name,\n" +
                 "\n" +
                 "                  CASE WHEN exists(SELECT *\n" +
@@ -190,7 +190,7 @@ public class MainSection implements FilterPanelListener {
                 "                                              date_trunc('day', ua.created) IN (date_trunc('day', TIMESTAMP '"+CommonUtils.getFormattedDate(date)+"'))))\n" +
                 "               FROM v_student vs\n" +
                 "               WHERE vs.group_name NOTNULL\n" +
-                "               GROUP BY vs.group_name, vs.id,vs.advisor ORDER BY vs.group_name ) as foo GROUP BY foo.group_name , foo.advisor;";
+                "               GROUP BY vs.group_name, vs.id,vs.advisor_name ORDER BY vs.group_name ) as foo GROUP BY foo.group_name , foo.advisor_name;";
 
         try {
             List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
