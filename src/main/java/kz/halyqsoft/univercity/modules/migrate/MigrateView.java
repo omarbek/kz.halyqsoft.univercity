@@ -19,10 +19,12 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
+import org.r3a.common.dblink.facade.CommonIDFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.ID;
 import org.r3a.common.entity.beans.AbstractTask;
 import org.r3a.common.entity.query.QueryModel;
+import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.dialog.Message;
 
@@ -87,8 +89,8 @@ public class MigrateView extends AbstractTaskView {
         public OutputStream receiveUpload(String filename, String mimeType) {
             FileOutputStream fos = null;
             try {
-//                file = new File("/tmp/files/" + filename);
-                file = new File("C:/Users/Omarbek/IdeaProjects/kz.halyqsoft.univercity/tmp/files/" + filename);
+                file = new File("/tmp/files/" + filename);
+//                file = new File("C:/Users/Omarbek/IdeaProjects/kz.halyqsoft.univercity/tmp/files/" + filename);
                 if (file.exists()) {
                     file.delete();
                 }
@@ -118,7 +120,6 @@ public class MigrateView extends AbstractTaskView {
                 int lastRowNo = sheet.getLastRowNum();
 
                 int YEAR_2013 = 9;
-                int SPEC_IT = 90;
 
                 for (int i = 6; i <= lastRowNo; i++) {
                     Row row = sheet.getRow(i);
@@ -131,45 +132,19 @@ public class MigrateView extends AbstractTaskView {
                     cell = row.getCell(3);
                     String middleName = cell.getStringCellValue().trim();
 
-                    cell=row.getCell(4);
-                    String year=cell.getStringCellValue().trim().substring(0,1);
-                    Integer studyYear=Integer.parseInt(year);
+                    cell = row.getCell(4);
+                    String year = cell.getStringCellValue().trim().substring(0, 1);
+                    Integer studyYear = Integer.parseInt(year);
 
-                    cell=row.getCell(5);
-                    String specCode=cell.getStringCellValue().trim();
-//                    QueryModel<>
+                    cell = row.getCell(5);
+                    String specCode = cell.getStringCellValue().trim();
+                    QueryModel<SPECIALITY> specQM = new QueryModel<>(SPECIALITY.class);
+                    specQM.addWhere("deleted", false);
+                    specQM.addWhere("code", ECriteria.EQUAL, specCode);
+                    SPECIALITY speciality = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(specQM);
 
-                    USERS user = new USERS();
-                    user.setFirstName(firstName);
-                    user.setLastName(lastName);
-                    user.setMiddleName(middleName);
-                    user.setFirstNameEN(TestView.transliterate(firstName));
-                    user.setLastNameEN(TestView.transliterate(lastName));
-                    user.setMiddleNameEN(TestView.transliterate(middleName));
-                    user.setTypeIndex(2);
-                    user.setBirthDate(new Date());
-                    user.setSex(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
-                            SEX.class, ID.valueOf(1)));
-                    user.setMaritalStatus(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
-                            MARITAL_STATUS.class, ID.valueOf(3)));
-                    user.setCitizenship(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
-                            COUNTRY.class, ID.valueOf(1)));
-                    user.setNationality(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
-                            NATIONALITY.class, ID.valueOf(1)));
-                    String code = CommonUtils.getCode("13");
-                    user.setCode(code);
-                    user.setLogin(code);
-                    user.setPasswd("12345678");
-                    user.setPhoneMobile("");
-                    user.setLocked(false);
-                    user.setLockReason(null);
-                    user.setDeleted(false);
-                    user.setCreated(new Date());
-                    user.setCreatedBy("admin");
-                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(user);
-
-                    STUDENT student = new STUDENT();
-                    student.setId(user.getId());
+                    STUDENT student =new STUDENT();
+                    student.setId(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("s_users"));
                     student.setLevel(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
                             LEVEL.class, ID.valueOf(1)));
                     student.setCategory(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
@@ -181,6 +156,34 @@ public class MigrateView extends AbstractTaskView {
                             ENTRANCE_YEAR.class, ID.valueOf(YEAR_2013)));
                     student.setDiplomaType(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
                             STUDENT_DIPLOMA_TYPE.class, ID.valueOf(1)));
+
+                    student.setFirstName(firstName);
+                    student.setLastName(lastName);
+                    student.setMiddleName(middleName);
+                    student.setFirstNameEN(TestView.transliterate(firstName));
+                    student.setLastNameEN(TestView.transliterate(lastName));
+                    student.setMiddleNameEN(TestView.transliterate(middleName));
+                    student.setTypeIndex(2);
+                    student.setBirthDate(new Date());
+                    student.setSex(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
+                            SEX.class, ID.valueOf(1)));
+                    student.setMaritalStatus(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
+                            MARITAL_STATUS.class, ID.valueOf(3)));
+                    student.setCitizenship(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
+                            COUNTRY.class, ID.valueOf(1)));
+                    student.setNationality(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
+                            NATIONALITY.class, ID.valueOf(1)));
+                    String code = CommonUtils.getCode("12");
+                    student.setCode(code);
+                    student.setLogin(code);
+                    student.setPasswd("12345678");
+                    student.setPhoneMobile("");
+                    student.setLocked(false);
+                    student.setLockReason(null);
+                    student.setDeleted(false);
+                    student.setCreated(new Date());
+                    student.setCreatedBy("admin");
+
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(student);
 
                     ENTRANT_SPECIALITY entrantSpeciality = new ENTRANT_SPECIALITY();
@@ -189,36 +192,34 @@ public class MigrateView extends AbstractTaskView {
                             lookup(LANGUAGE.class, ID.valueOf(1)));
                     entrantSpeciality.setUniversity(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
                             lookup(UNIVERSITY.class, ID.valueOf(1)));
-                    entrantSpeciality.setSpeciality(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
-                            lookup(SPECIALITY.class, ID.valueOf(SPEC_IT)));
+                    entrantSpeciality.setSpeciality(speciality);
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(entrantSpeciality);
 
                     USER_ADDRESS userAddress = new USER_ADDRESS();
-                    userAddress.setUser(user);
+                    userAddress.setUser(student);
                     userAddress.setAddressType(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
                             ADDRESS_TYPE.class, ID.valueOf(2)));
                     userAddress.setPostalCode("160000");
                     userAddress.setStreet("");
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(userAddress);
 
-                    STUDENT_EDUCATION studentEducation=new STUDENT_EDUCATION();
+                    STUDENT_EDUCATION studentEducation = new STUDENT_EDUCATION();
                     studentEducation.setStudent(student);
-//                    studentEducation.setFaculty(speciality.getDepartment().getParent());
-//                    studentEducation.setChair(speciality.getDepartment());
-//                    studentEducation.setSpeciality(speciality);
+                    studentEducation.setFaculty(speciality.getDepartment().getParent());
+                    studentEducation.setChair(speciality.getDepartment());
+                    studentEducation.setSpeciality(speciality);
                     studentEducation.setStudyYear(SessionFacadeFactory.getSessionFacade(
                             CommonEntityFacadeBean.class).lookup(STUDY_YEAR.class, ID.valueOf(studyYear)));
                     studentEducation.setLanguage(SessionFacadeFactory.getSessionFacade(
                             CommonEntityFacadeBean.class).lookup(LANGUAGE.class, ID.valueOf(1)));
                     studentEducation.setEducationType(SessionFacadeFactory.getSessionFacade(
                             CommonEntityFacadeBean.class).lookup(STUDENT_EDUCATION_TYPE.class, ID.valueOf(1)));
-                    DateFormat uriDateFormat = new SimpleDateFormat("yyyy-MM-dd");
                     studentEducation.setStatus(SessionFacadeFactory.getSessionFacade(
                             CommonEntityFacadeBean.class).lookup(STUDENT_STATUS.class, ID.valueOf(1)));
                     studentEducation.setCreated(new Date());
-
-                    break;
+                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(studentEducation);
                 }
+                CommonUtils.showSavedNotification();
             } catch (Exception ex) {
                 LOG.error("Unable to load students' debt: ", ex);
                 Message.showError(ex.toString());
