@@ -18,6 +18,9 @@ public class VEmployeeInfo extends AbstractEntity {
     @FieldInfo(type = EFieldType.TEXT, order = 4)
     private String comeOUT;
 
+    @FieldInfo(type = EFieldType.INTEGER, order = 5, inGrid = false, inView = false, inEdit = false )
+    private String time;
+
     public String getFIO() {
         return FIO;
     }
@@ -48,5 +51,13 @@ public class VEmployeeInfo extends AbstractEntity {
 
     public void setComeOUT(String comeOUT) {
         this.comeOUT = comeOUT;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
     }
 }

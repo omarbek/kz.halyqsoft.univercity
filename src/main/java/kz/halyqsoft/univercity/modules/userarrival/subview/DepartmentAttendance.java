@@ -241,6 +241,8 @@ public class DepartmentAttendance implements EntityListener{
         } catch (Exception ex) {
             CommonUtils.showMessageAndWriteLog("Unable to load teacher list", ex);
         }
+        List<VEmployeeInfo> emplList = new ArrayList<>();
+
         refreshList(list);
         return list;
     }
@@ -298,19 +300,27 @@ public class DepartmentAttendance implements EntityListener{
         String formattedDate = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS").format(date);
         Map<Integer, Object> pm = new HashMap<>();
         String sql = "SELECT\n" +
-                "  empl.id,\n" +
-                "  trim(empl.LAST_NAME || ' ' || empl.FIRST_NAME || ' ' || coalesce(empl.MIDDLE_NAME, '')) FIO,\n" +
-                "  empl.code,\n" +
-                "  min(date_trunc('second', uaenter.created) :: TIME)::text,\n" +
-                "  max(date_trunc('second', uaexit.created) :: TIME)::text \n" +
-                "FROM v_employee empl\n" +
-                "  LEFT JOIN user_arrival uaenter ON empl.id = uaenter.user_id AND uaenter.come_in = TRUE AND\n" +
-                "                                    date_trunc('day', uaenter.created) = date_trunc('day', '"+formattedDate+"' :: TIMESTAMP)\n" +
-                "  LEFT JOIN user_arrival uaexit ON empl.id = uaexit.user_id AND uaexit.come_in = FALSE\n" +
-                "                                   AND\n" +
-                "                                   date_trunc('day', uaexit.created) = date_trunc('day', '"+formattedDate+"' :: TIMESTAMP)\n" +
-                "WHERE empl.dept_id = "+depID+"\n" +
-                "GROUP BY empl.id, empl.last_name, empl.first_name, empl.middle_name, empl.code;";
+                "                empl.id, trim(empl.LAST_NAME || ' ' || empl.FIRST_NAME || ' ' || coalesce(empl.MIDDLE_NAME, '')) FIO,\n" +
+                "                empl.code,\n" +
+                "                (arriv.created::time)::text,\n" +
+                "                (arrivF.created::time)::text as false\n" +
+                "                FROM v_employee empl\n" +
+                "                  left join (SELECT\n" +
+                "                     arriv.created,\n" +
+                "                               arriv.user_id\n" +
+                "                       FROM user_arrival arriv\n" +
+                "                       WHERE date_trunc('day', arriv.created) = date_trunc('day', timestamp'" + formattedDate + "')\n" +
+                "                       AND come_in = TRUE\n" +
+                "                       GROUP BY arriv.created,arriv.user_id)arriv on arriv.user_id=empl.id\n" +
+                "                  left join (SELECT\n" +
+                "                               arrivF.created,\n" +
+                "                               arrivF.user_id\n" +
+                "                             FROM user_arrival arrivF\n" +
+                "                             WHERE date_trunc('day', arrivF.created) = date_trunc('day', timestamp'" + formattedDate + "')\n" +
+                "                  AND come_in = FALSE\n" +
+                "                             GROUP BY arrivF.created,arrivF.user_id)arrivF on arrivF.user_id=empl.id\n" +
+                "                  WHERE empl.dept_id =" + depID + "\n" +
+                "                GROUP BY  FIO, empl.code,empl.created,arriv.created,arrivF.created, empl.id;";
 
         try {
             List<Object> emplBDList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, pm);
@@ -419,5 +429,13 @@ public class DepartmentAttendance implements EntityListener{
 
     public void setBackButtonFaculty(Button backButtonFaculty) {
         this.backButton = backButtonFaculty;
+    }
+
+    public GridWidget getEmployeeByDepartmentGW() {
+        return employeeByDepartmentGW;
+    }
+
+    public void setEmployeeByDepartmentGW(GridWidget employeeByDepartmentGM) {
+        this.employeeByDepartmentGW = employeeByDepartmentGM;
     }
 }

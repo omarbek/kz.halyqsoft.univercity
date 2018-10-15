@@ -125,6 +125,7 @@ public class GroupAttendance implements EntityListener{
                         list.add(vStudentInfo.getStudent().toString());
                         list.add(vStudentInfo.getCode());
                         list.add(vStudentInfo.getComeIN()!=null ? (vStudentInfo.getComeIN()): "");
+
                         list.add(vStudentInfo.getComeOUT()!=null ? (vStudentInfo.getComeOUT()): "");
                         tableBody.add(list);
                     }
@@ -310,6 +311,7 @@ public class GroupAttendance implements EntityListener{
                         }
                     }
                     if(!flag){
+
                         groupList.add(vg);
                     }
                 }
@@ -328,7 +330,10 @@ public class GroupAttendance implements EntityListener{
         Map<Integer,Object> params = new HashMap<>();
         String formattedDate = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS").format(date);
 
-        String sql = "SELECT DISTINCT (se.student_id), u.code , case date_trunc('day', ua.created) when date_trunc('day' , TIMESTAMP '"+formattedDate+"') then true else false end\n" +
+        String sql = "SELECT " +
+                "DISTINCT (se.student_id), " +
+                "u.code , " +
+                "case date_trunc('day', ua.created) when date_trunc('day' , TIMESTAMP '"+formattedDate+"') then true else false end\n" +
                 "  FROM student_education se\n" +
                 "    LEFT JOIN user_arrival ua\n" +
                 "      ON ua.user_id = se.student_id\n" +
