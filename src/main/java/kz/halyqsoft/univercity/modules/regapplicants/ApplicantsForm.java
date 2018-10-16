@@ -1198,7 +1198,6 @@ public final class ApplicantsForm extends UsersForm {
                 .replaceAll("\\$education", educationDoc.getEducationType().toString())
                 .replaceAll("\\$technic", tecnhik.toString())
                 .replaceAll("\\$attestat", attestationDate)
-                .replaceAll("\\$course", studentEducation.getStudyYear().toString())
                 .replaceAll("\\$nomer", educationDoc.getDocumentNo())
                 .replaceAll("\\$ent", untCertificate == null ? "" : untCertificate.getDocumentNo())
 //                .replaceAll("\\$document", createdDate)
