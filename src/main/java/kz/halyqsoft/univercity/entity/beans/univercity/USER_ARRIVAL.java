@@ -16,7 +16,7 @@ import java.util.Date;
 @Entity
 public class USER_ARRIVAL extends AbstractEntity {
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 2, inGrid = false, inEdit = false, inView = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 2, inEdit = false, inView = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "USER_ID", referencedColumnName = "ID")})

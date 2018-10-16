@@ -2,17 +2,10 @@ package kz.halyqsoft.univercity.modules.userarrival.subview;
 
 import com.byteowls.vaadin.chartjs.ChartJs;
 import com.byteowls.vaadin.chartjs.config.BarChartConfig;
-import com.byteowls.vaadin.chartjs.config.LineChartConfig;
-import com.byteowls.vaadin.chartjs.config.PieChartConfig;
 import com.byteowls.vaadin.chartjs.data.BarDataset;
-import com.byteowls.vaadin.chartjs.data.Dataset;
-import com.byteowls.vaadin.chartjs.data.LineDataset;
-import com.byteowls.vaadin.chartjs.data.PieDataset;
 import com.byteowls.vaadin.chartjs.options.InteractionMode;
 import com.byteowls.vaadin.chartjs.options.Position;
-import com.byteowls.vaadin.chartjs.options.elements.Rectangle;
 import com.byteowls.vaadin.chartjs.options.scale.Axis;
-import com.byteowls.vaadin.chartjs.options.scale.CategoryScale;
 import com.byteowls.vaadin.chartjs.options.scale.LinearScale;
 import com.byteowls.vaadin.chartjs.utils.ColorUtils;
 import com.vaadin.data.Property;
@@ -22,13 +15,14 @@ import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.*;
-import kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE;
-import kz.halyqsoft.univercity.entity.beans.univercity.GROUPS;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEPARTMENT;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDY_YEAR;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.*;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.VTopGroupArrival;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.VTopUserArrival;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_EMPLOYEE;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_STUDENT;
 import kz.halyqsoft.univercity.filter.FStatisticsFilter;
 import kz.halyqsoft.univercity.filter.panel.StatisticsFilterPanel;
+import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.MainDialog;
 import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.PrintDialog;
 import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.SimpleStatistics;
 import kz.halyqsoft.univercity.utils.CommonUtils;
@@ -51,12 +45,13 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class MainSection implements FilterPanelListener {
+
     private VerticalLayout mainVL;
     private DateField dateField;
-
     private StatisticsFilterPanel statisticsFilterPanel;
-
     private ChartJs chart;
+
+    private Long allEmployees;
 
     public MainSection() {
 
@@ -86,9 +81,9 @@ public class MainSection implements FilterPanelListener {
         chart.configure(barConfig);
 
 
-        try{
+        try {
             statisticsFilterPanel = (StatisticsFilterPanel) getFilter();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         mainVL = new VerticalLayout();
@@ -139,7 +134,7 @@ public class MainSection implements FilterPanelListener {
                 "    ON se.id = ld.student_id\n" +
                 "  INNER JOIN lesson l\n" +
                 "    ON ld.lesson_id = l.id\n" +
-                "WHERE date_trunc('month', l.lesson_date) IN (date_trunc('month', TIMESTAMP '"+CommonUtils.getFormattedDate(date)+"'))\n" +
+                "WHERE date_trunc('month', l.lesson_date) IN (date_trunc('month', TIMESTAMP '" + CommonUtils.getFormattedDate(date) + "'))\n" +
                 "      AND l.canceled = FALSE\n" +
                 "GROUP BY vs.id, fio, l.lesson_date, vs.group_name) newselect ORDER BY CASE WHEN present_lesson > 0\n" +
                 "    THEN all_lessons / present_lesson * 100\n" +
@@ -180,17 +175,18 @@ public class MainSection implements FilterPanelListener {
                 "                  CASE WHEN exists(SELECT *\n" +
                 "                                   FROM user_arrival ua\n" +
                 "                                   WHERE ua.user_id = vs.id AND\n" +
-                "                                         date_trunc('day', ua.created) IN (date_trunc('day', TIMESTAMP '"+CommonUtils.getFormattedDate(date)+"')))\n" +
+                "                                         date_trunc('day', ua.created) IN (date_trunc('day', TIMESTAMP '" + CommonUtils.getFormattedDate(date) + "')))\n" +
                 "                    THEN 1\n" +
                 "                  ELSE 0 END as data,\n" +
                 "\n" +
                 "                 count(exists(SELECT *\n" +
                 "                                        FROM user_arrival ua\n" +
                 "                                        WHERE ua.user_id = vs.id AND\n" +
-                "                                              date_trunc('day', ua.created) IN (date_trunc('day', TIMESTAMP '"+CommonUtils.getFormattedDate(date)+"'))))\n" +
+                "                                              date_trunc('day', ua.created) IN (date_trunc('day', TIMESTAMP '" + CommonUtils.getFormattedDate(date) + "'))))\n" +
                 "               FROM v_student vs\n" +
                 "               WHERE vs.group_name NOTNULL\n" +
-                "               GROUP BY vs.group_name, vs.id,vs.advisor_name ORDER BY vs.group_name ) as foo GROUP BY foo.group_name , foo.advisor_name;";
+                "               GROUP BY vs.group_name, vs.id,vs.advisor_name ORDER BY vs.group_name ) as foo GROUP BY foo.group_name , foo.advisor_name" +
+                " ORDER BY all_coming desc LIMIT 10";
 
         try {
             List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
@@ -212,7 +208,7 @@ public class MainSection implements FilterPanelListener {
         return groupList;
     }
 
-    public List<SimpleStatistics> getStatisticList(Long id, Date startingDate , Date endingDate) {
+    public List<SimpleStatistics> getStatisticList(Long id, Date startingDate, Date endingDate) {
         List<SimpleStatistics> simpleStatistics = new ArrayList<>();
         Map<Integer, Object> params = new HashMap<>();
 
@@ -227,16 +223,16 @@ public class MainSection implements FilterPanelListener {
                 "        CASE WHEN exists(SELECT *\n" +
                 "                         FROM user_arrival ua\n" +
                 "                         WHERE ua.user_id = vs.id AND\n" +
-                "                               (ua.created BETWEEN '"+CommonUtils.getFormattedDate(startingDate)+"'::TIMESTAMP AND '"+CommonUtils.getFormattedDate(endingDate)+"'::TIMESTAMP))\n" +
+                "                               (ua.created BETWEEN '" + CommonUtils.getFormattedDate(startingDate) + "'::TIMESTAMP AND '" + CommonUtils.getFormattedDate(endingDate) + "'::TIMESTAMP))\n" +
                 "          THEN 1\n" +
                 "        ELSE 0 END AS data,\n" +
                 "\n" +
                 "        count(exists(SELECT *\n" +
                 "                     FROM user_arrival ua\n" +
                 "                     WHERE ua.user_id = vs.id AND\n" +
-                "                           (ua.created BETWEEN '"+CommonUtils.getFormattedDate(startingDate)+"'::TIMESTAMP AND '"+CommonUtils.getFormattedDate(endingDate)+"'::TIMESTAMP)))\n" +
+                "                           (ua.created BETWEEN '" + CommonUtils.getFormattedDate(startingDate) + "'::TIMESTAMP AND '" + CommonUtils.getFormattedDate(endingDate) + "'::TIMESTAMP)))\n" +
                 "      FROM v_student vs\n" +
-                "      WHERE vs.group_name NOTNULL AND vs.faculty_id = "+ id +" \n" +
+                "      WHERE vs.group_name NOTNULL AND vs.faculty_id = " + id + " \n" +
                 "      GROUP BY vs.group_name, vs.id\n" +
                 "      HAVING count(vs.id) > 0 " +
                 "      ORDER BY vs.group_name) AS foo\n" +
@@ -247,7 +243,7 @@ public class MainSection implements FilterPanelListener {
                 for (Object o : tmpList) {
                     Object[] oo = (Object[]) o;
                     SimpleStatistics simpleStatistic = new SimpleStatistics();
-                    simpleStatistic.setGroupName((String)oo[0]);
+                    simpleStatistic.setGroupName((String) oo[0]);
                     simpleStatistic.setPercentage((Double) oo[1]);
                     simpleStatistics.add(simpleStatistic);
                 }
@@ -268,11 +264,11 @@ public class MainSection implements FilterPanelListener {
         label.setSizeFull();
         label.setCaptionAsHtml(true);
         label.setImmediate(true);
-        label.setCaption("<h2>    " + CommonUtils.getUILocaleUtil().getCaption("attendance") + "</h2>" );
+        label.setCaption("<h2>    " + CommonUtils.getUILocaleUtil().getCaption("attendance") + "</h2>");
         mainVL.addComponent(label);
-        try{
+        try {
             mainVL.addComponent(statisticsFilterPanel);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         mainVL.addComponent(chart);
@@ -280,7 +276,7 @@ public class MainSection implements FilterPanelListener {
         return mainVL;
     }
 
-    private AbstractFilterPanel getFilter() throws Exception{
+    private AbstractFilterPanel getFilter() throws Exception {
         StatisticsFilterPanel statisticsFP = new StatisticsFilterPanel(new FStatisticsFilter());
         statisticsFP.addFilterPanelListener(this);
         statisticsFP.setImmediate(true);
@@ -291,7 +287,7 @@ public class MainSection implements FilterPanelListener {
         facultyCB.setFilteringMode(FilteringMode.CONTAINS);
         facultyCB.setWidth(200, Sizeable.Unit.PIXELS);
         QueryModel<DEPARTMENT> facultyQM = new QueryModel<>(DEPARTMENT.class);
-        facultyQM.addWhere("deleted" , ECriteria.EQUAL,false);
+        facultyQM.addWhere("deleted", ECriteria.EQUAL, false);
         facultyQM.addWhereNullAnd("parent");
         BeanItemContainer<DEPARTMENT> facultyBIC = new BeanItemContainer<>(DEPARTMENT.class,
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(facultyQM));
@@ -316,7 +312,7 @@ public class MainSection implements FilterPanelListener {
         Label label = new Label();
         label.setImmediate(true);
         label.setCaptionAsHtml(true);
-        label.setCaption("<h2>    " + CommonUtils.getUILocaleUtil().getCaption("best.attendance") +"</h2>");
+        label.setCaption("<h2>    " + CommonUtils.getUILocaleUtil().getCaption("best.attendance") + "</h2>");
         label.setSizeFull();
 
         GridLayout topPerformanceGL = new GridLayout();
@@ -350,16 +346,16 @@ public class MainSection implements FilterPanelListener {
             public void buttonClick(Button.ClickEvent clickEvent) {
 
                 List<String> tableHeader = new ArrayList<>();
-                List<List<String>> tableBody= new ArrayList<>();
+                List<List<String>> tableBody = new ArrayList<>();
 
                 String fileName = "document";
 
-                for(GridColumnModel gcm : bestStudentsGM.getColumnModels()){
+                for (GridColumnModel gcm : bestStudentsGM.getColumnModels()) {
                     tableHeader.add(gcm.getLabel());
                 }
-                for(int i = 0 ; i < bestStudentsGW.getAllEntities().size(); i++){
+                for (int i = 0; i < bestStudentsGW.getAllEntities().size(); i++) {
                     VTopUserArrival vUser = (VTopUserArrival) bestStudentsGW.getAllEntities().get(i);
-                    if(bestStudentsGW.getCaption()!=null){
+                    if (bestStudentsGW.getCaption() != null) {
                         fileName = bestStudentsGW.getCaption();
                     }
                     List<String> list = new ArrayList<>();
@@ -370,8 +366,7 @@ public class MainSection implements FilterPanelListener {
                 }
 
 
-
-                PrintDialog printDialog = new PrintDialog(tableHeader, tableBody , CommonUtils.getUILocaleUtil().getCaption("print"),fileName);
+                PrintDialog printDialog = new PrintDialog(tableHeader, tableBody, CommonUtils.getUILocaleUtil().getCaption("print"), fileName);
             }
         });
 
@@ -382,27 +377,27 @@ public class MainSection implements FilterPanelListener {
             public void buttonClick(Button.ClickEvent clickEvent) {
 
                 List<String> tableHeader = new ArrayList<>();
-                List<List<String>> tableBody= new ArrayList<>();
+                List<List<String>> tableBody = new ArrayList<>();
 
                 String fileName = "document";
 
-                for(GridColumnModel gcm : bestGroupsGM.getColumnModels()){
+                for (GridColumnModel gcm : bestGroupsGM.getColumnModels()) {
                     tableHeader.add(gcm.getLabel());
                 }
-                for(int i = 0 ; i < bestGroupsGW.getAllEntities().size(); i++){
+                for (int i = 0; i < bestGroupsGW.getAllEntities().size(); i++) {
                     VTopGroupArrival vGroup = (VTopGroupArrival) bestGroupsGW.getAllEntities().get(i);
-                    if(bestGroupsGW.getCaption()!=null){
+                    if (bestGroupsGW.getCaption() != null) {
                         fileName = bestGroupsGW.getCaption();
                     }
                     List<String> list = new ArrayList<>();
                     list.add(vGroup.getGroup());
                     list.add(vGroup.getTeacher());
-                    list.add(vGroup.getAttend()+"");
-                    list.add(vGroup.getPercent()+"");
-                    list.add(vGroup.getSumOfStudent()+"");
+                    list.add(vGroup.getAttend() + "");
+                    list.add(vGroup.getPercent() + "");
+                    list.add(vGroup.getSumOfStudent() + "");
                     tableBody.add(list);
                 }
-                PrintDialog printDialog = new PrintDialog(tableHeader, tableBody , CommonUtils.getUILocaleUtil().getCaption("print"),fileName);
+                PrintDialog printDialog = new PrintDialog(tableHeader, tableBody, CommonUtils.getUILocaleUtil().getCaption("print"), fileName);
             }
         });
 
@@ -421,12 +416,12 @@ public class MainSection implements FilterPanelListener {
     private void setValues() {
 
         try {
-            if(mainVL.getComponentCount()>0){
+            if (mainVL.getComponentCount() > 0) {
                 mainVL.removeAllComponents();
             }
 
             mainVL.addComponent(dateField);
-            mainVL.setComponentAlignment(dateField,Alignment.TOP_RIGHT);
+            mainVL.setComponentAlignment(dateField, Alignment.TOP_RIGHT);
 
             HorizontalLayout mainHL;
             mainHL = new HorizontalLayout();
@@ -436,8 +431,8 @@ public class MainSection implements FilterPanelListener {
             mainHL.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
 
             mainHL.addComponent(setStudents());
-            mainHL.addComponent(setLaters());
             mainHL.addComponent(setEmployees());
+            mainHL.addComponent(setLaters());
             mainHL.addComponent(setNoCards());
 
             mainVL.addComponent(mainHL);
@@ -480,7 +475,7 @@ public class MainSection implements FilterPanelListener {
         QueryModel<V_EMPLOYEE> employeeQM = new QueryModel<>(V_EMPLOYEE.class);
         employeeQM.addSelect("code", EAggregate.COUNT);
         employeeQM.addWhere("deleted", Boolean.FALSE);
-        Long allEmployees = (Long) SessionFacadeFactory.
+        allEmployees = (Long) SessionFacadeFactory.
                 getSessionFacade(CommonEntityFacadeBean.class).lookupItems(employeeQM);
 
         String sql = "SELECT count(1) " +
@@ -525,15 +520,28 @@ public class MainSection implements FilterPanelListener {
         return null;
     }
 
-    private Panel setLaters() {
+    private Panel setLaters() throws Exception {
+        String sql = "SELECT count(1) " +
+                "FROM user_arrival arriv INNER JOIN v_employee empl ON empl.id = arriv.user_id " +
+                "WHERE date_trunc('day', arriv.created) = date_trunc('day', now()) " +
+                "      AND arriv.created = (SELECT min(max_arriv.created) " +
+                "                           FROM user_arrival max_arriv " +
+                "                           WHERE max_arriv.user_id = arriv.user_id " +
+                "                                 AND date_trunc('day', max_arriv.created) = date_trunc('day', now()) " +
+                "                                 AND come_in = TRUE) " +
+                "      AND come_in = TRUE AND arriv.created :: TIME > '08:40:00';";
+        Long lateEmpl = (Long) SessionFacadeFactory.getSessionFacade(
+                CommonEntityFacadeBean.class).lookupSingle(sql, new HashMap<>());
+        long inPercent = lateEmpl * 100 / allEmployees;
+
         Panel latersPanel = new Panel("<html><b>" + CommonUtils.getUILocaleUtil().getCaption("latersPanel") + "</b><br>" +
-                "9.8%<br>" +
-                "(313 из 3209)</html>");
+                inPercent + "%<br>" +
+                "(" + lateEmpl + " из " + allEmployees + ")</html>");
         latersPanel.setIcon(new ThemeResource("img/clock.png"));
         latersPanel.addClickListener(new MouseEvents.ClickListener() {
             @Override
             public void click(MouseEvents.ClickEvent event) {
-                Message.showInfo("laters");
+                new MainDialog();
             }
         });
         return latersPanel;
@@ -576,7 +584,7 @@ public class MainSection implements FilterPanelListener {
     public void doFilter(AbstractFilterBean abstractFilterBean) {
         FStatisticsFilter fStatisticsFilter = (FStatisticsFilter) abstractFilterBean;
         List<SimpleStatistics> simpleStatistics = new ArrayList<>();
-        if(fStatisticsFilter.getDepartment()!= null && fStatisticsFilter.getEndingDate()!=null && fStatisticsFilter.getStartingDate()!=null ){
+        if (fStatisticsFilter.getDepartment() != null && fStatisticsFilter.getEndingDate() != null && fStatisticsFilter.getStartingDate() != null) {
             simpleStatistics.addAll(getStatisticList(fStatisticsFilter.getDepartment().getId().getId().longValue(), fStatisticsFilter.getStartingDate(), fStatisticsFilter.getEndingDate()));
             refresh(simpleStatistics);
         }
@@ -591,14 +599,14 @@ public class MainSection implements FilterPanelListener {
         barConfig.
                 data()
                 .labels(CommonUtils.getUILocaleUtil().getCaption("attendance"));
-        for(SimpleStatistics ss : list){
+        for (SimpleStatistics ss : list) {
             barConfig.data()
                     .addDataset(
                             new BarDataset().backgroundColor(ColorUtils.randomColor(0.7), ColorUtils.randomColor(0.7), ColorUtils.randomColor(0.7)).label(ss.getGroupName()).yAxisID("y-axis-1"));
         }
 
         List<String> labels = barConfig.data().getLabels();
-        for (int j = 0 ; j < barConfig.data().getDatasets().size() ; j++) {
+        for (int j = 0; j < barConfig.data().getDatasets().size(); j++) {
             BarDataset lds = (BarDataset) barConfig.data().getDatasets().get(j);
             List<Double> data = new ArrayList<>();
             for (int i = 0; i < labels.size(); i++) {
