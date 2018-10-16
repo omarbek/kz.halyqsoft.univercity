@@ -1,7 +1,12 @@
 package kz.halyqsoft.univercity.modules.userarrival.subview;
 
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.data.Property;
+import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_ARRIVAL;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.VGroup;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.VStudentInfo;
+import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.PrintDialog;
+import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
@@ -11,7 +16,10 @@ import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.vaadin.widget.ERefreshType;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
+import org.r3a.common.vaadin.widget.grid.model.GridColumnModel;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -22,19 +30,73 @@ import java.util.List;
 public class LateEmployeesAttendance implements EntityListener {
 
     private VerticalLayout mainVL;
-
+    private DateField dateField;
+    private GridWidget usersGW;
+    private DBGridModel usersGM;
     public LateEmployeesAttendance(){
-        mainVL = new VerticalLayout();
-        mainVL.setSpacing(true);
-        mainVL.setSizeFull();
+
 
         GridWidget usersGW = new GridWidget(USER_ARRIVAL.class);
         usersGW.showToolbar(false);
 
-        DBGridModel usersGM = (DBGridModel) usersGW.getWidgetModel();
+        usersGM = (DBGridModel) usersGW.getWidgetModel();
         usersGM.setRefreshType(ERefreshType.MANUAL);
 
-        refreshGridWidget(usersGW);
+        Button printBtn = new Button(CommonUtils.getUILocaleUtil().getCaption("export"));
+        printBtn.setImmediate(true);
+        printBtn.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+
+                List<String> tableHeader = new ArrayList<>();
+                List<List<String>> tableBody= new ArrayList<>();
+
+                String fileName = "document";
+
+                tableHeader.add(CommonUtils.getUILocaleUtil().getCaption("user"));
+                tableHeader.add(CommonUtils.getUILocaleUtil().getCaption("time"));
+
+                for(int i = 0 ; i < usersGW.getAllEntities().size(); i++){
+                    USER_ARRIVAL userArrival = (USER_ARRIVAL) usersGW.getAllEntities().get(i);
+                    if(usersGW.getCaption()!=null){
+                        fileName = usersGW.getCaption();
+                    }
+                    List<String> list = new ArrayList<>();
+                    list.add(userArrival.getUser().toString());
+                    list.add(CommonUtils.getFormattedDate(userArrival.getCreated()));
+                    tableBody.add(list);
+                }
+
+
+                PrintDialog printDialog = new PrintDialog(tableHeader, tableBody , CommonUtils.getUILocaleUtil().getCaption("print"),fileName);
+            }
+        });
+        HorizontalLayout buttonPanel = CommonUtils.createButtonPanel();
+
+        dateField = new DateField();
+        dateField.setValue(new Date());
+        dateField.addValueChangeListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
+                refreshGridWidget(usersGW);
+            }
+        });
+
+        buttonPanel.addComponent(dateField);
+        buttonPanel.setComponentAlignment(dateField, Alignment.MIDDLE_CENTER);
+
+        buttonPanel.addComponent(printBtn);
+        buttonPanel.setComponentAlignment(printBtn, Alignment.MIDDLE_CENTER);
+
+
+
+        mainVL = new VerticalLayout();
+        mainVL.setSpacing(true);
+        mainVL.setSizeFull();
+
+
+        mainVL.addComponent(buttonPanel);
+        mainVL.setComponentAlignment(buttonPanel, Alignment.TOP_RIGHT);
         mainVL.addComponent(usersGW);
     }
 
@@ -42,11 +104,11 @@ public class LateEmployeesAttendance implements EntityListener {
         try {
             String sql = "SELECT arriv.* " +
                     "FROM user_arrival arriv INNER JOIN v_employee empl ON empl.id = arriv.user_id " +
-                    "WHERE date_trunc('day', arriv.created) = date_trunc('day', now()) " +
+                    "WHERE date_trunc('day', arriv.created) = date_trunc('day', TIMESTAMP '"+ CommonUtils.getFormattedDate(dateField.getValue())+"') " +
                     "      AND arriv.created = (SELECT min(max_arriv.created) " +
                     "                           FROM user_arrival max_arriv " +
                     "                           WHERE max_arriv.user_id = arriv.user_id " +
-                    "                                 AND date_trunc('day', max_arriv.created) = date_trunc('day', now()) " +
+                    "                                 AND date_trunc('day', max_arriv.created) = date_trunc('day', TIMESTAMP '"+ CommonUtils.getFormattedDate(dateField.getValue())+"') " +
                     "                                 AND come_in = TRUE) " +
                     "      AND come_in = TRUE AND arriv.created :: TIME > '08:40:00' " +
                     "ORDER BY created DESC;";
