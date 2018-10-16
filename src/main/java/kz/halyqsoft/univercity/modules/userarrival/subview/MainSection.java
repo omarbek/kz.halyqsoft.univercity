@@ -541,7 +541,7 @@ public class MainSection implements FilterPanelListener {
         latersPanel.addClickListener(new MouseEvents.ClickListener() {
             @Override
             public void click(MouseEvents.ClickEvent event) {
-                new MainDialog();
+                new MainDialog(new LateEmployeesAttendance().getMainVL());
             }
         });
         return latersPanel;

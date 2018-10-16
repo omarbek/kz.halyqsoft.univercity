@@ -70,6 +70,7 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
         String studentAttendance = getUILocaleUtil().getCaption("studentAttendance");
         String employeeAttendance = getUILocaleUtil().getCaption("employeeAttendance");
         String latecomers = getUILocaleUtil().getCaption("latecomers");
+        String lateEmployees=getUILocaleUtil().getCaption("late.employees");
         String absent = getUILocaleUtil().getCaption("absent");
         String yearlyAttendance = getUILocaleUtil().getCaption("yearlyAttendance");
         String manuallySign = getUILocaleUtil().getCaption("manuallySign");
@@ -83,6 +84,8 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
         hierarchicalContainer.setChildrenAllowed(employeeAttendance, false);
         hierarchicalContainer.addItem(latecomers);
         hierarchicalContainer.setChildrenAllowed(latecomers, false);
+        hierarchicalContainer.addItem(lateEmployees);
+        hierarchicalContainer.setChildrenAllowed(lateEmployees, false);
         hierarchicalContainer.addItem(absent);
         hierarchicalContainer.setChildrenAllowed(absent, false);
         hierarchicalContainer.addItem(yearlyAttendance);
@@ -115,37 +118,41 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
                     if (event != null && event.getProperty() != null && event.getProperty().getValue() != null) {
                         mainHSP.removeComponent(mainHL);
                         mainHL.removeAllComponents();
-                        if (main.equals(event.getProperty().getValue().toString())) {
+                        String menu = event.getProperty().getValue().toString();
+                        if (main.equals(menu)) {
                             MainSection mainSection = new MainSection();
                             mainHL.addComponent(mainSection.getMainVL());
-                        } else if (employeeAttendance.equals(event.getProperty().getValue().toString())) {
+                        } else if (employeeAttendance.equals(menu)) {
                             EmployeeAttendance employeeAttendance = new EmployeeAttendance();
                             mainHL.addComponent(employeeAttendance.getMainVL());
-                        } else if (studentAttendance.equalsIgnoreCase(event.getProperty().getValue().toString())) {
+                        } else if (studentAttendance.equalsIgnoreCase(menu)) {
                             FacultyAttendance facultyAttendance = new FacultyAttendance();
                             mainHL.addComponent(facultyAttendance.getMainVL());
-                        } else if (absent.equalsIgnoreCase(event.getProperty().getValue().toString())) {
+                        } else if (absent.equalsIgnoreCase(menu)) {
                             AbsentAttendance absentAttendance = new AbsentAttendance(tableVL);
                             mainHL.addComponent(absentAttendance.getAbsentsInfo());
-                        } else if (manuallySign.equalsIgnoreCase(event.getProperty().getValue().toString())) {
+                        } else if (manuallySign.equalsIgnoreCase(menu)) {
                             SigningSection signingSection = new SigningSection();
                             mainHL.addComponent(signingSection.getMainVL());
                             setAbsentsInfo();
 
-                        } else if (latecomers.equalsIgnoreCase(event.getProperty().getValue().toString())) {
+                        } else if (latecomers.equalsIgnoreCase(menu)) {
                             GroupLatecomers groupLatecomers = new GroupLatecomers();
                             mainHL.addComponent(groupLatecomers.getMainVL());
                             setAbsentsInfo();
 
-                        } else if (manuallySignedReport.equalsIgnoreCase(event.getProperty().getValue().toString())
+                        } else if (manuallySignedReport.equalsIgnoreCase(menu)
                                 && CommonUtils.isCurrentUserHasAdminPrivileges()) {
                             SigningReport signingReport = new SigningReport();
                             mainHL.addComponent(signingReport.getMainVL());
+                        }else if(lateEmployees.equalsIgnoreCase(menu)){
+                            LateEmployeesAttendance lateEmployeesAttendance=new LateEmployeesAttendance();
+                            mainHL.addComponent(lateEmployeesAttendance.getMainVL());
                         }
                         mainHSP.addComponent(mainHL);
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    e.printStackTrace();//TODO catch
                 }
             }
 
