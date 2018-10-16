@@ -47,6 +47,7 @@ public class DeleteDataView extends AbstractTaskView implements EntityListener, 
     private ComboBox userTypeCB;
     private USER_TYPE userType;
     private TextField iinTF;
+    private TextField codeTF;
 
     public DeleteDataView(AbstractTask task) throws Exception {
         super(task);
@@ -58,6 +59,11 @@ public class DeleteDataView extends AbstractTaskView implements EntityListener, 
     @Override
     public void initView(boolean b) throws Exception {
         filterPanel.addFilterPanelListener(this);
+
+        codeTF = new TextField();
+        codeTF.setNullRepresentation("");
+        codeTF.setNullSettingAllowed(true);
+        filterPanel.addFilterComponent("code", codeTF);
 
         userTypeCB = new ComboBox();
         userTypeCB.setNullSelectionAllowed(false);
@@ -111,6 +117,10 @@ public class DeleteDataView extends AbstractTaskView implements EntityListener, 
         if (userTypeId != null) {
             usersQM.addWhere("typeIndex", ECriteria.EQUAL, userTypeId);
         }
+        String code = codeTF.getValue();
+        if (code != null && !code.isEmpty()) {
+            usersQM.addWhere("code", ECriteria.EQUAL, code);
+        }
         List<USERS> list = null;
         try {
             list = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(usersQM);
@@ -140,6 +150,7 @@ public class DeleteDataView extends AbstractTaskView implements EntityListener, 
                         deleteMainTable(user, "employee_dept", "EMPLOYEE_ID");
                         deleteMainTable(user, "employee_scientific", "EMPLOYEE_ID");
                         deleteMainTable(user, "employee_work_hour", "EMPLOYEE_ID");
+                        deleteMainTable(user,"child","EMPLOYEE_ID");
                         deleteMainTable(user, "employee", "ID");
                     } else {
                         deleteMainTable(user, "entrant_speciality", "STUDENT_ID");
