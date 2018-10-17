@@ -354,7 +354,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         downloadTableButton.addClickListener(new ClickListener() {
                                                  @Override
                                                  public void buttonClick(ClickEvent clickEvent) {
-                                                     myResource = createResourceStudent("154", student);
+                                                     myResource = createResourceStudent("99", student);
                                                      fileDownloader = new FileDownloader(myResource);
                                                      myResource.setMIMEType("application/pdf");
                                                      fileDownloader.extend(downloadTableButton);
@@ -365,7 +365,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         downloadTableRusButton.addClickListener(new ClickListener() {
                                                     @Override
                                                     public void buttonClick(ClickEvent clickEvent) {
-                                                        myResource = createResourceStudent("155", student);
+                                                        myResource = createResourceStudent("98", student);
                                                         fileDownloader = new FileDownloader(myResource);
                                                         myResource.setMIMEType("application/pdf");
                                                         fileDownloader.extend(downloadTableRusButton);
