@@ -1,7 +1,14 @@
 package kz.halyqsoft.univercity.modules.userarrival.subview;
 
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.VerticalLayout;
+import kz.halyqsoft.univercity.entity.beans.univercity.USER_ARRIVAL;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEPARTMENT;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.POST;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_EMPLOYEE;
+import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.PrintDialog;
+import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
@@ -12,6 +19,7 @@ import org.r3a.common.vaadin.widget.ERefreshType;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -24,9 +32,6 @@ public class AbsentTodayAttendance implements EntityListener {
     private VerticalLayout mainVL;
 
     public AbsentTodayAttendance() {
-        mainVL = new VerticalLayout();
-        mainVL.setSpacing(true);
-        mainVL.setSizeFull();
 
         GridWidget usersGW = new GridWidget(V_EMPLOYEE.class);
         usersGW.showToolbar(false);
@@ -34,7 +39,48 @@ public class AbsentTodayAttendance implements EntityListener {
         DBGridModel usersGM = (DBGridModel) usersGW.getWidgetModel();
         usersGM.setRefreshType(ERefreshType.MANUAL);
 
+        Button printBtn = new Button(CommonUtils.getUILocaleUtil().getCaption("export"));
+        printBtn.setImmediate(true);
+        printBtn.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+
+                List<String> tableHeader = new ArrayList<>();
+                List<List<String>> tableBody= new ArrayList<>();
+
+                String fileName = "document";
+
+                tableHeader.add(CommonUtils.getUILocaleUtil().getCaption("code"));
+                tableHeader.add(CommonUtils.getUILocaleUtil().getCaption("user"));
+                tableHeader.add(CommonUtils.getUILocaleUtil().getEntityLabel(DEPARTMENT.class));
+                tableHeader.add(CommonUtils.getUILocaleUtil().getEntityLabel(POST.class));
+
+                for(int i = 0 ; i < usersGW.getAllEntities().size(); i++){
+                    V_EMPLOYEE user = (V_EMPLOYEE) usersGW.getAllEntities().get(i);
+                    if(usersGW.getCaption()!=null){
+                        fileName = usersGW.getCaption();
+                    }
+                    List<String> list = new ArrayList<>();
+                    list.add(user.getCode());
+                    list.add(user.getFirstName() + " " + user.getLastName() + " " +  (user.getMiddleName() != null ? user.getMiddleName() : ""));
+                    list.add(user.getDepartment() != null ? user.getDepartment().getDeptName() : "");
+                    list.add(user.getPostName() != null ? user.getPostName() : "");
+                    tableBody.add(list);
+                }
+
+
+                PrintDialog printDialog = new PrintDialog(tableHeader, tableBody , CommonUtils.getUILocaleUtil().getCaption("print"),fileName);
+            }
+        });
+
+        mainVL = new VerticalLayout();
+        mainVL.setSpacing(true);
+        mainVL.setSizeFull();
+
+
         refreshGridWidget(usersGW);
+        mainVL.addComponent(printBtn);
+        mainVL.setComponentAlignment(printBtn, Alignment.TOP_RIGHT);
         mainVL.addComponent(usersGW);
     }
 

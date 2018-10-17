@@ -685,7 +685,7 @@ public final class ApplicantsForm extends UsersForm {
                             qm.addWhere("user", ECriteria.EQUAL, student.getId());
                             imageArray = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(qm).getPhoto();
                         } catch (NoResultException e) {
-                            e.printStackTrace();
+                            CommonUtils.LOG.error(e.getMessage());
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -991,18 +991,26 @@ public final class ApplicantsForm extends UsersForm {
         STUDENT_RELATIVE studentRelativeMother = getStudent_relative(student, MOTHER);
         STUDENT_RELATIVE studentRelativeFather = getStudent_relative(student, FATHER);
 
-        USER_ADDRESS userAddress;
+        USER_ADDRESS userAddress = null;
         QueryModel<USER_ADDRESS> userAddressQueryModel = new QueryModel<>(USER_ADDRESS.class);
         userAddressQueryModel.addWhere("user", ECriteria.EQUAL, student.getId());
         userAddressQueryModel.addWhereAnd("addressType", ECriteria.EQUAL, ID.valueOf(ADDRESS_FACT));
-        userAddress = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(userAddressQueryModel);
+        try{
+            userAddress = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(userAddressQueryModel);
+        }catch (NoResultException nre){
+            nre.printStackTrace();
+        }
 
         QueryModel<EDUCATION_DOC> educationDocQueryModel = new QueryModel<>(EDUCATION_DOC.class);
 
-        EDUCATION_DOC educationDoc;
+        EDUCATION_DOC educationDoc = null;
         FromItem sc = educationDocQueryModel.addJoin(EJoin.INNER_JOIN, "id", USER_DOCUMENT.class, "id");
         educationDocQueryModel.addWhere(sc, "user", ECriteria.EQUAL, student.getId());
-        educationDoc = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(educationDocQueryModel);
+        try{
+            educationDoc = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(educationDocQueryModel);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
         UNT_CERTIFICATE untCertificate;
         QueryModel<UNT_CERTIFICATE> untCertificateQueryModel = new QueryModel<>(UNT_CERTIFICATE.class);
@@ -1042,16 +1050,18 @@ public final class ApplicantsForm extends UsersForm {
 
         DateFormat form = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.US);
 
-        Date dateBirth = form.parse(student.getBirthDate().toString());
+        Date dateBirth = form.parse(student.getBirthDate() != null ? student.getBirthDate().toString() : new Date().toString());
         Calendar cal = Calendar.getInstance();
         cal.setTime(dateBirth);
         String birthdayDate = cal.get(Calendar.DATE) + "." + (cal.get(Calendar.MONTH) + 1) + "." + cal.get(Calendar.YEAR);
         Date date1 = formatter.parse(birthdayDate);
         String birthday = formatter.format(date1);
 
-        Date dateDocument = form.parse(educationDoc.getIssueDate().toString());
+
+        Date dateDocument = form.parse(educationDoc.getIssueDate()!=null ? educationDoc.getIssueDate().toString() : new Date().toString());
         Calendar cal1 = Calendar.getInstance();
         cal1.setTime(dateDocument);
+
         String formatDate = cal1.get(Calendar.DATE) + "." + (cal1.get(Calendar.MONTH) + 1) + "." + cal1.get(Calendar.YEAR);
         Date date2 = formatter.parse(formatDate);
         String attestationDate = formatter.format(date2);
@@ -1077,8 +1087,10 @@ public final class ApplicantsForm extends UsersForm {
         if (student.getCoordinator() == null) {
             student.setCoordinator(coordinator);
         }
-        if (educationDoc.getEndYear() == null) {
-            educationDoc.setEndYear(Calendar.getInstance().get(Calendar.YEAR));
+        if(educationDoc!=null){
+            if (educationDoc.getEndYear() == null) {
+                educationDoc.setEndYear(Calendar.getInstance().get(Calendar.YEAR));
+            }
         }
         if (studentRelativeFather.getPhoneMobile() == null) {
             studentRelativeFather.setPhoneMobile("***");
@@ -1124,14 +1136,16 @@ public final class ApplicantsForm extends UsersForm {
             passportNumber = user_passport.getDocumentNo();
         }
         String fullAddress = "";
-        if (userAddress.getCountry() != null)
-            fullAddress += " " + userAddress.getCountry();
-        if (userAddress.getRegion() != null)
-            fullAddress += " " + userAddress.getRegion();
-        if (userAddress.getCity() != null)
-            fullAddress += " " + userAddress.getCity();
-        if (userAddress.getStreet() != null)
-            fullAddress += " " + userAddress.getStreet();
+        if(userAddress!=null){
+            if (userAddress.getCountry() != null)
+                fullAddress += " " + userAddress.getCountry();
+            if (userAddress.getRegion() != null)
+                fullAddress += " " + userAddress.getRegion();
+            if (userAddress.getCity() != null)
+                fullAddress += " " + userAddress.getCity();
+            if (userAddress.getStreet() != null)
+                fullAddress += " " + userAddress.getStreet();
+        }
         String firstCourseMoney = moneyForEducation;
         String secondCourseMoney = moneyForEducation;
 

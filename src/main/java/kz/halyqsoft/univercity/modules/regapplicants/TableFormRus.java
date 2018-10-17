@@ -12,6 +12,7 @@ import org.r3a.common.entity.ID;
 
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -94,7 +95,8 @@ public class TableFormRus {
 
             Map<Integer, Object> params = new HashMap<>();
             try {
-                java.util.List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
+                java.util.List<Object> tmpList = new ArrayList<>();
+                tmpList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params));
                 if (!tmpList.isEmpty()) {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
@@ -143,13 +145,14 @@ public class TableFormRus {
                     "      usr.locked = FALSE AND usr.id = "+studentId;
             Map<Integer, Object> param = new HashMap<>();
             try {
-                java.util.List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql1, param);
+                java.util.List<Object> tmpList = new ArrayList<>();
+                tmpList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql1, param));
                 if (!tmpList.isEmpty()) {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
 
                         for(int i = 0 ; i < 7;i++){
-                            insertCell(table,oo[i]!=null ? oo[i] instanceof String ? (String)oo[i]: String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
+                            insertCell(table,oo[i]!=null ? oo[i] instanceof String ? (String)oo[i] : String.valueOf(oo[i]) : "" , Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.NORMAL));
                         }
 
                     }
@@ -192,7 +195,8 @@ public class TableFormRus {
                     "  AND usr.locked = FALSE AND usr.id = "+studentId;
             Map<Integer, Object> para = new HashMap<>();
             try {
-                java.util.List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql2, para);
+                java.util.List<Object> tmpList = new ArrayList<>();
+                tmpList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql2, para));
                 if (!tmpList.isEmpty()) {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
@@ -233,7 +237,8 @@ public class TableFormRus {
 
             Map<Integer, Object> par = new HashMap<>();
             try {
-                java.util.List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql3, par);
+                java.util.List<Object> tmpList = new ArrayList<>();
+                tmpList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql3, par));
                 if (!tmpList.isEmpty()) {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
@@ -284,7 +289,8 @@ public class TableFormRus {
                     "  AND subj.mandatory=TRUE AND\n" +
                     "      usr.locked = FALSE AND usr.id = "+studentId;
             try {
-                java.util.List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlSem2, params);
+                java.util.List<Object> tmpList = new ArrayList<>();
+                tmpList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlSem2, params));
                 if (!tmpList.isEmpty()) {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
@@ -333,7 +339,8 @@ public class TableFormRus {
                     "  subj.module_id  != 3 AND \n" +
                     "      usr.locked = FALSE AND usr.id = "+studentId;
             try {
-                java.util.List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlAdd, param);
+                java.util.List<Object> tmpList = new ArrayList<>();
+                tmpList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlAdd, param));
                 if (!tmpList.isEmpty()) {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
@@ -380,7 +387,8 @@ public class TableFormRus {
                     "AND subj.module_id=3\n" +
                     "  AND usr.locked = FALSE AND usr.id = "+studentId;
             try {
-                java.util.List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlStud, para);
+                java.util.List<Object> tmpList = new ArrayList<>();
+                tmpList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlStud, para));
                 if (!tmpList.isEmpty()) {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
@@ -421,7 +429,8 @@ public class TableFormRus {
             insertCell(table, (" Всего в семестре:"), Element.ALIGN_LEFT, 3,  EmployeePdfCreator.getFont(12, Font.NORMAL));
 
             try {
-                java.util.List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlSum, par);
+                java.util.List<Object> tmpList = new ArrayList<>();
+                tmpList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlSum, par));
                 if (!tmpList.isEmpty()) {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
@@ -492,7 +501,8 @@ public class TableFormRus {
                     "      AND subj.mandatory=TRUE AND\n" +
                     "      usr.locked = FALSE AND usr.id = "+studentId;
             try {
-                java.util.List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlTeacherSem1, params);
+                java.util.List<Object> tmpList = new ArrayList<>();
+                tmpList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlTeacherSem1, params));
                 if (!tmpList.isEmpty()) {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
@@ -540,7 +550,8 @@ public class TableFormRus {
                     "  subj.module_id  != 3 AND\n" +
                     "  usr.locked = FALSE AND usr.id = "+studentId;
             try {
-                java.util.List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlTeaAdd, param);
+                java.util.List<Object> tmpList = new ArrayList<>();
+                tmpList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlTeaAdd, param));
                 if (!tmpList.isEmpty()) {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
@@ -588,7 +599,8 @@ public class TableFormRus {
                     "AND\n" +
                     "  usr.locked = FALSE AND usr.id = "+studentId;
             try {
-                java.util.List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlTeachAdd, para);
+                java.util.List<Object> tmpList = new ArrayList<>();
+                tmpList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlTeachAdd, para));
                 if (!tmpList.isEmpty()) {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
@@ -629,7 +641,8 @@ public class TableFormRus {
             insertCell(table1, ("Итого кредитов за семестр"), Element.ALIGN_LEFT, 2,  EmployeePdfCreator.getFont(12, Font.NORMAL));
 
             try {
-                java.util.List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlTeachSum, par);
+                java.util.List<Object> tmpList = new ArrayList<>();
+                tmpList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlTeachSum, par));
                 if (!tmpList.isEmpty()) {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
@@ -691,7 +704,8 @@ public class TableFormRus {
                     "      AND subj.mandatory=TRUE AND\n" +
                     "      usr.locked = FALSE AND usr.id = "+studentId;
             try {
-                java.util.List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlTeacherSem2, params);
+                java.util.List<Object> tmpList = new ArrayList<>();
+                tmpList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlTeacherSem2, params));
                 if (!tmpList.isEmpty()) {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
@@ -787,7 +801,8 @@ public class TableFormRus {
                     "AND\n" +
                     "  usr.locked = FALSE AND usr.id = "+studentId;
             try {
-                java.util.List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlTeachAdd2, para);
+                java.util.List<Object> tmpList = new ArrayList<>();
+                tmpList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlTeachAdd2, para));
                 if (!tmpList.isEmpty()) {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
@@ -827,7 +842,8 @@ public class TableFormRus {
             insertCell(table1, ("Итого кредитов за семестр"), Element.ALIGN_LEFT, 2,  EmployeePdfCreator.getFont(12, Font.NORMAL));
 
             try {
-                List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlTeachSum2, par);
+                List<Object> tmpList = new ArrayList<>();
+                        tmpList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlTeachSum2, par));
                 if (!tmpList.isEmpty()) {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
@@ -882,6 +898,7 @@ public class TableFormRus {
                     "                               (подпись)            (Ф.И.О.)            \n", EmployeePdfCreator.getFont(12, Font.BOLD)));
 
             pdfWriter.close();
+
 
         }catch (Exception e){
             e.printStackTrace();

@@ -100,8 +100,6 @@ public class MainSection implements FilterPanelListener {
             }
         });
         dateField.setValue(new Date());
-
-        setValues();
     }
 
     public List<VTopUserArrival> getUserList(Date date) {
