@@ -88,8 +88,6 @@ public class LateEmployeesAttendance implements EntityListener {
         buttonPanel.addComponent(printBtn);
         buttonPanel.setComponentAlignment(printBtn, Alignment.MIDDLE_CENTER);
 
-
-
         mainVL = new VerticalLayout();
         mainVL.setSpacing(true);
         mainVL.setSizeFull();

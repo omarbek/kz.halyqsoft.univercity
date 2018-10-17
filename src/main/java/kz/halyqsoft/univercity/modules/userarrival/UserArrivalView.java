@@ -70,8 +70,9 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
         String studentAttendance = getUILocaleUtil().getCaption("studentAttendance");
         String employeeAttendance = getUILocaleUtil().getCaption("employeeAttendance");
         String latecomers = getUILocaleUtil().getCaption("latecomers");
-        String lateEmployees=getUILocaleUtil().getCaption("late.employees");
-        String absent = getUILocaleUtil().getCaption("absent");
+        String lateEmployees = getUILocaleUtil().getCaption("late.employees");
+        String absentTooLong = getUILocaleUtil().getCaption("absent.too.long");
+        String absentToday = getUILocaleUtil().getCaption("absent.today");
         String yearlyAttendance = getUILocaleUtil().getCaption("yearlyAttendance");
         String manuallySign = getUILocaleUtil().getCaption("manuallySign");
         String manuallySignedReport = getUILocaleUtil().getCaption("manuallySign.report");
@@ -86,8 +87,10 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
         hierarchicalContainer.setChildrenAllowed(latecomers, false);
         hierarchicalContainer.addItem(lateEmployees);
         hierarchicalContainer.setChildrenAllowed(lateEmployees, false);
-        hierarchicalContainer.addItem(absent);
-        hierarchicalContainer.setChildrenAllowed(absent, false);
+        hierarchicalContainer.addItem(absentTooLong);
+        hierarchicalContainer.setChildrenAllowed(absentTooLong, false);
+        hierarchicalContainer.addItem(absentToday);
+        hierarchicalContainer.setChildrenAllowed(absentToday, false);
         hierarchicalContainer.addItem(yearlyAttendance);
         hierarchicalContainer.setChildrenAllowed(yearlyAttendance, false);
         if (CommonUtils.getCurrentUser().getId().getId().longValue() == 2) {
@@ -128,7 +131,7 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
                         } else if (studentAttendance.equalsIgnoreCase(menu)) {
                             FacultyAttendance facultyAttendance = new FacultyAttendance();
                             mainHL.addComponent(facultyAttendance.getMainVL());
-                        } else if (absent.equalsIgnoreCase(menu)) {
+                        } else if (absentTooLong.equalsIgnoreCase(menu)) {
                             AbsentAttendance absentAttendance = new AbsentAttendance(tableVL);
                             mainHL.addComponent(absentAttendance.getAbsentsInfo());
                         } else if (manuallySign.equalsIgnoreCase(menu)) {
@@ -145,9 +148,12 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
                                 && CommonUtils.isCurrentUserHasAdminPrivileges()) {
                             SigningReport signingReport = new SigningReport();
                             mainHL.addComponent(signingReport.getMainVL());
-                        }else if(lateEmployees.equalsIgnoreCase(menu)){
-                            LateEmployeesAttendance lateEmployeesAttendance=new LateEmployeesAttendance();
+                        } else if (lateEmployees.equalsIgnoreCase(menu)) {
+                            LateEmployeesAttendance lateEmployeesAttendance = new LateEmployeesAttendance();
                             mainHL.addComponent(lateEmployeesAttendance.getMainVL());
+                        } else if (absentToday.equalsIgnoreCase(menu)) {
+                            AbsentTodayAttendance absentTodayAttendance = new AbsentTodayAttendance();
+                            mainHL.addComponent(absentTodayAttendance.getMainVL());
                         }
                         mainHSP.addComponent(mainHL);
                     }
@@ -160,8 +166,6 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
 
         mainHSP.addComponent(menuTT);
         getContent().addComponent(mainHSP);
-
-        menuTT.select(main);
     }
 
     private void setAbsentsInfo() {

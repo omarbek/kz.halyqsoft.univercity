@@ -217,7 +217,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>univer</finalName>
+		<finalName>ukpu</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

@@ -150,7 +150,7 @@ public class DeleteDataView extends AbstractTaskView implements EntityListener, 
                         deleteMainTable(user, "employee_dept", "EMPLOYEE_ID");
                         deleteMainTable(user, "employee_scientific", "EMPLOYEE_ID");
                         deleteMainTable(user, "employee_work_hour", "EMPLOYEE_ID");
-                        deleteMainTable(user,"child","EMPLOYEE_ID");
+                        deleteMainTable(user, "child", "EMPLOYEE_ID");
                         deleteMainTable(user, "employee", "ID");
                     } else {
                         deleteMainTable(user, "entrant_speciality", "STUDENT_ID");
