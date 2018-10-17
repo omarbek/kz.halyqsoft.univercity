@@ -223,13 +223,13 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
                 if (iinTF.getValue().equals("") && iin == null) {
                     Message.showError(getUILocaleUtil().getMessage("error.iin"));
                     isFinding = false;
-                } else if (iinTF.getValue().length() < 12) {
-                    Message.showError(getUILocaleUtil().getMessage("incorrect.iin"));
-                    isFinding = false;
                 } else if ((flagSave(flag, dataFM) && Flag.MAIN_DATA.equals(flag))
                         || !Flag.MAIN_DATA.equals(flag)) {
                     addToLayout(Flag.FACT_ADDRESS, address.getAddressFactGFW(), regAddressButton, event);
                     isFinding = true;
+                } else if (iinTF.getValue().length() < 12) {
+                    Message.showError(getUILocaleUtil().getMessage("incorrect.iin"));
+                    isFinding = false;
                 }
             }
 
