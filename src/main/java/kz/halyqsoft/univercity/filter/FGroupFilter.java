@@ -1,5 +1,6 @@
 package kz.halyqsoft.univercity.filter;
 
+import kz.halyqsoft.univercity.entity.beans.univercity.GROUPS;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_GROUP;
 import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
@@ -12,7 +13,7 @@ public final class FGroupFilter extends AbstractFilterBean {
 
     private String code;
     private SPECIALITY speciality;
-    private V_GROUP group;
+    private GROUPS group;
     private Long orders;
 
     public FGroupFilter() {
@@ -26,11 +27,11 @@ public final class FGroupFilter extends AbstractFilterBean {
         this.code = code;
     }
 
-    public V_GROUP getGroup() {
+    public GROUPS getGroup() {
         return group;
     }
 
-    public void setGroup(V_GROUP group) {
+    public void setGroup(GROUPS group) {
         this.group = group;
     }
 

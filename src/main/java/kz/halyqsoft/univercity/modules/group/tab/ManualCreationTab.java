@@ -332,6 +332,7 @@ public class ManualCreationTab extends AbstractCommonView implements EntityListe
         cb.setFilteringMode(FilteringMode.STARTSWITH);
         cb.setPageLength(0);
         QueryModel<GROUPS> groupsQM = new QueryModel<>(GROUPS.class);
+        groupsQM.addWhere("deleted",false);
         BeanItemContainer<GROUPS> groupsBIC = new BeanItemContainer<>(GROUPS.class,
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(groupsQM));
         cb.setContainerDataSource(groupsBIC);
