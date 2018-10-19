@@ -798,7 +798,58 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
 
     protected abstract boolean checkFlag(Flag flag);
 
+    private boolean checkUserCollision(USERS user){
+        if(user!=null){
+            try{
+                Map<Integer,Object> params = new HashMap<>();
+                String sql =  "SELECT * FROM users " +
+                        " where " +
+                        " first_name ILIKE '%"+ user.getFirstName()+ "%' " +
+                        " AND last_name ILIKE '%"+user.getLastName()+"%' " ;
+
+                if(user.getMiddleName()!=null ){
+                    if(user.getMiddleName().length()>0){
+                        sql  = sql +  " AND middle_name ilike '%" + user.getMiddleName()+"%' " ;
+                    }
+                }
+                sql = sql + "AND date_trunc('day', birth_date) = date_trunc ('day', TIMESTAMP '"+CommonUtils.getFormattedDate(user.getBirthDate())+"') AND deleted  = FALSE ;";
+
+                List list = new ArrayList();
+                list.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql,params));
+                if(list.size()>0){
+                    return  true;
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
     private boolean saveIfModify(FormModel dataFM) {
+        try{
+            if (dataFM.getEntity() instanceof USERS){
+                if(dataFM.getEntity().getId()==null){
+                    String firstName = (String)dataFM.getFieldModel("firstName").getField().getValue();
+                    String lastName = (String)dataFM.getFieldModel("lastName").getField().getValue();
+                    String middleName = (String)dataFM.getFieldModel("middleName").getField().getValue();
+                    Date birthDate = (Date)dataFM.getFieldModel("birthDate").getField().getValue();
+
+                    USERS user = new USERS();
+                    user.setFirstName(firstName);
+                    user.setMiddleName(middleName);
+                    user.setLastName(lastName);
+                    user.setBirthDate(birthDate);
+
+                    if(checkUserCollision(user)){
+                        Message.showError(getUILocaleUtil().getMessage("user.already.exist"));
+                        return false;
+                    }
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         if (dataFM.isModified()) {
             if (dataAFW.save()) {
                 saveData = true;

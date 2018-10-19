@@ -555,7 +555,7 @@ public class MainSection implements FilterPanelListener {
                 "      AND come_in = TRUE";
         Long inStudents = (Long) SessionFacadeFactory.getSessionFacade(
                 CommonEntityFacadeBean.class).lookupSingle(sql, new HashMap<>());
-        long inPercent = inStudents * 100 / allStudents;
+        long inPercent = allStudents == 0 ? 0 : inStudents * 100 / allStudents;
 
         Panel studentsPanel = new Panel("<b>" + CommonUtils.getUILocaleUtil().getCaption("studentsPanel") + " - " + allStudents + "</b><br>" +
                 "" + CommonUtils.getUILocaleUtil().getCaption("attendanceOf") + " - " + inStudents + " (" + inPercent + "%)<br>" +
