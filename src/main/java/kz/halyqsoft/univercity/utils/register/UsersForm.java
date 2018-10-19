@@ -829,20 +829,22 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
     private boolean saveIfModify(FormModel dataFM) {
         try{
             if (dataFM.getEntity() instanceof USERS){
-                String firstName = (String)dataFM.getFieldModel("firstName").getField().getValue();
-                String lastName = (String)dataFM.getFieldModel("lastName").getField().getValue();
-                String middleName = (String)dataFM.getFieldModel("middleName").getField().getValue();
-                Date birthDate = (Date)dataFM.getFieldModel("birthDate").getField().getValue();
+                if(dataFM.getEntity().getId()==null){
+                    String firstName = (String)dataFM.getFieldModel("firstName").getField().getValue();
+                    String lastName = (String)dataFM.getFieldModel("lastName").getField().getValue();
+                    String middleName = (String)dataFM.getFieldModel("middleName").getField().getValue();
+                    Date birthDate = (Date)dataFM.getFieldModel("birthDate").getField().getValue();
 
-                USERS user = new USERS();
-                user.setFirstName(firstName);
-                user.setMiddleName(middleName);
-                user.setLastName(lastName);
-                user.setBirthDate(birthDate);
+                    USERS user = new USERS();
+                    user.setFirstName(firstName);
+                    user.setMiddleName(middleName);
+                    user.setLastName(lastName);
+                    user.setBirthDate(birthDate);
 
-                if(checkUserCollision(user)){
-                    Message.showError(getUILocaleUtil().getMessage("user.already.exist"));
-                    return false;
+                    if(checkUserCollision(user)){
+                        Message.showError(getUILocaleUtil().getMessage("user.already.exist"));
+                        return false;
+                    }
                 }
             }
         }catch (Exception e){
