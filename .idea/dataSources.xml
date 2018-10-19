@@ -1,29 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="realdb@localhost" uuid="62fb9e58-3fbe-4ddf-8fc9-6658a4d9762e">
+    <data-source source="LOCAL" name="newuniverdb@localhost" uuid="0f63aa22-3dd3-4895-8132-09739479ea4d">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost:5432/realdb1</jdbc-url>
-      <driver-properties>
-        <property name="ApplicationName" value="DataGrip" />
-      </driver-properties>
+      <jdbc-url>jdbc:postgresql://localhost:5432/newuniverdb</jdbc-url>
     </data-source>
-    <data-source source="LOCAL" name="realpostgre@localhost" uuid="04d9f337-2b7b-40e8-8032-101dda7356b2">
+    <data-source source="LOCAL" name="college@localhost" uuid="45116fab-d3f0-434d-a9d1-b8d7463d521f">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost:5432/realpostgre</jdbc-url>
-      <driver-properties>
-        <property name="ApplicationName" value="DataGrip" />
-      </driver-properties>
-    </data-source>
-    <data-source source="LOCAL" name="univerdb@89.40.60.206" uuid="3fe4faaf-b7c5-488b-980f-f8d0744ed90c">
-      <driver-ref>postgresql</driver-ref>
-      <synchronize>true</synchronize>
-      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://89.40.60.206:5432/univerdb</jdbc-url>
+      <jdbc-url>jdbc:postgresql://localhost:5432/college</jdbc-url>
     </data-source>
   </component>
 </project>
