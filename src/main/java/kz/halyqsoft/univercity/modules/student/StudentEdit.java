@@ -96,6 +96,9 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
     private static final String PATH_TO_PHOTO = "/files/photos/";
     private boolean kz;
 
+    private static final String IUPS_KAZ = "99";//97
+    private static final String IUPS_RU = "98";//96
+
     public StudentEdit(final FormModel baseDataFM, VerticalLayout mainVL,
                        StudentOrApplicantView studentOrApplicantView)
             throws Exception {
@@ -354,7 +357,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         downloadTableButton.addClickListener(new ClickListener() {
                                                  @Override
                                                  public void buttonClick(ClickEvent clickEvent) {
-                                                     myResource = createResourceStudent("99", student);
+                                                     myResource = createResourceStudent(IUPS_KAZ, student);
                                                      fileDownloader = new FileDownloader(myResource);
                                                      myResource.setMIMEType("application/pdf");
                                                      fileDownloader.extend(downloadTableButton);
@@ -365,7 +368,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         downloadTableRusButton.addClickListener(new ClickListener() {
                                                     @Override
                                                     public void buttonClick(ClickEvent clickEvent) {
-                                                        myResource = createResourceStudent("98", student);
+                                                        myResource = createResourceStudent(IUPS_RU, student);
                                                         fileDownloader = new FileDownloader(myResource);
                                                         myResource.setMIMEType("application/pdf");
                                                         fileDownloader.extend(downloadTableRusButton);
