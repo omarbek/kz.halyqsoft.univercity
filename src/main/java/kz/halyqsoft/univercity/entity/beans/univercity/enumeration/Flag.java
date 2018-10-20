@@ -22,5 +22,6 @@ public enum Flag {
     MOTHER,
     FATHER,
     CONTRACT,
-    SPECIALITY
+    SPECIALITY,
+    STUDENT_ADDITIONAL
 }

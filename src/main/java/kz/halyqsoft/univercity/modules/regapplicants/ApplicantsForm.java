@@ -48,6 +48,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import kz.halyqsoft.univercity.modules.pdf.CustomField;
+import org.r3a.common.vaadin.widget.toolbar.IconToolbar;
 
 /**
  * @author Omarbek
@@ -62,7 +63,7 @@ public final class ApplicantsForm extends UsersForm {
     private Button untNextButton;
 
     private TableWidget specTW;
-    private TableWidget awardsTW, socialCategoriesTW;
+    private TableWidget awardsTW, socialCategoriesTW, studentAdditionalInformationTW;
 
     private Button untButton, grantDocButton;
     private Button motherButton, fatherButton;
@@ -77,6 +78,7 @@ public final class ApplicantsForm extends UsersForm {
     private Grant grant;
     private Contract contract;
 
+
     private BrowserWindowOpener contractBWO;
     private BrowserWindowOpener masgisterContractBWO;
     private BrowserWindowOpener requestBWO;
@@ -88,10 +90,10 @@ public final class ApplicantsForm extends UsersForm {
     private static final int MOTHER = 2;
     private static final int ADDRESS_FACT = 2;
     private static String NEXT_BUTTON_CAPTION = "next";
-
+    private FormModel baseDataFM;
     ApplicantsForm(final FormModel dataFM, ENTRANCE_YEAR entranceYear) throws Exception {
         super(dataFM, entranceYear);
-
+        baseDataFM = dataFM;
         dataFM.getFieldModel("academicStatus").setInEdit(false);
         dataFM.getFieldModel("academicStatus").setInView(false);
 
@@ -467,14 +469,14 @@ public final class ApplicantsForm extends UsersForm {
             }
         });
 
-        moreButton = createFormButton("inform.more", false);
+        moreButton = createFormButton("inform.more", true);
         moreButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 if ((flagSave(flag, dataFM) && (Flag.MAIN_DATA.equals(flag) || Flag.CONTRACT.equals(flag)))
                         || !(Flag.MAIN_DATA.equals(flag) || Flag.CONTRACT.equals(flag))) {
                     setActive(event);
-                    flag = Flag.DEFAULT_FLAG;
+                    flag = Flag.STUDENT_ADDITIONAL;
 
                     awardsTW = new TableWidget(V_USER_AWARD.class);
                     awardsTW.addEntityListener(ApplicantsForm.this);
@@ -506,9 +508,36 @@ public final class ApplicantsForm extends UsersForm {
                     }
                     socialCategoriesQM.addWhere("user", ECriteria.EQUAL, userId);
 
+                    studentAdditionalInformationTW = new TableWidget(STUDENT_ADDITIONAL_INFORMATION.class);
+                    studentAdditionalInformationTW.addEntityListener(ApplicantsForm.this);
+                    studentAdditionalInformationTW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
+                    studentAdditionalInformationTW.setImmediate(true);
+                    DBTableModel studentAdditionalInformationTM = (DBTableModel) studentAdditionalInformationTW.getWidgetModel();
+                    QueryModel studentAdditionalInformationQM = studentAdditionalInformationTM.getQueryModel();
+                    if (!dataAFW.getWidgetModel().isCreateNew()) {
+                        try {
+                            userId = dataAFW.getWidgetModel().getEntity().getId();
+                        } catch (Exception e) {
+                            e.printStackTrace();//TODO catch
+                        }
+                    }
+                    studentAdditionalInformationQM.addWhere("student", ECriteria.EQUAL, userId);
+
+
+
                     VerticalLayout additionalDataVL = new VerticalLayout();
                     additionalDataVL.addComponent(socialCategoriesTW);
                     additionalDataVL.addComponent(awardsTW);
+
+                    Label importantLabel = new Label(getUILocaleUtil().getMessage("info.save.student.additional"));
+                    Label arrowDown = new Label();
+                    arrowDown.setIcon(FontAwesome.ARROW_DOWN);
+
+                    additionalDataVL.addComponent(importantLabel);
+                    additionalDataVL.setComponentAlignment(importantLabel, Alignment.MIDDLE_LEFT);
+                    additionalDataVL.addComponent(arrowDown);
+                    additionalDataVL.setComponentAlignment(arrowDown, Alignment.MIDDLE_LEFT);
+                    additionalDataVL.addComponent(studentAdditionalInformationTW);
 
                     contentHL.removeAllComponents();
                     contentHL.addComponent(additionalDataVL);
@@ -606,6 +635,12 @@ public final class ApplicantsForm extends UsersForm {
                 }
                 break;
             case CONTRACT:
+                saved = contract.save();
+                if (saved == null || saved) {
+                    return true;
+                }
+                break;
+            case STUDENT_ADDITIONAL:
                 saved = contract.save();
                 if (saved == null || saved) {
                     return true;
@@ -1412,6 +1447,39 @@ public final class ApplicantsForm extends UsersForm {
         return false;
     }
 
+    private boolean preSaveStudentAdditionalInformation(Entity e, boolean isNew) {
+        STUDENT_ADDITIONAL_INFORMATION studentAdditionalInformation = (STUDENT_ADDITIONAL_INFORMATION) e;
+
+        FormModel fm = dataAFW.getWidgetModel();
+        if (isNew) {
+            try {
+                USERS s = (USERS) fm.getEntity();
+                studentAdditionalInformation.setStudent((STUDENT) s);
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(studentAdditionalInformation);
+
+                QueryModel studentAddInfQM = ((DBTableModel) studentAdditionalInformationTW.getWidgetModel()).getQueryModel();
+                studentAddInfQM.addWhere("student", ECriteria.EQUAL, s.getId());
+
+                studentAdditionalInformationTW.refresh();
+                showSavedNotification();
+            } catch (Exception ex) {
+                CommonUtils.showMessageAndWriteLog("Unable to create a student additional information", ex);
+            }
+            studentAdditionalInformationTW.setButtonVisible(IconToolbar.ADD_BUTTON, false);
+        } else {
+            try {
+                studentAdditionalInformation = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(STUDENT_ADDITIONAL_INFORMATION.class, studentAdditionalInformation.getId());
+
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(studentAdditionalInformation);
+                studentAdditionalInformationTW.refresh();
+                showSavedNotification();
+            } catch (Exception ex) {
+                CommonUtils.showMessageAndWriteLog("Unable to merge a student additional information", ex);
+            }
+        }
+        return false;
+    }
+
     private boolean addFiles(Object source) {
         QueryModel<USER_DOCUMENT_FILE> udfQM = new QueryModel<>(USER_DOCUMENT_FILE.class);
         udfQM.addSelect("id");
@@ -1485,6 +1553,21 @@ public final class ApplicantsForm extends UsersForm {
             return canSave();
         } else if (source.equals(socialCategoriesTW)) {
             return canSave();
+        }else if(source.equals(studentAdditionalInformationTW)){
+            DBTableModel dbTableModel = (DBTableModel) studentAdditionalInformationTW.getWidgetModel();
+            if(baseDataFM.isCreateNew()){
+                try {
+                    dbTableModel.getQueryModel().addWhere("student", ECriteria.EQUAL, baseDataFM.getEntity().getId());
+
+                    if(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(dbTableModel.getQueryModel()).size()>0){
+                        studentAdditionalInformationTW.setButtonVisible(IconToolbar.ADD_BUTTON, false);
+
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+            return canSave();
         }
 
         return super.preCreate(source, buttonId);
@@ -1525,6 +1608,8 @@ public final class ApplicantsForm extends UsersForm {
             return preSaveAwards(e, isNew);
         } else if (source.equals(socialCategoriesTW)) {
             return preSaveSocialCategories(e, isNew);
+        }else if (source.equals(studentAdditionalInformationTW)) {
+            return preSaveStudentAdditionalInformation(e, isNew);
         }
         return super.preSave(source, e, isNew, buttonId);
     }

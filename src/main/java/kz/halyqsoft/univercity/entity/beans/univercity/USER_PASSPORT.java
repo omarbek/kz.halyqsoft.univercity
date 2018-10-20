@@ -32,7 +32,7 @@ public class USER_PASSPORT extends USER_DOCUMENT {
 	@Column(name = "ISSUER_NAME")
 	private String issuerName;
 	
-	@FieldInfo(type = EFieldType.TEXT, max = 12, order = 7)
+	@FieldInfo(type = EFieldType.TEXT, max = 12, order = 7, required = false)
 	@Column(name = "IIN")
 	private String iin;
 	
@@ -47,6 +47,11 @@ public class USER_PASSPORT extends USER_DOCUMENT {
     @JoinColumns({
         @JoinColumn(name = "BIRTH_REGION_ID", referencedColumnName = "ID")})
     private COUNTRY birthRegion;
+
+
+	@FieldInfo(type = EFieldType.TEXT, max = 24, order = 10)
+	@Column(name = "SERIAL_NUMBER")
+	private String serialNumber;
 
 	public USER_PASSPORT() {
 	}
@@ -89,5 +94,13 @@ public class USER_PASSPORT extends USER_DOCUMENT {
 
 	public void setBirthRegion(COUNTRY birthRegion) {
 		this.birthRegion = birthRegion;
+	}
+
+	public String getSerialNumber() {
+		return serialNumber;
+	}
+
+	public void setSerialNumber(String serialNumber) {
+		this.serialNumber = serialNumber;
 	}
 }

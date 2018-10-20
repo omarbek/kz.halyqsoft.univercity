@@ -142,6 +142,7 @@ public class DeleteDataView extends AbstractTaskView implements EntityListener, 
                         deleteMainTable(user, "employee_work_hour", "EMPLOYEE_ID");
                         deleteMainTable(user, "employee", "ID");
                     } else {
+                        deleteMainTable(user, "student_additional_information" , "STUDENT_ID");
                         deleteMainTable(user, "entrant_speciality", "STUDENT_ID");
                         deleteUntRates(user);
                         deleteUserDoc(user, "unt_certificate", 7);
@@ -177,7 +178,8 @@ public class DeleteDataView extends AbstractTaskView implements EntityListener, 
         return true;
     }
 
-    private void deleteSomeUserDoc(USERS user, String table, int documentTypeId) throws Exception {
+
+    private void deleteSomeUserDoc(USERS user, String table, int documentTypeId) {
         try {
             String sql = "delete from " + table + " where id in " +
                     "(select id from user_document where user_id = ?1 and document_type_id = " + documentTypeId + ")";

@@ -91,6 +91,7 @@ public class CheckStudentsView extends AbstractTaskView implements EntityListene
             for (Entity e : entities) {
                 USERS user = (USERS) e;
 
+                deleteMainTable(user, "student_additional_information" , "STUDENT_ID");
                 deleteMainTable(user, "entrant_speciality", "STUDENT_ID");
                 deleteUntRates(user);
                 deleteUserDoc(user, "unt_certificate", 7);
