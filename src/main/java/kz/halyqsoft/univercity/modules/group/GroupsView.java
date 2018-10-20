@@ -60,6 +60,10 @@ public class GroupsView extends AbstractTaskView{
     }
 
 
+
+
+
+
     @Override
     public void initView(boolean b) throws Exception {
         mainTS = new TabSheet();
