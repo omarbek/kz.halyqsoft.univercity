@@ -201,7 +201,7 @@ public class DepartmentAttendance implements EntityListener{
         String formattedDate = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS").format(date);
 
         Map<Integer, Object> params = new HashMap<>();
-        String sql = "SELECT  dep.DEPT_NAME," +
+        String sql = "SELECT  dep.DEPT_NAME, " +
         " count(empl.dept_id)," +
                 " count(user_id)," +
                 " dep.id" +
