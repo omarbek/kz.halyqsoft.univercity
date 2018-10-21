@@ -50,6 +50,7 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
     private final EmployeeFilterPanel filterPanel;
     private GridWidget teacherGW;
     private ComboBox cb;
+    private Button saveToCatalog;
 
     public EmployeeView(AbstractTask task) throws Exception {
         super(task);
@@ -65,7 +66,7 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
         tf.setNullSettingAllowed(true);
         filterPanel.addFilterComponent("code", tf);
 
-         tf = new TextField();
+        tf = new TextField();
         tf.setNullRepresentation("");
         tf.setNullSettingAllowed(true);
         filterPanel.addFilterComponent("firstname", tf);
@@ -75,7 +76,7 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
         tf.setNullSettingAllowed(true);
         filterPanel.addFilterComponent("lastname", tf);
 
-         cb = new ComboBox();
+        cb = new ComboBox();
         cb.setNullSelectionAllowed(true);
         cb.setTextInputAllowed(true);
         cb.setFilteringMode(FilteringMode.OFF);
@@ -140,7 +141,7 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
 
         doFilter(filterPanel.getFilterBean());
 
-        Button saveToCatalog = new Button(getUILocaleUtil().getCaption("saveToCatalog"));
+        saveToCatalog = new Button(getUILocaleUtil().getCaption("saveToCatalog"));
         saveToCatalog.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
@@ -394,6 +395,7 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
                 }
                 getContent().removeComponent(filterPanel);
                 getContent().removeComponent(teacherGW);
+                getContent().removeComponent(saveToCatalog);
 //                VerticalLayout viewVL = new VerticalLayout();
 //                viewVL.addComponent(filterPanel);
 //                viewVL.addComponent(teacherGW);
@@ -449,6 +451,10 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
         }
 
         return true;
+    }
+
+    public Button getSaveToCatalog() {
+        return saveToCatalog;
     }
 
     public EmployeeFilterPanel getFilterPanel() {

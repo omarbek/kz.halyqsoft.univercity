@@ -557,6 +557,8 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
 
         if (this instanceof ApplicantsForm) {
             userType = 2;
+            dataAFW.getWidgetModel().getFieldModel("coordinator").setRequired(true);
+
         } else {
             userType = 1;
         }
@@ -703,13 +705,15 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
                     String lastName = (String)dataFM.getFieldModel("lastName").getField().getValue();
                     String middleName = (String)dataFM.getFieldModel("middleName").getField().getValue();
                     Date birthDate = (Date)dataFM.getFieldModel("birthDate").getField().getValue();
-
+                    if(birthDate==null || firstName ==null || lastName ==null  ){
+                        Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
+                        return false;
+                    }
                     USERS user = new USERS();
                     user.setFirstName(firstName);
                     user.setMiddleName(middleName);
                     user.setLastName(lastName);
                     user.setBirthDate(birthDate);
-
                     if(checkUserCollision(user)){
                         Message.showError(getUILocaleUtil().getMessage("user.already.exist"));
                         return false;

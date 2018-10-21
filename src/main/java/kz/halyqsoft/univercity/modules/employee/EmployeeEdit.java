@@ -241,6 +241,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         }
         mainVL.removeComponent(this);
         mainVL.addComponent(employeeView.getFilterPanel());
+        mainVL.addComponent(employeeView.getSaveToCatalog());
         mainVL.addComponent(employeeView.getTeacherGW());
         return employeeView;
     }
