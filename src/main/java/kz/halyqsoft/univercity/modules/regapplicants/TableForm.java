@@ -36,7 +36,6 @@ public class TableForm {
         try {
             PdfWriter pdfWriter = PdfWriter.getInstance(this.document, byteArrayOutputStream);
             // pdfWriter.open();
-            document.open();
 
             PdfPTable table = new PdfPTable(7);
             document.add(new Paragraph(" Семестрде оқылатын пәндер тізімі:", EmployeePdfCreator.getFont(12, Font.BOLD)));
