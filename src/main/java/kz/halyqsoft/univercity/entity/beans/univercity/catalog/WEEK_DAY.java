@@ -40,6 +40,9 @@ public class WEEK_DAY extends AbstractEntity {
 	@Column(name = "DAY_SHORT_NAME_EN", nullable = false)
 	private String dayShortNameEN;
 
+	@Column(name = "VALUE", nullable = false)
+	private int value;
+
 	public WEEK_DAY() {
 	}
 
@@ -89,6 +92,14 @@ public class WEEK_DAY extends AbstractEntity {
 
 	public void setDayShortNameEN(String dayShortNameEN) {
 		this.dayShortNameEN = dayShortNameEN;
+	}
+
+	public int getValue() {
+		return value;
+	}
+
+	public void setValue(int value) {
+		this.value = value;
 	}
 
 	@Override

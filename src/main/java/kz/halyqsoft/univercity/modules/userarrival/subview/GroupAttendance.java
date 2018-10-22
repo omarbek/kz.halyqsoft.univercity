@@ -64,6 +64,15 @@ public class GroupAttendance implements EntityListener {
 
     private void init() {
 
+//        Button updateButton=new Button("update");
+//        updateButton.addClickListener(new Button.ClickListener() {
+//            @Override
+//            public void buttonClick(Button.ClickEvent event) {
+//                //TODO
+//            }
+//        });
+//        buttonPanel.addComponent(updateButton);
+
         backButton = new Button(CommonUtils.getUILocaleUtil().getCaption("backButton"));
         backButton.setImmediate(true);
         backButton.setVisible(false);
@@ -251,7 +260,7 @@ public class GroupAttendance implements EntityListener {
                     if (oo[2] != null) {
                         EMPLOYEE employee = null;
                         try {
-                            employee = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(EMPLOYEE.class, (ID) oo[2]);
+                            employee = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(EMPLOYEE.class, ID.valueOf((long) oo[2]));
                             vg.setCurator(employee);
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -419,7 +428,7 @@ public class GroupAttendance implements EntityListener {
 
     @Override
     public void onRefresh(Object o, List<Entity> list) {
-
+        getList(dateField.getValue());
     }
 
     @Override
