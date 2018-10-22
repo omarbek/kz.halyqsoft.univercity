@@ -2454,7 +2454,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
                 CARD oldCard = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
                         USERS.class, emp.getId()).getCard();
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(emp);
-                if (oldCard != null) {
+                if (oldCard != null && !oldCard.equals(emp.getCard())) {
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(oldCard);
                 }
                 if (userPhotoChanged) {

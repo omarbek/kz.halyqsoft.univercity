@@ -44,7 +44,7 @@ import java.util.Calendar;
  * @author Omarbek
  * @created on 13.07.2018
  */
-public class ScheduleManual extends AbstractCommonView {
+public class ScheduleManual extends AbstractCommonView implements EntityListener{
 
     private VerticalLayout tablesVL = new VerticalLayout();
     private ComboBox semesterDataCB;
@@ -103,7 +103,7 @@ public class ScheduleManual extends AbstractCommonView {
         weekDayGW = new GridWidget(WEEK_DAY.class);
         weekDayGW.setImmediate(true);
         weekDayGW.setSizeFull();
-       // weekDayGW.addEntityListener(this);
+        weekDayGW.addEntityListener(this);
         weekDayGW.setButtonVisible(IconToolbar.REFRESH_BUTTON,true);
         weekDayGW.setButtonVisible(IconToolbar.ADD_BUTTON,false);
         weekDayGW.setButtonVisible(IconToolbar.EDIT_BUTTON,false);
@@ -115,7 +115,7 @@ public class ScheduleManual extends AbstractCommonView {
         scheduleDetailGW = new GridWidget(SCHEDULE_DETAIL.class);
         scheduleDetailGW.setImmediate(true);
         scheduleDetailGW.setSizeFull();
-      //  scheduleDetailGW.addEntityListener(this);
+        scheduleDetailGW.addEntityListener(this);
         scheduleDetailGM = (DBGridModel)scheduleDetailGW.getWidgetModel();
         scheduleDetailGM.setRefreshType(ERefreshType.MANUAL);
         scheduleDetailGM.setDeferredCreate(true);
@@ -339,8 +339,7 @@ public class ScheduleManual extends AbstractCommonView {
         groupsQM.addWhere("studyYear", ECriteria.EQUAL, shiftStudyYear.getStudyYear().getId());
         return SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(groupsQM);
     }
-
-   // @Override
+    @Override
     public void handleEntityEvent(EntityEvent ev) {
         if(ev.getSource().equals(weekDayGW)){
             if(ev.getAction() == EntityEvent.SELECTED){
@@ -358,8 +357,7 @@ public class ScheduleManual extends AbstractCommonView {
         }
     }
 
-
-   // @Override
+    @Override
     public boolean preCreate(Object source, int buttonId) {
 
         if(source.equals(scheduleDetailGW)){
@@ -373,13 +371,12 @@ public class ScheduleManual extends AbstractCommonView {
             }
         }
 
-        //return super.preCreate(source, buttonId);
-            return true;
+        return true;
     }
 
 
 
-   // @Override
+    @Override
     public boolean preSave(Object source, Entity e, boolean isNew, int buttonId) {
         if(isNew){
             if(source.equals(scheduleDetailGW)){
@@ -444,7 +441,7 @@ public class ScheduleManual extends AbstractCommonView {
         return true;
     }
 
- //   @Override
+    @Override
     public void onDelete(Object source, List<Entity> entities, int buttonId) {
         try{
             SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(entities);
@@ -452,5 +449,60 @@ public class ScheduleManual extends AbstractCommonView {
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onCreate(Object o, Entity entity, int i) {
+
+    }
+
+    @Override
+    public boolean onEdit(Object o, Entity entity, int i) {
+        return true;
+    }
+
+    @Override
+    public boolean onPreview(Object o, Entity entity, int i) {
+        return true;
+    }
+
+    @Override
+    public void beforeRefresh(Object o, int i) {
+
+    }
+
+    @Override
+    public void onRefresh(Object o, List<Entity> list) {
+
+    }
+
+    @Override
+    public void onFilter(Object o, QueryModel queryModel, int i) {
+
+    }
+
+    @Override
+    public void onAccept(Object o, List<Entity> list, int i) {
+
+    }
+
+    @Override
+    public boolean preDelete(Object o, List<Entity> list, int i) {
+        return true;
+    }
+
+    @Override
+    public void deferredCreate(Object o, Entity entity) {
+
+    }
+
+    @Override
+    public void deferredDelete(Object o, List<Entity> list) {
+
+    }
+
+    @Override
+    public void onException(Object o, Throwable throwable) {
+
     }
 }

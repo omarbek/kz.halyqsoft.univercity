@@ -36,6 +36,7 @@ public class PdfAccess extends AbstractCommonView implements EntityListener{
     private GridWidget postGW;
     private GridWidget pdfDocumentSignerPostGW;
     public PdfAccess() {
+
         mainHSP = new HorizontalSplitPanel();
         mainHSP.setSplitPosition(30);
         mainHSP.setSizeFull();

@@ -206,7 +206,6 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
                 registrationHSP.removeComponent(contentHL);
                 contentHL = new HorizontalLayout();
                 contentHL.addComponent(dataAFW);
-
                 VerticalLayout photoAndButtonVL = getPhotoVL();
                 contentHL.addComponent(photoAndButtonVL);
                 registrationHSP.addComponent(contentHL);

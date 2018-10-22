@@ -328,10 +328,11 @@ public class ManualCreationTab extends AbstractCommonView implements EntityListe
 
         cb = new ComboBox();
         cb.setNullSelectionAllowed(true);
-        cb.setTextInputAllowed(false);
+        cb.setTextInputAllowed(true);
         cb.setFilteringMode(FilteringMode.STARTSWITH);
         cb.setPageLength(0);
         QueryModel<GROUPS> groupsQM = new QueryModel<>(GROUPS.class);
+        groupsQM.addWhere("deleted",false);
         BeanItemContainer<GROUPS> groupsBIC = new BeanItemContainer<>(GROUPS.class,
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(groupsQM));
         cb.setContainerDataSource(groupsBIC);
@@ -354,18 +355,12 @@ public class ManualCreationTab extends AbstractCommonView implements EntityListe
             sb.append("%'");
         }
         if (sf.getFirstname() != null && sf.getFirstname().trim().length() >= 3) {
-            if (sb.length() > 0) {
-                sb.append(" and ");
-            }
             sb.append(" and stu.FIRST_NAME ilike '");
             sb.append(sf.getFirstname().trim());
             sb.append("%'");
         }
         if (sf.getLastname() != null && sf.getLastname().trim().length() >= 3) {
-            if (sb.length() > 0) {
-                sb.append(" and ");
-            }
-            sb.append("  stu.LAST_NAME ilike '");
+            sb.append(" and stu.LAST_NAME ilike '");
             sb.append(sf.getLastname().trim());
             sb.append("%'");
         }
@@ -418,7 +413,7 @@ public class ManualCreationTab extends AbstractCommonView implements EntityListe
                 "  INNER JOIN student_diploma_type t on st.diploma_type_id = t.id" +
                 sb.toString() +
                 " ORDER BY FIO" +
-                " limit 20";
+                " limit 60";
         try {
             List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(
                     sql, params);
