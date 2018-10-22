@@ -14,6 +14,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.enumeration.Flag;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.*;
 import kz.halyqsoft.univercity.utils.CommonUtils;
+import kz.halyqsoft.univercity.utils.DocumentIDs;
 import kz.halyqsoft.univercity.utils.EmployeePdfCreator;
 import kz.halyqsoft.univercity.utils.register.*;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
@@ -634,9 +635,9 @@ public final class ApplicantsForm extends UsersForm {
             fileName = "Договор магистрант_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
         } else if (value.equals("90")) {
             fileName = "келісім-шарт_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
-        }  else if (value.equals("97")) {
+        }  else if (value.equals(DocumentIDs.IUPS_KAZ_ID)) {
             fileName = "ИУПС_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
-        } else if (value.equals("96")) {
+        } else if (value.equals(DocumentIDs.IUPS_RUS_ID)) {
             fileName = "ИУСП_рус_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
         }
         else {

@@ -5,6 +5,7 @@ import com.vaadin.server.StreamResource;
 import com.vaadin.ui.Button;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
 import kz.halyqsoft.univercity.modules.regapplicants.ApplicantsForm;
+import kz.halyqsoft.univercity.utils.DocumentIDs;
 import org.r3a.common.vaadin.AbstractWebUI;
 import org.r3a.common.vaadin.widget.dialog.AbstractDialog;
 
@@ -19,11 +20,11 @@ public class LanguageDialog extends AbstractDialog{
         kazDownload = new Button("KAZ");
         rusDownload = new Button("RUS");
         for(STUDENT student : studentList){
-            StreamResource myResource = ApplicantsForm.createResourceStudent("96", student);
+            StreamResource myResource = ApplicantsForm.createResourceStudent(DocumentIDs.IUPS_RUS_ID, student);
             fileDownloader = new FileDownloader(myResource);
             fileDownloader.extend(rusDownload);
 
-            myResource = ApplicantsForm.createResourceStudent("97", student);
+            myResource = ApplicantsForm.createResourceStudent(DocumentIDs.IUPS_KAZ_ID, student);
             fileDownloader = new FileDownloader(myResource);
             fileDownloader.extend(kazDownload);
         }
