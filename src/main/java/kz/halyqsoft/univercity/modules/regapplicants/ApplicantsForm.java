@@ -715,7 +715,6 @@ public final class ApplicantsForm extends UsersForm {
 
                         docum.setPageSize(one);
                         docum.setMargins(2, 2, 2, 2);
-                        docum.open();
                         docum.setPageSize(two);
                         docum.setMargins(20, 20, 20, 20);
                         docum.newPage();

@@ -69,15 +69,16 @@ public class StudentModule extends BaseModule{
                     List<STUDENT> studentList = new ArrayList<>();
                     for(Entity vStudent : getMainGW().getSelectedEntities()){
 
-                        STUDENT student = null;
+
                         try{
-                            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean .class)
+                            STUDENT student = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean .class)
                                     .lookup(STUDENT.class , vStudent.getId());
+
+                            studentList.add(student);
                         }catch (Exception e){
                             e.printStackTrace();
                             return;
                         }
-                        studentList.add(student);
                     }
                     LanguageDialog languageDialog = new LanguageDialog(studentList);
                 }else{

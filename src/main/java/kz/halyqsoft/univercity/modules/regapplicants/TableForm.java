@@ -866,8 +866,14 @@ public class TableForm {
             document.add(new Paragraph("\n"));
             document.add(new Paragraph("\n"));
 
+            try{
+                document.add( table );
+            }catch (Exception e){
+                CommonUtils.LOG.error(e.getMessage());
+                document.open();
+            }
 
-            document.add(table);
+
 
             document.add(new Paragraph("\n"));
             document.add(new Paragraph("\n"));
@@ -885,9 +891,15 @@ public class TableForm {
             document.add(new Paragraph("\n"));
             document.add(new Paragraph("\n"));
 
-            document.add(table1);
-            document.add(new Paragraph("\n"));
-            document.add(new Paragraph("\n"));
+            try{
+                document.add(table1);
+            }catch (Exception e){
+                CommonUtils.LOG.error(e.getMessage());
+                document.open();
+            }
+
+            document.add(new Paragraph("\n "));
+            document.add(new Paragraph("\n "));
             document.add(new Paragraph("Студент    __________  _______________________\n" +
                     "                        (қолы)            (Т.А.Ә.)            \n", EmployeePdfCreator.getFont(12, Font.BOLD)));
 
@@ -896,8 +908,11 @@ public class TableForm {
 
             document.add(new Paragraph("Тіркеу офисі     __________  __________________\n" +
                     "                        (қолы)            (Т.А.Ә.)            \n", EmployeePdfCreator.getFont(12, Font.BOLD)));
-
-            pdfWriter.close();
+            try{
+                pdfWriter.close();
+            }catch (Exception e){
+                CommonUtils.LOG.error(e.getMessage());
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -907,17 +922,12 @@ public class TableForm {
 
     private void insertCell(PdfPTable table, String text, int align, int colspan, Font font) {
 
-        //create a new cell with the specified Text and Font
         PdfPCell cell = new PdfPCell(new Phrase(text.trim(), font));
-        //set the cell alignment
         cell.setHorizontalAlignment(align);
-        //set the cell column span in case you want to merge two or more cells
         cell.setColspan(colspan);
-        //in case there is no text and you wan to create an empty row
         if (text.trim().equalsIgnoreCase("")) {
             cell.setMinimumHeight(10f);
         }
-        //add the call to the table
         table.addCell(cell);
 
     }
