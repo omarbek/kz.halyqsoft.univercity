@@ -1,6 +1,7 @@
 package kz.halyqsoft.univercity.modules.userarrival.subview;
 
 import com.vaadin.data.Property;
+import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_ARRIVAL;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VGroup;
@@ -19,10 +20,8 @@ import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 import org.r3a.common.vaadin.widget.grid.model.GridColumnModel;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.Calendar;
 
 /**
  * @author Omarbek
@@ -82,14 +81,25 @@ public class LateEmployeesAttendance implements EntityListener {
         });
         HorizontalLayout buttonPanel = CommonUtils.createButtonPanel();
 
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY,8);
+        cal.set(Calendar.MINUTE,40);
+        cal.set(Calendar.SECOND,0);
+        cal.set(Calendar.MILLISECOND,0);
+
         dateField = new DateField();
+        dateField.setShowISOWeekNumbers(true);
+        dateField.setStyleName("time-only");
+        dateField.setResolution(Resolution.SECOND);
+        dateField.setLocale(Locale.GERMANY);
         dateField.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
                 refreshGridWidget(usersGW);
             }
         });
-        dateField.setValue(new Date());
+        dateField.setValue(cal.getTime());
+
 
         buttonPanel.addComponent(dateField);
         buttonPanel.setComponentAlignment(dateField, Alignment.MIDDLE_CENTER);
