@@ -256,11 +256,12 @@ public class CommonUtils {
         return formatter.format(date);
     }
 
-//    public static String getTime(Date date){
-//        SimpleDateFormat localDateFormat = new SimpleDateFormat("HH:mm:ss");
-//        String time = localDateFormat.format(Utils.getDateObject(DateObject));
-//    }
-//
+    public static String getTimeFromDate(Date date){
+        SimpleDateFormat localDateFormat = new SimpleDateFormat("HH:mm:ss");
+        String time = localDateFormat.format(date);
+        return time;
+    }
+
     public static String getFormattedDateWithoutTime(Date date) {
         DateFormat formatter = new SimpleDateFormat(DATE);
         return formatter.format(date);

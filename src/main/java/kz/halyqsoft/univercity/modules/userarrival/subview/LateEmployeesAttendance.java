@@ -127,7 +127,7 @@ public class LateEmployeesAttendance implements EntityListener {
                     "                           WHERE max_arriv.user_id = arriv.user_id " +
                     "                                 AND date_trunc('day', max_arriv.created) = date_trunc('day', TIMESTAMP '"+ CommonUtils.getFormattedDate(dateField.getValue())+"') " +
                     "                                 AND come_in = TRUE) " +
-                    "      AND come_in = TRUE AND arriv.created :: TIME > '08:40:00' " +
+                    "      AND come_in = TRUE AND arriv.created :: TIME > '"+CommonUtils.getTimeFromDate(dateField.getValue())+"' " +
                     "ORDER BY created DESC;";
             List<USER_ARRIVAL> userArrivals = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(sql,
                     new HashMap<>(), USER_ARRIVAL.class);
