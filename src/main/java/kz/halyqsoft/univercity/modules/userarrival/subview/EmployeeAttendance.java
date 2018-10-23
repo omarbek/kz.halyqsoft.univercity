@@ -131,7 +131,7 @@ public class EmployeeAttendance implements EntityListener{
                 "                                        WHERE max_arriv.user_id = arriv.user_id)\n" +
                 "                   AND come_in = TRUE\n" +
                 "             GROUP BY arriv.user_id)arriv on arriv.user_id=ve.id\n" +
-                "WHERE d1.deleted = FALSE AND d2.deleted = FALSE\n" +
+                "WHERE d1.deleted = FALSE AND d2.deleted = FALSE and d1.fc = TRUE AND d2.fc = TRUE\n" +
                 "GROUP BY d1.dept_name,d1.id";
 
         try {

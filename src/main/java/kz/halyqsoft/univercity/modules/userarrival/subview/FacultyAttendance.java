@@ -129,7 +129,7 @@ public class FacultyAttendance implements EntityListener{
                 "                                                WHERE max_arriv.user_id = arriv.user_id)\n" +
                 "                           AND come_in = TRUE\n" +
                 "                     GROUP BY arriv.user_id)arriv on arriv.user_id=student.id\n" +
-                " WHERE dep.parent_id is null and dep.deleted is false and dep.id!=20 and dep.id!=43 " +
+                " WHERE dep.parent_id is null and dep.deleted is false and dep.fc = false  " +
                 "         GROUP BY  dep.dept_name,dep.id";
 
         try {
