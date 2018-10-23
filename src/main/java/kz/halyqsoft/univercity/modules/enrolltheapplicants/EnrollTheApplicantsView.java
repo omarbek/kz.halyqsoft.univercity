@@ -325,7 +325,7 @@ public class EnrollTheApplicantsView extends AbstractTaskView implements EntityL
             List tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql,
                     params);
             if (!tmpList.isEmpty()) {
-                for (Object o : tmpList) {
+                    for (Object o : tmpList) {
                     Object[] oo = (Object[]) o;
                     VStudent sp = new VStudent();
                     sp.setId(ID.valueOf((long)oo[0]));

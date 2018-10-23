@@ -17,7 +17,7 @@ public final class VStudent extends AbstractEntity {
 	@JsonIgnore
 	@FieldInfo(type = EFieldType.TEXT, order = 2)
 	private String code;
-	
+
 	@FieldInfo(type = EFieldType.TEXT, order = 3)
 	private String fio;
 

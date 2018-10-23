@@ -55,7 +55,7 @@ public class GroupsView extends AbstractTaskView{
 
     private TabSheet mainTS;
 
-    public GroupsView(AbstractTask task) throws Exception {
+    public GroupsView(AbstractTask task) throws Exception {//gfdghjk
         super(task);
     }
 
