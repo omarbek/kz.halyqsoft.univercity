@@ -68,8 +68,6 @@ public class StudentModule extends BaseModule{
                 if(getMainGW().getSelectedEntities().size() > 0){
                     List<STUDENT> studentList = new ArrayList<>();
                     for(Entity vStudent : getMainGW().getSelectedEntities()){
-
-
                         try{
                             STUDENT student = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean .class)
                                     .lookup(STUDENT.class , vStudent.getId());

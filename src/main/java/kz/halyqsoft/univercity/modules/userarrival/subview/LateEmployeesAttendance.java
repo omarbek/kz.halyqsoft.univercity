@@ -5,6 +5,7 @@ import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_ARRIVAL;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VGroup;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VStudentInfo;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_EMPLOYEE;
 import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.PrintDialog;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
@@ -58,13 +59,21 @@ public class LateEmployeesAttendance implements EntityListener {
 
                 for(int i = 0 ; i < usersGW.getAllEntities().size(); i++){
                     USER_ARRIVAL userArrival = (USER_ARRIVAL) usersGW.getAllEntities().get(i);
+                    V_EMPLOYEE vEmployee = null;
+                    try{
+                        vEmployee = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(V_EMPLOYEE.class,userArrival.getUser().getId());
+                        List<String> list = new ArrayList<>();
+                        list.add(vEmployee.getCode());
+                        list.add(vEmployee.getFirstName() + " " + vEmployee.getLastName() + " " + (vEmployee.getMiddleName() != null ? vEmployee.getMiddleName() : " "));
+                        list.add(CommonUtils.getFormattedDate(userArrival.getCreated()));
+                        tableBody.add(list);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
                     if(usersGW.getCaption()!=null){
                         fileName = usersGW.getCaption();
                     }
-                    List<String> list = new ArrayList<>();
-                    list.add(userArrival.getUser().toString());
-                    list.add(CommonUtils.getFormattedDate(userArrival.getCreated()));
-                    tableBody.add(list);
+
                 }
 
 
@@ -74,13 +83,13 @@ public class LateEmployeesAttendance implements EntityListener {
         HorizontalLayout buttonPanel = CommonUtils.createButtonPanel();
 
         dateField = new DateField();
-        dateField.setValue(new Date());
         dateField.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
                 refreshGridWidget(usersGW);
             }
         });
+        dateField.setValue(new Date());
 
         buttonPanel.addComponent(dateField);
         buttonPanel.setComponentAlignment(dateField, Alignment.MIDDLE_CENTER);
