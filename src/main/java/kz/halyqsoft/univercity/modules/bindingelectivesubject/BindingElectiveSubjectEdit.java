@@ -1,8 +1,8 @@
 package kz.halyqsoft.univercity.modules.bindingelectivesubject;
 
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.shared.ui.combobox.FilteringMode;
+import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VPairSubject;
@@ -22,6 +22,8 @@ import org.r3a.common.vaadin.AbstractWebUI;
 import org.r3a.common.vaadin.widget.ERefreshType;
 import org.r3a.common.vaadin.widget.dialog.AbstractDialog;
 import org.r3a.common.vaadin.widget.dialog.Message;
+import org.r3a.common.vaadin.widget.dialog.select.ESelectType;
+import org.r3a.common.vaadin.widget.dialog.select.custom.grid.CustomGridSelectDialog;
 import org.r3a.common.vaadin.widget.form.CommonFormWidget;
 import org.r3a.common.vaadin.widget.form.FormModel;
 import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
@@ -30,6 +32,7 @@ import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
 
 import javax.persistence.NoResultException;
+import javax.swing.plaf.basic.BasicOptionPaneUI;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -191,7 +194,7 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
     private CommonFormWidget createStudentElectiveBindedSubject() throws Exception {
         CommonFormWidget studentBindingElectiveFW = new CommonFormWidget(ELECTIVE_BINDED_SUBJECT.class);
         studentBindingElectiveFW.addEntityListener(new StudentCreativeExamListener());
-        final FormModel studentBindingElectiveFM = studentBindingElectiveFW.getWidgetModel();
+        FormModel studentBindingElectiveFM = studentBindingElectiveFW.getWidgetModel();
         studentBindingElectiveFM.setReadOnly(false);
         String errorMessage = getUILocaleUtil().getCaption("title.error").concat(": ").
                 concat("Binding elective subject");//TODO resource
@@ -266,6 +269,10 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
         studentElectiveSubjectGM.setMultiSelect(false);
         studentElectiveSubjectGM.setRefreshType(ERefreshType.MANUAL);
         studentElectiveSubjectGM.setCrudEntityClass(PAIR_SUBJECT.class);
+        FKFieldModel subjectFM = (FKFieldModel) studentElectiveSubjectGM.getFormModel().getFieldModel("subject");
+        subjectFM.setSelectType(ESelectType.CUSTOM_GRID);
+        subjectFM.setDialogHeight(400);
+        subjectFM.setDialogWidth(600);
 
         QueryModel subjectQM = ((FKFieldModel) studentElectiveSubjectGM.getFormModel().getFieldModel("subject")).
                 getQueryModel();
@@ -274,7 +281,29 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
         subjectQM.addWhereAnd("deleted", Boolean.FALSE);
         subjectQM.addWhereAnd("mandatory", Boolean.FALSE);
         subjectQM.addWhere(specFI, "deleted", false);
-        subjectQM.addWhere(specFI, "id", ECriteria.EQUAL, speciality.getId());
+
+        QueryModel<DEPARTMENT> chairQM = new QueryModel<>(DEPARTMENT.class);
+        chairQM.addWhereNotNull("parent");
+        chairQM.addWhereAnd("deleted", Boolean.FALSE);
+        chairQM.addWhereAnd("fc", Boolean.FALSE);
+        chairQM.addOrder("deptName");
+        BeanItemContainer<DEPARTMENT> chairBIC = new BeanItemContainer<>(DEPARTMENT.class, SessionFacadeFactory
+                .getSessionFacade(CommonEntityFacadeBean.class).lookup(chairQM));
+        ComboBox chairCB = new ComboBox();
+        chairCB.setContainerDataSource(chairBIC);
+        chairCB.setImmediate(true);
+        chairCB.setNullSelectionAllowed(true);
+        chairCB.setTextInputAllowed(true);
+        chairCB.setFilteringMode(FilteringMode.CONTAINS);
+        chairCB.setPageLength(0);
+        chairCB.setWidth(400, Unit.PIXELS);
+
+
+        CustomGridSelectDialog customGridSelectDialog = subjectFM.getCustomGridSelectDialog();
+        customGridSelectDialog.setMultiSelect(false);
+        customGridSelectDialog.getFilterModel().addFilter("chair" , chairCB);
+        customGridSelectDialog.initFilter();
+
 
         return studentElectiveSubjectGW;
     }
