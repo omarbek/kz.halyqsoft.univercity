@@ -28,12 +28,11 @@ public class EmployeeAttendance implements EntityListener{
     private GridWidget departmentGW;
     private DateField dateField;
     private DBGridModel departmentGM;
-    private Button  backButton;
+    private Button  backButton, backButtonAdministration;
     private DepartmentAttendance attendance;
+    private AdministrationAttendance administrationAttendance;
 
-    public EmployeeAttendance(){
-
-
+    public EmployeeAttendance( ){
         mainVL = new VerticalLayout();
         mainVL.setImmediate(true);
 
@@ -54,14 +53,31 @@ public class EmployeeAttendance implements EntityListener{
         backButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
-                mainVL.removeComponent(attendance.getMainVL());
-                mainVL.addComponent(departmentGW);
+                    mainVL.removeComponent(attendance.getMainVL());
+                    mainVL.addComponent(departmentGW);
                 dateField.setVisible(true);
                 backButton.setVisible(false);
             }
         });
 
+        backButtonAdministration = new Button(CommonUtils.getUILocaleUtil().getCaption("backButton"));
+        backButtonAdministration.setImmediate(true);
+        backButtonAdministration.setVisible(false);
+        backButtonAdministration.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                mainVL.removeComponent(administrationAttendance.getMainVL());
+                mainVL.addComponent(departmentGW);
+
+                dateField.setVisible(true);
+                backButtonAdministration.setVisible(false);
+            }
+        });
+
         topHL.addComponent(backButton);
+        topHL.setComponentAlignment(backButton, Alignment.TOP_LEFT);
+
+        topHL.addComponent(backButtonAdministration);
         topHL.setComponentAlignment(backButton, Alignment.TOP_LEFT);
 
         dateField = new DateField();
@@ -116,7 +132,7 @@ public class EmployeeAttendance implements EntityListener{
                 "  count(ve.id),\n" +
                 "  count(user_id),\n" +
                 "  d1.id\n" +
-                "FROM department d1\n" +
+                " FROM department d1\n" +
                 "  INNER JOIN department d2\n" +
                 "    ON d1.id = d2.parent_id\n" +
                 "  INNER JOIN v_employee ve\n" +
@@ -131,7 +147,7 @@ public class EmployeeAttendance implements EntityListener{
                 "                                        WHERE max_arriv.user_id = arriv.user_id)\n" +
                 "                   AND come_in = TRUE\n" +
                 "             GROUP BY arriv.user_id)arriv on arriv.user_id=ve.id\n" +
-                "WHERE d1.deleted = FALSE AND d2.deleted = FALSE\n" +
+                "WHERE d1.deleted = FALSE AND d2.deleted = FALSE and d1.fc = TRUE AND d2.fc = TRUE\n" +
                 "GROUP BY d1.dept_name,d1.id";
 
         try {
@@ -174,10 +190,17 @@ public class EmployeeAttendance implements EntityListener{
             if(entityEvent.getAction()==EntityEvent.SELECTED){
                 if(departmentGW !=null){
                     mainVL.removeComponent(departmentGW);
-                    attendance = new DepartmentAttendance((VDepartment) departmentGW.getSelectedEntity(),this);
-                    mainVL.addComponent(attendance.getMainVL());
+                    if(((VDepartment)departmentGW.getSelectedEntity()).getDepartmentID()==20){
+                        administrationAttendance = new AdministrationAttendance(this);
+                        mainVL.addComponent(administrationAttendance.getMainVL());
+                        backButtonAdministration.setVisible(true);
+                    }else{
+                        attendance = new DepartmentAttendance((VDepartment) departmentGW.getSelectedEntity(),this);
+                        mainVL.addComponent(attendance.getMainVL());
+                        backButton.setVisible(true);
+                    }
                     dateField.setVisible(false);
-                    backButton.setVisible(true);
+
                 }
             }
         }

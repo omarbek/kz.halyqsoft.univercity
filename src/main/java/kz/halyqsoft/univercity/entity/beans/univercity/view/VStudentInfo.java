@@ -1,14 +1,9 @@
 package kz.halyqsoft.univercity.entity.beans.univercity.view;
 
 import kz.halyqsoft.univercity.entity.beans.USERS;
-import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
-
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import java.util.Date;
 
 public class VStudentInfo extends AbstractEntity {
 

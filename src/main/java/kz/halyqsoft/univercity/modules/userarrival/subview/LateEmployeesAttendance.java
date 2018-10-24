@@ -1,8 +1,12 @@
 package kz.halyqsoft.univercity.modules.userarrival.subview;
 
 import com.vaadin.data.Property;
+import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_ARRIVAL;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.VGroup;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.VStudentInfo;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_EMPLOYEE;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VEmploeeDoc;
 import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.PrintDialog;
 import kz.halyqsoft.univercity.utils.CommonUtils;
@@ -17,6 +21,8 @@ import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 
 import java.util.*;
+import java.util.*;
+import java.util.Calendar;
 
 /**
  * @author Omarbek
@@ -97,14 +103,25 @@ public class LateEmployeesAttendance implements EntityListener {
         });
         HorizontalLayout buttonPanel = CommonUtils.createButtonPanel();
 
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY,8);
+        cal.set(Calendar.MINUTE,40);
+        cal.set(Calendar.SECOND,0);
+        cal.set(Calendar.MILLISECOND,0);
+
         dateField = new DateField();
-        dateField.setValue(new Date());
+        dateField.setShowISOWeekNumbers(true);
+        dateField.setStyleName("time-only");
+        dateField.setResolution(Resolution.SECOND);
+        dateField.setLocale(Locale.GERMANY);
         dateField.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
                 refreshGridWidget(usersGW);
             }
         });
+        dateField.setValue(cal.getTime());
+
 
         buttonPanel.addComponent(dateField);
         buttonPanel.setComponentAlignment(dateField, Alignment.MIDDLE_CENTER);
@@ -132,7 +149,7 @@ public class LateEmployeesAttendance implements EntityListener {
                     "                           WHERE max_arriv.user_id = arriv.user_id " +
                     "                                 AND date_trunc('day', max_arriv.created) = date_trunc('day', TIMESTAMP '" + CommonUtils.getFormattedDate(dateField.getValue()) + "') " +
                     "                                 AND come_in = TRUE) " +
-                    "      AND come_in = TRUE AND arriv.created :: TIME > '08:40:00' " +
+                    "      AND come_in = TRUE AND arriv.created :: TIME > '"+CommonUtils.getTimeFromDate(dateField.getValue())+"' " +
                     "ORDER BY created DESC;";
             List<USER_ARRIVAL> userArrivals = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(sql,
                     new HashMap<>(), USER_ARRIVAL.class);

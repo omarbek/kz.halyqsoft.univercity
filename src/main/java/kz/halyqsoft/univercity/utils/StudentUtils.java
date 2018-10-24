@@ -7,6 +7,7 @@ import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.CATALOG;
+import kz.halyqsoft.univercity.entity.beans.univercity.GROUPS;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VStudent;
@@ -166,6 +167,17 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(diplomaTypeQM));
         cb.setContainerDataSource(diplomaTypeBIC);
         studentFilterPanel.addFilterComponent("studentDiplomaType", cb);
+
+        cb = new ComboBox();
+        cb.setNullSelectionAllowed(true);
+        cb.setTextInputAllowed(false);
+        cb.setFilteringMode(FilteringMode.STARTSWITH);
+        cb.setPageLength(0);
+        QueryModel<GROUPS> groupsQM = new QueryModel<>(GROUPS.class);
+        BeanItemContainer<GROUPS> dgroupsBIC = new BeanItemContainer<>(GROUPS.class,
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(groupsQM));
+        cb.setContainerDataSource(dgroupsBIC);
+        studentFilterPanel.addFilterComponent("group", cb);
 
 
         return studentFilterPanel;
@@ -466,6 +478,10 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
         if (sf.getStudentDiplomaType() != null) {
             params.put(i, sf.getStudentDiplomaType().getId().getId());
             sb.append(" and st.diploma_type_id = ?" + i++);
+        }
+        if (sf.getGroup() != null) {
+            params.put(i, sf.getGroup().getId().getId());
+            sb.append(" and stu.groups_id = ?" + i++);
         }
 
         List<VStudent> list = new ArrayList<>();

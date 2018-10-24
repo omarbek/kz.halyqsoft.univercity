@@ -105,15 +105,27 @@ public class DetalizationDialog extends AbstractDialog implements EntityListener
             userDataVL.addComponent(gridFormWidget);
         }
         TableWidget userArrivalTW = new TableWidget(USER_ARRIVAL.class);
+        userArrivalTW.setCaption(getUILocaleUtil().getCaption("userArrivalTW"));
         userArrivalTW.showToolbar(false);
         userArrivalTW.setImmediate(true);
         userArrivalTW.setSizeFull();
         userArrivalTW.addEntityListener(this);
+
         DBTableModel dbTableModel = (DBTableModel)userArrivalTW.getWidgetModel();
         dbTableModel.setEntities(getList(user,date));
         dbTableModel.setRefreshType(ERefreshType.MANUAL);
 
+        TableWidget userArrivalBySemTW = new TableWidget(USER_ARRIVAL.class);
+        userArrivalBySemTW.setCaption(" ");
+        userArrivalBySemTW.setCaption(getUILocaleUtil().getCaption("userArrivalBySemTW"));
+        userArrivalBySemTW.showToolbar(false);
+        userArrivalBySemTW.setImmediate(true);
+        userArrivalBySemTW.setSizeFull();
+        userArrivalBySemTW.addEntityListener(this);
 
+        DBTableModel userArrivalBySemTM = (DBTableModel)userArrivalBySemTW.getWidgetModel();
+        userArrivalBySemTM.setEntities(getListBySem(user,date));
+        userArrivalBySemTM.setRefreshType(ERefreshType.MANUAL);
 
         Button closeBtn = new Button(getUILocaleUtil().getCaption("close"));
         closeBtn.addClickListener(new Button.ClickListener() {
@@ -124,12 +136,14 @@ public class DetalizationDialog extends AbstractDialog implements EntityListener
         });
 
         userArrivalVL.addComponent(userArrivalTW);
+        userArrivalVL.addComponent(userArrivalBySemTW);
         this.userDataVL.addComponent(userDataVL);
         mainHSP.setFirstComponent(userArrivalVL);
         mainHSP.setSecondComponent(this.userDataVL);
 
         getContent().addComponent(mainHSP);
         getContent().addComponent(closeBtn);
+        getContent().setComponentAlignment(closeBtn,Alignment.MIDDLE_CENTER);
 
         AbstractWebUI.getInstance().addWindow(this);
     }
@@ -142,8 +156,9 @@ public class DetalizationDialog extends AbstractDialog implements EntityListener
         String formattedDate = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS").format(date);
 
         String sql = "select * from user_arrival ua " +
-                "\nwhere ua.user_id = "+user.getId().getId().longValue()+" " +
-                "\n ORDER BY ua.created ;";
+                "\nwhere ua.user_id = " + user.getId().getId().longValue()+" " +
+                " and date_trunc('day',ua.created) = date_trunc('day', timestamp'"+formattedDate+"')"+
+                "\n ORDER BY ua.created ";
 
         try {
             List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
@@ -176,6 +191,46 @@ public class DetalizationDialog extends AbstractDialog implements EntityListener
         return userArrivals;
     }
 
+    public List<USER_ARRIVAL> getListBySem(USERS user, Date date){
+        List<USER_ARRIVAL> userArrivalList = new ArrayList<>();
+
+        Map<Integer,Object> params = new HashMap<>();
+        String formattedDate = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS").format(date);
+
+        String sql = "select * from user_arrival ua " +
+                "\nwhere ua.user_id = " + user.getId().getId().longValue()+" " +
+                "\n ORDER BY ua.created ";
+
+        try {
+            List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
+            if (!tmpList.isEmpty()) {
+                for (Object o : tmpList) {
+                    try{
+                        Object[] oo = (Object[]) o;
+                        USER_ARRIVAL ua = new USER_ARRIVAL();
+                        ua.setId(ID.valueOf((Long)oo[0]));
+                        ID userId = ID.valueOf((Long)oo[1]);
+                        if(userId!=null){
+                            ua.setUser(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(USERS.class,userId));
+                        }
+                        ua.setCreated((Date)oo[2]);
+                        ua.setComeIn((Boolean)oo[3]);
+
+                        ID turnstileId = ID.valueOf((Long)oo[4]);
+                        if(turnstileId!=null){
+                            ua.setTurnstileType(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(TURNSTILE_TYPE.class,turnstileId));
+                        }
+                        userArrivalList.add(ua);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            CommonUtils.showMessageAndWriteLog("Unable to load user_arrival list", ex);
+        }
+        return userArrivalList;
+    }
 
     @Override
     protected String createTitle() {
