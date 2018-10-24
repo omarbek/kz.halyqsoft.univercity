@@ -89,3 +89,13 @@ INSERT INTO public.pdf_property (id, text, x, y, font, size, pdf_document_id, or
 INSERT INTO public.pdf_property (id, text, x, y, font, size, pdf_document_id, order_number, center, rights, custom) VALUES (1348, 'Ответственный секретарь приемной комиссии ИФЭП ОЗ
 ___________          ___________           дата', 6, 0, 'Normal', 12, 179, 38.00, false, false, false);
 INSERT INTO public.pdf_property (id, text, x, y, font, size, pdf_document_id, order_number, center, rights, custom) VALUES (1349, '        (Фамилия,----)                                       (Подпись)', 6, 0, 'Normal', 8, 179, 39.00, false, false, false);
+
+
+
+_________________________________________________________________CHARACTER_SET_CATALOG
+
+ALTER TABLE student_additional_information
+    ADD COLUMN school_diploma_number VARCHAR(255);
+
+ALTER TABLE student_additional_information
+  ADD COLUMN work_place VARCHAR(255);

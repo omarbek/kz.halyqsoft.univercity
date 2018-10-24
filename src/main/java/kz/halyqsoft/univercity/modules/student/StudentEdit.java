@@ -78,7 +78,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
     private FromItem educationUDFI;
     private Label lockLabel, lockReasonLabel, createdBylabel,label;
     private Button lockUnlockButton;
-    private Button downloadTableButton,downloadTableRusButton;
+    private Button downloadTableButton,downloadTableRusButton,downloadAnketaBtn,downloadZayavBtn;
     private LockDialog lockDialog;
     private STUDENT student;
     private USERS users;
@@ -328,7 +328,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         getTabSheet().addTab(content, getMasterTabTitle());
 
         HorizontalLayout hl = new HorizontalLayout();
-        hl.setWidth(30, Unit.PERCENTAGE);
+        hl.setWidth(40, Unit.PERCENTAGE);
         kazCheckBox = new CheckBox();
         rusCheckBox = new CheckBox();
         rusCheckBox.setCaption(getUILocaleUtil().getCaption("ru.short"));
@@ -349,11 +349,26 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         downloadTableRusButton.setCaption(getUILocaleUtil().getCaption("iupsrus"));
         hl.addComponent(downloadTableRusButton);
 
+        downloadAnketaBtn = new Button();
+        downloadAnketaBtn.setImmediate(true);
+        downloadAnketaBtn.setWidth("80");
+        downloadAnketaBtn.setCaption("Anketa");
+        hl.addComponent(downloadAnketaBtn);
+
+        downloadZayavBtn = new Button();
+        downloadZayavBtn.setImmediate(true);
+        downloadZayavBtn.setWidth("80");
+        downloadZayavBtn.setCaption("Zayava");
+        hl.addComponent(downloadZayavBtn);
+
+
         hl.addComponents(kazCheckBox, rusCheckBox);
         hl.setComponentAlignment(kazCheckBox, Alignment.MIDDLE_CENTER);
         hl.setComponentAlignment(rusCheckBox, Alignment.MIDDLE_CENTER);
         hl.setComponentAlignment(downloadTableButton, Alignment.MIDDLE_LEFT);
         hl.setComponentAlignment(downloadTableRusButton, Alignment.TOP_LEFT);
+        hl.setComponentAlignment(downloadAnketaBtn, Alignment.TOP_RIGHT);
+        hl.setComponentAlignment(downloadZayavBtn, Alignment.TOP_RIGHT);
 
         downloadTableButton.addClickListener(new ClickListener() {
              @Override
@@ -376,6 +391,26 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
              }
          }
         );
+
+        downloadAnketaBtn.addClickListener(new ClickListener() {
+            @Override
+            public void buttonClick(ClickEvent clickEvent) {
+                myResource = createResourceStudent("178",student);
+                fileDownloader = new FileDownloader(myResource);
+                myResource.setMIMEType("application/pdf");
+                fileDownloader.extend(downloadAnketaBtn);
+            }
+        });
+
+        downloadZayavBtn.addClickListener(new ClickListener() {
+            @Override
+            public void buttonClick(ClickEvent clickEvent) {
+                myResource = createResourceStudent("179",student);
+                fileDownloader = new FileDownloader(myResource);
+                myResource.setMIMEType("application/pdf");
+                fileDownloader.extend(downloadZayavBtn);
+            }
+        });
 
 
         pdfDownload = createDownloadButton();

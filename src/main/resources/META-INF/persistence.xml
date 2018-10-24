@@ -356,6 +356,7 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.LOAD_TO_CHAIR</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_ATTENDANCE_LOG</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_TEACHER_SUBJECT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_ADDITIONAL_INFORMATION</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
@@ -366,7 +367,7 @@
             <!--<property name="javax.persistence.jdbc.password" value="univer"/>-->
 
             <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
-            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/univerdb"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/newuniverdb"/>
             <property name="javax.persistence.jdbc.user" value="univer"/>
             <property name="javax.persistence.jdbc.password" value="univer"/>
 

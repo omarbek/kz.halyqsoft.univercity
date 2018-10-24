@@ -26,7 +26,7 @@ public class STUDENT_ADDITIONAL_INFORMATION extends AbstractEntity{
             @JoinColumn(name = "STUDENT_ID", referencedColumnName = "ID")})
     private STUDENT student;
 
-    @FieldInfo(type = EFieldType.BOOLEAN, order = 2, required = false)
+    @FieldInfo(type = EFieldType.BOOLEAN, order = 1, required = false)
     @Column(name = "CONVICTION_AVAILABILITY", nullable = false)
     private boolean convictionAvailability = false;
 
@@ -57,6 +57,14 @@ public class STUDENT_ADDITIONAL_INFORMATION extends AbstractEntity{
     @FieldInfo(type = EFieldType.BOOLEAN, order = 8, required = false)
     @Column(name = "PHOTO_AVAILABILITY", nullable = false)
     private boolean photoAvailability = false;
+
+    @FieldInfo(type = EFieldType.TEXT, order = 9, required = false)
+    @Column(name = "SCHOOL_DIPLOMA_NUMBER", nullable = false)
+    private String schoolDiplomaNumber;
+
+    @FieldInfo(type = EFieldType.TEXT, order = 10, required = false)
+    @Column(name = "WORK_PLACE", nullable = false)
+    private String workPlace;
 
     public STUDENT_ADDITIONAL_INFORMATION() {
 
@@ -133,4 +141,22 @@ public class STUDENT_ADDITIONAL_INFORMATION extends AbstractEntity{
     public void setPhotoAvailability(boolean photoAvailability) {
         this.photoAvailability = photoAvailability;
     }
+
+    public String getSchoolDiplomaNumber() {
+        return schoolDiplomaNumber;
+    }
+
+    public void setSchoolDiplomaNumber(String schoolDiplomaNumber) {
+        this.schoolDiplomaNumber = schoolDiplomaNumber;
+    }
+
+    public String getWorkPlace() {
+        return workPlace;
+    }
+
+    public void setWorkPlace(String workPlace) {
+        this.workPlace = workPlace;
+    }
+
+
 }

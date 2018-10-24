@@ -973,6 +973,18 @@ public final class ApplicantsForm extends UsersForm {
             untCertificate = null;
         }
 
+        UNT_CERT_SUBJECT untCertSubject = null;
+        QueryModel<UNT_CERT_SUBJECT> untCertSubjectQM = new QueryModel<>(UNT_CERT_SUBJECT.class);
+        FromItem untCertS = untCertSubjectQM.addJoin(EJoin.INNER_JOIN, "untCertificate", UNT_CERTIFICATE.class, "id");
+        FromItem untCert = untCertS.addJoin(EJoin.INNER_JOIN, "id", USER_DOCUMENT.class, "id");
+        untCertSubjectQM.addWhere(untCert, "user", ECriteria.EQUAL, student.getId());
+        try {
+            untCertSubject = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class)
+                    .lookupSingle(untCertSubjectQM);
+        } catch (NoResultException ex) {
+            untCertificate = null;
+        }
+
         String inLettersDorn = "";
         String moneyForDorm = "";
         ACCOUNTANT_PRICE accountantPriceDorm = getAccountantPrice(student, 1);
@@ -1068,10 +1080,68 @@ public final class ApplicantsForm extends UsersForm {
             FromItem fi = fi1.addJoin(EJoin.INNER_JOIN, "user", USERS.class, "id");
             qm.addWhere(fi, "deleted", ECriteria.EQUAL, false);
             qm.addWhere(fi, "id", ECriteria.EQUAL, student.getId());
-
-
             user_passport = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(qm);
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        USER_LANGUAGE userLanguage = null;
+        try {
+            QueryModel<USER_LANGUAGE> userLanguageQM = new QueryModel<>(USER_LANGUAGE.class);
+            userLanguageQM.addWhere("user",ECriteria.EQUAL,student.getId());
+            userLanguage = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(userLanguageQM);
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        STUDENT_ADDITIONAL_INFORMATION studentAdditionalInformation = null;
+        try {
+            QueryModel<STUDENT_ADDITIONAL_INFORMATION> studentAdditionalInformationQM = new QueryModel<>(STUDENT_ADDITIONAL_INFORMATION.class);
+            studentAdditionalInformationQM.addWhere("student",ECriteria.EQUAL,student.getId());
+               studentAdditionalInformation = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(studentAdditionalInformationQM);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        MILITARY_DOC militaryDoc = null;
+        try {
+            QueryModel<MILITARY_DOC> militaryQM = new QueryModel<>(MILITARY_DOC.class);
+            FromItem sItem = militaryQM.addJoin(EJoin.INNER_JOIN,"id",USER_DOCUMENT.class,"id");
+            militaryQM.addWhere(sItem,"user",ECriteria.EQUAL,student.getId());
+                militaryDoc = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(militaryQM);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        UNT_CERTIFICATE untCertif = null;
+        try {
+            QueryModel<MILITARY_DOC> militaryQM = new QueryModel<>(MILITARY_DOC.class);
+            FromItem sItem = militaryQM.addJoin(EJoin.INNER_JOIN,"id",USER_DOCUMENT.class,"id");
+            militaryQM.addWhere(sItem,"user",ECriteria.EQUAL,student.getId());
+            militaryDoc = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(militaryQM);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        USER_SOCIAL_CATEGORY userSocialCategory = null;
+        try {
+            QueryModel<USER_SOCIAL_CATEGORY> userSocialCategoryQM = new QueryModel<>(USER_SOCIAL_CATEGORY.class);
+            userSocialCategoryQM.addWhere("user",ECriteria.EQUAL,student.getId());
+            userSocialCategory = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(userSocialCategoryQM);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+
+        USER_AWARD userAward = null;
+
+        try {
+            QueryModel<USER_AWARD> userAwardQM = new QueryModel<>(USER_AWARD.class);
+            userAwardQM.addJoin(EJoin.INNER_JOIN,"award",AWARD.class,"id");
+            userAwardQM.addWhere("user",ECriteria.EQUAL,student.getId());
+            userAward = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(userAwardQM);
+        }catch (Exception e){
             e.printStackTrace();
         }
 
@@ -1156,17 +1226,33 @@ public final class ApplicantsForm extends UsersForm {
                 .replaceAll("\\$education", educationDoc.getEducationType().toString())
                 .replaceAll("\\$technic", tecnhik.toString())
                 .replaceAll("\\$attestat", attestationDate)
-                .replaceAll("\\$course", String.valueOf(educationDoc.getEntryYear().toString()))
                 .replaceAll("\\$nomer", educationDoc.getDocumentNo())
                 .replaceAll("\\$ent", untCertificate == null ? "" : untCertificate.getDocumentNo())
-//                .replaceAll("\\$document", createdDate)
                 .replaceAll("\\$document", "_______")
                 .replaceAll("\\$diplomaType", student.getDiplomaType().toString())
-               // .replaceAll("\\$group", sdf())
                 .replaceAll("қажет, қажет емес", dorm)
-                //.replaceAll("$educode", studentEducation.getSpeciality().getCode());
-                      //  .replaceAll("$language", studentEducation.getLanguage().getLangName())
-                        .replaceAll("\\$code", student.getCode());
+                .replaceAll("\\$coordinator", student.getCoordinator().getFio())
+                .replaceAll("\\$school", educationDoc.getSchoolName())
+                .replaceAll("\\$serialNum", user_passport.getSerialNumber())
+                .replaceAll("\\$addLanguage", userLanguage==null ? "": userLanguage.getLanguage().getLangName())
+                .replaceAll("\\$materialStatus", student.getMaritalStatus().getStatusName())
+                .replaceAll("\\$schooldiplomnum",studentAdditionalInformation == null ?  "" : studentAdditionalInformation.getSchoolDiplomaNumber())
+                .replaceAll("\\$workplace",studentAdditionalInformation == null ?  "нет" : studentAdditionalInformation.getWorkPlace())
+                .replaceAll("\\$pcavailability", studentAdditionalInformation == null ?  "нет" : "да")
+                .replaceAll("\\$pcskillavailability",studentAdditionalInformation == null ?  "нет" : "да")
+                .replaceAll("\\$convictionInf",studentAdditionalInformation == null ?  "нет" : String.valueOf(studentAdditionalInformation.isConvictionAvailability()))
+                .replaceAll("\\$militarydoc",militaryDoc == null ?  "нет" : "да")
+                .replaceAll("\\$passtype",user_passport.getPassportType().getTypeName())
+                .replaceAll("\\$issureName",user_passport.getIssuerName())
+                .replaceAll("\\$faccode",studentEducation.getFaculty().getCode())
+                .replaceAll("\\$eduType",studentEducation.getEducationType().getTypeName())
+                .replaceAll("\\$cert",untCertificate== null ?  "нет" : "да")
+                .replaceAll("\\$entSubj",untCertSubject== null ?  "нет" :untCertSubject.getUntSubject().toString() +" "+ untCertificate.getRate().toString())
+                .replaceAll("\\$fedu",educationDoc.getEducationDocType().getId().getId().longValue()==2 ? "нет" : "да" )
+                .replaceAll("\\$socCateg",userSocialCategory== null ?  "нет" : userSocialCategory.getSocialCategory().getCategoryName())
+                .replaceAll("\\$award",userAward== null ?  "нет" : String.valueOf(userAward.getAward().getId().getId().longValue()==2))
+                .replaceAll("\\$dorm",student.isNeedDorm()== false ?  "нет" : "да")
+                .replaceAll("\\$code", student.getCode());
     }
 
 
