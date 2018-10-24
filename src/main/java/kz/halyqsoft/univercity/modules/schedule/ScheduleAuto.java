@@ -143,7 +143,6 @@ public class ScheduleAuto extends AbstractCommonView {
         if (currentSemesterData != null) {
             QueryModel<SCHEDULE_DETAIL> scheduleDetailQM = new QueryModel<>(SCHEDULE_DETAIL.class);
             scheduleDetailQM.addWhere("semesterData", ECriteria.EQUAL, currentSemesterData.getId());
-            scheduleDetailQM.addWhere("id", ECriteria.EQUAL, ID.valueOf(3624));
             List<SCHEDULE_DETAIL> scheduleDetails = SessionFacadeFactory.getSessionFacade(
                     CommonEntityFacadeBean.class).lookup(scheduleDetailQM);
             for (SCHEDULE_DETAIL scheduleDetail : scheduleDetails) {
