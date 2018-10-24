@@ -222,7 +222,7 @@ public class SubjectView extends AbstractTaskView implements FilterPanelListener
                     "                      INNER JOIN LEVEL lvl ON subj.LEVEL_ID = lvl.ID\n" +
                     "                      INNER JOIN subject_module mdl ON subj.MODULE_ID = mdl.ID\n" +
                     "                      INNER JOIN CREDITABILITY cred ON subj.CREDITABILITY_ID = cred.ID\n" +
-                    "                      INNER JOIN ACADEMIC_FORMULA formula ON subj.ACADEMIC_FORMULA_ID = formula.ID\n" +
+                    "                      LEFT JOIN ACADEMIC_FORMULA formula ON subj.ACADEMIC_FORMULA_ID = formula.ID\n" +
                     sb.toString() +
                     " ORDER BY SUBJECT_NAME";
             try {

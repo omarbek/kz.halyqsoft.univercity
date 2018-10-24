@@ -23,7 +23,6 @@ import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 import org.r3a.common.vaadin.widget.grid.model.GridColumnModel;
-import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -63,6 +62,15 @@ public class GroupAttendance implements EntityListener {
     }
 
     private void init() {
+
+        Button updateButton=new Button("update");
+        updateButton.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                getList(dateField.getValue());
+            }
+        });
+        buttonPanel.addComponent(updateButton);
 
         backButton = new Button(CommonUtils.getUILocaleUtil().getCaption("backButton"));
         backButton.setImmediate(true);
@@ -180,10 +188,7 @@ public class GroupAttendance implements EntityListener {
         vGroupGW = new GridWidget(VGroup.class);
         vGroupGW.setImmediate(true);
         vGroupGW.showToolbar(false);
-
-        vGroupGW.setButtonVisible(AbstractToolbar.REFRESH_BUTTON, true);
         vGroupGW.addEntityListener(this);
-
         vGroupGM = (DBGridModel) vGroupGW.getWidgetModel();
         vGroupGM.setRowNumberVisible(true);
         vGroupGM.setRowNumberWidth(30);
@@ -251,7 +256,7 @@ public class GroupAttendance implements EntityListener {
                     if (oo[2] != null) {
                         EMPLOYEE employee = null;
                         try {
-                            employee = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(EMPLOYEE.class, (ID) oo[2]);
+                            employee = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(EMPLOYEE.class, ID.valueOf((long) oo[2]));
                             vg.setCurator(employee);
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -414,12 +419,10 @@ public class GroupAttendance implements EntityListener {
 
     @Override
     public void beforeRefresh(Object o, int i) {
-
     }
 
     @Override
     public void onRefresh(Object o, List<Entity> list) {
-
     }
 
     @Override
