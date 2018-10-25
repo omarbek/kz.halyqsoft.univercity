@@ -302,8 +302,8 @@ public class DepartmentAttendance implements EntityListener{
         String sql = "SELECT\n" +
                 "                empl.id, trim(empl.LAST_NAME || ' ' || empl.FIRST_NAME || ' ' || coalesce(empl.MIDDLE_NAME, '')) FIO,\n" +
                 "                empl.code,\n" +
-                "                (arriv.created::time)::text,\n" +
-                "                (arrivF.created::time)::text as false\n" +
+                "                date_trunc('minute', arriv.created)::timestamp(0)::time::text,\n" +
+                "                date_trunc('minute', arrivF.created)::timestamp(0)::time::text as false\n" +
                 "                FROM v_employee empl\n" +
                 "                  left join (SELECT\n" +
                 "                     arriv.created,\n" +
