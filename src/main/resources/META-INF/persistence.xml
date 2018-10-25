@@ -151,6 +151,7 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.QUALIFICATION</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.CANDIDATE</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.NON_ADMISSION_CAUSE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.PRACTICE_BREAKDOWN</class>
 
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_SPECIALITY</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_ORGANIZATION</class>
@@ -361,7 +362,7 @@
         <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
         <properties>
             <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
-            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/realdb"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/univerdb"/>
             <property name="javax.persistence.jdbc.user" value="postgres"/>
             <property name="javax.persistence.jdbc.password" value="ukpu18!"/>
             <property name="eclipselink.connection-pool.default.initial" value="1"/>

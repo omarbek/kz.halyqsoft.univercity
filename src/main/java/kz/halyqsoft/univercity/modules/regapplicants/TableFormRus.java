@@ -33,7 +33,6 @@ public class TableFormRus {
         try {
             PdfWriter pdfWriter = PdfWriter.getInstance(this.document, byteArrayOutputStream);
             // pdfWriter.open();
-            document.open();
 
             PdfPTable table = new PdfPTable(7);
             document.add(new Paragraph("Дисциплины изучаемые в семестре:", EmployeePdfCreator.getFont(12, Font.BOLD)));
@@ -878,16 +877,31 @@ public class TableFormRus {
             document.add(new Paragraph("\n")); document.add(new Paragraph("\n")); document.add(new Paragraph("\n"));
 
 
-            document.add(table);
+            try{
+                document.add( table );
+            }catch (Exception e){
+                CommonUtils.LOG.error(e.getMessage());
+                document.open();
+            }
+
+
+
 
             document.add(new Paragraph("\n")); document.add(new Paragraph("\n")); document.add(new Paragraph("\n"));
             document.add(new Paragraph("\n")); document.add(new Paragraph("\n")); document.add(new Paragraph("\n"));
             document.add(new Paragraph("\n")); document.add(new Paragraph("\n")); document.add(new Paragraph("\n")); document.add(new Paragraph("\n")); document.add(new Paragraph("\n"));
             document.add(new Paragraph("\n")); document.add(new Paragraph("\n")); document.add(new Paragraph("\n")); document.add(new Paragraph("\n"));
 
-            document.add(table1);
-            document.add(new Paragraph("\n"));
-            document.add(new Paragraph("\n"));
+
+            try{
+                document.add(table1);
+            }catch (Exception e){
+                CommonUtils.LOG.error(e.getMessage());
+                document.open();
+            }
+
+            document.add(new Paragraph("\n "));
+            document.add(new Paragraph("\n "));
             document.add(new Paragraph("Студент    __________  _______________________\n" +
                     "                         (подпись)              (Ф.И.О.)         \n", EmployeePdfCreator.getFont(12, Font.BOLD)));
 
@@ -897,7 +911,11 @@ public class TableFormRus {
             document.add(new Paragraph("Офис регистратор     __________  __________________\n" +
                     "                               (подпись)            (Ф.И.О.)            \n", EmployeePdfCreator.getFont(12, Font.BOLD)));
 
-            pdfWriter.close();
+            try{
+                pdfWriter.close();
+            }catch (Exception e){
+                CommonUtils.LOG.error(e.getMessage());
+            }
 
 
         }catch (Exception e){

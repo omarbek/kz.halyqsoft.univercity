@@ -14,6 +14,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.enumeration.Flag;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.*;
 import kz.halyqsoft.univercity.utils.CommonUtils;
+import kz.halyqsoft.univercity.utils.DocumentIDs;
 import kz.halyqsoft.univercity.utils.EmployeePdfCreator;
 import kz.halyqsoft.univercity.utils.register.*;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
@@ -122,7 +123,7 @@ public final class ApplicantsForm extends UsersForm {
 
     @Override
     protected void setOpeners() {
-        StreamResource myResource = createResourceStudent("85", null);
+        StreamResource myResource = createResourceStudent(DocumentIDs.CONTRACT_RUS_ID, null);
         contractBWO = new BrowserWindowOpener(myResource);
         contractBWO.extend(finishButton);
 
@@ -275,35 +276,35 @@ public final class ApplicantsForm extends UsersForm {
 
             StreamResource myResource = null;
             if (student.getLevel().getLevelName().equalsIgnoreCase("Магистратура")) {
-                myResource = createResourceStudent("82", student);
+                myResource = createResourceStudent(DocumentIDs.MAGIS_CONTRACT_ID, student);
             } else {
-                myResource = createResourceStudent("85", student);
+                myResource = createResourceStudent(DocumentIDs.CONTRACT_RUS_ID, student);
             }
             FileDownloader fileDownloader = new FileDownloader(myResource);
             myResource.setMIMEType("application/pdf");
             myResource.setCacheTime(0);
             fileDownloader.extend(downloadContractButton);
 
-            StreamResource myResourceParents = createResourceStudent("27", student);
+            StreamResource myResourceParents = createResourceStudent(DocumentIDs.OTINISH_OKPU_ID, student);
             FileDownloader fileDownloaderParent = new FileDownloader(myResourceParents);
             myResourceParents.setMIMEType("application/pdf");
             myResourceParents.setCacheTime(0);
             fileDownloaderParent.extend(downloadButtonRegisterButton);
 
-            StreamResource myResourceTitul = createResourceStudent("32", student);//TODO docs
+            StreamResource myResourceTitul = createResourceStudent(DocumentIDs.TITLE_ID, student);//TODO docs
             FileDownloader fileDownloaderTitul = new FileDownloader(myResourceTitul);
             myResourceTitul.setMIMEType("application/pdf");
             myResourceTitul.setCacheTime(0);
             fileDownloaderTitul.extend(downloadButtonRegisterButton);
 
-            StreamResource myResourceReg = createResourceStudent("33", student);
+            StreamResource myResourceReg = createResourceStudent(DocumentIDs.KOLKHAT_ID, student);
             FileDownloader fileDownloaderReg = new FileDownloader(myResourceReg);
             myResourceReg.setMIMEType("application/pdf");
             myResourceReg.setCacheTime(0);
             fileDownloaderReg.extend(downloadButtonRegisterButton);
 
             if (student.isNeedDorm() == true) {
-                StreamResource myResourceDorm = createResourceStudent("92", student);
+                StreamResource myResourceDorm = createResourceStudent(DocumentIDs.DORM_CONTRACT_KAZ_ID, student);
                 FileDownloader fileDownloaderDorm = new FileDownloader(myResourceDorm);
                 myResourceDorm.setMIMEType("application/pdf");
                 myResourceDorm.setCacheTime(0);
@@ -528,26 +529,25 @@ public final class ApplicantsForm extends UsersForm {
 
         StreamResource myResource = null;
         if (student.getLevel().getLevelName().equalsIgnoreCase("Магистратура")) {
-            myResource = createResourceStudent("82", student);
+            myResource = createResourceStudent(DocumentIDs.MAGIS_CONTRACT_ID, student);
             masgisterContractBWO.setResource(myResource);
         } else {
-            myResource = createResourceStudent("85", student);
+            myResource = createResourceStudent(DocumentIDs.CONTRACT_RUS_ID, student);
             contractBWO.setResource(myResource);
         }
 
-        myResource = createResourceStudent("27", student);
+        myResource = createResourceStudent(DocumentIDs.OTINISH_OKPU_ID, student);
         requestBWO.setResource(myResource);
 
-        myResource = createResourceStudent("33", student);
+        myResource = createResourceStudent(DocumentIDs.KOLKHAT_ID, student);
         voucherBWO.setResource(myResource);
 
-        myResource = createResourceStudent("32", student);
+        myResource = createResourceStudent(DocumentIDs.TITLE_ID, student);
         titleBWO.setResource(myResource);
 
         if (student != null && student.isNeedDorm() && !came) {
             came = true;
-
-            myResource = createResourceStudent("92", student);
+            myResource = createResourceStudent(DocumentIDs.DORM_CONTRACT_KAZ_ID, student);
             dormBWO = new BrowserWindowOpener(myResource);
             dormBWO.extend(finishButton);
         }
@@ -622,22 +622,22 @@ public final class ApplicantsForm extends UsersForm {
 
     public static StreamResource createResourceStudent(String value, STUDENT student) {
         String fileName = "";
-        if (value.equals("92")) {
-            fileName = "Договор общага_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
-        } else if (value.equals("85")) {
+        if (value.equals(DocumentIDs.DORM_CONTRACT_KAZ_ID)) {
+            fileName = "Договор общежитие_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
+        } else if (value.equals(DocumentIDs.CONTRACT_RUS_ID)) {
             fileName = "Договор на рус_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
-        } else if (value.equals("32")) {
+        } else if (value.equals(DocumentIDs.TITLE_ID)) {
             fileName = "Титул_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
-        } else if (value.equals("33")) {
+        } else if (value.equals(DocumentIDs.KOLKHAT_ID)) {
             fileName = "Қолхат_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
-        } else if (value.equals("82")) {//TODO Assyl check all docs, not only yours
+        } else if (value.equals(DocumentIDs.MAGIS_CONTRACT_ID)) {//TODO Assyl check all docs, not only yours
             fileName = "Договор магистрант_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
-        } else if (value.equals("90")) {
+        } else if (value.equals(DocumentIDs.KELISIM_SHART_ID)) {
             fileName = "келісім-шарт_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
-        }  else if (value.equals("99")) {
+        }  else if (value.equals(DocumentIDs.IUPS_KAZ_ID)) {
             fileName = "ИУПС_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
-        } else if (value.equals("98")) {
-            fileName = "ИУПС_рус_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
+        } else if (value.equals(DocumentIDs.IUPS_RUS_ID)) {
+            fileName = "ИУСП_рус_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
         }
         else {
             fileName = "Өтініш_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
@@ -667,7 +667,7 @@ public final class ApplicantsForm extends UsersForm {
                         e.printStackTrace();
                     }
 
-                    if (value.equals("32")) {
+                    if (value.equals(DocumentIDs.TITLE_ID)) {
                         PdfContentByte canvas = pdfWriter.getDirectContent();
 
 
@@ -709,13 +709,12 @@ public final class ApplicantsForm extends UsersForm {
                                 getFont(12, Font.BOLD));
                         title.setAlignment(Element.ALIGN_CENTER);
                         title.setSpacingBefore(10f);
-                    } else if (value.equals("33")) {
+                    } else if (value.equals(DocumentIDs.KOLKHAT_ID)) {
                         Rectangle one = new Rectangle(70, 140);
                         Rectangle two = new Rectangle(1000, 800);
 
                         docum.setPageSize(one);
                         docum.setMargins(2, 2, 2, 2);
-                        docum.open();
                         docum.setPageSize(two);
                         docum.setMargins(20, 20, 20, 20);
                         docum.newPage();
@@ -796,7 +795,7 @@ public final class ApplicantsForm extends UsersForm {
                                 getFont(12, Font.BOLD));
                         title.setSpacingBefore(0f);
                         title.setIndentationLeft(150f);
-                    } else if (value.equals("27")) {
+                    } else if (value.equals(DocumentIDs.OTINISH_OKPU_ID)) {
                         title = new Paragraph("ОҢТҮСТІК ҚАЗАҚСТАН ПЕДАГОГИКАЛЫҚ УНИВЕРСИТЕТІ",
                                 getFont(12, Font.BOLD));
                         title.setAlignment(Element.ALIGN_CENTER);
@@ -1212,7 +1211,6 @@ public final class ApplicantsForm extends UsersForm {
                 .replaceAll("\\$education", educationDoc.getEducationType().toString())
                 .replaceAll("\\$technic", tecnhik.toString())
                 .replaceAll("\\$attestat", attestationDate)
-                .replaceAll("\\$course", studentEducation.getStudyYear().toString())
                 .replaceAll("\\$nomer", educationDoc.getDocumentNo())
                 .replaceAll("\\$ent", untCertificate == null ? "" : untCertificate.getDocumentNo())
 //                .replaceAll("\\$document", createdDate)
