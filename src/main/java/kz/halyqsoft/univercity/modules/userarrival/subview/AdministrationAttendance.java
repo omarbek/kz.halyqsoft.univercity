@@ -185,14 +185,14 @@ public class AdministrationAttendance implements EntityListener{
                 "               arriv.created,\n" +
                 "               arriv.user_id\n" +
                 "             FROM user_arrival arriv\n" +
-                "             WHERE date_trunc('day', arriv.created) = date_trunc('day', timestamp'2018-10-10 17:36:13.560')\n" +
+                "             WHERE date_trunc('day', arriv.created) = date_trunc('day', timestamp'"+ formattedDate +"')\n" +
                 "                   AND come_in = TRUE\n" +
                 "             GROUP BY arriv.created,arriv.user_id)arriv on arriv.user_id=empl.id\n" +
                 "  left join (SELECT\n" +
                 "               arrivF.created,\n" +
                 "               arrivF.user_id\n" +
                 "             FROM user_arrival arrivF\n" +
-                "             WHERE date_trunc('day', arrivF.created) = date_trunc('day', timestamp'2018-10-10 17:36:13.560')\n" +
+                "             WHERE date_trunc('day', arrivF.created) = date_trunc('day', timestamp'"+ formattedDate +"')\n" +
                 "                   AND come_in = FALSE\n" +
                 "             GROUP BY arrivF.created,arrivF.user_id)arrivF on arrivF.user_id=empl.id\n" +
                 "  INNER JOIN department d ON d.id = empl.dept_id\n" +
