@@ -217,7 +217,7 @@ public class DepartmentAttendance implements EntityListener{
                 "                                        WHERE max_arriv.user_id = arriv.user_id)\n" +
                 "                   AND come_in = TRUE\n" +
                 "             GROUP BY arriv.user_id)arriv on arriv.user_id=empl.id" +
-                " WHERE dep.fc = TRUE and dep.parent_id = " + department.getDepartmentID() +
+                " WHERE dep.parent_id = " + department.getDepartmentID() +
                 " GROUP BY  dep.dept_name,dep.id";
 
         try {
