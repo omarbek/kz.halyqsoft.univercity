@@ -191,11 +191,11 @@ public class ScheduleManual extends AbstractCommonView implements EntityListener
     }
 
     private ROOM getRoom(WEEK_DAY weekDay, LESSON_TIME time, int roomType, int numberOfStudents,
-                         boolean notComputer) throws Exception {
+                         boolean notComputer, SEMESTER_DATA semesterData) throws Exception {
         if (LECTURE == roomType) {
             List<ROOM> lectureRooms = getLectureRooms(numberOfStudents);
             for (ROOM room : lectureRooms) {
-                if (!scheduleAlreadyHas(room, weekDay, time)) {
+                if (!scheduleAlreadyHas(room, weekDay, time,semesterData)) {
                     return room;
                 }
             }
@@ -203,7 +203,7 @@ public class ScheduleManual extends AbstractCommonView implements EntityListener
         } else {
             List<ROOM> practiceRooms = getPracticeRooms(numberOfStudents);
             for (ROOM room : practiceRooms) {
-                if (!scheduleAlreadyHas(room, weekDay, time)) {
+                if (!scheduleAlreadyHas(room, weekDay, time,semesterData)) {
                     if (COMPUTER.equals(room.getEquipment()) || notComputer) {
                         return room;
                     }
@@ -213,16 +213,17 @@ public class ScheduleManual extends AbstractCommonView implements EntityListener
         return new ROOM();
     }
 
-    private boolean scheduleAlreadyHas(ROOM room, WEEK_DAY weekDay, LESSON_TIME time) throws Exception {
+    private boolean scheduleAlreadyHas(ROOM room, WEEK_DAY weekDay, LESSON_TIME time,SEMESTER_DATA semesterData) throws Exception {
         String sql = "SELECT 1 " +
                 "FROM schedule_detail sched " +
                 "  INNER JOIN lesson_time time ON time.id = sched.lesson_time_id " +
                 "WHERE " +
-                "  (sched.room_id = ?1 AND sched.week_day_id = ?2 AND time.lesson_number = ?3)";
+                "  (sched.room_id = ?1 AND sched.week_day_id = ?2 AND time.lesson_number = ?3 AND sched.semester_data_id=?4)";
         Map<Integer, Object> params = new HashMap<>();
         params.put(1, room.getId().getId());
         params.put(2, weekDay.getId().getId());
         params.put(3, time.getLessonNumber());
+        params.put(4, semesterData.getId().getId());
         List results = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(
                 sql, params);
         return results.size() > 0;
@@ -418,13 +419,14 @@ public class ScheduleManual extends AbstractCommonView implements EntityListener
             }
         }
 
-        if(scheduleAlreadyHas(scheduleDetail.getRoom(),scheduleDetail.getWeekDay(),scheduleDetail.getLessonTime())){
+        if(scheduleAlreadyHas(scheduleDetail.getRoom(),scheduleDetail.getWeekDay(),scheduleDetail.getLessonTime(),scheduleDetail.getSemesterData())){
             QueryModel<SCHEDULE_DETAIL> scheduleDetailQM = new QueryModel<>(SCHEDULE_DETAIL.class);
             scheduleDetailQM.addWhere("subject" ,ECriteria.EQUAL, scheduleDetail.getSubject().getId());
             scheduleDetailQM.addWhereAnd("lessonType" ,ECriteria.EQUAL, scheduleDetail.getLessonType().getId());
             scheduleDetailQM.addWhereAnd("teacher" ,ECriteria.EQUAL, scheduleDetail.getTeacher().getId());
             scheduleDetailQM.addWhereAnd("lessonTime" ,ECriteria.EQUAL, scheduleDetail.getLessonTime().getId());
             scheduleDetailQM.addWhereAnd("room" ,ECriteria.EQUAL, scheduleDetail.getRoom().getId());
+            scheduleDetailQM.addWhereAnd("semesterData" ,ECriteria.EQUAL, scheduleDetail.getSemesterData().getId());
             List<SCHEDULE_DETAIL> scheduleDetails = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(scheduleDetailQM);
             if(scheduleDetails.size()==0){
                 Message.showError(getUILocaleUtil().getMessage("room.not.free.this.time"));
