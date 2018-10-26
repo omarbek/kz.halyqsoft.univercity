@@ -201,8 +201,8 @@ public class DepartmentAttendance implements EntityListener{
         String formattedDate = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS").format(date);
 
         Map<Integer, Object> params = new HashMap<>();
-        String sql = "SELECT  dep.DEPT_NAME, " +
-        " count(empl.dept_id)," +
+        String sql = "SELECT  dep.DEPT_NAME," +
+                " count(empl.dept_id)," +
                 " count(user_id)," +
                 " dep.id" +
                 " FROM v_employee empl" +
@@ -215,9 +215,9 @@ public class DepartmentAttendance implements EntityListener{
                 "                   AND arriv.created = (SELECT max(max_arriv.created)\n" +
                 "                                        FROM user_arrival max_arriv\n" +
                 "                                        WHERE max_arriv.user_id = arriv.user_id)\n" +
-                "                   AND come_in = TRUE\n" +
+//                "                   AND come_in = TRUE\n" +
                 "             GROUP BY arriv.user_id)arriv on arriv.user_id=empl.id" +
-                " WHERE dep.fc = TRUE and dep.parent_id = " + department.getDepartmentID() +
+                " WHERE dep.parent_id = " + department.getDepartmentID() +
                 " GROUP BY  dep.dept_name,dep.id";
 
         try {
@@ -302,8 +302,8 @@ public class DepartmentAttendance implements EntityListener{
         String sql = "SELECT\n" +
                 "                empl.id, trim(empl.LAST_NAME || ' ' || empl.FIRST_NAME || ' ' || coalesce(empl.MIDDLE_NAME, '')) FIO,\n" +
                 "                empl.code,\n" +
-                "                (arriv.created::time)::text,\n" +
-                "                (arrivF.created::time)::text as false\n" +
+                "                date_trunc('minute', arriv.created)::timestamp(0)::time::text,\n" +
+                "                date_trunc('minute', arrivF.created)::timestamp(0)::time::text as false\n" +
                 "                FROM v_employee empl\n" +
                 "                  left join (SELECT\n" +
                 "                     arriv.created,\n" +
