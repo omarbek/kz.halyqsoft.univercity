@@ -5,8 +5,6 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.ComboBox;
-import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_SUBJECT;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.VStudent;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VStudentSubject;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_STUDENT;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
@@ -44,7 +42,7 @@ public class StudentSubjectView extends AbstractTaskView implements EntityListen
         studentCB.setNullSelectionAllowed(false);
         studentCB.setTextInputAllowed(true);
         studentCB.setFilteringMode(FilteringMode.CONTAINS);
-        studentCB.setPageLength(0);
+        studentCB.setPageLength(10);
         QueryModel<V_STUDENT> studentQM = new QueryModel<>(V_STUDENT.class);
         BeanItemContainer<V_STUDENT> studentBIC = new BeanItemContainer<>(V_STUDENT.class,
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(studentQM));
