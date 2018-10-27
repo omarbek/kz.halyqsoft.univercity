@@ -620,8 +620,8 @@ public final class ApplicantsForm extends UsersForm {
 
     public static StreamResource createResourceStudent(String value, STUDENT student) {
         String fileName = "";
-        if (value.equals(DocumentIDs.DORM_CONTRACT_KAZ_ID)) {
-            fileName = "Договор общежитие_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
+        if (value.equals(DocumentIDs.DORM_CONTRACT_RUS_ID)) {
+            fileName = "Договор общежитие_рус" + Calendar.getInstance().getTimeInMillis() + ".pdf";
         } else if (value.equals(DocumentIDs.CONTRACT_RUS_ID)) {
             fileName = "Договор на рус_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
         } else if (value.equals(DocumentIDs.TITLE_ID)) {
@@ -636,6 +636,8 @@ public final class ApplicantsForm extends UsersForm {
             fileName = "ИУПС_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
         } else if (value.equals(DocumentIDs.IUPS_RUS_ID)) {
             fileName = "ИУСП_рус_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
+        } else if (value.equals(DocumentIDs.DORM_CONTRACT_KAZ_ID)) {
+            fileName = "Договор общежитие_каз" + Calendar.getInstance().getTimeInMillis() + ".pdf";
         }
         else {
             fileName = "Өтініш_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
@@ -1029,7 +1031,7 @@ public final class ApplicantsForm extends UsersForm {
         } else {
             moneyForDorm = "0";
         }
-        String answerDorm = String.valueOf(Double.valueOf(moneyForDorm) / 8);
+        String answerDorm = String.valueOf(Double.valueOf(moneyForDorm) / 9);
 
         String ochnii = student.getDiplomaType().toString();
         DateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");

@@ -20,7 +20,7 @@ public class PAIR_SUBJECT extends AbstractEntity {
             @JoinColumn(name = "ELECTIVE_BINDED_SUBJECT_ID", referencedColumnName = "ID")})
     private ELECTIVE_BINDED_SUBJECT electiveBindedSubject;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 3)
+    @FieldInfo(type = EFieldType.FK_DIALOG, order = 3)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
