@@ -2,12 +2,13 @@ package kz.halyqsoft.univercity.modules.regapplicants;
 
 import com.itextpdf.text.*;
 import com.itextpdf.text.Image;
-import com.itextpdf.text.pdf.*;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.PdfWriter;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.*;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.*;
-import com.vaadin.ui.TextField;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
@@ -40,15 +41,12 @@ import javax.persistence.NoResultException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.Calendar;
 import java.util.List;
-
-import kz.halyqsoft.univercity.modules.pdf.CustomField;
 
 /**
  * @author Omarbek

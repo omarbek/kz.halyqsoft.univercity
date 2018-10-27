@@ -9,12 +9,9 @@ import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_ARRIVAL;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.TURNSTILE_TYPE;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.USER_TYPE;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.VDepartmentInfo;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.VEmployeeInfo;
 import kz.halyqsoft.univercity.filter.FUserFilter;
 import kz.halyqsoft.univercity.filter.panel.UserFilterPanel;
 import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.PrintDialog;
-import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.SignDialog;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.SampleEntityListener;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
@@ -34,8 +31,6 @@ import java.util.*;
 public class SigningReport extends SampleEntityListener implements FilterPanelListener{
 
     private UserFilterPanel filterPanel;
-
-
     private VerticalLayout mainVL;
     private GridWidget usersGW;
     private DBGridModel usersGM;
@@ -58,8 +53,6 @@ public class SigningReport extends SampleEntityListener implements FilterPanelLi
         usersGW.addEntityListener(this);
         usersGW.showToolbar(false);
         usersGW.setHeight(100, Sizeable.Unit.PERCENTAGE);
-
-
 
         usersGM = (DBGridModel) usersGW.getWidgetModel();
         usersGM.setRowNumberVisible(true);
@@ -108,9 +101,7 @@ public class SigningReport extends SampleEntityListener implements FilterPanelLi
                         list.add(userArrival.getTurnstileType().toString());
                         tableBody.add(list);
                     }
-
                     PrintDialog printDialog = new PrintDialog(tableHeader, tableBody, CommonUtils.getUILocaleUtil().getCaption("print"), fileName);
-
                 }
             }
         });
