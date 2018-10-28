@@ -220,6 +220,14 @@ public class CommonUtils {
         return cancel;
     }
 
+    public static Button createRefreshButton() {
+        Button refreshButton = new Button();
+        refreshButton.setWidth(120.0F, Sizeable.Unit.PIXELS);
+        refreshButton.setIcon(new ThemeResource("img/button/refresh.png"));
+        refreshButton.setCaption(getUILocaleUtil().getCaption("update"));
+        return refreshButton;
+    }
+
     public static void setCards(FormModel baseDataFM) throws Exception {
         String sql = "SELECT id " +
                 "FROM card " +

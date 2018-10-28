@@ -25,6 +25,7 @@ import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Calendar;
 
 import static java.lang.Boolean.FALSE;
 
@@ -178,21 +179,21 @@ public class AdministrationAttendance implements EntityListener{
         String sql = "SELECT\n" +
                 "  empl.id, trim(empl.LAST_NAME || ' ' || empl.FIRST_NAME || ' ' || coalesce(empl.MIDDLE_NAME, '')) FIO,\n" +
                 "  empl.code,\n" +
-                "  (arriv.created::time)::text,\n" +
-                "           (arrivF.created::time)::text as false\n" +
+                "  date_trunc('minute', arriv.created)::timestamp(0)::time::text,\n" +
+                "  date_trunc('minute', arrivF.created)::timestamp(0)::time::text as false \n" +
                 "FROM v_employee empl\n" +
                 "  left join (SELECT\n" +
                 "               arriv.created,\n" +
                 "               arriv.user_id\n" +
                 "             FROM user_arrival arriv\n" +
-                "             WHERE date_trunc('day', arriv.created) = date_trunc('day', timestamp'"+ formattedDate +"')\n" +
+                "             WHERE date_trunc('day', arriv.created) = date_trunc('day', timestamp'"+formattedDate+"')\n" +
                 "                   AND come_in = TRUE\n" +
                 "             GROUP BY arriv.created,arriv.user_id)arriv on arriv.user_id=empl.id\n" +
                 "  left join (SELECT\n" +
                 "               arrivF.created,\n" +
                 "               arrivF.user_id\n" +
                 "             FROM user_arrival arrivF\n" +
-                "             WHERE date_trunc('day', arrivF.created) = date_trunc('day', timestamp'"+ formattedDate +"')\n" +
+                "             WHERE date_trunc('day', arrivF.created) = date_trunc('day', timestamp'"+formattedDate+"')\n" +
                 "                   AND come_in = FALSE\n" +
                 "             GROUP BY arrivF.created,arrivF.user_id)arrivF on arrivF.user_id=empl.id\n" +
                 "  INNER JOIN department d ON d.id = empl.dept_id\n" +
@@ -210,6 +211,7 @@ public class AdministrationAttendance implements EntityListener{
                     vempl.setCode((String) oo[2]);
                     vempl.setComeIN((String) oo[3]);
                     vempl.setComeOUT((String) oo[4]);
+
                     emplList.add(vempl);
                 }
             }
@@ -220,7 +222,6 @@ public class AdministrationAttendance implements EntityListener{
         refreshEmployeeList(emplList);
         return emplList;
     }
-
 
     @Override
     public boolean preCreate(Object o, int i) {

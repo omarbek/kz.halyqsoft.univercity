@@ -144,6 +144,11 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
                             SigningSection signingSection = new SigningSection();
                             mainHL.addComponent(signingSection.getMainVL());
                             setAbsentsInfo();
+                        } else if (latecomers.equalsIgnoreCase(menu)) {
+                            GroupLatecomers groupLatecomers = new GroupLatecomers();
+                            mainHL.addComponent(groupLatecomers.getMainVL());
+                            setAbsentsInfo();
+
                         } else if (manuallySignedReport.equalsIgnoreCase(menu)
                                 && CommonUtils.isCurrentUserHasAdminPrivileges()) {
                             SigningReport signingReport = new SigningReport();

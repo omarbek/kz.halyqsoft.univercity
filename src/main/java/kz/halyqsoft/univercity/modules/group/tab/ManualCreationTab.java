@@ -413,7 +413,7 @@ public class ManualCreationTab extends AbstractCommonView implements EntityListe
                 "  INNER JOIN student_diploma_type t on st.diploma_type_id = t.id" +
                 sb.toString() +
                 " ORDER BY FIO" +
-                " limit 60";
+                " limit 200";
         try {
             List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(
                     sql, params);

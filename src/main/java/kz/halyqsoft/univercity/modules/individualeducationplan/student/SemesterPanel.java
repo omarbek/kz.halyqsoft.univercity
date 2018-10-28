@@ -82,7 +82,7 @@ public class SemesterPanel extends AbstractCommonPanel {
         setTeachers();
     }
 
-    private void addGrid(ArrayList<STUDENT_SUBJECT> studentSubjects, List<SUBJECT> mainSubjects) throws Exception {
+    private void addGrid(ArrayList<STUDENT_SUBJECT> studentSubjects, List<SUBJECT> mainSubjects) {
         mainSubjectGrid = new Grid();
         mainSubjectGrid.setSizeFull();
         mainSubjectGrid.setCaption("chosen main subjects");
@@ -342,6 +342,7 @@ public class SemesterPanel extends AbstractCommonPanel {
         QueryModel<DEPARTMENT> departmentQM = new QueryModel<>(DEPARTMENT.class);
         departmentQM.addWhereNotNull("parent");
         departmentQM.addWhere("deleted", false);
+        departmentQM.addWhere("fc", false);
         List<DEPARTMENT> departments = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(departmentQM);
 
         for (DEPARTMENT department : departments) {
@@ -503,7 +504,7 @@ public class SemesterPanel extends AbstractCommonPanel {
                 CommonEntityFacadeBean.class).lookup(studentTeacherSubjectQM);
     }
 
-    private void selectAll() throws Exception {
+    private void selectAll() {
         Set<SUBJECT> subjects = (Set<SUBJECT>) chairsAndSubjectsTT.getValue();
         if (subjects.isEmpty()) {
             Message.showInfo(getUILocaleUtil().getMessage("select.subject"));
@@ -514,13 +515,13 @@ public class SemesterPanel extends AbstractCommonPanel {
         }
     }
 
-    private void cancelAll() throws Exception {
+    private void cancelAll() {
         Collection<Object> selectedRows = mainSubjectGrid.getSelectedRows();
         if (selectedRows.isEmpty()) {
             Message.showInfo(getUILocaleUtil().getMessage("select.subject"));
         } else {
             for (Object o : selectedRows) {
-                chosenMainlist.remove((SUBJECT) o);
+                chosenMainlist.remove(o);
             }
             BeanItemContainer<SUBJECT> bic = new BeanItemContainer<>(SUBJECT.class, chosenMainlist);
             mainSubjectGrid.setContainerDataSource(bic);

@@ -43,6 +43,7 @@ public class GroupAttendance implements EntityListener {
     private Button detalizationBtn;
     private VFaculty vFaculty;
     private FacultyAttendance facultyAttendance;
+    private Button updateButton;
 
     public GroupAttendance(VFaculty vFaculty, FacultyAttendance facultyAttendance) {
 
@@ -63,7 +64,7 @@ public class GroupAttendance implements EntityListener {
 
     private void init() {
 
-        Button updateButton=new Button("update");
+        updateButton = CommonUtils.createRefreshButton();
         updateButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
@@ -83,6 +84,7 @@ public class GroupAttendance implements EntityListener {
                 backButton.setVisible(false);
                 detalizationBtn.setVisible(false);
                 facultyAttendance.getBackButtonFaculty().setVisible(true);
+                updateButton.setVisible(true);
             }
         });
 
@@ -212,39 +214,31 @@ public class GroupAttendance implements EntityListener {
         String formattedDate = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS").format(date);
         String sql = "SELECT " +
                 "  DISTINCT " +
-                "  g.name                                                            AS group_name, " +
-                "  g.id                                                              AS group_id, " +
-                "  g.curator_id                                                      AS curator_id, " +
-                "  COUNT(DISTINCT " +
-                "      se2.student_id)                                               AS count_students_in_the_group, " +
-                "  count(DISTINCT " +
-                "      ua.user_id)                                                   AS come_in_students, " +
-                "  (COUNT(DISTINCT se2.student_id) - count(DISTINCT " +
-                "      ua.user_id))                                                  AS do_not_come_students, " +
-                "  CAST(((count(DISTINCT ua.user_id) * 100)) AS FLOAT) / CAST(((COUNT(DISTINCT se2.student_id))) AS " +
-                "                                                             FLOAT) AS percentage_of_come_in_students " +
-                "FROM groups g " +
-                "  INNER JOIN student_education se " +
-                "    ON g.id = se.groups_id " +
-                "  INNER JOIN user_arrival ua " +
-                "    ON ua.user_id = se.student_id " +
-                "  INNER JOIN student_education se2 " +
-                "    ON g.id = se2.groups_id " +
-                "  INNER JOIN speciality s2 " +
-                "    ON g.speciality_id = s2.id " +
-                "  INNER JOIN department d2 " +
-                "    ON s2.chair_id = d2.id " +
-                "WHERE " +
-                "  date_trunc('day', ua.created) = date_trunc('day' , TIMESTAMP '" + formattedDate + "')" +
-                "  AND " +
-                "  ua.come_in = TRUE " +
-                "  AND " +
-                "  ua.created = (SELECT max(ua2.created) " +
-                "                FROM user_arrival ua2 " +
-                "                WHERE date_trunc('day', ua.created) = date_trunc('day' , TIMESTAMP '" + formattedDate + "')" +
-                "                      and ua2.come_in = TRUE AND ua2.user_id = ua.user_id) " +
-                "  AND d2.parent_id = " + vFaculty.getFacultyID() +
-                " GROUP BY g.name, curator_id, g.id;";
+                "  gr.name       AS           group_name, " +
+                "  gr.id         AS           group_id, " +
+                "  gr.curator_id AS           curator_id, " +
+                "  count(DISTINCT stu_edu.id) count_students_in_the_group, " +
+                "  arrival.come_in_students   come_in_students, " +
+                "  0                          do_not_come_students," +
+                "  0                          percentage_of_come_in_students " +
+                "FROM groups gr " +
+                "  INNER JOIN speciality spec ON gr.speciality_id = spec.id " +
+                "  INNER JOIN department dep ON spec.chair_id = dep.id " +
+                "  INNER JOIN student_education stu_edu ON gr.id = stu_edu.groups_id " +
+                "                                          AND stu_edu.child_id IS NULL " +
+                "  INNER JOIN ( " +
+                "               SELECT " +
+                "                 groups_id, " +
+                "                 count(DISTINCT user_id) come_in_students " +
+                "               FROM user_arrival arriv " +
+                "                 INNER JOIN student_education stu_edu ON stu_edu.student_id = arriv.user_id " +
+                "                                                         AND stu_edu.child_id IS NULL " +
+                "               WHERE date_trunc('day', arriv.created) = date_trunc('day', TIMESTAMP '" + formattedDate + "')" +
+                "                     AND come_in = TRUE " +
+                "               GROUP BY groups_id " +
+                "             ) arrival ON arrival.groups_id = gr.id " +
+                "WHERE dep.parent_id = " + vFaculty.getFacultyID() +
+                " GROUP BY gr.id, arrival.come_in_students";
         try {
             List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
             if (!tmpList.isEmpty()) {
@@ -262,10 +256,12 @@ public class GroupAttendance implements EntityListener {
                             e.printStackTrace();
                         }
                     }
-                    vg.setCount((Long) oo[3]);
-                    vg.setIsPresent((Long) oo[4]);
-                    vg.setAbsent((Long) oo[5]);
-                    vg.setPercantage((Double) oo[6]);
+                    Long totalCount = (Long) oo[3];
+                    Long isPresentCount = (Long) oo[4];
+                    vg.setCount(totalCount);
+                    vg.setIsPresent(isPresentCount);
+                    vg.setAbsent(totalCount - isPresentCount);
+                    vg.setPercantage(isPresentCount * 100 / totalCount);
                     groupList.add(vg);
                 }
             }
@@ -392,6 +388,7 @@ public class GroupAttendance implements EntityListener {
                     backButton.setVisible(true);
                     detalizationBtn.setVisible(true);
                     facultyAttendance.getBackButtonFaculty().setVisible(false);
+                    updateButton.setVisible(false);
                 }
             }
         }
