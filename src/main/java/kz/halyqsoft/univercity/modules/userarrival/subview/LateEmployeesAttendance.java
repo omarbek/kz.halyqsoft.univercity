@@ -188,7 +188,7 @@ public class LateEmployeesAttendance implements EntityListener {
         Map<Integer, Object> params = new HashMap<>();
         String sql = "select distinct  * from (SELECT trim(empl.first_name||' '|| empl.last_name ||' '|| empl.middle_name),\n" +
                 "  first_value(empl.dept_name) over (partition by empl.id rows between unbounded  preceding  and unbounded following ),\n" +
-                "  empl.created\n," +
+                "   (empl.created::time)::text\n," +
                 "  arriv.user_id," +
                 "  first_value(empl.dept_id) over (partition by empl.id rows between unbounded  preceding  and unbounded following ) as dept_id\n" +
                 "  FROM user_arrival arriv\n" +
@@ -215,7 +215,7 @@ public class LateEmployeesAttendance implements EntityListener {
                     VLateEmployees vAbsent = new VLateEmployees();
                     vAbsent.setFIO((String) oo[0]);
                     vAbsent.setFaculty((String) oo[1]);
-                    vAbsent.setDate((Date)oo[2]);
+                    vAbsent.setDate((String)oo[2]);
                     vAbsent.setUserId((Long) oo[3]);
                     list.add(vAbsent);
                 }
