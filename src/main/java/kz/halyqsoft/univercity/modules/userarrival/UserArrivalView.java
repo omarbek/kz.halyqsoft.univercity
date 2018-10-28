@@ -155,12 +155,12 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
                             AbsentTodayAttendance absentTodayAttendance = new AbsentTodayAttendance();
                             mainHL.addComponent(absentTodayAttendance.getMainVL());
                         }  else if (latecomers.equalsIgnoreCase(menu)) {
-                            EmployeeLatecomers employeeLatecomers = new EmployeeLatecomers();
-                            mainHL.addComponent(employeeLatecomers.getMainVL());
-                            setAbsentsInfo();
-                        }else if (absent.equalsIgnoreCase(menu)) {
                             GroupLatecomers groupLatecomers = new GroupLatecomers();
                             mainHL.addComponent(groupLatecomers.getMainVL());
+                            setAbsentsInfo();
+                        }else if (absent.equalsIgnoreCase(menu)) {
+                            EmployeeLatecomers employeeLatecomers = new EmployeeLatecomers();
+                            mainHL.addComponent(employeeLatecomers.getMainVL());
                             setAbsentsInfo();
                         }
                         mainHSP.addComponent(mainHL);

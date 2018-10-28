@@ -4,8 +4,6 @@ import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
 
-import java.util.Date;
-
 public class VLateEmployees extends AbstractEntity {
 
         @FieldInfo(type=EFieldType.TEXT, order = 1)
@@ -14,8 +12,8 @@ public class VLateEmployees extends AbstractEntity {
         @FieldInfo(type = EFieldType.TEXT, order = 2)
         private String faculty;
 
-        @FieldInfo(type = EFieldType.DATE, order = 3)
-        private Date date;
+        @FieldInfo(type = EFieldType.TEXT, order = 3)
+        private String date;
 
         @FieldInfo(type = EFieldType.INTEGER, order = 3,inView = false)
         private long userId;
@@ -36,11 +34,11 @@ public class VLateEmployees extends AbstractEntity {
         this.faculty = faculty;
     }
 
-    public Date getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(String date) {
         this.date = date;
     }
 

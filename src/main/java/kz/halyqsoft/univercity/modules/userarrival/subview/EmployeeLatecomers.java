@@ -3,7 +3,7 @@ package kz.halyqsoft.univercity.modules.userarrival.subview;
 import com.vaadin.data.Property;
 import com.vaadin.server.Sizeable;
 import com.vaadin.ui.*;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.VDepartment;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.VEmployeeLatecomers;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -29,9 +29,10 @@ public class EmployeeLatecomers implements EntityListener{
     private DateField dateField,dateField2;
     private DBGridModel departmentGM;
     private Button  backButton, backButtonAdministration,backButtonAE;
-    private DepartmentAttendance attendance;
+    private DepartmentLatecomers latecomers;
     private AdministrationAttendance administrationAttendance;
     private AdministrationEmployeeAttendance administrationEA;
+    private Label at, to;
 
     public EmployeeLatecomers( ){
         mainVL = new VerticalLayout();
@@ -54,9 +55,12 @@ public class EmployeeLatecomers implements EntityListener{
         backButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
-                mainVL.removeComponent(attendance.getMainVL());
+                mainVL.removeComponent(latecomers.getMainVL());
                 mainVL.addComponent(departmentGW);
                 dateField.setVisible(true);
+                dateField2.setVisible(true);
+                at.setVisible(true);
+                to.setVisible(true);
                 backButton.setVisible(false);
             }
         });
@@ -71,6 +75,7 @@ public class EmployeeLatecomers implements EntityListener{
                 mainVL.addComponent(departmentGW);
 
                 dateField.setVisible(true);
+                dateField2.setVisible(true);
                 backButtonAdministration.setVisible(false);
             }
         });
@@ -122,13 +127,19 @@ public class EmployeeLatecomers implements EntityListener{
             }
         });
 
+        at = new Label(CommonUtils.getUILocaleUtil().getCaption("at"));
+        at.setWidth("20");
+        to = new Label(CommonUtils.getUILocaleUtil().getCaption("to"));
+        to.setWidth("30");
+
         dateHL = new HorizontalLayout();
-        dateHL.setWidth(100, Sizeable.Unit.PERCENTAGE);
         dateHL.setImmediate(true);
 
+        dateHL.addComponent(at);
         dateHL.addComponent(dateField);
-        dateHL.addComponent(new Label("to"));
+        dateHL.addComponent(to);
         dateHL.addComponent(dateField2);
+
 
         buttonPanel.addComponent(dateHL);
         buttonPanel.setComponentAlignment(dateHL, Alignment.MIDDLE_CENTER);
@@ -136,7 +147,7 @@ public class EmployeeLatecomers implements EntityListener{
         topHL.addComponent(buttonPanel);
         topHL.setComponentAlignment(buttonPanel, Alignment.TOP_RIGHT);
 
-        departmentGW = new GridWidget(VDepartment.class);
+        departmentGW = new GridWidget(VEmployeeLatecomers.class);
         departmentGW.setImmediate(true);
         departmentGW.showToolbar(false);
 
@@ -159,9 +170,9 @@ public class EmployeeLatecomers implements EntityListener{
         return mainVL;
     }
 
-    public List<VDepartment> getDepartment(Date date,Date date2) {
+    public List<VEmployeeLatecomers> getDepartment(Date date, Date date2) {
 
-        List<VDepartment> list = new ArrayList<>();
+        List<VEmployeeLatecomers> list = new ArrayList<>();
         String formattedDate = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS").format(date);
         String formattedDate2 = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS").format(date2);
 
@@ -169,7 +180,7 @@ public class EmployeeLatecomers implements EntityListener{
         String sql = "SELECT\n" +
                 "  d1.dept_name,\n" +
                 "  count(ve.id),\n" +
-                "  count(user_id),\n" +
+                "  count(ve.id)-count(user_id),\n" +
                 "  d1.id\n" +
                 " FROM department d1\n" +
                 "  INNER JOIN department d2\n" +
@@ -191,12 +202,12 @@ public class EmployeeLatecomers implements EntityListener{
             if (!tmpList.isEmpty()) {
                 for (Object o : tmpList) {
                     Object[] oo = (Object[]) o;
-                    VDepartment ve = new VDepartment();
+                    VEmployeeLatecomers ve = new VEmployeeLatecomers();
                     ve.setDeptName((String) oo[0]);
                     ve.setCount((long) oo[1]);
-                    ve.setIsPresent((long) oo[2]);
-                    if (ve.getCount() != 0 && ve.getIsPresent() != 0) {
-                        ve.setPercantage((ve.getIsPresent() * 100) / ve.getCount());
+                    ve.setIsNotPresent((long) oo[2]);
+                    if (ve.getCount() != 0 && ve.getIsNotPresent() != 0) {
+                        ve.setPercantage((ve.getIsNotPresent() * 100) / ve.getCount());
                     } else {
                         ve.setPercantage(0);
                     }
@@ -211,7 +222,7 @@ public class EmployeeLatecomers implements EntityListener{
         return list;
     }
 
-    private void refreshList(List<VDepartment> list) {
+    private void refreshList(List<VEmployeeLatecomers> list) {
         ((DBGridModel) departmentGW.getWidgetModel()).setEntities(list);
         try {
             departmentGW.refresh();
@@ -226,21 +237,13 @@ public class EmployeeLatecomers implements EntityListener{
             if(entityEvent.getAction()==EntityEvent.SELECTED){
                 if(departmentGW !=null){
                     mainVL.removeComponent(departmentGW);
-//                    if(((VDepartment)departmentGW.getSelectedEntity()).getDepartmentID()==20){
-//                        administrationAttendance = new AdministrationAttendance(this);
-//                        mainVL.addComponent(administrationAttendance.getMainVL());
-//                        backButtonAdministration.setVisible(true);
-//                    }else if(((VDepartment)departmentGW.getSelectedEntity()).getDepartmentID()==43){
-//                        administrationEA = new AdministrationEmployeeAttendance(this);
-//                        mainVL.addComponent(administrationEA.getMainVL());
-//                        backButtonAE.setVisible(true);
-//                    }else {
-//                        attendance = new DepartmentAttendance((VDepartment) departmentGW.getSelectedEntity(),this);
-//                        mainVL.addComponent(attendance.getMainVL());
-//                        backButton.setVisible(true);
-//                    }
+                    latecomers = new DepartmentLatecomers((VEmployeeLatecomers) departmentGW.getSelectedEntity(),this);
+                        mainVL.addComponent(latecomers.getMainVL());
+                        backButton.setVisible(true);
                     dateField.setVisible(false);
-
+                    dateField2.setVisible(false);
+                    at.setVisible(false);
+                    to.setVisible(false);
                 }
             }
         }
@@ -338,5 +341,29 @@ public class EmployeeLatecomers implements EntityListener{
 
     public void setDepartmentGW(GridWidget departmentGW) {
         this.departmentGW = departmentGW;
+    }
+
+    public DateField getDateField2() {
+        return dateField2;
+    }
+
+    public void setDateField2(DateField dateField2) {
+        this.dateField2 = dateField2;
+    }
+
+    public Label getAt() {
+        return at;
+    }
+
+    public void setAt(Label at) {
+        this.at = at;
+    }
+
+    public Label getTo() {
+        return to;
+    }
+
+    public void setTo(Label to) {
+        this.to = to;
     }
 }
