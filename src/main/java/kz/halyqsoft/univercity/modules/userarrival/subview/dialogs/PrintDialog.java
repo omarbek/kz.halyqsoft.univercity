@@ -39,7 +39,13 @@ public class PrintDialog extends AbstractDialog{
     private Button pdfBtn;
     private Button excelBtn;
     private CreateExcel createExcel = null;
+    private Font currentFont;
     public PrintDialog(List<String> tableHeader, List<List<String>> tableBody,String title ,String fileName){
+        currentFont = EmployeePdfCreator.getFont(12, Font.BOLD);
+        print(tableHeader, tableBody,title ,fileName);
+    }
+
+    private void print(List<String> tableHeader, List<List<String>> tableBody,String title ,String fileName){
         this.tableBody = tableBody;
         this.tableHeader = tableHeader;
 
@@ -52,7 +58,6 @@ public class PrintDialog extends AbstractDialog{
         }catch (Exception e){
             e.printStackTrace();
         }
-
 
         buttonPanel = CommonUtils.createButtonPanel();
 
@@ -85,6 +90,11 @@ public class PrintDialog extends AbstractDialog{
         AbstractWebUI.getInstance().addWindow(this);
     }
 
+    public PrintDialog(List<String> tableHeader, List<List<String>> tableBody,String title ,String fileName, Font font){
+        setCurrentFont(font);
+        print(tableHeader, tableBody,title ,fileName);
+    }
+
     private byte[] xlsxToPdf() throws Exception{
         ByteArrayInputStream bais =new ByteArrayInputStream(createExcel.getMainByte());
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -107,7 +117,7 @@ public class PrintDialog extends AbstractDialog{
 
                         case STRING:
 
-                            Paragraph paragraph = new Paragraph(cell.getStringCellValue(), EmployeePdfCreator.getFont(12, Font.BOLD));
+                            Paragraph paragraph = new Paragraph(cell.getStringCellValue(), currentFont);
                             table_cell = new PdfPCell(paragraph);
 
                                 //table_cell=new PdfPCell(new Phrase(cell.getStringCellValue()));
@@ -126,6 +136,17 @@ public class PrintDialog extends AbstractDialog{
         return byteArrayOutputStream.toByteArray();
     }
 
+    public Button getPdfBtn() {
+        return pdfBtn;
+    }
+
+    public Button getExcelBtn() {
+        return excelBtn;
+    }
+
+    public void setCurrentFont(Font currentFont) {
+        this.currentFont = currentFont;
+    }
 
     @Override
     protected String createTitle() {
