@@ -277,4 +277,12 @@ public class DetalizationDialog extends AbstractDialog implements EntityListener
     public void onException(Object o, Throwable throwable) {
 
     }
+
+    public DateField getDateField() {
+        return dateField;
+    }
+
+    public void setDateField(DateField dateField) {
+        this.dateField = dateField;
+    }
 }
