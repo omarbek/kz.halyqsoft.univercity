@@ -1,6 +1,5 @@
 package kz.halyqsoft.univercity.modules.userarrival.subview.dialogs;
 
-import com.vaadin.data.Property;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_ARRIVAL;
@@ -34,9 +33,7 @@ public class DetalizationDialog extends AbstractDialog implements EntityListener
     private VerticalLayout userArrivalVL;
     private VerticalLayout userDataVL;
     private HorizontalSplitPanel mainHSP;
-    private HorizontalLayout dateHL;
-    private DateField startDF;
-    private DateField endDF;
+    private DateField dateField;
 
     public DetalizationDialog(String title, USERS user , Date date) {
 
@@ -46,10 +43,8 @@ public class DetalizationDialog extends AbstractDialog implements EntityListener
         setWidth(95, Unit.PERCENTAGE);
         setHeight(70, Unit.PERCENTAGE);
 
-        dateHL = new HorizontalLayout();
-        dateHL.setSizeFull();
-        dateHL.setSpacing(true);
-        dateHL.setImmediate(true);
+        dateField = new DateField();
+        dateField.setImmediate(true);
 
         mainHSP = new HorizontalSplitPanel();
         mainHSP.setSizeFull();
@@ -121,39 +116,19 @@ public class DetalizationDialog extends AbstractDialog implements EntityListener
         userArrivalTW.addEntityListener(this);
 
         DBTableModel dbTableModel = (DBTableModel)userArrivalTW.getWidgetModel();
+        dbTableModel.setEntities(getList(user,date));
         dbTableModel.setRefreshType(ERefreshType.MANUAL);
-        startDF = new DateField();
 
-        startDF.setValue(date);
-        startDF.addValueChangeListener(new Property.ValueChangeListener() {
-            @Override
-            public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
-                dbTableModel.setEntities(getList(user, startDF.getValue(), startDF.getValue()));
-                try{
-                    userArrivalTW.refresh();
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-            }
-        });
+        TableWidget userArrivalBySemTW = new TableWidget(USER_ARRIVAL.class);
+        userArrivalBySemTW.setCaption(" ");
+        userArrivalBySemTW.setCaption(getUILocaleUtil().getCaption("userArrivalBySemTW"));
+        userArrivalBySemTW.showToolbar(false);
+        userArrivalBySemTW.setImmediate(true);
+        userArrivalBySemTW.setSizeFull();
+        userArrivalBySemTW.addEntityListener(this);
 
-        endDF = new DateField();
-        endDF.addValueChangeListener(new Property.ValueChangeListener() {
-            @Override
-            public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
-                dbTableModel.setEntities(getList(user, endDF.getValue(), startDF.getValue()));
-                try{
-                    userArrivalTW.refresh();
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-            }
-        });
-        endDF.setValue(date);
-
-
-
-
+        DBTableModel userArrivalBySemTM = (DBTableModel)userArrivalBySemTW.getWidgetModel();
+        userArrivalBySemTM.setRefreshType(ERefreshType.MANUAL);
 
 
         Button closeBtn = new Button(getUILocaleUtil().getCaption("close"));
@@ -164,10 +139,9 @@ public class DetalizationDialog extends AbstractDialog implements EntityListener
             }
         });
 
-        dateHL.addComponent(startDF);
-        dateHL.addComponent(endDF);
-        userArrivalVL.addComponent(dateHL);
         userArrivalVL.addComponent(userArrivalTW);
+        userArrivalVL.addComponent(dateField);
+        userArrivalVL.addComponent(userArrivalBySemTW);
         this.userDataVL.addComponent(userDataVL);
         mainHSP.setFirstComponent(userArrivalVL);
         mainHSP.setSecondComponent(this.userDataVL);
@@ -180,19 +154,15 @@ public class DetalizationDialog extends AbstractDialog implements EntityListener
     }
 
 
-    public List<USER_ARRIVAL> getList(USERS user, Date date1 , Date date2){
+    public List<USER_ARRIVAL> getList(USERS user, Date date){
         List<USER_ARRIVAL> userArrivals = new ArrayList<>();
-        if(date1==null || date2 == null){
-            return userArrivals;
-        }
+
         Map<Integer,Object> params = new HashMap<>();
-        String formattedDate1 = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS").format(date1);
-        String formattedDate2 = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS").format(date2);
+        String formattedDate = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS").format(date);
 
         String sql = "select * from user_arrival ua " +
                 "\nwhere ua.user_id = " + user.getId().getId().longValue()+" " +
-                " and date_trunc('day',ua.created) between date_trunc('day', timestamp'"+formattedDate1+"') and "+
-                "date_trunc('day', timestamp'"+formattedDate2+"')" +
+                " and date_trunc('day',ua.created) = date_trunc('day', timestamp'"+formattedDate+"')"+
                 "\n ORDER BY ua.created ";
 
         try {
@@ -224,6 +194,47 @@ public class DetalizationDialog extends AbstractDialog implements EntityListener
             CommonUtils.showMessageAndWriteLog("Unable to load user_arrival list", ex);
         }
         return userArrivals;
+    }
+
+    public List<USER_ARRIVAL> getListBySem(USERS user, Date date){
+        List<USER_ARRIVAL> userArrivalList = new ArrayList<>();
+
+        Map<Integer,Object> params = new HashMap<>();
+        String formattedDate = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS").format(date);
+
+        String sql = "select * from user_arrival ua " +
+                "\nwhere ua.user_id = " + user.getId().getId().longValue()+" " +
+                "\n ORDER BY ua.created ";
+
+        try {
+            List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
+            if (!tmpList.isEmpty()) {
+                for (Object o : tmpList) {
+                    try{
+                        Object[] oo = (Object[]) o;
+                        USER_ARRIVAL ua = new USER_ARRIVAL();
+                        ua.setId(ID.valueOf((Long)oo[0]));
+                        ID userId = ID.valueOf((Long)oo[1]);
+                        if(userId!=null){
+                            ua.setUser(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(USERS.class,userId));
+                        }
+                        ua.setCreated((Date)oo[2]);
+                        ua.setComeIn((Boolean)oo[3]);
+
+                        ID turnstileId = ID.valueOf((Long)oo[4]);
+                        if(turnstileId!=null){
+                            ua.setTurnstileType(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(TURNSTILE_TYPE.class,turnstileId));
+                        }
+                        userArrivalList.add(ua);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            CommonUtils.showMessageAndWriteLog("Unable to load user_arrival list", ex);
+        }
+        return userArrivalList;
     }
 
     @Override
