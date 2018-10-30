@@ -5,7 +5,7 @@
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost:1818/univerdb</jdbc-url>
+      <jdbc-url>jdbc:postgresql://localhost:5432/univerdb</jdbc-url>
     </data-source>
     <data-source source="LOCAL" name="univerdb@89.40.60.206" uuid="62c2b9d1-e4bf-49ed-8a79-7d78d4b59613">
       <driver-ref>postgresql</driver-ref>

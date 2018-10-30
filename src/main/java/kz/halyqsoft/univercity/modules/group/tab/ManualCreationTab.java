@@ -2,10 +2,7 @@ package kz.halyqsoft.univercity.modules.group.tab;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.combobox.FilteringMode;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.GROUPS;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_EDUCATION;
@@ -37,27 +34,35 @@ import org.r3a.common.vaadin.widget.toolbar.IconToolbar;
 
 import java.util.*;
 
-public class ManualCreationTab extends AbstractCommonView implements EntityListener , FilterPanelListener{
+public class ManualCreationTab extends AbstractCommonView implements EntityListener, FilterPanelListener {
 
     private StudentFilterPanel filterPanel;
-
     private VerticalLayout mainVL;
     private GridWidget studentGroupsGW;
     private String title;
+    private Integer studentNumber = 0;
+    private Label studentNumberLabel;
+
+    private static final String STUDENT_NUMBER_CAPTION = getUILocaleUtil().getCaption("finded") + ": ";
+
     public ManualCreationTab(String title) {
         this.title = title;
 
         mainVL = new VerticalLayout();
 
-        try{
+        try {
             filterPanel = createStudentFilterPanel();
 
             mainVL.addComponent(filterPanel);
             mainVL.setComponentAlignment(filterPanel, Alignment.TOP_CENTER);
 
-        }catch (Exception e ){
+        } catch (Exception e) {
             e.printStackTrace();
         }
+
+        studentNumberLabel = new Label();
+        studentNumberLabel.setCaption(STUDENT_NUMBER_CAPTION + studentNumber);
+        mainVL.addComponent(studentNumberLabel);
 
         studentGroupsGW = new GridWidget(V_STUDENT.class);
         studentGroupsGW.setButtonVisible(IconToolbar.PREVIEW_BUTTON, false);
@@ -68,8 +73,8 @@ public class ManualCreationTab extends AbstractCommonView implements EntityListe
 
         DBGridModel studentGM = (DBGridModel) studentGroupsGW.getWidgetModel();
         QueryModel studentQM = studentGM.getQueryModel();
-        studentQM.addWhere("category" ,ECriteria.EQUAL, STUDENT_CATEGORY.STUDENT_ID);
-        studentQM.addWhere("studentStatus" ,ECriteria.EQUAL, STUDENT_STATUS.STUDYING_ID);
+        studentQM.addWhere("category", ECriteria.EQUAL, STUDENT_CATEGORY.STUDENT_ID);
+        studentQM.addWhere("studentStatus", ECriteria.EQUAL, STUDENT_STATUS.STUDYING_ID);
 
         studentGM.setRefreshType(ERefreshType.MANUAL);
         studentGM.setMultiSelect(false);
@@ -136,21 +141,21 @@ public class ManualCreationTab extends AbstractCommonView implements EntityListe
     @Override
     public boolean onEdit(Object o, Entity entity, int i) {
 
-        V_STUDENT vStudent = (V_STUDENT)entity;
+        V_STUDENT vStudent = (V_STUDENT) entity;
         QueryModel<STUDENT_EDUCATION> studentQM = new QueryModel<>(STUDENT_EDUCATION.class);
-        studentQM.addWhere("student" , ECriteria.EQUAL, vStudent.getId());
+        studentQM.addWhere("student", ECriteria.EQUAL, vStudent.getId());
         studentQM.addWhereNullAnd("child");
         STUDENT_EDUCATION studentEducation = null;
-        try{
+        try {
             studentEducation = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(studentQM);
 
-            try{
-                GroupEditDialog groupEditDialog = new GroupEditDialog(getViewName(),studentEducation, this);
-            } catch (Exception e){
+            try {
+                GroupEditDialog groupEditDialog = new GroupEditDialog(getViewName(), studentEducation, this);
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             doFilter(filterPanel.getFilterBean());
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -332,7 +337,7 @@ public class ManualCreationTab extends AbstractCommonView implements EntityListe
         cb.setFilteringMode(FilteringMode.STARTSWITH);
         cb.setPageLength(0);
         QueryModel<GROUPS> groupsQM = new QueryModel<>(GROUPS.class);
-        groupsQM.addWhere("deleted",false);
+        groupsQM.addWhere("deleted", false);
         BeanItemContainer<GROUPS> groupsBIC = new BeanItemContainer<>(GROUPS.class,
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(groupsQM));
         cb.setContainerDataSource(groupsBIC);
@@ -391,11 +396,11 @@ public class ManualCreationTab extends AbstractCommonView implements EntityListe
         }
         if (sf.getStudentDiplomaType() != null) {
             params.put(i, sf.getStudentDiplomaType().getId().getId());
-            sb.append(" and st.diploma_type_id = ?" + i++);
+            sb.append(" and stu.diploma_type_id = ?" + i++);
         }
         if (sf.getGroup() != null) {
             params.put(i, sf.getGroup().getId().getId());
-            sb.append(" and stu.groups_id = ?"+i++ );
+            sb.append(" and stu.groups_id = ?" + i++);
         }
 
 
@@ -409,19 +414,18 @@ public class ManualCreationTab extends AbstractCommonView implements EntityListe
                 "  stu.faculty_short_name                                                               FACULTY, " +
                 "  stu.speciality_name                                                                  SPEC_NAME " +
                 "FROM V_STUDENT stu " +
-                "  INNER JOIN student st on st.id = stu.id\n" +
-                "  INNER JOIN student_diploma_type t on st.diploma_type_id = t.id" +
                 sb.toString() +
                 " ORDER BY FIO" +
                 " limit 200";
         try {
-            List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(
+            List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                    lookupItemsList(
                     sql, params);
             if (!tmpList.isEmpty()) {
                 for (Object o : tmpList) {
                     Object[] oo = (Object[]) o;
-                    V_STUDENT vs = null;
-                    vs = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(V_STUDENT.class,ID.valueOf((long) oo[0]));
+                    V_STUDENT vs = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                            lookup(V_STUDENT.class, ID.valueOf((long) oo[0]));
                     list.add(vs);
                 }
             }
@@ -429,6 +433,8 @@ public class ManualCreationTab extends AbstractCommonView implements EntityListe
             CommonUtils.showMessageAndWriteLog("Unable to load student list", ex);
         }
 
+        studentNumber = list.size();
+        studentNumberLabel.setCaption(STUDENT_NUMBER_CAPTION + studentNumber);
         ((DBGridModel) studentGroupsGW.getWidgetModel()).setEntities(list);
         try {
             studentGroupsGW.refresh();

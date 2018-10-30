@@ -12,7 +12,6 @@ import kz.halyqsoft.univercity.entity.beans.univercity.catalog.CARD;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEPARTMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.POST;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VEmployee;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.VStudent;
 import kz.halyqsoft.univercity.filter.FEmployeeFilter;
 import kz.halyqsoft.univercity.filter.panel.EmployeeFilterPanel;
 import kz.halyqsoft.univercity.utils.CommonUtils;
@@ -65,7 +64,7 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
         tf.setNullSettingAllowed(true);
         filterPanel.addFilterComponent("code", tf);
 
-         tf = new TextField();
+        tf = new TextField();
         tf.setNullRepresentation("");
         tf.setNullSettingAllowed(true);
         filterPanel.addFilterComponent("firstname", tf);
@@ -75,7 +74,7 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
         tf.setNullSettingAllowed(true);
         filterPanel.addFilterComponent("lastname", tf);
 
-         cb = new ComboBox();
+        cb = new ComboBox();
         cb.setNullSelectionAllowed(true);
         cb.setTextInputAllowed(true);
         cb.setFilteringMode(FilteringMode.OFF);
@@ -121,7 +120,7 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
         cb.setNullSelectionAllowed(true);
         cb.setTextInputAllowed(true);
         cb.setFilteringMode(FilteringMode.OFF);
-        for(int i = 1; i<19; i++) {
+        for (int i = 1; i < 19; i++) {
             cb.addItem(i);
         }
         filterPanel.addFilterComponent("childAge", cb);
@@ -190,7 +189,7 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
 
                                         if (nameTF.getValue().toCharArray()[0] != '$') {
                                             name = name.trim();
-                                            name = name.replaceAll("\\s+","");
+                                            name = name.replaceAll("\\s+", "");
                                             name = "$" + name;
                                         }
 
@@ -267,7 +266,7 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
             sb.append("%'");
         }
         if (ef.getFirstname() != null && ef.getFirstname().trim().length() >= 3) {
-            sb.append("lower(usr.FIRST_NAME) like '");
+            sb.append("usr.FIRST_NAME ilike '");
             sb.append(ef.getFirstname().trim().toLowerCase());
             sb.append("%'");
         }
@@ -275,7 +274,7 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
             if (sb.length() > 0) {
                 sb.append(" and ");
             }
-            sb.append("lower(usr.LAST_NAME) like '");
+            sb.append("usr.LAST_NAME ilike '");
             sb.append(ef.getLastname().trim().toLowerCase());
             sb.append("%'");
         }
@@ -307,7 +306,7 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
             if (sb.length() > 0) {
                 sb.append(" and ");
             }
-            sb.append(" date_part('year',age(c2.birth_date)) <= "+ef.getChildAge()+" ");
+            sb.append(" date_part('year',age(c2.birth_date)) <= " + ef.getChildAge() + " ");
             i++;
         }
 
@@ -325,7 +324,7 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
                 "  LEFT JOIN EMPLOYEE_DEPT empl_dept ON empl_dept.EMPLOYEE_ID = empl.ID AND empl_dept.DISMISS_DATE IS NULL\n" +
                 "  LEFT JOIN DEPARTMENT dep ON empl_dept.DEPT_ID = dep.ID\n" +
                 "  LEFT JOIN POST post ON empl_dept.POST_ID = post.id\n" +
-                "  LEFT JOIN child c2 on empl.id = c2.employee_id\n" +sb.toString()+
+                "  LEFT JOIN child c2 on empl.id = c2.employee_id\n" + sb.toString() +
                 "   usr.id not in (1,2) and usr.deleted = FALSE  \n" +
                 "GROUP BY empl.ID,  usr.CODE,\n" +
                 "  FIO,\n" +
