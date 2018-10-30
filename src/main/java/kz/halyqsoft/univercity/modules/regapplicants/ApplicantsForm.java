@@ -1217,6 +1217,7 @@ public final class ApplicantsForm extends UsersForm {
                 .replaceAll("\\$document", "_______")
                 .replaceAll("\\$diplomaType", student.getDiplomaType().toString())
                // .replaceAll("\\$group", sdf())
+                .replaceAll("\\$course", studentEducation.getStudyYear().toString())
                 .replaceAll("қажет, қажет емес", dorm)
                 //.replaceAll("$educode", studentEducation.getSpeciality().getCode());
                       //  .replaceAll("$language", studentEducation.getLanguage().getLangName())

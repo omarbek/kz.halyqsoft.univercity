@@ -25,7 +25,7 @@ public class TableForm {
     private PdfPTable pdfPTable;
     private ByteArrayOutputStream byteArrayOutputStream;
     private ID studentId;
-
+    private static int fontSize = 10;
     public TableForm(Document document, ID studentID) {
         this.document = document;
         this.studentId = studentID;
@@ -38,24 +38,24 @@ public class TableForm {
             // pdfWriter.open();
 
             PdfPTable table = new PdfPTable(7);
-            document.add(new Paragraph(" Семестрде оқылатын пәндер тізімі:", EmployeePdfCreator.getFont(12, Font.BOLD)));
+            document.add(new Paragraph(" Семестрде оқылатын пәндер тізімі:", EmployeePdfCreator.getFont(fontSize, Font.BOLD)));
 
-            insertCell(table, "СЕМЕСТР 1", Element.ALIGN_CENTER, 7, EmployeePdfCreator.getFont(12, Font.BOLD));
-            insertCell(table, "Міндетті түрде оқытылатын пәндер:", Element.ALIGN_LEFT, 7, EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table, "СЕМЕСТР 1", Element.ALIGN_CENTER, 7, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+            insertCell(table, "Міндетті түрде оқытылатын пәндер:", Element.ALIGN_LEFT, 7, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
 
-            insertCell(table, "Пәннің коды", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table, "Пәннің коды", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
 
-            insertCell(table, "Модуль түрлері", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table, "Модуль түрлері", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
 
-            insertCell(table, "Пәннің толық атауы", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table, "Пәннің толық атауы", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
 
-            insertCell(table, "Кредит саны", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table, "Кредит саны", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
 
-            insertCell(table, "ЕСТS", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table, "ЕСТS", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
 
-            insertCell(table, "Семестр", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table, "Семестр", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
 
-            insertCell(table, "Тьютордың аты-жөні", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table, "Тьютордың аты-жөні", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
 
             table.setWidthPercentage(100);
 
@@ -103,14 +103,14 @@ public class TableForm {
                         Object[] oo = (Object[]) o;
 
                         for (int i = 0; i < 7; i++) {
-                            insertCell(table, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.NORMAL));
+                            insertCell(table, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
                         }
                     }
                 }
             } catch (Exception ex) {
                 CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
             }
-            insertCell(table, "Студенттің таңдаған пәндері:", Element.ALIGN_LEFT, 7, EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table, "Студенттің таңдаған пәндері:", Element.ALIGN_LEFT, 7, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
 
             String sql1 = "SELECT\n" +
                     "  DISTINCT s4.code,\n" +
@@ -153,7 +153,7 @@ public class TableForm {
                         Object[] oo = (Object[]) o;
 
                         for (int i = 0; i < 7; i++) {
-                            insertCell(table, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.NORMAL));
+                            insertCell(table, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
                         }
 
                     }
@@ -162,7 +162,7 @@ public class TableForm {
                 CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
             }
 
-            insertCell(table, "Студенттің қосымша пәндері:\t", Element.ALIGN_LEFT, 7, EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table, "Студенттің қосымша пәндері:\t", Element.ALIGN_LEFT, 7, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
 
             String sql2 = "SELECT\n" +
                     "  DISTINCT s4.code,\n" +
@@ -203,7 +203,7 @@ public class TableForm {
                         Object[] oo = (Object[]) o;
 
                         for (int i = 0; i < 7; i++) {
-                            insertCell(table, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.NORMAL));
+                            insertCell(table, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
                         }
 
                     }
@@ -236,7 +236,7 @@ public class TableForm {
                     "  usr.id =  " + studentId +
                     " AND sem_data.semester_period_id=1";
 
-            insertCell(table, ("Семестрде барлығы"), Element.ALIGN_LEFT, 3, EmployeePdfCreator.getFont(12, Font.NORMAL));
+            insertCell(table, ("Семестрде барлығы"), Element.ALIGN_LEFT, 3, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
 
             Map<Integer, Object> par = new HashMap<>();
             try {
@@ -246,7 +246,7 @@ public class TableForm {
                         Object[] oo = (Object[]) o;
 
                         for (int i = 0; i < 2; i++) {
-                            insertCell(table, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.NORMAL));
+                            insertCell(table, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
                         }
 
                     }
@@ -255,11 +255,11 @@ public class TableForm {
                 CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
             }
 
-            insertCell(table, (" "), Element.ALIGN_LEFT, 2, EmployeePdfCreator.getFont(12, Font.NORMAL));
-            insertCell(table, "СЕМЕСТР 2", Element.ALIGN_CENTER, 7, EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table, (" "), Element.ALIGN_LEFT, 2, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
+            insertCell(table, "СЕМЕСТР 2", Element.ALIGN_CENTER, 7, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
 
 
-            insertCell(table, "Міндетті түрде оқытылатын пәндер:", Element.ALIGN_LEFT, 7, EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table, "Міндетті түрде оқытылатын пәндер:", Element.ALIGN_LEFT, 7, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
             String sqlSem2 = "SELECT DISTINCT\n" +
                     "  s4.code,\n" +
                     "  module.module_short_name moduleType,\n" +
@@ -299,7 +299,7 @@ public class TableForm {
                         Object[] oo = (Object[]) o;
 
                         for (int i = 0; i < 7; i++) {
-                            insertCell(table, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.NORMAL));
+                            insertCell(table, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
                         }
 
                     }
@@ -307,7 +307,7 @@ public class TableForm {
             } catch (Exception ex) {
                 CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
             }
-            insertCell(table, "Студенттің таңдаған пәндері:", Element.ALIGN_LEFT, 7, EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table, "Студенттің таңдаған пәндері:", Element.ALIGN_LEFT, 7, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
 
             String sqlAdd = "SELECT DISTINCT\n" +
                     "  s4.code,\n" +
@@ -348,7 +348,7 @@ public class TableForm {
                         Object[] oo = (Object[]) o;
 
                         for (int i = 0; i < 7; i++) {
-                            insertCell(table, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.NORMAL));
+                            insertCell(table, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
                         }
                     }
                 }
@@ -356,7 +356,7 @@ public class TableForm {
                 CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
             }
 
-            insertCell(table, "Студенттің қосымша пәндері:", Element.ALIGN_LEFT, 7, EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table, "Студенттің қосымша пәндері:", Element.ALIGN_LEFT, 7, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
 
             String sqlStud = "SELECT DISTINCT\n" +
                     "  s4.code,\n" +
@@ -395,7 +395,7 @@ public class TableForm {
                         Object[] oo = (Object[]) o;
 
                         for (int i = 0; i < 7; i++) {
-                            insertCell(table, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.NORMAL));
+                            insertCell(table, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
                         }
                     }
                 }
@@ -426,7 +426,7 @@ public class TableForm {
                     "  usr.id = " + studentId +
                     "  AND sem_data.semester_period_id=2";
 
-            insertCell(table, ("Семестрде барлығы"), Element.ALIGN_LEFT, 3, EmployeePdfCreator.getFont(12, Font.NORMAL));
+            insertCell(table, ("Семестрде барлығы"), Element.ALIGN_LEFT, 3, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
 
             try {
                 java.util.List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlSum, par);
@@ -435,7 +435,7 @@ public class TableForm {
                         Object[] oo = (Object[]) o;
 
                         for (int i = 0; i < 2; i++) {
-                            insertCell(table, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.NORMAL));
+                            insertCell(table, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
                         }
                     }
                 }
@@ -443,18 +443,18 @@ public class TableForm {
                 CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
             }
 
-            insertCell(table, (" "), Element.ALIGN_LEFT, 2, EmployeePdfCreator.getFont(12, Font.NORMAL));
+            insertCell(table, (" "), Element.ALIGN_LEFT, 2, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
 
 
             PdfPTable table1 = new PdfPTable(6);
-            insertCell(table1, "Пәннің коды", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.BOLD));
-            insertCell(table1, "Пәннің толық атауы", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.BOLD));
-            insertCell(table1, "Кредит саны", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.BOLD));
-            insertCell(table1, "ECTS", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.BOLD));
-            insertCell(table1, "Оқытушының аты-жөні", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.BOLD));
-            insertCell(table1, "Емтихан", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.BOLD));
-            insertCell(table1, "СЕМЕСТР 1", Element.ALIGN_CENTER, 6, EmployeePdfCreator.getFont(12, Font.BOLD));
-            insertCell(table1, "Міндетті түрде оқытылатын пәндер:", Element.ALIGN_LEFT, 6, EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table1, "Пәннің коды", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+            insertCell(table1, "Пәннің толық атауы", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+            insertCell(table1, "Кредит саны", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+            insertCell(table1, "ECTS", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+            insertCell(table1, "Оқытушының аты-жөні", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+            insertCell(table1, "Емтихан", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+            insertCell(table1, "СЕМЕСТР 1", Element.ALIGN_CENTER, 6, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+            insertCell(table1, "Міндетті түрде оқытылатын пәндер:", Element.ALIGN_LEFT, 6, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
             table1.setWidthPercentage(100);
 
             String sqlTeacherSem1 = "SELECT DISTINCT\n" +
@@ -495,14 +495,14 @@ public class TableForm {
                         Object[] oo = (Object[]) o;
 
                         for (int i = 0; i < 6; i++) {
-                            insertCell(table1, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.NORMAL));
+                            insertCell(table1, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
                         }
                     }
                 }
             } catch (Exception ex) {
                 CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
             }
-            insertCell(table1, "Студенттің таңдаған пәндері:", Element.ALIGN_LEFT, 7, EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table1, "Студенттің таңдаған пәндері:", Element.ALIGN_LEFT, 7, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
 
             String sqlTeaAdd = "SELECT DISTINCT\n" +
                     "  s4.code,\n" +
@@ -543,7 +543,7 @@ public class TableForm {
                         Object[] oo = (Object[]) o;
 
                         for (int i = 0; i < 6; i++) {
-                            insertCell(table1, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.NORMAL));
+                            insertCell(table1, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
                         }
 
 
@@ -553,7 +553,7 @@ public class TableForm {
                 CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
             }
 
-            insertCell(table1, "Студенттің қосымша пәндері:", Element.ALIGN_LEFT, 7, EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table1, "Студенттің қосымша пәндері:", Element.ALIGN_LEFT, 7, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
 
             String sqlTeachAdd = "SELECT DISTINCT\n" +
                     "  s4.code,\n" +
@@ -592,7 +592,7 @@ public class TableForm {
                         Object[] oo = (Object[]) o;
 
                         for (int i = 0; i < 6; i++) {
-                            insertCell(table1, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.NORMAL));
+                            insertCell(table1, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
                         }
 
 
@@ -625,7 +625,7 @@ public class TableForm {
                     "  usr.id = " + studentId +
                     " AND sem_data.semester_period_id=1";
 
-            insertCell(table1, ("Семестрде барлығы"), Element.ALIGN_LEFT, 2, EmployeePdfCreator.getFont(12, Font.NORMAL));
+            insertCell(table1, ("Семестрде барлығы"), Element.ALIGN_LEFT, 2, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
 
             try {
                 java.util.List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlTeachSum, par);
@@ -634,7 +634,7 @@ public class TableForm {
                         Object[] oo = (Object[]) o;
 
                         for (int i = 0; i < 2; i++) {
-                            insertCell(table1, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.NORMAL));
+                            insertCell(table1, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
                         }
                     }
                 }
@@ -642,11 +642,11 @@ public class TableForm {
                 CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
             }
 
-            insertCell(table1, (" "), Element.ALIGN_LEFT, 2, EmployeePdfCreator.getFont(12, Font.NORMAL));
+            insertCell(table1, (" "), Element.ALIGN_LEFT, 2, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
 
 
-            insertCell(table1, "СЕМЕСТР 2", Element.ALIGN_CENTER, 6, EmployeePdfCreator.getFont(12, Font.BOLD));
-            insertCell(table1, "           Міндетті түрде оқытылатын пәндер:", Element.ALIGN_LEFT, 6, EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table1, "СЕМЕСТР 2", Element.ALIGN_CENTER, 6, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+            insertCell(table1, "           Міндетті түрде оқытылатын пәндер:", Element.ALIGN_LEFT, 6, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
 
 
             String sqlTeacherSem2 = "SELECT DISTINCT\n" +
@@ -687,7 +687,7 @@ public class TableForm {
                         Object[] oo = (Object[]) o;
 
                         for (int i = 0; i < 6; i++) {
-                            insertCell(table1, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.NORMAL));
+                            insertCell(table1, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
                         }
 
 
@@ -696,7 +696,7 @@ public class TableForm {
             } catch (Exception ex) {
                 CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
             }
-            insertCell(table1, "Студенттің таңдаған пәндері:", Element.ALIGN_LEFT, 7, EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table1, "Студенттің таңдаған пәндері:", Element.ALIGN_LEFT, 7, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
 
             String sqlTeaAdd2 = "SELECT DISTINCT\n" +
                     "  s4.code,\n" +
@@ -737,7 +737,7 @@ public class TableForm {
                         Object[] oo = (Object[]) o;
 
                         for (int i = 0; i < 6; i++) {
-                            insertCell(table1, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.NORMAL));
+                            insertCell(table1, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
                         }
 
                     }
@@ -746,7 +746,7 @@ public class TableForm {
                 CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
             }
 
-            insertCell(table1, "Студенттің қосымша пәндері:", Element.ALIGN_LEFT, 7, EmployeePdfCreator.getFont(12, Font.BOLD));
+            insertCell(table1, "Студенттің қосымша пәндері:", Element.ALIGN_LEFT, 7, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
 
             String sqlTeachAdd2 = "SELECT DISTINCT\n" +
                     "  s4.code,\n" +
@@ -784,7 +784,7 @@ public class TableForm {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
                         for (int i = 0; i < 6; i++) {
-                            insertCell(table1, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.NORMAL));
+                            insertCell(table1, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
                         }
 
                     }
@@ -816,7 +816,7 @@ public class TableForm {
                     "  usr.id = " + studentId +
                     "  AND sem_data.semester_period_id=2";
 
-            insertCell(table1, ("Семестрде барлығы"), Element.ALIGN_LEFT, 2, EmployeePdfCreator.getFont(12, Font.NORMAL));
+            insertCell(table1, ("Семестрде барлығы"), Element.ALIGN_LEFT, 2, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
 
             try {
                 List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sqlTeachSum2, par);
@@ -825,7 +825,7 @@ public class TableForm {
                         Object[] oo = (Object[]) o;
 
                         for (int i = 0; i < 2; i++) {
-                            insertCell(table1, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.NORMAL));
+                            insertCell(table1, oo[i] != null ? oo[i] instanceof String ? (String) oo[i] : String.valueOf(oo[i]) : "", Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
                         }
                     }
                 }
@@ -833,7 +833,7 @@ public class TableForm {
                 CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
             }
 
-            insertCell(table1, (" "), Element.ALIGN_LEFT, 2, EmployeePdfCreator.getFont(12, Font.NORMAL));
+            insertCell(table1, (" "), Element.ALIGN_LEFT, 2, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
 
 
             document.add(new Paragraph("\n"));
@@ -858,7 +858,7 @@ public class TableForm {
             document.add(new Paragraph("\n"));
             document.add(new Paragraph("\n"));
             document.add(new Paragraph("\n"));
-            //document.add(new Paragraph("Студенттің қолы .............................................       Күні   «.......»........................... 20......ж.\n", EmployeePdfCreator.getFont(12, Font.NORMAL)));
+            //document.add(new Paragraph("Студенттің қолы .............................................       Күні   «.......»........................... 20......ж.\n", EmployeePdfCreator.getFont(fontSize, Font.NORMAL)));
 
 
             document.add(new Paragraph("\n"));
@@ -900,13 +900,13 @@ public class TableForm {
             document.add(new Paragraph("\n "));
             document.add(new Paragraph("\n "));
             document.add(new Paragraph("Студент    __________  _______________________\n" +
-                    "                        (қолы)            (Т.А.Ә.)            \n", EmployeePdfCreator.getFont(12, Font.BOLD)));
+                    "                        (қолы)            (Т.А.Ә.)            \n", EmployeePdfCreator.getFont(fontSize, Font.BOLD)));
 
             document.add(new Paragraph("Эдвайзер    __________  _______________________\n" +
-                    "                        (қолы)            (Т.А.Ә.)            \n", EmployeePdfCreator.getFont(12, Font.BOLD)));
+                    "                        (қолы)            (Т.А.Ә.)            \n", EmployeePdfCreator.getFont(fontSize, Font.BOLD)));
 
             document.add(new Paragraph("Тіркеу офисі     __________  __________________\n" +
-                    "                        (қолы)            (Т.А.Ә.)            \n", EmployeePdfCreator.getFont(12, Font.BOLD)));
+                    "                        (қолы)            (Т.А.Ә.)            \n", EmployeePdfCreator.getFont(fontSize, Font.BOLD)));
             try{
                 pdfWriter.close();
             }catch (Exception e){
