@@ -34,7 +34,9 @@ public class DetalizationDialog extends AbstractDialog implements EntityListener
     private VerticalLayout userArrivalVL;
     private VerticalLayout userDataVL;
     private HorizontalSplitPanel mainHSP;
-    private DateField dateField;
+    private HorizontalLayout dateHL;
+    private DateField startDF;
+    private DateField endDF;
 
     public DetalizationDialog(String title, USERS user , Date date) {
 
@@ -44,6 +46,10 @@ public class DetalizationDialog extends AbstractDialog implements EntityListener
         setWidth(95, Unit.PERCENTAGE);
         setHeight(70, Unit.PERCENTAGE);
 
+        dateHL = new HorizontalLayout();
+        dateHL.setSizeFull();
+        dateHL.setSpacing(true);
+        dateHL.setImmediate(true);
 
         mainHSP = new HorizontalSplitPanel();
         mainHSP.setSizeFull();
@@ -116,11 +122,13 @@ public class DetalizationDialog extends AbstractDialog implements EntityListener
 
         DBTableModel dbTableModel = (DBTableModel)userArrivalTW.getWidgetModel();
         dbTableModel.setRefreshType(ERefreshType.MANUAL);
-        dateField = new DateField();
-        dateField.addValueChangeListener(new Property.ValueChangeListener() {
+        startDF = new DateField();
+
+        startDF.setValue(date);
+        startDF.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
-                dbTableModel.setEntities(getList(user,dateField.getValue()));
+                dbTableModel.setEntities(getList(user, startDF.getValue(), startDF.getValue()));
                 try{
                     userArrivalTW.refresh();
                 }catch (Exception e){
@@ -128,7 +136,21 @@ public class DetalizationDialog extends AbstractDialog implements EntityListener
                 }
             }
         });
-        dateField.setValue(date);
+
+        endDF = new DateField();
+        endDF.addValueChangeListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
+                dbTableModel.setEntities(getList(user, endDF.getValue(), startDF.getValue()));
+                try{
+                    userArrivalTW.refresh();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        });
+        endDF.setValue(date);
+
 
 
 
@@ -142,7 +164,9 @@ public class DetalizationDialog extends AbstractDialog implements EntityListener
             }
         });
 
-        userArrivalVL.addComponent(dateField);
+        dateHL.addComponent(startDF);
+        dateHL.addComponent(endDF);
+        userArrivalVL.addComponent(dateHL);
         userArrivalVL.addComponent(userArrivalTW);
         this.userDataVL.addComponent(userDataVL);
         mainHSP.setFirstComponent(userArrivalVL);
@@ -156,15 +180,19 @@ public class DetalizationDialog extends AbstractDialog implements EntityListener
     }
 
 
-    public List<USER_ARRIVAL> getList(USERS user, Date date){
+    public List<USER_ARRIVAL> getList(USERS user, Date date1 , Date date2){
         List<USER_ARRIVAL> userArrivals = new ArrayList<>();
-
+        if(date1==null || date2 == null){
+            return userArrivals;
+        }
         Map<Integer,Object> params = new HashMap<>();
-        String formattedDate = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS").format(date);
+        String formattedDate1 = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS").format(date1);
+        String formattedDate2 = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS").format(date2);
 
         String sql = "select * from user_arrival ua " +
                 "\nwhere ua.user_id = " + user.getId().getId().longValue()+" " +
-                " and date_trunc('day',ua.created) = date_trunc('day', timestamp'"+formattedDate+"')"+
+                " and date_trunc('day',ua.created) between date_trunc('day', timestamp'"+formattedDate1+"') and "+
+                "date_trunc('day', timestamp'"+formattedDate2+"')" +
                 "\n ORDER BY ua.created ";
 
         try {

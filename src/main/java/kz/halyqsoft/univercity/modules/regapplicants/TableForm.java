@@ -59,11 +59,10 @@ public class TableForm {
 
             table.setWidthPercentage(100);
 
-            Font font = new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD, BaseColor.WHITE);
 
 
             String sql = "SELECT\n" +
-                    "  s4.code,\n" +
+                    "  DISTINCT s4.code,\n" +
                     "  module.module_short_name moduleType,\n" +
                     "  subj.name_RU                                                                   subjectName,\n" +
                     "  credit.credit,\n" +
@@ -86,7 +85,7 @@ public class TableForm {
                     "  LEFT JOIN teacher_subject ts ON ts.subject_id = subj.id\n" +
                     "  LEFT JOIN subject sbj ON ts.subject_id = sbj.id\n" +
                     "  LEFT JOIN users u ON u.id = ts.employee_id\n" +
-                    "  LEFT JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
+                    "  INNER JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
                     "\n" +
                     "  LEFT JOIN pair_subject s4 ON subj.id = s4.subject_id" +
                     "   WHERE   sem_data.semester_period_id=1\n" +
@@ -114,7 +113,7 @@ public class TableForm {
             insertCell(table, "Студенттің таңдаған пәндері:", Element.ALIGN_LEFT, 7, EmployeePdfCreator.getFont(12, Font.BOLD));
 
             String sql1 = "SELECT\n" +
-                    "  s4.code,\n" +
+                    "  DISTINCT s4.code,\n" +
                     "  module.module_short_name moduleType,\n" +
                     "  subj.name_RU                                                                   subjectName,\n" +
                     "  credit.credit,\n" +
@@ -137,7 +136,7 @@ public class TableForm {
                     "  LEFT JOIN teacher_subject ts ON ts.subject_id = subj.id\n" +
                     "  LEFT JOIN subject sbj ON ts.subject_id = sbj.id\n" +
                     "  LEFT JOIN users u ON u.id = ts.employee_id\n" +
-                    "  LEFT JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
+                    "  INNER JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
                     "\n" +
                     "  LEFT JOIN pair_subject s4 ON subj.id = s4.subject_id" +
                     "   WHERE   sem_data.semester_period_id=1\n" +
@@ -166,7 +165,7 @@ public class TableForm {
             insertCell(table, "Студенттің қосымша пәндері:\t", Element.ALIGN_LEFT, 7, EmployeePdfCreator.getFont(12, Font.BOLD));
 
             String sql2 = "SELECT\n" +
-                    "  s4.code,\n" +
+                    "  DISTINCT s4.code,\n" +
                     "  module.module_short_name moduleType,\n" +
                     "  subj.name_RU                                                                   subjectName,\n" +
                     "  credit.credit,\n" +
@@ -189,7 +188,7 @@ public class TableForm {
                     "  LEFT JOIN teacher_subject ts ON ts.subject_id = subj.id\n" +
                     "  LEFT JOIN subject sbj ON ts.subject_id = sbj.id\n" +
                     "  LEFT JOIN users u ON u.id = ts.employee_id\n" +
-                    "  LEFT JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
+                    "  INNER JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
                     "\n" +
                     "  LEFT JOIN pair_subject s4 ON subj.id = s4.subject_id \n" +
                     "WHERE  usr.deleted = FALSE AND\n" +
@@ -213,7 +212,7 @@ public class TableForm {
                 CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
             }
 
-            String sql3 = "SELECT  sum( credit.credit) credit, sum( ects.ects) ects\n" +
+            String sql3 = "SELECT  DISTINCT sum( credit.credit) credit, sum( ects.ects) ects\n" +
                     "FROM student_subject stu_subj\n" +
                     "  INNER JOIN student_education stu_edu ON stu_subj.student_id = stu_edu.id\n" +
                     "  INNER JOIN student ON stu_edu.student_id = student.id AND stu_edu.child_id IS NULL\n" +
@@ -230,7 +229,7 @@ public class TableForm {
                     "  LEFT JOIN teacher_subject ts ON ts.subject_id = subj.id\n" +
                     "  LEFT JOIN subject sbj ON ts.subject_id = sbj.id\n" +
                     "  LEFT JOIN users u ON u.id = ts.employee_id\n" +
-                    "  LEFT JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
+                    "  INNER JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
                     "\n" +
                     "  LEFT JOIN pair_subject s4 ON subj.id = s4.subject_id\n" +
                     "WHERE\n" +
@@ -261,7 +260,7 @@ public class TableForm {
 
 
             insertCell(table, "Міндетті түрде оқытылатын пәндер:", Element.ALIGN_LEFT, 7, EmployeePdfCreator.getFont(12, Font.BOLD));
-            String sqlSem2 = "SELECT\n" +
+            String sqlSem2 = "SELECT DISTINCT\n" +
                     "  s4.code,\n" +
                     "  module.module_short_name moduleType,\n" +
                     "  subj.name_RU                                                                   subjectName,\n" +
@@ -285,7 +284,7 @@ public class TableForm {
                     "  LEFT JOIN teacher_subject ts ON ts.subject_id = subj.id\n" +
                     "  LEFT JOIN subject sbj ON ts.subject_id = sbj.id\n" +
                     "  LEFT JOIN users u ON u.id = ts.employee_id\n" +
-                    "  LEFT JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
+                    "  INNER JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
                     "  LEFT JOIN pair_subject s4 ON subj.id = s4.subject_id " +
                     "   WHERE   sem_data.semester_period_id=2\n" +
                     "      AND usr.deleted = FALSE AND\n" +
@@ -310,7 +309,7 @@ public class TableForm {
             }
             insertCell(table, "Студенттің таңдаған пәндері:", Element.ALIGN_LEFT, 7, EmployeePdfCreator.getFont(12, Font.BOLD));
 
-            String sqlAdd = "SELECT\n" +
+            String sqlAdd = "SELECT DISTINCT\n" +
                     "  s4.code,\n" +
                     "  module.module_short_name moduleType,\n" +
                     "  subj.name_RU                                                                   subjectName,\n" +
@@ -334,7 +333,7 @@ public class TableForm {
                     "  LEFT JOIN teacher_subject ts ON ts.subject_id = subj.id\n" +
                     "  LEFT JOIN subject sbj ON ts.subject_id = sbj.id\n" +
                     "  LEFT JOIN users u ON u.id = ts.employee_id\n" +
-                    "  LEFT JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
+                    "  INNER JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
                     "  LEFT JOIN pair_subject s4 ON subj.id = s4.subject_id\n" +
                     "   WHERE   sem_data.semester_period_id=2\n" +
                     "      AND usr.deleted = FALSE AND\n" +
@@ -359,7 +358,7 @@ public class TableForm {
 
             insertCell(table, "Студенттің қосымша пәндері:", Element.ALIGN_LEFT, 7, EmployeePdfCreator.getFont(12, Font.BOLD));
 
-            String sqlStud = "SELECT\n" +
+            String sqlStud = "SELECT DISTINCT\n" +
                     "  s4.code,\n" +
                     "  module.module_short_name moduleType,\n" +
                     "  subj.name_RU                                                                   subjectName,\n" +
@@ -383,7 +382,7 @@ public class TableForm {
                     "  LEFT JOIN teacher_subject ts ON ts.subject_id = subj.id\n" +
                     "  LEFT JOIN subject sbj ON ts.subject_id = sbj.id\n" +
                     "  LEFT JOIN users u ON u.id = ts.employee_id\n" +
-                    "  LEFT JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
+                    "  INNER JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
                     "  LEFT JOIN pair_subject s4 ON subj.id = s4.subject_id" +
                     "   WHERE  usr.deleted = FALSE AND\n" +
                     "      subj.subject_cycle_id IS NOT NULL\n" +
@@ -404,7 +403,7 @@ public class TableForm {
                 CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
             }
 
-            String sqlSum = "SELECT  sum( credit.credit) credit, sum( ects.ects) ects\n" +
+            String sqlSum = "SELECT DISTINCT sum( credit.credit) credit, sum( ects.ects) ects\n" +
                     "FROM student_subject stu_subj " +
                     " INNER JOIN student_education stu_edu ON stu_subj.student_id = stu_edu.id\n" +
                     "  INNER JOIN student ON stu_edu.student_id = student.id AND stu_edu.child_id IS NULL\n" +
@@ -421,7 +420,7 @@ public class TableForm {
                     "  LEFT JOIN teacher_subject ts ON ts.subject_id = subj.id\n" +
                     "  LEFT JOIN subject sbj ON ts.subject_id = sbj.id\n" +
                     "  LEFT JOIN users u ON u.id = ts.employee_id\n" +
-                    "  LEFT JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
+                    "  INNER JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
                     "  LEFT JOIN pair_subject s4 ON subj.id = s4.subject_id\n" +
                     "   WHERE\n" +
                     "  usr.id = " + studentId +
@@ -458,7 +457,7 @@ public class TableForm {
             insertCell(table1, "Міндетті түрде оқытылатын пәндер:", Element.ALIGN_LEFT, 6, EmployeePdfCreator.getFont(12, Font.BOLD));
             table1.setWidthPercentage(100);
 
-            String sqlTeacherSem1 = "SELECT\n" +
+            String sqlTeacherSem1 = "SELECT DISTINCT\n" +
                     "  s4.code,\n" +
                     "  subj.name_kz                                                                   subjectName,\n" +
                     "  credit.credit,\n" +
@@ -481,7 +480,7 @@ public class TableForm {
                     "  LEFT JOIN teacher_subject ts ON ts.subject_id = subj.id\n" +
                     "  LEFT JOIN subject sbj ON ts.subject_id = sbj.id\n" +
                     "  LEFT JOIN users u ON u.id = ts.employee_id\n" +
-                    "  LEFT JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
+                    "  INNER JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
                     "  LEFT JOIN pair_subject s4 ON subj.id = s4.subject_id " +
                     "   WHERE\n" +
                     "  sem_data.semester_period_id=1 AND\n" +
@@ -505,7 +504,7 @@ public class TableForm {
             }
             insertCell(table1, "Студенттің таңдаған пәндері:", Element.ALIGN_LEFT, 7, EmployeePdfCreator.getFont(12, Font.BOLD));
 
-            String sqlTeaAdd = "SELECT\n" +
+            String sqlTeaAdd = "SELECT DISTINCT\n" +
                     "  s4.code,\n" +
                     "  subj.name_kz                                                                   subjectName,\n" +
                     "  credit.credit,\n" +
@@ -528,7 +527,7 @@ public class TableForm {
                     "  LEFT JOIN teacher_subject ts ON ts.subject_id = subj.id\n" +
                     "  LEFT JOIN subject sbj ON ts.subject_id = sbj.id\n" +
                     "  LEFT JOIN users u ON u.id = ts.employee_id\n" +
-                    "  LEFT JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
+                    "  INNER JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
                     "  LEFT JOIN pair_subject s4 ON subj.id = s4.subject_id " +
                     "   WHERE\n" +
                     "  sem_data.semester_period_id=1\n" +
@@ -556,7 +555,7 @@ public class TableForm {
 
             insertCell(table1, "Студенттің қосымша пәндері:", Element.ALIGN_LEFT, 7, EmployeePdfCreator.getFont(12, Font.BOLD));
 
-            String sqlTeachAdd = "SELECT\n" +
+            String sqlTeachAdd = "SELECT DISTINCT\n" +
                     "  s4.code,\n" +
                     "  subj.name_kz                                                                   subjectName,\n" +
                     "  credit.credit,\n" +
@@ -579,7 +578,7 @@ public class TableForm {
                     "  LEFT JOIN teacher_subject ts ON ts.subject_id = subj.id\n" +
                     "  LEFT JOIN subject sbj ON ts.subject_id = sbj.id\n" +
                     "  LEFT JOIN users u ON u.id = ts.employee_id\n" +
-                    "  LEFT JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
+                    "  INNER JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
                     "  LEFT JOIN pair_subject s4 ON subj.id = s4.subject_id \n" +
                     "   WHERE\n" +
                     "  usr.deleted = FALSE AND\n" +
@@ -603,7 +602,7 @@ public class TableForm {
                 CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
             }
 
-            String sqlTeachSum = "SELECT  sum( credit.credit) credit, sum( ects.ects) ects\n" +
+            String sqlTeachSum = "SELECT DISTINCT sum( credit.credit) credit, sum( ects.ects) ects\n" +
                     "FROM student_subject stu_subj\n" +
                     " INNER JOIN student_education stu_edu ON stu_subj.student_id = stu_edu.id\n" +
                     "  INNER JOIN student ON stu_edu.student_id = student.id AND stu_edu.child_id IS NULL\n" +
@@ -620,7 +619,7 @@ public class TableForm {
                     "  LEFT JOIN teacher_subject ts ON ts.subject_id = subj.id\n" +
                     "  LEFT JOIN subject sbj ON ts.subject_id = sbj.id\n" +
                     "  LEFT JOIN users u ON u.id = ts.employee_id\n" +
-                    "  LEFT JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
+                    "  INNER JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
                     "  LEFT JOIN pair_subject s4 ON subj.id = s4.subject_id " +
                     "   WHERE\n" +
                     "  usr.id = " + studentId +
@@ -650,7 +649,7 @@ public class TableForm {
             insertCell(table1, "           Міндетті түрде оқытылатын пәндер:", Element.ALIGN_LEFT, 6, EmployeePdfCreator.getFont(12, Font.BOLD));
 
 
-            String sqlTeacherSem2 = "SELECT\n" +
+            String sqlTeacherSem2 = "SELECT DISTINCT\n" +
                     "  s4.code,\n" +
                     "  subj.name_kz                                                                   subjectName,\n" +
                     "  credit.credit,\n" +
@@ -673,7 +672,7 @@ public class TableForm {
                     "  LEFT JOIN teacher_subject ts ON ts.subject_id = subj.id\n" +
                     "  LEFT JOIN subject sbj ON ts.subject_id = sbj.id\n" +
                     "  LEFT JOIN users u ON u.id = ts.employee_id\n" +
-                    "  LEFT JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
+                    "  INNER JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
                     "  LEFT JOIN pair_subject s4 ON subj.id = s4.subject_id\n" +
                     "   WHERE\n" +
                     "  sem_data.semester_period_id=2 AND\n" +
@@ -699,7 +698,7 @@ public class TableForm {
             }
             insertCell(table1, "Студенттің таңдаған пәндері:", Element.ALIGN_LEFT, 7, EmployeePdfCreator.getFont(12, Font.BOLD));
 
-            String sqlTeaAdd2 = "SELECT\n" +
+            String sqlTeaAdd2 = "SELECT DISTINCT\n" +
                     "  s4.code,\n" +
                     "  subj.name_kz                                                                   subjectName,\n" +
                     "  credit.credit,\n" +
@@ -722,7 +721,7 @@ public class TableForm {
                     "  LEFT JOIN teacher_subject ts ON ts.subject_id = subj.id\n" +
                     "  LEFT JOIN subject sbj ON ts.subject_id = sbj.id\n" +
                     "  LEFT JOIN users u ON u.id = ts.employee_id\n" +
-                    "  LEFT JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
+                    "  INNER JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
                     "  LEFT JOIN pair_subject s4 ON subj.id = s4.subject_id\n" +
                     "   WHERE\n" +
                     "  sem_data.semester_period_id=2\n" +
@@ -749,7 +748,7 @@ public class TableForm {
 
             insertCell(table1, "Студенттің қосымша пәндері:", Element.ALIGN_LEFT, 7, EmployeePdfCreator.getFont(12, Font.BOLD));
 
-            String sqlTeachAdd2 = "SELECT\n" +
+            String sqlTeachAdd2 = "SELECT DISTINCT\n" +
                     "  s4.code,\n" +
                     "  subj.name_kz                                                                   subjectName,\n" +
                     "  credit.credit,\n" +
@@ -772,7 +771,7 @@ public class TableForm {
                     "  LEFT JOIN teacher_subject ts ON ts.subject_id = subj.id\n" +
                     "  LEFT JOIN subject sbj ON ts.subject_id = sbj.id\n" +
                     "  LEFT JOIN users u ON u.id = ts.employee_id\n" +
-                    "  LEFT JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
+                    "  INNER JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
                     "  LEFT JOIN pair_subject s4 ON subj.id = s4.subject_id\n" +
                     "   WHERE\n" +
                     "  usr.deleted = FALSE AND\n" +
@@ -794,7 +793,7 @@ public class TableForm {
                 CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
             }
 
-            String sqlTeachSum2 = "SELECT  sum( credit.credit) credit, sum( ects.ects) ects\n" +
+            String sqlTeachSum2 = "SELECT DISTINCT sum( credit.credit) credit, sum( ects.ects) ects\n" +
                     "FROM student_subject stu_subj\n" +
                     "  INNER JOIN student_education stu_edu ON stu_subj.student_id = stu_edu.id\n" +
                     "  INNER JOIN student ON stu_edu.student_id = student.id AND stu_edu.child_id IS NULL\n" +
@@ -811,7 +810,7 @@ public class TableForm {
                     "  LEFT JOIN teacher_subject ts ON ts.subject_id = subj.id\n" +
                     "  LEFT JOIN subject sbj ON ts.subject_id = sbj.id\n" +
                     "  LEFT JOIN users u ON u.id = ts.employee_id\n" +
-                    "  LEFT JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
+                    "  INNER JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
                     "  LEFT JOIN pair_subject s4 ON subj.id = s4.subject_id \n" +
                     "   WHERE\n" +
                     "  usr.id = " + studentId +
