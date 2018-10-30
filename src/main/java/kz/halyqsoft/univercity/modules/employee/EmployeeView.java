@@ -267,7 +267,7 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
         }
         if (ef.getFirstname() != null && ef.getFirstname().trim().length() >= 3) {
             sb.append("usr.FIRST_NAME ilike '");
-            sb.append(ef.getFirstname().trim().toLowerCase());
+            sb.append(ef.getFirstname().trim());
             sb.append("%'");
         }
         if (ef.getLastname() != null && ef.getLastname().trim().length() >= 3) {
@@ -275,7 +275,7 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
                 sb.append(" and ");
             }
             sb.append("usr.LAST_NAME ilike '");
-            sb.append(ef.getLastname().trim().toLowerCase());
+            sb.append(ef.getLastname().trim());
             sb.append("%'");
         }
         if (ef.getCard() != null) {
