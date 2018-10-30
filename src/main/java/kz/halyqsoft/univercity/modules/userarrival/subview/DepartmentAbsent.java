@@ -27,7 +27,7 @@ import java.util.*;
 
 import static java.lang.Boolean.FALSE;
 
-public class DepartmentLatecomers implements EntityListener{
+public class DepartmentAbsent implements EntityListener{
     private VerticalLayout mainVL;
     private HorizontalLayout topHL,dateHL;
     private HorizontalLayout buttonPanel;
@@ -38,11 +38,11 @@ public class DepartmentLatecomers implements EntityListener{
     private GroupAttendance groupAttendance;
     private Long depID;
     private VEmployeeLatecomers department;
-    private EmployeeLatecomers employeeLatecomers;
+    private EmployeeAbsent employeeLatecomers;
     private Button detalizationBtn,printBtn;
     private Label at, to;
 
-    public DepartmentLatecomers(VEmployeeLatecomers department, EmployeeLatecomers employeeLatecomers){
+    public DepartmentAbsent(VEmployeeLatecomers department, EmployeeAbsent employeeLatecomers){
 
         this.department = department;
         this.employeeLatecomers = employeeLatecomers;
@@ -71,6 +71,9 @@ public class DepartmentLatecomers implements EntityListener{
                 mainVL.addComponent(employeeGW);
                 backButton.setVisible(false);
                 detalizationBtn.setVisible(false);
+                dateField2.setVisible(false);
+                at.setVisible(false);
+                to.setVisible(false);
                 employeeLatecomers.getBackButton().setVisible(true);
             }
         });
@@ -92,15 +95,14 @@ public class DepartmentLatecomers implements EntityListener{
                         tableHeader.add(gcm.getLabel());
                     }
                     for (int i = 0; i < employeeByDepartmentGW.getAllEntities().size(); i++) {
-                        VEmployeeInfo vEmployeeInfo = (VEmployeeInfo) employeeByDepartmentGW.getAllEntities().get(i);
+                        VDetailEmployeeLate vEmployeeInfo = (VDetailEmployeeLate) employeeByDepartmentGW.getAllEntities().get(i);
                         if (employeeByDepartmentGW.getCaption() != null) {
                             fileName = employeeByDepartmentGW.getCaption();
                         }
                         List<String> list = new ArrayList<>();
                         list.add(vEmployeeInfo.getFIO());
-                        list.add(vEmployeeInfo.getCode());
-                        list.add(vEmployeeInfo.getComeIN() != null ? vEmployeeInfo.getComeIN() : " ");
-                        list.add(vEmployeeInfo.getComeOUT() != null ? vEmployeeInfo.getComeOUT() : " ");
+                        list.add(vEmployeeInfo.getPostName());
+                        list.add(vEmployeeInfo.getAbsentSum().toString());
                         tableBody.add(list);
                     }
                 } else if (mainVL.getComponentIndex(employeeGW) != -1) {
@@ -135,7 +137,7 @@ public class DepartmentLatecomers implements EntityListener{
             @Override
             public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
                 if(mainVL.getComponentIndex(employeeGW)>-1){
-                    employeeGM.setEntities(getDepartment(dateField.getValue(),dateField2.getValue()));
+                    employeeGM.setEntities(getDepartment(dateField.getValue()));
                 }if(mainVL.getComponentIndex(employeeByDepartmentGW)>-1){
                     employeeByDepartmentGM.setEntities(getEmployee(dateField.getValue(),dateField2.getValue()));
                 }
@@ -143,13 +145,13 @@ public class DepartmentLatecomers implements EntityListener{
         });
 
         dateField2 = new DateField();
-        dateField2.setValue(employeeLatecomers.getDateField2().getValue());
-
+        dateField2.setValue(new Date());
+        dateField2.setVisible(false);
         dateField2.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
                 if(mainVL.getComponentIndex(employeeGW)>-1){
-                    employeeGM.setEntities(getDepartment(dateField.getValue(),dateField2.getValue()));
+                    employeeGM.setEntities(getDepartment(dateField.getValue()));
                 }if(mainVL.getComponentIndex(employeeByDepartmentGW)>-1){
                     employeeByDepartmentGM.setEntities(getEmployee(dateField.getValue(),dateField2.getValue()));
                 }
@@ -175,12 +177,12 @@ public class DepartmentLatecomers implements EntityListener{
 
         at = new Label(CommonUtils.getUILocaleUtil().getCaption("at"));
         at.setWidth("20");
+        at.setVisible(false);
         to = new Label(CommonUtils.getUILocaleUtil().getCaption("to"));
         to.setWidth("30");
+        to.setVisible(false);
 
-        dateHL = new HorizontalLayout();
-        dateHL.setWidth(200, Sizeable.Unit.PERCENTAGE);
-        dateHL.setImmediate(true);
+        dateHL = CommonUtils.createButtonPanel();
 
         dateHL.addComponent(at);
         dateHL.addComponent(dateField);
@@ -210,7 +212,7 @@ public class DepartmentLatecomers implements EntityListener{
         employeeGM.setRowNumberVisible(true);
         employeeGM.setRowNumberWidth(30);
         employeeGM.setMultiSelect(false);
-        employeeGM.setEntities(getDepartment(dateField.getValue(),dateField2.getValue()));
+        employeeGM.setEntities(getDepartment(dateField.getValue()));
         employeeGM.setRefreshType(ERefreshType.MANUAL);
         employeeGM.getFormModel().getFieldModel("time").setInView(FALSE);
 
@@ -222,11 +224,10 @@ public class DepartmentLatecomers implements EntityListener{
         return mainVL;
     }
 
-    public List<VLateEmployee> getDepartment(Date date, Date date2) {
+    public List<VLateEmployee> getDepartment(Date date) {
 
         List<VLateEmployee> list = new ArrayList<>();
         String formattedDate = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS").format(date);
-        String formattedDate2 = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS").format(date);
 
         Map<Integer, Object> params = new HashMap<>();
         String sql = "SELECT  dep.DEPT_NAME,\n" +
@@ -239,8 +240,7 @@ public class DepartmentLatecomers implements EntityListener{
                 "                    arriv.user_id,\n" +
                 "            count(arriv.user_id) as cameCount\n" +
                 "            FROM user_arrival arriv\n" +
-                "            WHERE date_trunc('day', arriv.created) between date_trunc('day', timestamp'"+formattedDate+"') and\n" +
-                "                  date_trunc('day', timestamp'"+formattedDate2+"')\n" +
+                "            WHERE date_trunc('day', arriv.created) = date_trunc('day', timestamp'"+formattedDate+"')\n" +
                 "            AND arriv.created = (SELECT max(max_arriv.created)\n" +
                 "            FROM user_arrival max_arriv\n" +
                 "            WHERE max_arriv.user_id = arriv.user_id)\n" +
@@ -312,6 +312,9 @@ public class DepartmentLatecomers implements EntityListener{
                     backButton.setVisible(true);
                     detalizationBtn.setVisible(true);
                     employeeLatecomers.getBackButton().setVisible(false);
+                    dateField2.setVisible(true);
+                    at.setVisible(true);
+                    to.setVisible(true);
                 }
             }
         }
@@ -324,17 +327,28 @@ public class DepartmentLatecomers implements EntityListener{
             depID = ((VLateEmployee) employeeGW.getSelectedEntity()).getDepartmentID();
         }
         String formattedDate = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS").format(date);
-        String formattedDate2 = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS").format(date);
+        String formattedDate2 = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS").format(date2);
 
         Map<Integer, Object> pm = new HashMap<>();
-        String sql = "select empl.id,\n" +
-                "   trim(empl.LAST_NAME || ' ' || empl.FIRST_NAME || ' ' || coalesce(empl.MIDDLE_NAME, '')) FIO,\n" +
+        String sql = "SELECT\n" +
+                " empl.id," +
+                "  trim(empl.LAST_NAME || ' ' || empl.FIRST_NAME || ' ' || coalesce(empl.MIDDLE_NAME, '')) FIO,\n" +
                 "  empl.post_name,\n" +
-                "  date_part ('days',now()::date - max(ua.created) )\n" +
-                "from v_employee empl\n" +
-                "  inner join user_arrival ua on empl.id = ua.user_id\n" +
-                "where dept_id = 23 and ua.created between timestamp'"+ formattedDate +"' and timestamp'"+formattedDate2+"'\n" +
-                "GROUP BY FIO,empl.post_name,ua.created, empl.id;";
+                "  date_part('day' , age('"+formattedDate2+"', '"+ formattedDate +"')) - count(newtable.user_id) as kelmedi\n" +
+                "FROM v_employee empl\n" +
+                "  LEFT JOIN (\n" +
+                "              SELECT DISTINCT ua.user_id , date_trunc('day',ua.created )\n" +
+                "              FROM user_arrival ua\n" +
+                "              WHERE\n" +
+                "                date_trunc('day', ua.created) between\n" +
+                "                date_trunc('day', TIMESTAMP '"+ formattedDate +"') and date_trunc('day',\n" +
+                "                                                                         TIMESTAMP '"+formattedDate2+"') and (EXTRACT(ISODOW FROM ua.created) NOT IN (6, 7))\n" +
+                "\n" +
+                "              GROUP BY ua.user_id , date_trunc('day',ua.created )\n" +
+                "            ) AS newtable ON newtable.user_id = empl.id\n" +
+                "WHERE empl.dept_id = \n" + depID +
+                "GROUP BY FIO, empl.post_name, empl.id\n" +
+                "ORDER BY FIO;";
 
         try {
             List<Object> emplBDList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, pm);

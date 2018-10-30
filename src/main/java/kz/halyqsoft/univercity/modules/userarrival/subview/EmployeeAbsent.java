@@ -21,20 +21,19 @@ import java.util.*;
 
 import static java.lang.Boolean.FALSE;
 
-public class EmployeeLatecomers implements EntityListener{
+public class EmployeeAbsent implements EntityListener{
     private VerticalLayout mainVL;
     private HorizontalLayout topHL, dateHL;
     private HorizontalLayout buttonPanel;
     private GridWidget departmentGW;
-    private DateField dateField,dateField2;
+    private DateField dateField;
     private DBGridModel departmentGM;
     private Button  backButton, backButtonAdministration,backButtonAE;
-    private DepartmentLatecomers latecomers;
-    private AdministrationAttendance administrationAttendance;
-    private AdministrationEmployeeAttendance administrationEA;
-    private Label at, to;
+    private DepartmentAbsent latecomers;
+    private AdministrationAbsent administrationLatecomers;
+    private AdministrationEmployeeAbsent administrationEL;
 
-    public EmployeeLatecomers( ){
+    public EmployeeAbsent( ){
         mainVL = new VerticalLayout();
         mainVL.setImmediate(true);
 
@@ -58,9 +57,6 @@ public class EmployeeLatecomers implements EntityListener{
                 mainVL.removeComponent(latecomers.getMainVL());
                 mainVL.addComponent(departmentGW);
                 dateField.setVisible(true);
-                dateField2.setVisible(true);
-                at.setVisible(true);
-                to.setVisible(true);
                 backButton.setVisible(false);
             }
         });
@@ -71,11 +67,10 @@ public class EmployeeLatecomers implements EntityListener{
         backButtonAdministration.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
-                mainVL.removeComponent(administrationAttendance.getMainVL());
+                mainVL.removeComponent(administrationLatecomers.getMainVL());
                 mainVL.addComponent(departmentGW);
 
                 dateField.setVisible(true);
-                dateField2.setVisible(true);
                 backButtonAdministration.setVisible(false);
             }
         });
@@ -86,7 +81,7 @@ public class EmployeeLatecomers implements EntityListener{
         backButtonAE.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
-                mainVL.removeComponent(administrationEA.getMainVL());
+                mainVL.removeComponent(administrationEL.getMainVL());
                 mainVL.addComponent(departmentGW);
 
                 dateField.setVisible(true);
@@ -110,36 +105,15 @@ public class EmployeeLatecomers implements EntityListener{
             @Override
             public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
                 if(mainVL.getComponentIndex(departmentGW)>-1){
-                    departmentGM.setEntities(getDepartment(dateField.getValue(),dateField2.getValue()));
+                    departmentGM.setEntities(getDepartment(dateField.getValue()));
                 }
             }
         });
-
-        dateField2 = new DateField();
-        dateField2.setValue(new Date());
-
-        dateField2.addValueChangeListener(new Property.ValueChangeListener() {
-            @Override
-            public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
-                if(mainVL.getComponentIndex(departmentGW)>-1){
-                    departmentGM.setEntities(getDepartment(dateField.getValue(),dateField2.getValue()));
-                }
-            }
-        });
-
-        at = new Label(CommonUtils.getUILocaleUtil().getCaption("at"));
-        at.setWidth("20");
-        to = new Label(CommonUtils.getUILocaleUtil().getCaption("to"));
-        to.setWidth("30");
 
         dateHL = new HorizontalLayout();
         dateHL.setImmediate(true);
 
-        dateHL.addComponent(at);
         dateHL.addComponent(dateField);
-        dateHL.addComponent(to);
-        dateHL.addComponent(dateField2);
-
 
         buttonPanel.addComponent(dateHL);
         buttonPanel.setComponentAlignment(dateHL, Alignment.MIDDLE_CENTER);
@@ -158,7 +132,7 @@ public class EmployeeLatecomers implements EntityListener{
         departmentGM.setRowNumberVisible(true);
         departmentGM.setRowNumberWidth(30);
         departmentGM.setMultiSelect(false);
-        departmentGM.setEntities(getDepartment(dateField.getValue(),dateField2.getValue()));
+        departmentGM.setEntities(getDepartment(dateField.getValue()));
         departmentGM.setRefreshType(ERefreshType.MANUAL);
         departmentGM.getFormModel().getFieldModel("time").setInView(FALSE);
 
@@ -170,11 +144,10 @@ public class EmployeeLatecomers implements EntityListener{
         return mainVL;
     }
 
-    public List<VEmployeeLatecomers> getDepartment(Date date, Date date2) {
+    public List<VEmployeeLatecomers> getDepartment(Date date) {
 
         List<VEmployeeLatecomers> list = new ArrayList<>();
         String formattedDate = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS").format(date);
-        String formattedDate2 = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS").format(date2);
 
         Map<Integer, Object> params = new HashMap<>();
         String sql = "SELECT\n" +
@@ -191,8 +164,7 @@ public class EmployeeLatecomers implements EntityListener{
                 "               arriv.user_id,\n" +
                 "               date_part('days', now()::date - (max(arriv.created) )) as absentDay\n" +
                 "             FROM user_arrival arriv\n" +
-                "             WHERE date_trunc('day', arriv.created) between date_trunc('day', timestamp'"+formattedDate+"') and\n" +
-                "              date_trunc('day', timestamp'"+formattedDate2+"')\n" +
+                "             WHERE date_trunc('day', arriv.created) = date_trunc('day', timestamp'"+formattedDate+"') \n" +
                 "             GROUP BY arriv.user_id)arriv on arriv.user_id=ve.id\n" +
                 "WHERE d1.deleted = FALSE AND d2.deleted = FALSE \n" +
                 "GROUP BY d1.dept_name,d1.id;";
@@ -237,13 +209,20 @@ public class EmployeeLatecomers implements EntityListener{
             if(entityEvent.getAction()==EntityEvent.SELECTED){
                 if(departmentGW !=null){
                     mainVL.removeComponent(departmentGW);
-                    latecomers = new DepartmentLatecomers((VEmployeeLatecomers) departmentGW.getSelectedEntity(),this);
+                    if(((VEmployeeLatecomers)departmentGW.getSelectedEntity()).getDepartmentID()==20){
+                        administrationLatecomers = new AdministrationAbsent(this);
+                        mainVL.addComponent(administrationLatecomers.getMainVL());
+                        backButtonAdministration.setVisible(true);
+                    }else if(((VEmployeeLatecomers)departmentGW.getSelectedEntity()).getDepartmentID()==43){
+                        administrationEL = new AdministrationEmployeeAbsent(this);
+                        mainVL.addComponent(administrationEL.getMainVL());
+                        backButtonAE.setVisible(true);
+                    }else {
+                        latecomers = new DepartmentAbsent((VEmployeeLatecomers) departmentGW.getSelectedEntity(), this);
                         mainVL.addComponent(latecomers.getMainVL());
                         backButton.setVisible(true);
+                    }
                     dateField.setVisible(false);
-                    dateField2.setVisible(false);
-                    at.setVisible(false);
-                    to.setVisible(false);
                 }
             }
         }
@@ -343,27 +322,4 @@ public class EmployeeLatecomers implements EntityListener{
         this.departmentGW = departmentGW;
     }
 
-    public DateField getDateField2() {
-        return dateField2;
-    }
-
-    public void setDateField2(DateField dateField2) {
-        this.dateField2 = dateField2;
-    }
-
-    public Label getAt() {
-        return at;
-    }
-
-    public void setAt(Label at) {
-        this.at = at;
-    }
-
-    public Label getTo() {
-        return to;
-    }
-
-    public void setTo(Label to) {
-        this.to = to;
-    }
 }
