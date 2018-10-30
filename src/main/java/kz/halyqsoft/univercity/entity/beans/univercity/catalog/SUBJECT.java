@@ -1,6 +1,7 @@
 package kz.halyqsoft.univercity.entity.beans.univercity.catalog;
 
 import kz.halyqsoft.univercity.entity.beans.univercity.PRACTICE_TYPE;
+import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
@@ -86,7 +87,7 @@ public class SUBJECT extends AbstractEntity {
             @JoinColumn(name = "ECTS_ID", referencedColumnName = "ID")})
     private ECTS ects;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 16, inGrid = false,required=false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 16, inGrid = false, required = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "PRACTICE_BREAKDOWN_ID", referencedColumnName = "ID")})
@@ -336,7 +337,13 @@ public class SUBJECT extends AbstractEntity {
     }
 
     public String toString() {
-        return nameKZ + "-" + chair.getDeptShortName() + ", "
+        String name;
+        if (CommonUtils.getLanguage().equals("kz")) {
+            name = nameKZ;
+        } else {
+            name = nameRU;
+        }
+        return name + "-" + chair.getDeptShortName() + ", "
                 + creditability.toString() + " кр.";
     }
 

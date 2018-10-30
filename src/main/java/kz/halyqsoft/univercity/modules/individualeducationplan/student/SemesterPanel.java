@@ -31,8 +31,8 @@ public class SemesterPanel extends AbstractCommonPanel {
     private Grid mainSubjectGrid;
     private List<SUBJECT> chosenMainlist;
 
-    public SemesterPanel(IndividualEducationPlanView registrationView, SEMESTER s) throws Exception {
-        this.semester = s;
+    public SemesterPanel(IndividualEducationPlanView registrationView, SEMESTER semester) throws Exception {
+        this.semester = semester;
         chosenMainlist = new ArrayList<>();
 
         this.registrationView = registrationView;
@@ -57,7 +57,7 @@ public class SemesterPanel extends AbstractCommonPanel {
 
         addButtons(allSubjectsHL);
 
-        addGrid(studentSubjects,mainSubjects);
+        addGrid(studentSubjects, mainSubjects);
 
         VerticalLayout electiveSubjectsVL = new VerticalLayout();
         electiveSubjectsVL.setSpacing(true);
@@ -386,12 +386,18 @@ public class SemesterPanel extends AbstractCommonPanel {
 
     private ArrayList<STUDENT_SUBJECT> getStudentSubjects() throws Exception {
         QueryModel<STUDENT_SUBJECT> studentSubjectQM = new QueryModel<>(STUDENT_SUBJECT.class);
-        studentSubjectQM.addWhere("semesterData", ECriteria.EQUAL, CommonUtils.getCurrentSemesterData().getId());
+        FromItem semesterDataFI = studentSubjectQM.addJoin(EJoin.INNER_JOIN, "semesterData",
+                SEMESTER_DATA.class, "id");
+        studentSubjectQM.addWhere(semesterDataFI, "year", ECriteria.EQUAL, studentEducation.
+                getStudent().getEntranceYear().getId());
+        studentSubjectQM.addWhere(semesterDataFI, "semesterPeriod", ECriteria.EQUAL, semester.
+                getSemesterPeriod().getId());
         studentSubjectQM.addWhere("studentEducation", ECriteria.EQUAL, studentEducation.getId());
         studentSubjectQM.addOrder("id");
         ArrayList<STUDENT_SUBJECT> studentSubjects = new ArrayList<>();
         try {
-            studentSubjects.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(studentSubjectQM));
+            studentSubjects.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                    lookup(studentSubjectQM));
         } catch (NoResultException e) {
             System.out.println(e.getMessage());
         }
