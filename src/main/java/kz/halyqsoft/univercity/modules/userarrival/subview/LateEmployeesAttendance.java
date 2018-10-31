@@ -188,7 +188,7 @@ public class LateEmployeesAttendance implements EntityListener {
         Map<Integer, Object> params = new HashMap<>();
         String sql = "select distinct  * from (SELECT trim(empl.first_name||' '|| empl.last_name ||' '|| empl.middle_name),\n" +
                 "  first_value(empl.dept_name) over (partition by empl.id rows between unbounded  preceding  and unbounded following ),\n" +
-                "   (empl.created::time)::text\n," +
+                "   (arriv.created::time)::text\n," +
                 "  arriv.user_id," +
                 "  first_value(empl.dept_id) over (partition by empl.id rows between unbounded  preceding  and unbounded following ) as dept_id\n" +
                 "  FROM user_arrival arriv\n" +

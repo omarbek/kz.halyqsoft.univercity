@@ -12,7 +12,7 @@ public class VYearEmployeeLatecomers extends AbstractEntity {
     @FieldInfo(type = EFieldType.TEXT, order = 2)
     private String faculty;
 
-    @FieldInfo(type = EFieldType.TEXT, order = 3)
+    @FieldInfo(type = EFieldType.TEXT, order = 3, inView = false)
     private String postName;
 
     @FieldInfo(type = EFieldType.INTEGER, order = 4)
