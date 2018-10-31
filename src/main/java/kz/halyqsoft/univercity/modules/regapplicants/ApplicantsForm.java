@@ -698,7 +698,6 @@ public final class ApplicantsForm extends UsersForm {
                             canvas.addImage(image);
                         }
 
-
                         canvas.rectangle(rect1);
                         canvas.rectangle(rect);
 
@@ -911,9 +910,13 @@ public final class ApplicantsForm extends UsersForm {
                         if (property.isCenter()) {
                             paragraph.setAlignment(Element.ALIGN_CENTER);
                         }
+
+                        if (property.isRight()) {
+                            paragraph.setAlignment(Element.ALIGN_RIGHT);
+                        }
+
                         paragraph.setSpacingBefore(property.getY());
                         paragraph.setIndentationLeft(property.getX());
-
 
                         docum.add(paragraph);
                     }

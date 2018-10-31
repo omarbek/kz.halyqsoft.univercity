@@ -29,8 +29,8 @@ public class CanceledLessons extends AbstractTaskView implements EntityListener 
     public void initView(boolean b) throws Exception {
         lessonGW = new GridWidget(VCanceledLessons.class);
         lessonGW.addEntityListener(this);
-        lessonGW.setButtonVisible(AbstractToolbar.ADD_BUTTON,false);
-        lessonGW.setButtonVisible(AbstractToolbar.DELETE_BUTTON,false);
+        lessonGW.setButtonVisible(AbstractToolbar.ADD_BUTTON, false);
+        lessonGW.setButtonVisible(AbstractToolbar.DELETE_BUTTON, false);
 
 
         DBGridModel lessonGM = (DBGridModel) lessonGW.getWidgetModel();
@@ -66,7 +66,7 @@ public class CanceledLessons extends AbstractTaskView implements EntityListener 
         Map<Integer, Object> pm = new HashMap<>();
         String sql = "SELECT " +
                 "        ls.id," +
-                "        s2.name_ru,\n" +
+                "        s2.name_" + CommonUtils.getLanguage() + ","+
                 "        trim(u.first_name||' '||u.last_name||' '||u.middle_name),\n" +
                 "        ls.lesson_date,\n" +
                 "        (ls.begin_date::time)::text ,\n" +
@@ -85,13 +85,13 @@ public class CanceledLessons extends AbstractTaskView implements EntityListener 
                 for (Object o : emplBDList) {
                     Object[] oo = (Object[]) o;
                     VCanceledLessons lesson = new VCanceledLessons();
-                    lesson.setId(ID.valueOf((long)oo[0]));
-                    lesson.setSubjectName((String) oo [1]);
-                    lesson.setTeacherFIO((String) oo [2]);
-                    lesson.setLessonDate((Date) oo [3]);
-                    lesson.setBeginDate((String) oo [4]);
-                    lesson.setFinishDate((String) oo [5]);
-                    lesson.setCancelReason((String) oo [6]);
+                    lesson.setId(ID.valueOf((long) oo[0]));
+                    lesson.setSubjectName((String) oo[1]);
+                    lesson.setTeacherFIO((String) oo[2]);
+                    lesson.setLessonDate((Date) oo[3]);
+                    lesson.setBeginDate((String) oo[4]);
+                    lesson.setFinishDate((String) oo[5]);
+                    lesson.setCancelReason((String) oo[6]);
                     lessonList.add(lesson);
                 }
             }

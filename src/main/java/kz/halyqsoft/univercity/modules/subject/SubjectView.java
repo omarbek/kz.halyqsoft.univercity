@@ -136,7 +136,7 @@ public class SubjectView extends AbstractTaskView implements FilterPanelListener
         subjectGW.setButtonVisible(AbstractToolbar.REFRESH_BUTTON, false);
         subjectGW.setButtonVisible(AbstractToolbar.REFRESH_BUTTON, false);
 
-        ((DBGridModel)subjectGW.getWidgetModel()).setEntities(getEntities());
+        ((DBGridModel) subjectGW.getWidgetModel()).setEntities(getEntities());
 
         DBGridModel subjectGM = (DBGridModel) subjectGW.getWidgetModel();
         subjectGM.setCrudEntityClass(SUBJECT.class);
@@ -156,7 +156,7 @@ public class SubjectView extends AbstractTaskView implements FilterPanelListener
     @Override
     public void doFilter(AbstractFilterBean filterBean) {
         FSubjectFilter sf = (FSubjectFilter) filterBean;
-        if (sf.getChair() == null && sf.getSubjectName()==null) {
+        if (sf.getChair() == null && sf.getSubjectName() == null) {
             Message.showInfo(getUILocaleUtil().getMessage("choose.field.name.or.chair"));
             return;
         }
@@ -205,7 +205,7 @@ public class SubjectView extends AbstractTaskView implements FilterPanelListener
             if (sb.length() > 0) {
                 sb.append(" and ");
             }
-            sb.append(" subj.NAME_RU ilike '" +sf.getSubjectName().trim() +"%' ");
+            sb.append(" subj.NAME_" + CommonUtils.getLanguage() + " ilike '" + sf.getSubjectName().trim() + "%' ");
             i++;
         }
 
@@ -215,7 +215,8 @@ public class SubjectView extends AbstractTaskView implements FilterPanelListener
             sb.append(" and ");
             sb.append("subj.DELETED = ?" + i++);
             sb.insert(0, " where ");
-            String sql = "SELECT  subj.ID, subj.NAME_RU  SUBJECT_NAME, dep.DEPT_NAME CHAIR_NAME,  lvl.LEVEL_NAME, mdl.MODULE_NAME,\n" +
+            String sql = "SELECT  subj.ID, subj.NAME_" + CommonUtils.getLanguage() +
+                    "  SUBJECT_NAME, dep.DEPT_NAME CHAIR_NAME,  lvl.LEVEL_NAME, mdl.MODULE_NAME,\n" +
                     "                      cred.CREDIT,\n" +
                     "                      formula.FORMULA\n" +
                     "                    FROM SUBJECT subj INNER JOIN DEPARTMENT dep ON subj.CHAIR_ID = dep.ID\n" +
@@ -249,13 +250,12 @@ public class SubjectView extends AbstractTaskView implements FilterPanelListener
         refresh(list);
     }
 
-    public List<SUBJECT> getEntities(){
+    public List<SUBJECT> getEntities() {
         QueryModel<SUBJECT> qm = new QueryModel<>(SUBJECT.class);
-        try{
+        try {
             List<SUBJECT> subjects = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(qm);
             return subjects;
-        }catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;

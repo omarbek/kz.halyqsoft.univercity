@@ -1,14 +1,15 @@
 package kz.halyqsoft.univercity.modules.scheduletable;
 
+import com.vaadin.data.Property;
+import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.USERS;
+import kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE;
 import kz.halyqsoft.univercity.entity.beans.univercity.GROUPS;
 import kz.halyqsoft.univercity.entity.beans.univercity.SCHEDULE_DETAIL;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_EDUCATION;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.LESSON_TIME;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_DATA;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.TIME;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.WEEK_DAY;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -29,6 +30,7 @@ public class ScheduleTableView extends AbstractTaskView {
     private GridLayout matrixGL;
     private boolean addComponent = true;
     private USERS user = CommonUtils.getCurrentUser();
+    private ComboBox groupCB, teacherCB, roomCB;
 
     private static final int STUDENT = 2;
 
@@ -38,6 +40,38 @@ public class ScheduleTableView extends AbstractTaskView {
 
     @Override
     public void initView(boolean b) throws Exception {
+
+        groupCB = new ComboBox();
+        groupCB.setTextInputAllowed(true);
+        groupCB.setFilteringMode(FilteringMode.CONTAINS);
+        groupCB.setCaption(getUILocaleUtil().getEntityLabel(GROUPS.class));
+        QueryModel<GROUPS> groupQM = new QueryModel<>(GROUPS.class);
+        groupQM.addWhere("deleted", Boolean.FALSE);
+        groupQM.addOrderDesc("id");
+        BeanItemContainer<GROUPS> groupBIC = new BeanItemContainer<>(GROUPS.class,
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(groupQM));
+        groupCB.setContainerDataSource(groupBIC);
+
+        teacherCB = new ComboBox();
+        teacherCB.setTextInputAllowed(true);
+        teacherCB.setFilteringMode(FilteringMode.CONTAINS);
+        teacherCB.setCaption(getUILocaleUtil().getEntityLabel(EMPLOYEE.class));
+        QueryModel<USERS> emplQM = new QueryModel<>(USERS.class);
+        emplQM.addWhere("typeIndex", ECriteria.EQUAL, 1);
+        emplQM.addOrderDesc("id");
+        BeanItemContainer<USERS> emplBIC = new BeanItemContainer<>(USERS.class,
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(emplQM));
+        teacherCB.setContainerDataSource(emplBIC);
+
+        roomCB = new ComboBox();
+        roomCB.setTextInputAllowed(true);
+        roomCB.setFilteringMode(FilteringMode.CONTAINS);
+        roomCB.setCaption(getUILocaleUtil().getEntityLabel(ROOM.class));
+        QueryModel<ROOM> roomQM = new QueryModel<>(ROOM.class);
+        roomQM.addOrderDesc("id");
+        BeanItemContainer<ROOM> roomBIC = new BeanItemContainer<>(ROOM.class,
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(roomQM));
+        roomCB.setContainerDataSource(roomBIC);
 
         if (user.getTypeIndex() == STUDENT) {
 
@@ -53,6 +87,7 @@ public class ScheduleTableView extends AbstractTaskView {
             }
 
             QueryModel<WEEK_DAY> weekDayQM = new QueryModel<>(WEEK_DAY.class);
+            weekDayQM.addOrder("id");
             List<WEEK_DAY> weekDayList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
                     weekDayQM);
 
@@ -92,10 +127,62 @@ public class ScheduleTableView extends AbstractTaskView {
                 i++;
             }
 
+            HorizontalLayout comboVL = new HorizontalLayout();
 
+            comboVL.addComponent(groupCB);
+            comboVL.addComponent(teacherCB);
+            comboVL.addComponent(roomCB);
+            groupCB.addValueChangeListener(new Property.ValueChangeListener() {
+                @Override
+                public void valueChange(Property.ValueChangeEvent event) {
+                    try {
+                        if (groupCB.getValue() == null) {
+                            refreshStudent();
+                        } else {
+                            refresh(groupCB);
+                        }
+                    } catch (Exception e) {
+                        CommonUtils.showMessageAndWriteLog("Unable to refresh schedule widget", e);
+                    }
+                }
+            });
+            teacherCB.addValueChangeListener(new Property.ValueChangeListener() {
+                @Override
+                public void valueChange(Property.ValueChangeEvent event) {
+                    try {
+                        if (teacherCB.getValue() == null) {
+                            refreshStudent();
+                        } else {
+                            refreshTeacherCB(teacherCB);
+                        }
+                    } catch (Exception e) {
+                        CommonUtils.showMessageAndWriteLog("Unable to refresh schedule widget", e);
+                    }
+                }
+            });
+            roomCB.addValueChangeListener(new Property.ValueChangeListener() {
+                @Override
+                public void valueChange(Property.ValueChangeEvent event) {
+                    try {
+                        if (roomCB.getValue() == null) {
+                            refreshStudent();
+                        } else {
+                            refreshRoomCB(roomCB);
+                        }
+                    } catch (Exception e) {
+                        CommonUtils.showMessageAndWriteLog("Unable to refresh schedule widget", e);
+                    }
+                }
+            });
+
+            if (!groupCB.isSelected(null) && !teacherCB.isSelected(null) && !roomCB.isSelected(null)) {
+                refreshStudent();
+            }
+
+            getContent().addComponent(comboVL);
             getContent().addComponent(matrixGL);
+            getContent().setComponentAlignment(comboVL, Alignment.MIDDLE_CENTER);
             getContent().setComponentAlignment(matrixGL, Alignment.MIDDLE_CENTER);
-            refreshStudent();
         } else {
 
             QueryModel<LESSON_TIME> lessonTimeQM = new QueryModel<>(LESSON_TIME.class);
@@ -110,13 +197,13 @@ public class ScheduleTableView extends AbstractTaskView {
             }
 
             QueryModel<WEEK_DAY> weekDayQM = new QueryModel<>(WEEK_DAY.class);
+            weekDayQM.addOrder("id");
             List<WEEK_DAY> weekDayList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
                     weekDayQM);
 
             for (WEEK_DAY weekDay : weekDayList) {
                 weekDays = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(weekDayQM);
             }
-
             int cols = 9;
             int rows = times.size() + 1;
 
@@ -148,15 +235,216 @@ public class ScheduleTableView extends AbstractTaskView {
                 matrixGL.setColumnExpandRatio(i, 1);
                 i++;
             }
+            HorizontalLayout comboVL = new HorizontalLayout();
 
+            comboVL.addComponent(groupCB);
+            comboVL.addComponent(teacherCB);
+            comboVL.addComponent(roomCB);
 
-            refreshTeacher();
+            groupCB.addValueChangeListener(new Property.ValueChangeListener() {
+                @Override
+                public void valueChange(Property.ValueChangeEvent event) {
+                    try {
+                        if (groupCB.getValue() == null) {
+                            refreshTeacher();
+                        } else {
+                            refresh(groupCB);
+                        }
+                    } catch (Exception e) {
+                        CommonUtils.showMessageAndWriteLog("Unable to refresh schedule widget", e);
+                    }
+                }
+            });
+
+            teacherCB.addValueChangeListener(new Property.ValueChangeListener() {
+                @Override
+                public void valueChange(Property.ValueChangeEvent event) {
+                    try {
+                        if (teacherCB.getValue() == null) {
+                            refreshTeacher();
+                        } else {
+                            refreshTeacherCB(teacherCB);
+                        }
+                    } catch (Exception e) {
+                        CommonUtils.showMessageAndWriteLog("Unable to refresh schedule widget", e);
+                    }
+                }
+            });
+            roomCB.addValueChangeListener(new Property.ValueChangeListener() {
+                @Override
+                public void valueChange(Property.ValueChangeEvent event) {
+                    try {
+                        if (roomCB.getValue() == null) {
+                            refreshTeacher();
+                        } else {
+                            refreshRoomCB(roomCB);
+                        }
+                    } catch (Exception e) {
+                        CommonUtils.showMessageAndWriteLog("Unable to refresh schedule widget", e);
+                    }
+                }
+            });
+
+            if (!groupCB.isSelected(null) && !teacherCB.isSelected(null) && !roomCB.isSelected(null)) {
+                refreshTeacher();
+            }
+
+            getContent().addComponent(comboVL);
+            getContent().setComponentAlignment(comboVL, Alignment.MIDDLE_CENTER);
             getContent().addComponent(matrixGL);
             getContent().setComponentAlignment(matrixGL, Alignment.MIDDLE_CENTER);
 
-
         }
 
+    }
+
+    private void refresh(ComboBox groupCB) throws Exception {
+        getSchedule((GROUPS) groupCB.getValue());
+    }
+
+    public void getSchedule(GROUPS group) {
+
+        SEMESTER_DATA semesterData = CommonUtils.getCurrentSemesterData();
+
+        QueryModel<SCHEDULE_DETAIL> sdQM = new QueryModel<>(SCHEDULE_DETAIL.class);
+        FromItem lessonTimeFI = sdQM.addJoin(EJoin.INNER_JOIN, "lessonTime", LESSON_TIME.class, "id");
+
+        sdQM.addWhere("group", ECriteria.EQUAL, group.getId());
+        sdQM.addWhereAnd("semesterData", ECriteria.EQUAL, semesterData.getId());
+        for (int i = 0; i < weekDays.size(); i++) {
+            sdQM.addWhere("weekDay", ECriteria.EQUAL, weekDays.get(i).getId());
+            for (int j = 0; j < times.size(); j++) {
+                sdQM.addWhere(lessonTimeFI, "beginTime", ECriteria.EQUAL, times.get(j).getId());
+                try {
+                    SCHEDULE_DETAIL scheduleDetail = null;
+                    List<SCHEDULE_DETAIL> list = SessionFacadeFactory.getSessionFacade(
+                            CommonEntityFacadeBean.class).lookup(sdQM);
+                    if (!list.isEmpty()) {
+                        scheduleDetail = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                                lookup(SCHEDULE_DETAIL.class, list.get(0).getId());
+                    }
+
+                    ScheduleCellStudent sc = new ScheduleCellStudent(scheduleDetail);
+                    int col = i + 1;
+                    int row = j + 1;
+
+                    matrixGL.removeComponent(col, row);
+                    if (scheduleDetail != null && (scheduleDetail.getLessonTime().getEndTime().getTimeValue()
+                            - scheduleDetail.getLessonTime().getBeginTime().getTimeValue() == 2)) {
+                        matrixGL.removeComponent(col, row + 1);
+                        matrixGL.addComponent(sc, col, row, col, row + 1);
+                        addComponent = false;
+                    } else if (addComponent) {
+                        matrixGL.addComponent(sc, col, row);
+                    } else {
+                        addComponent = true;
+                    }
+
+                } catch (Exception ex) {
+                    CommonUtils.showMessageAndWriteLog("Unable to load schedule detail", ex);
+                }
+                matrixGL.removeComponent(weekDays.size() + 1, j + 1);
+            }
+        }
+    }
+
+    private void refreshTeacherCB(ComboBox teacherCB) throws Exception {
+        getScheduleTeacher((EMPLOYEE) teacherCB.getValue());
+    }
+
+    public void getScheduleTeacher(EMPLOYEE teacher) {
+
+        SEMESTER_DATA semesterData = CommonUtils.getCurrentSemesterData();
+
+        QueryModel<SCHEDULE_DETAIL> sdQM = new QueryModel<>(SCHEDULE_DETAIL.class);
+        FromItem lessonTimeFI = sdQM.addJoin(EJoin.INNER_JOIN, "lessonTime", LESSON_TIME.class, "id");
+        sdQM.addWhere("teacher", ECriteria.EQUAL, teacher.getId());
+        sdQM.addWhereAnd("semesterData", ECriteria.EQUAL, semesterData.getId());
+        for (int i = 0; i < weekDays.size(); i++) {
+            sdQM.addWhere("weekDay", ECriteria.EQUAL, weekDays.get(i).getId());
+            for (int j = 0; j < times.size(); j++) {
+                sdQM.addWhere(lessonTimeFI, "beginTime", ECriteria.EQUAL, times.get(j).getId());
+                try {
+                    SCHEDULE_DETAIL scheduleDetail = null;
+                    List<SCHEDULE_DETAIL> list = SessionFacadeFactory.getSessionFacade(
+                            CommonEntityFacadeBean.class).lookup(sdQM);
+                    if (!list.isEmpty()) {
+                        scheduleDetail = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                                lookup(SCHEDULE_DETAIL.class, list.get(0).getId());
+                    }
+
+                    ScheduleCellStudent sc = new ScheduleCellStudent(scheduleDetail);
+                    int col = i + 1;
+                    int row = j + 1;
+
+                    matrixGL.removeComponent(col, row);
+                    if (scheduleDetail != null && (scheduleDetail.getLessonTime().getEndTime().getTimeValue()
+                            - scheduleDetail.getLessonTime().getBeginTime().getTimeValue() == 2)) {
+                        matrixGL.removeComponent(col, row + 1);
+                        matrixGL.addComponent(sc, col, row, col, row + 1);
+                        addComponent = false;
+                    } else if (addComponent) {
+                        matrixGL.addComponent(sc, col, row);
+                    } else {
+                        addComponent = true;
+                    }
+
+                } catch (Exception ex) {
+                    CommonUtils.showMessageAndWriteLog("Unable to load schedule detail", ex);
+                }
+                matrixGL.removeComponent(weekDays.size() + 1, j + 1);
+            }
+        }
+    }
+
+    private void refreshRoomCB(ComboBox roomCB) throws Exception {
+        getScheduleRoom((ROOM) roomCB.getValue());
+    }
+
+    public void getScheduleRoom(ROOM room) {
+
+        SEMESTER_DATA semesterData = CommonUtils.getCurrentSemesterData();
+
+        QueryModel<SCHEDULE_DETAIL> sdQM = new QueryModel<>(SCHEDULE_DETAIL.class);
+        FromItem lessonTimeFI = sdQM.addJoin(EJoin.INNER_JOIN, "lessonTime", LESSON_TIME.class, "id");
+        sdQM.addWhere("room", ECriteria.EQUAL, room.getId());
+        sdQM.addWhereAnd("semesterData", ECriteria.EQUAL, semesterData.getId());
+        for (int i = 0; i < weekDays.size(); i++) {
+            sdQM.addWhere("weekDay", ECriteria.EQUAL, weekDays.get(i).getId());
+            for (int j = 0; j < times.size(); j++) {
+                sdQM.addWhere(lessonTimeFI, "beginTime", ECriteria.EQUAL, times.get(j).getId());
+                try {
+                    SCHEDULE_DETAIL scheduleDetail = null;
+                    List<SCHEDULE_DETAIL> list = SessionFacadeFactory.getSessionFacade(
+                            CommonEntityFacadeBean.class).lookup(sdQM);
+                    if (!list.isEmpty()) {
+                        scheduleDetail = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                                lookup(SCHEDULE_DETAIL.class, list.get(0).getId());
+                    }
+
+                    ScheduleCellStudent sc = new ScheduleCellStudent(scheduleDetail);
+                    int col = i + 1;
+                    int row = j + 1;
+
+                    matrixGL.removeComponent(col, row);
+                    if (scheduleDetail != null && (scheduleDetail.getLessonTime().getEndTime().getTimeValue()
+                            - scheduleDetail.getLessonTime().getBeginTime().getTimeValue() == 2)) {
+                        matrixGL.removeComponent(col, row + 1);
+                        matrixGL.addComponent(sc, col, row, col, row + 1);
+                        addComponent = false;
+                    } else if (addComponent) {
+                        matrixGL.addComponent(sc, col, row);
+                    } else {
+                        addComponent = true;
+                    }
+
+
+                } catch (Exception ex) {
+                    CommonUtils.showMessageAndWriteLog("Unable to load schedule detail", ex);
+                }
+                matrixGL.removeComponent(weekDays.size() + 1, j + 1);
+            }
+        }
     }
 
     public void refreshStudent() throws Exception {
