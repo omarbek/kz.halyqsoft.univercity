@@ -19,6 +19,8 @@ import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.vaadin.widget.ERefreshType;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
+import org.vaadin.jsconsole.ClientLog;
+import org.vaadin.jsconsole.client.JsConsole;
 
 import java.util.*;
 import java.util.*;
@@ -108,7 +110,6 @@ public class LateEmployeesAttendance implements EntityListener {
         cal.set(Calendar.MINUTE,40);
         cal.set(Calendar.SECOND,0);
         cal.set(Calendar.MILLISECOND,0);
-
         dateField = new DateField();
         dateField.setShowISOWeekNumbers(true);
         dateField.setStyleName("time-only");
@@ -141,16 +142,16 @@ public class LateEmployeesAttendance implements EntityListener {
 
     private void refreshGridWidget(GridWidget usersGW) {
         try {
-            String sql = "SELECT arriv.* " +
-                    "FROM user_arrival arriv INNER JOIN v_employee empl ON empl.id = arriv.user_id " +
-                    "WHERE date_trunc('day', arriv.created) = date_trunc('day', TIMESTAMP '" + CommonUtils.getFormattedDate(dateField.getValue()) + "') " +
-                    "      AND arriv.created = (SELECT min(max_arriv.created) " +
-                    "                           FROM user_arrival max_arriv " +
-                    "                           WHERE max_arriv.user_id = arriv.user_id " +
-                    "                                 AND date_trunc('day', max_arriv.created) = date_trunc('day', TIMESTAMP '" + CommonUtils.getFormattedDate(dateField.getValue()) + "') " +
-                    "                                 AND come_in = TRUE) " +
-                    "      AND come_in = TRUE AND arriv.created :: TIME > '"+CommonUtils.getTimeFromDate(dateField.getValue())+"' " +
-                    "ORDER BY created DESC;";
+            String sql = "SELECT arriv.* \n" +
+                    " FROM user_arrival arriv INNER JOIN v_employee empl ON empl.id = arriv.user_id\n" +
+                    "  INNER JOIN (SELECT min(max_arriv.created) AS min , max_arriv.user_id\n" +
+                    "              FROM user_arrival max_arriv\n" +
+                    "              WHERE date_trunc('day', max_arriv.created) = date_trunc('day', TIMESTAMP '" + CommonUtils.getFormattedDate(dateField.getValue()) + "')\n" +
+                    "                    AND come_in = TRUE GROUP BY max_arriv.user_id) AS foo ON arriv.created = foo.min and foo.user_id = arriv.user_id\n" +
+                    " WHERE date_trunc('day', arriv.created) = date_trunc('day', TIMESTAMP '" + CommonUtils.getFormattedDate(dateField.getValue()) + "') AND\n" +
+                    "      come_in = TRUE AND arriv.created :: TIME > '"+CommonUtils.getTimeFromDate(dateField.getValue())+"'\n" +
+                    " ORDER BY created DESC";
+
             List<USER_ARRIVAL> userArrivals = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(sql,
                     new HashMap<>(), USER_ARRIVAL.class);
             ((DBGridModel) usersGW.getWidgetModel()).setEntities(userArrivals);
