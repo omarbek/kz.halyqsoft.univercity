@@ -599,7 +599,6 @@ public final class ApplicantsForm extends UsersForm {
     protected void initSpec(FormModel dataFM) {
         saveSpec = false;
         saveEduc = false;
-//        saveUnt = false;
         saveFactAddress = false;
         specTW = new TableWidget(V_ENTRANT_SPECIALITY.class);
         specTW.addEntityListener(ApplicantsForm.this);
@@ -872,6 +871,9 @@ public final class ApplicantsForm extends UsersForm {
                         if (property.isCenter()) {
                             paragraph.setAlignment(Element.ALIGN_CENTER);
                         }
+                        if (property.isRight()) {
+                            paragraph.setAlignment(Element.ALIGN_RIGHT);
+                        }
                         paragraph.setSpacingBefore(property.getY());
                         paragraph.setIndentationLeft(property.getX());
 
@@ -1073,7 +1075,7 @@ public final class ApplicantsForm extends UsersForm {
         String facultyName = getStringBeforeSlash(studentEducation.getFaculty().toString());
         String specialityName = getStringBeforeSlash(speciality.getSpecName());
 
-        USER_PASSPORT user_passport = null;
+        USER_PASSPORT user_passport;
         try {
             QueryModel<USER_PASSPORT> qm = new QueryModel<>(USER_PASSPORT.class);
             FromItem fi1 = qm.addJoin(EJoin.INNER_JOIN, "id", USER_DOCUMENT.class, "id");
@@ -1082,59 +1084,59 @@ public final class ApplicantsForm extends UsersForm {
             qm.addWhere(fi, "id", ECriteria.EQUAL, student.getId());
             user_passport = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(qm);
         } catch (Exception e) {
-            e.printStackTrace();
+            user_passport = null;
         }
 
-        USER_LANGUAGE userLanguage = null;
+        USER_LANGUAGE userLanguage ;
         try {
             QueryModel<USER_LANGUAGE> userLanguageQM = new QueryModel<>(USER_LANGUAGE.class);
             userLanguageQM.addWhere("user",ECriteria.EQUAL,student.getId());
             userLanguage = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(userLanguageQM);
-
         }catch (Exception e){
-            e.printStackTrace();
+            userLanguage=null;
         }
 
-        STUDENT_ADDITIONAL_INFORMATION studentAdditionalInformation = null;
+        STUDENT_ADDITIONAL_INFORMATION studentAdditionalInformation;
         try {
             QueryModel<STUDENT_ADDITIONAL_INFORMATION> studentAdditionalInformationQM = new QueryModel<>(STUDENT_ADDITIONAL_INFORMATION.class);
             studentAdditionalInformationQM.addWhere("student",ECriteria.EQUAL,student.getId());
-               studentAdditionalInformation = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(studentAdditionalInformationQM);
+                studentAdditionalInformation = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(studentAdditionalInformationQM);
+
         }catch (Exception e){
-            e.printStackTrace();
+            studentAdditionalInformation=null;
         }
 
-        MILITARY_DOC militaryDoc = null;
+        MILITARY_DOC militaryDoc;
         try {
             QueryModel<MILITARY_DOC> militaryQM = new QueryModel<>(MILITARY_DOC.class);
             FromItem sItem = militaryQM.addJoin(EJoin.INNER_JOIN,"id",USER_DOCUMENT.class,"id");
             militaryQM.addWhere(sItem,"user",ECriteria.EQUAL,student.getId());
                 militaryDoc = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(militaryQM);
         }catch (Exception e){
-            e.printStackTrace();
+            militaryDoc = null;
         }
 
-        UNT_CERTIFICATE untCertif = null;
+        UNT_CERTIFICATE untCertif;
         try {
             QueryModel<MILITARY_DOC> militaryQM = new QueryModel<>(MILITARY_DOC.class);
             FromItem sItem = militaryQM.addJoin(EJoin.INNER_JOIN,"id",USER_DOCUMENT.class,"id");
             militaryQM.addWhere(sItem,"user",ECriteria.EQUAL,student.getId());
             militaryDoc = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(militaryQM);
         }catch (Exception e){
-            e.printStackTrace();
+            untCertif = null;
         }
 
-        USER_SOCIAL_CATEGORY userSocialCategory = null;
+        USER_SOCIAL_CATEGORY userSocialCategory;
         try {
             QueryModel<USER_SOCIAL_CATEGORY> userSocialCategoryQM = new QueryModel<>(USER_SOCIAL_CATEGORY.class);
             userSocialCategoryQM.addWhere("user",ECriteria.EQUAL,student.getId());
             userSocialCategory = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(userSocialCategoryQM);
         }catch (Exception e){
-            e.printStackTrace();
+            userSocialCategory = null;
         }
 
 
-        USER_AWARD userAward = null;
+        USER_AWARD userAward;
 
         try {
             QueryModel<USER_AWARD> userAwardQM = new QueryModel<>(USER_AWARD.class);
@@ -1142,7 +1144,7 @@ public final class ApplicantsForm extends UsersForm {
             userAwardQM.addWhere("user",ECriteria.EQUAL,student.getId());
             userAward = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(userAwardQM);
         }catch (Exception e){
-            e.printStackTrace();
+           userAward = null;
         }
 
         String iin = "";

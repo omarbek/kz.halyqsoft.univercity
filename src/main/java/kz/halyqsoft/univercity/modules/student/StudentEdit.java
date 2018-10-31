@@ -78,7 +78,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
     private FromItem educationUDFI;
     private Label lockLabel, lockReasonLabel, createdBylabel,label;
     private Button lockUnlockButton;
-    private Button downloadTableButton,downloadTableRusButton,downloadAnketaBtn,downloadZayavBtn;
+    private Button downloadAnketaBtn,downloadZayavBtn;
     private LockDialog lockDialog;
     private STUDENT student;
     private USERS users;
@@ -92,7 +92,6 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
             myResourceTitle, myResourceLetter;
     private FormLayout educationFL;
     private FormModel mainBaseDataFM;
-    private CheckBox kazCheckBox, rusCheckBox;
     private ComboBox subjectCB;
 
     private static final int UKPU = 1;
@@ -328,69 +327,23 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         getTabSheet().addTab(content, getMasterTabTitle());
 
         HorizontalLayout hl = new HorizontalLayout();
-        hl.setWidth(40, Unit.PERCENTAGE);
-        kazCheckBox = new CheckBox();
-        rusCheckBox = new CheckBox();
-        rusCheckBox.setCaption(getUILocaleUtil().getCaption("ru.short"));
-        kazCheckBox.setCaption(getUILocaleUtil().getCaption("kk.short"));
-        kazCheckBox.setValue(false);
-        rusCheckBox.setValue(false);
-
-
-        downloadTableButton=new Button();
-        downloadTableButton.setImmediate(true);
-        downloadTableButton.setWidth("80");
-        downloadTableButton.setCaption(getUILocaleUtil().getCaption("iups"));
-        hl.addComponent(downloadTableButton);
-
-        downloadTableRusButton=new Button();
-        downloadTableRusButton.setImmediate(true);
-        downloadTableRusButton.setWidth("80");
-        downloadTableRusButton.setCaption(getUILocaleUtil().getCaption("iupsrus"));
-        hl.addComponent(downloadTableRusButton);
+        hl.setWidth(20, Unit.PERCENTAGE);
 
         downloadAnketaBtn = new Button();
         downloadAnketaBtn.setImmediate(true);
         downloadAnketaBtn.setWidth("80");
-        downloadAnketaBtn.setCaption("Anketa");
+        downloadAnketaBtn.setCaption(getUILocaleUtil().getCaption("anketa"));
         hl.addComponent(downloadAnketaBtn);
 
         downloadZayavBtn = new Button();
         downloadZayavBtn.setImmediate(true);
         downloadZayavBtn.setWidth("80");
-        downloadZayavBtn.setCaption("Zayava");
+        downloadZayavBtn.setCaption(getUILocaleUtil().getCaption("zayava"));
         hl.addComponent(downloadZayavBtn);
 
-
-        hl.addComponents(kazCheckBox, rusCheckBox);
-        hl.setComponentAlignment(kazCheckBox, Alignment.MIDDLE_CENTER);
-        hl.setComponentAlignment(rusCheckBox, Alignment.MIDDLE_CENTER);
-        hl.setComponentAlignment(downloadTableButton, Alignment.MIDDLE_LEFT);
-        hl.setComponentAlignment(downloadTableRusButton, Alignment.TOP_LEFT);
         hl.setComponentAlignment(downloadAnketaBtn, Alignment.TOP_RIGHT);
         hl.setComponentAlignment(downloadZayavBtn, Alignment.TOP_RIGHT);
 
-        downloadTableButton.addClickListener(new ClickListener() {
-             @Override
-             public void buttonClick(ClickEvent clickEvent) {
-                 myResource = createResourceStudent("99", student);
-                 fileDownloader = new FileDownloader(myResource);
-                 myResource.setMIMEType("application/pdf");
-                 fileDownloader.extend(downloadTableButton);
-             }
-         }
-        );
-
-        downloadTableRusButton.addClickListener(new ClickListener() {
-             @Override
-             public void buttonClick(ClickEvent clickEvent) {
-                 myResource = createResourceStudent("98", student);
-                 fileDownloader = new FileDownloader(myResource);
-                 myResource.setMIMEType("application/pdf");
-                 fileDownloader.extend(downloadTableRusButton);
-             }
-         }
-        );
 
         downloadAnketaBtn.addClickListener(new ClickListener() {
             @Override
@@ -412,11 +365,6 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
             }
         });
 
-
-        pdfDownload = createDownloadButton();
-        hl.addComponent(pdfDownload);
-        hl.setComponentAlignment(pdfDownload, Alignment.MIDDLE_RIGHT);
-
         content.addComponent(hl);
         content.setComponentAlignment(hl, Alignment.BOTTOM_CENTER);
 
@@ -427,42 +375,6 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
             myResource.setMIMEType("application/pdf");
             fileDownloader.extend(pdfDownload);
 
-        } else {
-
-            kazCheckBox.addValueChangeListener(new Property.ValueChangeListener() {
-                @Override
-                public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
-
-                    if (valueChangeEvent != null && valueChangeEvent.getProperty() != null && valueChangeEvent.getProperty().getValue() != null) {
-                        try {
-                            setKazLanguage(student,true);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        myResource = createResourceStudent("90", student);
-                        fileDownloader = new FileDownloader(myResource);
-                        myResource.setMIMEType("application/pdf");
-                        fileDownloader.extend(pdfDownload);
-
-                    }
-                }
-            });
-
-            rusCheckBox.addValueChangeListener(new Property.ValueChangeListener() {
-                @Override
-                public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
-                    try {
-                        setRusLanguage(student,true);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    myResource = createResourceStudent("85", student);
-                    fileDownloader = new FileDownloader(myResource);
-                    myResource.setMIMEType("application/pdf");
-                    fileDownloader.extend(pdfDownload);
-
-                }
-            });
         }
 
         myResourceLetter = createResourceStudent("33", student);
@@ -643,32 +555,6 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
             lockUnlockButton.setCaption(getUILocaleUtil().getCaption("unlock"));
         }
         return lockUnlockButton;
-    }
-
-    private Button createDownloadButton() {
-
-        Button downloadButton = new Button();
-        downloadButton.setData(11);
-        downloadButton.setCaption(getUILocaleUtil().getCaption("download.contract"));
-        downloadButton.setWidth(130, Unit.PIXELS);
-
-        downloadButton.addClickListener(
-                new Button.ClickListener() {
-                    @Override
-                    public void buttonClick(Button.ClickEvent clickEvent) {
-
-                        try {
-                            if (kazCheckBox.isEmpty() && rusCheckBox.isEmpty()) {
-                                Message.showInfo(getUILocaleUtil().getMessage("error.student"));
-
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-
-        return downloadButton;
     }
 
     private Button createDownloadButtonDorm() {
