@@ -136,6 +136,47 @@ public class PrintDialog extends AbstractDialog{
         return byteArrayOutputStream.toByteArray();
     }
 
+    private PdfPTable xlsxToPdfTable() throws Exception{
+        ByteArrayInputStream bais =new ByteArrayInputStream(createExcel.getMainByte());
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+        XSSFWorkbook my_xls_workbook = new XSSFWorkbook(bais);
+        XSSFSheet my_worksheet = my_xls_workbook.getSheetAt(0);
+        Iterator<Row> rowIterator = my_worksheet.iterator();
+        Document iText_xls_2_pdf = new Document();
+        PdfWriter.getInstance(iText_xls_2_pdf, byteArrayOutputStream);
+        iText_xls_2_pdf.open();
+        PdfPTable my_table = new PdfPTable(createExcel.getTableHeader().size());
+        PdfPCell table_cell;
+
+        while (rowIterator.hasNext()) {
+            Row row = rowIterator.next();
+            Iterator<Cell> cellIterator = row.cellIterator();
+            while (cellIterator.hasNext()) {
+                Cell cell = cellIterator.next();
+                switch (cell.getCellTypeEnum()) {
+
+                    case STRING:
+
+                        Paragraph paragraph = new Paragraph(cell.getStringCellValue(), currentFont);
+                        table_cell = new PdfPCell(paragraph);
+
+                        //table_cell=new PdfPCell(new Phrase(cell.getStringCellValue()));
+                        my_table.addCell(table_cell);
+                        break;
+
+                }
+            }
+
+        }
+        iText_xls_2_pdf.add(my_table);
+        iText_xls_2_pdf.close();
+
+        bais.close();
+
+        return my_table;
+    }
+
     public Button getPdfBtn() {
         return pdfBtn;
     }
