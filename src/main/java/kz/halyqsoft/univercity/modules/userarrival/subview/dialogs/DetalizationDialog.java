@@ -1,5 +1,6 @@
 package kz.halyqsoft.univercity.modules.userarrival.subview.dialogs;
 
+import com.vaadin.data.Property;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.USER_ARRIVAL;
@@ -34,6 +35,7 @@ public class DetalizationDialog extends AbstractDialog implements EntityListener
     private VerticalLayout userDataVL;
     private HorizontalSplitPanel mainHSP;
     private DateField dateField;
+    private HorizontalLayout rangeHL;
 
     public DetalizationDialog(String title, USERS user , Date date) {
 
@@ -43,9 +45,6 @@ public class DetalizationDialog extends AbstractDialog implements EntityListener
         setWidth(95, Unit.PERCENTAGE);
         setHeight(70, Unit.PERCENTAGE);
 
-        dateField = new DateField();
-        dateField.setImmediate(true);
-
         mainHSP = new HorizontalSplitPanel();
         mainHSP.setSizeFull();
         mainHSP.setImmediate(true);
@@ -54,6 +53,7 @@ public class DetalizationDialog extends AbstractDialog implements EntityListener
 
         userArrivalVL = new VerticalLayout();
         userArrivalVL.setSizeFull();
+        userArrivalVL.setSpacing(true);
         userArrivalVL.setImmediate(true);
         userArrivalVL.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
 
@@ -119,6 +119,21 @@ public class DetalizationDialog extends AbstractDialog implements EntityListener
         dbTableModel.setEntities(getList(user,date));
         dbTableModel.setRefreshType(ERefreshType.MANUAL);
 
+        dateField = new DateField();
+        dateField.setImmediate(true);
+        dateField.setValue(date);
+        dateField.addValueChangeListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
+                dbTableModel.setEntities(getList(user,dateField.getValue()));
+                try{
+                    userArrivalTW.refresh();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        });
+
         TableWidget userArrivalBySemTW = new TableWidget(USER_ARRIVAL.class);
         userArrivalBySemTW.setCaption(" ");
         userArrivalBySemTW.setCaption(getUILocaleUtil().getCaption("userArrivalBySemTW"));
@@ -130,6 +145,36 @@ public class DetalizationDialog extends AbstractDialog implements EntityListener
         DBTableModel userArrivalBySemTM = (DBTableModel)userArrivalBySemTW.getWidgetModel();
         userArrivalBySemTM.setRefreshType(ERefreshType.MANUAL);
 
+        rangeHL = new HorizontalLayout();
+        rangeHL.setSpacing(true);
+        rangeHL.setSizeFull();
+        rangeHL.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
+
+        DateField startDate = new DateField(getUILocaleUtil().getCaption("detalization.from"));
+        DateField endDate = new DateField(getUILocaleUtil().getCaption("detalization.to"));
+        Button searchBtn = new Button(getUILocaleUtil().getCaption("search"));
+        rangeHL.addComponent(startDate);
+        rangeHL.addComponent(endDate);
+        rangeHL.addComponent(searchBtn);
+        searchBtn.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                if(startDate.getValue()==null || endDate.getValue()==null){
+                    return;
+                }else if(startDate.getValue().after(endDate.getValue())){
+                    Date temp = startDate.getValue();
+                    startDate.setValue(endDate.getValue());
+                    endDate.setValue(temp);
+                }
+                try{
+                    userArrivalBySemTM.setEntities(getListBySem(user, startDate.getValue(),endDate.getValue()));
+                    userArrivalBySemTW.refresh();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
+            }
+        });
 
         Button closeBtn = new Button(getUILocaleUtil().getCaption("close"));
         closeBtn.addClickListener(new Button.ClickListener() {
@@ -139,8 +184,9 @@ public class DetalizationDialog extends AbstractDialog implements EntityListener
             }
         });
 
-        userArrivalVL.addComponent(userArrivalTW);
         userArrivalVL.addComponent(dateField);
+        userArrivalVL.addComponent(userArrivalTW);
+        userArrivalVL.addComponent(rangeHL);
         userArrivalVL.addComponent(userArrivalBySemTW);
         this.userDataVL.addComponent(userDataVL);
         mainHSP.setFirstComponent(userArrivalVL);
@@ -196,15 +242,18 @@ public class DetalizationDialog extends AbstractDialog implements EntityListener
         return userArrivals;
     }
 
-    public List<USER_ARRIVAL> getListBySem(USERS user, Date date){
+    public List<USER_ARRIVAL> getListBySem(USERS user, Date startDate ,Date endDate){
         List<USER_ARRIVAL> userArrivalList = new ArrayList<>();
 
         Map<Integer,Object> params = new HashMap<>();
-        String formattedDate = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS").format(date);
+        String formattedStartDate = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS").format(startDate);
+        String formattedEndDate = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS").format(endDate);
 
         String sql = "select * from user_arrival ua " +
-                "\nwhere ua.user_id = " + user.getId().getId().longValue()+" " +
-                "\n ORDER BY ua.created ";
+                "\n where ua.user_id = " + user.getId().getId().longValue()+" " +
+                "\n and date_trunc('day', ua.created) " +
+                " between date_trunc('day', TIMESTAMP '"+formattedStartDate+"') and date_trunc('day', TIMESTAMP '"+formattedEndDate+"') " +
+                " ORDER BY ua.created ";
 
         try {
             List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
