@@ -83,7 +83,7 @@ public class EmployeeYearLatecomers implements EntityListener {
                         List<String> list = new ArrayList<>();
                         list.add(vEmployeeInfo.getFIO());
                         list.add(vEmployeeInfo.getFaculty());
-                        //list.add(vEmployeeInfo.getLateSum())
+                        list.add(vEmployeeInfo.getLateSum());
                         tableBody.add(list);
                     }
                 }
@@ -226,7 +226,7 @@ public class EmployeeYearLatecomers implements EntityListener {
         }
         Map<Integer, Object> pm = new HashMap<>();
         String sql = "select distinct   id, FIO ,\n" +
-                "  first_value,mytime, count(user_id),user_id from (SELECT (empl.id)id," +
+                "  first_value,mytime, count(user_id)::text,user_id from (SELECT (empl.id)id," +
                 " trim(empl.first_name||' '|| empl.last_name ||' '|| empl.middle_name)FIO,\n" +
                 "                  first_value(empl.dept_name) over (partition by empl.id rows between unbounded  preceding  and unbounded following )first_value,\n" +
                 "                   (arriv.created::time)mytime,\n" +
@@ -259,7 +259,7 @@ public class EmployeeYearLatecomers implements EntityListener {
                     vempl.setId(ID.valueOf((long) oo[0]));
                     vempl.setFIO((String) oo[1]);
                     vempl.setFaculty((String)oo[2]);
-                    vempl.setLateSum((long)oo[4 ]);
+                    vempl.setLateSum((String)oo[4 ]);
                     emplList.add(vempl);
                 }
             }
