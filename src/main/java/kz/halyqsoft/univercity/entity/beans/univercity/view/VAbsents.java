@@ -14,16 +14,10 @@ public class VAbsents extends AbstractEntity {
     @FieldInfo(type = EFieldType.TEXT, order = 2)
     private String faculty;
 
-    @FieldInfo(type = EFieldType.TEXT, order = 3)
-    private String speciality;
-
-    @FieldInfo(type = EFieldType.TEXT, order = 4)
-    private String group;
-
-    @FieldInfo(type = EFieldType.DOUBLE, order = 5)
+    @FieldInfo(type = EFieldType.DOUBLE, order = 3)
     private Double absentSum;
 
-    @FieldInfo(type = EFieldType.DATE, order = 6)
+    @FieldInfo(type = EFieldType.DATE, order = 4)
     private Date lastVisit;
 
     public String getFIO() {
@@ -40,22 +34,6 @@ public class VAbsents extends AbstractEntity {
 
     public void setFaculty(String faculty) {
         this.faculty = faculty;
-    }
-
-    public String getSpeciality() {
-        return speciality;
-    }
-
-    public void setSpeciality(String speciality) {
-        this.speciality = speciality;
-    }
-
-    public String getGroup() {
-        return group;
-    }
-
-    public void setGroup(String group) {
-        this.group = group;
     }
 
     public Double getAbsentSum() {

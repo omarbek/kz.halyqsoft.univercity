@@ -264,7 +264,7 @@ public class CommonUtils {
         return formatter.format(date);
     }
 
-    public static String getTimeFromDate(Date date){
+    public static String getTimeFromDate(Date date) {
         SimpleDateFormat localDateFormat = new SimpleDateFormat("HH:mm:ss");
         String time = localDateFormat.format(date);
         return time;
@@ -287,9 +287,9 @@ public class CommonUtils {
                 code = beginYear + "0" + usersCode;
             } else if (usersCode < 10000) {
                 code = beginYear + usersCode;
-            } else if(usersCode < 100000){
+            } else if (usersCode < 100000) {
                 code = beginYear + usersCode;
-            }else {
+            } else {
                 SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USERS_CODE").
                         setId(BigInteger.valueOf(0));//TODO check
                 code = getCode(beginYear);
@@ -404,10 +404,10 @@ public class CommonUtils {
         return sd;
     }
 
-    public static boolean isCurrentUserHasAdminPrivileges(){
+    public static boolean isCurrentUserHasAdminPrivileges() {
         List<USER_ROLES> userRoles = getCurrentUser().getUserRoles();
-        for(USER_ROLES userRole : userRoles){
-            if(userRole.getId().getId().longValue() == 3){
+        for (USER_ROLES userRole : userRoles) {
+            if (userRole.getId().getId().longValue() == 3) {
                 return true;
             }
         }
@@ -417,5 +417,13 @@ public class CommonUtils {
     public static boolean isAdmin() {
         return getCurrentUser().getId().getId().intValue() == 1
                 || getCurrentUser().getId().getId().intValue() == 2;
+    }
+
+    public static String getLanguage() {
+        String lang = getUILocaleUtil().getCurrentLocale().toString().toLowerCase();
+        if (lang.startsWith("en")) {
+            return lang.substring(0, 2);
+        }
+        return lang.substring(3);
     }
 }

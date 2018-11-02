@@ -69,11 +69,12 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
         String main = getUILocaleUtil().getCaption("main");
         String studentAttendance = getUILocaleUtil().getCaption("studentAttendance");
         String employeeAttendance = getUILocaleUtil().getCaption("employeeAttendance");
-        String latecomers = getUILocaleUtil().getCaption("latecomers");
         String lateEmployees = getUILocaleUtil().getCaption("late.employees");
         String absentTooLong = getUILocaleUtil().getCaption("absent.too.long");
         String absentToday = getUILocaleUtil().getCaption("absent.today");
         String yearlyAttendance = getUILocaleUtil().getCaption("yearlyAttendance");
+        String latecomers = getUILocaleUtil().getCaption("latecomers");
+        String absent = getUILocaleUtil().getCaption("absent");
         String manuallySign = getUILocaleUtil().getCaption("manuallySign");
         String manuallySignedReport = getUILocaleUtil().getCaption("manuallySign.report");
 
@@ -83,8 +84,8 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
         hierarchicalContainer.setChildrenAllowed(studentAttendance, false);
         hierarchicalContainer.addItem(employeeAttendance);
         hierarchicalContainer.setChildrenAllowed(employeeAttendance, false);
-        hierarchicalContainer.addItem(latecomers);
-        hierarchicalContainer.setChildrenAllowed(latecomers, false);
+//        hierarchicalContainer.addItem(latecomers);
+//        hierarchicalContainer.setChildrenAllowed(latecomers, false);
         hierarchicalContainer.addItem(lateEmployees);
         hierarchicalContainer.setChildrenAllowed(lateEmployees, false);
         hierarchicalContainer.addItem(absentTooLong);
@@ -92,14 +93,19 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
         hierarchicalContainer.addItem(absentToday);
         hierarchicalContainer.setChildrenAllowed(absentToday, false);
         hierarchicalContainer.addItem(yearlyAttendance);
-        hierarchicalContainer.setChildrenAllowed(yearlyAttendance, false);
+        hierarchicalContainer.addItem(latecomers);
+        hierarchicalContainer.setChildrenAllowed(latecomers, false);
+        hierarchicalContainer.addItem(absent);
+        hierarchicalContainer.setChildrenAllowed(absent, false);
+        hierarchicalContainer.setParent(latecomers,yearlyAttendance);
+        hierarchicalContainer.setParent(absent,yearlyAttendance);
+
         if (CommonUtils.getCurrentUser().getId().getId().longValue() == 2) {
             hierarchicalContainer.addItem(manuallySign);
             hierarchicalContainer.addItem(manuallySignedReport);
             hierarchicalContainer.setChildrenAllowed(manuallySignedReport, false);
             hierarchicalContainer.setParent(manuallySignedReport, manuallySign);
         }
-
 
         menuTT.setContainerDataSource(hierarchicalContainer);
         menuTT.setSizeFull();
@@ -139,7 +145,7 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
                             mainHL.addComponent(signingSection.getMainVL());
                             setAbsentsInfo();
                         } else if (latecomers.equalsIgnoreCase(menu)) {
-                            GroupLatecomers groupLatecomers = new GroupLatecomers();
+                            EmployeeYearLatecomers groupLatecomers = new EmployeeYearLatecomers();
                             mainHL.addComponent(groupLatecomers.getMainVL());
                             setAbsentsInfo();
 
@@ -153,6 +159,14 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
                         } else if (absentToday.equalsIgnoreCase(menu)) {
                             AbsentTodayAttendance absentTodayAttendance = new AbsentTodayAttendance();
                             mainHL.addComponent(absentTodayAttendance.getMainVL());
+                        }  else if (latecomers.equalsIgnoreCase(menu)) {
+                            EmployeeYearLatecomers groupLatecomers = new EmployeeYearLatecomers();
+                            mainHL.addComponent(groupLatecomers.getMainVL());
+                            setAbsentsInfo();
+                        }else if (absent.equalsIgnoreCase(menu)) {
+                            EmployeeAbsent employeeLatecomers = new EmployeeAbsent();
+                            mainHL.addComponent(employeeLatecomers.getMainVL());
+                            setAbsentsInfo();
                         }
                         mainHSP.addComponent(mainHL);
                     }
@@ -160,7 +174,6 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
                     e.printStackTrace();//TODO catch
                 }
             }
-
         });
 
         mainHSP.addComponent(menuTT);
@@ -173,7 +186,6 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
         absentDayCB.setTextInputAllowed(true);
         absentDayCB.setFilteringMode(FilteringMode.CONTAINS);
         absentDayCB.setWidth(300, Unit.PIXELS);
-
     }
 
 }

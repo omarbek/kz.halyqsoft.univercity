@@ -3,7 +3,10 @@ package kz.halyqsoft.univercity.modules.bindingelectivesubject;
 import com.itextpdf.text.Font;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.combobox.FilteringMode;
-import com.vaadin.ui.*;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.HorizontalLayout;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VPairSubject;
@@ -12,7 +15,6 @@ import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.PrintDialog;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.EmployeePdfCreator;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
-import org.r3a.common.dblink.facade.CommonIDFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.ID;
@@ -37,7 +39,6 @@ import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
 import org.r3a.common.vaadin.widget.toolbar.IconToolbar;
 
 import javax.persistence.NoResultException;
-import javax.swing.plaf.basic.BasicOptionPaneUI;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -123,7 +124,7 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
         String sql = "SELECT\n" +
                 "                  pair.id,\n" +
                 "                  pair.code,\n" +
-                "                  subj.name_ru      subjectName,\n" +
+                "                  subj.name_" + CommonUtils.getLanguage() + "      subjectName,\n" +
                 "                  credit.credit,\n" +
                 "                  ects.ects,\n" +
                 "                  sem.semester_name semesterName,\n" +
@@ -363,7 +364,7 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
 
         CustomGridSelectDialog customGridSelectDialog = subjectFM.getCustomGridSelectDialog();
         customGridSelectDialog.setMultiSelect(false);
-        customGridSelectDialog.getFilterModel().addFilter("chair" , chairCB);
+        customGridSelectDialog.getFilterModel().addFilter("chair", chairCB);
         customGridSelectDialog.initFilter();
 
 

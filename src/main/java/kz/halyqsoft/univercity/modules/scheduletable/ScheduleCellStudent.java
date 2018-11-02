@@ -65,6 +65,9 @@ final class ScheduleCellStudent extends VerticalLayout {
                 sb.append(teacher.getMiddleName().charAt(0));
                 sb.append('.');
             }
+            sb.append(" ");
+            sb.append(scheduleDetail.getGroup().getName());
+            sb.append(" ");
             sb.append(scheduleDetail.getRoom().getRoomNo());
             addStyleName("schedule-cell-full");
         } else {
