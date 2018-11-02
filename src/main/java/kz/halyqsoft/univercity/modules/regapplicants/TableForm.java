@@ -292,7 +292,7 @@ public class TableForm {
                 "  LEFT JOIN teacher_subject ts ON ts.subject_id = subj.id\n" +
                 "  LEFT JOIN subject sbj ON ts.subject_id = sbj.id\n" +
                 "  LEFT JOIN users u ON u.id = ts.employee_id\n" +
-                "  INNER JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id\n" +
+                "  INNER JOIN student_teacher_subject s3 ON s3.teacher_subject_id = ts.id AND s3.student_education_id = stu_edu.id \n" +
                 "  LEFT JOIN pair_subject s4 ON subj.id = s4.subject_id\n" ;
 
                 if(iupsType == IUPS_TYPE.CHOOSEN){
