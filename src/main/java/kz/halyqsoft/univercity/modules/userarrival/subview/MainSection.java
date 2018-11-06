@@ -422,7 +422,7 @@ public class MainSection implements FilterPanelListener {
 
                 PdfCreator pdfCreator = new PdfCreator();
 
-                Paragraph paragraph = new Paragraph("Оңтүстік Қазақстан педагогикалық университеті", PdfUtils.getMainFont());
+                Paragraph paragraph = new Paragraph("Халықаралық SILKWAY университеті", PdfUtils.getMainFont());
                 paragraph.setAlignment(Element.ALIGN_CENTER);
                 pdfCreator.add(paragraph);
 
