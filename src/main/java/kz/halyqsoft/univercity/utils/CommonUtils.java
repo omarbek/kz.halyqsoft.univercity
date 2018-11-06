@@ -368,39 +368,49 @@ public class CommonUtils {
         try {
             sd = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(sdQM);
         } catch (NoResultException nrex) {
-            sd = new SEMESTER_DATA();
-            sd.setYear(studyYear);
-            sd.setSemesterPeriod(sp);
-
-            Calendar c = Calendar.getInstance();
-            c.clear();
-            if (sp.getId().equals(ID.valueOf(1))) {
-                c.set(Calendar.DAY_OF_MONTH, 20);
-                c.set(Calendar.MONTH, Calendar.AUGUST);
-                c.set(Calendar.YEAR, studyYear.getBeginYear());
-                sd.setBeginDate(c.getTime());
-
-                c.clear();
-                c.set(Calendar.DAY_OF_MONTH, 31);
-                c.set(Calendar.MONTH, Calendar.DECEMBER);
-                c.set(Calendar.YEAR, studyYear.getBeginYear());
-                sd.setEndDate(c.getTime());
-            } else if (sp.getId().equals(ID.valueOf(2))) {
-                c.set(Calendar.DAY_OF_MONTH, 10);
-                c.set(Calendar.MONTH, Calendar.JANUARY);
-                c.set(Calendar.YEAR, studyYear.getEndYear());
-                sd.setBeginDate(c.getTime());
-
-                c.clear();
-                c.set(Calendar.DAY_OF_MONTH, 25);
-                c.set(Calendar.MONTH, Calendar.MAY);
-                c.set(Calendar.YEAR, studyYear.getEndYear());
-                sd.setEndDate(c.getTime());
-            }
-
-            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(sd);
+            sd = createSemesterData(studyYear, sp);
         }
 
+        return sd;
+    }
+
+    private static SEMESTER_DATA createSemesterData(ENTRANCE_YEAR studyYear, SEMESTER_PERIOD sp) {
+        SEMESTER_DATA sd;
+        sd = new SEMESTER_DATA();
+        sd.setYear(studyYear);
+        sd.setSemesterPeriod(sp);
+
+        Calendar c = Calendar.getInstance();
+        c.clear();
+        if (sp.getId().equals(ID.valueOf(1))) {
+            c.set(Calendar.DAY_OF_MONTH, 20);
+            c.set(Calendar.MONTH, Calendar.AUGUST);
+            c.set(Calendar.YEAR, studyYear.getBeginYear());
+            sd.setBeginDate(c.getTime());
+
+            c.clear();
+            c.set(Calendar.DAY_OF_MONTH, 31);
+            c.set(Calendar.MONTH, Calendar.DECEMBER);
+            c.set(Calendar.YEAR, studyYear.getBeginYear());
+            sd.setEndDate(c.getTime());
+        } else if (sp.getId().equals(ID.valueOf(2))) {
+            c.set(Calendar.DAY_OF_MONTH, 10);
+            c.set(Calendar.MONTH, Calendar.JANUARY);
+            c.set(Calendar.YEAR, studyYear.getEndYear());
+            sd.setBeginDate(c.getTime());
+
+            c.clear();
+            c.set(Calendar.DAY_OF_MONTH, 25);
+            c.set(Calendar.MONTH, Calendar.MAY);
+            c.set(Calendar.YEAR, studyYear.getEndYear());
+            sd.setEndDate(c.getTime());
+        }
+
+        try {
+            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(sd);
+        } catch (Exception e) {
+            e.printStackTrace();//TODO catch
+        }
         return sd;
     }
 
@@ -425,5 +435,23 @@ public class CommonUtils {
             return lang.substring(0, 2);
         }
         return lang.substring(3);
+    }
+
+    public static SEMESTER_DATA getSemesterDataBySemesterAndEntranceYear(SEMESTER semester,
+                                                                         ENTRANCE_YEAR entranceYear) {
+        SEMESTER_DATA semesterData = new SEMESTER_DATA();
+        try {
+            QueryModel<SEMESTER_DATA> semesterDataQM = new QueryModel<>(SEMESTER_DATA.class);
+            semesterDataQM.addWhere("year", ECriteria.EQUAL, entranceYear.getId());
+            semesterDataQM.addWhere("semesterPeriod", ECriteria.EQUAL, semester.getSemesterPeriod().
+                    getId());
+            semesterData = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                    lookupSingle(semesterDataQM);
+        } catch (NoResultException e) {
+            semesterData = createSemesterData(entranceYear, semester.getSemesterPeriod());
+        } catch (Exception e) {
+            e.printStackTrace();//TODO catch
+        }
+        return semesterData;
     }
 }
