@@ -440,7 +440,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         content.setSizeFull();
 
         /* Subject PPS */
-        subjectPPSTW = new TableWidget(V_TEACHER_SUBJECT.class);
+        subjectPPSTW = new TableWidget(V_TEACHER_SUBJECT_MODULE.class);
         subjectPPSTW.setButtonVisible(AbstractToolbar.REFRESH_BUTTON, false);
         subjectPPSTW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
         subjectPPSTW.setButtonVisible(AbstractToolbar.EDIT_BUTTON, true);
@@ -449,12 +449,14 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         subjectPPSTM.setReadOnly(baseDataFW.getWidgetModel().isReadOnly());
         subjectPPSTM.setCrudEntityClass(TEACHER_SUBJECT.class);
 
+
         FormModel subjectPPSFM = ((DBTableModel) subjectPPSTW.getWidgetModel()).getFormModel();
         FKFieldModel subjectFM = (FKFieldModel) subjectPPSFM.getFieldModel("subject");
         subjectFM.setSelectType(ESelectType.CUSTOM_GRID);
         subjectFM.setDialogHeight(360);
         subjectFM.setDialogWidth(800);
         QueryModel subjectQM = subjectFM.getQueryModel();
+//        ((DBTableModel) subjectPPSTW.getWidgetModel()).getColumnModel("").setInTable(true);
 
         QueryModel subjectPPSQM = subjectPPSTM.getQueryModel();
         ID employeeId = ID.valueOf(-1);
