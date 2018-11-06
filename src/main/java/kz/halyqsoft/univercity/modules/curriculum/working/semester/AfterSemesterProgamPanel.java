@@ -9,8 +9,8 @@ import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_CURRICULUM_AFTER_SEMESTER;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_SUBJECT_SELECT;
-import kz.halyqsoft.univercity.modules.curriculum.working.AbstractCurriculumPanel;
-import kz.halyqsoft.univercity.modules.curriculum.working.CurriculumView;
+import kz.halyqsoft.univercity.modules.curriculum.working.main.AbstractCurriculumPanel;
+import kz.halyqsoft.univercity.modules.curriculum.working.main.CurriculumView;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -347,7 +347,7 @@ public class AfterSemesterProgamPanel extends AbstractCurriculumPanel implements
         return false;
     }
 
-    public final void checkForConform() throws Exception {
+    public final void checkForConfirm() throws Exception {
         if (getTotalCredit() == 0) {
             throw new Exception(getUILocaleUtil().getCaption("no.programs.after.semester"));
         }
@@ -460,14 +460,6 @@ public class AfterSemesterProgamPanel extends AbstractCurriculumPanel implements
 
     @Override
     public void onException(Object source, Throwable ex) {
-    }
-
-    @Override
-    public void save() throws Exception {
-    }
-
-    @Override
-    protected void cancel() {
     }
 
     public Integer getTotalCredit() {

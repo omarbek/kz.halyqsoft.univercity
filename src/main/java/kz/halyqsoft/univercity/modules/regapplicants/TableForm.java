@@ -360,5 +360,3 @@ public class TableForm {
         this.document = document;
     }
 }
-
-

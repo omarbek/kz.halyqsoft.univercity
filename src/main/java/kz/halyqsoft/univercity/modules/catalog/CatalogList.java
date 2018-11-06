@@ -70,6 +70,7 @@ class CatalogList {
         addCatalogEntityToList(SKILL.class);
         addCatalogEntityToList(QUALIFICATION.class);
         addCatalogEntityToList(NON_ADMISSION_CAUSE.class);
+        addCatalogEntityToList(TRAJECTORY.class);
 
         return new ArrayList<>(list);
     }

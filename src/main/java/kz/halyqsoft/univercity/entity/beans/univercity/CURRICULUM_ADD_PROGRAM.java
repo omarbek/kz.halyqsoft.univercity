@@ -5,64 +5,59 @@ import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_DATA;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT;
 import org.r3a.common.entity.AbstractEntity;
+import org.r3a.common.entity.EFieldType;
+import org.r3a.common.entity.FieldInfo;
 
+import javax.persistence.*;
 import java.util.Date;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.ManyToOne;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 /**
  * @author Omarbek
- * @created Feb 25, 2016 5:05:40 PM
+ * @created 06.11.2018
  */
 @Entity
 public class CURRICULUM_ADD_PROGRAM extends AbstractEntity {
 
-	private static final long serialVersionUID = -1694890284738737494L;
-
-    @ManyToOne
-    @JoinColumns({
-        @JoinColumn(name = "CURRICULUM_ID", referencedColumnName = "ID")})
-    private CURRICULUM curriculum;
-
-    @ManyToOne
-    @JoinColumns({
-        @JoinColumn(name = "SEMESTER_ID", referencedColumnName = "ID")})
-    private SEMESTER semester;
+	@ManyToOne
+	@JoinColumns({
+			@JoinColumn(name = "CURRICULUM_ID", referencedColumnName = "ID")})
+	private CURRICULUM curriculum;
 
 	@ManyToOne
-    @JoinColumns({
-        @JoinColumn(name = "SEMESTER_DATA_ID", referencedColumnName = "ID", nullable = false)})
-    private SEMESTER_DATA semesterData;
+	@JoinColumns({
+			@JoinColumn(name = "SEMESTER_ID", referencedColumnName = "ID")})
+	private SEMESTER semester;
 
-    @ManyToOne
-    @JoinColumns({
-        @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
-    private SUBJECT subject;
+	@ManyToOne
+	@JoinColumns({
+			@JoinColumn(name = "SEMESTER_DATA_ID", referencedColumnName = "ID", nullable = false)})
+	private SEMESTER_DATA semesterData;
 
-	@Column(name = "CODE")
+	@ManyToOne
+	@JoinColumns({
+			@JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
+	private SUBJECT subject;
+
+	@Column(name = "CREATED")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date created;
+
+	@Column(name = "UPDATED")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date updated;
+
+	@Column(name = "DELETED", nullable = false)
+	private boolean deleted;
+
+	@FieldInfo(type = EFieldType.TEXT, required = false)
+	@Column(name = "CODE", nullable = false)
 	private String code;
 
+	@FieldInfo(type = EFieldType.FK_COMBO, order = 2, required = false)
 	@ManyToOne
 	@JoinColumns({
 			@JoinColumn(name = "EDUCATION_MODULE_TYPE_ID", referencedColumnName = "ID")})
 	private EDUCATION_MODULE_TYPE educationModuleType;
-
-	@Column(name = "CREATED")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date created;
-
-	@Column(name = "UPDATED")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updated;
-
-	@Column(name = "DELETED", nullable = false)
-    private boolean deleted;
 
 	public CURRICULUM getCurriculum() {
 		return curriculum;
@@ -70,6 +65,14 @@ public class CURRICULUM_ADD_PROGRAM extends AbstractEntity {
 
 	public void setCurriculum(CURRICULUM curriculum) {
 		this.curriculum = curriculum;
+	}
+
+	public SEMESTER getSemester() {
+		return semester;
+	}
+
+	public void setSemester(SEMESTER semester) {
+		this.semester = semester;
 	}
 
 	public SEMESTER_DATA getSemesterData() {
@@ -86,14 +89,6 @@ public class CURRICULUM_ADD_PROGRAM extends AbstractEntity {
 
 	public void setSubject(SUBJECT subject) {
 		this.subject = subject;
-	}
-
-	public SEMESTER getSemester() {
-		return semester;
-	}
-
-	public void setSemester(SEMESTER semester) {
-		this.semester = semester;
 	}
 
 	public Date getCreated() {
