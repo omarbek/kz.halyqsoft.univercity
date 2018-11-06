@@ -343,7 +343,7 @@ public class CyclePanel extends AbstractCurriculumPanel {
             cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
 
             cell = row.createCell(2);
-            cell.setCellValue(vcap.getSubjectNameRU());
+//            cell.setCellValue(vcap.getSubjectNameRU());
             cell.setCellStyle(styles.get(ExcelStyles.CONTENT_LEFT));
 
             cell = row.createCell(3);
