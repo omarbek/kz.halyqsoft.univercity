@@ -15,6 +15,7 @@ import org.r3a.common.vaadin.widget.ERefreshType;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
+import org.vaadin.jsconsole.ClientLog;
 
 import java.text.SimpleDateFormat;
 import java.util.*;

@@ -1,5 +1,7 @@
 package kz.halyqsoft.univercity.entity.beans.univercity.catalog;
 
+import org.r3a.common.entity.ID;
+
 import javax.persistence.Entity;
 
 /**
@@ -9,8 +11,8 @@ import javax.persistence.Entity;
 @Entity
 public class CURRICULUM_STATUS extends AbstractStatusEntity {
 
-	private static final long serialVersionUID = -1874778987991369020L;
+    public static final ID IN_CREATING = ID.valueOf(1);
+    public static final ID IN_CONFORMING = ID.valueOf(2);
+    public static final ID APPROVED = ID.valueOf(3);
 
-	public CURRICULUM_STATUS() {
-	}
 }

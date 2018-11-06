@@ -56,4 +56,5 @@ public class SUBJECT_REQUISITE extends AbstractEntity {
 	public void setPreRequisite(boolean preRequisite) {
 		this.preRequisite = preRequisite;
 	}
+
 }

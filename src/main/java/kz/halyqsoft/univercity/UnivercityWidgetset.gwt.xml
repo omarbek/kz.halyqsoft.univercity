@@ -38,4 +38,6 @@
     
 
     
+
+    <inherits name="org.vaadin.jsconsole.JsConsoleWidgetset" />
 </module>

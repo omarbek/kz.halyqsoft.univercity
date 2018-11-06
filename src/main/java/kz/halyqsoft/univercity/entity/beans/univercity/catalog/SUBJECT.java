@@ -147,7 +147,13 @@ public class SUBJECT extends AbstractEntity {
     @Column(name = "WEEK_NUMBER")
     private Integer weekNumber;
 
-    @FieldInfo(type = EFieldType.BOOLEAN, order = 30, required = false, inEdit = false, inGrid = false, inView = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 30, required = false)
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "TRAJECTORY_ID", referencedColumnName = "ID")})
+    private TRAJECTORY trajectory;
+
+    @FieldInfo(type = EFieldType.BOOLEAN, order = 31, required = false, inEdit = false, inGrid = false, inView = false)
     @Column(name = "DELETED", nullable = false)
     private boolean deleted;
 
@@ -343,7 +349,7 @@ public class SUBJECT extends AbstractEntity {
         } else {
             name = nameRU;
         }
-        return name + "-" + chair.getDeptShortName() + ", "
+        return name + " (" + trajectory + "), "
                 + creditability.toString() + " кр.";
     }
 
@@ -385,5 +391,13 @@ public class SUBJECT extends AbstractEntity {
 
     public void setPracticeBreakdown(PRACTICE_BREAKDOWN practiceBreakdown) {
         this.practiceBreakdown = practiceBreakdown;
+    }
+
+    public TRAJECTORY getTrajectory() {
+        return trajectory;
+    }
+
+    public void setTrajectory(TRAJECTORY trajectory) {
+        this.trajectory = trajectory;
     }
 }

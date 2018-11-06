@@ -290,13 +290,13 @@ public class SubjectView extends AbstractTaskView implements FilterPanelListener
 
             fm.setReadOnly(false);
             fm.setTitleVisible(false);
-            FSubjectFilter sf = (FSubjectFilter) filterPanel.getFilterBean();
-
+//            FSubjectFilter sf = (FSubjectFilter) filterPanel.getFilterBean();
+//
             SUBJECT newSubject = (SUBJECT) fm.createNew();
-
-            if (sf != null) {
-                newSubject.setChair(sf.getChair());
-            }
+//
+//            if (sf != null) {
+//                newSubject.setChair(sf.getChair());
+//            }
             SubjectEdit se = new SubjectEdit(fm);
             new SubjectDialog(se, SubjectView.this);
         }

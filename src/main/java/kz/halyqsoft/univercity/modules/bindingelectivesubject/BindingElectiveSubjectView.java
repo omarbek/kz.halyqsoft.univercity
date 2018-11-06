@@ -1,18 +1,25 @@
 package kz.halyqsoft.univercity.modules.bindingelectivesubject;
 
+import com.itextpdf.text.Font;
+import com.itextpdf.text.pdf.BaseFont;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.server.VaadinService;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
 import kz.halyqsoft.univercity.entity.beans.univercity.CATALOG_ELECTIVE_SUBJECTS;
 import kz.halyqsoft.univercity.entity.beans.univercity.ELECTIVE_BINDED_SUBJECT;
 import kz.halyqsoft.univercity.entity.beans.univercity.PAIR_SUBJECT;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SPECIALITY;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.VAbsents;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_ELECTIVE_SUBJECT;
 import kz.halyqsoft.univercity.filter.FElectiveFilter;
 import kz.halyqsoft.univercity.filter.panel.ElectiveFilterPanel;
+import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.PrintDialog;
 import kz.halyqsoft.univercity.utils.CommonUtils;
+import kz.halyqsoft.univercity.utils.EmployeePdfCreator;
 import kz.halyqsoft.univercity.utils.EntityUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -24,12 +31,15 @@ import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.ERefreshType;
+import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 import org.r3a.common.vaadin.widget.filter2.FilterPanelListener;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
+import org.r3a.common.vaadin.widget.grid.model.GridColumnModel;
 import org.r3a.common.vaadin.widget.toolbar.IconToolbar;
 
+import javax.swing.plaf.ButtonUI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -110,7 +120,6 @@ public class BindingElectiveSubjectView extends AbstractTaskView implements Filt
         electiveSubjectGM.setMultiSelect(true);
         electiveSubjectGM.setRefreshType(ERefreshType.MANUAL);
         refresh();
-
         getContent().addComponent(electiveSubjectsGW);
         getContent().setComponentAlignment(electiveSubjectsGW, Alignment.MIDDLE_CENTER);
 

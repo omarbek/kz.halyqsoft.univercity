@@ -21,6 +21,8 @@ import org.r3a.common.vaadin.widget.ERefreshType;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
+import org.vaadin.jsconsole.ClientLog;
+import org.vaadin.jsconsole.client.JsConsole;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -188,7 +190,7 @@ public class LateEmployeesAttendance implements EntityListener {
         Map<Integer, Object> params = new HashMap<>();
         String sql = "select distinct  * from (SELECT trim(empl.first_name||' '|| empl.last_name ||' '|| empl.middle_name),\n" +
                 "  first_value(empl.dept_name) over (partition by empl.id rows between unbounded  preceding  and unbounded following ),\n" +
-                "   (arriv.created::time)::text created\n," +
+                "   (arriv.created::time)::text\n," +
                 "  arriv.user_id," +
                 "  first_value(empl.dept_id) over (partition by empl.id rows between unbounded  preceding  and unbounded following ) as dept_id\n" +
                 "  FROM user_arrival arriv\n" +
@@ -201,7 +203,7 @@ public class LateEmployeesAttendance implements EntityListener {
                 "                                   AND date_trunc('day', max_arriv.created) = date_trunc('day', TIMESTAMP '"+ CommonUtils.getFormattedDate(dateField.getValue()) +"')\n" +
                 "                                   AND come_in = TRUE)\n" +
                 "        AND come_in = TRUE AND arriv.created :: TIME > '"+CommonUtils.getTimeFromDate(dateField.getValue())+"'\n" +
-                " ) as foo order by foo.created desc";
+                " ) as foo";
 
         if(department!=null){
             sql = sql + "   where dept_id = " + department.getId();
@@ -235,8 +237,6 @@ public class LateEmployeesAttendance implements EntityListener {
             CommonUtils.showMessageAndWriteLog("Unable to refresh department list", ex);
         }
     }
-
-
 
     @Override
     public void handleEntityEvent(EntityEvent entityEvent) {
