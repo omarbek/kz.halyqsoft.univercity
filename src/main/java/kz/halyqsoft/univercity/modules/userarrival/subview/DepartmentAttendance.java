@@ -201,24 +201,27 @@ public class DepartmentAttendance implements EntityListener{
         String formattedDate = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS").format(date);
 
         Map<Integer, Object> params = new HashMap<>();
-        String sql = "SELECT  dep.DEPT_NAME," +
-                " count(empl.dept_id)," +
-                " count(user_id)," +
-                " dep.id" +
-                " FROM v_employee empl" +
-                " RIGHT JOIN department dep ON  dep.id = empl.dept_id " +
-                " LEFT join (SELECT\n" +
+        String sql = "SELECT\n" +
+                "  dep.DEPT_NAME,\n" +
+                "  count(empl.dept_id),\n" +
+                "  count(user_id),\n" +
+                "  dep.id\n" +
+                "FROM v_employee empl RIGHT JOIN department dep ON dep.id = empl.dept_id\n" +
+                "  LEFT JOIN (SELECT\n" +
                 "               arriv.user_id,\n" +
-                "               count(arriv.user_id) as cameCount\n" +
+                "               count(arriv.user_id) AS cameCount\n" +
                 "             FROM user_arrival arriv\n" +
-                "             WHERE date_trunc('day', arriv.created) = date_trunc('day', timestamp'" + formattedDate + "')\n" +
-                "                   AND arriv.created = (SELECT max(max_arriv.created)\n" +
-                "                                        FROM user_arrival max_arriv\n" +
-                "                                        WHERE max_arriv.user_id = arriv.user_id)\n" +
-//                "                   AND come_in = TRUE\n" +
-                "             GROUP BY arriv.user_id)arriv on arriv.user_id=empl.id" +
-                " WHERE dep.parent_id = " + department.getDepartmentID() +
-                " GROUP BY  dep.dept_name,dep.id";
+                "               INNER JOIN (SELECT\n" +
+                "                             max(max_arriv.created) AS max,\n" +
+                "                             user_id\n" +
+                "                           FROM user_arrival max_arriv\n" +
+                "                           GROUP BY user_id) AS foo\n" +
+                "                 ON foo.user_id = arriv.user_id AND date_trunc('day', timestamp '"+formattedDate+"') = date_trunc('day', foo.max)\n" +
+                "             WHERE date_trunc('day', arriv.created) = date_trunc('day', foo.max)\n" +
+                //"                   AND come_in = TRUE\n" +
+                "             GROUP BY arriv.user_id) arriv ON arriv.user_id = empl.id\n" +
+                "WHERE dep.parent_id = "+department.getDepartmentID()+"\n" +
+                "GROUP BY dep.dept_name, dep.id;";
 
         try {
             List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);

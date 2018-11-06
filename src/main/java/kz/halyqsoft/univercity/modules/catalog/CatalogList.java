@@ -49,6 +49,7 @@ class CatalogList {
         addCatalogEntityToList(STUDENT_CATEGORY.class);
         addCatalogEntityToList(LOCK_REASON.class);
         addCatalogEntityToList(CREATIVE_EXAM_SUBJECT.class);
+        addCatalogEntityToList(WEEKEND_DAYS.class);
 
         addCatalogEntityToList(SPECIALITY.class);
         addCatalogEntityToList(ACADEMIC_DEGREE.class);
