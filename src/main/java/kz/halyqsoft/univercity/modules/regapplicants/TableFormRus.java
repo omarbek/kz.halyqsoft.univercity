@@ -21,7 +21,7 @@ public class TableFormRus {
     private PdfPTable pdfPTable;
     private ByteArrayOutputStream byteArrayOutputStream;
     private ID studentId;
-    private static int fontSize = 9;
+    private static int fontSize = 7;
 
     public TableFormRus(Document document, ID studentID){
         this.document = document;

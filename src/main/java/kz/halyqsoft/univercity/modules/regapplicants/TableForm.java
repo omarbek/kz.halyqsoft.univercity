@@ -25,7 +25,7 @@ public class TableForm {
     private PdfPTable pdfPTable;
     private ByteArrayOutputStream byteArrayOutputStream;
     private ID studentId;
-    private static int fontSize = 9;
+    private static int fontSize = 7;
 
     public TableForm(Document document, ID studentID) {
         this.document = document;
@@ -301,7 +301,7 @@ public class TableForm {
                 }
 
                 sql +="  WHERE  usr.deleted = FALSE\n" +
-                "      AND sem_data.id = " + semData + " \n" +
+                "      AND sem_data.year_id = " + semesterData.getYear().getId().getId().longValue() + " \n" +
                 "      AND usr.deleted = FALSE\n" +
                 "      AND subj.subject_cycle_id IS NOT NULL\n" +
                 "      AND sem_data.semester_period_id = "+semPeriod+" \n" ;
