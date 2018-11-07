@@ -342,7 +342,7 @@ public class MainSection implements FilterPanelListener {
                         "  count(DISTINCT vs.id)::text,\n" +
                         "  round(count(DISTINCT vs.id) * sum(newTable.cameDays) / sum(newTable.allDays))::text,\n" +
                         "  concat(round(sum(newTable.cameDays) * 100 / sum(newTable.allDays), 2), '%'),\n" +
-                        "  concat(ve.first_name, ' ', ve.last_name, ' ', ve.middle_name) AS FIO\n" +
+                        "  concat(ve.last_name, ' ', (LEFT(ve.first_name, 1)), '. ') AS FIO\n" +
                         "FROM (\n" +
                         "       SELECT\n" +
                         "         vs.groups_id,\n" +
@@ -493,7 +493,7 @@ public class MainSection implements FilterPanelListener {
                 PdfUtils.insertCell(resultTable, "Сабаққа қатысу пайызы", Element.ALIGN_CENTER,1);
                 for(String key : resultMap.keySet()){
                     PdfUtils.insertCell(resultTable, key+" - курс", Element.ALIGN_CENTER,1);
-                    PdfUtils.insertCell(resultTable, resultMap.get(key)+"%", Element.ALIGN_CENTER,1);
+                    PdfUtils.insertCell(resultTable, resultMap.get(key), Element.ALIGN_CENTER,1);
                 }
                 pdfCreator.add(resultTable);
                 byte[] bytes = null;
