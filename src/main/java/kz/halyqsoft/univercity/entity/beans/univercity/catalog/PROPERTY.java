@@ -10,7 +10,7 @@ import javax.persistence.ManyToOne;
 
 /**
  * @author Omarbek
- * Created Jan 25, 2017 12:49:55 PM
+ * Created Jan 25, 2018 12:49:55 PM
  */
 @Entity
 public class PROPERTY extends AbstractEntity {

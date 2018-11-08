@@ -6,7 +6,7 @@ import java.util.Locale;
 
 /**
  * @author Omarbek
- * @created Feb 27, 2017 11:33:54 AM
+ * @created Feb 27, 2018 11:33:54 AM
  */
 @SuppressWarnings("unused")
 public final class VSubjectRequisite extends AbstractEntity {

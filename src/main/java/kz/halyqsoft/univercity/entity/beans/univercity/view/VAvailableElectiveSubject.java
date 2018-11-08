@@ -4,7 +4,7 @@ import org.r3a.common.entity.AbstractEntity;
 
 /**
  * @author Omarbek
- * @created Feb 22, 2017 10:11:54 AM
+ * @created Feb 22, 2018 10:11:54 AM
  */
 public final class VAvailableElectiveSubject extends AbstractEntity {
 

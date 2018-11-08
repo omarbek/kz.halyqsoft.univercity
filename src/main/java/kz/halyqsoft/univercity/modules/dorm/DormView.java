@@ -10,7 +10,7 @@ import org.r3a.common.vaadin.view.AbstractTaskView;
 
 /**
  * @author Dinassil Omarbek
- * @created May 24, 2017 9:14:06 AM
+ * @created May 24, 2018 9:14:06 AM
  */
 public class DormView extends AbstractTaskView {
 

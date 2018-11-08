@@ -442,7 +442,9 @@ public class CommonUtils {
         SEMESTER_DATA semesterData = new SEMESTER_DATA();
         try {
             QueryModel<SEMESTER_DATA> semesterDataQM = new QueryModel<>(SEMESTER_DATA.class);
-            semesterDataQM.addWhere("year", ECriteria.EQUAL, entranceYear.getId());
+            FromItem yearFI = semesterDataQM.addJoin(EJoin.INNER_JOIN, "year", ENTRANCE_YEAR.class, "id");
+            semesterDataQM.addWhere(yearFI, "beginYear", ECriteria.EQUAL, entranceYear.getBeginYear() +
+                    semester.getStudyYear().getStudyYear() - 1);
             semesterDataQM.addWhere("semesterPeriod", ECriteria.EQUAL, semester.getSemesterPeriod().
                     getId());
             semesterData = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
@@ -453,5 +455,22 @@ public class CommonUtils {
             e.printStackTrace();//TODO catch
         }
         return semesterData;
+    }
+
+    public static SEMESTER getSemesterBySemesterDataAndEntranceYear(SEMESTER_DATA semesterData,
+                                                                    ENTRANCE_YEAR entranceYear) {
+        SEMESTER semester = new SEMESTER();
+        try {
+            QueryModel<SEMESTER> semesterQM = new QueryModel<>(SEMESTER.class);
+            semesterQM.addWhere("semesterPeriod", ECriteria.EQUAL, semesterData.getSemesterPeriod().getId());
+            int year = semesterData.getYear().getBeginYear() - entranceYear.getBeginYear() + 1;
+            semesterQM.addWhere("studyYear", ECriteria.EQUAL, ID.valueOf(year));
+            semester = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(semesterQM);
+        } catch (NoResultException e) {
+            semester = null;
+        } catch (Exception e) {
+            e.printStackTrace();//TODO catch
+        }
+        return semester;
     }
 }

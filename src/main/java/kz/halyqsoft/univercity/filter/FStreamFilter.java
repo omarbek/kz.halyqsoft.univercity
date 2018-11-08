@@ -2,12 +2,11 @@ package kz.halyqsoft.univercity.filter;
 
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_DATA;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SPECIALITY;
 import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 
 /**
  * @author Omarbek
- * @created Mar 27, 2017 4:54:32 PM
+ * @created Mar 27, 2018 4:54:32 PM
  */
 public final class FStreamFilter extends AbstractFilterBean {
 

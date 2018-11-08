@@ -4,7 +4,7 @@ import org.r3a.common.entity.AbstractEntity;
 
 /**
  * @author Omarbek
- * @created Feb 22, 2017 2:21:13 PM
+ * @created Feb 22, 2018 2:21:13 PM
  */
 public final class VCurriculumSchedule extends AbstractEntity {
 

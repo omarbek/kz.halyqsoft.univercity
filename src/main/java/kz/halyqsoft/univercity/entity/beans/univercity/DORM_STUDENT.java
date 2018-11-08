@@ -10,7 +10,7 @@ import java.util.Date;
 
 /**
  * @author Omarbek
- * @created Apr 11, 2017 5:16:07 PM
+ * @created Apr 11, 2018 5:16:07 PM
  */
 @Entity
 public class DORM_STUDENT extends AbstractEntity {

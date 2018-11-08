@@ -10,7 +10,7 @@ import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 
 /**
  * @author Dinassil Omarbek
- * @created Apr 28, 2017 3:07:53 PM
+ * @created Apr 28, 2018 3:07:53 PM
  */
 public final class FSemesterSubjectFilter extends AbstractFilterBean {
 

@@ -10,7 +10,7 @@ import java.util.Date;
 
 /**
  * @author Omarbek
- * @created Apr 3, 2017 3:14:15 PM
+ * @created Apr 3, 2018 3:14:15 PM
  */
 @Entity
 public class STUDENT_PAYMENT extends AbstractEntity {

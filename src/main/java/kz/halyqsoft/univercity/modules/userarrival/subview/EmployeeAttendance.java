@@ -15,26 +15,25 @@ import org.r3a.common.vaadin.widget.ERefreshType;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
-import org.vaadin.jsconsole.ClientLog;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static java.lang.Boolean.FALSE;
 
-public class EmployeeAttendance implements EntityListener{
+public class EmployeeAttendance implements EntityListener {
     private VerticalLayout mainVL;
     private HorizontalLayout topHL;
     private HorizontalLayout buttonPanel;
     private GridWidget departmentGW;
     private DateField dateField;
     private DBGridModel departmentGM;
-    private Button  backButton, backButtonAdministration,backButtonAE;
+    private Button backButton, backButtonAdministration, backButtonAE;
     private DepartmentAttendance attendance;
     private AdministrationAttendance administrationAttendance;
     private AdministrationEmployeeAttendance administrationEA;
 
-    public EmployeeAttendance( ){
+    public EmployeeAttendance() {
         mainVL = new VerticalLayout();
         mainVL.setImmediate(true);
 
@@ -47,7 +46,7 @@ public class EmployeeAttendance implements EntityListener{
         init();
     }
 
-    private void init(){
+    private void init() {
 
         backButton = new Button(CommonUtils.getUILocaleUtil().getCaption("backButton"));
         backButton.setImmediate(true);
@@ -55,8 +54,8 @@ public class EmployeeAttendance implements EntityListener{
         backButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
-                    mainVL.removeComponent(attendance.getMainVL());
-                    mainVL.addComponent(departmentGW);
+                mainVL.removeComponent(attendance.getMainVL());
+                mainVL.addComponent(departmentGW);
                 dateField.setVisible(true);
                 backButton.setVisible(false);
             }
@@ -105,7 +104,7 @@ public class EmployeeAttendance implements EntityListener{
         dateField.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
-                if(mainVL.getComponentIndex(departmentGW)>-1){
+                if (mainVL.getComponentIndex(departmentGW) > -1) {
                     departmentGM.setEntities(getDepartment(dateField.getValue()));
                 }
             }
@@ -165,9 +164,9 @@ public class EmployeeAttendance implements EntityListener{
                 "                             user_id\n" +
                 "                           FROM user_arrival max_arriv\n" +
                 "                           GROUP BY user_id) AS foo\n" +
-                "ON foo.user_id = arriv.user_id AND date_trunc('day', TIMESTAMP '"+formattedDate+"') = date_trunc('day', foo.max)\n" +
+                "ON foo.user_id = arriv.user_id AND date_trunc('day', TIMESTAMP '" + formattedDate + "') = date_trunc('day', foo.max)\n" +
                 "             WHERE date_trunc('day', arriv.created) = date_trunc('day', foo.max)\n" +
-       //         "                   AND come_in = TRUE\n" +
+                //         "                   AND come_in = TRUE\n" +
                 "             GROUP BY arriv.user_id) arriv ON arriv.user_id = ve.id\n" +
                 "WHERE d1.deleted = FALSE AND d2.deleted = FALSE\n" +
                 "GROUP BY d1.dept_name, d1.id;\n";
@@ -208,20 +207,20 @@ public class EmployeeAttendance implements EntityListener{
 
     @Override
     public void handleEntityEvent(EntityEvent entityEvent) {
-        if(entityEvent.getSource().equals(departmentGW)){
-            if(entityEvent.getAction()==EntityEvent.SELECTED){
-                if(departmentGW !=null){
+        if (entityEvent.getSource().equals(departmentGW)) {
+            if (entityEvent.getAction() == EntityEvent.SELECTED) {
+                if (departmentGW != null) {
                     mainVL.removeComponent(departmentGW);
-                    if(((VDepartment)departmentGW.getSelectedEntity()).getDepartmentID()==20){
+                    if (((VDepartment) departmentGW.getSelectedEntity()).getDepartmentID() == 20) {
                         administrationAttendance = new AdministrationAttendance(this);
                         mainVL.addComponent(administrationAttendance.getMainVL());
                         backButtonAdministration.setVisible(true);
-                    }else if(((VDepartment)departmentGW.getSelectedEntity()).getDepartmentID()==43){
+                    } else if (((VDepartment) departmentGW.getSelectedEntity()).getDepartmentID() == 43) {
                         administrationEA = new AdministrationEmployeeAttendance(this);
                         mainVL.addComponent(administrationEA.getMainVL());
                         backButtonAE.setVisible(true);
-                    }else {
-                        attendance = new DepartmentAttendance((VDepartment) departmentGW.getSelectedEntity(),this);
+                    } else {
+                        attendance = new DepartmentAttendance((VDepartment) departmentGW.getSelectedEntity(), this);
                         mainVL.addComponent(attendance.getMainVL());
                         backButton.setVisible(true);
                     }

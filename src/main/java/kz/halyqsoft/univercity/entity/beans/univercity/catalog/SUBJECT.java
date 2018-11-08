@@ -21,7 +21,7 @@ public class SUBJECT extends AbstractEntity {
     @Column(name = "NAME_KZ", nullable = false)
     private String nameKZ;
 
-    @FieldInfo(type = EFieldType.TEXT_LATIN, max = 256, order = 2)
+    @FieldInfo(type = EFieldType.TEXT_LATIN, max = 256, order = 2,inGrid = false)
     @Column(name = "NAME_EN", nullable = false)
     private String nameEN;
 
@@ -41,57 +41,57 @@ public class SUBJECT extends AbstractEntity {
             @JoinColumn(name = "STUDY_DIRECT_ID", referencedColumnName = "ID")})
     private STUDY_DIRECT studyDirect;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 8)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 6)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "CHAIR_ID", referencedColumnName = "ID")})
     private DEPARTMENT chair;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 9, inGrid = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 7)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "LEVEL_ID", referencedColumnName = "ID")})
     private LEVEL level;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 10, inGrid = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 8)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "MODULE_ID", referencedColumnName = "ID")})
     private SUBJECT_MODULE subjectModule;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 11, inGrid = false, required = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 9, required = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "SUBJECT_CYCLE_ID", referencedColumnName = "ID", nullable = true)})
     private SUBJECT_CYCLE subjectCycle;
 
-    @FieldInfo(type = EFieldType.BOOLEAN, order = 12, required = false, columnWidth = 100)
-    @Column(name = "MANDATORY", nullable = false)
-    private boolean mandatory;
-
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 13, inGrid = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 10)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "CREDITABILITY_ID", referencedColumnName = "ID")})
     private CREDITABILITY creditability;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 14, inGrid = false, required = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 11, required = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "ACADEMIC_FORMULA_ID", referencedColumnName = "ID")})
     private ACADEMIC_FORMULA academicFormula;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 15)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 12)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "ECTS_ID", referencedColumnName = "ID")})
     private ECTS ects;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 16, inGrid = false, required = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 13, inGrid = false, required = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "PRACTICE_BREAKDOWN_ID", referencedColumnName = "ID")})
     private PRACTICE_BREAKDOWN practiceBreakdown;
+
+    @FieldInfo(type = EFieldType.BOOLEAN, order = 14, required = false, columnWidth = 100)
+    @Column(name = "MANDATORY", nullable = false)
+    private boolean mandatory;
 
     @FieldInfo(type = EFieldType.INTEGER, order = 17, required = false)
     @Column(name = "CLASS_ROOM")
