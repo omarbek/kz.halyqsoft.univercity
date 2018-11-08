@@ -12,3 +12,10 @@ CREATE SEQUENCE S_TRAJECTORY
   MINVALUE 0
   START WITH 1
   NO CYCLE;
+
+ALTER TABLE schedule_detail ADD COLUMN stream_id int;
+
+ALTER TABLE schedule_detail
+  ADD CONSTRAINT fk_t_schedule_detail_stream FOREIGN KEY (stream_id)
+REFERENCES stream (id)
+ON DELETE RESTRICT ON UPDATE RESTRICT;

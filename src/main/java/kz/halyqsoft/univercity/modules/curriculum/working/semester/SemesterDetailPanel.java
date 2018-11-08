@@ -78,7 +78,7 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
         currentGW.addEntityListener(this);
         currentGW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
         currentGW.setButtonDescription(AbstractToolbar.ADD_BUTTON, "add.from.iups");
-        currentGW.setButtonWidth(AbstractToolbar.ADD_BUTTON, "150px");
+        //currentGW.setButt(AbstractToolbar.ADD_BUTTON, "150px");
         currentGW.addButtonClickListener(AbstractToolbar.ADD_BUTTON, new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
