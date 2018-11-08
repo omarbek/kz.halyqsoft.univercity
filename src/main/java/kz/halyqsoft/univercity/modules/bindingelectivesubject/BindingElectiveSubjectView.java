@@ -12,9 +12,14 @@ import com.vaadin.ui.HorizontalLayout;
 import kz.halyqsoft.univercity.entity.beans.univercity.CATALOG_ELECTIVE_SUBJECTS;
 import kz.halyqsoft.univercity.entity.beans.univercity.ELECTIVE_BINDED_SUBJECT;
 import kz.halyqsoft.univercity.entity.beans.univercity.PAIR_SUBJECT;
+
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VAbsents;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_ELECTIVE_SUBJECT;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SPECIALITY;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT_REQUISITE;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.VPairSubject;
 import kz.halyqsoft.univercity.filter.FElectiveFilter;
 import kz.halyqsoft.univercity.filter.panel.ElectiveFilterPanel;
 import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.PrintDialog;
@@ -24,6 +29,7 @@ import kz.halyqsoft.univercity.utils.EntityUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
+import org.r3a.common.entity.ID;
 import org.r3a.common.entity.beans.AbstractTask;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.from.EJoin;
@@ -31,7 +37,6 @@ import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.ERefreshType;
-import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 import org.r3a.common.vaadin.widget.filter2.FilterPanelListener;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
@@ -39,9 +44,10 @@ import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 import org.r3a.common.vaadin.widget.grid.model.GridColumnModel;
 import org.r3a.common.vaadin.widget.toolbar.IconToolbar;
 
-import javax.swing.plaf.ButtonUI;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Omarbek
@@ -53,6 +59,8 @@ public class BindingElectiveSubjectView extends AbstractTaskView implements Filt
     private ComboBox specCB;
     private ComboBox yearCB;
     private GridWidget electiveSubjectsGW;
+    private DBGridModel electiveSubjectGM;
+    private BindingElectiveSubjectEdit edit;
 
     public ComboBox getSpecCB() {
         return specCB;
@@ -109,6 +117,94 @@ public class BindingElectiveSubjectView extends AbstractTaskView implements Filt
         getContent().addComponent(componentHL);
         getContent().setComponentAlignment(componentHL, Alignment.MIDDLE_CENTER);
 
+        Button printBtn = new Button(CommonUtils.getUILocaleUtil().getCaption("export"));
+        printBtn.setImmediate(true);
+        printBtn.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                List<String> tableHeader = new ArrayList<>();
+                List<List<String>> tableBody = new ArrayList<>();
+                String fileName = "document";
+
+                for (GridColumnModel gcm : electiveSubjectGM.getColumnModels()) {
+                    tableHeader.add(gcm.getLabel());
+                }
+                for (int i = 0; i <  electiveSubjectsGW.getAllEntities().size(); i++) {
+                    ELECTIVE_BINDED_SUBJECT subject = (ELECTIVE_BINDED_SUBJECT)  electiveSubjectsGW.getAllEntities().get(i);
+                    //PAIR_SUBJECT ps = (PAIR_SUBJECT) edit.getPairSubjectGW().getAllEntities();
+                    String slqEmpl = "SELECT pair.id,\n" +
+                            "      pair.code,\n" +
+                            "      subj.name_kz,\n" +
+                            "      credit.credit,\n" +
+                            "      ects.ects,\n" +
+                            "      sem.semester_name semesterName,\n" +
+                            "      pair.pair_number    pairNumber,\n" +
+                            "      pair.aim,\n" +
+                            "      pair.description   description,\n" +
+                            "      pair.competence,\n" +
+                            "  requisite.pre_requisite\n" +
+                            "      FROM pair_subject pair\n" +
+                            "        INNER JOIN subject subj ON subj.id = pair.subject_id\n" +
+                            "        INNER JOIN creditability credit ON credit.id = subj.creditability_id\n" +
+                            "        INNER JOIN ects ects ON ects.id = subj.ects_id\n" +
+                            "        INNER JOIN elective_binded_subject elect_bind ON elect_bind.id = pair.elective_binded_subject_id\n" +
+                            "        INNER JOIN semester sem ON sem.id = elect_bind.semester_id\n" +
+                            "        INNER JOIN subject_requisite requisite on subj.id = requisite.requisite_id\n" +
+                            "      WHERE pair.elective_binded_subject_id = "+ subject.getId() +" AND subj.mandatory = FALSE AND subj.subject_cycle_id\n" +
+                            "      IS NOT NULL";
+                    if (electiveSubjectsGW.getCaption() != null) {
+                        fileName = electiveSubjectsGW.getCaption();
+                    }
+                    List<String> list = new ArrayList<>();
+                    list.add(subject.getSemester().toString());
+
+                    try {
+                        Map<Integer, Object> para = null;
+                        List tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(slqEmpl,
+                                para);
+                        if (!tmpList.isEmpty()) {
+                            for (Object o : tmpList) {
+                                Object[] oo = (Object[]) o;
+                                VPairSubject pairSubject = new VPairSubject();
+                                list.add((String) oo[2]);
+                                list.add(((BigDecimal) oo[3]).toString());
+                                list.add(((BigDecimal) oo[4]).toString());
+                                list.add((String) oo[5]);
+                                list.add(((Long) oo[6]).toString());
+                                list.add((String) oo[7]);
+                                list.add((String) oo[8]);
+                                list.add((String) oo[9]);
+
+                                List<String> preRequisites = new ArrayList<>();
+                                List<String> postRequisites = new ArrayList<>();
+
+                                QueryModel<SUBJECT_REQUISITE> requisistesQM = new QueryModel<>(SUBJECT_REQUISITE.class);
+                                requisistesQM.addWhere("pairSubject", ECriteria.EQUAL, ID.valueOf((long) oo[0]));
+                                List<SUBJECT_REQUISITE> requisites = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                                        lookup(requisistesQM);
+                                for (SUBJECT_REQUISITE requisite : requisites) {
+                                    if (requisite.isPreRequisite()) {
+                                        preRequisites.add(requisite.getSubject().toString());
+                                    } else {
+                                        postRequisites.add(requisite.getSubject().toString());
+                                    }
+                                }
+                                list.add(preRequisites.toString());
+                                list.add(postRequisites.toString());
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    tableBody.add(list);
+                }
+                PrintDialog printDialog = new PrintDialog(tableHeader, tableBody, CommonUtils.getUILocaleUtil().getCaption("print"), fileName);
+            }
+        });
+
+        getContent().addComponent(printBtn);
+        getContent().setComponentAlignment(printBtn, Alignment.MIDDLE_CENTER);
+
         electiveSubjectsGW = new GridWidget(ELECTIVE_BINDED_SUBJECT.class);
         electiveSubjectsGW.addEntityListener(new CreateElectiveSubjectEntity());
         electiveSubjectsGW.setButtonVisible(IconToolbar.PREVIEW_BUTTON, false);
@@ -116,7 +212,7 @@ public class BindingElectiveSubjectView extends AbstractTaskView implements Filt
         electiveSubjectsGW.setButtonEnabled(IconToolbar.ADD_BUTTON, false);
         electiveSubjectsGW.setButtonEnabled(IconToolbar.EDIT_BUTTON, false);
 
-        DBGridModel electiveSubjectGM = (DBGridModel) electiveSubjectsGW.getWidgetModel();
+        electiveSubjectGM = (DBGridModel) electiveSubjectsGW.getWidgetModel();
         electiveSubjectGM.setMultiSelect(true);
         electiveSubjectGM.setRefreshType(ERefreshType.MANUAL);
         refresh();
