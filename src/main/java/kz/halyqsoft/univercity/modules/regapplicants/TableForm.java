@@ -25,7 +25,7 @@ public class TableForm {
     private PdfPTable pdfPTable;
     private ByteArrayOutputStream byteArrayOutputStream;
     private ID studentId;
-    private static int fontSize = 9;
+    private static int fontSize = 7;
 
     public TableForm(Document document, ID studentID) {
         this.document = document;
@@ -37,7 +37,8 @@ public class TableForm {
         try {
             PdfWriter pdfWriter = PdfWriter.getInstance(this.document, byteArrayOutputStream);
             PdfPTable table = new PdfPTable(7);
-
+            int allCredits = 0;
+            int allEcts = 0;
             for(int i = 1 ; i <= 2; i++){
                 insertCell(table, "СЕМЕСТР " + i, Element.ALIGN_CENTER, 7, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
 
@@ -98,11 +99,22 @@ public class TableForm {
                     ectsNum += Integer.parseInt(myRow.get(4).trim().length()>0 ? myRow.get(4) :"0");
                 }
 
+
+                allEcts +=ectsNum;
+                allCredits +=creditNum;
+
                 insertCell(table, ("Семестрде барлығы"), Element.ALIGN_LEFT, 3, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
                 insertCell(table,String.valueOf(creditNum), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.BOLD));
                 insertCell(table,String.valueOf(ectsNum), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.BOLD));
                 insertCell(table,"", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.BOLD));
                 insertCell(table,"", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.BOLD));
+                if(i==2){
+                    insertCell(table, ("Барлығы"), Element.ALIGN_LEFT, 3, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
+                    insertCell(table,String.valueOf(allCredits), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.BOLD));
+                    insertCell(table,String.valueOf(allEcts), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.BOLD));
+                    insertCell(table,"", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.BOLD));
+                    insertCell(table,"", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.BOLD));
+                }
             }
 
             PdfPTable table1 = new PdfPTable(7);
@@ -171,6 +183,14 @@ public class TableForm {
                 insertCell(table1,String.valueOf(ectsNum), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.BOLD));
                 insertCell(table1,"", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.BOLD));
                 insertCell(table1,"", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.BOLD));
+
+                if(i==2){
+                    insertCell(table1, ("Барлығы"), Element.ALIGN_LEFT, 3, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
+                    insertCell(table1,String.valueOf(allCredits), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.BOLD));
+                    insertCell(table1,String.valueOf(allEcts), Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.BOLD));
+                    insertCell(table1,"", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.BOLD));
+                    insertCell(table1,"", Element.ALIGN_LEFT, 1,  EmployeePdfCreator.getFont(12, Font.BOLD));
+                }
             }
 
 
@@ -301,7 +321,7 @@ public class TableForm {
                 }
 
                 sql +="  WHERE  usr.deleted = FALSE\n" +
-                "      AND sem_data.id = " + semData + " \n" +
+                "      AND sem_data.year_id = " + semesterData.getYear().getId().getId().longValue() + " \n" +
                 "      AND usr.deleted = FALSE\n" +
                 "      AND subj.subject_cycle_id IS NOT NULL\n" +
                 "      AND sem_data.semester_period_id = "+semPeriod+" \n" ;

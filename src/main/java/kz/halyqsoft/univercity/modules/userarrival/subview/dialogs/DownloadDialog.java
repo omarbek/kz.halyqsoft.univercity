@@ -16,7 +16,7 @@ public class DownloadDialog extends AbstractDialog {
 
     @Override
     protected String createTitle() {
-        return null;
+        return "PDF/EXCEL";
     }
 
     public HorizontalLayout getMainHL() {
