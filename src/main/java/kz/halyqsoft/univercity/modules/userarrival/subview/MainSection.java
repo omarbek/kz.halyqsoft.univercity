@@ -8,26 +8,37 @@ import com.byteowls.vaadin.chartjs.options.Position;
 import com.byteowls.vaadin.chartjs.options.scale.Axis;
 import com.byteowls.vaadin.chartjs.options.scale.LinearScale;
 import com.byteowls.vaadin.chartjs.utils.ColorUtils;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfPTable;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.MouseEvents;
+import com.vaadin.server.FileDownloader;
 import com.vaadin.server.Sizeable;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEPARTMENT;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.WEEKEND_DAYS;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VTopGroupArrival;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VTopUserArrival;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_EMPLOYEE;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_STUDENT;
 import kz.halyqsoft.univercity.filter.FStatisticsFilter;
 import kz.halyqsoft.univercity.filter.panel.StatisticsFilterPanel;
+import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.DownloadDialog;
 import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.MainDialog;
 import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.PrintDialog;
 import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.SimpleStatistics;
 import kz.halyqsoft.univercity.utils.CommonUtils;
+import kz.halyqsoft.univercity.utils.EmployeePdfCreator;
+import kz.halyqsoft.univercity.utils.PdfCreator;
+import kz.halyqsoft.univercity.utils.PdfUtils;
+import org.apache.shiro.session.Session;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
+import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.ID;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.select.EAggregate;
@@ -41,8 +52,10 @@ import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 import org.r3a.common.vaadin.widget.grid.model.GridColumnModel;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Calendar;
 
 public class MainSection implements FilterPanelListener {
 
@@ -50,7 +63,9 @@ public class MainSection implements FilterPanelListener {
     private DateField dateField;
     private StatisticsFilterPanel statisticsFilterPanel;
     private ChartJs chart;
-
+    private ComboBox facultyCB;
+    private DateField startingDateDF;
+    private DateField endingDateDF;
     private Long allEmployees;
 
     public MainSection() {
@@ -253,10 +268,17 @@ public class MainSection implements FilterPanelListener {
     }
 
     private Component getStatistics() {
+
+
         VerticalLayout mainVL = new VerticalLayout();
         mainVL.setSizeFull();
         mainVL.setImmediate(true);
         mainVL.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
+        mainVL.setSpacing(true);
+
+        GridWidget weekendDaysGW = new GridWidget(WEEKEND_DAYS.class);
+        weekendDaysGW.setSizeFull();
+        mainVL.addComponent(weekendDaysGW);
 
         Label label = new Label();
         label.setSizeFull();
@@ -269,9 +291,242 @@ public class MainSection implements FilterPanelListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        Button exportBtn = new Button(CommonUtils.getUILocaleUtil().getCaption("export"));
+        exportBtn.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                if(facultyCB.getValue()==null || startingDateDF.getValue()==null || endingDateDF.getValue() ==null){
+                    Message.showError(CommonUtils.getUILocaleUtil().getMessage("error.required.fields"));
+                    return;
+                }
+
+                HashMap<String,List<List>> map = new HashMap<>();
+
+                DEPARTMENT department = (DEPARTMENT) facultyCB.getValue();
+                Date startingDate = startingDateDF.getValue();
+                Date endingDate = endingDateDF.getValue();
+                if(startingDate.after(endingDate)){
+                    Date temp = startingDate;
+                    startingDate = endingDate;
+                    endingDate = temp;
+                }
+                String formattedStartingDate = CommonUtils.getFormattedDate(startingDate);
+                String formattedEndingDate = CommonUtils.getFormattedDate(endingDate);
+
+                List <Entity>weekendDays = weekendDaysGW.getAllEntities();
+                String inQuery = " ( ";
+
+                List<Integer> years = getAllYearsBetween(startingDate,endingDate);
+                boolean flag = false;
+                for(int i = 0 ; i < weekendDays.size(); i++){
+                    flag = true;
+                    WEEKEND_DAYS weekendDay = (WEEKEND_DAYS) weekendDays.get(i);
+                    String s = " ";
+                    for(Integer y :years ){
+                        s +=" '" + y + "-" + weekendDay.getMonth().getId().getId().longValue()+"-"+weekendDay.getWeekendDay() +"':: TIMESTAMP";
+                    }
+                    if(i < weekendDays.size()-1){
+                        s +=" , ";
+                    }
+                    inQuery +=s;
+                }
+
+                inQuery += " ) ";
+
+                String sql = "SELECT\n" +
+                        "  newTable.groups_id::text,\n" +
+                        "  newTable.group_name::text,\n" +
+                        "  newTable.study_year::text,\n" +
+                        "  newTable.faculty_id,\n" +
+                        "  newTable.speciality_id,\n" +
+                        "  count(DISTINCT vs.id)::text,\n" +
+                        "  round(count(DISTINCT vs.id) * sum(newTable.cameDays) / sum(newTable.allDays))::text,\n" +
+                        "  concat(round(sum(newTable.cameDays) * 100 / sum(newTable.allDays), 2), '%'),\n" +
+                        "  concat(ve.first_name, ' ', ve.last_name, ' ', ve.middle_name) AS FIO\n" +
+                        "FROM (\n" +
+                        "       SELECT\n" +
+                        "         vs.groups_id,\n" +
+                        "         vs.group_name,\n" +
+                        "         sy.study_year,\n" +
+                        "         vs.speciality_id,\n" +
+                        "         vs.faculty_id,\n" +
+                        "         count(DISTINCT days.days)     cameDays,\n" +
+                        "         count(DISTINCT all_days.days) allDays,\n" +
+                        "         vs.advisor_name\n" +
+                        "       FROM user_arrival ua INNER JOIN v_student vs ON ua.user_id = vs.id\n" +
+                        "         INNER JOIN (\n" +
+                        "                      SELECT date_trunc('day', dd) :: DATE days\n" +
+                        "                      FROM generate_series\n" +
+                        "                           ('"+formattedStartingDate+"' :: TIMESTAMP\n" +
+                        "                          , '"+formattedEndingDate+"' :: TIMESTAMP\n" +
+                        "                          , '1 day' :: INTERVAL) dd\n";
+                if(flag){
+                    sql +=" where dd NOT in "+inQuery+" " ;
+                }
+
+                sql += "                    ) days ON days.days = date_trunc('day', ua.created)\n" +
+                        "         INNER JOIN (\n" +
+                        "                      SELECT date_trunc('day', dd) :: DATE days\n" +
+                        "                      FROM generate_series\n" +
+                        "                           ('"+formattedStartingDate+"' :: TIMESTAMP\n" +
+                        "                          , '"+formattedEndingDate+"' :: TIMESTAMP\n" +
+                        "                          , '1 day' :: INTERVAL) dd\n" ;
+                     if(flag){
+                         sql +=" where dd NOT in "+inQuery+" " ;
+                     }
+
+                sql+=        "                    ) all_days ON TRUE\n" +
+                        "         INNER JOIN study_year sy ON sy.id = vs.study_year_id\n" +
+                        "       GROUP BY vs.groups_id, vs.group_name, sy.study_year, ua.user_id, vs.advisor_name,\n" +
+                        "         vs.speciality_id,\n" +
+                        "         vs.faculty_id\n" +
+                        "     ) newTable\n" +
+                        "  INNER JOIN v_student vs ON newTable.groups_id = vs.groups_id\n" +
+                        "  INNER JOIN groups vg ON newTable.groups_id = vg.id \n" +
+                        "  LEFT JOIN v_employee ve ON ve.id = vg.curator_id "+
+                        " WHERE vs.student_status_id = 1 AND newTable.faculty_id = "+department.getId().getId().longValue()+"\n" +
+                        " GROUP BY newTable.groups_id, newTable.group_name, newTable.study_year, \n" +
+                        "  newTable.faculty_id,\n" +
+                        "  newTable.speciality_id, FIO;";
+
+                try{
+                    List list = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class)
+                            .lookupItemsList(sql ,new HashMap<Integer, Object>());
+                    for(Object o : list){
+                        Object oo[]  = (Object [])o;
+
+                        String groupName = (String)oo[1];
+                        String studyYear = (String) oo[2];
+                        Long specialityId = (Long)oo[3];
+                        Long facultyId = (Long)oo[4];
+                        String allStudents = (String)oo[5];
+                        String comeStudents = (String)oo[6];
+                        String percentage = (String)oo[7];
+                        String fio = (String)oo[8];
+                        if(map.get(studyYear)==null){
+                            map.put(studyYear, new ArrayList<List>());
+                        }
+
+                        ArrayList row = new ArrayList();
+                        row.add(groupName);
+                        row.add(allStudents);
+                        row.add(comeStudents);
+                        row.add(Integer.parseInt(allStudents) - Integer.parseInt(comeStudents));
+                        row.add(percentage);
+                        row.add(fio);
+                        map.get(studyYear).add(row);
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
+                PdfCreator pdfCreator = new PdfCreator();
+
+                Paragraph paragraph = new Paragraph("Оңтүстік Қазақстан педагогикалық университеті", PdfUtils.getMainFont());
+                paragraph.setAlignment(Element.ALIGN_CENTER);
+                pdfCreator.add(paragraph);
+
+                paragraph = new Paragraph(department.getDeptName(), PdfUtils.getMainFont());
+                paragraph.setAlignment(Element.ALIGN_CENTER);
+                pdfCreator.add(paragraph);
+
+                paragraph = new Paragraph("Студенттердің сабаққа келуін тексеру", PdfUtils.getMainFont());
+                paragraph.setAlignment(Element.ALIGN_CENTER);
+                pdfCreator.add(paragraph);
+
+                paragraph = new Paragraph(CommonUtils.getFormattedDateWithoutTime(startingDate)+ " - " +CommonUtils.getFormattedDateWithoutTime(endingDate), PdfUtils.getMainFont());
+                paragraph.setAlignment(Element.ALIGN_RIGHT);
+                pdfCreator.add(paragraph);
+
+                PdfPTable table = PdfUtils.getTable(7);
+                table.setWidthPercentage(100);
+                String headers[] = {"№" , "Топ" , "Студ. жалпы саны" , "Келгені", "Келмегені", "Келгенінің пайызы", "Эдвайзер және тәлімгерлер"};
+                Map<String, String> resultMap = new HashMap<>();
+                int overallStudentCount = 0;
+                int overallComeInStudentCount = 0;
+                int overallDontComeInStudentCount = 0;
+                for(String key : map.keySet()){
+                    int allStudents = 0;
+                    int comeInStudents = 0;
+                    int dontComeInStudents = 0;
+                    PdfUtils.insertCell(table, key+"-курс", Element.ALIGN_CENTER,7);
+                    for(String s : headers){
+                        PdfUtils.insertCell(table, s, Element.ALIGN_CENTER,1);
+                    }
+                    List <List>list = map.get(key);
+                    int counter = 1;
+                    for(List innerList : list ){
+                        PdfUtils.insertCell(table, counter+"", Element.ALIGN_CENTER,1);
+                        for(Object o : innerList){
+                            PdfUtils.insertCell(table, o.toString(), Element.ALIGN_CENTER,1);
+                        }
+                        allStudents += Integer.parseInt(innerList.get(1).toString());
+                        comeInStudents += Integer.parseInt(innerList.get(2).toString());
+                        dontComeInStudents  += Integer.parseInt(innerList.get(3).toString());
+                        counter++;
+                    }
+                    PdfUtils.insertCell(table, "", Element.ALIGN_CENTER,2);
+                    PdfUtils.insertCell(table, allStudents+"", Element.ALIGN_CENTER,1);
+                    PdfUtils.insertCell(table, comeInStudents+"", Element.ALIGN_CENTER,1);
+                    PdfUtils.insertCell(table, dontComeInStudents+"", Element.ALIGN_CENTER,1);
+                    String resultPercentage = allStudents > 0 ? comeInStudents*100/allStudents+"%" : "0%";
+                    PdfUtils.insertCell(table, resultPercentage, Element.ALIGN_CENTER,1);
+                    PdfUtils.insertCell(table, "", Element.ALIGN_CENTER,1);
+                    resultMap.put(key, resultPercentage);
+
+                    overallStudentCount +=allStudents;
+                    overallComeInStudentCount += comeInStudents;
+                    overallDontComeInStudentCount += dontComeInStudents;
+                }
+                PdfUtils.insertCell(table, "фак. б/ша", Element.ALIGN_CENTER,2);
+                PdfUtils.insertCell(table, overallComeInStudentCount+"", Element.ALIGN_CENTER,1);
+                PdfUtils.insertCell(table, overallComeInStudentCount+"", Element.ALIGN_CENTER,1);
+                PdfUtils.insertCell(table, overallDontComeInStudentCount+"", Element.ALIGN_CENTER,1);
+                PdfUtils.insertCell(table, "", Element.ALIGN_CENTER,1);
+                PdfUtils.insertCell(table, "", Element.ALIGN_CENTER,1);
+
+                pdfCreator.add(table);
+                pdfCreator.add(new Paragraph("\n"));
+                PdfPTable resultTable = PdfUtils.getTable(2);
+                resultTable.setWidthPercentage(30);
+                PdfUtils.insertCell(resultTable, "Курс", Element.ALIGN_CENTER,1);
+                PdfUtils.insertCell(resultTable, "Сабаққа қатысу пайызы", Element.ALIGN_CENTER,1);
+                for(String key : resultMap.keySet()){
+                    PdfUtils.insertCell(resultTable, key+" - курс", Element.ALIGN_CENTER,1);
+                    PdfUtils.insertCell(resultTable, resultMap.get(key)+"%", Element.ALIGN_CENTER,1);
+                }
+                pdfCreator.add(resultTable);
+                byte[] bytes = null;
+                try{
+                    bytes = pdfCreator.createAndGetPdf();
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+                FileDownloader fileDownloader = new FileDownloader(EmployeePdfCreator.getStreamResourceFromByte(bytes, "document.pdf"));
+                Button pdfBtn = new Button("PDF");
+                DownloadDialog downloadDialog = new DownloadDialog();
+                HorizontalLayout innerHL = downloadDialog.getMainHL();
+                fileDownloader.extend(pdfBtn);
+                innerHL.addComponent(pdfBtn);
+                downloadDialog.init();
+            }
+        });
+        mainVL.addComponent(exportBtn);
         mainVL.addComponent(chart);
 
         return mainVL;
+    }
+
+    private static List<Integer> getAllYearsBetween(Date start, Date end){
+        Calendar calendar1 = Calendar.getInstance();
+        calendar1.setTime(start);
+        Calendar calendar2 = Calendar.getInstance();
+        calendar2.setTime(end);
+        List<Integer> years = new ArrayList<>();
+        for(int i = calendar1.get(Calendar.YEAR); i <= calendar2.get(Calendar.YEAR);i++ ){
+            years.add(i);
+        }
+        return years;
     }
 
     private AbstractFilterPanel getFilter() throws Exception {
@@ -279,7 +534,7 @@ public class MainSection implements FilterPanelListener {
         statisticsFP.addFilterPanelListener(this);
         statisticsFP.setImmediate(true);
 
-        ComboBox facultyCB = new ComboBox();
+        facultyCB = new ComboBox();
         facultyCB.setNullSelectionAllowed(false);
         facultyCB.setTextInputAllowed(true);
         facultyCB.setFilteringMode(FilteringMode.CONTAINS);
@@ -292,10 +547,10 @@ public class MainSection implements FilterPanelListener {
         facultyCB.setContainerDataSource(facultyBIC);
         statisticsFP.addFilterComponent("department", facultyCB);
 
-        DateField startingDateDF = new DateField();
+        startingDateDF = new DateField();
         statisticsFP.addFilterComponent("startingDate", startingDateDF);
 
-        DateField endingDateDF = new DateField();
+        endingDateDF = new DateField();
         statisticsFP.addFilterComponent("endingDate", endingDateDF);
         return statisticsFP;
     }

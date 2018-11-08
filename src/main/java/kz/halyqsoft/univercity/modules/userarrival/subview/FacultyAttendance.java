@@ -112,25 +112,23 @@ public class FacultyAttendance implements EntityListener{
         String formattedDate = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS").format(date);
 
         String sql = "SELECT   dep.DEPT_NAME,\n" +
-                "         count(student.id),\n" +
-                "         count(arriv.user_id),\n" +
+                "  count(student.id),\n" +
+                "  count(arriv.user_id),\n" +
                 "  (COUNT( student.id)-count( arriv.user_id)),\n" +
-                " case when (COUNT ( student.id))<>0 then CAST((count( arriv.user_id)*100)as FLOAT)  /CAST((COUNT ( student.id))as FLOAT) else 0 end,\n" +
-                "        dep.id\n" +
-                "         FROM v_student student\n" +
-                "         RIGHT JOIN department dep ON  dep.id = student.faculty_id\n" +
-                "         LEFT join (SELECT\n" +
-                "                       arriv.user_id,\n" +
-                "                       count(arriv.user_id) as cameCount\n" +
-                "                     FROM user_arrival arriv\n" +
-                "                     WHERE date_trunc('day', arriv.created) = date_trunc('day', timestamp'"+formattedDate+"')\n" +
-                "                           AND arriv.created = (SELECT max(max_arriv.created)\n" +
-                "                                                FROM user_arrival max_arriv\n" +
-                "                                                WHERE max_arriv.user_id = arriv.user_id)\n" +
-                "                           AND come_in = TRUE\n" +
-                "                     GROUP BY arriv.user_id)arriv on arriv.user_id=student.id\n" +
-                " WHERE dep.parent_id is null and dep.deleted is false and dep.fc = false  " +
-                "         GROUP BY  dep.dept_name,dep.id";
+                "  case when (COUNT ( student.id))<>0 then CAST((count( arriv.user_id)*100)as FLOAT)  /CAST((COUNT ( student.id))as FLOAT) else 0 end,\n" +
+                "  dep.id\n" +
+                "FROM v_student student\n" +
+                "  RIGHT JOIN department dep ON  dep.id = student.faculty_id\n" +
+                "  LEFT join (SELECT\n" +
+                "               arriv.user_id,\n" +
+                "               count( arriv.user_id) as cameCount\n" +
+                "             FROM user_arrival arriv\n" +
+                "               INNER JOIN (SELECT max(max_arriv.created) as max , user_id\n" +
+                "                           FROM user_arrival max_arriv GROUP BY user_id ) as foo ON foo.user_id = arriv.user_id AND date_trunc('day', timestamp'"+formattedDate+"') = date_trunc('day' , foo.max)\n" +
+                "             WHERE date_trunc('day', arriv.created) = date_trunc('day', foo.max)\n" +
+                "                   AND come_in = TRUE\n" +
+                "             GROUP BY arriv.user_id) arriv on arriv.user_id=student.id\n" +
+                "WHERE dep.parent_id is null and dep.deleted is false and dep.fc = false           GROUP BY  dep.dept_name,dep.id;";
 
         try {
             List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);

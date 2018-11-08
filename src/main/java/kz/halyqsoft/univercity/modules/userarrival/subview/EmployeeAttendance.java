@@ -15,6 +15,7 @@ import org.r3a.common.vaadin.widget.ERefreshType;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
+import org.vaadin.jsconsole.ClientLog;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -150,23 +151,26 @@ public class EmployeeAttendance implements EntityListener{
                 "  count(ve.id),\n" +
                 "  count(user_id),\n" +
                 "  d1.id\n" +
-                " FROM department d1\n" +
+                "FROM department d1\n" +
                 "  INNER JOIN department d2\n" +
                 "    ON d1.id = d2.parent_id\n" +
                 "  INNER JOIN v_employee ve\n" +
                 "    ON ve.dept_id = d2.id\n" +
-                "  LEFT join (SELECT\n" +
+                "  LEFT JOIN (SELECT\n" +
                 "               arriv.user_id,\n" +
-                "               count(arriv.user_id) as cameCount\n" +
+                "               count(arriv.user_id) AS cameCount\n" +
                 "             FROM user_arrival arriv\n" +
-                "             WHERE date_trunc('day', arriv.created) = date_trunc('day', timestamp'"+ formattedDate +"')\n" +
-                "                   AND arriv.created = (SELECT max(max_arriv.created)\n" +
-                "                                        FROM user_arrival max_arriv\n" +
-                "                                        WHERE max_arriv.user_id = arriv.user_id)\n" +
-//                "                   AND come_in = TRUE\n" +
-                "             GROUP BY arriv.user_id)arriv on arriv.user_id=ve.id\n" +
-                "WHERE d1.deleted = FALSE AND d2.deleted = FALSE \n" +
-                "GROUP BY d1.dept_name,d1.id";
+                "               INNER JOIN (SELECT\n" +
+                "                             max(max_arriv.created) AS max,\n" +
+                "                             user_id\n" +
+                "                           FROM user_arrival max_arriv\n" +
+                "                           GROUP BY user_id) AS foo\n" +
+                "ON foo.user_id = arriv.user_id AND date_trunc('day', TIMESTAMP '"+formattedDate+"') = date_trunc('day', foo.max)\n" +
+                "             WHERE date_trunc('day', arriv.created) = date_trunc('day', foo.max)\n" +
+       //         "                   AND come_in = TRUE\n" +
+                "             GROUP BY arriv.user_id) arriv ON arriv.user_id = ve.id\n" +
+                "WHERE d1.deleted = FALSE AND d2.deleted = FALSE\n" +
+                "GROUP BY d1.dept_name, d1.id;\n";
 
         try {
             List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);

@@ -12,11 +12,11 @@ public class VYearEmployeeLatecomers extends AbstractEntity {
     @FieldInfo(type = EFieldType.TEXT, order = 2)
     private String faculty;
 
-    @FieldInfo(type = EFieldType.TEXT, order = 3)
+    @FieldInfo(type = EFieldType.TEXT, order = 3, inGrid = false, inView = false, inEdit = false)
     private String postName;
 
-    @FieldInfo(type = EFieldType.INTEGER, order = 4)
-    private long lateSum;
+    @FieldInfo(type = EFieldType.TEXT, order = 4)
+    private String lateSum;
 
     @FieldInfo(type = EFieldType.INTEGER, order = 5, inGrid = false, inView = false, inEdit = false )
     private String time;
@@ -37,11 +37,11 @@ public class VYearEmployeeLatecomers extends AbstractEntity {
         this.postName = postName;
     }
 
-    public long getLateSum() {
+    public String getLateSum() {
         return lateSum;
     }
 
-    public void setLateSum(long lateSum) {
+    public void setLateSum(String lateSum) {
         this.lateSum = lateSum;
     }
 
