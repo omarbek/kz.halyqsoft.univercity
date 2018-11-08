@@ -45,7 +45,7 @@ import java.util.Calendar;
 
 /**
  * @author Dinassil Omarbek
- * @created May 24, 2017 4:10:38 PM
+ * @created May 24, 2018 4:10:38 PM
  */
 @SuppressWarnings({"serial"})
 public final class StudentEdit extends AbstractFormWidgetView implements PhotoWidgetListener {

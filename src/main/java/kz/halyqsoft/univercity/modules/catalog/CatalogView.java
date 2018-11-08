@@ -204,8 +204,7 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                     }*/
                     else if (entityClass.equals(ROLES.class)) {
                         classASW.setButtonVisible(AbstractToolbar.FILTER_BUTTON, true);
-                    }
-                    else if (entityClass.equals(NON_ADMISSION_CAUSE.class)) {
+                    } else if (entityClass.equals(NON_ADMISSION_CAUSE.class)) {
                         classASW.setButtonVisible(AbstractToolbar.DELETE_BUTTON, false);
                     }
                 }

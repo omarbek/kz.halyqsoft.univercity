@@ -3,6 +3,7 @@ package kz.halyqsoft.univercity.entity.beans.univercity.catalog;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
+import org.r3a.common.entity.ID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,25 +15,24 @@ import javax.persistence.Entity;
 @Entity
 public class LEVEL extends AbstractEntity {
 
-	private static final long serialVersionUID = 9003319730846780339L;
+    public static final ID BACHELOR = ID.valueOf(1);
+    public static final ID MASTER = ID.valueOf(2);
+    public static final ID DOCTOR = ID.valueOf(3);
 
-	@FieldInfo(type = EFieldType.TEXT, max = 64, order = 1)
-	@Column(name = "LEVEL_NAME", nullable = false)
-	private String levelName;
+    @FieldInfo(type = EFieldType.TEXT, max = 64, order = 1)
+    @Column(name = "LEVEL_NAME", nullable = false)
+    private String levelName;
 
-	public LEVEL() {
-	}
+    public String getLevelName() {
+        return levelName;
+    }
 
-	public String getLevelName() {
-		return levelName;
-	}
+    public void setLevelName(String levelName) {
+        this.levelName = levelName;
+    }
 
-	public void setLevelName(String levelName) {
-		this.levelName = levelName;
-	}
-
-	@Override
-	public String toString() {
-		return levelName;
-	}
+    @Override
+    public String toString() {
+        return levelName;
+    }
 }

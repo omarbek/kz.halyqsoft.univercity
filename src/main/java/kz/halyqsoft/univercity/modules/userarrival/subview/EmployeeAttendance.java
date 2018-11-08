@@ -21,19 +21,19 @@ import java.util.*;
 
 import static java.lang.Boolean.FALSE;
 
-public class EmployeeAttendance implements EntityListener{
+public class EmployeeAttendance implements EntityListener {
     private VerticalLayout mainVL;
     private HorizontalLayout topHL;
     private HorizontalLayout buttonPanel;
     private GridWidget departmentGW;
     private DateField dateField;
     private DBGridModel departmentGM;
-    private Button  backButton, backButtonAdministration,backButtonAE;
+    private Button backButton, backButtonAdministration, backButtonAE;
     private DepartmentAttendance attendance;
     private AdministrationAttendance administrationAttendance;
     private AdministrationEmployeeAttendance administrationEA;
 
-    public EmployeeAttendance( ){
+    public EmployeeAttendance() {
         mainVL = new VerticalLayout();
         mainVL.setImmediate(true);
 
@@ -46,7 +46,7 @@ public class EmployeeAttendance implements EntityListener{
         init();
     }
 
-    private void init(){
+    private void init() {
 
         backButton = new Button(CommonUtils.getUILocaleUtil().getCaption("backButton"));
         backButton.setImmediate(true);
@@ -54,8 +54,8 @@ public class EmployeeAttendance implements EntityListener{
         backButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
-                    mainVL.removeComponent(attendance.getMainVL());
-                    mainVL.addComponent(departmentGW);
+                mainVL.removeComponent(attendance.getMainVL());
+                mainVL.addComponent(departmentGW);
                 dateField.setVisible(true);
                 backButton.setVisible(false);
             }
@@ -104,7 +104,7 @@ public class EmployeeAttendance implements EntityListener{
         dateField.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
-                if(mainVL.getComponentIndex(departmentGW)>-1){
+                if (mainVL.getComponentIndex(departmentGW) > -1) {
                     departmentGM.setEntities(getDepartment(dateField.getValue()));
                 }
             }
@@ -150,23 +150,26 @@ public class EmployeeAttendance implements EntityListener{
                 "  count(ve.id),\n" +
                 "  count(user_id),\n" +
                 "  d1.id\n" +
-                " FROM department d1\n" +
+                "FROM department d1\n" +
                 "  INNER JOIN department d2\n" +
                 "    ON d1.id = d2.parent_id\n" +
                 "  INNER JOIN v_employee ve\n" +
                 "    ON ve.dept_id = d2.id\n" +
-                "  LEFT join (SELECT\n" +
+                "  LEFT JOIN (SELECT\n" +
                 "               arriv.user_id,\n" +
-                "               count(arriv.user_id) as cameCount\n" +
+                "               count(arriv.user_id) AS cameCount\n" +
                 "             FROM user_arrival arriv\n" +
-                "             WHERE date_trunc('day', arriv.created) = date_trunc('day', timestamp'"+ formattedDate +"')\n" +
-                "                   AND arriv.created = (SELECT max(max_arriv.created)\n" +
-                "                                        FROM user_arrival max_arriv\n" +
-                "                                        WHERE max_arriv.user_id = arriv.user_id)\n" +
-//                "                   AND come_in = TRUE\n" +
-                "             GROUP BY arriv.user_id)arriv on arriv.user_id=ve.id\n" +
-                "WHERE d1.deleted = FALSE AND d2.deleted = FALSE \n" +
-                "GROUP BY d1.dept_name,d1.id";
+                "               INNER JOIN (SELECT\n" +
+                "                             max(max_arriv.created) AS max,\n" +
+                "                             user_id\n" +
+                "                           FROM user_arrival max_arriv\n" +
+                "                           GROUP BY user_id) AS foo\n" +
+                "ON foo.user_id = arriv.user_id AND date_trunc('day', TIMESTAMP '" + formattedDate + "') = date_trunc('day', foo.max)\n" +
+                "             WHERE date_trunc('day', arriv.created) = date_trunc('day', foo.max)\n" +
+                //         "                   AND come_in = TRUE\n" +
+                "             GROUP BY arriv.user_id) arriv ON arriv.user_id = ve.id\n" +
+                "WHERE d1.deleted = FALSE AND d2.deleted = FALSE\n" +
+                "GROUP BY d1.dept_name, d1.id;\n";
 
         try {
             List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
@@ -204,20 +207,20 @@ public class EmployeeAttendance implements EntityListener{
 
     @Override
     public void handleEntityEvent(EntityEvent entityEvent) {
-        if(entityEvent.getSource().equals(departmentGW)){
-            if(entityEvent.getAction()==EntityEvent.SELECTED){
-                if(departmentGW !=null){
+        if (entityEvent.getSource().equals(departmentGW)) {
+            if (entityEvent.getAction() == EntityEvent.SELECTED) {
+                if (departmentGW != null) {
                     mainVL.removeComponent(departmentGW);
-                    if(((VDepartment)departmentGW.getSelectedEntity()).getDepartmentID()==20){
+                    if (((VDepartment) departmentGW.getSelectedEntity()).getDepartmentID() == 20) {
                         administrationAttendance = new AdministrationAttendance(this);
                         mainVL.addComponent(administrationAttendance.getMainVL());
                         backButtonAdministration.setVisible(true);
-                    }else if(((VDepartment)departmentGW.getSelectedEntity()).getDepartmentID()==43){
+                    } else if (((VDepartment) departmentGW.getSelectedEntity()).getDepartmentID() == 43) {
                         administrationEA = new AdministrationEmployeeAttendance(this);
                         mainVL.addComponent(administrationEA.getMainVL());
                         backButtonAE.setVisible(true);
-                    }else {
-                        attendance = new DepartmentAttendance((VDepartment) departmentGW.getSelectedEntity(),this);
+                    } else {
+                        attendance = new DepartmentAttendance((VDepartment) departmentGW.getSelectedEntity(), this);
                         mainVL.addComponent(attendance.getMainVL());
                         backButton.setVisible(true);
                     }

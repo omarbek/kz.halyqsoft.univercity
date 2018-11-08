@@ -5,7 +5,7 @@ import org.r3a.common.entity.ID;
 
 /**
  * @author Omarbek
- * @created Feb 22, 2017 11:52:20 AM
+ * @created Feb 22, 2018 11:52:20 AM
  */
 public final class VCurriculumCreditCycleSum implements Entity {
 

@@ -4,19 +4,12 @@ import kz.halyqsoft.univercity.entity.beans.univercity.catalog.CURRICULUM_STATUS
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_DATA;
 import org.r3a.common.entity.AbstractEntity;
 
+import javax.persistence.*;
 import java.util.Date;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.ManyToOne;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 /**
  * @author Omarbek
- * @created Apr 19, 2017 11:09:55 AM
+ * @created Apr 19, 2018 11:09:55 AM
  */
 @Entity
 public class CURRICULUM_SUMMER extends AbstractEntity {

@@ -8,7 +8,7 @@ import javax.persistence.Lob;
 
 /**
  * @author Omarbek
- * @created Apr 11, 2017 10:50:13 AM
+ * @created Apr 11, 2018 10:50:13 AM
  */
 @Entity
 public class SCHEDULE_LOG extends AbstractEntity {

@@ -7,7 +7,7 @@ import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 
 /**
  * @author Omarbek
- * @created Apr 10, 2017 5:18:24 PM
+ * @created Apr 10, 2018 5:18:24 PM
  */
 public final class FEmployeeFilter extends AbstractFilterBean {
 

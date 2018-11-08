@@ -31,15 +31,12 @@ public class SemesterPanel extends AbstractCommonPanel {
     private Grid mainSubjectGrid;
     private List<SUBJECT> chosenMainlist;
 
-    public SemesterPanel(IndividualEducationPlanView registrationView, SEMESTER semester) throws Exception {
+    public SemesterPanel(IndividualEducationPlanView registrationView, SEMESTER semester,
+                         STUDENT_EDUCATION studentEducation) throws Exception {
         this.semester = semester;
-        chosenMainlist = new ArrayList<>();
-
+        this.studentEducation = studentEducation;
         this.registrationView = registrationView;
-        QueryModel<STUDENT_EDUCATION> studentEducationQM = new QueryModel<>(STUDENT_EDUCATION.class);
-        studentEducationQM.addWhere("student", ECriteria.EQUAL, CommonUtils.getCurrentUser().getId());
-        studentEducationQM.addWhereNull("child");
-        studentEducation = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(studentEducationQM);
+        chosenMainlist = new ArrayList<>();
     }
 
     public void initPanel() throws Exception {
@@ -300,7 +297,8 @@ public class SemesterPanel extends AbstractCommonPanel {
     }
 
     private ArrayList<OptionGroup> setElectiveSubjects(ArrayList<STUDENT_SUBJECT> studentSubjects,
-                                                       VerticalLayout electiveSubjectsVL, List<PAIR_SUBJECT> pairSubjects) {
+                                                       VerticalLayout electiveSubjectsVL,
+                                                       List<PAIR_SUBJECT> pairSubjects) throws Exception {
         Map<Integer, ArrayList<SUBJECT>> map = new HashMap<>();
 
         for (PAIR_SUBJECT pairSubject : pairSubjects) {
@@ -388,8 +386,8 @@ public class SemesterPanel extends AbstractCommonPanel {
         QueryModel<STUDENT_SUBJECT> studentSubjectQM = new QueryModel<>(STUDENT_SUBJECT.class);
         FromItem semesterDataFI = studentSubjectQM.addJoin(EJoin.INNER_JOIN, "semesterData",
                 SEMESTER_DATA.class, "id");
-        studentSubjectQM.addWhere(semesterDataFI, "year", ECriteria.EQUAL, studentEducation.
-                getStudent().getEntranceYear().getId());
+        studentSubjectQM.addWhere(semesterDataFI, "year", ECriteria.EQUAL, CommonUtils.getCurrentSemesterData()
+                .getYear().getId());
         studentSubjectQM.addWhere(semesterDataFI, "semesterPeriod", ECriteria.EQUAL, semester.
                 getSemesterPeriod().getId());
         studentSubjectQM.addWhere("studentEducation", ECriteria.EQUAL, studentEducation.getId());

@@ -1,6 +1,5 @@
 package kz.halyqsoft.univercity.modules.curriculum.working.schedule;
 
-import com.vaadin.data.Container.Indexed;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.grid.HeightMode;
@@ -14,8 +13,8 @@ import kz.halyqsoft.univercity.entity.beans.univercity.catalog.MONTH;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDY_YEAR;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.WEEK;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VCurriculumSchedule;
-import kz.halyqsoft.univercity.modules.curriculum.working.AbstractCurriculumPanel;
-import kz.halyqsoft.univercity.modules.curriculum.working.CurriculumView;
+import kz.halyqsoft.univercity.modules.curriculum.working.main.AbstractCurriculumPanel;
+import kz.halyqsoft.univercity.modules.curriculum.working.main.CurriculumView;
 import kz.halyqsoft.univercity.utils.excel.ExcelStyles;
 import kz.halyqsoft.univercity.utils.excel.ExcelUtil;
 import org.apache.poi.ss.usermodel.*;
@@ -229,41 +228,6 @@ public class SchedulePanel extends AbstractCurriculumPanel {
 
         BeanItemContainer<ScheduleBean> bic = new BeanItemContainer<ScheduleBean>(ScheduleBean.class, sbList);
         grid.setContainerDataSource(bic);
-    }
-
-    @Override
-    public void save() throws Exception {
-        CURRICULUM curriculum = getCurriculum();
-        if (curriculum != null && !curriculum.getCurriculumStatus().getId().equals(ID.valueOf(3))) {
-            List<CURRICULUM_SCHEDULE> mergeList = new ArrayList<CURRICULUM_SCHEDULE>();
-            Indexed ds = grid.getContainerDataSource();
-            try {
-                for (Object item : ds.getItemIds()) {
-                    ScheduleBean sb = (ScheduleBean) item;
-                    for (WEEK w : weekList) {
-                        Integer weekCode = w.getWeekCode();
-                        if (sb.isChanged(weekCode)) {
-                            VCurriculumSchedule vcs = sb.get(weekCode);
-                            CURRICULUM_SCHEDULE cs = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(CURRICULUM_SCHEDULE.class, vcs.getId());
-
-                            cs.setSymbol(symbolMap.get(vcs.getSymbolCode()));
-                            mergeList.add(cs);
-                        }
-                    }
-                }
-
-                if (!mergeList.isEmpty()) {
-                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(mergeList);
-                }
-            } catch (Exception ex) {
-                LOG.error("Unable to save changes: ", ex);
-                Message.showError(ex.toString());
-            }
-        }
-    }
-
-    @Override
-    protected void cancel() {
     }
 
     public int getRecordCount() {
@@ -632,7 +596,7 @@ public class SchedulePanel extends AbstractCurriculumPanel {
         }
     }
 
-    public final void checkForConform() throws Exception {
+    public final void checkForConfirm() throws Exception {
         if (getRecordCount() == 0) {
             throw new Exception(getUILocaleUtil().getMessage("no.curriculum.schedule"));
         }

@@ -435,6 +435,9 @@ public final class SubjectEdit extends AbstractFormWidgetView {
                     } else if (practiceTypeId.equals(PRACTICE_TYPE.EDUCATIONAL_ID)) {
                         count = creditability.getCredit() * 5 + "";
                         totalCount = creditability.getCredit() * 5 * 3 + "";
+                    } else if (practiceTypeId.equals(PRACTICE_TYPE.UNDERGRADUATE_ID)) {
+                        count = creditability.getCredit() * 25 + "";
+                        totalCount = creditability.getCredit() * 25 * 3 + "";
                     } else {// PRACTICE_TYPE.PEDAGOGICAL_ID
                         count = creditability.getCredit() * 10 + "";
                         totalCount = creditability.getCredit() * 10 * 3 + "";

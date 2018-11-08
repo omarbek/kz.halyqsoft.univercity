@@ -4,7 +4,7 @@ import javax.persistence.Entity;
 
 /**
  * @author Omarbek
- * Created Apr 3, 2017 4:42:09 PM
+ * Created Apr 3, 2018 4:42:09 PM
  */
 @Entity
 public class REGISTRATION_SIGNATURE_TYPE extends AbstractTypeEntity {

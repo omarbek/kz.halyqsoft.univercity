@@ -1,5 +1,6 @@
 package kz.halyqsoft.univercity.modules.bindingelectivesubject;
 
+import com.itextpdf.text.Font;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.Alignment;
@@ -9,7 +10,10 @@ import com.vaadin.ui.HorizontalLayout;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VPairSubject;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_ELECTIVE_SUBJECT;
+import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.PrintDialog;
 import kz.halyqsoft.univercity.utils.CommonUtils;
+import kz.halyqsoft.univercity.utils.EmployeePdfCreator;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
@@ -263,6 +267,63 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
                 }
             }
         });
+        studentElectiveSubjectGW.setButtonVisible(AbstractToolbar.PRINT_BUTTON ,true);
+        studentElectiveSubjectGW.addButtonClickListener(AbstractToolbar.PRINT_BUTTON, new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                List<String> tableHeader = new ArrayList<>();
+                List<List<String>> tableBody= new ArrayList<>();
+
+                String fileName = "document";
+
+                tableHeader.add("№");
+                tableHeader.add(getUILocaleUtil().getEntityFieldLabel(V_ELECTIVE_SUBJECT.class , "subjectCode"));
+                tableHeader.add(getUILocaleUtil().getEntityFieldLabel(V_ELECTIVE_SUBJECT.class , "subjectName"));
+                tableHeader.add(getUILocaleUtil().getEntityFieldLabel(V_ELECTIVE_SUBJECT.class , "credit"));
+                tableHeader.add(getUILocaleUtil().getEntityFieldLabel(SUBJECT.class , "ects"));
+                tableHeader.add(getUILocaleUtil().getEntityLabel(SEMESTER.class ));
+                tableHeader.add(getUILocaleUtil().getCaption("prerequisites") + " / " + getUILocaleUtil().getCaption("postrequisites"));
+                tableHeader.add(getUILocaleUtil().getEntityFieldLabel(PAIR_SUBJECT.class , "aim"));
+                tableHeader.add(getUILocaleUtil().getEntityFieldLabel(PAIR_SUBJECT.class , "description") );
+                tableHeader.add(getUILocaleUtil().getEntityFieldLabel(PAIR_SUBJECT.class , "competence"));
+
+                for (int i = 0 ; i < studentElectiveSubjectGW.getAllEntities().size(); i++){
+                    ArrayList<String> rowList = new ArrayList<>();
+                    rowList.add((1 + i) + "");
+                    VPairSubject vPairSubject = (VPairSubject) studentElectiveSubjectGW.getAllEntities().get(i);
+                    rowList.add(checkForNull(vPairSubject.getCode()));
+                    rowList.add(checkForNull(vPairSubject.getSubjectName()));
+                    rowList.add(checkForNull(vPairSubject.getCredit()+""));
+                    rowList.add(vPairSubject.getEcts()+"");
+                    rowList.add(vPairSubject.getSemesterName());
+                    String preRequsuites = getUILocaleUtil().getCaption("prerequisites")+ ": ";
+                    String postRequsuites = getUILocaleUtil().getCaption("postrequisites") + ": ";
+
+                    for(int j = 0 ; j < vPairSubject.getPrerequisites().size(); j++){
+                        preRequsuites += vPairSubject.getPrerequisites().get(j);
+                        if(j+1 != vPairSubject.getPrerequisites().size()){
+                            preRequsuites+= ", ";
+                        }
+                    }
+
+                    for(int j = 0 ; j < vPairSubject.getPostrequisites().size(); j++){
+                        postRequsuites += vPairSubject.getPostrequisites().get(j);
+                        if(j+1 != vPairSubject.getPostrequisites().size()){
+                            postRequsuites+= ", ";
+                        }
+                    }
+                    rowList.add(preRequsuites + "\n" + postRequsuites);
+                    rowList.add(checkForNull(vPairSubject.getAim()));
+                    rowList.add(checkForNull(vPairSubject.getDescription()));
+                    rowList.add(checkForNull(vPairSubject.getCompetence()));
+                    tableBody.add(rowList);
+                }
+                Font font = EmployeePdfCreator.getFont(6, Font.BOLD);
+                PrintDialog printDialog = new PrintDialog(tableHeader, tableBody , CommonUtils.getUILocaleUtil().getCaption("print"),fileName, font);
+                printDialog.getPdfBtn().setVisible(false);
+            }
+        });
+
         studentElectiveSubjectGW.addEntityListener(new StudentCreativeExamSubjectListener());
 
         DBGridModel studentElectiveSubjectGM = (DBGridModel) studentElectiveSubjectGW.getWidgetModel();
@@ -273,7 +334,7 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
         FKFieldModel subjectFM = (FKFieldModel) studentElectiveSubjectGM.getFormModel().getFieldModel("subject");
         subjectFM.setSelectType(ESelectType.CUSTOM_GRID);
         subjectFM.setDialogHeight(400);
-        subjectFM.setDialogWidth(600);
+        subjectFM.setDialogWidth(1000);
 
         QueryModel subjectQM = ((FKFieldModel) studentElectiveSubjectGM.getFormModel().getFieldModel("subject")).
                 getQueryModel();
@@ -307,6 +368,12 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
 
 
         return studentElectiveSubjectGW;
+    }
+
+    private String checkForNull(String s){
+        if(s == null)
+            return "";
+        return s;
     }
 
     private class StudentCreativeExamListener implements EntityListener {

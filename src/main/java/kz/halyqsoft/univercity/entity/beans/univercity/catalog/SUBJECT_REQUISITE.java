@@ -13,7 +13,7 @@ import javax.persistence.ManyToOne;
 
 /**
  * @author Omarbek
- * Created Feb 27, 2017 10:46:53 AM
+ * Created Feb 27, 2018 10:46:53 AM
  */
 @Entity
 public class SUBJECT_REQUISITE extends AbstractEntity {
@@ -56,4 +56,5 @@ public class SUBJECT_REQUISITE extends AbstractEntity {
 	public void setPreRequisite(boolean preRequisite) {
 		this.preRequisite = preRequisite;
 	}
+
 }

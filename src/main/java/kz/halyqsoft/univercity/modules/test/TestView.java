@@ -1,7 +1,10 @@
 package kz.halyqsoft.univercity.modules.test;
 
 import com.vaadin.ui.Button;
-import kz.halyqsoft.univercity.entity.beans.M_USERS;
+import com.vaadin.ui.Label;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_DATA;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -26,6 +29,28 @@ public class TestView extends AbstractTaskView {
 
     @Override
     public void initView(boolean b) throws Exception {
+        try {
+            QueryModel<SEMESTER_DATA> semesterDataQM = new QueryModel<>(SEMESTER_DATA.class);
+            List<SEMESTER_DATA> semesterDataList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                    lookup(semesterDataQM);
+            QueryModel<ENTRANCE_YEAR> entranceYearQM = new QueryModel<>(ENTRANCE_YEAR.class);
+            List<ENTRANCE_YEAR> entranceYears = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                    lookup(entranceYearQM);
+            for (ENTRANCE_YEAR entranceYear : entranceYears) {
+                for (SEMESTER_DATA semesterData : semesterDataList) {
+                    if (semesterData.getYear().getBeginYear() > entranceYear.getBeginYear()) {
+                        SEMESTER semester = CommonUtils.getSemesterBySemesterDataAndEntranceYear(semesterData,
+                                entranceYear);
+                        getContent().addComponent(new Label("semesterData=" + semesterData));
+                        getContent().addComponent(new Label("entranceYear=" + entranceYear));
+                        getContent().addComponent(new Label("semester=" + semester));
+                    }
+                }
+                getContent().addComponent(new Label(""));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 //        GridWidget awardGW=new GridWidget(AWARD.class);
 //        getContent().addComponent(awardGW);
         Button fixButton = new Button("fix");
@@ -128,34 +153,7 @@ public class TestView extends AbstractTaskView {
 //    }
 
     public static void main(String[] args) {
-//        List<Integer> repeatedIds=new ArrayList<>();
-//        repeatedIds.add(1);
-//        repeatedIds.add(2);
-//        repeatedIds.add(1);
-//        Set<Integer> ids = new HashSet<>();
-//        for (Integer repeatedId : repeatedIds) {
-//            Integer id = getId(ids, repeatedId);
-//            System.out.println(id);
-//        }
 
-//        Date date = new Date();
-//        Calendar cal = Calendar.getInstance();
-//        cal.set(Calendar.HOUR_OF_DAY,17);
-//        cal.set(Calendar.MINUTE,30);
-//        cal.set(Calendar.SECOND,0);
-//        cal.set(Calendar.MILLISECOND,0);
-//
-//        Date d = cal.getTime();
-//        System.out.println(d);
-
-//        LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-//        System.out.println(localDate);
-//        localDate = localDate.with(TemporalAdjusters.next(DayOfWeek.of(1)));
-//        localDate = localDate.with(TemporalAdjusters.next(DayOfWeek.of(1)));
-//        System.out.println(localDate);
-//        Date date1 = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-//        System.out.println(date1);
-//        System.out.println(getFirstMonday(2018, Calendar.AUGUST));
     }
 
 //    private static int getFirstMonday(int year, int month) {

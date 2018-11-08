@@ -55,7 +55,7 @@ import java.util.Calendar;
 
 /**
  * @author Omarbek Dinassil
- * @created Apr 19, 2017 11:46:30 AM
+ * @created Apr 19, 2018 11:46:30 AM
  */
 @SuppressWarnings({"serial", "unchecked"})
 public final class CurriculumView extends AbstractTaskView implements EntityListener {

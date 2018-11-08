@@ -6,7 +6,7 @@ import org.r3a.common.entity.FieldInfo;
 
 /**
  * @author Omarbek
- * @created Apr 6, 2017 10:54:30 AM
+ * @created Apr 6, 2018 10:54:30 AM
  */
 public final class VSubject extends AbstractEntity {
 
@@ -18,20 +18,23 @@ public final class VSubject extends AbstractEntity {
 	@FieldInfo(type = EFieldType.TEXT, order = 3)
 	private String subjectName;
 	
-	@FieldInfo(type = EFieldType.TEXT, order = 4, columnWidth = 200)
+	@FieldInfo(type = EFieldType.TEXT, order = 4, columnWidth = 250)
 	private String chairName;
 	
 	@FieldInfo(type = EFieldType.TEXT, order = 5, columnWidth = 120)
 	private String levelName;
 
-	@FieldInfo(type = EFieldType.TEXT, order = 6, columnWidth = 120)
+	@FieldInfo(type = EFieldType.TEXT, order = 6, columnWidth = 150)
 	private String moduleName;
 	
-	@FieldInfo(type = EFieldType.INTEGER, order = 7, columnWidth = 100)
+	@FieldInfo(type = EFieldType.INTEGER, order = 7, columnWidth = 80)
 	private int credit;
 	
-	@FieldInfo(type = EFieldType.TEXT, order = 8, columnWidth = 120)
+	@FieldInfo(type = EFieldType.TEXT, order = 8, columnWidth = 80)
 	private String formula;
+
+	@FieldInfo(type = EFieldType.TEXT, order = 9, columnWidth = 200)
+	private String cycleName;
 	
 //	public String getCode() {
 //		return code;
@@ -83,5 +86,13 @@ public final class VSubject extends AbstractEntity {
 
 	public void setFormula(String formula) {
 		this.formula = formula;
+	}
+
+	public String getCycleName() {
+		return cycleName;
+	}
+
+	public void setCycleName(String cycleName) {
+		this.cycleName = cycleName;
 	}
 }
