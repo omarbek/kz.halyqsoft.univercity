@@ -189,6 +189,9 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                         classASW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
                         classASW.setButtonVisible(IconToolbar.ADD_BUTTON, false);
                         qm.addWhere("subjectName", null, null, true);
+                    }else if (entityClass.equals(TRAJECTORY.class)) {
+                         classASW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
+                        qm.addWhere("typeName", null, null, true);
                     }
                     /*else if (entityClass.equals(ACADEMIC_DEGREE.class)) {
                         FormModel fm = ((DBSelectModel) classASW.getWidgetModel()).getFormModel();

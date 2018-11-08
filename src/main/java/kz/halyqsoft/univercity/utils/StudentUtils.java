@@ -174,6 +174,7 @@ public abstract class StudentUtils extends AbstractFormWidgetView implements Ent
         cb.setFilteringMode(FilteringMode.STARTSWITH);
         cb.setPageLength(0);
         QueryModel<GROUPS> groupsQM = new QueryModel<>(GROUPS.class);
+        groupsQM.addOrder("name");
         BeanItemContainer<GROUPS> dgroupsBIC = new BeanItemContainer<>(GROUPS.class,
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(groupsQM));
         cb.setContainerDataSource(dgroupsBIC);
