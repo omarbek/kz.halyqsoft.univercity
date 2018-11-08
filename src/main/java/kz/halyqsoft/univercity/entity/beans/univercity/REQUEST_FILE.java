@@ -10,7 +10,7 @@ import javax.persistence.Lob;
 
 /**
  * @author Omarbek
- * @created Apr 19, 2017 9:56:20 AM
+ * @created Apr 19, 2018 9:56:20 AM
  */
 @Entity
 public class REQUEST_FILE extends AbstractEntity {

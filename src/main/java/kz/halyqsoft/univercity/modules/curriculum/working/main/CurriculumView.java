@@ -17,7 +17,6 @@ import kz.halyqsoft.univercity.modules.curriculum.working.changelisteners.Entran
 import kz.halyqsoft.univercity.modules.curriculum.working.changelisteners.SpecialityChangeListener;
 import kz.halyqsoft.univercity.modules.curriculum.working.cycle.CyclePanel;
 import kz.halyqsoft.univercity.modules.curriculum.working.schedule.SchedulePanel;
-import kz.halyqsoft.univercity.modules.curriculum.working.semester.AddProgramPanel;
 import kz.halyqsoft.univercity.modules.curriculum.working.semester.AfterSemesterProgamPanel;
 import kz.halyqsoft.univercity.modules.curriculum.working.semester.CreditCountByComponentsPanel;
 import kz.halyqsoft.univercity.modules.curriculum.working.semester.SemesterDetailPanel;
@@ -68,7 +67,7 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
     private Label totalCreditSumLabel;//in current semester
 
     private List<SemesterDetailPanel> semesterDetailPanels;
-    private AddProgramPanel addProgramPanel;
+    private SemesterDetailPanel addProgramPanel;
     private AfterSemesterProgamPanel afterSemesterProgamPanel;
     private CreditCountByComponentsPanel creditCountByComponentsPanel;
     private CyclePanel cyclePanel;
@@ -203,8 +202,10 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
 //            semesterDetailPanel.setCreditCountByComponentsPanel(creditCountByComponentsPanel);
 //        }
 
-        addProgramPanel = new AddProgramPanel(this);
+        addProgramPanel = new SemesterDetailPanel(this, null);
+        addProgramPanel.setWidth(100, Unit.PERCENTAGE);
         addProgramPanel.setCurriculum(curriculum);
+        addProgramPanel.setEntranceYear((ENTRANCE_YEAR) entranceYearCB.getValue());
         addProgramPanel.initPanel();
         mainTS.addTab(addProgramPanel, getUILocaleUtil().getCaption("add.education.programm"));
 
@@ -396,6 +397,7 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
             }
 
             addProgramPanel.setCurriculum(curriculum);
+            addProgramPanel.setEntranceYear((ENTRANCE_YEAR) entranceYearCB.getValue());
             addProgramPanel.refresh();
 //            afterSemesterProgamPanel.setCurriculum(curriculum);//TODO return
 //            afterSemesterProgamPanel.refresh();
@@ -415,10 +417,11 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
         int totalSumAns;
 
         for (SemesterDetailPanel semesterDetailPanel : semesterDetailPanels) {
-            sum += semesterDetailPanel.getTotalCredit();
+            sum += semesterDetailPanel.getTotalCredit(
+                    SemesterDetailPanel.SubjectsType.MAIN_SUBJECTS);//here can be elective subject type
         }
 
-        totalSumAns = sum + addProgramPanel.getTotalCredit()
+        totalSumAns = sum + addProgramPanel.getTotalCredit(SemesterDetailPanel.SubjectsType.ADDING_SUBJECTS)
         /*+ afterSemesterProgamPanel.getTotalCredit()*/;//TODO return
         creditSumLabel.setValue(String.format(getUILocaleUtil().getCaption("credit.sum"),
                 totalSumAns));
@@ -430,7 +433,7 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
             semesterDetailPanel.setCurriculum(curriculum);
         }
 
-            addProgramPanel.setCurriculum(curriculum);
+        addProgramPanel.setCurriculum(curriculum);
 //            afterSemesterProgamPanel.setCurriculum(curriculum);//TODO return
 //            creditCountByComponentsPanel.setCurriculum(curriculum);
 //            cyclePanel.setCurriculum(curriculum);
@@ -454,7 +457,7 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
     private void approve() throws Exception {
 //        checkForConform();//TODO return
 
-        addProgramPanel.approve();
+//        addProgramPanel.approve();//TODO replace code here
 //        afterSemesterProgamPanel.approve();//TODO return
 //        cyclePanel.checkForApprove();
 
@@ -471,10 +474,11 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
         }
 
         for (SemesterDetailPanel semesterDetailPanel : semesterDetailPanels) {
-            semesterDetailPanel.checkForConform();
+            semesterDetailPanel.checkForConform(
+                    SemesterDetailPanel.SubjectsType.ELECTIVE_SUBJECTS);//here can be main subjects
         }
 
-        addProgramPanel.checkForConform();
+        addProgramPanel.checkForConform(SemesterDetailPanel.SubjectsType.ADDING_SUBJECTS);
 //        afterSemesterProgamPanel.checkForConform();//TODO return
 //        schedulePanel.checkForConform();
     }
@@ -552,60 +556,61 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
         int mainSubjectsTotalSum = 0;
         int electiveSubjectsTotalSum = 0;
         int totalSum = 0;//in current semester
-        if (curriculum.getId() != null) {
+        if (curriculum != null && curriculum.getId() != null) {
             if (mainTS.getSelectedTab() instanceof SemesterDetailPanel) {
                 SemesterDetailPanel semesterDetailPanel = (SemesterDetailPanel) mainTS.
                         getSelectedTab();
 
-                QueryModel<SEMESTER> semesterQM = new QueryModel<>(SEMESTER.class);
-                semesterQM.addWhere("id", ECriteria.EQUAL, semesterDetailPanel.getSemester().getId());
-                semesterQM.addWhere("studyYear", ECriteria.EQUAL, semesterDetailPanel.getSemester().
-                        getStudyYear().getId());
-                semesterQM.addOrder("id");
+                if (semesterDetailPanel.getSemester() != null) {
+                    QueryModel<SEMESTER> semesterQM = new QueryModel<>(SEMESTER.class);
+                    semesterQM.addWhere("id", ECriteria.EQUAL, semesterDetailPanel.getSemester().getId());
+                    semesterQM.addWhere("studyYear", ECriteria.EQUAL, semesterDetailPanel.getSemester().
+                            getStudyYear().getId());
+                    semesterQM.addOrder("id");
 
-                List<SEMESTER> semesters = new ArrayList<>();
-                try {
-                    semesters = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(semesterQM);
-                } catch (Exception e) {
-                    CommonUtils.showMessageAndWriteLog("Unable to get semesters", e);
-                }
-
-                QueryModel<V_CURRICULUM_DETAIL> curriculumDetailQM = new QueryModel<>(
-                        V_CURRICULUM_DETAIL.class);
-                curriculumDetailQM.addWhere("curriculum", ECriteria.EQUAL, curriculum.getId());
-
-                QueryModel<V_ELECTIVE_SUBJECT> electiveSubjectQM = new QueryModel<>(
-                        V_ELECTIVE_SUBJECT.class);
-                electiveSubjectQM.addWhere("curriculum", ECriteria.EQUAL, curriculum.getId());
-
-                for (SEMESTER semester : semesters) {
-                    curriculumDetailQM.addWhere("semester", ECriteria.EQUAL, semester.getId());
-                    electiveSubjectQM.addWhere("semester", ECriteria.EQUAL, semester.getId());
-                    List<V_CURRICULUM_DETAIL> detailList = new ArrayList<>();
-                    List<V_ELECTIVE_SUBJECT> electiveSubjects = new ArrayList<>();
+                    List<SEMESTER> semesters = new ArrayList<>();
                     try {
-                        detailList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(curriculumDetailQM);
-                        electiveSubjects = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(electiveSubjectQM);
+                        semesters = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(semesterQM);
                     } catch (Exception e) {
-                        CommonUtils.showMessageAndWriteLog("Unable to get subjects", e);
+                        CommonUtils.showMessageAndWriteLog("Unable to get semesters", e);
                     }
 
-                    for (V_CURRICULUM_DETAIL mainSubject : detailList) {
-                        if (mainSubject.getSubjectCode() != null) {
-                            mainSubjectsTotalSum += mainSubject.getCredit();
+                    QueryModel<V_CURRICULUM_DETAIL> curriculumDetailQM = new QueryModel<>(
+                            V_CURRICULUM_DETAIL.class);
+                    curriculumDetailQM.addWhere("curriculum", ECriteria.EQUAL, curriculum.getId());
+
+                    QueryModel<V_ELECTIVE_SUBJECT> electiveSubjectQM = new QueryModel<>(
+                            V_ELECTIVE_SUBJECT.class);
+                    electiveSubjectQM.addWhere("curriculum", ECriteria.EQUAL, curriculum.getId());
+
+                    for (SEMESTER semester : semesters) {
+                        curriculumDetailQM.addWhere("semester", ECriteria.EQUAL, semester.getId());
+                        electiveSubjectQM.addWhere("semester", ECriteria.EQUAL, semester.getId());
+                        List<V_CURRICULUM_DETAIL> detailList = new ArrayList<>();
+                        List<V_ELECTIVE_SUBJECT> electiveSubjects = new ArrayList<>();
+                        try {
+                            detailList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(curriculumDetailQM);
+                            electiveSubjects = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(electiveSubjectQM);
+                        } catch (Exception e) {
+                            CommonUtils.showMessageAndWriteLog("Unable to get subjects", e);
                         }
 
-                    }
-                    for (V_ELECTIVE_SUBJECT electiveSubject : electiveSubjects) {
-                        if (electiveSubject.getSubjectCode() != null && electiveSubject.isConsiderCredit()) {
-                            mainSubjectsTotalSum += electiveSubject.getCredit();
+                        for (V_CURRICULUM_DETAIL mainSubject : detailList) {
+                            if (mainSubject.getSubjectCode() != null) {
+                                mainSubjectsTotalSum += mainSubject.getCredit();
+                            }
+
                         }
+                        for (V_ELECTIVE_SUBJECT electiveSubject : electiveSubjects) {
+                            if (electiveSubject.getSubjectCode() != null && electiveSubject.isConsiderCredit()) {
+                                mainSubjectsTotalSum += electiveSubject.getCredit();
+                            }
+                        }
+                        totalSum = mainSubjectsTotalSum + electiveSubjectsTotalSum;
                     }
-                    totalSum = mainSubjectsTotalSum + electiveSubjectsTotalSum;
+                } else {
+                    totalSum += addProgramPanel.getTotalCredit(SemesterDetailPanel.SubjectsType.ADDING_SUBJECTS);
                 }
-            } else if (mainTS.getSelectedTab() instanceof AddProgramPanel) {
-                AddProgramPanel addProgramPanel = (AddProgramPanel) mainTS.getSelectedTab();
-                totalSum += addProgramPanel.getTotalCredit();
             } else if (mainTS.getSelectedTab() instanceof AfterSemesterProgamPanel) {
                 AfterSemesterProgamPanel afterSemesterProgamPanel = (AfterSemesterProgamPanel) mainTS.getSelectedTab();
                 totalSum += afterSemesterProgamPanel.getTotalCredit();

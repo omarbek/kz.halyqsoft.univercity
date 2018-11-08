@@ -4,7 +4,7 @@ import javax.persistence.Entity;
 
 /**
  * @author Omarbek
- * Created Mar 15, 2017 5:01:02 PM
+ * Created Mar 15, 2018 5:01:02 PM
  */
 @Entity
 public class QUESTIONNAIRE_TYPE extends AbstractTypeEntity {

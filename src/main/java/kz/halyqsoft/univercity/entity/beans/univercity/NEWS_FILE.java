@@ -13,7 +13,7 @@ import javax.persistence.ManyToOne;
 
 /**
  * @author Omarbek
- * @created Mar 24, 2017 12:44:36 PM
+ * @created Mar 24, 2018 12:44:36 PM
  */
 @Entity
 public class NEWS_FILE extends AbstractEntity {

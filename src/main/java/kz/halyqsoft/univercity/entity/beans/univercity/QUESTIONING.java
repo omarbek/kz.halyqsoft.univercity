@@ -9,7 +9,7 @@ import java.util.Date;
 
 /**
  * @author Omarbek
- * @created Mar 15, 2017 6:01:27 PM
+ * @created Mar 15, 2018 6:01:27 PM
  */
 @Entity
 public class QUESTIONING extends AbstractEntity {

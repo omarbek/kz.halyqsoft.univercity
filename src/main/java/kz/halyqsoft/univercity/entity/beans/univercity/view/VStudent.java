@@ -8,7 +8,7 @@ import org.r3a.common.entity.ID;
 
 /**
  * @author Omarbek
- * @created Mar 28, 2017 11:55:40 AM
+ * @created Mar 28, 2018 11:55:40 AM
  */
 public final class VStudent extends AbstractEntity {
 

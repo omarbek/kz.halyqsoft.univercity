@@ -36,7 +36,6 @@ import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
-import org.r3a.common.vaadin.widget.toolbar.IconToolbar;
 
 import javax.persistence.NoResultException;
 import java.math.BigDecimal;
@@ -335,7 +334,7 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
         FKFieldModel subjectFM = (FKFieldModel) studentElectiveSubjectGM.getFormModel().getFieldModel("subject");
         subjectFM.setSelectType(ESelectType.CUSTOM_GRID);
         subjectFM.setDialogHeight(400);
-        subjectFM.setDialogWidth(600);
+        subjectFM.setDialogWidth(1000);
 
         QueryModel subjectQM = ((FKFieldModel) studentElectiveSubjectGM.getFormModel().getFieldModel("subject")).
                 getQueryModel();
