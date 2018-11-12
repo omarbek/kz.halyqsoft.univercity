@@ -1,23 +1,24 @@
 package kz.halyqsoft.univercity.entity.beans.univercity;
 
-import kz.halyqsoft.univercity.entity.beans.USERS;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
 
-import javax.persistence.*;
-import java.util.Date;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class STREAM_GROUP extends AbstractEntity {
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 1)
+    @FieldInfo(type = EFieldType.FK_COMBO)
     @ManyToOne
     @JoinColumns({
-            @JoinColumn(name = "GROUP_ID",  referencedColumnName = "ID", nullable = false)})
+            @JoinColumn(name = "GROUP_ID", referencedColumnName = "ID", nullable = false)})
     private GROUPS group;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 2, inGrid = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 2, inEdit = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "STREAM_ID", referencedColumnName = "ID", nullable = false)})

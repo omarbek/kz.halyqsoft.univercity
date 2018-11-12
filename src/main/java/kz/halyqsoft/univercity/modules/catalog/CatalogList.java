@@ -71,6 +71,7 @@ class CatalogList {
         addCatalogEntityToList(QUALIFICATION.class);
         addCatalogEntityToList(NON_ADMISSION_CAUSE.class);
         addCatalogEntityToList(TRAJECTORY.class);
+        addCatalogEntityToList(CURRICULUM_INDIVIDUAL_PLAN.class);
 
         return new ArrayList<>(list);
     }

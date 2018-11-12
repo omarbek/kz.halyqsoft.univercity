@@ -10,10 +10,7 @@ import kz.halyqsoft.univercity.entity.beans.ROLES;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.USER_ROLES;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_DATA;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_PERIOD;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.facade.CommonIDFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -472,5 +469,24 @@ public class CommonUtils {
             e.printStackTrace();//TODO catch
         }
         return semester;
+    }
+
+    public static int getStudyYearByEntranceYear(ENTRANCE_YEAR entranceYear) {
+        return getCurrentSemesterData().getYear().getBeginYear() - entranceYear.getBeginYear() + 1;
+    }
+
+    public static ENTRANCE_YEAR getEntranceYearByStudyYear(STUDY_YEAR studyYear) {
+        ENTRANCE_YEAR entranceYear=new ENTRANCE_YEAR();
+        try {
+            QueryModel<ENTRANCE_YEAR> entranceYearQM = new QueryModel<>(ENTRANCE_YEAR.class);
+            entranceYearQM.addWhere("beginYear", ECriteria.EQUAL,
+                    CommonUtils.getCurrentSemesterData().getYear().getBeginYear() - (studyYear.getStudyYear() - 1));
+            entranceYear = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(entranceYearQM);
+        } catch (NoResultException e) {
+            entranceYear = null;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return entranceYear;
     }
 }
