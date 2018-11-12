@@ -132,7 +132,7 @@ public class BindingElectiveSubjectView extends AbstractTaskView implements Filt
                     String fileName = "document";
 
                     tableHeader.add("№");
-                    tableHeader.add(getUILocaleUtil().getEntityFieldLabel(V_ELECTIVE_SUBJECT.class, "subjectCode"));
+                    //tableHeader.add(getUILocaleUtil().getEntityFieldLabel(V_ELECTIVE_SUBJECT.class, "subjectCode"));
                     tableHeader.add(getUILocaleUtil().getEntityFieldLabel(V_ELECTIVE_SUBJECT.class, "subjectName"));
                     tableHeader.add(getUILocaleUtil().getEntityFieldLabel(V_ELECTIVE_SUBJECT.class, "credit"));
                     tableHeader.add(getUILocaleUtil().getEntityFieldLabel(SUBJECT.class, "ects"));
@@ -146,7 +146,7 @@ public class BindingElectiveSubjectView extends AbstractTaskView implements Filt
                         ArrayList<String> rowList = new ArrayList<>();
                         rowList.add((1 + i) + "");
                         VPairSubject vPairSubject = (VPairSubject) getEmployee().get(i);
-                        rowList.add(checkForNull(vPairSubject.getCode()));
+                       // rowList.add(checkForNull(vPairSubject.getCode()));
                         rowList.add(checkForNull(vPairSubject.getSubjectName()));
                         rowList.add(checkForNull(vPairSubject.getCredit() + ""));
                         rowList.add(vPairSubject.getEcts() + "");
@@ -174,6 +174,12 @@ public class BindingElectiveSubjectView extends AbstractTaskView implements Filt
                         tableBody.add(rowList);
                     }
                     PrintDialog printDialog = new PrintDialog(tableHeader, tableBody, CommonUtils.getUILocaleUtil().getCaption("print"), fileName);
+                    printDialog.getPdfBtn().addClickListener(new Button.ClickListener() {
+                        @Override
+                        public void buttonClick(Button.ClickEvent clickEvent) {
+
+                        }
+                    });
                 }
 
         });
@@ -313,7 +319,7 @@ public class BindingElectiveSubjectView extends AbstractTaskView implements Filt
                     VPairSubject pairSubject = new VPairSubject();
                     ID pairSubjectId = ID.valueOf((long) oo[0]);
                     pairSubject.setId(pairSubjectId);
-                    pairSubject.setCode((String) oo[1]);
+                    //pairSubject.setCode((String) oo[1]);
                     pairSubject.setSubjectName((String) oo[2]);
                     pairSubject.setCredit(((BigDecimal) oo[3]).intValue());
                     pairSubject.setEcts(((BigDecimal) oo[4]).intValue());

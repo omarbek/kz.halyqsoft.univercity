@@ -3,20 +3,19 @@ package kz.halyqsoft.univercity.modules.schedule;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.combobox.FilteringMode;
-import com.vaadin.ui.*;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.VerticalLayout;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_EMPLOYEE;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.V_GROUP;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.V_TEACHER_LOAD_ASSIGN_DETAIL;
 import kz.halyqsoft.univercity.utils.CommonUtils;
-import kz.halyqsoft.univercity.utils.TimeUtils;
+import kz.halyqsoft.univercity.utils.EntityUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
-import org.r3a.common.entity.ID;
-import org.r3a.common.entity.beans.AbstractTask;
 import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.event.EntityListener;
 import org.r3a.common.entity.query.QueryModel;
@@ -25,7 +24,6 @@ import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.select.EAggregate;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.view.AbstractCommonView;
-import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.ERefreshType;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
@@ -33,12 +31,7 @@ import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 import org.r3a.common.vaadin.widget.toolbar.IconToolbar;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.temporal.TemporalAdjusters;
 import java.util.*;
-import java.util.Calendar;
 
 /**
  * @author Omarbek
@@ -115,7 +108,7 @@ public class ScheduleManual extends AbstractCommonView implements EntityListener
         scheduleDetailGW = new GridWidget(SCHEDULE_DETAIL.class);
         scheduleDetailGW.setImmediate(true);
         scheduleDetailGW.setSizeFull();
-        scheduleDetailGW.addEntityListener(this);
+        scheduleDetailGW.addEntityListener(new ScheduleDetail());
         scheduleDetailGM = (DBGridModel)scheduleDetailGW.getWidgetModel();
         scheduleDetailGM.setRefreshType(ERefreshType.MANUAL);
         scheduleDetailGM.setDeferredCreate(true);
@@ -158,6 +151,46 @@ public class ScheduleManual extends AbstractCommonView implements EntityListener
         mainVL.addComponent(semesterDataCB);
         mainVL.addComponent(mainHL);
 
+    }
+
+    private class ScheduleDetail extends EntityUtils {
+
+        @Override
+        protected void init(Object source, Entity e, boolean isNew) throws Exception {
+            SCHEDULE_DETAIL scheduleDetail = (SCHEDULE_DETAIL) e;
+            ScheduleDetailEdit scheduleDetailEdit = new ScheduleDetailEdit(ScheduleManual.this, scheduleDetail,isNew);
+        }
+
+        @Override
+        protected GridWidget getGridWidget() {
+            return scheduleDetailGW;
+        }
+
+        @Override
+        protected String getModuleName() {
+            return "binded elective subject";
+        }
+
+        @Override
+        protected Class<? extends Entity> getEntityClass() {
+            return ELECTIVE_BINDED_SUBJECT.class;
+        }
+
+        @Override
+        protected void refresh() throws Exception {
+            ScheduleManual.this.refresh();
+        }
+
+        @Override
+        protected void removeChildrenEntity(List<Entity> delList) throws Exception {
+            for (Entity entity : delList) {
+                QueryModel<PAIR_SUBJECT> pairSubjectQM = new QueryModel<>(PAIR_SUBJECT.class);
+                pairSubjectQM.addWhere("electiveBindedSubject", ECriteria.EQUAL, entity.getId());
+                List<PAIR_SUBJECT> subjects = SessionFacadeFactory.getSessionFacade(
+                        CommonEntityFacadeBean.class).lookup(pairSubjectQM);
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(subjects);
+            }
+        }
     }
 
     private void refresh() throws Exception {
