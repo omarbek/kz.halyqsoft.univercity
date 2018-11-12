@@ -154,7 +154,8 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.NON_ADMISSION_CAUSE</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.PRACTICE_BREAKDOWN</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.TRAJECTORY</class>
-
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.STREAM_TYPE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.CURRICULUM_INDIVIDUAL_PLAN</class>
 
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_SPECIALITY</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_ORGANIZATION</class>

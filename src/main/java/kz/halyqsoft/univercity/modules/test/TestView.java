@@ -1,18 +1,14 @@
 package kz.halyqsoft.univercity.modules.test;
 
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Label;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_DATA;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDY_YEAR;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
+import org.r3a.common.entity.ID;
 import org.r3a.common.entity.beans.AbstractTask;
-import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.vaadin.view.AbstractTaskView;
-
-import java.util.List;
 
 public class TestView extends AbstractTaskView {
 
@@ -30,24 +26,14 @@ public class TestView extends AbstractTaskView {
     @Override
     public void initView(boolean b) throws Exception {
         try {
-            QueryModel<SEMESTER_DATA> semesterDataQM = new QueryModel<>(SEMESTER_DATA.class);
-            List<SEMESTER_DATA> semesterDataList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
-                    lookup(semesterDataQM);
-            QueryModel<ENTRANCE_YEAR> entranceYearQM = new QueryModel<>(ENTRANCE_YEAR.class);
-            List<ENTRANCE_YEAR> entranceYears = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
-                    lookup(entranceYearQM);
-            for (ENTRANCE_YEAR entranceYear : entranceYears) {
-                for (SEMESTER_DATA semesterData : semesterDataList) {
-                    if (semesterData.getYear().getBeginYear() > entranceYear.getBeginYear()) {
-                        SEMESTER semester = CommonUtils.getSemesterBySemesterDataAndEntranceYear(semesterData,
-                                entranceYear);
-                        getContent().addComponent(new Label("semesterData=" + semesterData));
-                        getContent().addComponent(new Label("entranceYear=" + entranceYear));
-                        getContent().addComponent(new Label("semester=" + semester));
-                    }
-                }
-                getContent().addComponent(new Label(""));
-            }
+//            qwe(1);
+//            qwe(2);
+//            qwe(5);
+//            qwe(9);
+            asd(1);
+            asd(2);
+            asd(3);
+            asd(4);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -152,8 +138,15 @@ public class TestView extends AbstractTaskView {
 //        return result;
 //    }
 
-    public static void main(String[] args) {
-
+    private static void qwe(int i) throws Exception {
+        ENTRANCE_YEAR entranceYear = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                lookup(ENTRANCE_YEAR.class, ID.valueOf(i));
+        System.out.println(entranceYear.toString() + ":" + CommonUtils.getStudyYearByEntranceYear(entranceYear));
+    }
+    private static void asd(int i) throws Exception {
+        STUDY_YEAR studyYear = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                lookup(STUDY_YEAR.class, ID.valueOf(i));
+        System.out.println(studyYear.toString() + ":" + CommonUtils.getEntranceYearByStudyYear(studyYear));
     }
 
 //    private static int getFirstMonday(int year, int month) {
