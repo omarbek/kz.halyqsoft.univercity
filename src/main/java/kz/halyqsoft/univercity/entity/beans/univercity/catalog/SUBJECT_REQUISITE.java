@@ -18,7 +18,7 @@ import javax.persistence.ManyToOne;
 @Entity
 public class SUBJECT_REQUISITE extends AbstractEntity {
 
-	@FieldInfo(type = EFieldType.FK_COMBO)
+	@FieldInfo(type = EFieldType.FK_DIALOG)
 	@ManyToOne
     @JoinColumns({
         @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
