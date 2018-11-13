@@ -71,7 +71,7 @@ public class CustomDocument {
             document.open();
             Paragraph paragraph = new Paragraph(title, EmployeePdfCreator.getFont(12, Font.BOLD));
             paragraph.setAlignment(Element.ALIGN_CENTER);
-
+            document.add(paragraph);
             for (CustomField cf : customFieldList) {
                 cf.getxComboBox().setEnabled(true);
 

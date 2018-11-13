@@ -1421,7 +1421,7 @@ public class CustomReportsView extends AbstractTaskView{
                                 "         LEFT JOIN non_admission_exam nae ON nae.student_education_id = se.id\n" +
                                 "       WHERE vs.groups_id NOTNULL\n" +
                                 "--              AND ser.subject_id = 1 \n" +
-                                " AND ser.semester_id = "+ CommonUtils.getCurrentSemesterData().getId().getId().longValue() +"\n" +
+//                                " AND ser.semester_id = "+ CommonUtils.getCurrentSemesterData().getId().getId().longValue() +"\n" +
                                 "       GROUP BY vs.speciality_code, vs.speciality_name, form.column1, yaz.column1, type.column1, vs.study_year_id,\n" +
                                 "         vs.education_type_id, vs.language_id, vs.diploma_type_id, vs.student_status_id, ser.final,\n" +
                                 "         nae.respectful_reason\n" +
