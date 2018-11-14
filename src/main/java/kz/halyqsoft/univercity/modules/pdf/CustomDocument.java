@@ -6,29 +6,18 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.vaadin.server.VaadinService;
-import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.PDF_PROPERTY;
-import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_SUBJECT;
-import kz.halyqsoft.univercity.entity.beans.univercity.TEACHER_SUBJECT;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.EmployeePdfCreator;
-import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
-import org.r3a.common.dblink.utils.SessionFacadeFactory;
-import org.r3a.common.entity.query.QueryModel;
-import org.r3a.common.entity.query.from.EJoin;
-import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.vaadin.widget.dialog.Message;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Phaser;
 
 public class CustomDocument {
 
@@ -47,7 +36,7 @@ public class CustomDocument {
         fontMap.put(CustomField.ITALIC, Font.ITALIC);
         fontMap.put(CustomField.UNDERLINE, Font.UNDERLINE);
         fontMap.put(CustomField.BOLDITALIC, Font.BOLDITALIC);
-        pdfPTable = new PdfPTable(new float[] { 2, 1, 2 });
+        pdfPTable = new PdfPTable(new float[]{2, 1, 2});
     }
 
     private Font getFont(int fontSize, int font) {
@@ -67,7 +56,7 @@ public class CustomDocument {
         try {
             PdfWriter pdfWriter = PdfWriter.getInstance(this.document, byteArrayOutputStream);
 
-            Document doc=new Document();
+            Document doc = new Document();
             document.open();
             Paragraph paragraph = new Paragraph(title, EmployeePdfCreator.getFont(12, Font.BOLD));
             paragraph.setAlignment(Element.ALIGN_CENTER);
@@ -81,9 +70,9 @@ public class CustomDocument {
                 float x = (float) Integer.parseInt(cf.getxComboBox().getValue().toString());
                 float y = (float) Integer.parseInt(cf.getyComboBox().getValue().toString());
 
-                if(cf.getCenterCheckBox().getValue()){
+                if (cf.getCenterCheckBox().getValue()) {
                     paragraph1.setAlignment(Element.ALIGN_CENTER);
-                }else if(cf.getRightCheckBox().getValue()){
+                } else if (cf.getRightCheckBox().getValue()) {
                     paragraph1.setAlignment(Element.ALIGN_RIGHT);
                 }
 
@@ -810,19 +799,18 @@ public class CustomDocument {
 
 
             document.close();
-        pdfWriter.close();
-    } catch (Exception e) {
-        CommonUtils.LOG.error("Unable to create pdf property", e);
-        Message.showError(e.toString());
-        e.printStackTrace();
+            pdfWriter.close();
+        } catch (Exception e) {
+            CommonUtils.LOG.error("Unable to create pdf property", e);
+            Message.showError(e.toString());
+            e.printStackTrace();
+        }
+
+
     }
 
 
-
-    }
-
-
-    private void insertCell(PdfPTable table, String text, int align, int colspan, Font font){
+    private void insertCell(PdfPTable table, String text, int align, int colspan, Font font) {
 
         //create a new cell with the specified Text and Font
         PdfPCell cell = new PdfPCell(new Phrase(text.trim(), font));
@@ -831,7 +819,7 @@ public class CustomDocument {
         //set the cell column span in case you want to merge two or more cells
         cell.setColspan(colspan);
         //in case there is no text and you wan to create an empty row
-        if(text.trim().equalsIgnoreCase("")){
+        if (text.trim().equalsIgnoreCase("")) {
             cell.setMinimumHeight(2f);
         }
         //add the call to the table
@@ -844,7 +832,7 @@ public class CustomDocument {
         PdfWriter.getInstance(document, new FileOutputStream(dest));
         document.open();
         PdfPTable table = new PdfPTable(8);
-        for(int aw = 0; aw < 16; aw++){
+        for (int aw = 0; aw < 16; aw++) {
             table.addCell("hi");
         }
         document.add(table);

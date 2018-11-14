@@ -166,7 +166,6 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                     } else if (entityClass.equals(UNIVERSITY.class)) {
                         classASW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
                         qm.addWhere("universityName", null, null, true);
-                        qm.addWhere("useDefault", Boolean.FALSE, true);
                     } else if (entityClass.equals(UNT_SUBJECT.class)) {
                         classASW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
                         qm.addWhere("subjectName", null, null, true);
@@ -189,10 +188,9 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                         classASW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
                         classASW.setButtonVisible(IconToolbar.ADD_BUTTON, false);
                         qm.addWhere("subjectName", null, null, true);
-                    } else if (entityClass.equals(TRAJECTORY.class)) {
-                        FormModel trajectoryFM = ((DBSelectModel) classASW.getWidgetModel()).getFormModel();
-                        QueryModel specQM = ((FKFieldModel) trajectoryFM.getFieldModel("speciality")).getQueryModel();
-                        specQM.addWhere("deleted", Boolean.FALSE);
+                    }else if (entityClass.equals(TRAJECTORY.class)) {
+                         classASW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
+                        qm.addWhere("typeName", null, null, true);
                     }
                     /*else if (entityClass.equals(ACADEMIC_DEGREE.class)) {
                         FormModel fm = ((DBSelectModel) classASW.getWidgetModel()).getFormModel();
@@ -207,6 +205,15 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                         classASW.setButtonVisible(AbstractToolbar.FILTER_BUTTON, true);
                     } else if (entityClass.equals(NON_ADMISSION_CAUSE.class)) {
                         classASW.setButtonVisible(AbstractToolbar.DELETE_BUTTON, false);
+                    } else if (entityClass.equals(TRAJECTORY.class)) {
+                        FormModel trajectoryFM = ((DBSelectModel) classASW.getWidgetModel()).getFormModel();
+                        QueryModel specQM = ((FKFieldModel) trajectoryFM.getFieldModel("speciality")).getQueryModel();
+                        specQM.addWhere("deleted", Boolean.FALSE);
+                    } else if (entityClass.equals(CURRICULUM_INDIVIDUAL_PLAN.class)) {
+                        FormModel curriculumFM = ((DBSelectModel) classASW.getWidgetModel()).getFormModel();
+                        FKFieldModel specialityFM = (FKFieldModel) curriculumFM.getFieldModel("speciality");
+                        QueryModel specQM = specialityFM.getQueryModel();
+                        specQM.addWhere("deleted", Boolean.FALSE);
                     }
                 }
                 mainHSP.addComponent(classASW);

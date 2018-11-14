@@ -30,18 +30,6 @@ public final class VEmployee extends AbstractEntity {
 	private String postName;
 
 	@JsonIgnore
-	@FieldInfo(type = EFieldType.BOOLEAN, order = 6, inGrid = false)
-	private boolean lecture;
-
-	@JsonIgnore
-	@FieldInfo(type = EFieldType.BOOLEAN, order = 7, inGrid = false)
-	private boolean laboratory;
-
-	@JsonIgnore
-	@FieldInfo(type = EFieldType.BOOLEAN, order = 8, inGrid = false)
-	private boolean practice;
-
-	@JsonIgnore
 	@FieldInfo(type = EFieldType.BOOLEAN, order = 9, inGrid = false)
 	private boolean fall;
 
@@ -88,30 +76,6 @@ public final class VEmployee extends AbstractEntity {
 
 	public void setPostName(String postName) {
 		this.postName = postName;
-	}
-
-	public boolean isLecture() {
-		return lecture;
-	}
-
-	public void setLecture(boolean lecture) {
-		this.lecture = lecture;
-	}
-
-	public boolean isLaboratory() {
-		return laboratory;
-	}
-
-	public void setLaboratory(boolean laboratory) {
-		this.laboratory = laboratory;
-	}
-
-	public boolean isPractice() {
-		return practice;
-	}
-
-	public void setPractice(boolean practice) {
-		this.practice = practice;
 	}
 
 	public boolean isFall() {

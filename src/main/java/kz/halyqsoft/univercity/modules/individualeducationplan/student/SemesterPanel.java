@@ -375,8 +375,8 @@ public class SemesterPanel extends AbstractCommonPanel {
 
     private List<SUBJECT> getMainSubjects() throws Exception {
         QueryModel<SUBJECT> mainSubjectQM = new QueryModel<>(SUBJECT.class);
-        mainSubjectQM.addWhereNotNull("subjectCycle");
         mainSubjectQM.addWhere("deleted", false);
+        mainSubjectQM.addWhere("level", ECriteria.EQUAL, LEVEL.BACHELOR);
         mainSubjectQM.addWhere("mandatory", true);
         return SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
                 lookup(mainSubjectQM);

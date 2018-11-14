@@ -21,7 +21,7 @@ public class SUBJECT extends AbstractEntity {
     @Column(name = "NAME_KZ", nullable = false)
     private String nameKZ;
 
-    @FieldInfo(type = EFieldType.TEXT_LATIN, max = 256, order = 2,inGrid = false)
+    @FieldInfo(type = EFieldType.TEXT_LATIN, max = 256, order = 2, inGrid = false)
     @Column(name = "NAME_EN", nullable = false)
     private String nameEN;
 
@@ -41,7 +41,7 @@ public class SUBJECT extends AbstractEntity {
             @JoinColumn(name = "STUDY_DIRECT_ID", referencedColumnName = "ID")})
     private STUDY_DIRECT studyDirect;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 6)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 6, required = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "CHAIR_ID", referencedColumnName = "ID")})

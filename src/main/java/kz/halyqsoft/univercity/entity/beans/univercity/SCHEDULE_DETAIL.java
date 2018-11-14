@@ -66,6 +66,12 @@ public class SCHEDULE_DETAIL extends AbstractEntity {
             @JoinColumn(name = "GROUP_ID",  referencedColumnName = "ID")})
     private GROUPS group;
 
+    @FieldInfo(type = EFieldType.FK_COMBO,order = 9)
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "STREAM_ID",  referencedColumnName = "ID")})
+    private STREAM stream;
+
     public SCHEDULE_DETAIL() {
     }
 
@@ -131,5 +137,13 @@ public class SCHEDULE_DETAIL extends AbstractEntity {
 
     public void setGroup(GROUPS group) {
         this.group = group;
+    }
+
+    public STREAM getStream() {
+        return stream;
+    }
+
+    public void setStream(STREAM stream) {
+        this.stream = stream;
     }
 }
