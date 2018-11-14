@@ -17,10 +17,8 @@ import com.vaadin.ui.Upload.SucceededEvent;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.enumeration.OperType;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.VPairSubject;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_ORDER_DOC;
 import kz.halyqsoft.univercity.utils.CommonUtils;
-import org.apache.commons.lang3.ObjectUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.facade.CommonIDFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -34,17 +32,11 @@ import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.view.AbstractCommonView;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.form.AbstractFormWidgetView;
-import org.r3a.common.vaadin.widget.form.FormModel;
 import org.r3a.common.vaadin.widget.form.field.filelist.FileListFieldModel;
-import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
-import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.table.TableWidget;
 import org.r3a.common.vaadin.widget.table.model.DBTableModel;
 
-import javax.persistence.Id;
-import javax.persistence.NoResultException;
 import java.io.*;
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -691,10 +683,9 @@ final class EducationDetailPanel extends AbstractFormWidgetView {
                 " INNER JOIN student_subject ss on subject.id=ss.subject_id\n" +
                 "INNER JOIN student_education se ON ss.student_id = se.id\n" +
                 "  INNER JOIN speciality s2 ON se.speciality_id = s2.id\n" +
-                "WHERE ss.student_id=170 ";//+stuId;
+                "WHERE ss.student_id= "+stuId;
 
         Map<Integer, Object> params = new HashMap<>();
-
 
         try {
             List tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(randStudentSubjectSql, params);
