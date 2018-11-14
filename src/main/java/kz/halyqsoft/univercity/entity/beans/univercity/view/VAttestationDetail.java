@@ -4,7 +4,7 @@ import org.r3a.common.entity.AbstractEntity;
 
 /**
  * @author Omarbek
- * @created Feb 21, 2017 4:44:54 PM
+ * @created Feb 21, 2018 4:44:54 PM
  */
 public final class VAttestationDetail extends AbstractEntity {
 

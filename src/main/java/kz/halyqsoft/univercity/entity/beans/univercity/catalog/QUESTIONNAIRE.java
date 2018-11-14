@@ -4,19 +4,12 @@ import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
 
+import javax.persistence.*;
 import java.util.Date;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.ManyToOne;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 /**
  * @author Omarbek
- * Created Mar 15, 2017 5:06:31 PM
+ * Created Mar 15, 2018 5:06:31 PM
  */
 @Entity
 public class QUESTIONNAIRE extends AbstractEntity {

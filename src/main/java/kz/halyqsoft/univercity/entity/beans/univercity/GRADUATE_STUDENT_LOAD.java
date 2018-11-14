@@ -13,7 +13,7 @@ import javax.persistence.ManyToOne;
 
 /**
  * @author Omarbek
- * @created Mar 14, 2017 4:00:04 PM
+ * @created Mar 14, 2018 4:00:04 PM
  */
 @Entity
 public class GRADUATE_STUDENT_LOAD extends AbstractEntity {

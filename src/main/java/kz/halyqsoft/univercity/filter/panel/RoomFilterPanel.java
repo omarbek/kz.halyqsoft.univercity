@@ -8,7 +8,7 @@ import org.r3a.common.vaadin.widget.filter2.panel.AbstractFilterPanel;
 
 /**
  * @author Omarbek
- * @created Apr 10, 2017 3:19:50 PM
+ * @created Apr 10, 2018 3:19:50 PM
  */
 @SuppressWarnings("serial")
 public final class RoomFilterPanel extends AbstractFilterPanel {

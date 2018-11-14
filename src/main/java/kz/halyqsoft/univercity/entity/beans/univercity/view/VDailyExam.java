@@ -6,7 +6,7 @@ import org.r3a.common.entity.FieldInfo;
 
 /**
  * @author Dinassil Omarbek
- * @created Apr 19, 2017 12:27:36 PM
+ * @created Apr 19, 2018 12:27:36 PM
  */
 public class VDailyExam extends AbstractEntity {
 

@@ -5,7 +5,7 @@ import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 
 /**
  * @author Omarbek
- * @created Apr 6, 2017 10:09:22 AM
+ * @created Apr 6, 2018 10:09:22 AM
  */
 public final class FSubjectFilter extends AbstractFilterBean {
 

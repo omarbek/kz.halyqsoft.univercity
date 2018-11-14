@@ -16,11 +16,5 @@
         <property name="ApplicationName" value="DataGrip" />
       </driver-properties>
     </data-source>
-    <data-source source="LOCAL" name="univerdb@ukpu-systems.kz" uuid="ebfb1223-f9a8-49ae-9b3b-69d6c88a1d83">
-      <driver-ref>postgresql</driver-ref>
-      <synchronize>true</synchronize>
-      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://ukpu-systems.kz:5432/univerdb</jdbc-url>
-    </data-source>
   </component>
 </project>

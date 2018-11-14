@@ -30,7 +30,7 @@ import java.util.Map;
 
 /**
  * @author Dinassil Omarbek
- * @created May 24, 2017 9:14:06 AM
+ * @created May 24, 2018 9:14:06 AM
  */
 public class StudentDormView extends AbstractTaskView {
     private ComboBox buildingCB, roomCB;

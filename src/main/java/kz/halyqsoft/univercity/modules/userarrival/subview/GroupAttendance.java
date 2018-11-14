@@ -157,6 +157,11 @@ public class GroupAttendance implements EntityListener {
                 } else if (mainVL.getComponentIndex(vStudentInfoGW) > -1) {
                     if (vGroupGW.getSelectedEntity() != null) {
                         vStudentInfoGM.setEntities(getList((VGroup) vGroupGW.getSelectedEntity(), dateField.getValue()));
+                        try{
+                            vStudentInfoGW.refresh();
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
                     }
                 }
             }
@@ -384,6 +389,11 @@ public class GroupAttendance implements EntityListener {
                     vStudentInfoGM.setRefreshType(ERefreshType.MANUAL);
                     vStudentInfoGM.setEntities(getList((VGroup) vGroupGW.getSelectedEntity(), dateField.getValue()));
 
+                    try{
+                        vStudentInfoGW.refresh();
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
                     mainVL.addComponent(vStudentInfoGW);
                     backButton.setVisible(true);
                     detalizationBtn.setVisible(true);

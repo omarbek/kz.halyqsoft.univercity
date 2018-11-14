@@ -13,12 +13,12 @@ import javax.persistence.ManyToOne;
 
 /**
  * @author Omarbek
- * Created Feb 27, 2017 10:46:53 AM
+ * Created Feb 27, 2018 10:46:53 AM
  */
 @Entity
 public class SUBJECT_REQUISITE extends AbstractEntity {
 
-	@FieldInfo(type = EFieldType.FK_COMBO)
+	@FieldInfo(type = EFieldType.FK_DIALOG)
 	@ManyToOne
     @JoinColumns({
         @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})

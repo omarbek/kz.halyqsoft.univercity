@@ -1,15 +1,14 @@
 package kz.halyqsoft.univercity.entity.beans.univercity.catalog;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Omarbek
- * Created Jan 25, 2017 12:25:24 PM
+ * Created Jan 25, 2018 12:25:24 PM
  */
 @Entity
 public class PROPERTY_TYPE extends AbstractTypeEntity {

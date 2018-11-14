@@ -8,7 +8,7 @@ import java.util.Date;
 
 /**
  * @author Dinassil Omarbek
- * @created Apr 18, 2017 9:19:47 AM
+ * @created Apr 18, 2018 9:19:47 AM
  */
 public class VStudentFinDebt extends AbstractEntity {
 

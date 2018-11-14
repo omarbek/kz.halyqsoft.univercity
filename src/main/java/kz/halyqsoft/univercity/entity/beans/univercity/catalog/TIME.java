@@ -9,7 +9,7 @@ import javax.persistence.Entity;
 
 /**
  * @author Omarbek
- * Created May 4, 2017 2:46:40 PM
+ * Created May 4, 2018 2:46:40 PM
  */
 @Entity
 public class TIME extends AbstractEntity {

@@ -15,7 +15,7 @@ import org.r3a.common.vaadin.widget.dialog.select.custom.grid.CustomGridSelectDi
 
 /**
  * @author Omarbek Dinassil
- * @created Apr 20, 2017 2:03:36 PM
+ * @created Apr 20, 2018 2:03:36 PM
  */
 @SuppressWarnings("serial")
 final class ElectiveSubjectSelectDialog extends CustomGridSelectDialog {

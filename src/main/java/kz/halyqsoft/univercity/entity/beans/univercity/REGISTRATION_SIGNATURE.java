@@ -10,7 +10,7 @@ import java.util.Date;
 
 /**
  * @author Omarbek
- * @created Apr 3, 2017 5:03:41 PM
+ * @created Apr 3, 2018 5:03:41 PM
  */
 @Entity
 @NamedQueries({

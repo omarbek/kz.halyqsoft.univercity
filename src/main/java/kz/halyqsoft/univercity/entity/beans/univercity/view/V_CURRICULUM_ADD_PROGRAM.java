@@ -57,7 +57,7 @@ public class V_CURRICULUM_ADD_PROGRAM extends AbstractEntity {
 
 	@ManyToOne
 	@JoinColumns({
-			@JoinColumn(name = "SUBJECT_MODULE_ID", referencedColumnName = "ID")})
+			@JoinColumn(name = "MODULE_ID", referencedColumnName = "ID")})
 	private SUBJECT_MODULE subjectModule;
 
 	@ManyToOne

@@ -8,7 +8,7 @@ import java.util.Date;
 
 /**
  * @author Omarbek
- * @created Apr 12, 2017 10:22:36 AM
+ * @created Apr 12, 2018 10:22:36 AM
  */
 @Entity
 public class DORM_STUDENT_VIOLATION extends AbstractEntity {

@@ -6,7 +6,7 @@ import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 
 /**
  * @author Dinassil Omarbek
- * @created Apr 19, 2017 11:12:31 AM
+ * @created Apr 19, 2018 11:12:31 AM
  */
 public final class FDailyExamFilter extends AbstractFilterBean {
 

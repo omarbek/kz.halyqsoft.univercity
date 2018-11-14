@@ -12,7 +12,7 @@ import java.util.List;
 
 /**
  * @author Dinassil Omarbek
- * @created May 24, 2017 3:26:17 PM
+ * @created May 24, 2018 3:26:17 PM
  */
 public class StudentView extends StudentOrApplicantView {
 

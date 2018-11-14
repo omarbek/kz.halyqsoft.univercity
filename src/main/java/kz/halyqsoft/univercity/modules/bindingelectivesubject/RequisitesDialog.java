@@ -1,9 +1,14 @@
 package kz.halyqsoft.univercity.modules.bindingelectivesubject;
 
+import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.Alignment;
+import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import kz.halyqsoft.univercity.entity.beans.univercity.ELECTIVE_BINDED_SUBJECT;
 import kz.halyqsoft.univercity.entity.beans.univercity.PAIR_SUBJECT;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEPARTMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SPECIALITY;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT_REQUISITE;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VPairSubject;
@@ -12,7 +17,6 @@ import kz.halyqsoft.univercity.utils.WindowUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
-import org.r3a.common.entity.ID;
 import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.event.EntityListener;
 import org.r3a.common.entity.query.QueryModel;
@@ -20,6 +24,8 @@ import org.r3a.common.entity.query.from.EJoin;
 import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.widget.ERefreshType;
+import org.r3a.common.vaadin.widget.dialog.select.ESelectType;
+import org.r3a.common.vaadin.widget.dialog.select.custom.grid.CustomGridSelectDialog;
 import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
@@ -35,16 +41,13 @@ public class RequisitesDialog extends WindowUtils {
 
     private BindingElectiveSubjectEdit bindingElectiveSubjectEdit;
     private ELECTIVE_BINDED_SUBJECT electiveBindedSubject;
-    private SPECIALITY speciality;
     private VPairSubject pairSubject;
     private GridWidget requisitesGW;
 
     public RequisitesDialog(BindingElectiveSubjectEdit bindingElectiveSubjectEdit,
-                            ELECTIVE_BINDED_SUBJECT electiveBindedSubject, SPECIALITY speciality,
-                            VPairSubject pairSubject) {
+                            ELECTIVE_BINDED_SUBJECT electiveBindedSubject, VPairSubject pairSubject) {
         this.bindingElectiveSubjectEdit = bindingElectiveSubjectEdit;
         this.electiveBindedSubject = electiveBindedSubject;
-        this.speciality = speciality;
         this.pairSubject = pairSubject;
         init(600, 450);
     }
@@ -78,14 +81,54 @@ public class RequisitesDialog extends WindowUtils {
 
         refreshGridModel();
 
-        QueryModel subjectQM = ((FKFieldModel) requisitesGM.getFormModel().
-                getFieldModel("subject")).getQueryModel();
+        FKFieldModel subjectFM = (FKFieldModel) requisitesGM.getFormModel().
+                getFieldModel("subject");
+        QueryModel subjectQM = subjectFM.getQueryModel();
         FromItem specFI = subjectQM.addJoin(EJoin.INNER_JOIN, "chair", SPECIALITY.class, "department");
-        subjectQM.addWhereNotNull("subjectCycle");
         subjectQM.addWhereAnd("deleted", Boolean.FALSE);
-        subjectQM.addWhereAnd("mandatory", Boolean.FALSE);
         subjectQM.addWhere(specFI, "deleted", false);
-        subjectQM.addWhere(specFI, "id", ECriteria.EQUAL, speciality.getId());
+
+        subjectFM.setSelectType(ESelectType.CUSTOM_GRID);
+        subjectFM.setDialogHeight(400);
+        subjectFM.setDialogWidth(1000);
+
+        QueryModel<DEPARTMENT> chairQM = new QueryModel<>(DEPARTMENT.class);
+        chairQM.addWhereNotNull("parent");
+        chairQM.addWhereAnd("deleted", Boolean.FALSE);
+        chairQM.addWhereAnd("fc", Boolean.FALSE);
+        chairQM.addOrder("deptName");
+        BeanItemContainer<DEPARTMENT> chairBIC = null;
+        try {
+            chairBIC = new BeanItemContainer<>(DEPARTMENT.class, SessionFacadeFactory
+                    .getSessionFacade(CommonEntityFacadeBean.class).lookup(chairQM));
+        } catch (Exception e) {
+            e.printStackTrace();//TODO catch
+        }
+        ComboBox chairCB = new ComboBox();
+        chairCB.setContainerDataSource(chairBIC);
+        chairCB.setImmediate(true);
+        chairCB.setNullSelectionAllowed(true);
+        chairCB.setTextInputAllowed(true);
+        chairCB.setFilteringMode(FilteringMode.CONTAINS);
+        chairCB.setPageLength(0);
+        chairCB.setWidth(400, Unit.PIXELS);
+
+        TextField nameRuTF = new TextField();
+        nameRuTF.setNullSettingAllowed(true);
+
+        TextField nameKzTF = new TextField();
+        nameKzTF.setNullSettingAllowed(true);
+
+        CustomGridSelectDialog customGridSelectDialog = subjectFM.getCustomGridSelectDialog();
+        customGridSelectDialog.setMultiSelect(false);
+        customGridSelectDialog.getFilterModel().addFilter("chair", chairCB);
+        customGridSelectDialog.getFilterModel().addFilter("nameRU", nameRuTF);
+        customGridSelectDialog.getFilterModel().addFilter("nameKZ", nameKzTF);
+        try {
+            customGridSelectDialog.initFilter();
+        } catch (Exception e) {
+            e.printStackTrace();//TODO catch
+        }
 
         mainVL.addComponent(requisitesGW);
         mainVL.setComponentAlignment(requisitesGW, Alignment.MIDDLE_CENTER);

@@ -39,11 +39,11 @@ public class IndividualEducationPlanView extends AbstractTaskView {
         semesterQM.addWhere("studyYear",ECriteria.EQUAL,studentEducation.getStudyYear().getId());
         List<SEMESTER> semesterList = SessionFacadeFactory.
                 getSessionFacade(CommonEntityFacadeBean.class).lookup(semesterQM);
-        for (SEMESTER s : semesterList) {
-            subjectPanel = new SemesterPanel(this,s);
+        for (SEMESTER semester : semesterList) {
+            subjectPanel = new SemesterPanel(this,semester,studentEducation);
             subjectPanel.initPanel();
 
-            ts.addTab(subjectPanel, getUILocaleUtil().getCaption("semester." + s.getId()));
+            ts.addTab(subjectPanel, getUILocaleUtil().getCaption("semester." + semester.getId()));
         }
 
         ts.addSelectedTabChangeListener(new SemesterChangeListener());

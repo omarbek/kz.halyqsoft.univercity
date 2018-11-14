@@ -21,8 +21,6 @@ import org.r3a.common.vaadin.widget.ERefreshType;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
-import org.vaadin.jsconsole.ClientLog;
-import org.vaadin.jsconsole.client.JsConsole;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -68,10 +66,10 @@ public class LateEmployeesAttendance implements EntityListener {
 
 
         Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.HOUR_OF_DAY,8);
-        cal.set(Calendar.MINUTE,40);
-        cal.set(Calendar.SECOND,0);
-        cal.set(Calendar.MILLISECOND,0);
+        cal.set(Calendar.HOUR_OF_DAY, 8);
+        cal.set(Calendar.MINUTE, 40);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
 
         dateField = new DateField();
         dateField.setCaption(CommonUtils.getUILocaleUtil().getCaption("dateField"));
@@ -83,7 +81,7 @@ public class LateEmployeesAttendance implements EntityListener {
         dateField.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
-                if(mainVL.getComponentIndex(usersGW)>-1){
+                if (mainVL.getComponentIndex(usersGW) > -1) {
                     ((DBGridModel) usersGW.getWidgetModel()).setEntities(getLateList((DEPARTMENT) departmentCB.getValue(), dateField.getValue()));
                     refreshAbsentList(getLateList((DEPARTMENT) departmentCB.getValue(), dateField.getValue()));
                 }
@@ -102,7 +100,6 @@ public class LateEmployeesAttendance implements EntityListener {
         usersGM.setTitleVisible(false);
         usersGM.setMultiSelect(false);
         usersGM.setRefreshType(ERefreshType.MANUAL);
-
 
 
         Button printBtn = new Button(CommonUtils.getUILocaleUtil().getCaption("export"));
@@ -195,16 +192,16 @@ public class LateEmployeesAttendance implements EntityListener {
                 "  FROM user_arrival arriv\n" +
                 "    INNER JOIN v_employee empl ON empl.id = arriv.user_id\n" +
                 "    INNER JOIN department dep ON dep.id = empl.dept_id\n" +
-                "  WHERE date_trunc('day', arriv.created) = date_trunc('day', TIMESTAMP '"+ CommonUtils.getFormattedDate(dateField.getValue())+"')\n" +
+                "  WHERE date_trunc('day', arriv.created) = date_trunc('day', TIMESTAMP '" + CommonUtils.getFormattedDate(dateField.getValue()) + "')\n" +
                 "        AND arriv.created = (SELECT min(max_arriv.created)\n" +
                 "                             FROM user_arrival max_arriv\n" +
                 "                             WHERE max_arriv.user_id = arriv.user_id\n" +
-                "                                   AND date_trunc('day', max_arriv.created) = date_trunc('day', TIMESTAMP '"+ CommonUtils.getFormattedDate(dateField.getValue()) +"')\n" +
+                "                                   AND date_trunc('day', max_arriv.created) = date_trunc('day', TIMESTAMP '" + CommonUtils.getFormattedDate(dateField.getValue()) + "')\n" +
                 "                                   AND come_in = TRUE)\n" +
-                "        AND come_in = TRUE AND arriv.created :: TIME > '"+CommonUtils.getTimeFromDate(dateField.getValue())+"'\n" +
+                "        AND come_in = TRUE AND arriv.created :: TIME > '" + CommonUtils.getTimeFromDate(dateField.getValue()) + "'\n" +
                 " ) as foo";
 
-        if(department!=null){
+        if (department != null) {
             sql = sql + "   where dept_id = " + department.getId();
         }
 
@@ -216,7 +213,7 @@ public class LateEmployeesAttendance implements EntityListener {
                     VLateEmployees vAbsent = new VLateEmployees();
                     vAbsent.setFIO((String) oo[0]);
                     vAbsent.setFaculty((String) oo[1]);
-                    vAbsent.setDate((String)oo[2]);
+                    vAbsent.setDate((String) oo[2]);
                     vAbsent.setUserId((Long) oo[3]);
                     list.add(vAbsent);
                 }
