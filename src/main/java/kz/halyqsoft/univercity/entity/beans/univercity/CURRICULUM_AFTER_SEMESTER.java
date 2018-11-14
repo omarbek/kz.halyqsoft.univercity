@@ -1,117 +1,105 @@
 package kz.halyqsoft.univercity.entity.beans.univercity;
 
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.EDUCATION_MODULE_TYPE;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT;
 import org.r3a.common.entity.AbstractEntity;
+import org.r3a.common.entity.EFieldType;
+import org.r3a.common.entity.FieldInfo;
 
 import javax.persistence.*;
 import java.util.Date;
 
 /**
  * @author Omarbek
- * @created 15.06.2018
+ * @created 06.11.2018
  */
 @Entity
 public class CURRICULUM_AFTER_SEMESTER extends AbstractEntity {
 
-	private static final long serialVersionUID = -1694890284738737494L;
-
     @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "CURRICULUM_ID", referencedColumnName = "ID")})
+            @JoinColumn(name = "CURRICULUM_ID", referencedColumnName = "ID")})
     private CURRICULUM curriculum;
 
     @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
+            @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
     private SUBJECT subject;
 
-	@ManyToOne
-	@JoinColumns({
-			@JoinColumn(name = "EDUCATION_MODULE_TYPE_ID", referencedColumnName = "ID")})
-	private EDUCATION_MODULE_TYPE educationModuleType;
-
-	@ManyToOne
-	@JoinColumns({
-			@JoinColumn(name = "SEMESTER_ID", referencedColumnName = "ID")})
-	private SEMESTER semester;
-
-	@Column(name = "CODE")
-	private String code;
-
-	@Column(name = "CREATED")
+    @Column(name = "CREATED")
     @Temporal(TemporalType.TIMESTAMP)
     private Date created;
 
-	@Column(name = "UPDATED")
+    @Column(name = "UPDATED")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updated;
 
-	@Column(name = "DELETED", nullable = false)
+    @Column(name = "DELETED", nullable = false)
     private boolean deleted;
 
-	public CURRICULUM getCurriculum() {
-		return curriculum;
-	}
+    @FieldInfo(type = EFieldType.TEXT, required = false)
+    @Column(name = "CODE", nullable = false)
+    private String code;
 
-	public void setCurriculum(CURRICULUM curriculum) {
-		this.curriculum = curriculum;
-	}
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 2, required = false)
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "EDUCATION_MODULE_TYPE_ID", referencedColumnName = "ID")})
+    private EDUCATION_MODULE_TYPE educationModuleType;
 
-	public SUBJECT getSubject() {
-		return subject;
-	}
+    public CURRICULUM getCurriculum() {
+        return curriculum;
+    }
 
-	public void setSubject(SUBJECT subject) {
-		this.subject = subject;
-	}
+    public void setCurriculum(CURRICULUM curriculum) {
+        this.curriculum = curriculum;
+    }
 
-	public Date getCreated() {
-		return created;
-	}
+    public SUBJECT getSubject() {
+        return subject;
+    }
 
-	public void setCreated(Date created) {
-		this.created = created;
-	}
+    public void setSubject(SUBJECT subject) {
+        this.subject = subject;
+    }
 
-	public Date getUpdated() {
-		return updated;
-	}
+    public Date getCreated() {
+        return created;
+    }
 
-	public void setUpdated(Date updated) {
-		this.updated = updated;
-	}
+    public void setCreated(Date created) {
+        this.created = created;
+    }
 
-	public boolean isDeleted() {
-		return deleted;
-	}
+    public Date getUpdated() {
+        return updated;
+    }
 
-	public void setDeleted(boolean deleted) {
-		this.deleted = deleted;
-	}
+    public void setUpdated(Date updated) {
+        this.updated = updated;
+    }
 
-	public EDUCATION_MODULE_TYPE getEducationModuleType() {
-		return educationModuleType;
-	}
+    public boolean isDeleted() {
+        return deleted;
+    }
 
-	public void setEducationModuleType(EDUCATION_MODULE_TYPE educationModuleType) {
-		this.educationModuleType = educationModuleType;
-	}
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
 
-	public String getCode() {
-		return code;
-	}
+    public String getCode() {
+        return code;
+    }
 
-	public void setCode(String code) {
-		this.code = code;
-	}
+    public void setCode(String code) {
+        this.code = code;
+    }
 
-	public SEMESTER getSemester() {
-		return semester;
-	}
+    public EDUCATION_MODULE_TYPE getEducationModuleType() {
+        return educationModuleType;
+    }
 
-	public void setSemester(SEMESTER semester) {
-		this.semester = semester;
-	}
+    public void setEducationModuleType(EDUCATION_MODULE_TYPE educationModuleType) {
+        this.educationModuleType = educationModuleType;
+    }
 }

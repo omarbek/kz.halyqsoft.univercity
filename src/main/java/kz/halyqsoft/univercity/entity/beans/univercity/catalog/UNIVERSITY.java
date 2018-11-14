@@ -19,7 +19,7 @@ public class UNIVERSITY extends AbstractEntity {
 	@FieldInfo(type = EFieldType.TEXT, max = 64, order = 1)
 	@Column(name = "UNIVERSITY_NAME", nullable = false)
 	private String universityName;
-	
+
 	@FieldInfo(type = EFieldType.BOOLEAN, order = 2, required = false)
 	@Column(name = "USE_DEFAULT", nullable = false)
     private boolean useDefault;

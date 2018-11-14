@@ -4,7 +4,9 @@ import com.itextpdf.text.Font;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.*;
-import kz.halyqsoft.univercity.entity.beans.univercity.*;
+import kz.halyqsoft.univercity.entity.beans.univercity.CATALOG_ELECTIVE_SUBJECTS;
+import kz.halyqsoft.univercity.entity.beans.univercity.ELECTIVE_BINDED_SUBJECT;
+import kz.halyqsoft.univercity.entity.beans.univercity.PAIR_SUBJECT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VPairSubject;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_ELECTIVE_SUBJECT;
@@ -529,28 +531,6 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
             List<PAIR_SUBJECT> delList = new ArrayList<>();
             try {
                 for (Entity entity : entities) {
-                    PAIR_SUBJECT pairSubject = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(PAIR_SUBJECT.class, entity.getId());
-
-                    QueryModel<SEMESTER_DATA> semesterDataQM = new QueryModel<>(SEMESTER_DATA.class);
-                    semesterDataQM.addWhere("year", ECriteria.EQUAL, pairSubject.getElectveBindedSubject().getCatalogElectiveSubjects().getEntranceYear().getId());
-                    semesterDataQM.addWhere("semesterPeriod", ECriteria.EQUAL, pairSubject.getElectveBindedSubject().getSemester().getSemesterPeriod().getId());
-                    SEMESTER_DATA semesterData = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(semesterDataQM);
-
-                    if (semesterData != null) {
-                        QueryModel<SEMESTER_SUBJECT> semesterSubjectQM = new QueryModel<>(SEMESTER_SUBJECT.class);
-                        semesterSubjectQM.addWhere("semesterData", ECriteria.EQUAL, semesterData.getId());
-                        semesterSubjectQM.addWhereAnd("subject", ECriteria.EQUAL, pairSubject.getSubject().getId());
-                        List<SEMESTER_SUBJECT> semesterSubjects = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(semesterSubjectQM);
-                        for (SEMESTER_SUBJECT semesterSubject : semesterSubjects) {
-                            QueryModel<STUDENT_SUBJECT> studentSubjectQM = new QueryModel<>(STUDENT_SUBJECT.class);
-                            studentSubjectQM.addWhere("subject", ECriteria.EQUAL, semesterSubject.getId());
-                            studentSubjectQM.addWhere("semesterData", ECriteria.EQUAL, semesterData.getId());
-                            List<STUDENT_SUBJECT> studentSubjects = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(studentSubjectQM);
-                            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(studentSubjects);
-                        }
-                        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(semesterSubjects);
-                    }
-
                     delList.add(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
                             lookup(PAIR_SUBJECT.class, entity.getId()));
                 }

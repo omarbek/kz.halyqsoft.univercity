@@ -166,7 +166,6 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                     } else if (entityClass.equals(UNIVERSITY.class)) {
                         classASW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
                         qm.addWhere("universityName", null, null, true);
-                        qm.addWhere("useDefault", Boolean.FALSE, true);
                     } else if (entityClass.equals(UNT_SUBJECT.class)) {
                         classASW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
                         qm.addWhere("subjectName", null, null, true);
