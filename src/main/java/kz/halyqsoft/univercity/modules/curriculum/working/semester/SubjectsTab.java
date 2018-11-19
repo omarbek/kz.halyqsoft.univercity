@@ -62,14 +62,14 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
     @Override
     public void initPanel() {
         if (semester != null) {
-            mainSubjectsGW = initGridWidget(V_CURRICULUM_DETAIL.class, CURRICULUM_DETAIL.class);
-            electiveSubjectsGW = initGridWidget(V_ELECTIVE_SUBJECT.class, ELECTIVE_SUBJECT.class);
+            mainSubjectsGW = initGridWidget(V_CURRICULUM_DETAIL.class, CURRICULUM_DETAIL.class, SubjectsType.MAIN_SUBJECTS);
+            electiveSubjectsGW = initGridWidget(V_ELECTIVE_SUBJECT.class, ELECTIVE_SUBJECT.class, SubjectsType.ELECTIVE_SUBJECTS);
         } else {
             if (subjectType.equals(SubjectsType.ADDING_SUBJECTS)) {
-                addingSubjectsGW = initGridWidget(V_CURRICULUM_ADD_PROGRAM.class, CURRICULUM_ADD_PROGRAM.class);
+                addingSubjectsGW = initGridWidget(V_CURRICULUM_ADD_PROGRAM.class, CURRICULUM_ADD_PROGRAM.class,subjectType);
             } else {
                 afterSemesterSubjectsGW = initGridWidget(V_CURRICULUM_AFTER_SEMESTER.class,
-                        CURRICULUM_AFTER_SEMESTER.class);
+                        CURRICULUM_AFTER_SEMESTER.class,subjectType);
             }
         }
         if (curriculum != null) {
@@ -78,10 +78,7 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
     }
 
     private GridWidget initGridWidget(Class<? extends Entity> view,
-                                      Class<? extends Entity> table) {
-        if (table.equals(ELECTIVE_SUBJECT.class)) {
-            subjectType = SubjectsType.ELECTIVE_SUBJECTS;
-        }
+                                      Class<? extends Entity> table,SubjectsType subjectType) {
         GridWidget currentGW = new GridWidget(view);
         currentGW.addEntityListener(this);
         currentGW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
@@ -93,7 +90,7 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
                 Message.showConfirm(getUILocaleUtil().getMessage("confirmation.save"), new AbstractYesButtonListener() {
                     @Override
                     public void buttonClick(Button.ClickEvent event) {
-                        addSubjectsFromIups(curriculum, semester);
+                        addSubjectsFromIups(curriculum, semester,subjectType);
                     }
                 });
             }
@@ -121,7 +118,7 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
         return currentGW;
     }
 
-    private void addSubjectsFromIups(CURRICULUM curriculum, SEMESTER semester) {
+    private void addSubjectsFromIups(CURRICULUM curriculum, SEMESTER semester,SubjectsType subjectType) {
         boolean isMainSubjects = subjectType.equals(SubjectsType.MAIN_SUBJECTS);
         boolean isElectiveSubjects = subjectType.equals(SubjectsType.ELECTIVE_SUBJECTS);
         boolean isAddingSubjects = subjectType.equals(SubjectsType.ADDING_SUBJECTS);
