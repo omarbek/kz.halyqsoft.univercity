@@ -31,6 +31,7 @@ import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.DownloadDialo
 import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.MainDialog;
 import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.PrintDialog;
 import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.SimpleStatistics;
+import kz.halyqsoft.univercity.modules.userarrival.subview.reports.EmployeesArrivalReport;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.EmployeePdfCreator;
 import kz.halyqsoft.univercity.utils.PdfCreator;
@@ -542,7 +543,7 @@ public class MainSection implements FilterPanelListener {
         facultyCB.setWidth(200, Sizeable.Unit.PIXELS);
         QueryModel<DEPARTMENT> facultyQM = new QueryModel<>(DEPARTMENT.class);
         facultyQM.addWhere("deleted", ECriteria.EQUAL, false);
-        facultyQM.addWhereNullAnd("parent");
+        facultyQM.addWhereNotNullAnd("parent");
         BeanItemContainer<DEPARTMENT> facultyBIC = new BeanItemContainer<>(DEPARTMENT.class,
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(facultyQM));
         facultyCB.setContainerDataSource(facultyBIC);
@@ -579,8 +580,8 @@ public class MainSection implements FilterPanelListener {
             mainHL.addComponent(setEmployees());
             mainHL.addComponent(setLaters());
             mainHL.addComponent(setNoCards());
-
             mainVL.addComponent(mainHL);
+            mainVL.addComponent(getEmployeesAttendanceReport());
             mainVL.addComponent(getStatistics());
 
         } catch (Exception e) {
@@ -592,6 +593,10 @@ public class MainSection implements FilterPanelListener {
         return mainVL;
     }
 
+    private VerticalLayout getEmployeesAttendanceReport(){
+        EmployeesArrivalReport employeesArrivalReport = new EmployeesArrivalReport();
+        return employeesArrivalReport;
+    }
     private Panel setNoCards() {
         Object[] info = getCardInfo();
         long all = (Long) info[0];
