@@ -3,17 +3,19 @@ package kz.halyqsoft.univercity.modules.stream.generate;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.CORPUS;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.LANGUAGE;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.LEVEL;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDY_YEAR;
+import kz.halyqsoft.univercity.entity.beans.univercity.STREAM;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_GROUP;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.query.QueryModel;
+import org.r3a.common.entity.query.where.ECriteria;
+import org.r3a.common.vaadin.widget.dialog.AbstractYesButtonListener;
+import org.r3a.common.vaadin.widget.dialog.Message;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +63,12 @@ abstract class Generate implements Button.ClickListener {
 
     @Override
     public void buttonClick(Button.ClickEvent event) {
-        generate();
+        Message.showConfirm(CommonUtils.getUILocaleUtil().getMessage("confirmation.save"), new AbstractYesButtonListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                generate();
+            }
+        });
     }
 
     private void generate() {
@@ -107,6 +114,15 @@ abstract class Generate implements Button.ClickListener {
                 List<CORPUS> corpuses = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
                         lookup(corpusQM);
 
+                QueryModel<STREAM> streamQM = new QueryModel<>(STREAM.class);
+                streamQM.addWhere("streamType", ECriteria.EQUAL, STREAM_TYPE.SPEC);
+                List<STREAM> streams = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(streamQM);
+                for (STREAM stream : streams) {
+                    stream.setDeleted(true);
+                    stream.setUpdated(new Date());
+                }
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(streams);
+
                 int numberOfStream = 0;
                 int currentLoop = 0;
                 for (STUDY_YEAR studyYear : studyYears) {
@@ -128,6 +144,7 @@ abstract class Generate implements Button.ClickListener {
                 }
                 samplePB.setValue(0f);
                 CommonUtils.showSavedNotification();
+
             } catch (Exception e) {
                 e.printStackTrace();
             }

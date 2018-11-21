@@ -10,6 +10,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.view.V_GROUP;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.facade.CommonIDFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
+import org.r3a.common.entity.ID;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.from.EJoin;
 import org.r3a.common.entity.query.from.FromItem;
@@ -42,6 +43,7 @@ public class GenerateSpecStreams extends Generate {
         specQM.addOrder("specName");
         List<SPECIALITY> specialities = SessionFacadeFactory.getSessionFacade(
                 CommonEntityFacadeBean.class).lookup(specQM);
+
         for (SPECIALITY speciality : specialities) {
             for (LANGUAGE language : languages) {
                 QueryModel<V_GROUP> groupQM = new QueryModel<>(V_GROUP.class);
@@ -78,13 +80,14 @@ public class GenerateSpecStreams extends Generate {
     protected void createStream(List<V_GROUP> groups) throws Exception {
         STREAM stream = new STREAM();
         stream.setCreated(new Date());
-        stream.setName(SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("s_stream")
-                + "S");
+        ID seqenceOfStream = SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("s_stream");
+        stream.setName(seqenceOfStream + "S");
         stream.setDeleted(false);
         stream.setLanguage(groups.get(0).getLanguage());
         stream.setStreamType(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class)
                 .lookup(STREAM_TYPE.class, STREAM_TYPE.SPEC));
-        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(stream);
+        stream.setId(seqenceOfStream);
+        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(stream);
 
         for (V_GROUP group : groups) {
             STREAM_GROUP streamGroup = new STREAM_GROUP();

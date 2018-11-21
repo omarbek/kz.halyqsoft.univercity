@@ -66,10 +66,10 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
             electiveSubjectsGW = initGridWidget(V_ELECTIVE_SUBJECT.class, ELECTIVE_SUBJECT.class, SubjectsType.ELECTIVE_SUBJECTS);
         } else {
             if (subjectType.equals(SubjectsType.ADDING_SUBJECTS)) {
-                addingSubjectsGW = initGridWidget(V_CURRICULUM_ADD_PROGRAM.class, CURRICULUM_ADD_PROGRAM.class,subjectType);
+                addingSubjectsGW = initGridWidget(V_CURRICULUM_ADD_PROGRAM.class, CURRICULUM_ADD_PROGRAM.class, subjectType);
             } else {
                 afterSemesterSubjectsGW = initGridWidget(V_CURRICULUM_AFTER_SEMESTER.class,
-                        CURRICULUM_AFTER_SEMESTER.class,subjectType);
+                        CURRICULUM_AFTER_SEMESTER.class, subjectType);
             }
         }
         if (curriculum != null) {
@@ -78,27 +78,45 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
     }
 
     private GridWidget initGridWidget(Class<? extends Entity> view,
-                                      Class<? extends Entity> table,SubjectsType subjectType) {
+                                      Class<? extends Entity> table, SubjectsType subjectType) {
         GridWidget currentGW = new GridWidget(view);
         currentGW.addEntityListener(this);
         currentGW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
-        currentGW.setButtonDescription(AbstractToolbar.ADD_BUTTON, "add.from.iups");
-        //currentGW.setButt(AbstractToolbar.ADD_BUTTON, "150px");
+        currentGW.addButtonClickListener(AbstractToolbar.REFRESH_BUTTON, new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                refreshSubjects(curriculum, semester);
+            }
+        });
+
+        currentGW.setButtonDescription(AbstractToolbar.ADD_BUTTON, "add.from.one.student");
+        currentGW.setButtonWidth(AbstractToolbar.ADD_BUTTON, "180px");
+        currentGW.setButtonIcon(AbstractToolbar.ADD_BUTTON, "img/button/users.png");
         currentGW.addButtonClickListener(AbstractToolbar.ADD_BUTTON, new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 Message.showConfirm(getUILocaleUtil().getMessage("confirmation.save"), new AbstractYesButtonListener() {
                     @Override
                     public void buttonClick(Button.ClickEvent event) {
-                        addSubjectsFromIups(curriculum, semester,subjectType);
+                        addSubjectsFromIups(curriculum, semester, subjectType, true);
                     }
                 });
             }
         });
-        currentGW.addButtonClickListener(AbstractToolbar.REFRESH_BUTTON, new Button.ClickListener() {
+
+        currentGW.setButtonVisible(AbstractToolbar.HELP_BUTTON, true);
+        currentGW.setButtonDescription(AbstractToolbar.HELP_BUTTON, "add.from.iups");
+        currentGW.setButtonWidth(AbstractToolbar.HELP_BUTTON, "150px");
+        currentGW.setButtonIcon(AbstractToolbar.HELP_BUTTON, "img/button/add.png");
+        currentGW.addButtonClickListener(AbstractToolbar.HELP_BUTTON, new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                refreshSubjects(curriculum, semester);
+                Message.showConfirm(getUILocaleUtil().getMessage("confirmation.save"), new AbstractYesButtonListener() {
+                    @Override
+                    public void buttonClick(Button.ClickEvent event) {
+                        addSubjectsFromIups(curriculum, semester, subjectType, false);
+                    }
+                });
             }
         });
 
@@ -118,7 +136,8 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
         return currentGW;
     }
 
-    private void addSubjectsFromIups(CURRICULUM curriculum, SEMESTER semester,SubjectsType subjectType) {
+    private void addSubjectsFromIups(CURRICULUM curriculum, SEMESTER semester, SubjectsType subjectType,
+                                     boolean fromOneStudent) {
         boolean isMainSubjects = subjectType.equals(SubjectsType.MAIN_SUBJECTS);
         boolean isElectiveSubjects = subjectType.equals(SubjectsType.ELECTIVE_SUBJECTS);
         boolean isAddingSubjects = subjectType.equals(SubjectsType.ADDING_SUBJECTS);
@@ -138,13 +157,15 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
                     "  INNER JOIN teacher_subject teach_subj  " +
                     "    ON sem_subj.subject_id = teach_subj.subject_id " +
                     "  INNER JOIN student_teacher_subject stu_teach_subj " +
-                    "    ON stu_teach_subj.teacher_subject_id = teach_subj.id " +
-                    "  INNER JOIN curriculum_individual_plan ind_plan" +
-                    "   on ind_plan.speciality_id = stu_edu.speciality_id" +
-                    "      and ind_plan.entrance_year_id = stu.entrance_year_id" +
-                    "      and ind_plan.diploma_type_id = stu.diploma_type_id" +
-                    "      and ind_plan.student_code = usr.code " +
-                    "WHERE usr.deleted = FALSE AND usr.locked = FALSE " +
+                    "    ON stu_teach_subj.teacher_subject_id = teach_subj.id ");
+            if (fromOneStudent) {
+                sqlSB.append("  INNER JOIN curriculum_individual_plan ind_plan" +
+                        "   on ind_plan.speciality_id = stu_edu.speciality_id" +
+                        "      and ind_plan.entrance_year_id = stu.entrance_year_id" +
+                        "      and ind_plan.diploma_type_id = stu.diploma_type_id" +
+                        "      and ind_plan.student_code = usr.code ");
+            }
+            sqlSB.append("WHERE usr.deleted = FALSE AND usr.locked = FALSE " +
                     "      AND subj.deleted = FALSE AND subj.level_id = 1 ");
             if (isMainSubjects) {
                 sqlSB.append(" AND subj.mandatory = TRUE AND subj.practice_type_id IS NULL" +
@@ -156,7 +177,7 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
                 sqlSB.append(" AND subj.mandatory = TRUE and subj.practice_type_id IS NULL" +
                         " AND subj.subject_cycle_id = 4");
             } else {//after sem
-                sqlSB.append(" and subj.practice_type_id is not null and subject_cycle_id is null");
+                sqlSB.append(" and subj.practice_type_id is not null and subject_cycle_id = 4");
             }
             sqlSB.append(" AND stu_edu.speciality_id = ?1 AND stu.diploma_type_id = ?2 " +
                     "      AND stu.entrance_year_id = ?3 ");
