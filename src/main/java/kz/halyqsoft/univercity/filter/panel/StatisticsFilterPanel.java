@@ -14,30 +14,44 @@ public final class StatisticsFilterPanel extends AbstractFilterPanel {
 	public StatisticsFilterPanel(FStatisticsFilter filterBean) {
 		super(filterBean);
 	}
-
+	private AbstractField department;
+	private AbstractField startingDate;
+	private AbstractField endingDate;
 	@Override
 	protected void initWidget() {
 		HorizontalLayout hl = new HorizontalLayout();
 		hl.setSpacing(true);
 		hl.setWidthUndefined();
 
-		AbstractField af = getFilterComponent("department");
-		if (af != null) {
-			hl.addComponent(af);
+		AbstractField department = getFilterComponent("department");
+		if (department != null) {
+			hl.addComponent(department);
 		}
 
-		af = getFilterComponent("startingDate");
-		if (af != null) {
-			hl.addComponent(af);
+		startingDate = getFilterComponent("startingDate");
+		if (startingDate != null) {
+			hl.addComponent(startingDate);
 		}
 
-		af = getFilterComponent("endingDate");
-		if (af != null) {
-			hl.addComponent(af);
+		endingDate = getFilterComponent("endingDate");
+		if (endingDate != null) {
+			hl.addComponent(endingDate);
 		}
 
 		getContent().addComponent(hl);
 		getContent().setComponentAlignment(hl, Alignment.MIDDLE_CENTER);
+	}
+
+	public AbstractField getDepartment() {
+		return department;
+	}
+
+	public AbstractField getStartingDate() {
+		return startingDate;
+	}
+
+	public AbstractField getEndingDate() {
+		return endingDate;
 	}
 }
 

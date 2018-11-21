@@ -7,7 +7,7 @@ import javax.persistence.*;
 
 /**
  * @author Omarbek
- * @created Mar 16, 2017 2:46:03 PM
+ * @created Mar 16, 2018 2:46:03 PM
  */
 @Entity
 public class USER_FILE extends AbstractEntity {

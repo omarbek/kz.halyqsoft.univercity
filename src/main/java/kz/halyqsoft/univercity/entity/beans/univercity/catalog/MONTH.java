@@ -16,6 +16,9 @@ import javax.persistence.Entity;
 @Entity
 public class MONTH extends AbstractEntity {
 
+
+
+
 	private static final long serialVersionUID = 161308351644533733L;
 
 	@FieldInfo(type = EFieldType.TEXT, order = 1)

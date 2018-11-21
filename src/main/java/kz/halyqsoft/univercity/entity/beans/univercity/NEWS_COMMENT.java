@@ -8,7 +8,7 @@ import java.util.Date;
 
 /**
  * @author Omarbek
- * @created Mar 24, 2017 12:50:02 PM
+ * @created Mar 24, 2018 12:50:02 PM
  */
 @Entity
 public class NEWS_COMMENT extends AbstractEntity {

@@ -4,6 +4,8 @@ import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
 
+import java.util.List;
+
 /**
  * @author Omarbek
  * @created 18.07.2018
@@ -11,36 +13,39 @@ import org.r3a.common.entity.FieldInfo;
 public final class VPairSubject extends AbstractEntity {
 
 	@FieldInfo(type = EFieldType.TEXT,order = 1)
-	private String code;
+	private String cycleShortName;
 
 	@FieldInfo(type = EFieldType.TEXT,order = 2)
 	private String subjectName;
 
-	@FieldInfo(type = EFieldType.TEXT, order = 3)
-	private Integer credit;
+	@FieldInfo(type = EFieldType.TEXT,order = 3)
+	private String trajectoryName;
 
 	@FieldInfo(type = EFieldType.TEXT, order = 4)
-	private Integer ects;
+	private Integer credit;
 
 	@FieldInfo(type = EFieldType.TEXT, order = 5)
-	private String semesterName;
+	private Integer ects;
 
 	@FieldInfo(type = EFieldType.TEXT, order = 6)
-	private Long pairNumber;
+	private String semesterName;
 
 	@FieldInfo(type = EFieldType.TEXT, order = 7)
-	private String postrequisite;
+	private Long pairNumber;
 
 	@FieldInfo(type = EFieldType.TEXT, order = 8)
-	private String prerequisite;
+	private List<String> postrequisites;
 
 	@FieldInfo(type = EFieldType.TEXT, order = 9)
-	private String aim;
+	private List<String> prerequisites;
 
 	@FieldInfo(type = EFieldType.TEXT, order = 10)
-	private String description;
+	private String aim;
 
 	@FieldInfo(type = EFieldType.TEXT, order = 11)
+	private String description;
+
+	@FieldInfo(type = EFieldType.TEXT, order = 12)
 	private String competence;
 
 	public String getSubjectName() {
@@ -91,12 +96,12 @@ public final class VPairSubject extends AbstractEntity {
 		this.pairNumber = pairNumber;
 	}
 
-	public String getCode() {
-		return code;
+	public String getCycleShortName() {
+		return cycleShortName;
 	}
 
-	public void setCode(String code) {
-		this.code = code;
+	public void setCycleShortName(String cycleShortName) {
+		this.cycleShortName = cycleShortName;
 	}
 
 	public String getAim() {
@@ -107,20 +112,20 @@ public final class VPairSubject extends AbstractEntity {
 		this.aim = aim;
 	}
 
-	public String getPostrequisite() {
-		return postrequisite;
+	public List<String> getPostrequisites() {
+		return postrequisites;
 	}
 
-	public void setPostrequisite(String postrequisite) {
-		this.postrequisite = postrequisite;
+	public void setPostrequisites(List<String> postrequisites) {
+		this.postrequisites = postrequisites;
 	}
 
-	public String getPrerequisite() {
-		return prerequisite;
+	public List<String> getPrerequisites() {
+		return prerequisites;
 	}
 
-	public void setPrerequisite(String prerequisite) {
-		this.prerequisite = prerequisite;
+	public void setPrerequisites(List<String> prerequisites) {
+		this.prerequisites = prerequisites;
 	}
 
 	public String getCompetence() {
@@ -129,5 +134,13 @@ public final class VPairSubject extends AbstractEntity {
 
 	public void setCompetence(String competence) {
 		this.competence = competence;
+	}
+
+	public String getTrajectoryName() {
+		return trajectoryName;
+	}
+
+	public void setTrajectoryName(String trajectoryName) {
+		this.trajectoryName = trajectoryName;
 	}
 }

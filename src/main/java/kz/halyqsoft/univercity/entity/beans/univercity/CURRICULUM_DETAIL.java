@@ -1,19 +1,22 @@
 package kz.halyqsoft.univercity.entity.beans.univercity;
 
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.EDUCATION_MODULE_TYPE;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_DATA;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT;
 import org.r3a.common.entity.AbstractEntity;
+import org.r3a.common.entity.EFieldType;
+import org.r3a.common.entity.FieldInfo;
 
 import javax.persistence.*;
 import java.util.Date;
 
 /**
  * @author Omarbek
- * @created Feb 18, 2016 10:01:59 AM
+ * @created 02.11.2018
  */
 @Entity
 public class CURRICULUM_DETAIL extends AbstractEntity {
-
-    private static final long serialVersionUID = -4720228895492227308L;
 
     @ManyToOne
     @JoinColumns({
@@ -35,25 +38,6 @@ public class CURRICULUM_DETAIL extends AbstractEntity {
             @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
     private SUBJECT subject;
 
-    @ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "SUBJECT_CYCLE_ID", referencedColumnName = "ID")})
-    private SUBJECT_CYCLE subjectCycle;
-
-    @ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "EDUCATION_MODULE_TYPE_ID", referencedColumnName = "ID")})
-    private EDUCATION_MODULE_TYPE educationModuleType;
-
-    @Column(name = "CODE", nullable = false)
-    private String code;
-
-    @Column(name = "RECOMMENDED_SEMESTER")
-    private String recommendedSemester;
-
-    @Column(name = "CONSIDER_CREDIT", nullable = false)
-    private boolean considerCredit;
-
     @Column(name = "CREATED")
     @Temporal(TemporalType.TIMESTAMP)
     private Date created;
@@ -65,8 +49,15 @@ public class CURRICULUM_DETAIL extends AbstractEntity {
     @Column(name = "DELETED", nullable = false)
     private boolean deleted;
 
-    public CURRICULUM_DETAIL() {
-    }
+    @FieldInfo(type = EFieldType.TEXT, required = false)
+    @Column(name = "CODE", nullable = false)
+    private String code;
+
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 2, required = false)
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "EDUCATION_MODULE_TYPE_ID", referencedColumnName = "ID")})
+    private EDUCATION_MODULE_TYPE educationModuleType;
 
     public CURRICULUM getCurriculum() {
         return curriculum;
@@ -98,26 +89,6 @@ public class CURRICULUM_DETAIL extends AbstractEntity {
 
     public void setSubject(SUBJECT subject) {
         this.subject = subject;
-    }
-
-    public SUBJECT_CYCLE getSubjectCycle() {
-        return subjectCycle;
-    }
-
-    public void setSubjectCycle(SUBJECT_CYCLE subjectCycle) {
-        this.subjectCycle = subjectCycle;
-    }
-
-    public void setRecommendedSemester(String recommendedSemester) {
-        this.recommendedSemester = recommendedSemester;
-    }
-
-    public boolean isConsiderCredit() {
-        return considerCredit;
-    }
-
-    public void setConsiderCredit(boolean considerCredit) {
-        this.considerCredit = considerCredit;
     }
 
     public Date getCreated() {

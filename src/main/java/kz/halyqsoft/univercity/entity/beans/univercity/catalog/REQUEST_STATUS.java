@@ -4,7 +4,7 @@ import javax.persistence.Entity;
 
 /**
  * @author Omarbek
- * Created Apr 19, 2017 9:20:50 AM
+ * Created Apr 19, 2018 9:20:50 AM
  */
 @Entity
 public class REQUEST_STATUS extends AbstractStatusEntity {

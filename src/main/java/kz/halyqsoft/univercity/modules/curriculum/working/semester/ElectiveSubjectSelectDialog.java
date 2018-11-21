@@ -15,13 +15,12 @@ import org.r3a.common.vaadin.widget.dialog.select.custom.grid.CustomGridSelectDi
 
 /**
  * @author Omarbek Dinassil
- * @created Apr 20, 2017 2:03:36 PM
+ * @created Apr 20, 2018 2:03:36 PM
  */
 @SuppressWarnings("serial")
 final class ElectiveSubjectSelectDialog extends CustomGridSelectDialog {
 
     private CheckBox considerCreditCB;
-    private ComboBox subjectCycleCB;
     private TextField codeTF;
     private ComboBox educationModuleCB;
 
@@ -63,33 +62,12 @@ final class ElectiveSubjectSelectDialog extends CustomGridSelectDialog {
         considerCreditCB.setValue(true);
 
         QueryModel<SUBJECT_CYCLE> subjectCycleQM = new QueryModel<SUBJECT_CYCLE>(SUBJECT_CYCLE.class);
-        subjectCycleQM.addOrder("cycleShortName");
-        try {
-            BeanItemContainer<SUBJECT_CYCLE> subjectCycleBIC = new BeanItemContainer<SUBJECT_CYCLE>(SUBJECT_CYCLE.class,
-                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(subjectCycleQM));
-            subjectCycleCB = new ComboBox();
-            subjectCycleCB.setCaption(getUILocaleUtil().getCaption("curriculum.component"));
-            subjectCycleCB.setContainerDataSource(subjectCycleBIC);
-            subjectCycleCB.setImmediate(true);
-            subjectCycleCB.setNullSelectionAllowed(true);
-            subjectCycleCB.setTextInputAllowed(false);
-            subjectCycleCB.setFilteringMode(FilteringMode.OFF);
-            subjectCycleCB.setPageLength(0);
-            paramsFL.addComponent(subjectCycleCB);
-        } catch (Exception ex) {
-            LOG.error("Unable to load subject cycle list: ", ex);
-        }
-
         getContent().addComponent(paramsFL);
         getContent().setComponentAlignment(paramsFL, Alignment.MIDDLE_CENTER);
     }
 
     public boolean isConsiderCredit() {
         return considerCreditCB.getValue();
-    }
-
-    public SUBJECT_CYCLE getSubjectCycle() {
-        return (SUBJECT_CYCLE) subjectCycleCB.getValue();
     }
 
     public String getCode(){

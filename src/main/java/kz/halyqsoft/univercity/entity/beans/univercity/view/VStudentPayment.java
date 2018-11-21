@@ -4,11 +4,9 @@ import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
 
-import java.util.Date;
-
 /**
  * @author Dinassil Omarbek
- * @created Apr 18, 2017 9:19:47 AM
+ * @created Apr 18, 2018 9:19:47 AM
  */
 public class VStudentPayment extends AbstractEntity {
 
@@ -19,9 +17,6 @@ public class VStudentPayment extends AbstractEntity {
 
 	@FieldInfo(type = EFieldType.TEXT, order = 3)
 	private String fio;
-
-	@FieldInfo(type = EFieldType.DATETIME, order = 4)
-	private Date created;
 
 	@FieldInfo(type = EFieldType.DOUBLE, order = 5)
 	private Double paymentSum;
@@ -40,14 +35,6 @@ public class VStudentPayment extends AbstractEntity {
 
 	public void setCode(String code) {
 		this.code = code;
-	}
-
-	public Date getCreated() {
-		return created;
-	}
-
-	public void setCreated(Date created) {
-		this.created = created;
 	}
 
 	public Double getPaymentSum() {

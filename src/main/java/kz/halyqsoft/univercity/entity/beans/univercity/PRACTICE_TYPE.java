@@ -14,6 +14,8 @@ public class PRACTICE_TYPE extends AbstractTypeEntity {
 
     public static final ID PEDAGOGICAL_ID = ID.valueOf(3);
 
+    public static final ID UNDERGRADUATE_ID = ID.valueOf(4);
+
     public PRACTICE_TYPE() {
     }
 }

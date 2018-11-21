@@ -410,7 +410,7 @@ public class RegistrationView extends AbstractTaskView {
         params.put(1, ((STUDY_YEAR) courseCB.getValue()).getId().getId());
         String sql = "SELECT\n" +
                 "    ss.id,\n" +
-                "    subj.name_ru      SUBJECT_NAME,\n" +
+                "    subj.name_" + CommonUtils.getLanguage() + "      SUBJECT_NAME,\n" +
                 "    d2.dept_name CHAIR_NAME,\n" +
                 "    l.LEVEL_NAME,\n" +
                 "    sc.cycle_short_name,\n" +
@@ -437,9 +437,8 @@ public class RegistrationView extends AbstractTaskView {
                 "AND ss.semester_data_id = " + CommonUtils.getCurrentSemesterData().getId().getId().longValue();
 
         String subjectName = subjectNameTF.getValue();
-        CommonUtils.getCurrentSemesterData();
         if (subjectName != null && subjectName.trim().length() >= 3) {
-            sql = sql + " and subj.NAME_RU ilike '%";
+            sql = sql + " and subj.NAME_" + CommonUtils.getLanguage() + " ilike '%";
             sql = sql + subjectName.trim().toLowerCase();
             sql = sql + "%'";
         }

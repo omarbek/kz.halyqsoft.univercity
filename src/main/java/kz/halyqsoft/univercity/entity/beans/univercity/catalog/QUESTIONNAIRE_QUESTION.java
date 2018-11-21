@@ -12,7 +12,7 @@ import javax.persistence.ManyToOne;
 
 /**
  * @author Omarbek
- * Created Mar 15, 2017 5:36:26 PM
+ * Created Mar 15, 2018 5:36:26 PM
  */
 @Entity
 public class QUESTIONNAIRE_QUESTION extends AbstractEntity {

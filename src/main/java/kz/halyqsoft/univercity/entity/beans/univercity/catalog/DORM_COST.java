@@ -10,7 +10,7 @@ import javax.persistence.ManyToOne;
 
 /**
  * @author Omarbek
- * Created Apr 12, 2017 9:33:41 AM
+ * Created Apr 12, 2018 9:33:41 AM
  */
 @Entity
 public class DORM_COST extends AbstractEntity {

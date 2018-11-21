@@ -26,7 +26,7 @@ import java.util.Date;
 
 /**
  * @author Dinassil Omarbek
- * @created May 30, 2017 11:08:41 AM
+ * @created May 30, 2018 11:08:41 AM
  */
 public class WarrantAndSkipOfStudents implements StreamSource {
 

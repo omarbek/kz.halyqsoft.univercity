@@ -9,6 +9,7 @@ import com.vaadin.ui.VerticalLayout;
 import kz.halyqsoft.univercity.entity.beans.univercity.PRACTICE_TYPE;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ACADEMIC_FORMULA;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.CREDITABILITY;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.PRACTICE_BREAKDOWN;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VEmployee;
 import kz.halyqsoft.univercity.utils.CommonUtils;
@@ -20,6 +21,7 @@ import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.view.AbstractCommonView;
 import org.r3a.common.vaadin.widget.ERefreshType;
+import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.form.AbstractFormWidget;
 import org.r3a.common.vaadin.widget.form.AbstractFormWidgetView;
 import org.r3a.common.vaadin.widget.form.CommonFormWidget;
@@ -63,29 +65,16 @@ public final class SubjectEdit extends AbstractFormWidgetView {
         FormModel baseDataFM = baseDataFW.getWidgetModel();
         baseDataFM.setButtonsVisible(false);
 
-        FieldModel weekName = baseDataFM.getFieldModel("weekNumber");
-        weekName.setReadOnly(true);
+        FieldModel classRoomFM = baseDataFM.getFieldModel("classRoom");
+        classRoomFM.setReadOnly(true);
+
+        FieldModel practiceBreakDownFM = baseDataFM.getFieldModel("practiceBreakdown");
+        practiceBreakDownFM.setReadOnly(true);
+
+        final FieldModel weekNumberFM = baseDataFM.getFieldModel("weekNumber");
+        weekNumberFM.setReadOnly(true);
 
         FieldModel practiceType = baseDataFM.getFieldModel("practiceType");
-
-        FKFieldModel practiceTypeFM = (FKFieldModel) baseDataFM.getFieldModel("practiceType");
-        practiceTypeFM.getListeners().add(new Property.ValueChangeListener() {
-            @Override
-            public void valueChange(ValueChangeEvent valueChangeEvent) {
-                FKFieldModel creditabilityFM = (FKFieldModel) baseDataFM.getFieldModel("creditability");
-                FKFieldModel academicFormulaFM = (FKFieldModel) baseDataFM.getFieldModel("academicFormula");
-                if(practiceType.getValue()!=null){
-                    baseDataFM.getFieldModel("weekNumber").setReadOnly(false);
-                }else{
-                    baseDataFM.getFieldModel("weekNumber").setReadOnly(true);
-                }
-                try {
-                    creditabilityFM.refresh(practiceType);
-                } catch (Exception e) {
-                    e.printStackTrace();//TODO catch
-                }
-            }
-        });
 
         FKFieldModel studyDirectFM = (FKFieldModel) baseDataFM.getFieldModel("studyDirect");
         studyDirectFM.setDialogHeight(400);
@@ -97,7 +86,6 @@ public final class SubjectEdit extends AbstractFormWidgetView {
         QueryModel chairQM = chairFM.getQueryModel();
         chairQM.addWhereNotNull("parent");
         chairQM.addWhereAnd("deleted", Boolean.FALSE);
-
 
 
         QueryModel subjectCycleQM = ((FKFieldModel) baseDataFM.getFieldModel("subjectCycle")).
@@ -120,18 +108,107 @@ public final class SubjectEdit extends AbstractFormWidgetView {
             }
         }
         FieldModel withTeacherCountFM = baseDataFM.getFieldModel("withTeacherCount");
-        FieldModel ownTeacherCountFM = baseDataFM.getFieldModel("ownCount");
         FieldModel totalCountFM = baseDataFM.getFieldModel("totalCount");
 
+        FieldModel ownCountFM = baseDataFM.getFieldModel("ownCount");
+
+        classRoomFM.getListeners().add(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(ValueChangeEvent event) {
+                try {
+                    Object value = event.getProperty().getValue();
+                    if (value != null) {
+                        Integer classRoomCount = Integer.parseInt(value.toString());
+                        if (totalCountFM.getValue() != null) {
+                            Integer totalCount = Integer.parseInt(totalCountFM.getValue().toString());
+                            ownCountFM.refresh(String.valueOf(totalCount - classRoomCount));
+                        } else {
+                            Message.showInfo(getUILocaleUtil().getMessage("fill.creditability"));//TODO check
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();//TODO catch
+                }
+            }
+        });
+        totalCountFM.getListeners().add(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(ValueChangeEvent event) {
+                if (practiceType.getValue() != null) {
+                    try {
+                        Object value = event.getProperty().getValue();
+                        if (value != null) {
+                            Integer totalCount = Integer.parseInt(value.toString());
+                            classRoomFM.refresh((totalCount - Integer.parseInt(ownCountFM.getValue().toString())) + "");
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();//TODO catch
+                    }
+                }
+            }
+        });
+
+        FKFieldModel practiceTypeFM = (FKFieldModel) baseDataFM.getFieldModel("practiceType");
+        practiceTypeFM.getListeners().add(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(ValueChangeEvent event) {
+                FKFieldModel creditabilityFM = (FKFieldModel) baseDataFM.getFieldModel("creditability");
+                if (practiceType.getValue() != null) {//practice
+                    weekNumberFM.setReadOnly(false);
+                    classRoomFM.setReadOnly(false);
+                    practiceBreakDownFM.setReadOnly(false);
+                    baseDataFM.getFieldModel("academicFormula").setReadOnly(true);
+                    baseDataFM.getFieldModel("lcCount").setReadOnly(true);
+                    baseDataFM.getFieldModel("prCount").setReadOnly(true);
+                    baseDataFM.getFieldModel("lbCount").setReadOnly(true);
+                } else {//not practice
+                    weekNumberFM.setReadOnly(true);
+                    classRoomFM.setReadOnly(true);
+                    practiceBreakDownFM.setReadOnly(true);
+                    baseDataFM.getFieldModel("academicFormula").setReadOnly(false);
+                    baseDataFM.getFieldModel("lcCount").setReadOnly(false);
+                    baseDataFM.getFieldModel("prCount").setReadOnly(false);
+                    baseDataFM.getFieldModel("lbCount").setReadOnly(false);
+                }
+                setHours(creditabilityFM.getValue(), event.getProperty().getValue(), academicFormulaFM, null,
+                        withTeacherCountFM, ownCountFM, totalCountFM);
+            }
+        });
+
         creditabilityFM.getListeners().add(new CreditabilityChangeListener(academicFormula,
-                academicFormulaFM, withTeacherCountFM, ownTeacherCountFM, totalCountFM, practiceTypeFM));
+                academicFormulaFM, withTeacherCountFM, ownCountFM, totalCountFM, practiceTypeFM));
 
         FieldModel lcCountFM = baseDataFM.getFieldModel("lcCount");
         FieldModel prCountFM = baseDataFM.getFieldModel("prCount");
         FieldModel lbCountFM = baseDataFM.getFieldModel("lbCount");
 
         academicFormulaFM.getListeners().add(new AcademicFormulaChangeListener(lcCountFM, prCountFM,
-                lbCountFM,practiceTypeFM));
+                lbCountFM, practiceTypeFM));
+
+        FKFieldModel practiceBreakdownFKFM = (FKFieldModel) baseDataFM.getFieldModel("practiceBreakdown");
+        practiceBreakdownFKFM.getListeners().add(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(ValueChangeEvent event) {
+                try {
+                    Object value = event.getProperty().getValue();
+                    if (value != null) {
+                        PRACTICE_BREAKDOWN practiceBreakdown = (PRACTICE_BREAKDOWN) value;
+                        int sumOfProportion = practiceBreakdown.getFirstDigit() + practiceBreakdown.getSecondDigit();
+                        if (totalCountFM.getValue() != null) {
+                            Integer totalCount = Integer.parseInt(totalCountFM.getValue().toString());
+                            int ownCount = totalCount * practiceBreakdown.getSecondDigit()
+                                    / sumOfProportion;
+                            ownCountFM.refresh(String.valueOf(ownCount));
+                            classRoomFM.refresh(String.valueOf(totalCount - ownCount));
+                        } else {
+                            Message.showInfo(getUILocaleUtil().getMessage("fill.creditability"));
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();//TODO catch
+                }
+            }
+        });
 
         leftPanel.addComponent(baseDataFW);
         leftPanel.setComponentAlignment(baseDataFW, Alignment.MIDDLE_CENTER);
@@ -181,9 +258,6 @@ public final class SubjectEdit extends AbstractFormWidgetView {
         DBGridModel teacherGM = (DBGridModel) teacherGW.getWidgetModel();
         teacherGM.setReadOnly(true);
         teacherGM.getColumnModel("code").setInGrid(false);
-        teacherGM.getColumnModel("lecture").setInGrid(true);
-        teacherGM.getColumnModel("laboratory").setInGrid(true);
-        teacherGM.getColumnModel("practice").setInGrid(true);
         teacherGM.getColumnModel("fall").setInGrid(true);
         teacherGM.getColumnModel("spring").setInGrid(true);
         teacherGM.setRefreshType(ERefreshType.MANUAL);
@@ -208,15 +282,6 @@ public final class SubjectEdit extends AbstractFormWidgetView {
                 "  trim(usr.LAST_NAME || ' ' || usr.FIRST_NAME || ' ' || coalesce(usr.MIDDLE_NAME, '')) TEACHER_FIO, " +
                 "  dept.DEPT_NAME, " +
                 "  post.POST_NAME, " +
-                "  CASE WHEN teach_subj.GROUP_LEC_COUNT = 0 " +
-                "    THEN 0 " +
-                "  ELSE 1 END                                                                           LEC, " +
-                "  CASE WHEN teach_subj.GROUP_LAB_COUNT = 0 " +
-                "    THEN 0 " +
-                "  ELSE 1 END                                                                           LAB, " +
-                "  CASE WHEN teach_subj.GROUP_PRAC_COUNT = 0 " +
-                "    THEN 0 " +
-                "  ELSE 1 END                                                                           PRAC, " +
                 "  teach_subj.FALL, " +
                 "  teach_subj.SPRING " +
                 "FROM EMPLOYEE empl INNER JOIN USERS usr ON empl.ID = usr.ID " +
@@ -238,11 +303,8 @@ public final class SubjectEdit extends AbstractFormWidgetView {
                 emp.setFio((String) oo[1]);
                 emp.setDeptName((String) oo[2]);
                 emp.setPostName((String) oo[3]);
-                emp.setLecture((int) oo[4] == 1);
-                emp.setLaboratory((int) oo[5] == 1);
-                emp.setPractice((int) oo[6] == 1);
-                emp.setFall((Boolean) oo[7]);
-                emp.setSpring((Boolean) oo[8]);
+                emp.setFall((Boolean) oo[4]);
+                emp.setSpring((Boolean) oo[5]);
                 list.add(emp);
             }
 
@@ -314,7 +376,7 @@ public final class SubjectEdit extends AbstractFormWidgetView {
 
         CreditabilityChangeListener(ACADEMIC_FORMULA academicFormula, FKFieldModel academicFormulaFM,
                                     FieldModel withTeacherCountFM, FieldModel ownTeacherCountFM,
-                                    FieldModel totalCountFM,FKFieldModel practiceType) {
+                                    FieldModel totalCountFM, FKFieldModel practiceType) {
             this.academicFormula = academicFormula;
             this.academicFormulaFM = academicFormulaFM;
             this.withTeacherCountFM = withTeacherCountFM;
@@ -325,45 +387,59 @@ public final class SubjectEdit extends AbstractFormWidgetView {
 
         @Override
         public void valueChange(ValueChangeEvent ev) {
-            Object value = ev.getProperty().getValue();
-            QueryModel qm = academicFormulaFM.getQueryModel();
-            String count;
-            String totalCount;
+            Object creditValue = ev.getProperty().getValue();
+            Object practiceTypeValue = practiceType.getValue();
 
-            if (value != null &&practiceType.getValue()==null) {
-                CREDITABILITY creditability = (CREDITABILITY) value;
-                qm.addWhere("creditability", ECriteria.EQUAL, creditability.getId());
-                count = creditability.getCredit() * 15 + "";
-                totalCount = creditability.getCredit() * 15 * 3 + "";
-            }else if (value != null && ((PRACTICE_TYPE)practiceType.getValue()).getId().equals(PRACTICE_TYPE.PRODUCTION_ID)) {
-                CREDITABILITY creditability = (CREDITABILITY) value;
-                qm.addWhere("creditability", ECriteria.EQUAL, creditability.getId());
-                count = creditability.getCredit() * 25 + "";
-                totalCount = creditability.getCredit() * 25 * 3 + "";
-            } else if (value != null && ((PRACTICE_TYPE)practiceType.getValue()).getId().equals(PRACTICE_TYPE.EDUCATIONAL_ID)) {
-                CREDITABILITY creditability = (CREDITABILITY) value;
-                qm.addWhere("creditability", ECriteria.EQUAL, creditability.getId());
-                count = creditability.getCredit() * 5 + "";
-                totalCount = creditability.getCredit() * 5 * 3 + "";
-            } else if (value != null && ((PRACTICE_TYPE)practiceType.getValue()).getId().equals(PRACTICE_TYPE.PEDAGOGICAL_ID)) {
-                CREDITABILITY creditability = (CREDITABILITY) value;
-                qm.addWhere("creditability", ECriteria.EQUAL, creditability.getId());
-                count = creditability.getCredit() * 10 + "";
-                totalCount = creditability.getCredit() * 10 * 3 + "";
-            }  else {
-                practiceType.getValue().equals(PRACTICE_TYPE.PRODUCTION_ID);
-                qm.addWhere("creditability", ECriteria.EQUAL, ID.valueOf(-1));
+            setHours(creditValue, practiceTypeValue, academicFormulaFM, academicFormula, withTeacherCountFM,
+                    ownTeacherCountFM, totalCountFM);
+        }
+
+    }
+
+    private void setHours(Object creditValue, Object practiceTypeValue, FKFieldModel academicFormulaFM,
+                          ACADEMIC_FORMULA academicFormula, FieldModel withTeacherCountFM,
+                          FieldModel ownTeacherCountFM, FieldModel totalCountFM) {
+        String count;
+        String totalCount;
+        try {
+            QueryModel academicFormulaQM = academicFormulaFM.getQueryModel();
+            if (creditValue != null) {
+                CREDITABILITY creditability = (CREDITABILITY) creditValue;
+                if (practiceTypeValue == null) {
+                    academicFormulaQM.addWhere("creditability", ECriteria.EQUAL, creditability.getId());
+                    count = creditability.getCredit() * 15 + "";
+                    totalCount = creditability.getCredit() * 15 * 3 + "";
+
+                    withTeacherCountFM.refresh(count);
+                    academicFormulaFM.refresh(academicFormula);
+                } else {
+                    ID practiceTypeId = ((PRACTICE_TYPE) practiceTypeValue).getId();
+                    if (practiceTypeId.equals(PRACTICE_TYPE.PRODUCTION_ID)) {
+                        count = creditability.getCredit() * 25 + "";
+                        totalCount = creditability.getCredit() * 25 * 3 + "";
+                    } else if (practiceTypeId.equals(PRACTICE_TYPE.EDUCATIONAL_ID)) {
+                        count = creditability.getCredit() * 5 + "";
+                        totalCount = creditability.getCredit() * 5 * 3 + "";
+                    } else if (practiceTypeId.equals(PRACTICE_TYPE.UNDERGRADUATE_ID)) {
+                        count = creditability.getCredit() * 25 + "";
+                        totalCount = creditability.getCredit() * 25 * 3 + "";
+                    } else {// PRACTICE_TYPE.PEDAGOGICAL_ID
+                        count = creditability.getCredit() * 10 + "";
+                        totalCount = creditability.getCredit() * 10 * 3 + "";
+                    }
+                }
+            } else {
+                if (practiceTypeValue == null) {
+                    academicFormulaQM.addWhere("creditability", ECriteria.EQUAL, ID.valueOf(-1));
+                }
                 count = "0";
                 totalCount = "0";
             }
-            try {
-                academicFormulaFM.refresh(academicFormula);
-                withTeacherCountFM.refresh(count);
-                ownTeacherCountFM.refresh(count);
-                totalCountFM.refresh(totalCount);
-            } catch (Exception e) {
-                e.printStackTrace();//TODO catch
-            }
+
+            ownTeacherCountFM.refresh(count);
+            totalCountFM.refresh(totalCount);
+        } catch (Exception e) {
+            e.printStackTrace();//TODO catch
         }
     }
 
@@ -376,7 +452,7 @@ public final class SubjectEdit extends AbstractFormWidgetView {
 
 
         AcademicFormulaChangeListener(FieldModel lcCountFM, FieldModel prCountFM,
-                                      FieldModel lbCountFM,FKFieldModel practiceType) {
+                                      FieldModel lbCountFM, FKFieldModel practiceType) {
             this.lcCountFM = lcCountFM;
             this.prCountFM = prCountFM;
             this.lbCountFM = lbCountFM;
@@ -389,26 +465,11 @@ public final class SubjectEdit extends AbstractFormWidgetView {
             String lcCount;
             String prCount;
             String lbCount;
-            if (value != null && practiceType.getValue()==null) {
+            if (value != null) {
                 ACADEMIC_FORMULA academicFormula = (ACADEMIC_FORMULA) value;
                 lcCount = academicFormula.getLcCount() * 15 + "";
                 prCount = academicFormula.getPrCount() * 15 + "";
                 lbCount = academicFormula.getLbCount() * 15 + "";
-            }else if (value != null && ((PRACTICE_TYPE)practiceType.getValue()).getId().equals(PRACTICE_TYPE.PRODUCTION_ID)) {
-                ACADEMIC_FORMULA academicFormula = (ACADEMIC_FORMULA) value;
-                lcCount = academicFormula.getLcCount() * 25 + "";
-                prCount = academicFormula.getPrCount() * 25 + "";
-                lbCount = academicFormula.getLbCount() * 25 + "";
-            } else if (value != null && ((PRACTICE_TYPE)practiceType.getValue()).getId().equals(PRACTICE_TYPE.EDUCATIONAL_ID)) {
-                ACADEMIC_FORMULA academicFormula = (ACADEMIC_FORMULA) value;
-                lcCount = academicFormula.getLcCount() * 5 + "";
-                prCount = academicFormula.getPrCount() * 5 + "";
-                lbCount = academicFormula.getLbCount() * 5 + "";
-            } else if (value != null && ((PRACTICE_TYPE)practiceType.getValue()).getId().equals(PRACTICE_TYPE.PEDAGOGICAL_ID)) {
-                ACADEMIC_FORMULA academicFormula = (ACADEMIC_FORMULA) value;
-                lcCount = academicFormula.getLcCount() * 10 + "";
-                prCount = academicFormula.getPrCount() * 10 + "";
-                lbCount = academicFormula.getLbCount() * 10 + "";
             } else {
                 lcCount = "0";
                 prCount = "0";

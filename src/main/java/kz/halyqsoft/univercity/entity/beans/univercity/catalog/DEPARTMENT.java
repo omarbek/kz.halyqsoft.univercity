@@ -45,9 +45,9 @@ public class DEPARTMENT extends AbstractEntity implements CommonTree<DEPARTMENT>
             @JoinColumn(name = "PARENT_ID", referencedColumnName = "ID")})
     private DEPARTMENT parent;
 
-    @FieldInfo(type = EFieldType.BOOLEAN, order = 5, required = false, inEdit = false, inGrid = false, inView = false)
+    @FieldInfo(type = EFieldType.BOOLEAN, order = 5, required = false)
     @Column(name = "FC", nullable = false)
-    private boolean fc;
+    private boolean forEmployees = false;
 
     @FieldInfo(type = EFieldType.BOOLEAN, order = 6, required = false, inEdit = false, inGrid = false, inView = false)
     @Column(name = "DELETED", nullable = false)
@@ -78,18 +78,20 @@ public class DEPARTMENT extends AbstractEntity implements CommonTree<DEPARTMENT>
         this.deptShortName = deptShortName;
     }
 
-    public boolean isFc() {
-        return fc;
+    public boolean isForEmployees() {
+        return forEmployees;
     }
 
-    public void setFc(boolean fc) {
-        this.fc = fc;
+    public void setForEmployees(boolean forEmployees) {
+        this.forEmployees = forEmployees;
     }
 
+    @Override
     public boolean isDeleted() {
         return deleted;
     }
 
+    @Override
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
     }

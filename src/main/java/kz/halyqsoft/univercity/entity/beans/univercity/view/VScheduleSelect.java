@@ -6,7 +6,7 @@ import java.util.Locale;
 
 /**
  * @author Omarbek
- * @created Feb 21, 2017 5:47:44 PM
+ * @created Feb 21, 2018 5:47:44 PM
  */
 public final class VScheduleSelect extends AbstractEntity {
 

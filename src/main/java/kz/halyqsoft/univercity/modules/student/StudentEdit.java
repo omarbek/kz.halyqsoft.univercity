@@ -1,8 +1,5 @@
 package kz.halyqsoft.univercity.modules.student;
 
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Font;
-import com.itextpdf.text.pdf.PdfPTable;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.FileDownloader;
@@ -56,7 +53,6 @@ import org.r3a.common.vaadin.widget.table.model.DBTableModel;
 import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
 
 import javax.persistence.NoResultException;
-import javax.swing.text.Document;
 import java.util.*;
 
 import static kz.halyqsoft.univercity.modules.regapplicants.ApplicantsForm.*;
@@ -76,14 +72,13 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
     private CommonFormWidget grantDocFW;
     private TableWidget educationTW, languageTW, medicalCheckupTW, differenceTW;
     private FromItem educationUDFI;
-    private Label lockLabel, lockReasonLabel, createdBylabel,label;
+    private Label lockLabel, lockReasonLabel, createdBylabel, label;
     private Button lockUnlockButton;
-    private Button downloadTableButton,downloadTableRusButton;
     private LockDialog lockDialog;
     private STUDENT student;
     private USERS users;
     private VerticalLayout mainVL;
-    private static Button pdfDownload, pdfDownloadDorm, pdfDownloadLetter;
+    private static Button pdfDownload, pdfDownloadDorm, pdfDownloadDormKaz, pdfDownloadLetter;
     private StudentOrApplicantView studentOrApplicantView;
     private HorizontalLayout downloadHL;
     private static FileDownloader fileDownloaderDorm, fileDownloader,
@@ -99,6 +94,9 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
 
     private static final String PATH_TO_PHOTO = "/files/photos/";
     private boolean kz;
+
+    private static final String IUPS_KAZ = "99";//97
+    private static final String IUPS_RU = "98";//96
 
     public StudentEdit(final FormModel baseDataFM, VerticalLayout mainVL,
                        StudentOrApplicantView studentOrApplicantView)
@@ -316,6 +314,11 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
             buttonPanel.setComponentAlignment(pdfDownloadDorm, Alignment.MIDDLE_CENTER);
             pdfDownloadDorm.setEnabled(false);
 
+            pdfDownloadDormKaz = createDownloadButtonDormKaz();
+            buttonPanel.addComponent(pdfDownloadDormKaz);
+            buttonPanel.setComponentAlignment(pdfDownloadDormKaz, Alignment.MIDDLE_CENTER);
+            pdfDownloadDormKaz.setEnabled(false);
+
             pdfDownloadLetter = createDownloadButtonLetter();
             buttonPanel.addComponent(pdfDownloadLetter);
             buttonPanel.setComponentAlignment(pdfDownloadLetter, Alignment.MIDDLE_CENTER);
@@ -336,47 +339,9 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         kazCheckBox.setValue(false);
         rusCheckBox.setValue(false);
 
-
-        downloadTableButton=new Button();
-        downloadTableButton.setImmediate(true);
-        downloadTableButton.setWidth("80");
-        downloadTableButton.setCaption(getUILocaleUtil().getCaption("iups"));
-        hl.addComponent(downloadTableButton);
-
-        downloadTableRusButton=new Button();
-        downloadTableRusButton.setImmediate(true);
-        downloadTableRusButton.setWidth("80");
-        downloadTableRusButton.setCaption(getUILocaleUtil().getCaption("iupsrus"));
-        hl.addComponent(downloadTableRusButton);
-
         hl.addComponents(kazCheckBox, rusCheckBox);
         hl.setComponentAlignment(kazCheckBox, Alignment.MIDDLE_CENTER);
         hl.setComponentAlignment(rusCheckBox, Alignment.MIDDLE_CENTER);
-        hl.setComponentAlignment(downloadTableButton, Alignment.MIDDLE_LEFT);
-        hl.setComponentAlignment(downloadTableRusButton, Alignment.TOP_LEFT);
-
-        downloadTableButton.addClickListener(new ClickListener() {
-             @Override
-             public void buttonClick(ClickEvent clickEvent) {
-                 myResource = createResourceStudent("154", student);
-                 fileDownloader = new FileDownloader(myResource);
-                 myResource.setMIMEType("application/pdf");
-                 fileDownloader.extend(downloadTableButton);
-             }
-         }
-        );
-
-        downloadTableRusButton.addClickListener(new ClickListener() {
-             @Override
-             public void buttonClick(ClickEvent clickEvent) {
-                 myResource = createResourceStudent("155", student);
-                 fileDownloader = new FileDownloader(myResource);
-                 myResource.setMIMEType("application/pdf");
-                 fileDownloader.extend(downloadTableRusButton);
-             }
-         }
-        );
-
 
         pdfDownload = createDownloadButton();
         hl.addComponent(pdfDownload);
@@ -400,7 +365,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
 
                     if (valueChangeEvent != null && valueChangeEvent.getProperty() != null && valueChangeEvent.getProperty().getValue() != null) {
                         try {
-                            setKazLanguage(student,true);
+                            setKazLanguage(student, true);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -417,7 +382,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 @Override
                 public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
                     try {
-                        setRusLanguage(student,true);
+                        setRusLanguage(student, true);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -451,6 +416,12 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
             fileDownloaderDorm = new FileDownloader(myResourceDorm);
             myResourceDorm.setMIMEType("application/pdf");
             fileDownloaderDorm.extend(pdfDownloadDorm);
+
+            pdfDownloadDormKaz.setEnabled(true);
+            myResourceDorm = createResourceStudent("180", student);
+            fileDownloaderDorm = new FileDownloader(myResourceDorm);
+            myResourceDorm.setMIMEType("application/pdf");
+            fileDownloaderDorm.extend(pdfDownloadDormKaz);
         }
 
         boolean readOnly = baseDataFW.getWidgetModel().isReadOnly();
@@ -535,13 +506,13 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         resourceParents.setMIMEType("application/pdf");
         fileDownloaderParent.extend(pdfDownloadLetter);
 
-        if (student.isNeedDorm()) {
-            pdfDownloadDorm.setEnabled(true);
-            myResourceDorm = createResourceStudent("92", student);
-            fileDownloaderDorm = new FileDownloader(myResourceDorm);
-            myResourceDorm.setMIMEType("application/pdf");
-            fileDownloaderDorm.extend(pdfDownloadDorm);
-        }
+//        if (student.isNeedDorm()) {
+//            pdfDownloadDorm.setEnabled(true);
+//            myResourceDorm = createResourceStudent("92", student);
+//            fileDownloaderDorm = new FileDownloader(myResourceDorm);
+//            myResourceDorm.setMIMEType("application/pdf");
+//            fileDownloaderDorm.extend(pdfDownloadDorm);
+//        }
     }
 
 
@@ -641,6 +612,16 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         Button dormDownloadButton = new Button();
         dormDownloadButton.setData(11);
         dormDownloadButton.setCaption(getUILocaleUtil().getCaption("download.contract.dorm"));
+        dormDownloadButton.setWidth(220, Unit.PIXELS);
+
+        return dormDownloadButton;
+    }
+
+    private Button createDownloadButtonDormKaz() {
+
+        Button dormDownloadButton = new Button();
+        dormDownloadButton.setData(11);
+        dormDownloadButton.setCaption(getUILocaleUtil().getCaption("download.contract.dorm.kaz"));
         dormDownloadButton.setWidth(220, Unit.PIXELS);
 
         return dormDownloadButton;
@@ -1248,17 +1229,11 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
             subjectsCB.add(subjectCB);
 
             QueryModel<SUBJECT> subjectQueryModel = new QueryModel<>(SUBJECT.class);
-            FromItem subj = subjectQueryModel.addJoin(EJoin.INNER_JOIN, "id", STUDENT_SUBJECT.class, "subject");
-            FromItem edu = subj.addJoin(EJoin.INNER_JOIN, "student_id", STUDENT_EDUCATION.class, "student");
+            FromItem semesterSubjectFI = subjectQueryModel.addJoin(EJoin.INNER_JOIN, "id", SEMESTER_SUBJECT.class, "subject");
+            FromItem subj = semesterSubjectFI.addJoin(EJoin.INNER_JOIN, "id", STUDENT_SUBJECT.class, "subject");
+            FromItem edu = subj.addJoin(EJoin.INNER_JOIN, "studentEducation", STUDENT_EDUCATION.class, "id");
             FromItem spe = edu.addJoin(EJoin.INNER_JOIN, "speciality", SPECIALITY.class, "id");
             subjectQueryModel.addWhere(edu, "student", ECriteria.EQUAL, s.getId());
-
-
-            QueryModel<SEMESTER_SUBJECT> semesterSubjectQM = new QueryModel<>(SEMESTER_SUBJECT.class);
-            FromItem FI1 = semesterSubjectQM.addJoin(EJoin.INNER_JOIN, "id",
-                    STUDENT_EDUCATION.class, "student");
-            FromItem specFI = FI1.addJoin(EJoin.INNER_JOIN, "id",
-                    SPECIALITY.class, "speciality");
 
             List<SUBJECT> subjects = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
                     lookup(subjectQueryModel);
@@ -1362,16 +1337,11 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                         final FormModel differenceFM = repatriateDocFW.getWidgetModel();
 
                         QueryModel<SUBJECT> subjectQueryModel = new QueryModel<>(SUBJECT.class);
-                        FromItem subj = subjectQueryModel.addJoin(EJoin.INNER_JOIN, "id", STUDENT_SUBJECT.class, "subject");
-                        FromItem edu = subj.addJoin(EJoin.INNER_JOIN, "student_id", STUDENT_EDUCATION.class, "student");
+                        FromItem semesterSubjectFI = subjectQueryModel.addJoin(EJoin.INNER_JOIN, "id", SEMESTER_SUBJECT.class, "subject");
+                        FromItem subj = semesterSubjectFI.addJoin(EJoin.INNER_JOIN, "id", STUDENT_SUBJECT.class, "subject");
+                        FromItem edu = subj.addJoin(EJoin.INNER_JOIN, "studentEducation", STUDENT_EDUCATION.class, "id");
                         FromItem spe = edu.addJoin(EJoin.INNER_JOIN, "speciality", SPECIALITY.class, "id");
                         subjectQueryModel.addWhere(edu, "student", ECriteria.EQUAL, s.getId());
-
-                        QueryModel<SEMESTER_SUBJECT> semesterSubjectQM = new QueryModel<>(SEMESTER_SUBJECT.class);
-                        FromItem FI1 = semesterSubjectQM.addJoin(EJoin.INNER_JOIN, "id",
-                                STUDENT_EDUCATION.class, "student");
-                        FromItem specFI = FI1.addJoin(EJoin.INNER_JOIN, "id",
-                                SPECIALITY.class, "speciality");
 
                         List<SUBJECT> subjects = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
                                 lookup(subjectQueryModel);
@@ -1757,7 +1727,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
             return preSaveGrantDoc(source, e, isNew, buttonId);
         } else if (source.equals(medicalCheckupTW)) {
             return preSaveMedicalCheckup(source, e, isNew, buttonId);
-        }else if(source.equals(differenceTW)){
+        } else if (source.equals(differenceTW)) {
             return preSaveDifference(source, e, isNew, buttonId);
         }
 
@@ -2366,7 +2336,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
 
     public boolean preSaveDifference(Object source, Entity e, boolean isNew, int buttonId) {
         V_STUDENT_DIFFERENCE vtDifference = (V_STUDENT_DIFFERENCE) e;
-        STUDENT_DIFFERENCE difference =null;
+        STUDENT_DIFFERENCE difference = null;
         FormModel fm = baseDataFW.getWidgetModel();
         if (isNew) {
             difference = new STUDENT_DIFFERENCE();
@@ -2460,7 +2430,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
             }
 
             return false;
-        }else if (source.equals(differenceTW)) {
+        } else if (source.equals(differenceTW)) {
 
             List<STUDENT_DIFFERENCE> delList = new ArrayList<>();
             for (Entity e : entities) {
@@ -2509,7 +2479,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
     public void handlePhotoWidgetEvent(PhotoWidgetEvent ev) {
         if (ev.getEvent() == PhotoWidgetEvent.CHANGED) {
             userPhotoBytes = ev.getBytes();
-            userPhotoFilename = PATH_TO_PHOTO +ev.getFilename();
+            userPhotoFilename = PATH_TO_PHOTO + ev.getFilename();
             userPhotoChanged = true;
         }
     }
@@ -2664,7 +2634,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                     @Override
                     public void buttonClick(ClickEvent ev) {
                         try {
-                            StudentChangeLanguage studentChangeLanguage = new StudentChangeLanguage(studentEducation,StudentEdit.this);
+                            StudentChangeLanguage studentChangeLanguage = new StudentChangeLanguage(studentEducation, StudentEdit.this);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -2745,7 +2715,6 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                 createdBylabel.setValue(user.toString());
             }
             educationFL.addComponent(createdBylabel);
-
 
 
             return educationFL;

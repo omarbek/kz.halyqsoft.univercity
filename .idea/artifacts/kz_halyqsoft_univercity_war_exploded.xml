@@ -7,6 +7,7 @@
           <element id="module-output" name="kz.halyqsoft.univercity" />
         </element>
         <element id="directory" name="lib">
+          <element id="library" level="project" name="Maven: org.vaadin.addons:jsconsole:0.1.0" />
           <element id="library" level="project" name="Maven: com.google.cloud:google-cloud-speech:0.23.1-alpha" />
           <element id="library" level="project" name="Maven: io.netty:netty-tcnative-boringssl-static:2.0.3.Final" />
           <element id="library" level="project" name="Maven: com.google.cloud:google-cloud-core:1.5.1" />

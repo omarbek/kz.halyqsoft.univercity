@@ -36,6 +36,7 @@ public class PdfAccess extends AbstractCommonView implements EntityListener{
     private GridWidget postGW;
     private GridWidget pdfDocumentSignerPostGW;
     public PdfAccess() {
+
         mainHSP = new HorizontalSplitPanel();
         mainHSP.setSplitPosition(30);
         mainHSP.setSizeFull();
@@ -220,7 +221,6 @@ public class PdfAccess extends AbstractCommonView implements EntityListener{
 
     @Override
     public boolean preSave(Object o, Entity entity, boolean b, int i) throws Exception {
-        Message.showError("Asdasdasdasd");
         return false;
     }
 

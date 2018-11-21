@@ -5,10 +5,9 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.ComboBox;
-import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_SUBJECT;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.VStudent;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VStudentSubject;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_STUDENT;
+import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.ID;
@@ -30,7 +29,7 @@ import java.util.Map;
  * @author Omarbek
  * @created on 14.09.2018
  */
-public class StudentSubjectView extends AbstractTaskView implements EntityListener{
+public class StudentSubjectView extends AbstractTaskView implements EntityListener {
 
     private GridWidget studentSubjectGW;
 
@@ -44,7 +43,7 @@ public class StudentSubjectView extends AbstractTaskView implements EntityListen
         studentCB.setNullSelectionAllowed(false);
         studentCB.setTextInputAllowed(true);
         studentCB.setFilteringMode(FilteringMode.CONTAINS);
-        studentCB.setPageLength(0);
+        studentCB.setPageLength(10);
         QueryModel<V_STUDENT> studentQM = new QueryModel<>(V_STUDENT.class);
         BeanItemContainer<V_STUDENT> studentBIC = new BeanItemContainer<>(V_STUDENT.class,
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(studentQM));
@@ -79,7 +78,7 @@ public class StudentSubjectView extends AbstractTaskView implements EntityListen
                         "  stu_subj.id, " +
                         "  'code'                   code, " +
                         "  module.module_short_name moduleType, " +
-                        "  subj.name_kz             subjectName, " +
+                        "  subj.name_" + CommonUtils.getLanguage() + "             subjectName, " +
                         "  credit.credit, " +
                         "  ects.ects, " +
                         "  sem.semester_name        semester, " +
@@ -110,7 +109,7 @@ public class StudentSubjectView extends AbstractTaskView implements EntityListen
                 params.put(1, student.getId().getId());
                 List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(
                         sql, params);
-                List<VStudentSubject> list=new ArrayList<>();
+                List<VStudentSubject> list = new ArrayList<>();
                 if (!tmpList.isEmpty()) {
                     for (Object o : tmpList) {
                         Object[] oo = (Object[]) o;
@@ -119,11 +118,11 @@ public class StudentSubjectView extends AbstractTaskView implements EntityListen
                         studentSubject.setCode((String) oo[1]);
                         studentSubject.setModuleType((String) oo[2]);
                         studentSubject.setSubjectName((String) oo[3]);
-                        studentSubject.setCredit(((BigDecimal)oo[4]).intValue());
-                        studentSubject.setEcts(((BigDecimal)oo[5]).intValue());
-                        studentSubject.setSemester((String)oo[6]);
-                        studentSubject.setTutor((String)oo[7]);
-                        studentSubject.setExamType((String)oo[8]);
+                        studentSubject.setCredit(((BigDecimal) oo[4]).intValue());
+                        studentSubject.setEcts(((BigDecimal) oo[5]).intValue());
+                        studentSubject.setSemester((String) oo[6]);
+                        studentSubject.setTutor((String) oo[7]);
+                        studentSubject.setExamType((String) oo[8]);
                         list.add(studentSubject);
                     }
                 }

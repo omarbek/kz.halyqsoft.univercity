@@ -55,7 +55,7 @@ import java.util.Calendar;
 
 /**
  * @author Omarbek Dinassil
- * @created Apr 19, 2017 11:46:30 AM
+ * @created Apr 19, 2018 11:46:30 AM
  */
 @SuppressWarnings({"serial", "unchecked"})
 public final class CurriculumView extends AbstractTaskView implements EntityListener {
@@ -251,7 +251,7 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
                     curriculum = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(qm);
                     curriculum = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(CURRICULUM_SUMMER.class, curriculum.getId());
                     statusLabel.setValue(getUILocaleUtil().getCaption("status") + ": " + curriculum.getCurriculumStatus().getStatusName());
-                    String sql = "select a.ID, b.CODE SUBJECT_CODE, b.NAME_RU SUBJECT_NAME, decode(b.SUBJECT_CYCLE_ID, 5, f.CYCLE_SHORT_NAME, c.CYCLE_SHORT_NAME) CYCLE_SHORT_NAME, d.CREDIT, e.FORMULA from CURRICULUM_SUMMER_DETAIL a inner join SUBJECT b on a.SUBJECT_ID = b.ID inner join SUBJECT_CYCLE c on b.SUBJECT_CYCLE_ID = c.ID inner join CREDITABILITY d on b.CREDITABILITY_ID = d.ID inner join ACADEMIC_FORMULA e on b.ACADEMIC_FORMULA_ID = e.ID left join SUBJECT_CYCLE f on a.SUBJECT_CYCLE_ID = f.ID where a.CURRICULUM_ID = ?1 and a.DELETED = ?2";
+                    String sql = "select a.ID, b.CODE SUBJECT_CODE, b.NAME_" + CommonUtils.getLanguage() + " SUBJECT_NAME, decode(b.SUBJECT_CYCLE_ID, 5, f.CYCLE_SHORT_NAME, c.CYCLE_SHORT_NAME) CYCLE_SHORT_NAME, d.CREDIT, e.FORMULA from CURRICULUM_SUMMER_DETAIL a inner join SUBJECT b on a.SUBJECT_ID = b.ID inner join SUBJECT_CYCLE c on b.SUBJECT_CYCLE_ID = c.ID inner join CREDITABILITY d on b.CREDITABILITY_ID = d.ID inner join ACADEMIC_FORMULA e on b.ACADEMIC_FORMULA_ID = e.ID left join SUBJECT_CYCLE f on a.SUBJECT_CYCLE_ID = f.ID where a.CURRICULUM_ID = ?1 and a.DELETED = ?2";
                     Map<Integer, Object> params = new HashMap<Integer, Object>(2);
                     params.put(1, curriculum.getId().getId());
                     params.put(2, Boolean.FALSE);

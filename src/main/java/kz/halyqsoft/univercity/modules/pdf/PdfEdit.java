@@ -37,7 +37,6 @@ public class PdfEdit extends AbstractCommonView {
     private PDF_DOCUMENT mainFile;
     public PdfEdit(PDF_DOCUMENT file, Object prevClassWithEmbedded) {
         openPdfButton.setEnabled(false);
-        this.pdfEmbedded = pdfEmbedded;
         this.prevClassWithEmbedded = prevClassWithEmbedded;
         try {
             addOrEdit(file);
@@ -103,8 +102,8 @@ public class PdfEdit extends AbstractCommonView {
         });
 
         cf.deadlineDays.addValueChangeListener(new Property.ValueChangeListener() {
-                @Override
-                public void valueChange(Property.ValueChangeEvent event) {
+            @Override
+            public void valueChange(Property.ValueChangeEvent event) {
                 refresh(cf);
             }
         });
@@ -166,7 +165,6 @@ public class PdfEdit extends AbstractCommonView {
                     }
                 });
                 textSizeComboBox.setValue(12);
-
                 textHL.addComponent(textSizeComboBox);
 
                 setTextField(customField.getOrder(),textHL);
@@ -300,20 +298,20 @@ public class PdfEdit extends AbstractCommonView {
         createDbButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
-            CustomDocument dc = new CustomDocument();
+                CustomDocument dc = new CustomDocument();
 
-            if(checkForEmpty(cf)){
-                Message.showError(getUILocaleUtil().getMessage("pdf.field.empty"));
-            }
-            else{
+                if(checkForEmpty(cf)){
+                    Message.showError(getUILocaleUtil().getMessage("pdf.field.empty"));
+                }
+                else{
 
-                ByteArrayOutputStream byteArrayOutputStream = dc.getByteArrayOutputStream();
+                    ByteArrayOutputStream byteArrayOutputStream = dc.getByteArrayOutputStream();
 
-                USERS user = CommonUtils.getCurrentUser();
+                    USERS user = CommonUtils.getCurrentUser();
 
-                if (user != null) {
-                    try {
-                           if (fileDoc.getId() == null) {
+                    if (user != null) {
+                        try {
+                            if (fileDoc.getId() == null) {
 
                                 if(!cf.pdfTitle.getValue().endsWith(".pdf"))
                                 {
@@ -321,90 +319,92 @@ public class PdfEdit extends AbstractCommonView {
                                 }else{
                                     fileDoc.setFileName(cf.pdfTitle.getValue());
                                 }
-                               fileDoc.setTitle(cf.title.getValue());
-                               fileDoc.setPeriod(Integer.parseInt(cf.deadlineDays.getValue()));
-                               fileDoc.setUser(user);
-                               fileDoc.setDeleted(false);
-                               fileDoc.setCreated(new Date());
+                                fileDoc.setTitle(cf.title.getValue());
+                                fileDoc.setPeriod(Integer.parseInt(cf.deadlineDays.getValue()));
+                                fileDoc.setUser(user);
+                                fileDoc.setDeleted(false);
+                                fileDoc.setCreated(new Date());
 
 
 
-                           SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(fileDoc);
+                                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(fileDoc);
 
 
-                           List<CustomField> customFields = new ArrayList<>();
-                           for(CustomField singleCF : customFieldList){
-                               if(singleCF.getCustomCheckBox().getValue()){
-                                   customFields.add(singleCF);
-                               }
-                           }
+                                List<CustomField> customFields = new ArrayList<>();
+                                for(CustomField singleCF : customFieldList){
+                                    if(singleCF.getCustomCheckBox().getValue()){
+                                        customFields.add(singleCF);
+                                    }
+                                }
 
-                           if(customFields.size()>0){
-                               CustomFieldsView view = new CustomFieldsView(getUILocaleUtil().getCaption("text.custom"), customFields, fileDoc);
-                           }
-                           dc.initialize(customFieldList, cf.getTitle().getValue());
-
-
-                               if (dc.getPdfProperties() != null) {
-                               for (PDF_PROPERTY pdfProperty : dc.getPdfProperties()) {
-                                    pdfProperty.setPdfDocument(fileDoc);
-                                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(pdfProperty);
-                               }
-                           }
-                        }
-                        else {
-
-                               if(!cf.pdfTitle.getValue().endsWith(".pdf"))
-                               {
-                                   fileDoc.setFileName(cf.pdfTitle.getValue() + ".pdf");
-                               }else{
-                                   fileDoc.setFileName(cf.pdfTitle.getValue());
-                               }
-                           fileDoc.setPeriod(Integer.parseInt(cf.deadlineDays.getValue()));
-                           fileDoc.setTitle(cf.title.getValue());
-
-                           QueryModel<PDF_PROPERTY> pdfPropertyQM = new QueryModel<>(PDF_PROPERTY.class);
-                           pdfPropertyQM.addWhere("pdfDocument", ECriteria.EQUAL, fileDoc.getId());
-
-                           List<PDF_PROPERTY> pdfProperties = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(pdfPropertyQM);
-                           SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(pdfProperties);
-
-                           List<CustomField> customFields = new ArrayList<>();
-                           for(CustomField singleCF : customFieldList){
-                               if(singleCF.getCustomCheckBox().getValue()){
-                                   customFields.add(singleCF);
-                               }
-                           }
-
-                           if(customFields.size()>0){
-                               CustomFieldsView view = new CustomFieldsView(getUILocaleUtil().getCaption("text.custom"), customFields, fileDoc);
-                           }
-
-                           dc.initialize(customFieldList, cf.getTitle().getValue());
+                                if(customFields.size()>0){
+                                    CustomFieldsView view = new CustomFieldsView(getUILocaleUtil().getCaption("text.custom"), customFields, fileDoc);
+                                }
+                                dc.initialize(customFieldList, cf.getTitle().getValue());
+                                dc.createPdf(cf.getTitle().getValue());
 
 
-                               SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(fileDoc);
-                           if (dc.getPdfProperties() != null) {
-                               for (PDF_PROPERTY pdfProperty : dc.getPdfProperties()) {
-                                   pdfProperty.setPdfDocument(fileDoc);
-                                   if(pdfProperty.getId() != null){
-                                       SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(pdfProperty);
-                                   }
-                                   else {
-                                       SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(pdfProperty);
-                                   }
+                                if (dc.getPdfProperties() != null) {
+                                    for (PDF_PROPERTY pdfProperty : dc.getPdfProperties()) {
+                                        pdfProperty.setPdfDocument(fileDoc);
+                                        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(pdfProperty);
+                                    }
                                 }
                             }
+                            else {
 
-                               }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }}
-                        CommonUtils.showSavedNotification();
+                                if(!cf.pdfTitle.getValue().endsWith(".pdf"))
+                                {
+                                    fileDoc.setFileName(cf.pdfTitle.getValue() + ".pdf");
+                                }else{
+                                    fileDoc.setFileName(cf.pdfTitle.getValue());
+                                }
+                                fileDoc.setPeriod(Integer.parseInt(cf.deadlineDays.getValue()));
+                                fileDoc.setTitle(cf.title.getValue());
+
+                                QueryModel<PDF_PROPERTY> pdfPropertyQM = new QueryModel<>(PDF_PROPERTY.class);
+                                pdfPropertyQM.addWhere("pdfDocument", ECriteria.EQUAL, fileDoc.getId());
+
+                                List<PDF_PROPERTY> pdfProperties = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(pdfPropertyQM);
+                                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(pdfProperties);
+
+                                List<CustomField> customFields = new ArrayList<>();
+                                for(CustomField singleCF : customFieldList){
+                                    if(singleCF.getCustomCheckBox().getValue()){
+                                        customFields.add(singleCF);
+                                    }
+                                }
+
+                                if(customFields.size()>0){
+                                    CustomFieldsView view = new CustomFieldsView(getUILocaleUtil().getCaption("text.custom"), customFields, fileDoc);
+                                }
+
+                                dc.initialize(customFieldList, cf.getTitle().getValue());
+                                dc.createPdf( cf.getTitle().getValue());
+
+
+                                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(fileDoc);
+                                if (dc.getPdfProperties() != null) {
+                                    for (PDF_PROPERTY pdfProperty : dc.getPdfProperties()) {
+                                        pdfProperty.setPdfDocument(fileDoc);
+                                        if(pdfProperty.getId() != null){
+                                            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(pdfProperty);
+                                        }
+                                        else {
+                                            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(pdfProperty);
+                                        }
+                                    }
+                                }
+
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }}
+                    CommonUtils.showSavedNotification();
 
                     refreshEmbedded();
+                }
             }
-        }
 
 
         });
@@ -728,14 +728,14 @@ public class PdfEdit extends AbstractCommonView {
 
         }
 
-            getContent().addComponent(itemsVL);
-            getContent().setComponentAlignment(itemsVL, Alignment.MIDDLE_CENTER);
+        getContent().addComponent(itemsVL);
+        getContent().setComponentAlignment(itemsVL, Alignment.MIDDLE_CENTER);
 
-            activityHL.addComponent(createDbButton);
-            activityHL.addComponent(openPdfButton);
+        activityHL.addComponent(createDbButton);
+        activityHL.addComponent(openPdfButton);
 
-            getContent().addComponent(activityHL);
-            getContent().setComponentAlignment(activityHL, Alignment.MIDDLE_CENTER);
+        getContent().addComponent(activityHL);
+        getContent().setComponentAlignment(activityHL, Alignment.MIDDLE_CENTER);
 
     }
 
@@ -759,7 +759,7 @@ public class PdfEdit extends AbstractCommonView {
                 || cf.getTitle().isEmpty() || cf.getPdfTitle().isEmpty()
                 || customField.getFontComboBox().getValue() == null
                 || customField.getxComboBox().getValue() == null || customField.getyComboBox().getValue() == null ||
-        customField.getOrder().isEmpty()|| cf.getDeadlineDays().isEmpty();
+                customField.getOrder().isEmpty()|| cf.getDeadlineDays().isEmpty();
     }
 
 
@@ -777,6 +777,7 @@ public class PdfEdit extends AbstractCommonView {
         CustomDocument dc = new CustomDocument();
         String fileName = cf.getTitle().getValue();
         dc.initialize(customFieldList, fileName);
+        // dc.createPdf(fileName);
         ByteArrayOutputStream byteArrayOutputStream = dc.getByteArrayOutputStream();
         streamSource = new CustomSource(byteArrayOutputStream);
         myResource.setStreamSource(streamSource);

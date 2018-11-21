@@ -5,8 +5,8 @@ import com.vaadin.ui.Label;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT_CYCLE;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_CURRICULUM_ADD_PROGRAM;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_CURRICULUM_SUBJECT;
-import kz.halyqsoft.univercity.modules.curriculum.working.CurriculumView;
-import kz.halyqsoft.univercity.modules.curriculum.working.AbstractCurriculumPanel;
+import kz.halyqsoft.univercity.modules.curriculum.working.main.CurriculumView;
+import kz.halyqsoft.univercity.modules.curriculum.working.main.AbstractCurriculumPanel;
 import kz.halyqsoft.univercity.utils.excel.ExcelStyles;
 import kz.halyqsoft.univercity.utils.excel.ExcelUtil;
 import org.apache.poi.ss.usermodel.*;
@@ -97,17 +97,6 @@ public class CyclePanel extends AbstractCurriculumPanel {
         } catch (Exception ex) {
             LOG.error("Unable to refresh footer: ", ex);
         }
-    }
-
-    @Override
-    public void save() throws Exception {
-        //		for (CycleDetailPanel cdp : detailPanelList) {
-        //			cdp.save();
-        //		}
-    }
-
-    @Override
-    protected void cancel() {
     }
 
     public final void checkForApprove() throws Exception {
@@ -354,7 +343,7 @@ public class CyclePanel extends AbstractCurriculumPanel {
             cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
 
             cell = row.createCell(2);
-            cell.setCellValue(vcap.getSubjectNameRU());
+//            cell.setCellValue(vcap.getSubjectNameRU());
             cell.setCellStyle(styles.get(ExcelStyles.CONTENT_LEFT));
 
             cell = row.createCell(3);

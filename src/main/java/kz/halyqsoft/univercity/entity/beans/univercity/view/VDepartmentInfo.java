@@ -21,6 +21,9 @@ public class VDepartmentInfo extends AbstractEntity {
     @FieldInfo(type = EFieldType.INTEGER, order = 5, inGrid = false, inView = false, inEdit = false)
     private Long departmentID;
 
+    @FieldInfo(type = EFieldType.INTEGER, order = 6, inGrid = false, inView = false, inEdit = false )
+    private String time;
+
     public String getDeptName() {
         return deptName;
     }
@@ -59,5 +62,13 @@ public class VDepartmentInfo extends AbstractEntity {
 
     public void setDepartmentID(Long departmentID) {
         this.departmentID = departmentID;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
     }
 }

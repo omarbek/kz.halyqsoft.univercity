@@ -33,6 +33,7 @@ public abstract class WindowUtils extends AbstractDialog {
     }
 
     public void init(Integer width, Integer height) {
+        setCaption(createTitle());
         if (width != null && height != null) {
             setWidth(width, defaultUnit);
             setHeight(height, defaultUnit);

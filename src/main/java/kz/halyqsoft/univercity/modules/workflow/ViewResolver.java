@@ -5,9 +5,7 @@ import kz.halyqsoft.univercity.modules.workflow.views.*;
 public class ViewResolver {
     public BaseView getViewByTitle(String title) throws IllegalArgumentException{
 
-        if(title.equals(WorkflowView.MAIN)){
-            return new MainView(title);
-        }else if(title.equals(WorkflowView.CREATE)){
+        if(title.equals(WorkflowView.CREATE)){
             return new CreateView(title);
         }else if(title.equals(WorkflowView.MY_DOCUMENTS)){
             return new MyDocumentsView(title);

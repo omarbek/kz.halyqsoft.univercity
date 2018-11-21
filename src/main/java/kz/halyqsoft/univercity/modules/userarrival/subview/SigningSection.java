@@ -7,38 +7,32 @@ import com.vaadin.shared.ui.grid.HeightMode;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.USER_TYPE;
-import kz.halyqsoft.univercity.entity.beans.univercity.enumeration.UserType;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.VUser;
 import kz.halyqsoft.univercity.filter.FUserFilter;
 import kz.halyqsoft.univercity.filter.panel.UserFilterPanel;
 import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.PrintDialog;
 import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.SignDialog;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.SampleEntityListener;
-import org.apache.shiro.web.filter.authc.UserFilter;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.ID;
 import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.query.QueryModel;
-import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.widget.ERefreshType;
-import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 import org.r3a.common.vaadin.widget.filter2.FilterPanelListener;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 import org.r3a.common.vaadin.widget.grid.model.GridColumnModel;
-import org.r3a.common.vaadin.widget.toolbar.IconToolbar;
 
-import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class SigningSection extends SampleEntityListener implements FilterPanelListener{
 
     private UserFilterPanel filterPanel;
-
 
     private VerticalLayout mainVL;
     private GridWidget usersGW;
@@ -62,8 +56,6 @@ public class SigningSection extends SampleEntityListener implements FilterPanelL
         usersGW.addEntityListener(this);
         usersGW.showToolbar(false);
         usersGW.setHeight(100, Sizeable.Unit.PERCENTAGE);
-
-
 
         usersGM = (DBGridModel) usersGW.getWidgetModel();
         usersGM.setRowNumberVisible(true);
@@ -114,17 +106,13 @@ public class SigningSection extends SampleEntityListener implements FilterPanelL
                         }
                         tableBody.add(list);
                     }
-
                     PrintDialog printDialog = new PrintDialog(tableHeader, tableBody, CommonUtils.getUILocaleUtil().getCaption("print"), fileName);
-
                 }
             }
         });
 
-
         mainVL.addComponent(filterPanel);
         mainVL.setComponentAlignment(filterPanel, Alignment.MIDDLE_CENTER);
-
 
         mainVL.addComponent(printBtn);
         mainVL.setComponentAlignment(printBtn, Alignment.MIDDLE_RIGHT);

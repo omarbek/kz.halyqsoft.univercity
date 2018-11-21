@@ -10,10 +10,7 @@ import kz.halyqsoft.univercity.entity.beans.ROLES;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.USER_ROLES;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_DATA;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_PERIOD;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.facade.CommonIDFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -47,7 +44,7 @@ public class CommonUtils {
 
     public static final String PDF_MIME_TYPE = "application/pdf";
 
-    public static final String DATETIME = "yyyy-MM-dd' 'HH:mm:ss.SSS";
+    public static final String DATETIME = "yyyy-MM-dd' 'HH:mm:ss";
     public static final String DATE = "dd.MM.yyyy";
 
     public static final Logger LOG = LoggerFactory.getLogger("ROOT");
@@ -220,6 +217,14 @@ public class CommonUtils {
         return cancel;
     }
 
+    public static Button createRefreshButton() {
+        Button refreshButton = new Button();
+        refreshButton.setWidth(120.0F, Sizeable.Unit.PIXELS);
+        refreshButton.setIcon(new ThemeResource("img/button/refresh.png"));
+        refreshButton.setCaption(getUILocaleUtil().getCaption("update"));
+        return refreshButton;
+    }
+
     public static void setCards(FormModel baseDataFM) throws Exception {
         String sql = "SELECT id " +
                 "FROM card " +
@@ -256,6 +261,17 @@ public class CommonUtils {
         return formatter.format(date);
     }
 
+    public static String getTimeFromDate(Date date) {
+        SimpleDateFormat localDateFormat = new SimpleDateFormat("HH:mm:ss");
+        String time = localDateFormat.format(date);
+        return time;
+    }
+
+    public static String getFormattedDateWithoutTime(Date date) {
+        DateFormat formatter = new SimpleDateFormat(DATE);
+        return formatter.format(date);
+    }
+
     public static String getCode(String beginYear) {
         String code = null;
         try {
@@ -267,6 +283,8 @@ public class CommonUtils {
             } else if (usersCode < 1000) {
                 code = beginYear + "0" + usersCode;
             } else if (usersCode < 10000) {
+                code = beginYear + usersCode;
+            } else if (usersCode < 100000) {
                 code = beginYear + usersCode;
             } else {
                 SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USERS_CODE").
@@ -347,47 +365,128 @@ public class CommonUtils {
         try {
             sd = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(sdQM);
         } catch (NoResultException nrex) {
-            sd = new SEMESTER_DATA();
-            sd.setYear(studyYear);
-            sd.setSemesterPeriod(sp);
-
-            Calendar c = Calendar.getInstance();
-            c.clear();
-            if (sp.getId().equals(ID.valueOf(1))) {
-                c.set(Calendar.DAY_OF_MONTH, 20);
-                c.set(Calendar.MONTH, Calendar.AUGUST);
-                c.set(Calendar.YEAR, studyYear.getBeginYear());
-                sd.setBeginDate(c.getTime());
-
-                c.clear();
-                c.set(Calendar.DAY_OF_MONTH, 31);
-                c.set(Calendar.MONTH, Calendar.DECEMBER);
-                c.set(Calendar.YEAR, studyYear.getBeginYear());
-                sd.setEndDate(c.getTime());
-            } else if (sp.getId().equals(ID.valueOf(2))) {
-                c.set(Calendar.DAY_OF_MONTH, 10);
-                c.set(Calendar.MONTH, Calendar.JANUARY);
-                c.set(Calendar.YEAR, studyYear.getEndYear());
-                sd.setBeginDate(c.getTime());
-
-                c.clear();
-                c.set(Calendar.DAY_OF_MONTH, 25);
-                c.set(Calendar.MONTH, Calendar.MAY);
-                c.set(Calendar.YEAR, studyYear.getEndYear());
-                sd.setEndDate(c.getTime());
-            }
-
-            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(sd);
+            sd = createSemesterData(studyYear, sp);
         }
 
         return sd;
     }
 
-    public static boolean isAdmin() {
-        if (getCurrentUser().getId().getId().intValue() == 1
-                || getCurrentUser().getId().getId().intValue() == 2) {
-            return true;
+    private static SEMESTER_DATA createSemesterData(ENTRANCE_YEAR studyYear, SEMESTER_PERIOD sp) {
+        SEMESTER_DATA sd;
+        sd = new SEMESTER_DATA();
+        sd.setYear(studyYear);
+        sd.setSemesterPeriod(sp);
+
+        Calendar c = Calendar.getInstance();
+        c.clear();
+        if (sp.getId().equals(ID.valueOf(1))) {
+            c.set(Calendar.DAY_OF_MONTH, 20);
+            c.set(Calendar.MONTH, Calendar.AUGUST);
+            c.set(Calendar.YEAR, studyYear.getBeginYear());
+            sd.setBeginDate(c.getTime());
+
+            c.clear();
+            c.set(Calendar.DAY_OF_MONTH, 31);
+            c.set(Calendar.MONTH, Calendar.DECEMBER);
+            c.set(Calendar.YEAR, studyYear.getBeginYear());
+            sd.setEndDate(c.getTime());
+        } else if (sp.getId().equals(ID.valueOf(2))) {
+            c.set(Calendar.DAY_OF_MONTH, 10);
+            c.set(Calendar.MONTH, Calendar.JANUARY);
+            c.set(Calendar.YEAR, studyYear.getEndYear());
+            sd.setBeginDate(c.getTime());
+
+            c.clear();
+            c.set(Calendar.DAY_OF_MONTH, 25);
+            c.set(Calendar.MONTH, Calendar.MAY);
+            c.set(Calendar.YEAR, studyYear.getEndYear());
+            sd.setEndDate(c.getTime());
+        }
+
+        try {
+            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(sd);
+        } catch (Exception e) {
+            e.printStackTrace();//TODO catch
+        }
+        return sd;
+    }
+
+    public static boolean isCurrentUserHasAdminPrivileges() {
+        List<USER_ROLES> userRoles = getCurrentUser().getUserRoles();
+        for (USER_ROLES userRole : userRoles) {
+            if (userRole.getId().getId().longValue() == 3) {
+                return true;
+            }
         }
         return false;
+    }
+
+    public static boolean isAdmin() {
+        return getCurrentUser().getId().getId().intValue() == 1
+                || getCurrentUser().getId().getId().intValue() == 2;
+    }
+
+    public static String getLanguage() {
+        String lang = getUILocaleUtil().getCurrentLocale().toString().toLowerCase();
+        if (lang.startsWith("en")) {
+            return lang.substring(0, 2);
+        }
+        return lang.substring(3);
+    }
+
+    public static SEMESTER_DATA getSemesterDataBySemesterAndEntranceYear(SEMESTER semester,
+                                                                         ENTRANCE_YEAR entranceYear) {
+        SEMESTER_DATA semesterData = new SEMESTER_DATA();
+        try {
+            QueryModel<SEMESTER_DATA> semesterDataQM = new QueryModel<>(SEMESTER_DATA.class);
+            FromItem yearFI = semesterDataQM.addJoin(EJoin.INNER_JOIN, "year", ENTRANCE_YEAR.class, "id");
+            semesterDataQM.addWhere(yearFI, "beginYear", ECriteria.EQUAL, entranceYear.getBeginYear() +
+                    semester.getStudyYear().getStudyYear() - 1);
+            semesterDataQM.addWhere("semesterPeriod", ECriteria.EQUAL, semester.getSemesterPeriod().
+                    getId());
+            semesterData = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                    lookupSingle(semesterDataQM);
+        } catch (NoResultException e) {
+            semesterData = createSemesterData(entranceYear, semester.getSemesterPeriod());
+        } catch (Exception e) {
+            e.printStackTrace();//TODO catch
+        }
+        return semesterData;
+    }
+
+    public static SEMESTER getSemesterBySemesterDataAndEntranceYear(SEMESTER_DATA semesterData,
+                                                                    ENTRANCE_YEAR entranceYear) {
+        SEMESTER semester = new SEMESTER();
+        try {
+            QueryModel<SEMESTER> semesterQM = new QueryModel<>(SEMESTER.class);
+            semesterQM.addWhere("semesterPeriod", ECriteria.EQUAL, semesterData.getSemesterPeriod().getId());
+            int year = semesterData.getYear().getBeginYear() - entranceYear.getBeginYear() + 1;
+            semesterQM.addWhere("studyYear", ECriteria.EQUAL, ID.valueOf(year));
+            semester = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(semesterQM);
+        } catch (NoResultException e) {
+            semester = null;
+        } catch (Exception e) {
+            e.printStackTrace();//TODO catch
+        }
+        return semester;
+    }
+
+    public static int getStudyYearByEntranceYear(ENTRANCE_YEAR entranceYear) {
+        return getCurrentSemesterData().getYear().getBeginYear() - entranceYear.getBeginYear() + 1;
+    }
+
+    public static ENTRANCE_YEAR getEntranceYearByStudyYear(STUDY_YEAR studyYear) {
+        ENTRANCE_YEAR entranceYear = new ENTRANCE_YEAR();
+        try {
+            QueryModel<ENTRANCE_YEAR> entranceYearQM = new QueryModel<>(ENTRANCE_YEAR.class);
+            entranceYearQM.addWhere("beginYear", ECriteria.EQUAL,
+                    CommonUtils.getCurrentSemesterData().getYear().getBeginYear() - (studyYear.getStudyYear() - 1));
+            entranceYear = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(entranceYearQM);
+        } catch (NoResultException e) {
+            entranceYear = null;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return entranceYear;
     }
 }

@@ -8,7 +8,7 @@ import org.r3a.common.vaadin.widget.filter2.panel.AbstractFilterPanel;
 
 /**
  * @author Dinassil Omarbek
- * @created Apr 28, 2017 3:17:17 PM
+ * @created Apr 28, 2018 3:17:17 PM
  */
 @SuppressWarnings("serial")
 public final class SemesterSubjectFilterPanel extends AbstractFilterPanel {

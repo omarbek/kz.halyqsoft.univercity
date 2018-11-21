@@ -7,7 +7,7 @@ import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 
 /**
  * @author Omarbek
- * @created Mar 27, 2017 4:54:32 PM
+ * @created Mar 27, 2018 4:54:32 PM
  */
 public final class FChangeToNextYearGroupFilter extends AbstractFilterBean {
 

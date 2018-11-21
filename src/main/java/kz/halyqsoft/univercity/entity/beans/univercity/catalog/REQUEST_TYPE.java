@@ -4,7 +4,7 @@ import javax.persistence.Entity;
 
 /**
  * @author Omarbek
- * Created Apr 19, 2017 9:28:09 AM
+ * Created Apr 19, 2018 9:28:09 AM
  */
 @Entity
 public class REQUEST_TYPE extends AbstractTypeEntity {

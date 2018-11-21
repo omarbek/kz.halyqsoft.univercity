@@ -13,6 +13,7 @@ import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.ERefreshType;
 import org.r3a.common.vaadin.widget.dialog.Message;
+import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 import org.r3a.common.vaadin.widget.toolbar.IconToolbar;
@@ -24,8 +25,7 @@ import java.util.List;
  * @author Omarbek
  * @created on 26.06.2018
  */
-public class
-BindingSpecialityToCorpusView extends AbstractTaskView implements EntityListener {
+public class BindingSpecialityToCorpusView extends AbstractTaskView implements EntityListener {
 
     private GridWidget specAndCorpusGW;
 
@@ -45,6 +45,9 @@ BindingSpecialityToCorpusView extends AbstractTaskView implements EntityListener
         specAndCorpusGM.setTitleVisible(false);
         specAndCorpusGM.setMultiSelect(true);
         specAndCorpusGM.setRefreshType(ERefreshType.MANUAL);
+
+        QueryModel specAndCorpusQM = ((FKFieldModel) specAndCorpusGM.getFormModel().getFieldModel("speciality")).getQueryModel();
+        specAndCorpusQM.addWhere("deleted", false);
 
         refresh();
 

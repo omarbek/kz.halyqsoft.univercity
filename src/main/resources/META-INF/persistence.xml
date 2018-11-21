@@ -38,6 +38,7 @@
         <class>kz.halyqsoft.univercity.entity.beans.TASKS</class>
         <class>kz.halyqsoft.univercity.entity.beans.USER_ROLES</class>
         <class>kz.halyqsoft.univercity.entity.beans.USERS</class>
+        <class>kz.halyqsoft.univercity.entity.beans.M_USERS</class>
 
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.AbstractCategoryEntity</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.AbstractStatusEntity</class>
@@ -135,6 +136,7 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.USER_TYPE</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.WEEK</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.WEEK_DAY</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.WEEKEND_DAYS</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.WORK_HOUR_STATUS</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.CREATIVE_EXAM_SUBJECT</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDENT_DIPLOMA_TYPE</class>
@@ -150,6 +152,10 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.QUALIFICATION</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.CANDIDATE</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.NON_ADMISSION_CAUSE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.PRACTICE_BREAKDOWN</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.TRAJECTORY</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.STREAM_TYPE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.CURRICULUM_INDIVIDUAL_PLAN</class>
 
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_SPECIALITY</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_ORGANIZATION</class>
@@ -212,6 +218,7 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_STUDENT_DIFFERENCE</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_MASTER</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_STUDENT_DEBTS</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_TEACHER_SUBJECT_MODULE</class>
 
         <class>kz.halyqsoft.univercity.entity.beans.univercity.AbstractSpiderEntity</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.AbstractStudentEntity</class>
@@ -360,7 +367,7 @@
         <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
         <properties>
             <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
-            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/realdb"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/univerdb"/>
             <property name="javax.persistence.jdbc.user" value="postgres"/>
             <property name="javax.persistence.jdbc.password" value="ukpu18!"/>
             <!--<property name="javax.persistence.jdbc.user" value="${javax.persistence.jdbc.user}"/>-->

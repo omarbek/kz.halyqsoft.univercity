@@ -69,6 +69,9 @@ class CatalogList {
         addCatalogEntityToList(SKILL.class);
         addCatalogEntityToList(QUALIFICATION.class);
         addCatalogEntityToList(NON_ADMISSION_CAUSE.class);
+        addCatalogEntityToList(WEEKEND_DAYS.class);
+        addCatalogEntityToList(TRAJECTORY.class);
+        addCatalogEntityToList(CURRICULUM_INDIVIDUAL_PLAN.class);
 
         return new ArrayList<>(list);
     }

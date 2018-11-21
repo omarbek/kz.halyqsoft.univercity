@@ -7,7 +7,7 @@ import javax.persistence.Entity;
 
 /**
  * @author Omarbek
- * Created Mar 14, 2017 11:51:39 AM
+ * Created Mar 14, 2018 11:51:39 AM
  */
 @Entity
 public class ECTS extends AbstractEntity {
