@@ -4,7 +4,7 @@ import javax.persistence.Entity;
 
 /**
  * @author Omarbek
- * Created Oct 27, 2015 10:46:14 AM
+ * Created 08.11.2018
  */
 @Entity
 public class EDUCATION_DOC_TYPE extends AbstractTypeEntity {

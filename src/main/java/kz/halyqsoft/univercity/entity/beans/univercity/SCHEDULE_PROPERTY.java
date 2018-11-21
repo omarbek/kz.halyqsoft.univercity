@@ -13,7 +13,7 @@ import javax.persistence.ManyToOne;
 
 /**
  * @author Omarbek
- * @created Jan 25, 2017 2:26:50 PM
+ * @created Jan 25, 2018 2:26:50 PM
  */
 @Entity
 public class SCHEDULE_PROPERTY extends AbstractEntity {

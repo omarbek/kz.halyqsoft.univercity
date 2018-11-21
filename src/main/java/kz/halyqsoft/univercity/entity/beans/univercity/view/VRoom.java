@@ -6,7 +6,7 @@ import org.r3a.common.entity.FieldInfo;
 
 /**
  * @author Omarbek
- * @created Apr 10, 2017 3:31:46 PM
+ * @created Apr 10, 2018 3:31:46 PM
  */
 public final class VRoom extends AbstractEntity {
 

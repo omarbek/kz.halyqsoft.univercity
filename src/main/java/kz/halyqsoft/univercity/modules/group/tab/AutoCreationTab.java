@@ -245,7 +245,7 @@ public class AutoCreationTab extends AbstractCommonView implements FilterPanelLi
                             groups.setSpeciality(speciality);
                             groups.setLanguage(language);
                             groups.setStudyYear(studyYear);
-                            groups.setOrders(new Long(groupCounter));
+//                            groups.setOrders(new Long(groupCounter));
                             groups.setDeleted(false);
                             groups.setCreated(new Date());
                             try {
@@ -264,7 +264,7 @@ public class AutoCreationTab extends AbstractCommonView implements FilterPanelLi
                                 groups.setLanguage(language);
                                 groups.setStudyYear(studyYear);
                                 groups.setSpeciality(speciality);
-                                groups.setOrders(new Long(groupCounter));
+//                                groups.setOrders(new Long(groupCounter));
                                 groups.setDeleted(false);
                                 groups.setCreated(new Date());
                                 try {

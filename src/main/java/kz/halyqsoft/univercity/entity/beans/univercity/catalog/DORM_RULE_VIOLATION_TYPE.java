@@ -4,7 +4,7 @@ import javax.persistence.Entity;
 
 /**
  * @author Omarbek
- * Created Apr 11, 2017 2:30:36 PM
+ * Created Apr 11, 2018 2:30:36 PM
  */
 @Entity
 public class DORM_RULE_VIOLATION_TYPE extends AbstractTypeEntity {

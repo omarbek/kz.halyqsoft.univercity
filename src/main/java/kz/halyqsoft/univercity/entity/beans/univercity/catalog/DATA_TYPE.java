@@ -4,7 +4,7 @@ import javax.persistence.Entity;
 
 /**
  * @author Omarbek
- * Created Jan 25, 2017 12:09:26 PM
+ * Created Jan 25, 2018 12:09:26 PM
  */
 @Entity
 public class DATA_TYPE extends AbstractTypeEntity {

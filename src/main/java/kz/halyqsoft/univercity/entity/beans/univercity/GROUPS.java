@@ -42,10 +42,6 @@ public class GROUPS extends AbstractEntity {
     @Column(name = "name" , nullable = false)
     private String name;
 
-    @FieldInfo(type = EFieldType.INTEGER, order = 6)
-    @Column(name = "orders", nullable = false)
-    private Long orders;
-
     @FieldInfo(type = EFieldType.BOOLEAN, inGrid = false, inEdit = false, inView = false, order = 7 )
     @Column(name = "deleted", nullable = false)
     private boolean deleted;
@@ -72,14 +68,6 @@ public class GROUPS extends AbstractEntity {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Long getOrders() {
-        return orders;
-    }
-
-    public void setOrders(Long orders) {
-        this.orders = orders;
     }
 
     public boolean isDeleted() {

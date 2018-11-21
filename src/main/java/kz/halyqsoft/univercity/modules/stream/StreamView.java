@@ -1,45 +1,36 @@
 package kz.halyqsoft.univercity.modules.stream;
 
-import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.shared.ui.combobox.FilteringMode;
-import com.vaadin.ui.*;
-import kz.halyqsoft.univercity.entity.beans.univercity.GROUPS;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.ProgressBar;
 import kz.halyqsoft.univercity.entity.beans.univercity.STREAM;
-import kz.halyqsoft.univercity.entity.beans.univercity.STREAM_GROUP;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_DATA;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_PERIOD;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDY_YEAR;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.V_GROUPS_CREATION_NEEDED;
-import kz.halyqsoft.univercity.filter.FStreamFilter;
-import kz.halyqsoft.univercity.filter.panel.StreamFilterPanel;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_STREAM;
 import kz.halyqsoft.univercity.modules.stream.dialogs.DetailDialog;
+import kz.halyqsoft.univercity.modules.stream.generate.CommonStreamsDialog;
+import kz.halyqsoft.univercity.modules.stream.generate.GenerateSpecStreams;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
-import org.r3a.common.entity.ID;
 import org.r3a.common.entity.beans.AbstractTask;
-import org.r3a.common.entity.event.EntityEvent;
-import org.r3a.common.entity.event.EntityListener;
 import org.r3a.common.entity.query.QueryModel;
-import org.r3a.common.entity.query.where.ECriteria;
-import org.r3a.common.vaadin.AbstractWebUI;
 import org.r3a.common.vaadin.view.AbstractTaskView;
-import org.r3a.common.vaadin.widget.ERefreshType;
-import org.r3a.common.vaadin.widget.dialog.AbstractDialog;
 import org.r3a.common.vaadin.widget.dialog.Message;
-import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
-import org.r3a.common.vaadin.widget.filter2.FilterPanelListener;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
+import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
 
-public class StreamView extends AbstractTaskView implements EntityListener, FilterPanelListener {
+/**
+ * @author Omarbek
+ * @created on 08.11.2018
+ */
+public class StreamView extends AbstractTaskView {
 
-    private GridWidget ssGW;
-    private StreamFilterPanel streamFilterPanel;
+    private GridWidget streamGW;
 
     public StreamView(AbstractTask task) throws Exception {
         super(task);
@@ -47,340 +38,117 @@ public class StreamView extends AbstractTaskView implements EntityListener, Filt
 
     @Override
     public void initView(boolean b) throws Exception {
-        SEMESTER_DATA currentSemesterData = CommonUtils.getCurrentSemesterData();
-        if (currentSemesterData != null) {
-            VerticalLayout mainVL = new VerticalLayout();
 
-            initGridWidget();
-            initFilter();
-            Button generateBtn = new Button(getUILocaleUtil().getCaption("generate"));
-            generateBtn.addClickListener(new Button.ClickListener() {
-                @Override
-                public void buttonClick(Button.ClickEvent clickEvent) {
+        HorizontalLayout buttonsHL = CommonUtils.createButtonPanel();
 
-                    deleteExtra();
+        generateCommonStreams(buttonsHL, 1);
+        generateCommonStreams(buttonsHL, 2);
+        generateCommonStreams(buttonsHL, 3);
+        generateCommonStreams(buttonsHL, 4);
 
-                    QueryModel<V_GROUPS_CREATION_NEEDED> vGroupsCreationNeededQueryModel = new QueryModel<>(
-                            V_GROUPS_CREATION_NEEDED.class);
+        getContent().addComponent(buttonsHL);
+        getContent().setComponentAlignment(buttonsHL, Alignment.MIDDLE_CENTER);
 
-                    List<V_GROUPS_CREATION_NEEDED> groupsList = new ArrayList<>();
+        ProgressBar samplePB = new ProgressBar();
+        samplePB.setWidth("80%");
+
+        Button generateSpecStreamsButton = new Button(getUILocaleUtil().getCaption("generate.spec.streams"));
+        generateSpecStreamsButton.addClickListener(new GenerateSpecStreams(samplePB));
+
+        buttonsHL = CommonUtils.createButtonPanel();
+        buttonsHL.addComponent(generateSpecStreamsButton);
+        getContent().addComponent(generateSpecStreamsButton);
+        getContent().setComponentAlignment(generateSpecStreamsButton, Alignment.MIDDLE_CENTER);
+
+        buttonsHL = CommonUtils.createButtonPanel();
+        buttonsHL.setSizeFull();
+        buttonsHL.addComponent(samplePB);
+        buttonsHL.setComponentAlignment(samplePB, Alignment.MIDDLE_CENTER);
+
+        getContent().addComponent(buttonsHL);
+        getContent().setComponentAlignment(buttonsHL, Alignment.MIDDLE_CENTER);
+
+        streamGW = new GridWidget(V_STREAM.class);
+        streamGW.addEntityListener(this);
+        streamGW.addButtonClickListener(AbstractToolbar.PREVIEW_BUTTON, new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                if (streamGW.getSelectedEntities().isEmpty()) {
+                    Message.showInfo(getUILocaleUtil().getMessage("info.noentityedit"));
+                } else {
+                    V_STREAM streamView = (V_STREAM) streamGW.getSelectedEntity();
                     try {
-                        groupsList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
-                                lookup(vGroupsCreationNeededQueryModel));
-
-                        CalculateStream calculateStream = new CalculateStream(groupsList);
-                        List<Map<Entity, List<V_GROUPS_CREATION_NEEDED>>> seyfl =
-                                calculateStream.sortedEntranceYearFromLanguage;
-
-                        QueryModel<SEMESTER> semesterQueryModel = new QueryModel<>(SEMESTER.class);
-
-                        List<SEMESTER> semesters = SessionFacadeFactory.getSessionFacade(
-                                CommonEntityFacadeBean.class).lookup(semesterQueryModel);
-                        int z = 1;
-                        for (Map<Entity, List<V_GROUPS_CREATION_NEEDED>> value : seyfl) {
-                            for (Entity key : value.keySet()) {
-                                STREAM stream = new STREAM();
-                                stream.setName("STREAM " + z);
-                                stream.setCreated(new Date());
-                                stream.setSemesterData(currentSemesterData);
-                                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
-                                        create(stream);
-                                int i = 0;
-
-                                for (V_GROUPS_CREATION_NEEDED group : value.get(key)) {
-                                    STREAM_GROUP streamGroup = new STREAM_GROUP();
-                                    GROUPS gr = SessionFacadeFactory.getSessionFacade(
-                                            CommonEntityFacadeBean.class).lookup(GROUPS.class, group.getId());
-                                    streamGroup.setGroup(gr);
-
-                                    if (stream.getSemester() == null) {
-                                        stream.setSemester(getSemester(gr.getStudyYear(),
-                                                currentSemesterData.getSemesterPeriod()));
-                                        SessionFacadeFactory.getSessionFacade(
-                                                CommonEntityFacadeBean.class).merge(stream);
-                                    }
-                                    streamGroup.setStream(stream);
-                                    if (i > 2) {
-                                        stream = new STREAM();
-                                        stream.setName("STREAM " + (++z));
-                                        stream.setCreated(new Date());
-                                        stream.setSemesterData(currentSemesterData);
-                                        stream.setSemester(getSemester(gr.getStudyYear(),
-                                                currentSemesterData.getSemesterPeriod()));
-                                        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(stream);
-                                        i = 0;
-                                    }
-                                    i++;
-                                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
-                                            create(streamGroup);
-                                }
-
-                            }
-                        }
-
-
+                        new DetailDialog(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class)
+                                .lookup(STREAM.class, streamView.getId()));
                     } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                    refresh();
-                }
-            });
-
-            Button openBtn = new Button((getUILocaleUtil().getCaption("open")));
-            openBtn.addClickListener(new Button.ClickListener() {
-                @Override
-                public void buttonClick(Button.ClickEvent clickEvent) {
-                    if(ssGW.getSelectedEntity()!=null){
-                        DetailDialog detailDialog = new DetailDialog((STREAM) ssGW.getSelectedEntity());
-                    }else{
-                        Message.showError(getUILocaleUtil().getMessage("choose.field"));
+                        e.printStackTrace();//TODO catch
                     }
                 }
-            });
-            mainVL.addComponent(streamFilterPanel);
-            mainVL.addComponent(ssGW);
-            ssGW.getToolbarPanel().addComponent(openBtn);
-            ssGW.getToolbarPanel().setComponentAlignment(openBtn, Alignment.MIDDLE_LEFT);
-            getContent().addComponent(mainVL);
-
-            refresh();
-        } else {
-            Label semIsNotGoingNowLabel = CommonUtils.getSemesterIsGoingNowLabel();
-            getContent().addComponent(semIsNotGoingNowLabel);
-            getContent().setComponentAlignment(semIsNotGoingNowLabel, Alignment.MIDDLE_CENTER);
-        }
-    }
-
-
-    private SEMESTER getSemester(STUDY_YEAR studyYear, SEMESTER_PERIOD semesterPeriod) throws Exception {
-        Integer semesterId;
-        if (semesterPeriod.getId().equals(SEMESTER_PERIOD.FALL_ID)) {
-            semesterId = studyYear.getStudyYear() * 2 - 1;
-        } else {
-            semesterId = studyYear.getStudyYear() * 2;
-        }
-        return SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(SEMESTER.class,
-                ID.valueOf(semesterId));
-    }
-
-    private void deleteExtra() {
-
-        try {
-            Map<Integer, Object> params = new HashMap<>();
-            String sql = "select * from stream_group sg \n" +
-                    "  inner join stream  s \n" +
-                    "    on sg.stream_id = s.id  \n" +
-                    "where s.semester_data_id = " + CommonUtils.getCurrentSemesterData().getId().getId().longValue();
-            List<STREAM_GROUP> streamList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(sql, params, STREAM_GROUP.class);
-
-            for (STREAM_GROUP group : streamList) {
-                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(group);
             }
+        });
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        DBGridModel streamGM = (DBGridModel) streamGW.getWidgetModel();
+        streamGM.setCrudEntityClass(STREAM.class);
 
-        try {
-            Map<Integer, Object> params = new HashMap<>();
-            String sql = "select * from stream where semester_data_id = " + CommonUtils.getCurrentSemesterData().getId().getId().longValue();
-            List<STREAM> streamList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(sql, params, STREAM.class);
-
-            for (STREAM group : streamList) {
-                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(group);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        getContent().addComponent(streamGW);
     }
 
-    private void initGridWidget() {
-        ssGW = new GridWidget(STREAM.class);
-        ssGW.setSizeFull();
-        ssGW.setImmediate(true);
-        ssGW.addEntityListener(this);
-
-        DBGridModel dbGridModel = (DBGridModel) ssGW.getWidgetModel();
-        dbGridModel.setDeferredCreate(true);
-
-        dbGridModel.setRefreshType(ERefreshType.AUTO);
+    private void generateCommonStreams(HorizontalLayout buttonsHL, int studyYear) {
+        Button generateCommonStreamsButton = new Button(getUILocaleUtil().getCaption("generate.common.streams") +
+                "-" + studyYear);
+        generateCommonStreamsButton.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                new CommonStreamsDialog(StreamView.this, studyYear);
+            }
+        });
+        buttonsHL.addComponent(generateCommonStreamsButton);
     }
 
     @Override
     public boolean onPreview(Object source, Entity e, int buttonId) {
-        return true;
-    }
-
-    private List<STREAM_GROUP> getStreamGroupByStream(STREAM stream) {
-        QueryModel<STREAM_GROUP> streamGroupQueryModel = new QueryModel(STREAM_GROUP.class);
-        streamGroupQueryModel.addWhere("stream", ECriteria.EQUAL, stream.getId());
-        List<STREAM_GROUP> streamGroupList = new ArrayList<>();
-        try {
-            streamGroupList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(streamGroupQueryModel));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return streamGroupList;
-    }
-
-    @Override
-    public void onDelete(Object source, List<Entity> entities, int buttonId) {
-        super.onDelete(source, entities, buttonId);
-        refresh();
+        return false;
     }
 
     @Override
     public boolean preSave(Object source, Entity e, boolean isNew, int buttonId) {
         STREAM stream = (STREAM) e;
-        try {
-            if (e.getId() == null) {//TODO Assyl this line has error, fix it
-                stream.setCreated(new Date());
-                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(stream);
-            } else {
-                stream.setUpdated(new Date());
-                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(stream);
+        stream.setCreated(new Date());
+        return true;
+    }
+
+    @Override
+    public boolean preDelete(Object o, List<Entity> list, int i) {
+        boolean b = setDeleted(o, list, streamGW);
+        refreshStreams();
+        return b;
+    }
+
+    public boolean setDeleted(Object o, List<Entity> list, GridWidget streamGW) {
+        if (o.equals(streamGW)) {
+            try {
+                for (Entity entity : list) {
+                    STREAM stream = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
+                            STREAM.class, entity.getId());
+                    stream.setDeleted(true);
+                    stream.setUpdated(new Date());
+                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(stream);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();//TODO catch
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
         }
-        refresh();
         return false;
     }
 
-
-    @Override
-    public void doFilter(AbstractFilterBean abstractFilterBean) {
-        FStreamFilter sf = (FStreamFilter) abstractFilterBean;
-        Map<Integer, Object> params = new HashMap<>();
-        int i = 1;
-        StringBuilder sb = new StringBuilder();
-        if (sf.getName() != null) {
-
-            sb.append(" and ");
-            params.put(i, sf.getName());
-            sb.append(" name = ?" + i++);
-
-        }
-
-        if (sf.getSemester() != null) {
-
-            sb.append(" and ");
-            params.put(i, sf.getSemester().getId().getId());
-            sb.append(" semester_id = ?" + i++);
-
-        }
-
-        if (sf.getSemesterData() != null) {
-
-            sb.append(" and ");
-            params.put(i, sf.getSemesterData().getId());
-            sb.append(" semester_data_id = ?" + i++);
-
-        }
-        List list = new ArrayList<>();
-
-        sb.insert(0, " where TRUE ");
-        String sql = "SELECT * from stream "
-                + sb.toString();
+    private void refreshStreams() {
         try {
-
-            List tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
-
-            if (!tmpList.isEmpty()) {
-                for (Object o : tmpList) {
-                    Object[] oo = (Object[]) o;
-
-                    STREAM stream = new STREAM();
-                    stream.setId(ID.valueOf((long) oo[0]));
-
-                    QueryModel<SEMESTER_DATA> qm1 = new QueryModel<>(SEMESTER_DATA.class);
-                    qm1.addWhere("id", ECriteria.EQUAL, ID.valueOf((long) oo[2]));
-                    SEMESTER_DATA semesterData = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(qm1);
-
-                    QueryModel<SEMESTER> qm = new QueryModel<>(SEMESTER.class);
-                    qm.addWhere("id", ECriteria.EQUAL, ID.valueOf((long) oo[3]));
-                    SEMESTER semester = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(qm);
-
-                    stream.setSemesterData(semesterData);
-                    stream.setSemester(semester);
-                    stream.setName((String) oo[1]);
-                    stream.setCreated((Date) oo[4]);
-                    list.add(stream);
-                }
-            }
-        } catch (Exception ex) {
-            CommonUtils.showMessageAndWriteLog("Unable to load streams list", ex);
+            QueryModel<V_STREAM> streamQM = new QueryModel<>(V_STREAM.class);
+            List<V_STREAM> streams = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(streamQM);
+            ((DBGridModel) streamGW.getWidgetModel()).setEntities(streams);
+            streamGW.refresh();
+        } catch (Exception e) {
+            e.printStackTrace();//TODO catch
         }
-
-        refresh(list);
-
-    }
-
-    public void initFilter() throws Exception {
-        streamFilterPanel = new StreamFilterPanel(new FStreamFilter());
-        streamFilterPanel.addFilterPanelListener(this);
-        streamFilterPanel.setImmediate(true);
-
-        ComboBox semesterComboBox = new ComboBox();
-        semesterComboBox.setNullSelectionAllowed(true);
-        semesterComboBox.setTextInputAllowed(true);
-        semesterComboBox.setFilteringMode(FilteringMode.CONTAINS);
-        semesterComboBox.setWidth(300, Unit.PIXELS);
-
-        QueryModel<SEMESTER> semesterQM = new QueryModel<>(SEMESTER.class);
-        BeanItemContainer<SEMESTER> semesterBIC = new BeanItemContainer<>(SEMESTER.class,
-                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(semesterQM));
-        semesterComboBox.setContainerDataSource(semesterBIC);
-
-        streamFilterPanel.addFilterComponent("semester", semesterComboBox);
-
-        ComboBox semesterDataComboBox = new ComboBox();
-        semesterDataComboBox.setNullSelectionAllowed(true);
-        semesterDataComboBox.setTextInputAllowed(true);
-        semesterDataComboBox.setFilteringMode(FilteringMode.CONTAINS);
-        semesterDataComboBox.setWidth(300, Unit.PIXELS);
-
-        QueryModel<SEMESTER_DATA> semesterDataQM = new QueryModel<>(SEMESTER_DATA.class);
-        BeanItemContainer<SEMESTER_DATA> semesterDataBIC = new BeanItemContainer<>(SEMESTER_DATA.class,
-                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(semesterDataQM));
-        semesterDataComboBox.setContainerDataSource(semesterDataBIC);
-
-        streamFilterPanel.addFilterComponent("semesterData", semesterDataComboBox);
-
-        TextField tf = new TextField();
-        tf.setNullRepresentation("");
-        tf.setNullSettingAllowed(true);
-        streamFilterPanel.addFilterComponent("name", tf);
-
-    }
-
-    @Override
-    public void handleEntityEvent(EntityEvent ev) {
-        if (ev.getAction() == EntityEvent.CREATED) {
-            refresh();
-        }
-
-        super.handleEntityEvent(ev);
-    }
-
-    @Override
-    public void clearFilter() {
-        doFilter(streamFilterPanel.getFilterBean());
-    }
-
-    private void refresh(List<Entity> list) {
-        ((DBGridModel) ssGW.getWidgetModel()).setEntities(list);
-        try {
-            ssGW.refresh();
-        } catch (Exception ex) {
-            CommonUtils.showMessageAndWriteLog("Unable to refresh stream list", ex);
-        }
-    }
-
-    private void refresh() {
-        doFilter(streamFilterPanel.getFilterBean());
     }
 }

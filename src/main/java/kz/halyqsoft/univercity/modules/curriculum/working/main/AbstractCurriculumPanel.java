@@ -1,4 +1,4 @@
-package kz.halyqsoft.univercity.modules.curriculum.working;
+package kz.halyqsoft.univercity.modules.curriculum.working.main;
 
 import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM;
 import org.r3a.common.vaadin.widget.AbstractCommonPanel;
@@ -34,8 +34,4 @@ public abstract class AbstractCurriculumPanel extends AbstractCommonPanel {
     }
 
     public abstract void refresh() throws Exception;
-
-    public abstract void save() throws Exception;
-
-    protected abstract void cancel();
 }

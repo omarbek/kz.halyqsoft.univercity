@@ -4,7 +4,7 @@ import org.r3a.common.entity.AbstractEntity;
 
 /**
  * @author Omarbek
- * @created Mar 30, 2017 5:01:44 PM
+ * @created Mar 30, 2018 5:01:44 PM
  */
 public class VIndividualCurriculumPrint extends AbstractEntity {
 	

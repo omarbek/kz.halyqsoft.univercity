@@ -8,7 +8,7 @@ import org.r3a.common.vaadin.widget.table.column.AbstractTableColumn;
 
 /**
  * @author Dinassil Omarbek
- * @created Apr 27, 2017 2:42:12 PM
+ * @created Apr 27, 2018 2:42:12 PM
  */
 public final class MenuColumn extends AbstractTableColumn {
 

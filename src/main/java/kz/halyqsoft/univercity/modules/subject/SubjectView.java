@@ -218,12 +218,14 @@ public class SubjectView extends AbstractTaskView implements FilterPanelListener
             String sql = "SELECT  subj.ID, subj.NAME_" + CommonUtils.getLanguage() +
                     "  SUBJECT_NAME, dep.DEPT_NAME CHAIR_NAME,  lvl.LEVEL_NAME, mdl.MODULE_NAME,\n" +
                     "                      cred.CREDIT,\n" +
-                    "                      formula.FORMULA\n" +
+                    "                      formula.FORMULA," +
+                    "                      cycle.CYCLE_NAME" +
                     "                    FROM SUBJECT subj INNER JOIN DEPARTMENT dep ON subj.CHAIR_ID = dep.ID\n" +
                     "                      INNER JOIN LEVEL lvl ON subj.LEVEL_ID = lvl.ID\n" +
                     "                      INNER JOIN subject_module mdl ON subj.MODULE_ID = mdl.ID\n" +
                     "                      INNER JOIN CREDITABILITY cred ON subj.CREDITABILITY_ID = cred.ID\n" +
                     "                      LEFT JOIN ACADEMIC_FORMULA formula ON subj.ACADEMIC_FORMULA_ID = formula.ID\n" +
+                    "                      LEFT JOIN SUBJECT_CYCLE cycle ON subj.SUBJECT_CYCLE_ID = cycle.ID\n" +
                     sb.toString() +
                     " ORDER BY SUBJECT_NAME";
             try {
@@ -239,6 +241,7 @@ public class SubjectView extends AbstractTaskView implements FilterPanelListener
                         vs.setModuleName((String) oo[4]);
                         vs.setCredit(((BigDecimal) oo[5]).intValue());
                         vs.setFormula((String) oo[6]);
+                        vs.setCycleName((String) oo[7]);
                         list.add(vs);
                     }
                 }
@@ -290,13 +293,13 @@ public class SubjectView extends AbstractTaskView implements FilterPanelListener
 
             fm.setReadOnly(false);
             fm.setTitleVisible(false);
-            FSubjectFilter sf = (FSubjectFilter) filterPanel.getFilterBean();
-
+//            FSubjectFilter sf = (FSubjectFilter) filterPanel.getFilterBean();
+//
             SUBJECT newSubject = (SUBJECT) fm.createNew();
-
-            if (sf != null) {
-                newSubject.setChair(sf.getChair());
-            }
+//
+//            if (sf != null) {
+//                newSubject.setChair(sf.getChair());
+//            }
             SubjectEdit se = new SubjectEdit(fm);
             new SubjectDialog(se, SubjectView.this);
         }

@@ -6,290 +6,334 @@ import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.ManyToOne;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
 /**
  * @author Omarbek
- * @created Feb 22, 2016 9:38:48 AM
+ * @created 02.11.2018
  */
 @Entity
 public class V_CURRICULUM_DETAIL extends AbstractEntity {
 
-	private static final long serialVersionUID = -526964672598850366L;
-
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 1, inGrid = false, inEdit = false, inView = false)
     @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "CURRICULUM_ID", referencedColumnName = "ID")})
+            @JoinColumn(name = "CURRICULUM_ID", referencedColumnName = "ID")})
     private CURRICULUM curriculum;
-	
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 2, inGrid = false, inEdit = false, inView = false)
+
     @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "SEMESTER_ID", referencedColumnName = "ID")})
+            @JoinColumn(name = "SEMESTER_ID", referencedColumnName = "ID")})
     private SEMESTER semester;
-	
-	@FieldInfo(type = EFieldType.TEXT, max = 9, order = 3, inGrid = false, inEdit = false, inView = false)
-	@Column(name = "SEMESTER_NAME")
-	private String semesterName;
-	
-	@FieldInfo(type = EFieldType.FK_DIALOG, order = 4, inGrid = false)
+
     @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
+            @JoinColumn(name = "SEMESTER_DATA_ID", referencedColumnName = "ID")})
+    private SEMESTER_DATA semesterData;
+
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
     private SUBJECT subject;
-	
-	@FieldInfo(type = EFieldType.TEXT, max = 10, order = 5, columnWidth = 120)
-	@Column(name = "SUBJECT_CODE")
-	private String subjectCode;
-	
-	@FieldInfo(type = EFieldType.TEXT, max = 10, order = 6, inEdit = false, inView = false)
-	@Column(name = "SUBJECT_NAME")
-	private String subjectName;
-	
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 7, inGrid = false, required = false)
+
     @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "SUBJECT_CYCLE_ID", referencedColumnName = "ID")})
-    private SUBJECT_CYCLE subjectCycle;
-	
-	@FieldInfo(type = EFieldType.TEXT, max = 10, order = 8, inEdit = false, inView = false, columnWidth = 90)
-	@Column(name = "CYCLE_SHORT_NAME")
-	private String cycleShortName;
-	
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 9, inGrid = false, required = true)
-    @ManyToOne
-    @JoinColumns({
-        @JoinColumn(name = "CREDITABILITY_ID", referencedColumnName = "ID")})
+            @JoinColumn(name = "CREDITABILITY_ID", referencedColumnName = "ID")})
     private CREDITABILITY creditability;
-	
-	@FieldInfo(type = EFieldType.INTEGER, max = 6, order = 10, inEdit = false, inView = false, columnWidth = 80)
-	@Column(name = "CREDIT")
-	private Integer credit;
-	
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 11, inGrid = false, readOnlyFixed = true, required = false)
+
     @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "ACADEMIC_FORMULA_ID", referencedColumnName = "ID")})
-    private ACADEMIC_FORMULA academicFormula;
-	
-	@FieldInfo(type = EFieldType.TEXT, min = 5, max = 5, order = 12, inEdit = false, inView = false, columnWidth = 80)
-	@Column(name = "FORMULA")
-	private String formula;
-	
-	@FieldInfo(type = EFieldType.BOOLEAN_EDIT, order = 14, inEdit = false, inView = false, columnWidth = 170)
-	@Column(name = "CONSIDER_CREDIT", nullable = false)
-    private boolean considerCredit;
-	
-	@FieldInfo(type = EFieldType.TEXT, order = 15, inEdit = false, inView = false, columnWidth = 130)
-	@Transient
-	private String subjectPrerequisiteCode;
-	
-	@FieldInfo(type = EFieldType.TEXT, max = 10, order = 17, inGrid = false, inEdit = false, inView = false)
-	@Column(name = "RECOMMENDED_SEMESTER")
-	private String recommendedSemester;
-	
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 18, inGrid = false, inEdit = false, inView = false)
+            @JoinColumn(name = "ECTS_ID", referencedColumnName = "ID")})
+    private ECTS ects;
+
     @ManyToOne
     @JoinColumns({
-        @JoinColumn(name = "CONTROL_TYPE_ID", referencedColumnName = "ID")})
+            @JoinColumn(name = "CONTROL_TYPE_ID", referencedColumnName = "ID")})
     private CONTROL_TYPE controlType;
-	
-	@FieldInfo(type = EFieldType.TEXT, max = 10, order = 19, inGrid = false, inEdit = false, inView = false)
-	@Column(name = "CONTROL_TYPE_NAME")
-	private String controlTypeName;
 
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 20, inGrid = false, inView = false)
-	@ManyToOne
-	@JoinColumns({
-			@JoinColumn(name = "EDUCATION_MODULE_TYPE_ID", referencedColumnName = "ID")})
-	private EDUCATION_MODULE_TYPE educationModuleType;
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "EDUCATION_MODULE_TYPE_ID", referencedColumnName = "ID")})
+    private EDUCATION_MODULE_TYPE educationModuleType;
 
-	@FieldInfo(type = EFieldType.TEXT,  order = 21, inEdit = false)
-	@Column(name = "EDUCATION_MODULE_TYPE_NAME")
-	private String educationModuleTypeName;
-	
-	@FieldInfo(type = EFieldType.BOOLEAN, order = 22, required = false, inEdit = false, inGrid = false, inView = false)
-	@Column(name = "DELETED")
-    private boolean deleted;
-	
-	@FieldInfo(type = EFieldType.BOOLEAN, order = 23, required = false, inEdit = false, inGrid = false, inView = false)
-	@Column(name = "ELECTIVE")
-    private boolean elective;
-	
-	public V_CURRICULUM_DETAIL() {
-	}
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "MODULE_ID", referencedColumnName = "ID")})
+    private SUBJECT_MODULE subjectModule;
 
-	public CURRICULUM getCurriculum() {
-		return curriculum;
-	}
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "SUBJECT_CYCLE_ID", referencedColumnName = "ID")})
+    private SUBJECT_CYCLE subjectCycle;
 
-	public void setCurriculum(CURRICULUM curriculum) {
-		this.curriculum = curriculum;
-	}
+    @FieldInfo(type = EFieldType.TEXT)
+    @Column(name = "SEMESTER_NAME")
+    private String semesterName;
 
-	public SEMESTER getSemester() {
-		return semester;
-	}
+    @FieldInfo(type = EFieldType.TEXT, order = 2)
+    @Column(name = "MODULE_SHORT_NAME")
+    private String moduleShortName;
 
-	public void setSemester(SEMESTER semester) {
-		this.semester = semester;
-	}
+    @FieldInfo(type = EFieldType.TEXT, order = 3)
+    @Column(name = "CYCLE_SHORT_NAME")
+    private String cycleShortName;
 
-	public String getSemesterName() {
-		return semesterName;
-	}
+    @FieldInfo(type = EFieldType.TEXT, order = 4)
+    @Column(name = "EDUCATION_MODULE_TYPE_NAME")
+    private String educationModuleTypeName;
 
-	public void setSemesterName(String semesterName) {
-		this.semesterName = semesterName;
-	}
+    @FieldInfo(type = EFieldType.TEXT, order = 5)
+    @Column(name = "SUBJECT_CODE")
+    private String subjectCode;
 
-	public SUBJECT getSubject() {
-		return subject;
-	}
+    @FieldInfo(type = EFieldType.TEXT, order = 6)
+    @Column(name = "SUBJECT_NAME_KZ")
+    private String subjectNameKz;
 
-	public void setSubject(SUBJECT subject) {
-		this.subject = subject;
-	}
+    @FieldInfo(type = EFieldType.TEXT, order = 7)
+    @Column(name = "SUBJECT_NAME_RU")
+    private String subjectNameRu;
 
-	public String getSubjectCode() {
-		return subjectCode;
-	}
+    @FieldInfo(type = EFieldType.INTEGER, order = 8)
+    @Column(name = "CREDIT")
+    private Integer credit;
 
-	public void setSubjectCode(String subjectCode) {
-		this.subjectCode = subjectCode;
-	}
+    @FieldInfo(type = EFieldType.INTEGER, order = 9)
+    @Column(name = "ECTS_COUNT")
+    private Integer ectsCount;
 
-	public String getSubjectName() {
-		return subjectName;
-	}
+    @FieldInfo(type = EFieldType.INTEGER, order = 10)
+    @Column(name = "LC_COUNT")
+    private Integer lcCount;
 
-	public void setSubjectName(String subjectName) {
-		this.subjectName = subjectName;
-	}
+    @FieldInfo(type = EFieldType.INTEGER, order = 11)
+    @Column(name = "PR_COUNT")
+    private Integer prCount;
 
-	public SUBJECT_CYCLE getSubjectCycle() {
-		return subjectCycle;
-	}
+    @FieldInfo(type = EFieldType.INTEGER, order = 12)
+    @Column(name = "LB_COUNT")
+    private Integer lbCount;
 
-	public void setSubjectCycle(SUBJECT_CYCLE subjectCycle) {
-		this.subjectCycle = subjectCycle;
-	}
+    @FieldInfo(type = EFieldType.INTEGER, order = 13)
+    @Column(name = "WITH_TEACHER_COUNT")
+    private Integer withTeacherCount;
 
-	public String getCycleShortName() {
-		return cycleShortName;
-	}
+    @FieldInfo(type = EFieldType.INTEGER, order = 14)
+    @Column(name = "OWN_COUNT")
+    private Integer ownCount;
 
-	public void setCycleShortName(String cycleShortName) {
-		this.cycleShortName = cycleShortName;
-	}
+    @FieldInfo(type = EFieldType.INTEGER, order = 15)
+    @Column(name = "TOTAL_COUNT")
+    private Integer totalCount;
 
-	public CREDITABILITY getCreditability() {
-		return creditability;
-	}
+    @FieldInfo(type = EFieldType.TEXT, order = 16)
+    @Column(name = "CONTROL_TYPE_NAME")
+    private String controlTypeName;
 
-	public void setCreditability(CREDITABILITY creditability) {
-		this.creditability = creditability;
-	}
+    public CURRICULUM getCurriculum() {
+        return curriculum;
+    }
 
-	public Integer getCredit() {
-		return credit;
-	}
+    public void setCurriculum(CURRICULUM curriculum) {
+        this.curriculum = curriculum;
+    }
 
-	public void setCredit(Integer credit) {
-		this.credit = credit;
-	}
+    public SEMESTER getSemester() {
+        return semester;
+    }
 
-	public ACADEMIC_FORMULA getAcademicFormula() {
-		return academicFormula;
-	}
+    public void setSemester(SEMESTER semester) {
+        this.semester = semester;
+    }
 
-	public void setAcademicFormula(ACADEMIC_FORMULA academicFormula) {
-		this.academicFormula = academicFormula;
-	}
+    public SEMESTER_DATA getSemesterData() {
+        return semesterData;
+    }
 
-	public String getFormula() {
-		return formula;
-	}
+    public void setSemesterData(SEMESTER_DATA semesterData) {
+        this.semesterData = semesterData;
+    }
 
-	public void setFormula(String formula) {
-		this.formula = formula;
-	}
+    public SUBJECT getSubject() {
+        return subject;
+    }
 
-	public String getRecommendedSemester() {
-		return recommendedSemester;
-	}
+    public void setSubject(SUBJECT subject) {
+        this.subject = subject;
+    }
 
-	public void setRecommendedSemester(String recommendedSemester) {
-		this.recommendedSemester = recommendedSemester;
-	}
-	
-	public boolean isConsiderCredit() {
-		return considerCredit;
-	}
+    public CREDITABILITY getCreditability() {
+        return creditability;
+    }
 
-	public void setConsiderCredit(boolean considerCredit) {
-		this.considerCredit = considerCredit;
-	}
-	
-	public String getSubjectPrerequisiteCode() {
-		return subjectPrerequisiteCode;
-	}
+    public void setCreditability(CREDITABILITY creditability) {
+        this.creditability = creditability;
+    }
 
-	public void setSubjectPrerequisiteCode(String subjectPrerequisiteCode) {
-		this.subjectPrerequisiteCode = subjectPrerequisiteCode;
-	}
+    public ECTS getEcts() {
+        return ects;
+    }
 
-	public CONTROL_TYPE getControlType() {
-		return controlType;
-	}
+    public void setEcts(ECTS ects) {
+        this.ects = ects;
+    }
 
-	public void setControlType(CONTROL_TYPE controlType) {
-		this.controlType = controlType;
-	}
+    public CONTROL_TYPE getControlType() {
+        return controlType;
+    }
 
-	public String getControlTypeName() {
-		return controlTypeName;
-	}
+    public void setControlType(CONTROL_TYPE controlType) {
+        this.controlType = controlType;
+    }
 
-	public void setControlTypeName(String controlTypeName) {
-		this.controlTypeName = controlTypeName;
-	}
+    public EDUCATION_MODULE_TYPE getEducationModuleType() {
+        return educationModuleType;
+    }
 
-	public boolean isDeleted() {
-		return deleted;
-	}
+    public void setEducationModuleType(EDUCATION_MODULE_TYPE educationModuleType) {
+        this.educationModuleType = educationModuleType;
+    }
 
-	public void setDeleted(boolean deleted) {
-		this.deleted = deleted;
-	}
+    public SUBJECT_MODULE getSubjectModule() {
+        return subjectModule;
+    }
 
-	public boolean isElective() {
-		return elective;
-	}
+    public void setSubjectModule(SUBJECT_MODULE subjectModule) {
+        this.subjectModule = subjectModule;
+    }
 
-	public void setElective(boolean elective) {
-		this.elective = elective;
-	}
+    public SUBJECT_CYCLE getSubjectCycle() {
+        return subjectCycle;
+    }
 
-	public EDUCATION_MODULE_TYPE getEducationModuleType() {
-		return educationModuleType;
-	}
+    public void setSubjectCycle(SUBJECT_CYCLE subjectCycle) {
+        this.subjectCycle = subjectCycle;
+    }
 
-	public void setEducationModuleType(EDUCATION_MODULE_TYPE educationModuleType) {
-		this.educationModuleType = educationModuleType;
-	}
+    public String getSemesterName() {
+        return semesterName;
+    }
 
-	public String getEducationModuleTypeName() {
-		return educationModuleTypeName;
-	}
+    public void setSemesterName(String semesterName) {
+        this.semesterName = semesterName;
+    }
 
-	public void setEducationModuleTypeName(String educationModuleTypeName) {
-		this.educationModuleTypeName = educationModuleTypeName;
-	}
+    public String getModuleShortName() {
+        return moduleShortName;
+    }
+
+    public void setModuleShortName(String moduleShortName) {
+        this.moduleShortName = moduleShortName;
+    }
+
+    public String getCycleShortName() {
+        return cycleShortName;
+    }
+
+    public void setCycleShortName(String cycleShortName) {
+        this.cycleShortName = cycleShortName;
+    }
+
+    public String getEducationModuleTypeName() {
+        return educationModuleTypeName;
+    }
+
+    public void setEducationModuleTypeName(String educationModuleTypeName) {
+        this.educationModuleTypeName = educationModuleTypeName;
+    }
+
+    public String getSubjectCode() {
+        return subjectCode;
+    }
+
+    public void setSubjectCode(String subjectCode) {
+        this.subjectCode = subjectCode;
+    }
+
+    public String getSubjectNameKz() {
+        return subjectNameKz;
+    }
+
+    public void setSubjectNameKz(String subjectNameKz) {
+        this.subjectNameKz = subjectNameKz;
+    }
+
+    public String getSubjectNameRu() {
+        return subjectNameRu;
+    }
+
+    public void setSubjectNameRu(String subjectNameRu) {
+        this.subjectNameRu = subjectNameRu;
+    }
+
+    public Integer getCredit() {
+        return credit;
+    }
+
+    public void setCredit(Integer credit) {
+        this.credit = credit;
+    }
+
+    public Integer getEctsCount() {
+        return ectsCount;
+    }
+
+    public void setEctsCount(Integer ectsCount) {
+        this.ectsCount = ectsCount;
+    }
+
+    public Integer getLcCount() {
+        return lcCount;
+    }
+
+    public void setLcCount(Integer lcCount) {
+        this.lcCount = lcCount;
+    }
+
+    public Integer getPrCount() {
+        return prCount;
+    }
+
+    public void setPrCount(Integer prCount) {
+        this.prCount = prCount;
+    }
+
+    public Integer getLbCount() {
+        return lbCount;
+    }
+
+    public void setLbCount(Integer lbCount) {
+        this.lbCount = lbCount;
+    }
+
+    public Integer getWithTeacherCount() {
+        return withTeacherCount;
+    }
+
+    public void setWithTeacherCount(Integer withTeacherCount) {
+        this.withTeacherCount = withTeacherCount;
+    }
+
+    public Integer getOwnCount() {
+        return ownCount;
+    }
+
+    public void setOwnCount(Integer ownCount) {
+        this.ownCount = ownCount;
+    }
+
+    public Integer getTotalCount() {
+        return totalCount;
+    }
+
+    public void setTotalCount(Integer totalCount) {
+        this.totalCount = totalCount;
+    }
+
+    public String getControlTypeName() {
+        return controlTypeName;
+    }
+
+    public void setControlTypeName(String controlTypeName) {
+        this.controlTypeName = controlTypeName;
+    }
 }

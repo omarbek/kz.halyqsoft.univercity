@@ -12,8 +12,8 @@ import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.Label;
 import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VCurriculumCreditCycleSum;
-import kz.halyqsoft.univercity.modules.curriculum.working.AbstractCurriculumPanel;
-import kz.halyqsoft.univercity.modules.curriculum.working.CurriculumView;
+import kz.halyqsoft.univercity.modules.curriculum.working.main.AbstractCurriculumPanel;
+import kz.halyqsoft.univercity.modules.curriculum.working.main.CurriculumView;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.vaadin.widget.dialog.Message;
@@ -29,12 +29,12 @@ import java.util.Map;
  * @created Feb 26, 2016 1:02:58 PM
  */
 @SuppressWarnings({"serial"})
-public class CreditCycleSumPanel extends AbstractCurriculumPanel {
+public class CreditCountByComponentsPanel extends AbstractCurriculumPanel {
 
     private CURRICULUM curriculum;
     private Grid grid;
 
-    public CreditCycleSumPanel(CurriculumView parentView) {
+    public CreditCountByComponentsPanel(CurriculumView parentView) {
         super(parentView);
     }
 
@@ -160,7 +160,7 @@ public class CreditCycleSumPanel extends AbstractCurriculumPanel {
                 "             WHERE a.CURRICULUM_ID = ?1 AND a.DELETED = FALSE AND a.CONSIDER_CREDIT = TRUE " +
                 "             GROUP BY a.CURRICULUM_ID, b.SUBJECT_CYCLE_ID, c.CYCLE_SHORT_NAME, c.CYCLE_NAME) t1 " +
                 "    ON t1.CURRICULUM_ID = t2.CURRICULUM_ID AND t1.SUBJECT_CYCLE_ID = t2.ELECTIVE_SUBJECT_CYCLE_ID";
-        Map<Integer, Object> params = new HashMap<Integer, Object>(5);
+        Map<Integer, Object> params = new HashMap<>(5);
         params.put(1, curriculumId);
 //        params.put(2, Boolean.FALSE);
 //        params.put(3, Boolean.TRUE);
@@ -170,7 +170,7 @@ public class CreditCycleSumPanel extends AbstractCurriculumPanel {
 
         try {
             List tempList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
-            List<VCurriculumCreditCycleSum> list = new ArrayList<VCurriculumCreditCycleSum>(tempList.size());
+            List<VCurriculumCreditCycleSum> list = new ArrayList<>(tempList.size());
             for (Object o : tempList) {
                 Object[] oo = (Object[]) o;
                 VCurriculumCreditCycleSum vccc = new VCurriculumCreditCycleSum();
@@ -205,13 +205,5 @@ public class CreditCycleSumPanel extends AbstractCurriculumPanel {
         fr.getCell("totalCreditSum").setText(String.valueOf(totalCreditSum));
         fr.getCell("requiredCreditSum").setText(String.valueOf(requiredCreditSum));
         fr.getCell("electiveCreditSum").setText(String.valueOf(electiveCreditSum));
-    }
-
-    @Override
-    public void save() throws Exception {
-    }
-
-    @Override
-    protected void cancel() {
     }
 }
