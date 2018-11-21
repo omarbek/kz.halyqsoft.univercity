@@ -581,6 +581,7 @@ public class MainSection implements FilterPanelListener {
             mainHL.addComponent(setLaters());
             mainHL.addComponent(setNoCards());
             mainVL.addComponent(mainHL);
+
             mainVL.addComponent(getEmployeesAttendanceReport());
             mainVL.addComponent(getStatistics());
 
@@ -595,6 +596,12 @@ public class MainSection implements FilterPanelListener {
 
     private VerticalLayout getEmployeesAttendanceReport(){
         EmployeesArrivalReport employeesArrivalReport = new EmployeesArrivalReport();
+        Label label = new Label();
+        label.setSizeFull();
+        label.setCaptionAsHtml(true);
+        label.setImmediate(true);
+        label.setCaption("<h2>    " + CommonUtils.getUILocaleUtil().getCaption("employeeAttendance") + "</h2>");
+        employeesArrivalReport.addComponentAsFirst(label);
         return employeesArrivalReport;
     }
     private Panel setNoCards() {
