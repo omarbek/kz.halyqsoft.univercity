@@ -4,7 +4,6 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEPARTMENT;
 import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.PrintDialog;
-import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.SimpleStatistics;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
