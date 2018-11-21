@@ -21,8 +21,6 @@ import javax.persistence.ManyToOne;
 @Entity
 public class SCIENTIFIC_MANAGEMENT_FILE extends AbstractEntity implements FileEntity {
 
-	private static final long serialVersionUID = -5388921352861855143L;
-
 	@FieldInfo(type = EFieldType.FK_COMBO, order = 1, inEdit = false, inGrid = false, inView = false)
     @ManyToOne
     @JoinColumns({
