@@ -226,6 +226,7 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
                 CommonEntityFacadeBean.class).lookup(curriculumAfterSemesterQM);
         for (CURRICULUM_AFTER_SEMESTER curriculumAfterSemester : curriculumAfterSemesters) {
             curriculumAfterSemester.setDeleted(true);
+            curriculumAfterSemester.setUpdated(new Date());
         }
         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(curriculumAfterSemesters);
         subjectIds.add(DIPLOM_SUBJECT);
@@ -252,6 +253,7 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
                 CommonEntityFacadeBean.class).lookup(curriculumAddProgramQM);
         for (CURRICULUM_ADD_PROGRAM curriculumAddProgram : curriculumAddPrograms) {
             curriculumAddProgram.setDeleted(true);
+            curriculumAddProgram.setUpdated(new Date());
         }
         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(curriculumAddPrograms);
         for (Object object : subjectsBySemester) {
@@ -284,6 +286,7 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
                 CommonEntityFacadeBean.class).lookup(curriculumDetailQM);
         for (ELECTIVE_SUBJECT electiveSubject : electiveSubjects) {
             electiveSubject.setDeleted(true);
+            electiveSubject.setUpdated(new Date());
         }
         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(
                 electiveSubjects);
@@ -312,6 +315,7 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
                 CommonEntityFacadeBean.class).lookup(curriculumDetailQM);
         for (CURRICULUM_DETAIL curriculumDetail : curriculumDetails) {
             curriculumDetail.setDeleted(true);
+            curriculumDetail.setUpdated(new Date());
         }
         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(
                 curriculumDetails);
@@ -539,6 +543,7 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
                     CURRICULUM_DETAIL curriculumDetail = SessionFacadeFactory.getSessionFacade(
                             CommonEntityFacadeBean.class).lookup(CURRICULUM_DETAIL.class, entity.getId());
                     curriculumDetail.setDeleted(true);
+                    curriculumDetail.setUpdated(new Date());
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
                             merge(curriculumDetail);
                 }
@@ -547,6 +552,7 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
                     ELECTIVE_SUBJECT electiveSubject = SessionFacadeFactory.getSessionFacade(
                             CommonEntityFacadeBean.class).lookup(ELECTIVE_SUBJECT.class, entity.getId());
                     electiveSubject.setDeleted(true);
+                    electiveSubject.setUpdated(new Date());
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
                             merge(electiveSubject);
                 }
@@ -555,8 +561,18 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
                     CURRICULUM_ADD_PROGRAM curriculumAddProgram = SessionFacadeFactory.getSessionFacade(
                             CommonEntityFacadeBean.class).lookup(CURRICULUM_ADD_PROGRAM.class, entity.getId());
                     curriculumAddProgram.setDeleted(true);
+                    curriculumAddProgram.setUpdated(new Date());
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
                             merge(curriculumAddProgram);
+                }
+            } else if (o.equals(afterSemesterSubjectsGW)) {
+                for (Entity entity : list) {
+                    CURRICULUM_AFTER_SEMESTER curriculumAfterSemester = SessionFacadeFactory.getSessionFacade(
+                            CommonEntityFacadeBean.class).lookup(CURRICULUM_AFTER_SEMESTER.class, entity.getId());
+                    curriculumAfterSemester.setDeleted(true);
+                    curriculumAfterSemester.setUpdated(new Date());
+                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                            merge(curriculumAfterSemester);
                 }
             }
             refreshSubjects(curriculum, semester);

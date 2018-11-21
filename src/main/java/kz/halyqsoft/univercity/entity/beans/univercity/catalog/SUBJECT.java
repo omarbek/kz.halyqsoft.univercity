@@ -349,8 +349,8 @@ public class SUBJECT extends AbstractEntity {
         } else {
             name = nameRU;
         }
-        return name + " (" + trajectory + "), "
-                + creditability.toString() + " кр.";
+        return name + " (" + (trajectory == null ? '-' : trajectory) + "), "
+                + creditability.toString() + " кр." + ", " + subjectModule.getModuleShortName();
     }
 
     public boolean isCourseWork() {

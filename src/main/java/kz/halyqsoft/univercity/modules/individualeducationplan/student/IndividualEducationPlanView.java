@@ -35,7 +35,7 @@ public class IndividualEducationPlanView extends AbstractTaskView {
         studentEducation = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(studentEducationQM);
 
 
-        QueryModel<SEMESTER> semesterQM = new QueryModel<SEMESTER>(SEMESTER.class);
+        QueryModel<SEMESTER> semesterQM = new QueryModel<>(SEMESTER.class);
         semesterQM.addWhere("studyYear",ECriteria.EQUAL,studentEducation.getStudyYear().getId());
         List<SEMESTER> semesterList = SessionFacadeFactory.
                 getSessionFacade(CommonEntityFacadeBean.class).lookup(semesterQM);

@@ -38,6 +38,7 @@ import java.util.Map;
  */
 @SuppressWarnings({"serial"})
 public class SchedulePanel extends AbstractCurriculumPanel {
+
     static Button regButton;
     private VerticalLayout registerVL;
     private boolean removeAll = false;
@@ -260,9 +261,10 @@ public class SchedulePanel extends AbstractCurriculumPanel {
                 monthMap.put(m.getId(), m);
             }
 
-            QueryModel<CURRICULUM_SCHEDULE_SYMBOL> qmSymbol = new QueryModel<CURRICULUM_SCHEDULE_SYMBOL>(CURRICULUM_SCHEDULE_SYMBOL.class);
-            List<CURRICULUM_SCHEDULE_SYMBOL> symbolList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(qmSymbol);
-            Map<ID, CURRICULUM_SCHEDULE_SYMBOL> symbolMap = new HashMap<ID, CURRICULUM_SCHEDULE_SYMBOL>();
+            QueryModel<CURRICULUM_SCHEDULE_SYMBOL> qmSymbol = new QueryModel<>(CURRICULUM_SCHEDULE_SYMBOL.class);
+            List<CURRICULUM_SCHEDULE_SYMBOL> symbolList = SessionFacadeFactory.getSessionFacade(
+                    CommonEntityFacadeBean.class).lookup(qmSymbol);
+            Map<ID, CURRICULUM_SCHEDULE_SYMBOL> symbolMap = new HashMap<>();
             for (CURRICULUM_SCHEDULE_SYMBOL css : symbolList) {
                 symbolMap.put(css.getId(), css);
             }
@@ -270,9 +272,10 @@ public class SchedulePanel extends AbstractCurriculumPanel {
             QueryModel<STUDY_YEAR> qmStudyYear = new QueryModel<STUDY_YEAR>(STUDY_YEAR.class);
             qmStudyYear.addWhere("studyYear", ECriteria.LESS_EQUAL, 4);
             qmStudyYear.addOrder("studyYear");
-            List<STUDY_YEAR> studyYearList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(qmStudyYear);
+            List<STUDY_YEAR> studyYearList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                    lookup(qmStudyYear);
 
-            QueryModel<WEEK> qmWeek = new QueryModel<WEEK>(WEEK.class);
+            QueryModel<WEEK> qmWeek = new QueryModel<>(WEEK.class);
             qmWeek.addOrder("id");
             List<WEEK> weekList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(qmWeek);
 
@@ -420,7 +423,7 @@ public class SchedulePanel extends AbstractCurriculumPanel {
     }
 
     private void generateMasterSchedule(CURRICULUM curriculum) throws Exception {
-        QueryModel<CURRICULUM_SCHEDULE> qm = new QueryModel<CURRICULUM_SCHEDULE>(CURRICULUM_SCHEDULE.class);
+        QueryModel<CURRICULUM_SCHEDULE> qm = new QueryModel<>(CURRICULUM_SCHEDULE.class);
         qm.addWhere("curriculum", ECriteria.EQUAL, curriculum.getId());
         List<CURRICULUM_SCHEDULE> list = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(qm);
         if (list.size() < 92) {
@@ -428,28 +431,29 @@ public class SchedulePanel extends AbstractCurriculumPanel {
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(list);
             }
 
-            List<CURRICULUM_SCHEDULE> newList = new ArrayList<CURRICULUM_SCHEDULE>();
+            List<CURRICULUM_SCHEDULE> newList = new ArrayList<>();
 
-            QueryModel<MONTH> qmMonth = new QueryModel<MONTH>(MONTH.class);
+            QueryModel<MONTH> qmMonth = new QueryModel<>(MONTH.class);
             List<MONTH> monthList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(qmMonth);
-            Map<ID, MONTH> monthMap = new HashMap<ID, MONTH>();
+            Map<ID, MONTH> monthMap = new HashMap<>();
             for (MONTH m : monthList) {
                 monthMap.put(m.getId(), m);
             }
 
-            QueryModel<CURRICULUM_SCHEDULE_SYMBOL> qmSymbol = new QueryModel<CURRICULUM_SCHEDULE_SYMBOL>(CURRICULUM_SCHEDULE_SYMBOL.class);
+            QueryModel<CURRICULUM_SCHEDULE_SYMBOL> qmSymbol = new QueryModel<>(CURRICULUM_SCHEDULE_SYMBOL.class);
             List<CURRICULUM_SCHEDULE_SYMBOL> symbolList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(qmSymbol);
-            Map<ID, CURRICULUM_SCHEDULE_SYMBOL> symbolMap = new HashMap<ID, CURRICULUM_SCHEDULE_SYMBOL>();
+            Map<ID, CURRICULUM_SCHEDULE_SYMBOL> symbolMap = new HashMap<>();
             for (CURRICULUM_SCHEDULE_SYMBOL css : symbolList) {
                 symbolMap.put(css.getId(), css);
             }
 
-            QueryModel<STUDY_YEAR> qmStudyYear = new QueryModel<STUDY_YEAR>(STUDY_YEAR.class);
+            QueryModel<STUDY_YEAR> qmStudyYear = new QueryModel<>(STUDY_YEAR.class);
             qmStudyYear.addWhere("studyYear", ECriteria.LESS_EQUAL, 2);
             qmStudyYear.addOrder("studyYear");
-            List<STUDY_YEAR> studyYearList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(qmStudyYear);
+            List<STUDY_YEAR> studyYearList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                    lookup(qmStudyYear);
 
-            QueryModel<WEEK> qmWeek = new QueryModel<WEEK>(WEEK.class);
+            QueryModel<WEEK> qmWeek = new QueryModel<>(WEEK.class);
             qmWeek.addOrder("id");
             List<WEEK> weekList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(qmWeek);
 
@@ -596,483 +600,9 @@ public class SchedulePanel extends AbstractCurriculumPanel {
         }
     }
 
-    public final void checkForConfirm() throws Exception {
+    public final void checkForConform() throws Exception {
         if (getRecordCount() == 0) {
             throw new Exception(getUILocaleUtil().getMessage("no.curriculum.schedule"));
-        }
-    }
-
-    public void fillWorkbook(Workbook wb) throws Exception {
-        Map<ExcelStyles, CellStyle> styles = ExcelUtil.createStyles(wb);
-
-        Sheet sheet = wb.createSheet(getUILocaleUtil().getCaption("curriculum.schedule"));
-        sheet.setDisplayGridlines(true);
-        sheet.getPrintSetup().setLandscape(true);
-        Row row = sheet.createRow(0);
-        Cell cell = row.createCell(0);
-        cell.setCellValue(getUILocaleUtil().getCaption("curriculum.1"));
-        cell.setCellStyle(styles.get(ExcelStyles.TITLE));
-        sheet.addMergedRegion(CellRangeAddress.valueOf("$A$1:$BA$1"));
-
-        String specialityText = getParentView().getSpecialityText();
-        row = sheet.createRow(1);
-        cell = row.createCell(0);
-        cell.setCellValue(specialityText);
-        cell.setCellStyle(styles.get(ExcelStyles.SUBTITLE_CENTER));
-        sheet.addMergedRegion(CellRangeAddress.valueOf("$A$2:$BA$2"));
-
-        LOG.info(specialityText);
-
-        row = sheet.createRow(4);
-        cell = row.createCell(1);
-        cell.setCellValue(getParentView().getAcademicDegreeText());
-        cell.setCellStyle(styles.get(ExcelStyles.SUBTITLE_LEFT));
-        sheet.addMergedRegion(CellRangeAddress.valueOf("$B$5:$BA$5"));
-
-        row = sheet.createRow(5);
-        cell = row.createCell(1);
-        cell.setCellValue(getParentView().getStudyPeriodText());
-        cell.setCellStyle(styles.get(ExcelStyles.SUBTITLE_LEFT));
-        sheet.addMergedRegion(CellRangeAddress.valueOf("$B$6:$BA$6"));
-
-        row = sheet.createRow(6);
-        cell = row.createCell(0);
-        cell.setCellValue(getUILocaleUtil().getCaption("curriculum.schedule"));
-        cell.setCellStyle(styles.get(ExcelStyles.SUBTITLE_CENTER));
-        sheet.addMergedRegion(CellRangeAddress.valueOf("$A$7:$BA$7"));
-
-        int startRow = 7;
-
-        row = sheet.createRow(startRow);
-        cell = row.createCell(0);
-        cell.setCellValue(getUILocaleUtil().getEntityLabel(STUDY_YEAR.class));
-        cell.setCellStyle(styles.get(ExcelStyles.HEADER_VERTICAL));
-
-        cell = row.createCell(1);
-        cell.setCellValue(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(MONTH.class, ID.valueOf(9)).getMonthNameRU());
-        cell.setCellStyle(styles.get(ExcelStyles.HEADER));
-        sheet.addMergedRegion(new CellRangeAddress(startRow, startRow, 1, 4));
-
-        cell = row.createCell(6);
-        cell.setCellValue(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(MONTH.class, ID.valueOf(10)).getMonthNameRU());
-        cell.setCellStyle(styles.get(ExcelStyles.HEADER));
-        sheet.addMergedRegion(new CellRangeAddress(startRow, startRow, 6, 9));
-
-        cell = row.createCell(11);
-        cell.setCellValue(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(MONTH.class, ID.valueOf(11)).getMonthNameRU());
-        cell.setCellStyle(styles.get(ExcelStyles.HEADER));
-        sheet.addMergedRegion(new CellRangeAddress(startRow, startRow, 11, 13));
-
-        cell = row.createCell(15);
-        cell.setCellValue(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(MONTH.class, ID.valueOf(12)).getMonthNameRU());
-        cell.setCellStyle(styles.get(ExcelStyles.HEADER));
-        sheet.addMergedRegion(new CellRangeAddress(startRow, startRow, 15, 17));
-
-        cell = row.createCell(19);
-        cell.setCellValue(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(MONTH.class, ID.valueOf(1)).getMonthNameRU());
-        cell.setCellStyle(styles.get(ExcelStyles.HEADER));
-        sheet.addMergedRegion(new CellRangeAddress(startRow, startRow, 19, 22));
-
-        cell = row.createCell(24);
-        cell.setCellValue(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(MONTH.class, ID.valueOf(2)).getMonthNameRU());
-        cell.setCellStyle(styles.get(ExcelStyles.HEADER));
-        sheet.addMergedRegion(new CellRangeAddress(startRow, startRow, 24, 26));
-
-        cell = row.createCell(28);
-        cell.setCellValue(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(MONTH.class, ID.valueOf(3)).getMonthNameRU());
-        cell.setCellStyle(styles.get(ExcelStyles.HEADER));
-        sheet.addMergedRegion(new CellRangeAddress(startRow, startRow, 28, 30));
-
-        cell = row.createCell(32);
-        cell.setCellValue(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(MONTH.class, ID.valueOf(4)).getMonthNameRU());
-        cell.setCellStyle(styles.get(ExcelStyles.HEADER));
-        sheet.addMergedRegion(new CellRangeAddress(startRow, startRow, 32, 35));
-
-        cell = row.createCell(36);
-        cell.setCellValue(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(MONTH.class, ID.valueOf(5)).getMonthNameRU());
-        cell.setCellStyle(styles.get(ExcelStyles.HEADER));
-        sheet.addMergedRegion(new CellRangeAddress(startRow, startRow, 36, 39));
-
-        cell = row.createCell(41);
-        cell.setCellValue(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(MONTH.class, ID.valueOf(6)).getMonthNameRU());
-        cell.setCellStyle(styles.get(ExcelStyles.HEADER));
-        sheet.addMergedRegion(new CellRangeAddress(startRow, startRow, 41, 43));
-
-        cell = row.createCell(45);
-        cell.setCellValue(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(MONTH.class, ID.valueOf(7)).getMonthNameRU());
-        cell.setCellStyle(styles.get(ExcelStyles.HEADER));
-        sheet.addMergedRegion(new CellRangeAddress(startRow, startRow, 45, 48));
-
-        cell = row.createCell(49);
-        cell.setCellValue(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(MONTH.class, ID.valueOf(8)).getMonthNameRU());
-        cell.setCellStyle(styles.get(ExcelStyles.HEADER));
-        sheet.addMergedRegion(new CellRangeAddress(startRow, startRow, 49, 52));
-
-        QueryModel<WEEK> qmWeek = new QueryModel<WEEK>(WEEK.class);
-        qmWeek.addOrder("weekCode");
-        List<WEEK> weekList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(qmWeek);
-
-        startRow++;
-        row = sheet.createRow(startRow);
-        for (WEEK w : weekList) {
-            cell = row.createCell(w.getWeekCode());
-            cell.setCellValue(w.getWeekCode());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-        }
-
-        QueryModel<STUDY_YEAR> qmStudyYear = new QueryModel<STUDY_YEAR>(STUDY_YEAR.class);
-        qmStudyYear.addWhere("studyYear", ECriteria.LESS_EQUAL, 4);
-        qmStudyYear.addOrder("studyYear");
-        List<STUDY_YEAR> syList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(qmStudyYear);
-
-        long curriculumId = (getCurriculum() != null && getCurriculum().getId() != null) ? getCurriculum().getId().getId().longValue() : -1;
-
-        String sql = "select a.ID, a.STUDY_YEAR_ID, b.WEEK_CODE, c.SYMBOL from CURRICULUM_SCHEDULE a inner join WEEK b on a.WEEK_ID = b.ID inner join CURRICULUM_SCHEDULE_SYMBOL c on a.SYMBOL_ID = c.ID where a.CURRICULUM_ID = ?1";
-        Map<Integer, Object> params = new HashMap<Integer, Object>(1);
-        params.put(1, curriculumId);
-
-        List tempList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
-
-        List<ScheduleBean> sbList = new ArrayList<ScheduleBean>(4);
-        for (STUDY_YEAR sy : syList) {
-            ScheduleBean sb = new ScheduleBean();
-            sb.setStudyYear(sy);
-            for (Object o : tempList) {
-                Object[] oo = (Object[]) o;
-                long syId = (long) oo[1];
-                if (syId == sy.getId().getId().longValue()) {
-                    VCurriculumSchedule vcs = new VCurriculumSchedule();
-                    vcs.setId(ID.valueOf((long) oo[0]));
-                    vcs.setWeekCode(((BigDecimal) oo[2]).intValue());
-                    vcs.setSymbolCode((String) oo[3]);
-                    sb.add(vcs);
-                }
-            }
-
-            sbList.add(sb);
-        }
-
-        startRow++;
-        for (ScheduleBean sb : sbList) {
-            row = sheet.createRow(startRow);
-            cell = row.createCell(0);
-            cell.setCellValue(sb.getStudyYear().getStudyYear());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(1);
-            cell.setCellValue(sb.getWeek01Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(2);
-            cell.setCellValue(sb.getWeek02Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(3);
-            cell.setCellValue(sb.getWeek03Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(4);
-            cell.setCellValue(sb.getWeek04Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(5);
-            cell.setCellValue(sb.getWeek05Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(6);
-            cell.setCellValue(sb.getWeek06Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(7);
-            cell.setCellValue(sb.getWeek07Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(8);
-            cell.setCellValue(sb.getWeek08Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(9);
-            cell.setCellValue(sb.getWeek09Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(10);
-            cell.setCellValue(sb.getWeek10Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(11);
-            cell.setCellValue(sb.getWeek11Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(12);
-            cell.setCellValue(sb.getWeek12Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(13);
-            cell.setCellValue(sb.getWeek13Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(14);
-            cell.setCellValue(sb.getWeek14Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(15);
-            cell.setCellValue(sb.getWeek15Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(16);
-            cell.setCellValue(sb.getWeek16Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(17);
-            cell.setCellValue(sb.getWeek17Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(18);
-            cell.setCellValue(sb.getWeek18Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(19);
-            cell.setCellValue(sb.getWeek19Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(20);
-            cell.setCellValue(sb.getWeek20Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(21);
-            cell.setCellValue(sb.getWeek21Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(22);
-            cell.setCellValue(sb.getWeek22Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(23);
-            cell.setCellValue(sb.getWeek23Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(24);
-            cell.setCellValue(sb.getWeek24Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(25);
-            cell.setCellValue(sb.getWeek25Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(26);
-            cell.setCellValue(sb.getWeek26Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(27);
-            cell.setCellValue(sb.getWeek27Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(28);
-            cell.setCellValue(sb.getWeek28Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(29);
-            cell.setCellValue(sb.getWeek29Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(30);
-            cell.setCellValue(sb.getWeek30Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(31);
-            cell.setCellValue(sb.getWeek31Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(32);
-            cell.setCellValue(sb.getWeek32Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(33);
-            cell.setCellValue(sb.getWeek33Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(34);
-            cell.setCellValue(sb.getWeek34Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(35);
-            cell.setCellValue(sb.getWeek35Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(36);
-            cell.setCellValue(sb.getWeek36Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(37);
-            cell.setCellValue(sb.getWeek37Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(38);
-            cell.setCellValue(sb.getWeek38Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(39);
-            cell.setCellValue(sb.getWeek39Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            cell = row.createCell(40);
-            cell.setCellValue(sb.getWeek40Symbol());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-            if (sb.getStudyYear().getStudyYear() <= 3) {
-                cell = row.createCell(41);
-                cell.setCellValue(sb.getWeek41Symbol());
-                cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-                cell = row.createCell(42);
-                cell.setCellValue(sb.getWeek42Symbol());
-                cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-                cell = row.createCell(43);
-                cell.setCellValue(sb.getWeek43Symbol());
-                cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-                cell = row.createCell(44);
-                cell.setCellValue(sb.getWeek44Symbol());
-                cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-                cell = row.createCell(45);
-                cell.setCellValue(sb.getWeek45Symbol());
-                cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-                cell = row.createCell(46);
-                cell.setCellValue(sb.getWeek46Symbol());
-                cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-                cell = row.createCell(47);
-                cell.setCellValue(sb.getWeek47Symbol());
-                cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-                cell = row.createCell(48);
-                cell.setCellValue(sb.getWeek48Symbol());
-                cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-                cell = row.createCell(49);
-                cell.setCellValue(sb.getWeek49Symbol());
-                cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-                cell = row.createCell(50);
-                cell.setCellValue(sb.getWeek50Symbol());
-                cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-                cell = row.createCell(51);
-                cell.setCellValue(sb.getWeek51Symbol());
-                cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-
-                cell = row.createCell(52);
-                cell.setCellValue(sb.getWeek52Symbol());
-                cell.setCellStyle(styles.get(ExcelStyles.CONTENT_CENTER));
-            }
-
-            startRow++;
-        }
-
-        sheet.setColumnWidth(0, 3 * 256);
-        sheet.setColumnWidth(1, 3 * 256);
-        sheet.setColumnWidth(2, 3 * 256);
-        sheet.setColumnWidth(3, 3 * 256);
-        sheet.setColumnWidth(4, 3 * 256);
-        sheet.setColumnWidth(5, 3 * 256);
-        sheet.setColumnWidth(6, 3 * 256);
-        sheet.setColumnWidth(7, 3 * 256);
-        sheet.setColumnWidth(8, 3 * 256);
-        sheet.setColumnWidth(9, 3 * 256);
-        sheet.setColumnWidth(10, 3 * 256);
-        sheet.setColumnWidth(11, 3 * 256);
-        sheet.setColumnWidth(12, 3 * 256);
-        sheet.setColumnWidth(13, 3 * 256);
-        sheet.setColumnWidth(14, 3 * 256);
-        sheet.setColumnWidth(15, 3 * 256);
-        sheet.setColumnWidth(16, 3 * 256);
-        sheet.setColumnWidth(17, 3 * 256);
-        sheet.setColumnWidth(18, 3 * 256);
-        sheet.setColumnWidth(19, 3 * 256);
-        sheet.setColumnWidth(20, 3 * 256);
-        sheet.setColumnWidth(21, 3 * 256);
-        sheet.setColumnWidth(22, 3 * 256);
-        sheet.setColumnWidth(23, 3 * 256);
-        sheet.setColumnWidth(24, 3 * 256);
-        sheet.setColumnWidth(25, 3 * 256);
-        sheet.setColumnWidth(26, 3 * 256);
-        sheet.setColumnWidth(27, 3 * 256);
-        sheet.setColumnWidth(28, 3 * 256);
-        sheet.setColumnWidth(29, 3 * 256);
-        sheet.setColumnWidth(30, 3 * 256);
-        sheet.setColumnWidth(31, 3 * 256);
-        sheet.setColumnWidth(32, 3 * 256);
-        sheet.setColumnWidth(33, 3 * 256);
-        sheet.setColumnWidth(34, 3 * 256);
-        sheet.setColumnWidth(35, 3 * 256);
-        sheet.setColumnWidth(36, 3 * 256);
-        sheet.setColumnWidth(37, 3 * 256);
-        sheet.setColumnWidth(38, 3 * 256);
-        sheet.setColumnWidth(39, 3 * 256);
-        sheet.setColumnWidth(40, 3 * 256);
-        sheet.setColumnWidth(41, 3 * 256);
-        sheet.setColumnWidth(42, 3 * 256);
-        sheet.setColumnWidth(43, 3 * 256);
-        sheet.setColumnWidth(44, 3 * 256);
-        sheet.setColumnWidth(45, 3 * 256);
-        sheet.setColumnWidth(46, 3 * 256);
-        sheet.setColumnWidth(47, 3 * 256);
-        sheet.setColumnWidth(48, 3 * 256);
-        sheet.setColumnWidth(49, 3 * 256);
-        sheet.setColumnWidth(50, 3 * 256);
-        sheet.setColumnWidth(51, 3 * 256);
-        sheet.setColumnWidth(52, 3 * 256);
-
-        startRow++;
-
-        row = sheet.createRow(startRow);
-        cell = row.createCell(1);
-        cell.setCellValue(getUILocaleUtil().getCaption("designations"));
-        cell.setCellStyle(styles.get(ExcelStyles.HEADER_LEFT));
-
-        QueryModel<CURRICULUM_SCHEDULE_SYMBOL> qmCSS = new QueryModel<CURRICULUM_SCHEDULE_SYMBOL>(CURRICULUM_SCHEDULE_SYMBOL.class);
-        qmCSS.addOrder("id");
-        List<CURRICULUM_SCHEDULE_SYMBOL> cssList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(qmCSS);
-
-        startRow++;
-        row = sheet.createRow(startRow);
-        for (int i = 0; i < 4; i++) {
-            if (i == 0) {
-                cell = row.createCell(1);
-            } else if (i == 1) {
-                cell = row.createCell(18);
-            } else if (i == 2) {
-                cell = row.createCell(28);
-            } else {
-                cell = row.createCell(38);
-            }
-
-            CURRICULUM_SCHEDULE_SYMBOL css = cssList.get(i);
-            cell.setCellValue(css.getSymbol() + " - " + css.getDescr());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_LEFT));
-        }
-
-        startRow++;
-        row = sheet.createRow(startRow);
-        for (int i = 4; i < 9; i++) {
-            if (i == 4) {
-                cell = row.createCell(1);
-            } else if (i == 5) {
-                cell = row.createCell(5);
-            } else if (i == 6) {
-                cell = row.createCell(17);
-            } else if (i == 7) {
-                cell = row.createCell(28);
-            } else {
-                cell = row.createCell(34);
-            }
-
-            CURRICULUM_SCHEDULE_SYMBOL css = cssList.get(i);
-            cell.setCellValue(css.getSymbol() + " - " + css.getDescr());
-            cell.setCellStyle(styles.get(ExcelStyles.CONTENT_LEFT));
         }
     }
 }

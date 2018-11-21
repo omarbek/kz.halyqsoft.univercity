@@ -32,7 +32,7 @@ public class SemesterPanel extends AbstractCommonPanel {
     private List<SUBJECT> chosenMainlist;
 
     public SemesterPanel(IndividualEducationPlanView registrationView, SEMESTER semester,
-                         STUDENT_EDUCATION studentEducation) throws Exception {
+                         STUDENT_EDUCATION studentEducation) {
         this.semester = semester;
         this.studentEducation = studentEducation;
         this.registrationView = registrationView;

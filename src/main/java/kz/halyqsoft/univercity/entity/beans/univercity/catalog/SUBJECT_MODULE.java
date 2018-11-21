@@ -10,14 +10,12 @@ import javax.persistence.Entity;
 @Entity
 public class SUBJECT_MODULE extends AbstractEntity {
 
-    private static final long serialVersionUID = 9003319730846780339L;
-
-    @FieldInfo(type = EFieldType.TEXT, max = 64, order = 1)
+    @FieldInfo(type = EFieldType.TEXT, max = 64)
     @Column(name = "MODULE_NAME", nullable = false)
     private String moduleName;
 
-    public SUBJECT_MODULE() {
-    }
+    @Column(name = "MODULE_SHORT_NAME", nullable = false)
+    private String moduleShortName;
 
     @Override
     public String toString() {
@@ -30,5 +28,13 @@ public class SUBJECT_MODULE extends AbstractEntity {
 
     public void setModuleName(String moduleName) {
         this.moduleName = moduleName;
+    }
+
+    public String getModuleShortName() {
+        return moduleShortName;
+    }
+
+    public void setModuleShortName(String moduleShortName) {
+        this.moduleShortName = moduleShortName;
     }
 }
