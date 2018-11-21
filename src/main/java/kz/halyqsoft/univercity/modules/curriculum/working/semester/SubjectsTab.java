@@ -90,7 +90,7 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
         });
 
         currentGW.setButtonDescription(AbstractToolbar.ADD_BUTTON, "add.from.one.student");
-        currentGW.setButtonWidth(AbstractToolbar.ADD_BUTTON, "180px");
+        //currentGW.setButtonWidth(AbstractToolbar.ADD_BUTTON, "180px");
         currentGW.setButtonIcon(AbstractToolbar.ADD_BUTTON, "img/button/users.png");
         currentGW.addButtonClickListener(AbstractToolbar.ADD_BUTTON, new Button.ClickListener() {
             @Override
@@ -106,7 +106,7 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
 
         currentGW.setButtonVisible(AbstractToolbar.HELP_BUTTON, true);
         currentGW.setButtonDescription(AbstractToolbar.HELP_BUTTON, "add.from.iups");
-        currentGW.setButtonWidth(AbstractToolbar.HELP_BUTTON, "150px");
+        // currentGW.setButtonWidth(AbstractToolbar.HELP_BUTTON, "150px");
         currentGW.setButtonIcon(AbstractToolbar.HELP_BUTTON, "img/button/add.png");
         currentGW.addButtonClickListener(AbstractToolbar.HELP_BUTTON, new Button.ClickListener() {
             @Override
@@ -407,7 +407,7 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
     }
 
     @Override
-    public void refresh() throws Exception {
+    public void refresh() {
         refreshSubjects(curriculum, semester);
     }
 
@@ -527,7 +527,7 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
     }
 
     @Override
-    public boolean preSave(Object o, Entity entity, boolean b, int i) throws Exception {
+    public boolean preSave(Object o, Entity entity, boolean b, int i) {
         return true;
     }
 
