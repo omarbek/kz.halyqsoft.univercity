@@ -93,6 +93,12 @@ public class CommonStreamsDialog extends WindowUtils implements EntityListener {
                 }
             }
         });
+        streamGW.addButtonClickListener(AbstractToolbar.REFRESH_BUTTON, new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                refreshStreams();
+            }
+        });
         widgetsHL.addComponent(streamGW);
 
         DBGridModel streamGM = (DBGridModel) streamGW.getWidgetModel();
@@ -206,7 +212,6 @@ public class CommonStreamsDialog extends WindowUtils implements EntityListener {
 
     @Override
     public void onRefresh(Object o, List<Entity> list) {
-
     }
 
     @Override
