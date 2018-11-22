@@ -20,9 +20,8 @@ import org.r3a.common.vaadin.widget.dialog.Message;
 import javax.persistence.NoResultException;
 import java.util.*;
 
-public class SemesterPanel extends AbstractCommonPanel {
+public class SubjectsPanel extends AbstractCommonPanel {
 
-    private IndividualEducationPlanView registrationView;
     private STUDENT_EDUCATION studentEducation;
     private SEMESTER semester;
     private List<SEMESTER_DATA> semesterData;
@@ -30,12 +29,12 @@ public class SemesterPanel extends AbstractCommonPanel {
     private TreeTable chairsAndSubjectsTT;
     private Grid mainSubjectGrid;
     private List<SUBJECT> chosenMainlist;
+    private boolean isAdmin;
 
-    public SemesterPanel(IndividualEducationPlanView registrationView, SEMESTER semester,
-                         STUDENT_EDUCATION studentEducation) {
+    SubjectsPanel(SEMESTER semester, STUDENT_EDUCATION studentEducation, boolean isAdmin) {
         this.semester = semester;
         this.studentEducation = studentEducation;
-        this.registrationView = registrationView;
+        this.isAdmin = isAdmin;
         chosenMainlist = new ArrayList<>();
     }
 
@@ -67,11 +66,13 @@ public class SemesterPanel extends AbstractCommonPanel {
         allSubjectsHL.addComponent(electiveSubjectsVL);
 
         Button saveButton = CommonUtils.createSaveButton();
-        saveButton.addClickListener(saveListener(pairSubjects, optionGroups, saveButton));
+        saveButton.addClickListener(saveListener(pairSubjects, optionGroups, saveButton, studentSubjects));
 
         getContent().addComponent(allSubjectsHL);
 
-        setDisableButton(studentSubjects, saveButton);
+        if (!isAdmin) {
+            setDisableButton(studentSubjects, saveButton);
+        }
 
         getContent().addComponent(saveButton);
         getContent().setComponentAlignment(saveButton, Alignment.MIDDLE_CENTER);
@@ -155,14 +156,15 @@ public class SemesterPanel extends AbstractCommonPanel {
         }
     }
 
-    private Button.ClickListener saveListener(List<PAIR_SUBJECT> pairSubjects, ArrayList<OptionGroup> optionGroups, Button saveButton) {
+    private Button.ClickListener saveListener(List<PAIR_SUBJECT> pairSubjects, ArrayList<OptionGroup> optionGroups,
+                                              Button saveButton, ArrayList<STUDENT_SUBJECT> studentSubjects) {
         return new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 try {
                     setStudentSubject();
                 } catch (Exception e) {
-                    CommonUtils.showMessageAndWriteLog(e.getMessage(),e);
+                    CommonUtils.showMessageAndWriteLog(e.getMessage(), e);
                     e.printStackTrace();
                 }
             }
@@ -193,7 +195,7 @@ public class SemesterPanel extends AbstractCommonPanel {
                         QueryModel<SEMESTER_SUBJECT> semesterSubjectQM = new QueryModel<>(SEMESTER_SUBJECT.class);
                         QueryModel<SEMESTER_DATA> semesterDataQM = new QueryModel<>(SEMESTER_DATA.class);
 
-                        ArrayList<STUDENT_SUBJECT> studentSubjects = new ArrayList<>();
+                        ArrayList<STUDENT_SUBJECT> electiveStudentSubjects = new ArrayList<>();
 
                         for (OptionGroup sub : optionGroups) {
                             ENTRANCE_YEAR entranceYear = CommonUtils.getCurrentSemesterData().getYear();
@@ -225,10 +227,10 @@ public class SemesterPanel extends AbstractCommonPanel {
                             studentSubject.setRegDate(new Date());
                             studentSubject.setSubject(semesterSubject);
 
-                            studentSubjects.add(studentSubject);
+                            electiveStudentSubjects.add(studentSubject);
                         }
 
-                        ArrayList<STUDENT_SUBJECT> studentSubjectAll = new ArrayList<>();
+                        ArrayList<STUDENT_SUBJECT> mainStudentSubjects = new ArrayList<>();
 
                         ENTRANCE_YEAR entranceYear = CommonUtils.getCurrentSemesterData().getYear();
                         SEMESTER_PERIOD semesterPeriod = semester.getSemesterPeriod();
@@ -260,18 +262,25 @@ public class SemesterPanel extends AbstractCommonPanel {
                             subjectOfStudent.setRegDate(new Date());
                             subjectOfStudent.setSubject(semesterSubject);
 
-                            studentSubjectAll.add(subjectOfStudent);
+                            mainStudentSubjects.add(subjectOfStudent);
                         }
 
 
                         try {
-                            if (!studentSubjects.isEmpty()) {
-                                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
-                                        create(studentSubjects);
+                            if (isAdmin) {
+                                for (STUDENT_SUBJECT studentSubject : studentSubjects) {
+                                    studentSubject.setDeleted(true);
+                                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(
+                                            studentSubject);
+                                }
                             }
-                            if (!studentSubjectAll.isEmpty()) {
+                            if (!electiveStudentSubjects.isEmpty()) {
                                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
-                                        create(studentSubjectAll);
+                                        create(electiveStudentSubjects);
+                            }
+                            if (!mainStudentSubjects.isEmpty()) {
+                                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                                        create(mainStudentSubjects);
                             }
                             saveButton.setEnabled(false);
 
@@ -282,9 +291,7 @@ public class SemesterPanel extends AbstractCommonPanel {
                     }
                 });
             }
-        }
-
-                ;
+        };
     }
 
     private List<PAIR_SUBJECT> getPairSubjects() throws Exception {
@@ -482,7 +489,7 @@ public class SemesterPanel extends AbstractCommonPanel {
                         for (OptionGroup optionGroup : optionGroups) {
                             Set<TEACHER_SUBJECT> teacherSubjects = ((Set) optionGroup.getValue());
 
-                            for(TEACHER_SUBJECT teacherSubject : teacherSubjects){
+                            for (TEACHER_SUBJECT teacherSubject : teacherSubjects) {
                                 if (teacherSubject != null) {
                                     STUDENT_TEACHER_SUBJECT studentTeacherSubject = new STUDENT_TEACHER_SUBJECT();
                                     studentTeacherSubject.setSemester(semester);
@@ -492,7 +499,7 @@ public class SemesterPanel extends AbstractCommonPanel {
                                 }
                             }
                             SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(studentTeacherSubjects);
-                            }
+                        }
 
                         saveButton.setEnabled(false);
                         CommonUtils.showSavedNotification();
@@ -501,10 +508,12 @@ public class SemesterPanel extends AbstractCommonPanel {
                     }
                 }
             });
-            for (STUDENT_TEACHER_SUBJECT studentTeacherSubject : getStudentTeacherSubject()) {
-                if (studentTeacherSubject.getSemester().equals(semester)) {
-                    saveButton.setEnabled(false);
-                    break;
+            if (!isAdmin) {
+                for (STUDENT_TEACHER_SUBJECT studentTeacherSubject : getStudentTeacherSubject()) {
+                    if (studentTeacherSubject.getSemester().equals(semester)) {
+                        saveButton.setEnabled(false);
+                        break;
+                    }
                 }
             }
             getContent().addComponent(saveButton);
