@@ -303,7 +303,7 @@ public class SemesterPanel extends AbstractCommonPanel {
 
     private ArrayList<OptionGroup> setElectiveSubjects(ArrayList<STUDENT_SUBJECT> studentSubjects,
                                                        VerticalLayout electiveSubjectsVL,
-                                                       List<PAIR_SUBJECT> pairSubjects) throws Exception {
+                                                       List<PAIR_SUBJECT> pairSubjects) {
         Map<Integer, ArrayList<SUBJECT>> map = new HashMap<>();
 
         for (PAIR_SUBJECT pairSubject : pairSubjects) {
@@ -396,6 +396,7 @@ public class SemesterPanel extends AbstractCommonPanel {
         studentSubjectQM.addWhere(semesterDataFI, "semesterPeriod", ECriteria.EQUAL, semester.
                 getSemesterPeriod().getId());
         studentSubjectQM.addWhere("studentEducation", ECriteria.EQUAL, studentEducation.getId());
+        studentSubjectQM.addWhere("deleted", ECriteria.EQUAL, false);
         studentSubjectQM.addOrder("id");
         ArrayList<STUDENT_SUBJECT> studentSubjects = new ArrayList<>();
         try {

@@ -1,5 +1,6 @@
 package kz.halyqsoft.univercity.entity.beans.univercity.catalog;
 
+import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
