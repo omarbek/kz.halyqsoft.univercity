@@ -10,6 +10,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.catalog.POST;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VEmployee;
 import kz.halyqsoft.univercity.filter.FEmployeeFilter;
 import kz.halyqsoft.univercity.filter.panel.EmployeeFilterPanel;
+import kz.halyqsoft.univercity.modules.employeeabsence.dialogs.AbsenceCauseDialog;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -36,13 +37,13 @@ import java.util.*;
  * on 21.11.2018
  * @project kz.halyqsoft.univercity
  */
-public class EmployeeAbsence extends AbstractTaskView implements EntityListener, FilterPanelListener {
+public class EmployeeAbsenceView extends AbstractTaskView implements EntityListener, FilterPanelListener {
 
     private final EmployeeFilterPanel filterPanel;
     private GridWidget teacherGW;
     private ComboBox cb;
 
-    public EmployeeAbsence(AbstractTask task) throws Exception {
+    public EmployeeAbsenceView(AbstractTask task) throws Exception {
         super(task);
         filterPanel = new EmployeeFilterPanel(new FEmployeeFilter());
     }
@@ -246,8 +247,8 @@ public class EmployeeAbsence extends AbstractTaskView implements EntityListener,
     @Override
     public void handleEntityEvent(EntityEvent ev) {
         if (ev.getSource().equals(teacherGW)) {
-            if (ev.getAction() == EntityEvent.SELECTED) {
-
+            if (ev.getAction() == EntityEvent.SELECTED && teacherGW.getSelectedEntity() != null) {
+                AbsenceCauseDialog absenceCauseDialog = new AbsenceCauseDialog((VEmployee) teacherGW.getSelectedEntity());
             }
         }
     }
