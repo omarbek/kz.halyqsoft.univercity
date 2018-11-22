@@ -12,6 +12,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.themes.ValoTheme;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_DATA;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SPECIALITY;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_COORDINATOR;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_STUDENT;
@@ -43,17 +44,12 @@ import java.util.List;
 
 public class StudentModule extends BaseModule{
 
-    private static String replaced;
-    private static String inLettersEdu;
-    private static String moneyForEducation;
-    private static String answerEdu;
-
-
     private static final int FATHER = 1;
     private static final int MOTHER = 2;
     private static final int ADDRESS_FACT = 2;
 
     private Button downloadBtn;
+    private Button clearBtn;
     public StudentModule(BaseModule baseModule, StudentPlan studentPlan) {
         super(V_STUDENT.class, baseModule, studentPlan);
         getMainGW().setMultiSelect(true);
@@ -84,7 +80,93 @@ public class StudentModule extends BaseModule{
                 }
             }
         });
+
+        clearBtn = new Button(CommonUtils.getUILocaleUtil().getCaption("clear"));
+        clearBtn.setStyleName(ValoTheme.BUTTON_LARGE);
+        clearBtn.setIcon(FontAwesome.TRASH);
+        clearBtn.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                if(getMainGW().getSelectedEntities().size() > 0){
+                    List<STUDENT> studentList = new ArrayList<>();
+                    for(Entity vStudent : getMainGW().getSelectedEntities()){
+                        try{
+                            STUDENT student = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean .class)
+                                    .lookup(STUDENT.class , vStudent.getId());
+
+                            studentList.add(student);
+                        }catch (Exception e){
+                            e.printStackTrace();
+                            return;
+                        }
+                    }
+                    QueryModel<SEMESTER_DATA> semesterDataQM = new QueryModel<>(SEMESTER_DATA.class);
+                    semesterDataQM.addWhere("year" ,ECriteria.EQUAL, CommonUtils.getCurrentSemesterData().getYear().getId());
+                    List<SEMESTER_DATA> semesterDatas = null;
+                    try{
+                        semesterDatas = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(semesterDataQM);
+                    }catch (Exception e){
+                        CommonUtils.showMessageAndWriteLog(e.getMessage(),e);
+                        e.printStackTrace();
+                    }
+                    List<ID> ids = new ArrayList<>();
+                    if(semesterDatas != null){
+                        for(SEMESTER_DATA ss : semesterDatas){
+                            ids.add(ss.getId());
+                        }
+                    }else{
+                        ids.add(CommonUtils.getCurrentSemesterData().getId());
+
+                    }
+                    for(STUDENT student : studentList){
+                        QueryModel<STUDENT_SUBJECT> studentSubjectQM = new QueryModel<>(STUDENT_SUBJECT.class);
+                        studentSubjectQM.addWhere("studentEducation" , ECriteria.EQUAL
+                        , student.getLastEducation().getId());
+                        studentSubjectQM.addWhereAnd("deleted" , ECriteria.EQUAL, false);
+                        studentSubjectQM.addWhereInAnd("semesterData" , ids);
+                        ArrayList<STUDENT_SUBJECT> studentSubjects = new ArrayList<>();
+                        try{
+                            studentSubjects.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(studentSubjectQM));
+                        }catch (Exception e){
+                            Message.showError(e.getMessage());
+                            e.printStackTrace();
+                        }
+
+                        for(STUDENT_SUBJECT ss : studentSubjects){
+                            QueryModel<STUDENT_TEACHER_SUBJECT> studentTeacherSubjectQM = new QueryModel<>(STUDENT_TEACHER_SUBJECT.class);
+                            studentTeacherSubjectQM.addWhere("studentEducation", ECriteria.EQUAL, ss.getStudentEducation().getId());
+                            FromItem fi = studentTeacherSubjectQM.addJoin(EJoin.INNER_JOIN ,"teacherSubject" , TEACHER_SUBJECT.class, "id");
+                            studentTeacherSubjectQM.addWhere(fi ,"subject" , ECriteria.EQUAL , ss.getSubject().getSubject().getId() );
+
+                            try{
+                                List<STUDENT_TEACHER_SUBJECT> stsList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(studentTeacherSubjectQM);
+                                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(stsList);
+                            }catch (Exception e){
+                                CommonUtils.showMessageAndWriteLog(e.getMessage() , e);
+                                e.printStackTrace();
+                            }
+
+                            ss.setDeleted(true);
+                        }
+
+                        if(studentSubjects.size()>0){
+                            try{
+                                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(studentSubjects);
+                            }catch (Exception e){
+                                CommonUtils.showMessageAndWriteLog(e.getMessage() , e);
+                                e.printStackTrace();
+                            }
+                        }
+                     }
+
+                }else{
+                    Message.showError(CommonUtils.getUILocaleUtil().getMessage("choose.field"));
+                }
+            }
+        });
         getButtonsPanel().addComponent(downloadBtn);
+        getButtonsPanel().addComponent(clearBtn);
+
     }
 
     @Override

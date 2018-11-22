@@ -322,7 +322,7 @@ public class TableForm {
 
                 sql +="  WHERE  usr.deleted = FALSE\n" +
                 "      AND sem_data.year_id = " + semesterData.getYear().getId().getId().longValue() + " \n" +
-                "      AND usr.deleted = FALSE\n" +
+                "      AND usr.deleted = FALSE and stu_subj.deleted = false \n" +
                 "      AND subj.subject_cycle_id IS NOT NULL\n" +
                 "      AND sem_data.semester_period_id = "+semPeriod+" \n" ;
 
