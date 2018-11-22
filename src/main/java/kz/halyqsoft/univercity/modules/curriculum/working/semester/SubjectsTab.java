@@ -50,9 +50,6 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
     private GridWidget addingSubjectsGW;
     private GridWidget afterSemesterSubjectsGW;
 
-    private static final long DIPLOM_SUBJECT = 1388L;
-    private static final long EXAM_SUBJECT = 1387L;
-
     public SubjectsTab(CurriculumView parentView, SEMESTER semester, SubjectsType subjectType) {
         super(parentView);
         this.semester = semester;
@@ -229,8 +226,8 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
             curriculumAfterSemester.setUpdated(new Date());
         }
         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(curriculumAfterSemesters);
-        subjectIds.add(DIPLOM_SUBJECT);
-        subjectIds.add(EXAM_SUBJECT);
+        subjectIds.add(SUBJECT.DIPLOM);
+        subjectIds.add(SUBJECT.EXAM);
         for (Long subjectId : subjectIds) {
             CURRICULUM_AFTER_SEMESTER curriculumAfterSemester = new CURRICULUM_AFTER_SEMESTER();
             curriculumAfterSemester.setDeleted(false);
@@ -238,7 +235,7 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
             curriculumAfterSemester.setCurriculum(curriculum);
             curriculumAfterSemester.setSubject(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean
                     .class).lookup(SUBJECT.class, ID.valueOf(subjectId)));
-            if (subjectId.equals(DIPLOM_SUBJECT)) {
+            if (subjectId.equals(SUBJECT.DIPLOM)) {
                 curriculumAfterSemester.setCode("-");
             }
             SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(curriculumAfterSemester);

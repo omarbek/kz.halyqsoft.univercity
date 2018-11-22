@@ -6,6 +6,7 @@ import com.vaadin.ui.VerticalLayout;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_CURRICULUM_DETAIL;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_ELECTIVE_SUBJECT;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_STREAM;
 import kz.halyqsoft.univercity.modules.stream.StreamView;
 import kz.halyqsoft.univercity.modules.stream.dialogs.DetailDialog;
@@ -110,23 +111,28 @@ public class CommonStreamsDialog extends WindowUtils implements EntityListener {
 
     private void setSubjects() {
         try {
-            QueryModel<SUBJECT> subjectQM = new QueryModel<>(SUBJECT.class);
-            FromItem curDetFI = subjectQM.addJoin(EJoin.INNER_JOIN, "id", V_CURRICULUM_DETAIL.class, "subject");
-            FromItem curFI = curDetFI.addJoin(EJoin.INNER_JOIN, "curriculum", CURRICULUM.class, "id");
-            FromItem semesterFI = curDetFI.addJoin(EJoin.INNER_JOIN, "semester", SEMESTER.class, "id");
-            subjectQM.addWhere(semesterFI, "studyYear", ECriteria.EQUAL, ID.valueOf(studyYear));
-            subjectQM.addWhere(curFI, "diplomaType", ECriteria.EQUAL, STUDENT_DIPLOMA_TYPE.FULL_TIME);
-            subjectQM.addWhere(curFI, "deleted", false);
-            //        subjectQM.addWhere(curFI, "curriculumStatus", ECriteria.EQUAL, CURRICULUM_STATUS.APPROVED);//TODO
-            subjectQM.addWhere("deleted", false);
-
-            List<SUBJECT> subjects = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(subjectQM);
+            List<SUBJECT> mainSubjects = getSubjects(V_CURRICULUM_DETAIL.class);
+            List<SUBJECT> electiveSubjects = getSubjects(V_ELECTIVE_SUBJECT.class);
+            mainSubjects.addAll(electiveSubjects);
             ((DBGridModel) subjectGW.getWidgetModel()).setRefreshType(ERefreshType.MANUAL);
-            ((DBGridModel) subjectGW.getWidgetModel()).setEntities(subjects);
+            ((DBGridModel) subjectGW.getWidgetModel()).setEntities(mainSubjects);
             subjectGW.refresh();
         } catch (Exception e) {
             e.printStackTrace();//TODO catch
         }
+    }
+
+    private List<SUBJECT> getSubjects(Class<? extends Entity> entity) throws Exception {
+        QueryModel<SUBJECT> mainSubjectQM = new QueryModel<>(SUBJECT.class);
+        FromItem curDetFI = mainSubjectQM.addJoin(EJoin.INNER_JOIN, "id", entity, "subject");
+        FromItem curFI = curDetFI.addJoin(EJoin.INNER_JOIN, "curriculum", CURRICULUM.class, "id");
+        FromItem semesterFI = curDetFI.addJoin(EJoin.INNER_JOIN, "semester", SEMESTER.class, "id");
+        mainSubjectQM.addWhere(semesterFI, "studyYear", ECriteria.EQUAL, ID.valueOf(studyYear));
+        mainSubjectQM.addWhere(curFI, "diplomaType", ECriteria.EQUAL, STUDENT_DIPLOMA_TYPE.FULL_TIME);
+        mainSubjectQM.addWhere(curFI, "deleted", false);
+        //        mainSubjectQM.addWhere(curFI, "curriculumStatus", ECriteria.EQUAL, CURRICULUM_STATUS.APPROVED);//TODO
+        mainSubjectQM.addWhere("deleted", false);
+        return SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(mainSubjectQM);
     }
 
     private void refreshStreams() {

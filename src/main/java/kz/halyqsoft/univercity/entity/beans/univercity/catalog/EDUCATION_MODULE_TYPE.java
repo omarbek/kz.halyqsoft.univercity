@@ -10,7 +10,7 @@ import javax.persistence.Entity;
 @Entity
 public class EDUCATION_MODULE_TYPE extends AbstractEntity {
 
-    @FieldInfo(type = EFieldType.TEXT, max = 100)
+    @FieldInfo(type = EFieldType.TEXT, max = 128)
     @Column(name = "TYPE_NAME", nullable = false)
     private String typeName;
 

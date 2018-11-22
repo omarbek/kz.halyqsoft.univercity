@@ -1,6 +1,7 @@
 alter table stream
     add column updated timestamp;
 
+--assyl
 CREATE EXTENSION tablefunc;
 
 
@@ -43,3 +44,24 @@ CREATE SEQUENCE S_EMPLOYEE_ABSENCE_CAUSE
     MINVALUE 0
     START WITH 1
     NO CYCLE;
+--end assyl
+
+drop view V_SUBJECT_SELECT;
+CREATE OR REPLACE VIEW V_SUBJECT_SELECT AS
+  SELECT subj.ID,
+         subj.name_kz,
+         subj.NAME_RU,
+         subj.module_id,
+         subj.STUDY_DIRECT_ID,
+         subj.CHAIR_ID,
+         subj.LEVEL_ID,
+         subj.SUBJECT_CYCLE_ID,
+         subj.MANDATORY,
+         subj.CREDITABILITY_ID,
+         cred.CREDIT,
+         contr_type.TYPE_NAME CONTROL_TYPE_NAME
+  FROM SUBJECT subj
+         INNER JOIN CREDITABILITY cred ON subj.CREDITABILITY_ID = cred.ID
+         INNER JOIN CONTROL_TYPE contr_type ON subj.CONTROL_TYPE_ID = contr_type.ID
+  WHERE subj.DELETED = FALSE
+    AND subj.CHAIR_ID IS NOT NULL;

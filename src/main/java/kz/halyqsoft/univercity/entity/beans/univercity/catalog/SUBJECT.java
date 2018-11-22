@@ -15,7 +15,8 @@ import javax.persistence.*;
 @Entity
 public class SUBJECT extends AbstractEntity {
 
-    private static final long serialVersionUID = -648721786979090913L;
+    public static final long DIPLOM = 1388L;
+    public static final long EXAM = 1387L;
 
     @FieldInfo(type = EFieldType.TEXT, max = 256, order = 1)
     @Column(name = "NAME_KZ", nullable = false)
