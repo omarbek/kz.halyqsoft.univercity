@@ -1,0 +1,52 @@
+CREATE OR REPLACE VIEW v_load_to_chair_with_groups AS
+  SELECT
+    vltc.id,
+    vltc.subject_id,
+    vltc.curriculum_id,
+    vltc.study_year_id,
+    vltc.stream_id,
+    vltc.group_id,
+    CASE WHEN string_agg(g.name, ',') ISNULL
+      THEN ''
+    ELSE string_agg(g.name, ',') END AS groups,
+    vltc.semester_id,
+    vltc.student_number,
+    vltc.credit,
+    vltc.lc_count,
+    vltc.pr_count,
+    vltc.lb_count,
+    vltc.with_teacher_count,
+    vltc.rating_count,
+    vltc.exam_count,
+    vltc.control_count,
+    vltc.course_work_count,
+    vltc.diploma_count,
+    vltc.practice_count,
+    vltc.mek,
+    vltc.protect_diploma_count,
+    vltc.total_count
+  FROM load_to_chair vltc LEFT JOIN
+    stream_group sg ON sg.stream_id = vltc.stream_id
+    LEFT JOIN groups g ON sg.group_id = g.id
+  GROUP BY vltc.id,
+    vltc.subject_id,
+    vltc.curriculum_id,
+    vltc.study_year_id,
+    vltc.stream_id,
+    vltc.group_id,
+    vltc.semester_id,
+    vltc.student_number,
+    vltc.credit,
+    vltc.lc_count,
+    vltc.pr_count,
+    vltc.lb_count,
+    vltc.with_teacher_count,
+    vltc.rating_count,
+    vltc.exam_count,
+    vltc.control_count,
+    vltc.course_work_count,
+    vltc.diploma_count,
+    vltc.practice_count,
+    vltc.mek,
+    vltc.protect_diploma_count,
+    vltc.total_count;
