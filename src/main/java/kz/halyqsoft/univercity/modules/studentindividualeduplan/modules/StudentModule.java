@@ -157,7 +157,7 @@ public class StudentModule extends BaseModule{
                             }
                         }
                      }
-
+                     Message.showInfo(CommonUtils.getUILocaleUtil().getMessage("cleared"));
                 }else{
                     Message.showError(CommonUtils.getUILocaleUtil().getMessage("choose.field"));
                 }

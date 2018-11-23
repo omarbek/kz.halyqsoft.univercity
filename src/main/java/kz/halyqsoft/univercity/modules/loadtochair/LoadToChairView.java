@@ -12,6 +12,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_GROUP;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_LOAD_TO_CHAIR_COUNT;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_LOAD_TO_CHAIR_COUNT_ALL;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_LOAD_TO_CHAIR_WITH_GROUPS;
 import kz.halyqsoft.univercity.filter.FChairFilter;
 import kz.halyqsoft.univercity.filter.panel.ChairFilterPanel;
 import kz.halyqsoft.univercity.modules.stream.dialogs.DetailDialog;
@@ -181,7 +182,7 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
             getContent().addComponent(filterPanel);
             getContent().setComponentAlignment(filterPanel, Alignment.TOP_CENTER);
 
-            loadGW = new GridWidget(LOAD_TO_CHAIR.class);
+            loadGW = new GridWidget(V_LOAD_TO_CHAIR_WITH_GROUPS.class);
             loadGW.addEntityListener(this);
             loadGW.setButtonEnabled(AbstractToolbar.ADD_BUTTON, false);
             Button openBtn = new Button(getUILocaleUtil().getCaption("open"));
@@ -190,7 +191,7 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
                 @Override
                 public void buttonClick(Button.ClickEvent clickEvent) {
                     if(loadGW.getSelectedEntity()!=null){
-                        LOAD_TO_CHAIR loadToChair = (LOAD_TO_CHAIR) loadGW.getSelectedEntity();
+                        V_LOAD_TO_CHAIR_WITH_GROUPS loadToChair = (V_LOAD_TO_CHAIR_WITH_GROUPS) loadGW.getSelectedEntity();
                         DetailDialog detailDialog = new DetailDialog(loadToChair.getStream(),false);
                         detailDialog.getStreamGroupGW().showToolbar(false);
                     }else{
@@ -204,6 +205,7 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
             loadGM.setTitleVisible(false);
             loadGM.setMultiSelect(false);
             loadGM.setRefreshType(ERefreshType.MANUAL);
+            loadGM.setCrudEntityClass(LOAD_TO_CHAIR.class);
 
             subjectQM = ((FKFieldModel) loadGM.getFormModel().getFieldModel("subject")).getQueryModel();
             subjectQM.addWhere("deleted", false);
@@ -254,7 +256,7 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
         }
     }
 
-    private void refresh(List<LOAD_TO_CHAIR> loads, List<V_LOAD_TO_CHAIR_COUNT> loadCounts,
+    private void refresh(List<V_LOAD_TO_CHAIR_WITH_GROUPS> loads, List<V_LOAD_TO_CHAIR_COUNT> loadCounts,
                          List<V_LOAD_TO_CHAIR_COUNT_ALL> loadAllCounts) {
         try {
             ((DBGridModel) loadGW.getWidgetModel()).setEntities(loads);
@@ -270,9 +272,9 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
         }
     }
 
-    private List<LOAD_TO_CHAIR> getLoads(DEPARTMENT chair, STUDENT_DIPLOMA_TYPE studentDiplomaType,
+    private List<V_LOAD_TO_CHAIR_WITH_GROUPS> getLoads(DEPARTMENT chair, STUDENT_DIPLOMA_TYPE studentDiplomaType,
                                          STUDY_YEAR studyYear) {
-        QueryModel<LOAD_TO_CHAIR> loadQM = new QueryModel<>(LOAD_TO_CHAIR.class);
+        QueryModel<V_LOAD_TO_CHAIR_WITH_GROUPS> loadQM = new QueryModel<>(V_LOAD_TO_CHAIR_WITH_GROUPS.class);
         FromItem curriculumFI = loadQM.addJoin(EJoin.INNER_JOIN, "curriculum", CURRICULUM.class, "id");
         FromItem subjFI = loadQM.addJoin(EJoin.INNER_JOIN, "subject", SUBJECT.class, "id");
         loadQM.addWhere(subjFI, "chair", ECriteria.EQUAL, chair.getId());
@@ -328,7 +330,7 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
         if (chairFilter.getChair() != null && chairFilter.getStudentDiplomaType() != null
                 && chairFilter.getStudyYear() != null) {
             loadGW.setButtonEnabled(AbstractToolbar.ADD_BUTTON, true);
-            List<LOAD_TO_CHAIR> loads = getLoads(chairFilter.getChair(), chairFilter.getStudentDiplomaType(),
+            List<V_LOAD_TO_CHAIR_WITH_GROUPS> loads = getLoads(chairFilter.getChair(), chairFilter.getStudentDiplomaType(),
                     chairFilter.getStudyYear());
             List<V_LOAD_TO_CHAIR_COUNT> loadCounts = getLoadCount(chairFilter.getChair(),
                     chairFilter.getStudentDiplomaType(), chairFilter.getStudyYear());

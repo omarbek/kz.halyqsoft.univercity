@@ -80,13 +80,13 @@ public class GenerateSpecStreams extends Generate {
     protected void createStream(List<V_GROUP> groups) throws Exception {
         STREAM stream = new STREAM();
         stream.setCreated(new Date());
-        ID seqenceOfStream = SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("s_stream");
-        stream.setName(seqenceOfStream + "S");
+        ID sequenceOfStream = SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("s_stream");
+        stream.setName(sequenceOfStream + "S");
         stream.setDeleted(false);
         stream.setLanguage(groups.get(0).getLanguage());
         stream.setStreamType(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class)
                 .lookup(STREAM_TYPE.class, STREAM_TYPE.SPEC));
-        stream.setId(seqenceOfStream);
+        stream.setId(sequenceOfStream);
         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(stream);
 
         for (V_GROUP group : groups) {
