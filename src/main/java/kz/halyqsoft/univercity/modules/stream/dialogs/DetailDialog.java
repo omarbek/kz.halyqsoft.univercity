@@ -4,6 +4,7 @@ import com.vaadin.ui.Alignment;
 import kz.halyqsoft.univercity.entity.beans.univercity.GROUPS;
 import kz.halyqsoft.univercity.entity.beans.univercity.STREAM;
 import kz.halyqsoft.univercity.entity.beans.univercity.STREAM_GROUP;
+import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
@@ -60,7 +61,29 @@ public class DetailDialog extends AbstractDialog implements EntityListener {
         FromItem streamGrFI = groupsQM.addJoin(EJoin.INNER_JOIN, "id", STREAM_GROUP.class, "group");
         groupsQM.addWhere("deleted", false);
         groupsQM.addWhere(streamGrFI, "stream", ECriteria.EQUAL, stream.getId());
+
         List<ID> groupIdsInThisStream = new ArrayList<>();
+
+        QueryModel<STREAM> streamQM = new QueryModel<>(STREAM.class);
+        streamQM.addWhere("subject" , ECriteria.EQUAL, stream.getSubject().getId());
+        streamQM.addWhereAnd("deleted" , ECriteria.EQUAL, false);
+        streamQM.addWhereAnd("semesterPeriod" , ECriteria.EQUAL, stream.getSemesterPeriod().getId());
+        try{
+            List<STREAM> streams = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(streamQM);
+            for(STREAM stream : streams){
+                QueryModel<STREAM_GROUP> streamGroupQM = new QueryModel<>(STREAM_GROUP.class);
+                streamGroupQM.addWhere("stream" , ECriteria.EQUAL, stream.getId());
+                List<STREAM_GROUP> streamGroups = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(streamGroupQM);
+                for(STREAM_GROUP streamGroup : streamGroups){
+                    if (!groupIdsInThisStream.contains(streamGroup.getGroup().getId())) {
+                        groupIdsInThisStream.add(streamGroup.getGroup().getId());
+                    }
+                }
+            }
+        }catch (Exception e){
+            CommonUtils.showMessageAndWriteLog(e.getMessage(),e);
+            e.printStackTrace();
+        }
         try {
             List<GROUPS> groups = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class)
                     .lookup(groupsQM);
@@ -70,7 +93,8 @@ public class DetailDialog extends AbstractDialog implements EntityListener {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();//TODO catch
+            CommonUtils.showMessageAndWriteLog(e.getMessage(),e);
+            e.printStackTrace();
         }
 
         FKFieldModel groupFM = (FKFieldModel) streamGroupGM.getFormModel().getFieldModel("group");
@@ -88,7 +112,8 @@ public class DetailDialog extends AbstractDialog implements EntityListener {
             streamGroupGM.setEntities(streamGroups);
             streamGroupGW.refresh();
         } catch (Exception e) {
-            e.printStackTrace();//TODO catch
+            CommonUtils.showMessageAndWriteLog(e.getMessage(),e);
+            e.printStackTrace();
         }
     }
 
