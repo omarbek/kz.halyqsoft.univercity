@@ -33,13 +33,13 @@ CREATE OR REPLACE VIEW V_LOAD_TO_CHAIR AS
                   0                                      protect_diploma_count,
                   subj.lc_count + subj.pr_count + subj.lb_count + credit * 5
                     + case
-                        when curr.student_diploma_type_id in (6, 7) then str.student_count / 4
+                        when curr.student_diploma_type_id not in (6, 7) then str.student_count / 4
                         else 0 end
                     + str.group_count * 2
                     + CASE
-                        WHEN curr.student_diploma_type_id not in (6, 7)
-                                THEN 0
-                        ELSE str.student_count / 5 END
+                        WHEN curr.student_diploma_type_id in (6, 7)
+                                THEN str.student_count / 5
+                        ELSE 0 END
                     + CASE
                         WHEN subj.course_work = TRUE
                                 THEN str.student_count / 4
@@ -90,13 +90,13 @@ CREATE OR REPLACE VIEW V_LOAD_TO_CHAIR AS
                   0                                      protect_diploma_count,
                   subj.lc_count + subj.pr_count + subj.lb_count + credit * 5
                     + case
-                        when curr.student_diploma_type_id in (6, 7) then str.student_count / 4
+                        when curr.student_diploma_type_id not in (6, 7) then str.student_count / 4
                         else 0 end
                     + str.group_count * 2
                     + CASE
-                        WHEN curr.student_diploma_type_id not in (6, 7)
-                                THEN 0
-                        ELSE str.student_count / 5 END
+                        WHEN curr.student_diploma_type_id in (6, 7)
+                                THEN str.student_count / 5
+                        ELSE 0 END
                     + CASE
                         WHEN subj.course_work = TRUE
                                 THEN str.student_count / 4
@@ -147,13 +147,13 @@ CREATE OR REPLACE VIEW V_LOAD_TO_CHAIR AS
                   0                                      protect_diploma_count,
                   subj.lc_count + subj.pr_count + subj.lb_count + credit * 5
                     + case
-                        when curr.student_diploma_type_id in (6, 7) then str.student_count / 4
+                        when curr.student_diploma_type_id not in (6, 7) then str.student_count / 4
                         else 0 end
                     + str.group_count * 2
                     + CASE
-                        WHEN curr.student_diploma_type_id not in (6, 7)
-                                THEN 0
-                        ELSE str.student_count / 5 END
+                        WHEN curr.student_diploma_type_id in (6, 7)
+                                THEN str.student_count / 5
+                        ELSE 0 END
                     + CASE
                         WHEN subj.course_work = TRUE
                                 THEN str.student_count / 4
