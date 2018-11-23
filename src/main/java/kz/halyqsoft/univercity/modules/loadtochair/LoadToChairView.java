@@ -1,6 +1,7 @@
 package kz.halyqsoft.univercity.modules.loadtochair;
 
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM;
@@ -13,6 +14,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.view.V_LOAD_TO_CHAIR_COUN
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_LOAD_TO_CHAIR_COUNT_ALL;
 import kz.halyqsoft.univercity.filter.FChairFilter;
 import kz.halyqsoft.univercity.filter.panel.ChairFilterPanel;
+import kz.halyqsoft.univercity.modules.stream.dialogs.DetailDialog;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -83,7 +85,7 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
             loadHL.addComponent(yearLabel);
 
             Button generateButton = new Button();
-            generateButton.setCaption("generate");//TODO
+            generateButton.setCaption(getUILocaleUtil().getCaption("generate"));
             generateButton.addClickListener(new Button.ClickListener() {
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
@@ -182,6 +184,21 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
             loadGW = new GridWidget(LOAD_TO_CHAIR.class);
             loadGW.addEntityListener(this);
             loadGW.setButtonEnabled(AbstractToolbar.ADD_BUTTON, false);
+            Button openBtn = new Button(getUILocaleUtil().getCaption("open"));
+            openBtn.setIcon(FontAwesome.SIGN_IN);
+            openBtn.addClickListener(new Button.ClickListener() {
+                @Override
+                public void buttonClick(Button.ClickEvent clickEvent) {
+                    if(loadGW.getSelectedEntity()!=null){
+                        LOAD_TO_CHAIR loadToChair = (LOAD_TO_CHAIR) loadGW.getSelectedEntity();
+                        DetailDialog detailDialog = new DetailDialog(loadToChair.getStream(),false);
+                        detailDialog.getStreamGroupGW().showToolbar(false);
+                    }else{
+                        Message.showError(getUILocaleUtil().getMessage("chooseARecord"));
+                    }
+                }
+            });
+            loadGW.getToolbarPanel().addComponent(openBtn);
 
             DBGridModel loadGM = (DBGridModel) loadGW.getWidgetModel();
             loadGM.setTitleVisible(false);
@@ -329,9 +346,17 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
 
     @Override
     public void handleEntityEvent(EntityEvent ev) {
+
+        if(ev.getAction() == EntityEvent.SELECTED){
+            if(ev.getSource().equals(loadGW)){
+
+            }
+        }
+
         if (ev.getAction() == EntityEvent.REMOVED || ev.getAction() == EntityEvent.MERGED) {
             doFilter(filterPanel.getFilterBean());
         }
+
     }
 
     @Override
