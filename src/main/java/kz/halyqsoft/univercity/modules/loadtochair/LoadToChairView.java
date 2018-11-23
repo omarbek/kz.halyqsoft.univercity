@@ -346,17 +346,9 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
 
     @Override
     public void handleEntityEvent(EntityEvent ev) {
-
-        if(ev.getAction() == EntityEvent.SELECTED){
-            if(ev.getSource().equals(loadGW)){
-
-            }
-        }
-
         if (ev.getAction() == EntityEvent.REMOVED || ev.getAction() == EntityEvent.MERGED) {
             doFilter(filterPanel.getFilterBean());
         }
-
     }
 
     @Override

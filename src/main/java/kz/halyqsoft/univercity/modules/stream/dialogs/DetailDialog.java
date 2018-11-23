@@ -81,8 +81,12 @@ public class DetailDialog extends AbstractDialog implements EntityListener {
 
             QueryModel<STREAM> streamQM = new QueryModel<>(STREAM.class);
             streamQM.addWhere("deleted" , ECriteria.EQUAL, false);
-            streamQM.addWhereAnd("subject" , ECriteria.EQUAL, stream.getSubject().getId());
-            streamQM.addWhereAnd("semesterPeriod" , ECriteria.EQUAL, stream.getSemesterPeriod().getId());
+            if(stream.getSubject() !=null){
+                streamQM.addWhereAnd("subject" , ECriteria.EQUAL, stream.getSubject().getId());
+            }
+            if(stream.getSemesterPeriod()!=null){
+                streamQM.addWhereAnd("semesterPeriod" , ECriteria.EQUAL, stream.getSemesterPeriod().getId());
+            }
             try{
                 List<STREAM> streams = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(streamQM);
                 for(STREAM stream : streams){
