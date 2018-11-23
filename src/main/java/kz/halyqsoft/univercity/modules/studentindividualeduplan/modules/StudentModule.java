@@ -116,7 +116,6 @@ public class StudentModule extends BaseModule{
                         }
                     }else{
                         ids.add(CommonUtils.getCurrentSemesterData().getId());
-
                     }
                     for(STUDENT student : studentList){
                         QueryModel<STUDENT_SUBJECT> studentSubjectQM = new QueryModel<>(STUDENT_SUBJECT.class);
