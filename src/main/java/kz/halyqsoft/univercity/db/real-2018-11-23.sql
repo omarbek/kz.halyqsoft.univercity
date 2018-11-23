@@ -51,8 +51,10 @@ CREATE OR REPLACE VIEW V_LOAD_TO_CHAIR AS
          INNER JOIN (SELECT DISTINCT str.id, str.group_count, str.student_count, gr.speciality_id, gr.study_year_id
                      FROM v_stream str
                             INNER JOIN stream_group str_gr ON str.id = str_gr.stream_id
-                            INNER JOIN v_group gr ON str_gr.group_id = gr.id) str
-           ON str.speciality_id = curr.speciality_id
+                            INNER JOIN v_group gr ON str_gr.group_id = gr.id
+                            INNER JOIN speciality spec on spec.id = gr.speciality_id
+                     where (spec.chair_id = 23 and str.stream_type_id = 2)
+                        or spec.chair_id != 23) str ON str.speciality_id = curr.speciality_id
   WHERE subj.deleted = FALSE
     AND curr.deleted = FALSE
     AND sem.study_year_id = str.study_year_id
@@ -106,8 +108,10 @@ CREATE OR REPLACE VIEW V_LOAD_TO_CHAIR AS
          INNER JOIN (SELECT DISTINCT str.id, str.group_count, str.student_count, gr.speciality_id, gr.study_year_id
                      FROM v_stream str
                             INNER JOIN stream_group str_gr ON str.id = str_gr.stream_id
-                            INNER JOIN v_group gr ON str_gr.group_id = gr.id) str
-           ON str.speciality_id = curr.speciality_id
+                            INNER JOIN v_group gr ON str_gr.group_id = gr.id
+                            INNER JOIN speciality spec on spec.id = gr.speciality_id
+                     where (spec.chair_id = 23 and str.stream_type_id = 2)
+                        or spec.chair_id != 23) str ON str.speciality_id = curr.speciality_id
   WHERE subj.deleted = FALSE
     AND curr.deleted = FALSE
     AND sem.study_year_id = str.study_year_id
@@ -162,8 +166,10 @@ CREATE OR REPLACE VIEW V_LOAD_TO_CHAIR AS
          INNER JOIN (SELECT DISTINCT str.id, str.group_count, str.student_count, gr.speciality_id, gr.study_year_id
                      FROM v_stream str
                             INNER JOIN stream_group str_gr ON str.id = str_gr.stream_id
-                            INNER JOIN v_group gr ON str_gr.group_id = gr.id) str
-           ON str.speciality_id = curr.speciality_id
+                            INNER JOIN v_group gr ON str_gr.group_id = gr.id
+                            INNER JOIN speciality spec on spec.id = gr.speciality_id
+                     where (spec.chair_id = 23 and str.stream_type_id = 2)
+                        or spec.chair_id != 23) str ON str.speciality_id = curr.speciality_id
   WHERE subj.deleted = FALSE
     AND curr.deleted = FALSE
     AND sem.study_year_id = str.study_year_id
