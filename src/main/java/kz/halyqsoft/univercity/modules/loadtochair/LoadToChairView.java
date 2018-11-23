@@ -280,6 +280,7 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
         loadQM.addWhere(curriculumFI, "diplomaType", ECriteria.EQUAL, studentDiplomaType.getId());
         loadQM.addWhere("studyYear", ECriteria.EQUAL, studyYear.getId());
         loadQM.addOrder("semester");
+        loadQM.addOrder("subject");
         try {
             return SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
                     lookup(loadQM);
