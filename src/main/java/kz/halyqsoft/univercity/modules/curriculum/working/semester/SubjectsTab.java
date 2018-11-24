@@ -87,7 +87,7 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
         });
 
         currentGW.setButtonDescription(AbstractToolbar.ADD_BUTTON, "add.from.one.student");
-        //currentGW.setButtonWidth(AbstractToolbar.ADD_BUTTON, "180px");
+        currentGW.setButtonWidth(AbstractToolbar.ADD_BUTTON, "180px");
         currentGW.setButtonIcon(AbstractToolbar.ADD_BUTTON, "img/button/users.png");
         currentGW.addButtonClickListener(AbstractToolbar.ADD_BUTTON, new Button.ClickListener() {
             @Override
@@ -103,7 +103,7 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
 
         currentGW.setButtonVisible(AbstractToolbar.HELP_BUTTON, true);
         currentGW.setButtonDescription(AbstractToolbar.HELP_BUTTON, "add.from.iups");
-        // currentGW.setButtonWidth(AbstractToolbar.HELP_BUTTON, "150px");
+        currentGW.setButtonWidth(AbstractToolbar.HELP_BUTTON, "150px");
         currentGW.setButtonIcon(AbstractToolbar.HELP_BUTTON, "img/button/add.png");
         currentGW.addButtonClickListener(AbstractToolbar.HELP_BUTTON, new Button.ClickListener() {
             @Override
@@ -141,7 +141,7 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
         boolean isAfterSemesterSubjects = subjectType.equals(SubjectsType.AFTER_SEMESTER_SUBJECTS);
         try {
             StringBuilder sqlSB = new StringBuilder("SELECT DISTINCT sem_subj.subject_id");
-            if (isAddingSubjects) {
+            if (isAddingSubjects || isAfterSemesterSubjects) {
                 sqlSB.append(", sem_subj.semester_data_id");
             }
             sqlSB.append(" FROM student_subject stu_subj " +
@@ -186,7 +186,7 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
             params.put(1, curriculum.getSpeciality().getId().getId());
             params.put(2, curriculum.getDiplomaType().getId().getId());
             params.put(3, curriculum.getEntranceYear().getId().getId());
-            if (!isAddingSubjects) {
+            if (isMainSubjects || isElectiveSubjects) {
                 SEMESTER_DATA semesterData = null;
                 if (!isAfterSemesterSubjects) {
                     semesterData = CommonUtils.getSemesterDataBySemesterAndEntranceYear(semester,
@@ -197,15 +197,17 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
                         lookupItemsList(sqlSB.toString(), params);
                 if (isMainSubjects) {
                     initCurriculumDetail(curriculum, semester, subjectIds, semesterData);
-                } else if (isElectiveSubjects) {
+                } else {//elective subj
                     initElectiveSubject(curriculum, semester, subjectIds, semesterData);
-                } else {//after sem
-                    initAfterSemesterSubject(curriculum, subjectIds);
                 }
             } else {
                 List<Object> subjectsBySemester = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class)
                         .lookupItemsList(sqlSB.toString(), params);
-                initAddingSubjects(curriculum, subjectsBySemester);
+                if (isAddingSubjects) {
+                    initAddingSubjects(curriculum, subjectsBySemester);
+                } else {//after sem
+                    initAfterSemesterSubject(curriculum, subjectsBySemester);
+                }
             }
             CommonUtils.showSavedNotification();
             refreshSubjects(curriculum, semester);
@@ -215,10 +217,11 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
         }
     }
 
-    private void initAfterSemesterSubject(CURRICULUM curriculum, List<Long> subjectIds) throws Exception {
+    private void initAfterSemesterSubject(CURRICULUM curriculum, List<Object> subjectsBySemester) throws Exception {
         QueryModel<CURRICULUM_AFTER_SEMESTER> curriculumAfterSemesterQM = new QueryModel<>(
                 CURRICULUM_AFTER_SEMESTER.class);
         curriculumAfterSemesterQM.addWhere("curriculum", ECriteria.EQUAL, curriculum.getId());
+        curriculumAfterSemesterQM.addWhere("deleted", false);
         List<CURRICULUM_AFTER_SEMESTER> curriculumAfterSemesters = SessionFacadeFactory.getSessionFacade(
                 CommonEntityFacadeBean.class).lookup(curriculumAfterSemesterQM);
         for (CURRICULUM_AFTER_SEMESTER curriculumAfterSemester : curriculumAfterSemesters) {
@@ -226,26 +229,46 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
             curriculumAfterSemester.setUpdated(new Date());
         }
         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(curriculumAfterSemesters);
+        for (Object object : subjectsBySemester) {
+            Object[] objects = (Object[]) object;
+            Long subjectId = (Long) objects[0];
+            Long semesterDataId = (Long) objects[1];
+
+            createCurriculumAfterSemester(curriculum, subjectId, semesterDataId);
+        }
+        List<Long> subjectIds = new ArrayList<>();
         subjectIds.add(SUBJECT.DIPLOM);
         subjectIds.add(SUBJECT.EXAM);
         for (Long subjectId : subjectIds) {
-            CURRICULUM_AFTER_SEMESTER curriculumAfterSemester = new CURRICULUM_AFTER_SEMESTER();
-            curriculumAfterSemester.setDeleted(false);
-            curriculumAfterSemester.setCreated(new Date());
-            curriculumAfterSemester.setCurriculum(curriculum);
-            curriculumAfterSemester.setSubject(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean
-                    .class).lookup(SUBJECT.class, ID.valueOf(subjectId)));
-            if (subjectId.equals(SUBJECT.DIPLOM)) {
-                curriculumAfterSemester.setCode("-");
-            }
-            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(curriculumAfterSemester);
+            createCurriculumAfterSemester(curriculum, subjectId, null);
         }
+    }
+
+    private void createCurriculumAfterSemester(CURRICULUM curriculum, Long subjectId, Long semesterDataId) throws Exception {
+        CURRICULUM_AFTER_SEMESTER curriculumAfterSemester = new CURRICULUM_AFTER_SEMESTER();
+        curriculumAfterSemester.setDeleted(false);
+        curriculumAfterSemester.setCreated(new Date());
+        curriculumAfterSemester.setCurriculum(curriculum);
+        curriculumAfterSemester.setSubject(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean
+                .class).lookup(SUBJECT.class, ID.valueOf(subjectId)));
+        if (subjectId.equals(SUBJECT.DIPLOM)) {
+            curriculumAfterSemester.setCode("-");
+        }
+        if (semesterDataId != null) {
+            SEMESTER_DATA semesterData = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean
+                    .class).lookup(SEMESTER_DATA.class, ID.valueOf(semesterDataId));
+            curriculumAfterSemester.setSemesterData(semesterData);
+            curriculumAfterSemester.setSemester(CommonUtils.getSemesterBySemesterDataAndEntranceYear(
+                    semesterData, entranceYear));
+        }
+        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(curriculumAfterSemester);
     }
 
     private void initAddingSubjects(CURRICULUM curriculum, List<Object> subjectsBySemester)
             throws Exception {
         QueryModel<CURRICULUM_ADD_PROGRAM> curriculumAddProgramQM = new QueryModel<>(CURRICULUM_ADD_PROGRAM.class);
         curriculumAddProgramQM.addWhere("curriculum", ECriteria.EQUAL, curriculum.getId());
+        curriculumAddProgramQM.addWhere("deleted", false);
         List<CURRICULUM_ADD_PROGRAM> curriculumAddPrograms = SessionFacadeFactory.getSessionFacade(
                 CommonEntityFacadeBean.class).lookup(curriculumAddProgramQM);
         for (CURRICULUM_ADD_PROGRAM curriculumAddProgram : curriculumAddPrograms) {
@@ -275,12 +298,13 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
 
     private void initElectiveSubject(CURRICULUM curriculum, SEMESTER semester,
                                      List<Long> subjectIds, SEMESTER_DATA semesterData) throws Exception {
-        QueryModel<ELECTIVE_SUBJECT> curriculumDetailQM = new QueryModel<>(
+        QueryModel<ELECTIVE_SUBJECT> electSubjQM = new QueryModel<>(
                 ELECTIVE_SUBJECT.class);
-        curriculumDetailQM.addWhere("curriculum", ECriteria.EQUAL, curriculum.getId());
-        curriculumDetailQM.addWhere("semester", ECriteria.EQUAL, semester.getId());
+        electSubjQM.addWhere("curriculum", ECriteria.EQUAL, curriculum.getId());
+        electSubjQM.addWhere("semester", ECriteria.EQUAL, semester.getId());
+        electSubjQM.addWhere("deleted", false);
         List<ELECTIVE_SUBJECT> electiveSubjects = SessionFacadeFactory.getSessionFacade(
-                CommonEntityFacadeBean.class).lookup(curriculumDetailQM);
+                CommonEntityFacadeBean.class).lookup(electSubjQM);
         for (ELECTIVE_SUBJECT electiveSubject : electiveSubjects) {
             electiveSubject.setDeleted(true);
             electiveSubject.setUpdated(new Date());
@@ -308,6 +332,7 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
                 CURRICULUM_DETAIL.class);
         curriculumDetailQM.addWhere("curriculum", ECriteria.EQUAL, curriculum.getId());
         curriculumDetailQM.addWhere("semester", ECriteria.EQUAL, semester.getId());
+        curriculumDetailQM.addWhere("deleted", false);
         List<CURRICULUM_DETAIL> curriculumDetails = SessionFacadeFactory.getSessionFacade(
                 CommonEntityFacadeBean.class).lookup(curriculumDetailQM);
         for (CURRICULUM_DETAIL curriculumDetail : curriculumDetails) {

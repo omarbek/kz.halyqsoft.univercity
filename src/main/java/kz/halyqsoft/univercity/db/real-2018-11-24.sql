@@ -1,11 +1,57 @@
-insert into user_roles
-values (nextval('s_user_roles'), 1, 3);
+alter table curriculum_after_semester
+  add column semester_id bigint;
+alter table curriculum_after_semester
+  add column semester_data_id bigint;
 
+drop view v_load_to_chair;
+drop view v_curriculum_after_semester;
+CREATE OR REPLACE VIEW v_curriculum_after_semester AS
+  SELECT curr_after_sem.ID,
+         curr_after_sem.CURRICULUM_ID,
+         curr_after_sem.SEMESTER_ID,
+         curr_after_sem.semester_data_id,
+         curr_after_sem.SUBJECT_ID,
+         subj.CREDITABILITY_ID,
+         subj.ects_id,
+         subj.CONTROL_TYPE_ID,
+         curr_after_sem.education_module_type_id,
+         subj.module_id,
+      --end of ids
+         sem.SEMESTER_NAME,
+         subj_mod.module_short_name,
+         CASE
+           WHEN curr_after_sem.education_module_type_id IS NULL
+                   THEN '-'
+           ELSE edu_mod_type.type_name END education_module_type_name,
+         curr_after_sem.CODE               SUBJECT_CODE,
+         subj.NAME_kz                      SUBJECT_NAME_KZ,
+         subj.name_ru                      subject_name_ru,
+         cred.CREDIT,
+         ects.ects                         ects_count,
+         subj.lc_count,
+         subj.week_number,
+         subj.lb_count,
+         subj.with_teacher_count,
+         subj.own_count,
+         subj.total_count,
+         contr_type.TYPE_NAME              CONTROL_TYPE_NAME
+  FROM curriculum_after_semester curr_after_sem
+         LEFT JOIN SEMESTER sem ON curr_after_sem.SEMESTER_ID = sem.ID
+         INNER JOIN SUBJECT subj ON curr_after_sem.SUBJECT_ID = subj.ID
+         INNER JOIN subject_module subj_mod ON subj.module_id = subj_mod.id
+         INNER JOIN CREDITABILITY cred ON subj.CREDITABILITY_ID = cred.ID
+         INNER JOIN CONTROL_TYPE contr_type ON subj.CONTROL_TYPE_ID = contr_type.ID
+         INNER JOIN ects ON subj.ects_id = ects.id
+         LEFT JOIN education_module_type edu_mod_type ON edu_mod_type.id = curr_after_sem.education_module_type_id
+  WHERE curr_after_sem.deleted = FALSE
+    AND subj.deleted = FALSE;
+
+drop view V_LOAD_TO_CHAIR;
 CREATE OR REPLACE VIEW V_LOAD_TO_CHAIR AS
   SELECT DISTINCT floor(random() * (1000) + 1) :: BIGINT id,
                   subj.id                                subject_id,
                   curr.id                                curriculum_id,
-                  sem.study_year_id,
+                  cast(null as bigint)                   study_year_id,
                   str.id                                 stream_id,
                   0                                      group_id,
                   sem.id                                 semester_id,
@@ -53,8 +99,7 @@ CREATE OR REPLACE VIEW V_LOAD_TO_CHAIR AS
                             INNER JOIN stream_group str_gr ON str.id = str_gr.stream_id
                             INNER JOIN v_group gr ON str_gr.group_id = gr.id
                             INNER JOIN speciality spec on spec.id = gr.speciality_id
-                     where (spec.chair_id = 23 and str.stream_type_id = 2)
-                        or spec.chair_id != 23) str ON str.speciality_id = curr.speciality_id
+                     where str.stream_type_id = 2) str ON str.speciality_id = curr.speciality_id
   WHERE subj.deleted = FALSE
     AND curr.deleted = FALSE
     AND sem.study_year_id = str.study_year_id
@@ -62,7 +107,7 @@ CREATE OR REPLACE VIEW V_LOAD_TO_CHAIR AS
   SELECT DISTINCT floor(random() * (1000) + 1) :: BIGINT id,
                   subj.id                                subject_id,
                   curr.id                                curriculum_id,
-                  sem.study_year_id,
+                  cast(null as bigint)                   study_year_id,
                   str.id                                 stream_id,
                   0                                      group_id,
                   sem.id                                 semester_id,
@@ -110,8 +155,7 @@ CREATE OR REPLACE VIEW V_LOAD_TO_CHAIR AS
                             INNER JOIN stream_group str_gr ON str.id = str_gr.stream_id
                             INNER JOIN v_group gr ON str_gr.group_id = gr.id
                             INNER JOIN speciality spec on spec.id = gr.speciality_id
-                     where (spec.chair_id = 23 and str.stream_type_id = 2)
-                        or spec.chair_id != 23) str ON str.speciality_id = curr.speciality_id
+                     where str.stream_type_id = 2) str ON str.speciality_id = curr.speciality_id
   WHERE subj.deleted = FALSE
     AND curr.deleted = FALSE
     AND sem.study_year_id = str.study_year_id
@@ -119,7 +163,7 @@ CREATE OR REPLACE VIEW V_LOAD_TO_CHAIR AS
   SELECT DISTINCT floor(random() * (1000) + 1) :: BIGINT id,
                   subj.id                                subject_id,
                   curr.id                                curriculum_id,
-                  sem.study_year_id,
+                  cast(null as bigint)                   study_year_id,
                   str.id                                 stream_id,
                   0                                      group_id,
                   sem.id                                 semester_id,
@@ -168,8 +212,7 @@ CREATE OR REPLACE VIEW V_LOAD_TO_CHAIR AS
                             INNER JOIN stream_group str_gr ON str.id = str_gr.stream_id
                             INNER JOIN v_group gr ON str_gr.group_id = gr.id
                             INNER JOIN speciality spec on spec.id = gr.speciality_id
-                     where (spec.chair_id = 23 and str.stream_type_id = 2)
-                        or spec.chair_id != 23) str ON str.speciality_id = curr.speciality_id
+                     where str.stream_type_id = 2) str ON str.speciality_id = curr.speciality_id
   WHERE subj.deleted = FALSE
     AND curr.deleted = FALSE
     AND sem.study_year_id = str.study_year_id
@@ -177,10 +220,10 @@ CREATE OR REPLACE VIEW V_LOAD_TO_CHAIR AS
   SELECT DISTINCT floor(random() * (1000) + 1) :: BIGINT id,
                   subj.id                                subject_id,
                   curr.id                                curriculum_id,
-                  gr.study_year_id,
+                  cast(null as bigint)                   study_year_id,
                   0                                      stream_id,
                   gr.id                                  group_id,
-                  0                                      semester_id,
+                  sem.id                                 semester_id,
                   gr.student_count                       student_number,
                   curr_after_sem.credit,
                   cast(0 as numeric(3, 0))               lc_count,
@@ -226,60 +269,9 @@ CREATE OR REPLACE VIEW V_LOAD_TO_CHAIR AS
   FROM v_curriculum_after_semester curr_after_sem
          INNER JOIN subject subj ON subj.id = curr_after_sem.subject_id
          INNER JOIN curriculum curr ON curr_after_sem.curriculum_id = curr.id
+         LEFT JOIN semester sem ON sem.id = curr_after_sem.semester_id
          INNER JOIN v_group gr ON gr.speciality_id = curr.speciality_id
          INNER JOIN study_year year ON year.id = gr.study_year_id
   WHERE subj.deleted = FALSE
-    AND curr.deleted = FALSE;
-
-CREATE OR REPLACE VIEW v_load_to_chair_with_groups AS
-       SELECT
-              vltc.id,
-              vltc.subject_id,
-              vltc.curriculum_id,
-              vltc.study_year_id,
-              vltc.stream_id,
-              vltc.group_id,
-              CASE WHEN string_agg(g.name, ',') ISNULL
-                        THEN ''
-                   ELSE string_agg(g.name, ',') END AS groups,
-              vltc.semester_id,
-              vltc.student_number,
-              vltc.credit,
-              vltc.lc_count,
-              vltc.pr_count,
-              vltc.lb_count,
-              vltc.with_teacher_count,
-              vltc.rating_count,
-              vltc.exam_count,
-              vltc.control_count,
-              vltc.course_work_count,
-              vltc.diploma_count,
-              vltc.practice_count,
-              vltc.mek,
-              vltc.protect_diploma_count,
-              vltc.total_count
-       FROM load_to_chair vltc LEFT JOIN
-                stream_group sg ON sg.stream_id = vltc.stream_id
-                               LEFT JOIN groups g ON sg.group_id = g.id
-       GROUP BY vltc.id,
-                vltc.subject_id,
-                vltc.curriculum_id,
-                vltc.study_year_id,
-                vltc.stream_id,
-                vltc.group_id,
-                vltc.semester_id,
-                vltc.student_number,
-                vltc.credit,
-                vltc.lc_count,
-                vltc.pr_count,
-                vltc.lb_count,
-                vltc.with_teacher_count,
-                vltc.rating_count,
-                vltc.exam_count,
-                vltc.control_count,
-                vltc.course_work_count,
-                vltc.diploma_count,
-                vltc.practice_count,
-                vltc.mek,
-                vltc.protect_diploma_count,
-                vltc.total_count;
+    AND curr.deleted = FALSE
+    AND sem.study_year_id = gr.study_year_id;

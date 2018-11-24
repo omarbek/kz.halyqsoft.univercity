@@ -22,6 +22,16 @@ public class V_CURRICULUM_AFTER_SEMESTER extends AbstractEntity {
 
     @ManyToOne
     @JoinColumns({
+            @JoinColumn(name = "SEMESTER_ID", referencedColumnName = "ID")})
+    private SEMESTER semester;
+
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "SEMESTER_DATA_ID", referencedColumnName = "ID")})
+    private SEMESTER_DATA semesterData;
+
+    @ManyToOne
+    @JoinColumns({
             @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
     private SUBJECT subject;
 
@@ -51,58 +61,62 @@ public class V_CURRICULUM_AFTER_SEMESTER extends AbstractEntity {
     private SUBJECT_MODULE subjectModule;
 
     @FieldInfo(type = EFieldType.TEXT)
+    @Column(name = "SEMESTER_NAME")
+    private String semesterName;
+
+    @FieldInfo(type = EFieldType.TEXT, order = 2)
     @Column(name = "MODULE_SHORT_NAME")
     private String moduleShortName;
 
-    @FieldInfo(type = EFieldType.TEXT, order = 2)
+    @FieldInfo(type = EFieldType.TEXT, order = 3)
     @Column(name = "EDUCATION_MODULE_TYPE_NAME")
     private String educationModuleTypeName;
 
-    @FieldInfo(type = EFieldType.TEXT, order = 3)
+    @FieldInfo(type = EFieldType.TEXT, order = 4)
     @Column(name = "SUBJECT_CODE")
     private String subjectCode;
 
-    @FieldInfo(type = EFieldType.TEXT, order = 4)
+    @FieldInfo(type = EFieldType.TEXT, order = 5)
     @Column(name = "SUBJECT_NAME_KZ")
     private String subjectNameKz;
 
-    @FieldInfo(type = EFieldType.TEXT, order = 5)
+    @FieldInfo(type = EFieldType.TEXT, order = 6)
     @Column(name = "SUBJECT_NAME_RU")
     private String subjectNameRu;
 
-    @FieldInfo(type = EFieldType.INTEGER, order = 6)
+    @FieldInfo(type = EFieldType.INTEGER, order = 7)
     @Column(name = "CREDIT")
     private Integer credit;
 
-    @FieldInfo(type = EFieldType.INTEGER, order = 7)
+    @FieldInfo(type = EFieldType.INTEGER, order = 8)
     @Column(name = "ECTS_COUNT")
     private Integer ectsCount;
 
-    @FieldInfo(type = EFieldType.INTEGER, order = 8)
+    @FieldInfo(type = EFieldType.INTEGER, order = 9)
     @Column(name = "LC_COUNT")
     private Integer lcCount;
 
-    @FieldInfo(type = EFieldType.INTEGER, order = 9)
+    @FieldInfo(type = EFieldType.INTEGER, order = 10)
     @Column(name = "WEEK_NUMBER")
     private Integer weekNumber;
 
-    @FieldInfo(type = EFieldType.INTEGER, order = 10)
+    @FieldInfo(type = EFieldType.INTEGER, order = 11)
     @Column(name = "LB_COUNT")
     private Integer lbCount;
 
-    @FieldInfo(type = EFieldType.INTEGER, order = 11)
+    @FieldInfo(type = EFieldType.INTEGER, order = 12)
     @Column(name = "WITH_TEACHER_COUNT")
     private Integer withTeacherCount;
 
-    @FieldInfo(type = EFieldType.INTEGER, order = 12)
+    @FieldInfo(type = EFieldType.INTEGER, order = 13)
     @Column(name = "OWN_COUNT")
     private Integer ownCount;
 
-    @FieldInfo(type = EFieldType.INTEGER, order = 13)
+    @FieldInfo(type = EFieldType.INTEGER, order = 14)
     @Column(name = "TOTAL_COUNT")
     private Integer totalCount;
 
-    @FieldInfo(type = EFieldType.TEXT, order = 14)
+    @FieldInfo(type = EFieldType.TEXT, order = 15)
     @Column(name = "CONTROL_TYPE_NAME")
     private String controlTypeName;
 
@@ -272,5 +286,29 @@ public class V_CURRICULUM_AFTER_SEMESTER extends AbstractEntity {
 
     public void setWeekNumber(Integer weekNumber) {
         this.weekNumber = weekNumber;
+    }
+
+    public SEMESTER getSemester() {
+        return semester;
+    }
+
+    public void setSemester(SEMESTER semester) {
+        this.semester = semester;
+    }
+
+    public SEMESTER_DATA getSemesterData() {
+        return semesterData;
+    }
+
+    public void setSemesterData(SEMESTER_DATA semesterData) {
+        this.semesterData = semesterData;
+    }
+
+    public String getSemesterName() {
+        return semesterName;
+    }
+
+    public void setSemesterName(String semesterName) {
+        this.semesterName = semesterName;
     }
 }
