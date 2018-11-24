@@ -375,14 +375,19 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
 
     @Override
     public void handleEntityEvent(EntityEvent ev) {
-        if (ev.getAction() == EntityEvent.REMOVED || ev.getAction() == EntityEvent.MERGED) {
+        if (ev.getAction() == EntityEvent.REMOVED || ev.getAction() == EntityEvent.MERGED || ev.getAction() == EntityEvent.CREATED) {
             doFilter(filterPanel.getFilterBean());
         }
     }
 
     @Override
     public boolean onEdit(Object source, Entity e, int buttonId) {
-        onCreateOrEdit((LOAD_TO_CHAIR) e);
+        try{
+            onCreateOrEdit(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(LOAD_TO_CHAIR.class,e.getId()));
+        }catch (Exception ex){
+            CommonUtils.showMessageAndWriteLog("Uanble to edit or create load_to_chair" , ex);
+            return false;
+        }
         return true;
     }
 

@@ -3,7 +3,6 @@ alter table curriculum_after_semester
 alter table curriculum_after_semester
   add column semester_data_id bigint;
 
-drop view v_load_to_chair;
 drop view v_curriculum_after_semester;
 CREATE OR REPLACE VIEW v_curriculum_after_semester AS
   SELECT curr_after_sem.ID,
