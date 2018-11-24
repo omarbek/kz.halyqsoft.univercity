@@ -3,6 +3,7 @@ package kz.halyqsoft.univercity.filter;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.CARD;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEPARTMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.POST;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT;
 import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 
 /**
@@ -19,6 +20,7 @@ public final class FEmployeeFilter extends AbstractFilterBean {
     private DEPARTMENT department;
     private POST post;
     private CARD card;
+    private SUBJECT subject;
     private Integer childAge;
 
     public FEmployeeFilter() {
@@ -80,9 +82,17 @@ public final class FEmployeeFilter extends AbstractFilterBean {
         this.childAge = childAge;
     }
 
+    public SUBJECT getSubject() {
+        return subject;
+    }
+
+    public void setSubject(SUBJECT subject) {
+        this.subject = subject;
+    }
+
     @Override
     public boolean hasFilter() {
         return (!(code == null && firstname == null && lastname == null
-                && department == null && post == null && card == null && childAge == null));
+                && department == null && post == null && card == null && childAge == null && subject == null));
     }
 }

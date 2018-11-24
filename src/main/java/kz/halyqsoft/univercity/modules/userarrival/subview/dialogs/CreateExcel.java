@@ -1,14 +1,19 @@
 package kz.halyqsoft.univercity.modules.userarrival.subview.dialogs;
 
-import kz.halyqsoft.univercity.modules.workflow.views.CreateView;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class CreateExcel {
 
@@ -17,6 +22,7 @@ public class CreateExcel {
     private String title;
     private String fileName = "Writesheet.xlsx";
     private File mainFile;
+    private String header = "Writesheet.xlsx";
     private byte[] mainByte;
     public CreateExcel(List<String> tableHeader, List<List<String>> tableBody,String title){
         this.tableBody = tableBody;

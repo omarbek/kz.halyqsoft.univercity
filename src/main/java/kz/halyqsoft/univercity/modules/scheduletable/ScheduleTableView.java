@@ -5,10 +5,7 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.USERS;
-import kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE;
-import kz.halyqsoft.univercity.entity.beans.univercity.GROUPS;
-import kz.halyqsoft.univercity.entity.beans.univercity.SCHEDULE_DETAIL;
-import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_EDUCATION;
+import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
@@ -308,7 +305,6 @@ public class ScheduleTableView extends AbstractTaskView {
 
         QueryModel<SCHEDULE_DETAIL> sdQM = new QueryModel<>(SCHEDULE_DETAIL.class);
         FromItem lessonTimeFI = sdQM.addJoin(EJoin.INNER_JOIN, "lessonTime", LESSON_TIME.class, "id");
-
         sdQM.addWhere("group", ECriteria.EQUAL, group.getId());
         sdQM.addWhereAnd("semesterData", ECriteria.EQUAL, semesterData.getId());
         for (int i = 0; i < weekDays.size(); i++) {

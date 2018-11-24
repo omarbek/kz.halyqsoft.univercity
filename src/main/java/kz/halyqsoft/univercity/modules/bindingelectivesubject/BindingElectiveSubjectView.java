@@ -1,21 +1,28 @@
 package kz.halyqsoft.univercity.modules.bindingelectivesubject;
 
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.server.FileDownloader;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
 import kz.halyqsoft.univercity.entity.beans.univercity.CATALOG_ELECTIVE_SUBJECTS;
+import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM;
 import kz.halyqsoft.univercity.entity.beans.univercity.ELECTIVE_BINDED_SUBJECT;
 import kz.halyqsoft.univercity.entity.beans.univercity.PAIR_SUBJECT;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SPECIALITY;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT_REQUISITE;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VPairSubject;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.V_ELECTIVE_SUBJECT;
 import kz.halyqsoft.univercity.filter.FElectiveFilter;
 import kz.halyqsoft.univercity.filter.panel.ElectiveFilterPanel;
-import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.PrintDialog;
 import kz.halyqsoft.univercity.utils.CommonUtils;
+import kz.halyqsoft.univercity.utils.EmployeePdfCreator;
 import kz.halyqsoft.univercity.utils.EntityUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -35,11 +42,10 @@ import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
 import org.r3a.common.vaadin.widget.toolbar.IconToolbar;
 
+import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Omarbek
@@ -53,6 +59,8 @@ public class BindingElectiveSubjectView extends AbstractTaskView implements Filt
     private GridWidget electiveSubjectsGW;
     private DBGridModel electiveSubjectGM;
     private BindingElectiveSubjectEdit electiveSubjectEdit;
+    FileDownloader fileDownloaderr = null;
+    private CURRICULUM curriculum;
 
     public ComboBox getSpecCB() {
         return specCB;
@@ -123,64 +131,114 @@ public class BindingElectiveSubjectView extends AbstractTaskView implements Filt
         electiveSubjectsGW.setButtonEnabled(IconToolbar.ADD_BUTTON, false);
         electiveSubjectsGW.setButtonEnabled(IconToolbar.EDIT_BUTTON, false);
         electiveSubjectsGW.setButtonVisible(IconToolbar.PRINT_BUTTON,true);
+
+        ByteArrayOutputStream byteArr = new ByteArrayOutputStream();
+        String REPORT = getUILocaleUtil().getCaption("report");
         electiveSubjectsGW.addButtonClickListener(AbstractToolbar.PRINT_BUTTON,new Button.ClickListener(){
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
-                    List<String> tableHeader = new ArrayList<>();
-                    List<List<String>> tableBody = new ArrayList<>();
+                Document document = new Document();
+                ByteArrayOutputStream byteArr = new ByteArrayOutputStream();
+                SPECIALITY speciality = (SPECIALITY) specCB.getValue();
+                ELECTIVE_BINDED_SUBJECT electiveBindedSubject = (ELECTIVE_BINDED_SUBJECT) electiveSubjectsGW.getSelectedEntity();
 
-                    String fileName = "document";
+                Collection<Entity> selectedEntities = electiveSubjectsGW.getSelectedEntities();
+                PdfPTable table = new PdfPTable(8);
+                Paragraph h = new Paragraph("Оңтүстік Қазақстан Педагогикалық университеті");
 
-                    tableHeader.add("№");
-                    //tableHeader.add(getUILocaleUtil().getEntityFieldLabel(V_ELECTIVE_SUBJECT.class, "subjectCode"));
-                    tableHeader.add(getUILocaleUtil().getEntityFieldLabel(V_ELECTIVE_SUBJECT.class, "subjectName"));
-                    tableHeader.add(getUILocaleUtil().getEntityFieldLabel(V_ELECTIVE_SUBJECT.class, "credit"));
-                    tableHeader.add(getUILocaleUtil().getEntityFieldLabel(SUBJECT.class, "ects"));
-                    tableHeader.add(getUILocaleUtil().getEntityLabel(SEMESTER.class));
-                    tableHeader.add(getUILocaleUtil().getCaption("prerequisites") + " / " + getUILocaleUtil().getCaption("postrequisites"));
-                    tableHeader.add(getUILocaleUtil().getEntityFieldLabel(PAIR_SUBJECT.class, "aim"));
-                    tableHeader.add(getUILocaleUtil().getEntityFieldLabel(PAIR_SUBJECT.class, "description"));
-                    tableHeader.add(getUILocaleUtil().getEntityFieldLabel(PAIR_SUBJECT.class, "competence"));
-
-                    for (int i = 0; i < getEmployee().size(); i++) {
-                        ArrayList<String> rowList = new ArrayList<>();
-                        rowList.add((1 + i) + "");
-                        VPairSubject vPairSubject = (VPairSubject) getEmployee().get(i);
-                       // rowList.add(checkForNull(vPairSubject.getCode()));
-                        rowList.add(checkForNull(vPairSubject.getSubjectName()));
-                        rowList.add(checkForNull(vPairSubject.getCredit() + ""));
-                        rowList.add(vPairSubject.getEcts() + "");
-                        rowList.add(vPairSubject.getSemesterName());
-                        String preRequsuites = getUILocaleUtil().getCaption("prerequisites") + ": ";
-                        String postRequsuites = getUILocaleUtil().getCaption("postrequisites") + ": ";
-
-                        for (int j = 0; j < vPairSubject.getPrerequisites().size(); j++) {
-                            preRequsuites += vPairSubject.getPrerequisites().get(j);
-                            if (j + 1 != vPairSubject.getPrerequisites().size()) {
-                                preRequsuites += ", ";
-                            }
-                        }
-
-                        for (int j = 0; j < vPairSubject.getPostrequisites().size(); j++) {
-                            postRequsuites += vPairSubject.getPostrequisites().get(j);
-                            if (j + 1 != vPairSubject.getPostrequisites().size()) {
-                                postRequsuites += ", ";
-                            }
-                        }
-                        rowList.add(preRequsuites + "\n" + postRequsuites);
-                        rowList.add(checkForNull(vPairSubject.getAim()));
-                        rowList.add(checkForNull(vPairSubject.getDescription()));
-                        rowList.add(checkForNull(vPairSubject.getCompetence()));
-                        tableBody.add(rowList);
+                String[] headers = new String[]{"Наименование дисциплины",
+                        "Кредит", "ECTS","Семестр", "Номер пары",  "Цель", "Описание", "Дескриптор"};
+                try {
+                    PdfWriter.getInstance(document, byteArr);
+                    document.open();
+                    for(String s : headers){
+                        insertCell(table, s, Element.ALIGN_CENTER, 1, EmployeePdfCreator.getFont(12, Font.BOLD));
                     }
-                    PrintDialog printDialog = new PrintDialog(tableHeader, tableBody, CommonUtils.getUILocaleUtil().getCaption("print"), fileName);
-                    printDialog.getPdfBtn().addClickListener(new Button.ClickListener() {
-                        @Override
-                        public void buttonClick(Button.ClickEvent clickEvent) {
 
+                    for (Object object : selectedEntities) {
+                        ELECTIVE_BINDED_SUBJECT elec = (ELECTIVE_BINDED_SUBJECT) object;
+                        insertCell(table, elec.getSemester().getSemesterName(), Element.ALIGN_LEFT, 8, EmployeePdfCreator.getFont(12, Font.BOLD));
+
+                        List<VPairSubject> list = new ArrayList<>();
+                        Map<Integer, Object> params = new HashMap<>();
+                        String sql = "SELECT\n" +
+                                "                  subj.name_" + CommonUtils.getLanguage() + "      subjectName,\n" +
+                                "                  credit.credit,\n" +
+                                "                  ects.ects,\n" +
+                                "                  sem.semester_name semesterName,\n" +
+                                "                  pair.pair_number    pairNumber,\n" +
+                                "                  pair.aim,\n" +
+                                "                   pair.description   description,\n" +
+                                "                  pair.competence\n" +
+                                "                FROM pair_subject pair\n" +
+                                "                  INNER JOIN subject subj ON subj.id = pair.subject_id\n" +
+                                "                  INNER JOIN creditability credit ON credit.id = subj.creditability_id\n" +
+                                "                  INNER JOIN ects ects ON ects.id = subj.ects_id\n" +
+                                "                  INNER JOIN elective_binded_subject elect_bind ON elect_bind.id = pair.elective_binded_subject_id\n" +
+                                "                  INNER JOIN semester sem ON sem.id = elect_bind.semester_id\n" +
+                                "   INNER JOIN  catalog_elective_subjects c2 on elect_bind.catalog_elective_subjects_id = c2.id\n" +
+                                "                WHERE  subj.mandatory = FALSE AND subj.subject_cycle_id\n" +
+                                "                IS NOT NULL AND sem.id = " + elec.getSemester().getId() + "" +
+                                " and c2.speciality_id =" + speciality.getId();
+
+                        List<ArrayList<String>> result = new ArrayList();
+
+                        List<Object> tmpList = new ArrayList<>();
+                        tmpList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params));
+                        if (!tmpList.isEmpty()) {
+                            for (Object o : tmpList) {
+                                Object[] oo = (Object[]) o;
+                                ArrayList<String> valuesList = new ArrayList();
+
+                                List<String> preRequisites = new ArrayList<>();
+                                List<String> postRequisites = new ArrayList<>();
+
+                                for (int i = 0; i < oo.length; i++) {
+
+                                    valuesList.add(oo[i] != null ? (String.valueOf(oo[i])) : "");
+                                }
+                                result.add(valuesList);
+                            }
+                        } else {
+                            ArrayList<String> valuesList = new ArrayList();
+                            for (int i = 0; i < 15; i++) {
+                                valuesList.add(" ");
+                            }
+                            result.add(valuesList);
                         }
-                    });
+
+
+                        for (ArrayList<String> one : result) {
+                            for (String s : one) {
+                                insertCell(table, s, Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(12, Font.BOLD));
+                            }
+                        }
+                    }
+
+                    document.add(h);
+                    document.add(table);
+                    document.close();
+
+                } catch (DocumentException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
+
+
+                if (fileDownloaderr == null) {
+                    try {
+                        fileDownloaderr = new FileDownloader(EmployeePdfCreator.getStreamResourceFromByte(byteArr.toByteArray(), REPORT + ".pdf"));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    if (fileDownloaderr != null) {
+                    }
+                } else {
+                    fileDownloaderr = new FileDownloader(EmployeePdfCreator.getStreamResourceFromByte(byteArr.toByteArray(), REPORT + ".pdf"));
+                }
+                fileDownloaderr.extend(electiveSubjectsGW);
+            }
 
         });
 
@@ -271,15 +329,31 @@ public class BindingElectiveSubjectView extends AbstractTaskView implements Filt
         }
 
         @Override
-        protected void removeChildrenEntity(List<Entity> delList) throws Exception {
+        protected void removeChildrenEntity(List<Entity> delList)  {
             for (Entity entity : delList) {
                 QueryModel<PAIR_SUBJECT> pairSubjectQM = new QueryModel<>(PAIR_SUBJECT.class);
                 pairSubjectQM.addWhere("electiveBindedSubject", ECriteria.EQUAL, entity.getId());
-                List<PAIR_SUBJECT> subjects = SessionFacadeFactory.getSessionFacade(
-                        CommonEntityFacadeBean.class).lookup(pairSubjectQM);
+                List<PAIR_SUBJECT> subjects = null;
+                try {
+                    subjects = SessionFacadeFactory.getSessionFacade(
+                            CommonEntityFacadeBean.class).lookup(pairSubjectQM);
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(subjects);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
             }
         }
+    }
+    private void insertCell(PdfPTable table, String text, int align, int colspan, Font font) {
+
+        PdfPCell cell = new PdfPCell(new Phrase(text.trim(), font));
+        cell.setHorizontalAlignment(align);
+        cell.setColspan(colspan);
+        if (text.trim().equalsIgnoreCase("")) {
+            cell.setMinimumHeight(10f);
+        }
+        table.addCell(cell);
     }
 
     public List<VPairSubject> getEmployee() {

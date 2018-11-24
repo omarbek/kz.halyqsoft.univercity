@@ -60,13 +60,13 @@ public class SCHEDULE_DETAIL extends AbstractEntity {
             @JoinColumn(name = "SEMESTER_DATA_ID", referencedColumnName = "ID")})
     private SEMESTER_DATA semesterData;
 
-    @FieldInfo(type = EFieldType.FK_COMBO,order = 8)
+    @FieldInfo(type = EFieldType.FK_COMBO,order = 8, required = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "GROUP_ID",  referencedColumnName = "ID")})
     private GROUPS group;
 
-    @FieldInfo(type = EFieldType.FK_COMBO,order = 9)
+    @FieldInfo(type = EFieldType.FK_DIALOG,order = 9,required = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "STREAM_ID",  referencedColumnName = "ID")})

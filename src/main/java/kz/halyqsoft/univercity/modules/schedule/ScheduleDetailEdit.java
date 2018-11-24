@@ -1,10 +1,17 @@
 package kz.halyqsoft.univercity.modules.schedule;
 
+import com.vaadin.data.Property;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
+import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.SCHEDULE_DETAIL;
 import kz.halyqsoft.univercity.entity.beans.univercity.STREAM_GROUP;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.EMPLOYEE_TYPE;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.LESSON_TYPE;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_DATA;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.WEEK_DAY;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_EMPLOYEE;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -13,17 +20,21 @@ import org.r3a.common.entity.ID;
 import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.event.EntityListener;
 import org.r3a.common.entity.query.QueryModel;
+import org.r3a.common.entity.query.from.EJoin;
+import org.r3a.common.entity.query.from.FromItem;
+import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.AbstractWebUI;
 import org.r3a.common.vaadin.widget.dialog.AbstractDialog;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.form.CommonFormWidget;
 import org.r3a.common.vaadin.widget.form.FormModel;
+import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 
 import javax.persistence.NoResultException;
 import java.util.List;
 
-public class ScheduleDetailEdit extends AbstractDialog {
+public class ScheduleDetailEdit extends AbstractDialog implements EntityListener {
 
     private ScheduleManual scheduleManual;
     private  SCHEDULE_DETAIL scheduleDetail;
@@ -31,22 +42,53 @@ public class ScheduleDetailEdit extends AbstractDialog {
     private GridWidget scheduleDetailGW;
     private final boolean isNew;
     private ID scheduleDeatilID;
+    private  LESSON_TYPE lessonTypes;
+    private FormModel scheduleFM;
+
+    private static final int INFORMATIONAL_STUDY_DIRECT = 9;
+    private static final String COMPUTER = "Компьютер";
+
+    private static final int LECTURE = 1;
+    private static final int PRACTICE = 3;
+
+    private static final int LECTURE_COUNT = 2;
+    private static final int PRACTICE_COUNT = 2;
+    private static SEMESTER_DATA currentSemesterData;
 
     ScheduleDetailEdit(ScheduleManual scheduleManual, SCHEDULE_DETAIL scheduleDetail, boolean isNew)
             throws Exception{
         this.scheduleDetail = scheduleDetail;
         this.scheduleManual = scheduleManual;
         this.isNew = isNew;
+        currentSemesterData = CommonUtils.getCurrentSemesterData();
+        QueryModel<LESSON_TYPE> lessonTypeQuety = new QueryModel<>(LESSON_TYPE.class);
+        lessonTypeQuety.addWhere("id",ECriteria.EQUAL,ID.valueOf(1));
+        lessonTypes = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(lessonTypeQuety);
 
         if(scheduleDetail!=null){
             scheduleDeatilID = scheduleDetail.getId();
         }
 
-        setHeight("400");
-        setWidth("600");
+        setHeight("500");
+        setWidth("700");
         center();
 
         scheduleDetailCFW = getScheduleDetailCFW();
+        FormModel fm = scheduleDetailCFW.getWidgetModel();
+
+        FKFieldModel lessonFM = (FKFieldModel) fm.getFieldModel("lessonType");
+        lessonFM.getListeners().add(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
+                if(lessonFM.getValue().equals(lessonTypes)){
+                    fm.getFieldModel("stream").getField().setEnabled(true);
+                    fm.getFieldModel("group").getField().setEnabled(false);
+                }else{
+                    fm.getFieldModel("group").getField().setEnabled(true);
+                }
+            }
+        });
+
         getContent().addComponent(scheduleDetailCFW);
         getContent().setComponentAlignment(scheduleDetailCFW,Alignment.MIDDLE_CENTER);
 
@@ -54,55 +96,54 @@ public class ScheduleDetailEdit extends AbstractDialog {
         saveButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent ev) {
+
                 if (scheduleDetailCFW.getWidgetModel().isModified()) {
                     scheduleDetailCFW.save();
-                    scheduleDetailGW.setVisible(true);
+
                 }
             }
         });
-
-        Button cancelButton = CommonUtils.createCancelButton();
-        cancelButton.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent ev) {
-
-            }
-        });
-
-        HorizontalLayout buttonsHL = CommonUtils.createButtonPanel();
-        buttonsHL.addComponents(saveButton, cancelButton);
-        buttonsHL.setComponentAlignment(saveButton, Alignment.MIDDLE_CENTER);
-        buttonsHL.setComponentAlignment(cancelButton, Alignment.MIDDLE_CENTER);
-        getContent().addComponent(buttonsHL);
-        getContent().setComponentAlignment(buttonsHL, Alignment.BOTTOM_CENTER);
-
-        scheduleDetailGW = new GridWidget(STREAM_GROUP.class);
-        getContent().addComponent(scheduleDetailGW);
-        getContent().setComponentAlignment(scheduleDetailGW,Alignment.MIDDLE_CENTER);
 
         Button closeButton = new Button(getUILocaleUtil().getCaption("close"));
         closeButton.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
                 close();
-//                try {
-//                    scheduleManual.refresh();
-//                } catch (Exception e) {
-//                    CommonUtils.showMessageAndWriteLog("Unable to refresh elective subject view", e);
-//                }
+                try {
+                } catch (Exception e) {
+                    CommonUtils.showMessageAndWriteLog("Unable to refresh elective subject view", e);
+                }
             }
         });
-        getContent().addComponent(closeButton);
-        getContent().setComponentAlignment(closeButton, Alignment.MIDDLE_CENTER);
+
+        HorizontalLayout buttonsHL = CommonUtils.createButtonPanel();
+        buttonsHL.addComponents(saveButton, closeButton);
+        buttonsHL.setComponentAlignment(saveButton, Alignment.MIDDLE_CENTER);
+        buttonsHL.setComponentAlignment(closeButton, Alignment.MIDDLE_CENTER);
+        getContent().addComponent(buttonsHL);
+        getContent().setComponentAlignment(buttonsHL, Alignment.MIDDLE_CENTER);
 
         AbstractWebUI.getInstance().addWindow(this);
     }
 
     private CommonFormWidget getScheduleDetailCFW()throws Exception{
+
         CommonFormWidget scheduleDetailCFW = new CommonFormWidget(SCHEDULE_DETAIL.class);
         scheduleDetailCFW.addEntityListener(new ScheduleDetailListener());
-        FormModel scheduleFM = scheduleDetailCFW.getWidgetModel();
+        scheduleFM = scheduleDetailCFW.getWidgetModel();
         scheduleFM.setReadOnly(false);
+        FKFieldModel fkfm = (FKFieldModel) scheduleFM.getFieldModel("stream");
+        fkfm.setDialogHeight(400);
+        fkfm.setDialogWidth(500);
+        QueryModel streamQM = ((FKFieldModel)scheduleFM.getFieldModel("stream")).getQueryModel();
+        streamQM.addJoin(EJoin.LEFT_JOIN,"id",STREAM_GROUP.class,"stream_id");
+        QueryModel scheduleDetailTeacherQM = ((FKFieldModel)scheduleFM.getFieldModel("teacher")).getQueryModel();
+        scheduleDetailTeacherQM.addJoin(EJoin.INNER_JOIN,"id" , USERS.class ,"id");
+        FromItem vEmployeeFI = scheduleDetailTeacherQM.addJoin(EJoin.INNER_JOIN,"id", V_EMPLOYEE.class,"id");
+        scheduleDetailTeacherQM.addWhere(vEmployeeFI , "employeeType" , ECriteria.EQUAL , EMPLOYEE_TYPE.TEACHER_ID);
+        ((FKFieldModel)scheduleFM.getFieldModel("subject")).getQueryModel().addWhere("deleted", ECriteria.EQUAL , false);
+        ((FKFieldModel)scheduleFM.getFieldModel("group")).getQueryModel().addWhere("deleted", ECriteria.EQUAL , false);
+
         String errorMessage = getUILocaleUtil().getCaption("title.error").concat(": ").
                 concat("Binding elective subject");
         scheduleFM.setErrorMessageTitle(errorMessage);
@@ -122,27 +163,9 @@ public class ScheduleDetailEdit extends AbstractDialog {
                         createNew();
             }
         }
-
         return scheduleDetailCFW;
     }
 
-    private GridWidget pairSubjectGridWidget() throws Exception {
-        if (scheduleDeatilID == null && !scheduleDetailCFW.getWidgetModel().isCreateNew()) {
-            SCHEDULE_DETAIL scheduleDetail = (SCHEDULE_DETAIL) scheduleDetailCFW.
-                    getWidgetModel().getEntity();
-            if (scheduleDetail != null) {
-                scheduleDeatilID = scheduleDetail.getId();
-            }
-        }
-
-        GridWidget scheduleGrid = new GridWidget(STREAM_GROUP.class);
-        if (isNew) {
-            scheduleGrid.setVisible(false);
-            scheduleDeatilID = ID.valueOf(-1);
-        }
-
-        return scheduleGrid;
-    }
 
     @Override
     protected String createTitle() {
@@ -152,20 +175,17 @@ public class ScheduleDetailEdit extends AbstractDialog {
     private class ScheduleDetailListener implements EntityListener{
 
         @Override
-        public boolean preSave(Object o, Entity entity, boolean isNew, int i) throws Exception {
-            SCHEDULE_DETAIL scheduleDetail = (SCHEDULE_DETAIL) entity;
+        public boolean preSave(Object source, Entity e, boolean isNew, int i) throws Exception {
+            SCHEDULE_DETAIL scheduleDetail = (SCHEDULE_DETAIL) e;
             if (isNew) {
+
+                if(scheduleFM.getFieldModel("group").getField()!=null&&scheduleFM.getFieldModel("stream").getField()!=null) {
+
+                    scheduleDetail.setWeekDay((WEEK_DAY) scheduleManual.getWeekDayGW().getSelectedEntity());
+                    scheduleDetail.setSemesterData((SEMESTER_DATA) scheduleManual.getSemesterDataCB().getValue());
+                }
                 try {
-
-//                    QueryModel<CATALOG_ELECTIVE_SUBJECTS> catQM = new QueryModel<>(CATALOG_ELECTIVE_SUBJECTS.class);
-//                    SPECIALITY spec = (SPECIALITY) bindingElectiveSubjectView.getSpecCB().getValue();
-//                    ENTRANCE_YEAR year = (ENTRANCE_YEAR) bindingElectiveSubjectView.getYearCB().getValue();
-//                    catQM.addWhere("speciality", ECriteria.EQUAL, spec.getId());
-//                    catQM.addWhere("entranceYear", ECriteria.EQUAL, year.getId());
-//                    CATALOG_ELECTIVE_SUBJECTS cat = getElectiveSubjects(catQM, spec, year);
-//                    scheduleDetail.setCatalogElectiveSubjects(cat);
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(scheduleDetail);
-
                     scheduleDetailCFW.getWidgetModel().loadEntity(scheduleDetail.getId());
                     scheduleDetailCFW.refresh();
 
@@ -192,11 +212,14 @@ public class ScheduleDetailEdit extends AbstractDialog {
 
         @Override
         public boolean preCreate(Object o, int i) {
-            if (scheduleDetailCFW.getWidgetModel().isCreateNew()) {
-                Message.showInfo(getUILocaleUtil().getMessage("info.save.base.data.first"));
-                return false;
-            }
-            return true;
+            if(scheduleManual.getSemesterDataCB().getValue()==null){
+            Message.showError(getUILocaleUtil().getMessage("select.semester"));
+
+        }
+            if(scheduleManual.getWeekDayGW().getSelectedEntity()==null){
+            Message.showError(getUILocaleUtil().getMessage("select.week.day"));
+        }
+        return true;
         }
 
         @Override
@@ -205,7 +228,7 @@ public class ScheduleDetailEdit extends AbstractDialog {
 
         @Override
         public boolean onEdit(Object o, Entity entity, int i) {
-            return false;
+            return true;
         }
 
         @Override
@@ -231,11 +254,16 @@ public class ScheduleDetailEdit extends AbstractDialog {
 
         @Override
         public boolean preDelete(Object o, List<Entity> list, int i) {
-            return false;
+            return true;
         }
 
         @Override
         public void onDelete(Object o, List<Entity> list, int i) {
+            try{
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(list);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
 
         @Override
@@ -249,6 +277,87 @@ public class ScheduleDetailEdit extends AbstractDialog {
         @Override
         public void onException(Object o, Throwable throwable) {
         }
+    }
+        @Override
+    public void handleEntityEvent(EntityEvent ev) {
+
+    }
+
+    @Override
+    public boolean preCreate(Object source, int buttonId) {
+        if(scheduleManual.getSemesterDataCB().getValue()==null){
+            Message.showError(getUILocaleUtil().getMessage("select.semester"));
+
+        }
+        if(scheduleManual.getWeekDayGW().getSelectedEntity()==null){
+            Message.showError(getUILocaleUtil().getMessage("select.week.day"));
+        }
+        return true;
+    }
+
+    @Override
+    public boolean preSave(Object source, Entity e, boolean isNew, int buttonId) {
+        return false;
+    }
+
+        @Override
+    public void onDelete(Object source, List<Entity> entities, int buttonId) {
+
+    }
+
+    @Override
+    public void onCreate(Object o, Entity entity, int i) {
+
+    }
+
+    @Override
+    public boolean onEdit(Object o, Entity entity, int i) {
+        return true;
+    }
+
+    @Override
+    public boolean onPreview(Object o, Entity entity, int i) {
+        return true;
+    }
+
+    @Override
+    public void beforeRefresh(Object o, int i) {
+
+    }
+
+    @Override
+    public void onRefresh(Object o, List<Entity> list) {
+
+    }
+
+    @Override
+    public void onFilter(Object o, QueryModel queryModel, int i) {
+
+    }
+
+    @Override
+    public void onAccept(Object o, List<Entity> list, int i) {
+
+    }
+
+    @Override
+    public boolean preDelete(Object o, List<Entity> list, int i) {
+        return true;
+    }
+
+    @Override
+    public void deferredCreate(Object o, Entity entity) {
+
+    }
+
+    @Override
+    public void deferredDelete(Object o, List<Entity> list) {
+
+    }
+
+    @Override
+    public void onException(Object o, Throwable throwable) {
+
     }
 
 }
