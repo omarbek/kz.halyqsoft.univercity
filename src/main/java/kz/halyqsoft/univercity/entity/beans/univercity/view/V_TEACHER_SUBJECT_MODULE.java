@@ -11,6 +11,7 @@ import javax.persistence.*;
 @Entity
 public class V_TEACHER_SUBJECT_MODULE extends AbstractEntity {
 
+	//
     private static final long serialVersionUID = 3570162232421096031L;
 
 	@ManyToOne

@@ -13,3 +13,5 @@ CREATE OR REPLACE VIEW V_TEACHER_SUBJECT_MODULE AS
     INNER JOIN SUBJECT subj ON teacher_subject.SUBJECT_ID = subj.ID
     INNER JOIN creditability credit ON subj.creditability_id = credit.id
     INNER JOIN subject_module subjm ON subj.module_id = subjm.id;
+
+//

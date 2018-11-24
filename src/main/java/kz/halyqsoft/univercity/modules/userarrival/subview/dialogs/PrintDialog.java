@@ -68,7 +68,6 @@ public class PrintDialog extends AbstractDialog{
             fileDownloaderr.extend(pdfBtn);
         }
 
-
         excelBtn = new Button("EXCEL");
         excelBtn.setImmediate(true);
 

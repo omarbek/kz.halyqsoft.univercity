@@ -440,6 +440,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         content.setSizeFull();
 
         /* Subject PPS */
+//        with 2 language
         subjectPPSTW = new TableWidget(V_TEACHER_SUBJECT_MODULE.class);
         subjectPPSTW.setButtonVisible(AbstractToolbar.REFRESH_BUTTON, false);
         subjectPPSTW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
