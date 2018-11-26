@@ -33,6 +33,11 @@ public class ChairFilterPanel extends AbstractFilterPanel {
             hl.addComponent(af);
         }
 
+        af = getFilterComponent("semesterPeriod");
+        if (af != null) {
+            hl.addComponent(af);
+        }
+
         getContent().addComponent(hl);
         getContent().setComponentAlignment(hl, Alignment.MIDDLE_CENTER);
     }
