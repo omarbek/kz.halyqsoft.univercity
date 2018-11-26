@@ -132,10 +132,7 @@ public class ScheduleManual extends AbstractCommonView implements EntityListener
         scheduleDetailGM.setRefreshType(ERefreshType.MANUAL);
         scheduleDetailGM.setDeferredCreate(true);
         scheduleDetailGM.setDeferredDelete(true);
-//        scheduleDetailGM.getFormModel().getFieldModel("stream").setInEdit(true);
-//        //scheduleDetailGM.getFormModel().getFieldModel("stream").
-//        scheduleDetailGM.getFormModel().getFieldModel("stream").setInView(true);
-         mainHL.addComponent(scheduleDetailGW);
+        mainHL.addComponent(scheduleDetailGW);
 
         semesterDataCB = new ComboBox();
         semesterDataCB.setWidth(300,Unit.PIXELS);
@@ -218,6 +215,16 @@ public class ScheduleManual extends AbstractCommonView implements EntityListener
                     CommonEntityFacadeBean.class).lookup(scheduleDetailQM);
             SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(detail);
             }
+        }
+
+        @Override
+        public boolean onEdit(Object source, Entity e, int buttonId) {
+            return super.onEdit(source, e, buttonId);
+        }
+
+        @Override
+        public void onCreate(Object o, Entity entity, int i) {
+
         }
     }
 

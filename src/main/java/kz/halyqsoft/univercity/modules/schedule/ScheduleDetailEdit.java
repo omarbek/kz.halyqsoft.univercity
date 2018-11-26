@@ -55,6 +55,7 @@ public class ScheduleDetailEdit extends AbstractDialog implements EntityListener
     private static final int PRACTICE_COUNT = 2;
     private static SEMESTER_DATA currentSemesterData;
 
+
     ScheduleDetailEdit(ScheduleManual scheduleManual, SCHEDULE_DETAIL scheduleDetail, boolean isNew)
             throws Exception{
         this.scheduleDetail = scheduleDetail;
@@ -74,20 +75,23 @@ public class ScheduleDetailEdit extends AbstractDialog implements EntityListener
         center();
 
         scheduleDetailCFW = getScheduleDetailCFW();
-        FormModel fm = scheduleDetailCFW.getWidgetModel();
-
-        FKFieldModel lessonFM = (FKFieldModel) fm.getFieldModel("lessonType");
-        lessonFM.getListeners().add(new Property.ValueChangeListener() {
-            @Override
-            public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
-                if(lessonFM.getValue().equals(lessonTypes)){
-                    fm.getFieldModel("stream").getField().setEnabled(true);
-                    fm.getFieldModel("group").getField().setEnabled(false);
-                }else{
-                    fm.getFieldModel("group").getField().setEnabled(true);
+        FKFieldModel lessonFM = (FKFieldModel) scheduleFM.getFieldModel("lessonType");
+        if(scheduleFM.getFieldModel("group").getValue()!=null&&scheduleFM.getFieldModel("stream").getValue()!=null) {
+            lessonFM.getListeners().add(new Property.ValueChangeListener() {
+                @Override
+                public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
+                    if (lessonFM.getValue() != null) {
+                        if (lessonFM.getValue().equals(lessonTypes)) {
+                            scheduleFM.getFieldModel("group").setReadOnly(true);
+                            scheduleFM.getFieldModel("stream").getField().setEnabled(true);
+                        } else {
+                            scheduleFM.getFieldModel("group").setReadOnly(false);
+                            scheduleFM.getFieldModel("stream").getField().setEnabled(false);
+                        }
+                    }
                 }
-            }
-        });
+            });
+        }
 
         getContent().addComponent(scheduleDetailCFW);
         getContent().setComponentAlignment(scheduleDetailCFW,Alignment.MIDDLE_CENTER);
@@ -131,7 +135,6 @@ public class ScheduleDetailEdit extends AbstractDialog implements EntityListener
         CommonFormWidget scheduleDetailCFW = new CommonFormWidget(SCHEDULE_DETAIL.class);
         scheduleDetailCFW.addEntityListener(new ScheduleDetailListener());
         scheduleFM = scheduleDetailCFW.getWidgetModel();
-        scheduleFM.setReadOnly(false);
         FKFieldModel fkfm = (FKFieldModel) scheduleFM.getFieldModel("stream");
         fkfm.setDialogHeight(400);
         fkfm.setDialogWidth(500);
@@ -224,6 +227,11 @@ public class ScheduleDetailEdit extends AbstractDialog implements EntityListener
 
         @Override
         public void onCreate(Object o, Entity entity, int i) {
+            if(o.equals(scheduleFM)){
+                scheduleFM.getFieldModel("group").getField().setEnabled(false);
+                scheduleFM.getFieldModel("stream").getField().setEnabled(false);
+
+            }
         }
 
         @Override

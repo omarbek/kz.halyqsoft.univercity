@@ -6,6 +6,7 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.FileDownloader;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -39,7 +40,6 @@ import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 import org.r3a.common.vaadin.widget.filter2.FilterPanelListener;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
-import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
 import org.r3a.common.vaadin.widget.toolbar.IconToolbar;
 
 import java.io.ByteArrayOutputStream;
@@ -59,8 +59,9 @@ public class BindingElectiveSubjectView extends AbstractTaskView implements Filt
     private GridWidget electiveSubjectsGW;
     private DBGridModel electiveSubjectGM;
     private BindingElectiveSubjectEdit electiveSubjectEdit;
-    FileDownloader fileDownloaderr = null;
+    private FileDownloader fileDownloaderr;
     private CURRICULUM curriculum;
+    private static int fontSize = 12;
 
     public ComboBox getSpecCB() {
         return specCB;
@@ -83,11 +84,12 @@ public class BindingElectiveSubjectView extends AbstractTaskView implements Filt
         filterPanel = new ElectiveFilterPanel(new FElectiveFilter());
     }
 
-    private String checkForNull(String s){
-        if(s == null)
+    private String checkForNull(String s) {
+        if (s == null)
             return "";
         return s;
     }
+
     @Override
     public void initView(boolean b) throws Exception {
         filterPanel.addFilterPanelListener(this);
@@ -130,13 +132,17 @@ public class BindingElectiveSubjectView extends AbstractTaskView implements Filt
         electiveSubjectsGW.setButtonVisible(IconToolbar.REFRESH_BUTTON, false);
         electiveSubjectsGW.setButtonEnabled(IconToolbar.ADD_BUTTON, false);
         electiveSubjectsGW.setButtonEnabled(IconToolbar.EDIT_BUTTON, false);
-        electiveSubjectsGW.setButtonVisible(IconToolbar.PRINT_BUTTON,true);
 
         ByteArrayOutputStream byteArr = new ByteArrayOutputStream();
         String REPORT = getUILocaleUtil().getCaption("report");
-        electiveSubjectsGW.addButtonClickListener(AbstractToolbar.PRINT_BUTTON,new Button.ClickListener(){
+        Button printButton = new Button();
+        printButton.setCaption(getUILocaleUtil().getCaption("print"));
+        printButton.setWidth(120, Unit.PIXELS);
+        printButton.setIcon(new ThemeResource("img/button/printer.png"));
+        printButton.addStyleName("print");
+        printButton.addClickListener(new Button.ClickListener() {
             @Override
-            public void buttonClick(Button.ClickEvent clickEvent) {
+            public void buttonClick(Button.ClickEvent event) {
                 Document document = new Document();
                 ByteArrayOutputStream byteArr = new ByteArrayOutputStream();
                 SPECIALITY speciality = (SPECIALITY) specCB.getValue();
@@ -144,14 +150,16 @@ public class BindingElectiveSubjectView extends AbstractTaskView implements Filt
 
                 Collection<Entity> selectedEntities = electiveSubjectsGW.getSelectedEntities();
                 PdfPTable table = new PdfPTable(8);
-                Paragraph h = new Paragraph("Оңтүстік Қазақстан Педагогикалық университеті");
+                Paragraph h = new Paragraph("Международный Университет SILKWAY",EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                h.setAlignment(Element.ALIGN_CENTER);
+                h.setSpacingAfter(10);
 
                 String[] headers = new String[]{"Наименование дисциплины",
-                        "Кредит", "ECTS","Семестр", "Номер пары",  "Цель", "Описание", "Дескриптор"};
+                        "Кредит", "ECTS", "Семестр", "Номер пары", "Цель", "Описание", "Дескриптор"};
                 try {
                     PdfWriter.getInstance(document, byteArr);
                     document.open();
-                    for(String s : headers){
+                    for (String s : headers) {
                         insertCell(table, s, Element.ALIGN_CENTER, 1, EmployeePdfCreator.getFont(12, Font.BOLD));
                     }
 
@@ -225,27 +233,26 @@ public class BindingElectiveSubjectView extends AbstractTaskView implements Filt
                     e.printStackTrace();
                 }
 
-
                 if (fileDownloaderr == null) {
                     try {
                         fileDownloaderr = new FileDownloader(EmployeePdfCreator.getStreamResourceFromByte(byteArr.toByteArray(), REPORT + ".pdf"));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    if (fileDownloaderr != null) {
-                    }
-                } else {
-                    fileDownloaderr = new FileDownloader(EmployeePdfCreator.getStreamResourceFromByte(byteArr.toByteArray(), REPORT + ".pdf"));
-                }
-                fileDownloaderr.extend(electiveSubjectsGW);
-            }
 
+                } else {
+                    fileDownloaderr.setFileDownloadResource(EmployeePdfCreator.getStreamResourceFromByte(byteArr.toByteArray(), REPORT + ".pdf"));
+                }
+                fileDownloaderr.extend(printButton);
+            }
         });
 
         electiveSubjectGM = (DBGridModel) electiveSubjectsGW.getWidgetModel();
         electiveSubjectGM.setMultiSelect(true);
         electiveSubjectGM.setRefreshType(ERefreshType.MANUAL);
         refresh();
+        getContent().addComponent(printButton);
+        getContent().setComponentAlignment(printButton,Alignment.MIDDLE_CENTER);
         getContent().addComponent(electiveSubjectsGW);
         getContent().setComponentAlignment(electiveSubjectsGW, Alignment.MIDDLE_CENTER);
 
@@ -329,7 +336,7 @@ public class BindingElectiveSubjectView extends AbstractTaskView implements Filt
         }
 
         @Override
-        protected void removeChildrenEntity(List<Entity> delList)  {
+        protected void removeChildrenEntity(List<Entity> delList) {
             for (Entity entity : delList) {
                 QueryModel<PAIR_SUBJECT> pairSubjectQM = new QueryModel<>(PAIR_SUBJECT.class);
                 pairSubjectQM.addWhere("electiveBindedSubject", ECriteria.EQUAL, entity.getId());
@@ -337,7 +344,7 @@ public class BindingElectiveSubjectView extends AbstractTaskView implements Filt
                 try {
                     subjects = SessionFacadeFactory.getSessionFacade(
                             CommonEntityFacadeBean.class).lookup(pairSubjectQM);
-                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(subjects);
+                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(subjects);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -345,6 +352,7 @@ public class BindingElectiveSubjectView extends AbstractTaskView implements Filt
             }
         }
     }
+
     private void insertCell(PdfPTable table, String text, int align, int colspan, Font font) {
 
         PdfPCell cell = new PdfPCell(new Phrase(text.trim(), font));
@@ -380,7 +388,7 @@ public class BindingElectiveSubjectView extends AbstractTaskView implements Filt
                 "                  INNER JOIN semester sem ON sem.id = elect_bind.semester_id\n" +
                 "   INNER JOIN  catalog_elective_subjects c2 on elect_bind.catalog_elective_subjects_id = c2.id\n" +
                 "                WHERE  subj.mandatory = FALSE AND subj.subject_cycle_id\n" +
-                "                IS NOT NULL AND sem.id = "+ electiveBindedSubject.getSemester().getId() + "" +
+                "                IS NOT NULL AND sem.id = " + electiveBindedSubject.getSemester().getId() + "" +
                 " and c2.speciality_id =" + speciality.getId();
         Map<Integer, Object> params = new HashMap<>();
 

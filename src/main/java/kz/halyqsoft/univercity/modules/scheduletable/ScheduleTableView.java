@@ -450,7 +450,6 @@ public class ScheduleTableView extends AbstractTaskView {
         FromItem seItem = groupQM.addJoin(EJoin.INNER_JOIN, "id", STUDENT_EDUCATION.class, "groups");
         FromItem sItem = seItem.addJoin(EJoin.INNER_JOIN, "student", USERS.class, "id");
         groupQM.addWhere(sItem, "id", ECriteria.EQUAL, user.getId());
-
         GROUPS group = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(groupQM);
 
         if (group != null) {
@@ -472,7 +471,7 @@ public class ScheduleTableView extends AbstractTaskView {
                         }
 
                         ScheduleCellStudent sc = new ScheduleCellStudent(scheduleDetail);
-                        int col = i + 1;
+                        int col = i  + 1;
                         int row = j + 1;
 
                         matrixGL.removeComponent(col, row);
