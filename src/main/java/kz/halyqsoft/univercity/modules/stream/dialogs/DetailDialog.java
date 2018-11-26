@@ -126,6 +126,8 @@ public class DetailDialog extends AbstractDialog implements EntityListener {
 
         QueryModel<STREAM_GROUP> streamGroupQM = new QueryModel<>(STREAM_GROUP.class);
         streamGroupQM.addWhere("stream", ECriteria.EQUAL, stream.getId());
+        FromItem fi = streamGroupQM.addJoin(EJoin.INNER_JOIN,"group", GROUPS.class, "id");
+        streamGroupQM.addWhere(fi , "deleted" , ECriteria.EQUAL, false);
         try {
             List<STREAM_GROUP> streamGroups = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class)
                     .lookup(streamGroupQM);
