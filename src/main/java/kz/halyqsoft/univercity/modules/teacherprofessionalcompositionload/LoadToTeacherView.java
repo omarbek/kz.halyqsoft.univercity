@@ -13,6 +13,7 @@ import kz.halyqsoft.univercity.modules.stream.dialogs.DetailDialog;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
+import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.ID;
 import org.r3a.common.entity.beans.AbstractTask;
@@ -91,7 +92,7 @@ public class LoadToTeacherView extends AbstractTaskView implements FilterPanelLi
                         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(loadToTeachers);
                         insert();
                         addTeachers();
-                        loadGW.refresh();
+                        doFilter(filterPanel.getFilterBean());
                     } catch (Exception e) {
                         CommonUtils.showMessageAndWriteLog("Unable to get loads to chair", e);
                     }
@@ -222,7 +223,39 @@ public class LoadToTeacherView extends AbstractTaskView implements FilterPanelLi
                     }
                 }
             });
+
+            Button divideBtn = new Button(getUILocaleUtil().getCaption("divide"));
+            divideBtn.setIcon(FontAwesome.ADJUST);
+            divideBtn.addClickListener(new Button.ClickListener() {
+                @Override
+                public void buttonClick(Button.ClickEvent clickEvent) {
+                    if (loadGW.getSelectedEntity() != null) {
+                        LOAD_TO_TEACHER loadToTeacher = (LOAD_TO_TEACHER) loadGW.getSelectedEntity();
+                        LOAD_TO_TEACHER newLoadToTeacher = new LOAD_TO_TEACHER();
+                        newLoadToTeacher.setSubject(loadToTeacher.getSubject());
+                        newLoadToTeacher.setStudyYear(loadToTeacher.getStudyYear());
+                        newLoadToTeacher.setStream(loadToTeacher.getStream());
+                        newLoadToTeacher.setGroup(loadToTeacher.getGroup());
+                        newLoadToTeacher.setSemester(loadToTeacher.getSemester());
+                        newLoadToTeacher.setStudentNumber(loadToTeacher.getStudentNumber());
+                        newLoadToTeacher.setCredit(loadToTeacher.getCredit());
+                        newLoadToTeacher.setTeacher(loadToTeacher.getTeacher());
+                        newLoadToTeacher.setCurriculum(loadToTeacher.getCurriculum());
+
+                        try{
+                            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(newLoadToTeacher);
+                            doFilter(filterPanel.getFilterBean());
+                        }catch (Exception e){
+                            CommonUtils.showMessageAndWriteLog("Unable to create load to teacher" , e);
+                        }
+                    } else {
+                        Message.showError(getUILocaleUtil().getMessage("chooseARecord"));
+                    }
+                }
+            });
+            loadGW.getToolbarPanel().addComponent(divideBtn);
             loadGW.getToolbarPanel().addComponent(openBtn);
+            loadGW.getToolbarPanel().setSizeUndefined();
 
             DBGridModel loadGM = (DBGridModel) loadGW.getWidgetModel();
             loadGM.setTitleVisible(false);
@@ -321,9 +354,52 @@ public class LoadToTeacherView extends AbstractTaskView implements FilterPanelLi
 
     @Override
     public boolean onEdit(Object source, Entity e, int buttonId) {
-        if(e instanceof LOAD_TO_TEACHER){
+        if(source.equals(loadGW)){
             LOAD_TO_TEACHER loadToTeacher = (LOAD_TO_TEACHER) e;
             teacherQM.addWhere(teacherFI, "subject" , ECriteria.EQUAL, loadToTeacher.getSubject().getId());
+
+
+            List<LOAD_TO_TEACHER> loadToTeachers = new ArrayList<>();
+
+            DBGridModel loadGM = (DBGridModel) loadGW.getWidgetModel();
+            ComboBox comboBox = new ComboBox();
+            QueryModel<LOAD_TO_TEACHER> loadQM = new QueryModel<>(LOAD_TO_TEACHER.class);
+            loadQM.addWhere("subject" , ECriteria.EQUAL, loadToTeacher.getSubject().getId());
+            loadQM.addWhereAnd("curriculum" , ECriteria.EQUAL, loadToTeacher.getCurriculum().getId());
+            loadQM.addWhereAnd("studyYear" , ECriteria.EQUAL, loadToTeacher.getStudyYear().getId());
+            loadQM.addWhereAnd("semester" , ECriteria.EQUAL, loadToTeacher.getSemester().getId());
+            if(loadToTeacher.getStream() != null){
+                loadQM.addWhereAnd("stream" , ECriteria.EQUAL, loadToTeacher.getStream().getId());
+                try{
+                    loadToTeachers.addAll(CommonUtils.getQuery().lookup(loadQM));
+                }catch (Exception ex){
+                    CommonUtils.showMessageAndWriteLog("Unable to load LoadToTeacher",ex);
+                }
+            }else if(loadToTeacher.getGroup() != null){
+                loadQM.addWhereAnd("group" , ECriteria.EQUAL, loadToTeacher.getGroup().getId());
+                try{
+                    loadToTeachers.addAll(CommonUtils.getQuery().lookup(loadQM));
+                }catch (Exception ex){
+                    CommonUtils.showMessageAndWriteLog("Unable to load LoadToTeacher",ex);
+                }
+            }
+
+
+            int max = 0;
+            for(LOAD_TO_TEACHER ltt : loadToTeachers){
+                max+=ltt.getDiplomaCount();
+            }
+            List numList = new ArrayList();
+            for(int i  = 0 ; i <= max ; i++){
+                numList.add(i);
+            }
+            BeanItemContainer<Integer> bic = new BeanItemContainer<Integer>(Integer.class,numList);
+            ComboBox totalNumCB = new ComboBox();
+            totalNumCB.setContainerDataSource(bic);
+            //loadGM.getFormModel().getWidgetItemModel("protectDiplomaCount").setType(EFieldType.FK_COMBO);
+            //loadGM.getFormModel().getFieldModel("protectDiplomaCount").setField(totalNumCB);
+            //loadGM.getFormModel().getWidgetItemModel("").
+
         }
         return true;
     }

@@ -490,5 +490,9 @@ public class CommonUtils {
         return entranceYear;
     }
 
+    public static CommonEntityFacadeBean getQuery() throws Exception{
+        return  SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class);
+    }
+
 
 }

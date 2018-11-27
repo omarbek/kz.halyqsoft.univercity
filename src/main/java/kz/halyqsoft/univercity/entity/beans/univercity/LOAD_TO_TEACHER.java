@@ -55,63 +55,63 @@ public class LOAD_TO_TEACHER extends AbstractEntity {
 
     @FieldInfo(type = EFieldType.INTEGER, order = 9, inEdit = false)
     @Column(name = "STUDENT_NUMBER",nullable = false)
-    private Integer studentNumber;
+    private Integer studentNumber = 0;
 
     @FieldInfo(type = EFieldType.DOUBLE, order = 10, inEdit = false)
     @Column(name = "CREDIT",nullable = false)
-    private Double credit;
+    private Double credit = 0.0;
 
     @FieldInfo(type = EFieldType.DOUBLE, order = 11)
     @Column(name = "LC_COUNT")
-    private Double lcCount;
+    private Double lcCount = 0.0;
 
     @FieldInfo(type = EFieldType.DOUBLE, order = 12)
     @Column(name = "PR_COUNT")
-    private Double prCount;
+    private Double prCount = 0.0;
 
     @FieldInfo(type = EFieldType.DOUBLE, order = 13)
     @Column(name = "LB_COUNT")
-    private Double lbCount;
+    private Double lbCount = 0.0;
 
     @FieldInfo(type = EFieldType.DOUBLE, order = 14)
     @Column(name = "WITH_TEACHER_COUNT")
-    private Double withTeacherCount;
+    private Double withTeacherCount = 0.0;
 
     @FieldInfo(type = EFieldType.DOUBLE, order = 15)
     @Column(name = "RATING_COUNT")
-    private Double ratingCount;
+    private Double ratingCount = 0.0;
 
     @FieldInfo(type = EFieldType.DOUBLE, order = 16)
     @Column(name = "EXAM_COUNT")
-    private Double examCount;
+    private Double examCount= 0.0;
 
     @FieldInfo(type = EFieldType.DOUBLE, order = 17)
     @Column(name = "CONTROL_COUNT")
-    private Double controlCount;
+    private Double controlCount= 0.0;
 
     @FieldInfo(type = EFieldType.DOUBLE, order = 18)
     @Column(name = "COURSE_WORK_COUNT")
-    private Double courseWorkCount;
+    private Double courseWorkCount= 0.0;
 
     @FieldInfo(type = EFieldType.DOUBLE, order = 19)
     @Column(name = "DIPLOMA_COUNT")
-    private Double diplomaCount;
+    private Double diplomaCount= 0.0;
 
     @FieldInfo(type = EFieldType.DOUBLE, order = 20)
     @Column(name = "PRACTICE_COUNT")
-    private Double practiceCount;
+    private Double practiceCount= 0.0;
 
     @FieldInfo(type = EFieldType.DOUBLE, order = 21)
     @Column(name = "MEK")
-    private Double mek;
+    private Double mek= 0.0;
 
     @FieldInfo(type = EFieldType.DOUBLE, order = 22)
     @Column(name = "PROTECT_DIPLOMA_COUNT")
-    private Double protectDiplomaCount;
+    private Double protectDiplomaCount= 0.0;
 
     @FieldInfo(type = EFieldType.DOUBLE, order = 23, inEdit = false)
     @Column(name = "TOTAL_COUNT",nullable = false)
-    private Double totalCount;
+    private Double totalCount= 0.0;
 
     @FieldInfo(type = EFieldType.FK_COMBO, order = 24)
     @ManyToOne
