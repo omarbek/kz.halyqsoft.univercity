@@ -247,3 +247,46 @@ CREATE OR REPLACE VIEW V_LOAD_TO_CHAIR AS
   WHERE subj.deleted = FALSE
     AND curr.deleted = FALSE
     AND sem.study_year_id = gr.study_year_id;
+
+update groups
+set deleted = true
+where id not in (select id from v_group);
+
+CREATE TABLE load_to_teacher
+(
+  id                    BIGINT NOT NULL ,
+  subject_id            BIGINT NOT NULL ,
+  curriculum_id         BIGINT NOT NULL ,
+  study_year_id         BIGINT,
+  stream_id             BIGINT ,
+  group_id              BIGINT,
+  semester_id           BIGINT,
+  student_number        NUMERIC,
+  credit                NUMERIC(2) ,
+  lc_count              NUMERIC(3),
+  pr_count              NUMERIC,
+  lb_count              NUMERIC,
+  with_teacher_count    NUMERIC,
+  rating_count          NUMERIC,
+  exam_count            BIGINT,
+  control_count         NUMERIC,
+  course_work_count     NUMERIC,
+  diploma_count         NUMERIC,
+  practice_count        NUMERIC,
+  mek                   NUMERIC,
+  protect_diploma_count NUMERIC,
+  total_count           NUMERIC,
+  teacher_id            BIGINT
+);
+CREATE SEQUENCE s_load_to_teacher MINVALUE 0 START WITH 1 no CYCLE;
+
+ALTER TABLE load_to_teacher ADD CONSTRAINT pk_load_to_teacher PRIMARY KEY (id);
+ALTER TABLE load_to_teacher ADD CONSTRAINT fk_load_to_teacher_subject FOREIGN KEY (subject_id) REFERENCES subject(id) ON UPDATE RESTRICT ON DELETE RESTRICT ;
+ALTER TABLE load_to_teacher ADD CONSTRAINT fk_load_to_teacher_curriculum FOREIGN KEY (curriculum_id) REFERENCES curriculum(id) ON UPDATE RESTRICT ON DELETE RESTRICT ;
+ALTER TABLE load_to_teacher ADD CONSTRAINT fk_load_to_teacher_study_year FOREIGN KEY (study_year_id) REFERENCES study_year(id) ON UPDATE RESTRICT ON DELETE RESTRICT ;
+ALTER TABLE load_to_teacher ADD CONSTRAINT fk_load_to_teacher_stream FOREIGN KEY (stream_id) REFERENCES stream(id) ON UPDATE RESTRICT ON DELETE RESTRICT ;
+ALTER TABLE load_to_teacher ADD CONSTRAINT fk_load_to_teacher_groups FOREIGN KEY (group_id) REFERENCES groups(id) ON UPDATE RESTRICT ON DELETE RESTRICT ;
+ALTER TABLE load_to_teacher ADD CONSTRAINT fk_load_to_teacher_semester FOREIGN KEY (semester_id) REFERENCES semester(id) ON UPDATE RESTRICT ON DELETE RESTRICT ;
+ALTER TABLE load_to_teacher ADD CONSTRAINT fk_load_to_teacher_teacher FOREIGN KEY (teacher_id) REFERENCES employee(id) ON UPDATE RESTRICT ON DELETE RESTRICT ;
+
+update lesson_time set lesson_number=5 where id=11;

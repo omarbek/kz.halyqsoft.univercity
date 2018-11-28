@@ -5,6 +5,7 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_CURRICULUM_ADD_PROGRAM;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_CURRICULUM_DETAIL;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_ELECTIVE_SUBJECT;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_STREAM;
@@ -119,7 +120,9 @@ public class CommonStreamsDialog extends WindowUtils implements EntityListener {
         try {
             List<SUBJECT> mainSubjects = getSubjects(V_CURRICULUM_DETAIL.class);
             List<SUBJECT> electiveSubjects = getSubjects(V_ELECTIVE_SUBJECT.class);
+            List<SUBJECT> addingSubjects = getSubjects(V_CURRICULUM_ADD_PROGRAM.class);
             mainSubjects.addAll(electiveSubjects);
+            mainSubjects.addAll(addingSubjects);
             ((DBGridModel) subjectGW.getWidgetModel()).setRefreshType(ERefreshType.MANUAL);
             ((DBGridModel) subjectGW.getWidgetModel()).setEntities(mainSubjects);
             subjectGW.refresh();

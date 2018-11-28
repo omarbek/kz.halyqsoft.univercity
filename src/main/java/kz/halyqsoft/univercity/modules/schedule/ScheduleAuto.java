@@ -6,21 +6,19 @@ import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_EMPLOYEE;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_GROUP;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.V_TEACHER_LOAD_ASSIGN_DETAIL;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.TimeUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.ID;
-import org.r3a.common.entity.beans.AbstractTask;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.from.EJoin;
 import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.select.EAggregate;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.view.AbstractCommonView;
-import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.dialog.Message;
 
 import java.time.DayOfWeek;
@@ -229,75 +227,74 @@ public class ScheduleAuto extends AbstractCommonView {
             SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(scheduleDetails);
 
             //generate
-            QueryModel<V_TEACHER_LOAD_ASSIGN_DETAIL> loadAssignDetailQM = new QueryModel<>(
-                    V_TEACHER_LOAD_ASSIGN_DETAIL.class);
-            FromItem loadAssignDetFI = loadAssignDetailQM.addJoin(EJoin.INNER_JOIN, "id",
-                    TEACHER_LOAD_ASSIGN_DETAIL.class, "id");
-            FromItem loadAssignFI = loadAssignDetFI.addJoin(EJoin.INNER_JOIN, "teacherLoadAssign",
-                    TEACHER_LOAD_ASSIGN.class, "id");
-            loadAssignDetailQM.addWhere(loadAssignFI, "entranceYear", ECriteria.EQUAL,
-                    currentSemesterData.getYear().getId());
-            loadAssignDetailQM.addWhere("semesterPeriod", ECriteria.EQUAL, currentSemesterData.
+            QueryModel<LOAD_TO_TEACHER> loadToTeacherQM = new QueryModel<>(LOAD_TO_TEACHER.class);
+            FromItem semesterFI = loadToTeacherQM.addJoin(EJoin.INNER_JOIN, "semester", SEMESTER.class, "id");
+            loadToTeacherQM.addWhere(semesterFI, "semesterPeriod", ECriteria.EQUAL, currentSemesterData.
                     getSemesterPeriod().getId());
-            loadAssignDetailQM.addOrderDesc("lcHour");
-            loadAssignDetailQM.addOrderDesc("prHour");
-            loadAssignDetailQM.addOrderDesc("studentCount");
-            List<V_TEACHER_LOAD_ASSIGN_DETAIL> loadAssignDetails = SessionFacadeFactory.getSessionFacade(
-                    CommonEntityFacadeBean.class).lookup(loadAssignDetailQM);
-            for (V_TEACHER_LOAD_ASSIGN_DETAIL loadAssignDetail : loadAssignDetails) {
-                generateByShifts(loadAssignDetail, 1);
-                generateByShifts(loadAssignDetail, 2);
+            loadToTeacherQM.addOrderDesc("lcCount");
+            loadToTeacherQM.addOrderDesc("prCount");
+            loadToTeacherQM.addOrderDesc("studentNumber");
+            List<LOAD_TO_TEACHER> loadToTeachers = SessionFacadeFactory.getSessionFacade(
+                    CommonEntityFacadeBean.class).lookup(loadToTeacherQM);
+            for (LOAD_TO_TEACHER loadToTeacher : loadToTeachers) {
+                generateByShifts(loadToTeacher, 1);
+                generateByShifts(loadToTeacher, 2);
             }
         } else {
             Message.showError(CommonUtils.getSemesterIsGoingNowLabel().getValue());
         }
     }
 
-    private void generateByShifts(V_TEACHER_LOAD_ASSIGN_DETAIL loadAssignDetail, Integer shift) throws Exception {
+    private void generateByShifts(LOAD_TO_TEACHER loadToTeacher, Integer shift) throws Exception {
         QueryModel<SHIFT_STUDY_YEAR> shiftQM = new QueryModel<>(SHIFT_STUDY_YEAR.class);
         FromItem shiftFI = shiftQM.addJoin(EJoin.INNER_JOIN, "shift", SHIFT.class, "id");
         shiftQM.addWhere(shiftFI, "name", ECriteria.EQUAL, shift.toString());
         List<SHIFT_STUDY_YEAR> shiftStudyYears = SessionFacadeFactory.getSessionFacade(
                 CommonEntityFacadeBean.class).lookup(shiftQM);
         for (SHIFT_STUDY_YEAR shiftStudyYear : shiftStudyYears) {
-            List<GROUPS> groups = getGroupsByStream(loadAssignDetail.getStream(), shiftStudyYear);
-            generateSubjects(loadAssignDetail, null, groups, shift);
+            List<GROUPS> groups = new ArrayList<>();
+            if (loadToTeacher.getStream() != null) {
+                groups = getGroupsByStream(loadToTeacher.getStream(), shiftStudyYear);
+            } else {
+                groups.add(loadToTeacher.getGroup());
+            }
+            generateSubjects(loadToTeacher, null, groups, shift);
             for (GROUPS group : groups) {
-                generateSubjects(loadAssignDetail, group, groups, shift);
+                generateSubjects(loadToTeacher, group, groups, shift);
             }
         }
     }
 
-    private void generateSubjects(V_TEACHER_LOAD_ASSIGN_DETAIL loadAssignDetail, GROUPS group,
+    private void generateSubjects(LOAD_TO_TEACHER loadToTeacher, GROUPS group,
                                   List<GROUPS> groups, int shift) throws Exception {
-        if (loadAssignDetail.getSubject().getStudyDirect().getId().equals(ID.valueOf(
+        if (loadToTeacher.getSubject().getStudyDirect().getId().equals(ID.valueOf(
                 INFORMATIONAL_STUDY_DIRECT))) {//computer
-            addLectureAndPractice(loadAssignDetail, group, false, groups, shift);
+            addLectureAndPractice(loadToTeacher, group, false, groups, shift);
         } else {
-            addLectureAndPractice(loadAssignDetail, group, true, groups, shift);
+            addLectureAndPractice(loadToTeacher, group, true, groups, shift);
         }
     }
 
-    private void addLectureAndPractice(V_TEACHER_LOAD_ASSIGN_DETAIL loadAssignDetail, GROUPS group,
+    private void addLectureAndPractice(LOAD_TO_TEACHER loadToTeacher, GROUPS group,
                                        boolean notComputer, List<GROUPS> groups, int shift) throws Exception {
         if (group == null) {
-            for (int i = 0; i < loadAssignDetail.getLcHour() / 15; i++) {
-                if (choosedDayAndTime(loadAssignDetail, null, notComputer, groups, shift)) {
+            for (int i = 0; i < loadToTeacher.getLcCount() / 15; i++) {
+                if (choosedDayAndTime(loadToTeacher, null, notComputer, groups, shift)) {
                     //TODO change choosedDayAndTime to void
                 }
             }
         } else {
-            for (int i = 0; i < (loadAssignDetail.getPrHour()
-                    + loadAssignDetail.getLbHour()) / groups.size() / 15;
+            for (int i = 0; i < (loadToTeacher.getPrCount()
+                    + loadToTeacher.getLbCount()) / groups.size() / 15;
                  i++) {
-                if (choosedDayAndTime(loadAssignDetail, group, notComputer, groups, shift)) {
+                if (choosedDayAndTime(loadToTeacher, group, notComputer, groups, shift)) {
                     //TODO change choosedDayAndTime to void
                 }
             }
         }
     }
 
-    private boolean choosedDayAndTime(V_TEACHER_LOAD_ASSIGN_DETAIL loadAssignDetail, GROUPS group,
+    private boolean choosedDayAndTime(LOAD_TO_TEACHER loadToTeacher, GROUPS group,
                                       boolean notComputer, List<GROUPS> groups, Integer shift) throws Exception {
         QueryModel<WEEK_DAY> weekDayQM = new QueryModel<>(WEEK_DAY.class);
         List<WEEK_DAY> weekDays = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
@@ -310,23 +307,23 @@ public class ScheduleAuto extends AbstractCommonView {
         for (WEEK_DAY weekDay : weekDays) {
             for (LESSON_TIME time : lessonTimes) {
                 if (group == null) {
-                    Integer size = loadAssignDetail.getStudentCount();
-                    if (added(groups, loadAssignDetail.getSubject(),
-                            loadAssignDetail.getTeacher(), weekDay, time, LECTURE, size, notComputer)) {
+                    Integer size = loadToTeacher.getStudentNumber();
+                    if (added(groups, loadToTeacher.getSubject(),
+                            loadToTeacher.getTeacher(), weekDay, time, LECTURE, size, notComputer)) {
                         return true;
                     }
                 } else {
-                    if ((loadAssignDetail.getPrHour() + loadAssignDetail.getLbHour()) / 15 /
-                            (loadAssignDetail.getSubject().getAcademicFormula().getPrCount() +
-                                    loadAssignDetail.getSubject().getAcademicFormula().getLbCount()) != 1) {
+                    if ((loadToTeacher.getPrCount() + loadToTeacher.getLbCount()) / 15 /
+                            (loadToTeacher.getSubject().getAcademicFormula().getPrCount() +
+                                    loadToTeacher.getSubject().getAcademicFormula().getLbCount()) != 1) {
                         groups = new ArrayList<>();
                         groups.add(group);
                     }
                     V_GROUP groupView = SessionFacadeFactory.getSessionFacade(
                             CommonEntityFacadeBean.class).
                             lookup(V_GROUP.class, group.getId());
-                    if (added(groups, loadAssignDetail.getSubject(),
-                            loadAssignDetail.getTeacher(), weekDay, time, PRACTICE,
+                    if (added(groups, loadToTeacher.getSubject(),
+                            loadToTeacher.getTeacher(), weekDay, time, PRACTICE,
                             groupView.getStudentCount(), notComputer)) {
                         return true;
                     }
@@ -337,11 +334,13 @@ public class ScheduleAuto extends AbstractCommonView {
         return false;
     }
 
-    private boolean added(List<GROUPS> groups, SUBJECT subject, EMPLOYEE teacher, WEEK_DAY weekDay,
+    private boolean added(List<GROUPS> groups, SUBJECT subject, V_EMPLOYEE teacher, WEEK_DAY weekDay,
                           LESSON_TIME time, int roomType, Integer studentCount, boolean notComputer)
             throws Exception {
+        EMPLOYEE employee = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
+                EMPLOYEE.class, teacher.getId());
         for (GROUPS group : groups) {
-            if (scheduleAlreadyHas(teacher, group, weekDay, time)) {
+            if (scheduleAlreadyHas(employee, group, weekDay, time)) {
                 return false;
             }
             if (subject.getLcCount() > 0) {
@@ -366,7 +365,7 @@ public class ScheduleAuto extends AbstractCommonView {
             scheduleDetail.setRoom(room);
             scheduleDetail.setSemesterData(currentSemesterData);
             scheduleDetail.setSubject(subject);
-            scheduleDetail.setTeacher(teacher);
+            scheduleDetail.setTeacher(employee);
             scheduleDetail.setWeekDay(weekDay);
             if (!groupHasEnoughLessons(group, subject)) {
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(scheduleDetail);
