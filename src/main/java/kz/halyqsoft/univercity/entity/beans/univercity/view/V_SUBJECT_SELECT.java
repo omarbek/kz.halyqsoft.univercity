@@ -80,21 +80,6 @@ public class V_SUBJECT_SELECT extends AbstractEntity {
 	@Column(name = "CONTROL_TYPE_NAME", nullable = false)
 	private String controlTypeName;
 	
-	public V_SUBJECT_SELECT() {
-	}
-
-	public static long getSerialVersionUID() {
-		return serialVersionUID;
-	}
-
-	public String getNameKz() {
-		return nameKz;
-	}
-
-	public void setNameKz(String nameKz) {
-		this.nameKz = nameKz;
-	}
-
 	public String getNameRU() {
 		return nameRU;
 	}
