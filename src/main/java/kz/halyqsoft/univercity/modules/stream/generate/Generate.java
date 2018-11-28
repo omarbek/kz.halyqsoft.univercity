@@ -86,7 +86,8 @@ abstract class Generate implements Button.ClickListener {
                         "WHERE capacity = (SELECT max(max_room.capacity) " +
                         "                  FROM room max_room " +
                         "                  WHERE max_room.corpus_id = room.corpus_id " +
-                        "                        AND max_room.deleted = FALSE) " +
+                        "                        AND max_room.deleted = FALSE" +
+                        "                       and max_room.room_type_id in (1, 4, 5)) " +
                         "      AND deleted = FALSE;";
                 List list = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class)
                         .lookupItemsList(sql, new HashMap<>());

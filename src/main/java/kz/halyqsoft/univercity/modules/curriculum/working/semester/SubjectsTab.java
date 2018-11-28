@@ -162,7 +162,7 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
                         "      and ind_plan.diploma_type_id = stu.diploma_type_id" +
                         "      and ind_plan.student_code = usr.code ");
             }
-            sqlSB.append("WHERE usr.deleted = FALSE AND usr.locked = FALSE " +
+            sqlSB.append("WHERE stu_subj.deleted = false and usr.deleted = FALSE AND usr.locked = FALSE " +
                     "      AND subj.deleted = FALSE AND subj.level_id = 1 ");
             if (isMainSubjects) {
                 sqlSB.append(" AND subj.mandatory = TRUE AND subj.practice_type_id IS NULL" +
