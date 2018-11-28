@@ -414,7 +414,7 @@ public class CommonUtils {
     public static boolean isCurrentUserHasAdminPrivileges() {
         List<USER_ROLES> userRoles = getCurrentUser().getUserRoles();
         for (USER_ROLES userRole : userRoles) {
-            if (userRole.getId().getId().longValue() == 3) {
+            if (userRole.getRole().getId().getId().longValue() == 3) {
                 return true;
             }
         }
@@ -489,4 +489,10 @@ public class CommonUtils {
         }
         return entranceYear;
     }
+
+    public static CommonEntityFacadeBean getQuery() throws Exception{
+        return  SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class);
+    }
+
+
 }

@@ -4,6 +4,7 @@ import com.vaadin.ui.Alignment;
 import kz.halyqsoft.univercity.entity.beans.univercity.GROUPS;
 import kz.halyqsoft.univercity.entity.beans.univercity.STREAM;
 import kz.halyqsoft.univercity.entity.beans.univercity.STREAM_GROUP;
+import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
@@ -30,8 +31,22 @@ public class DetailDialog extends AbstractDialog implements EntityListener {
     private STREAM stream;
     private GridWidget streamGroupGW;
     private DBGridModel streamGroupGM;
+    private boolean isCRUD;
+    public GridWidget getStreamGroupGW() {
+        return streamGroupGW;
+    }
+
+    public DetailDialog(STREAM stream , boolean isCRUD){
+        this.isCRUD = isCRUD;
+        init(stream, isCRUD);
+    }
 
     public DetailDialog(STREAM stream) {
+        isCRUD = true;
+        init(stream, isCRUD);
+    }
+
+    public void init(STREAM stream , boolean refreshable){
         this.stream = stream;
 
         getContent().setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
@@ -51,44 +66,76 @@ public class DetailDialog extends AbstractDialog implements EntityListener {
 
         refresh();
 
+
         getContent().addComponent(streamGroupGW);
         AbstractWebUI.getInstance().addWindow(this);
     }
-
     private void refresh() {
-        QueryModel<GROUPS> groupsQM = new QueryModel<>(GROUPS.class);
-        FromItem streamGrFI = groupsQM.addJoin(EJoin.INNER_JOIN, "id", STREAM_GROUP.class, "group");
-        groupsQM.addWhere("deleted", false);
-        groupsQM.addWhere(streamGrFI, "stream", ECriteria.EQUAL, stream.getId());
-        List<ID> groupIdsInThisStream = new ArrayList<>();
-        try {
-            List<GROUPS> groups = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class)
-                    .lookup(groupsQM);
-            for (GROUPS group : groups) {
-                if (!groupIdsInThisStream.contains(group.getId())) {
-                    groupIdsInThisStream.add(group.getId());
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();//TODO catch
-        }
+        if(isCRUD){
+            QueryModel<GROUPS> groupsQM = new QueryModel<>(GROUPS.class);
+            FromItem streamGrFI = groupsQM.addJoin(EJoin.INNER_JOIN, "id", STREAM_GROUP.class, "group");
+            groupsQM.addWhere("deleted", false);
+            groupsQM.addWhere(streamGrFI, "stream", ECriteria.EQUAL, stream.getId());
 
-        FKFieldModel groupFM = (FKFieldModel) streamGroupGM.getFormModel().getFieldModel("group");
-        QueryModel groupQM = groupFM.getQueryModel();
-        FromItem fi = groupQM.addJoin(EJoin.LEFT_JOIN, "id", STREAM_GROUP.class, "group");
-        groupQM.addWhere("deleted", ECriteria.EQUAL, false);
-        groupQM.addWhereNotIn("id", groupIdsInThisStream);
-        groupQM.addOrder("name");
+            List<ID> groupIdsInThisStream = new ArrayList<>();
+
+            QueryModel<STREAM> streamQM = new QueryModel<>(STREAM.class);
+            streamQM.addWhere("deleted" , ECriteria.EQUAL, false);
+            if(stream.getSubject() !=null){
+                streamQM.addWhereAnd("subject" , ECriteria.EQUAL, stream.getSubject().getId());
+            }
+            if(stream.getSemesterPeriod()!=null){
+                streamQM.addWhereAnd("semesterPeriod" , ECriteria.EQUAL, stream.getSemesterPeriod().getId());
+            }
+            try{
+                List<STREAM> streams = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(streamQM);
+                for(STREAM stream : streams){
+                    QueryModel<STREAM_GROUP> streamGroupQM = new QueryModel<>(STREAM_GROUP.class);
+                    streamGroupQM.addWhere("stream" , ECriteria.EQUAL, stream.getId());
+                    List<STREAM_GROUP> streamGroups = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(streamGroupQM);
+                    for(STREAM_GROUP streamGroup : streamGroups){
+                        if (!groupIdsInThisStream.contains(streamGroup.getGroup().getId())) {
+                            groupIdsInThisStream.add(streamGroup.getGroup().getId());
+                        }
+                    }
+                }
+            }catch (Exception e){
+                CommonUtils.showMessageAndWriteLog(e.getMessage(),e);
+                e.printStackTrace();
+            }
+            try {
+                List<GROUPS> groups = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class)
+                        .lookup(groupsQM);
+                for (GROUPS group : groups) {
+                    if (!groupIdsInThisStream.contains(group.getId())) {
+                        groupIdsInThisStream.add(group.getId());
+                    }
+                }
+            } catch (Exception e) {
+                CommonUtils.showMessageAndWriteLog(e.getMessage(),e);
+                e.printStackTrace();
+            }
+
+            FKFieldModel groupFM = (FKFieldModel) streamGroupGM.getFormModel().getFieldModel("group");
+            QueryModel groupQM = groupFM.getQueryModel();
+            FromItem fi = groupQM.addJoin(EJoin.LEFT_JOIN, "id", STREAM_GROUP.class, "group");
+            groupQM.addWhere("deleted", ECriteria.EQUAL, false);
+            groupQM.addWhereNotIn("id", groupIdsInThisStream);
+            groupQM.addOrder("name");
+        }
 
         QueryModel<STREAM_GROUP> streamGroupQM = new QueryModel<>(STREAM_GROUP.class);
         streamGroupQM.addWhere("stream", ECriteria.EQUAL, stream.getId());
+        FromItem fi = streamGroupQM.addJoin(EJoin.INNER_JOIN,"group", GROUPS.class, "id");
+        streamGroupQM.addWhere(fi , "deleted" , ECriteria.EQUAL, false);
         try {
             List<STREAM_GROUP> streamGroups = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class)
                     .lookup(streamGroupQM);
             streamGroupGM.setEntities(streamGroups);
             streamGroupGW.refresh();
         } catch (Exception e) {
-            e.printStackTrace();//TODO catch
+            CommonUtils.showMessageAndWriteLog(e.getMessage(),e);
+            e.printStackTrace();
         }
     }
 

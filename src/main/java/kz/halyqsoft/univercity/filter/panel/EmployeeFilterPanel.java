@@ -64,7 +64,12 @@ public final class EmployeeFilterPanel extends AbstractFilterPanel {
 		if (af != null) {
 			hl.addComponent(af);
 		}
-		
+
+		af = getFilterComponent("subject");
+		if (af != null) {
+			hl.addComponent(af);
+		}
+
 		getContent().addComponent(hl);
 		getContent().setComponentAlignment(hl, Alignment.MIDDLE_CENTER);
 	}

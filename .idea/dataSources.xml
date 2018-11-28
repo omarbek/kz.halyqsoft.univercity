@@ -7,14 +7,20 @@
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://89.40.60.206:5432/univerdb</jdbc-url>
     </data-source>
-    <data-source source="LOCAL" name="realdb@localhost" uuid="d86a80dc-8dba-46fd-a8ae-c90a1ae5fe3d">
+    <data-source source="LOCAL" name="univerdb@localhost" uuid="d86a80dc-8dba-46fd-a8ae-c90a1ae5fe3d">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost:5432/realdb</jdbc-url>
+      <jdbc-url>jdbc:postgresql://localhost:5432/univerdb</jdbc-url>
       <driver-properties>
         <property name="ApplicationName" value="DataGrip" />
       </driver-properties>
+    </data-source>
+    <data-source source="LOCAL" name="college@185.146.3.193" uuid="1fc07405-463e-49b0-b925-de8075e60179">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://185.146.3.193:5432/college</jdbc-url>
     </data-source>
   </component>
 </project>

@@ -1,5 +1,6 @@
 package kz.halyqsoft.univercity.entity.beans.univercity.view;
 
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.CREDITABILITY;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEPARTMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.LEVEL;
@@ -23,59 +24,59 @@ import javax.persistence.ManyToOne;
 @Entity
 public class V_SUBJECT_SELECT extends AbstractEntity {
 
-	private static final long serialVersionUID = -1442440970696524875L;
-
-//	@FieldInfo(type = EFieldType.TEXT, order = 1, columnWidth = 100)
-//	@Column(name = "CODE", nullable = false)
-//	private String code;
-	
-	@FieldInfo(type = EFieldType.TEXT, order = 2)
+	@FieldInfo(type = EFieldType.TEXT)
 	@Column(name = "NAME_RU", nullable = false)
 	private String nameRU;
 
-	@FieldInfo(type = EFieldType.TEXT, order=3)
+	@FieldInfo(type = EFieldType.TEXT, order = 2)
 	@Column(name = "NAME_KZ", nullable = false)
-	private String nameKz;
-	
-	@FieldInfo(type = EFieldType.FK_DIALOG, order = 5, inGrid = false)
+	private String nameKZ;
+
+	@FieldInfo(type = EFieldType.FK_COMBO, order = 3)
+	@ManyToOne
+	@JoinColumns({
+			@JoinColumn(name = "MODULE_ID", referencedColumnName = "ID")})
+	private SUBJECT_MODULE subjectModule;
+
+	@FieldInfo(type = EFieldType.FK_DIALOG, order = 4, inGrid = false)
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "STUDY_DIRECT_ID", referencedColumnName = "ID")})
     private STUDY_DIRECT studyDirect;
 	
-	@FieldInfo(type = EFieldType.FK_DIALOG, order = 6, inGrid = false)
+	@FieldInfo(type = EFieldType.FK_DIALOG, order = 5, inGrid = false)
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "CHAIR_ID", referencedColumnName = "ID")})
     private DEPARTMENT chair;
 
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 7, inGrid = false)
+	@FieldInfo(type = EFieldType.FK_COMBO, order = 6, inGrid = false)
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "LEVEL_ID", referencedColumnName = "ID")})
     private LEVEL level;
 	
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 8, inGrid = false)
+	@FieldInfo(type = EFieldType.FK_COMBO, order = 7, inGrid = false)
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "SUBJECT_CYCLE_ID", referencedColumnName = "ID")})
     private SUBJECT_CYCLE subjectCycle;
 	
-	@FieldInfo(type = EFieldType.BOOLEAN, order = 9, required = false)
+	@FieldInfo(type = EFieldType.BOOLEAN, order = 8, required = false)
 	@Column(name = "MANDATORY", nullable = false)
     private boolean mandatory;
 	
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 10, inGrid = false)
+	@FieldInfo(type = EFieldType.FK_COMBO, order = 9)
     @ManyToOne
     @JoinColumns({
         @JoinColumn(name = "CREDITABILITY_ID", referencedColumnName = "ID")})
     private CREDITABILITY creditability;
 	
-	@FieldInfo(type = EFieldType.INTEGER, order = 11)
+	@FieldInfo(type = EFieldType.INTEGER, order = 10)
 	@Column(name = "CREDIT", nullable = false)
 	private Integer credit;
 	
-	@FieldInfo(type = EFieldType.TEXT, order = 12)
+	@FieldInfo(type = EFieldType.TEXT, order = 11)
 	@Column(name = "CONTROL_TYPE_NAME", nullable = false)
 	private String controlTypeName;
 	
@@ -166,4 +167,24 @@ public class V_SUBJECT_SELECT extends AbstractEntity {
 		this.controlTypeName = controlTypeName;
 	}
 
+	@Override
+	public String toString() {
+		return nameRU;
+	}
+
+	public String getNameKZ() {
+		return nameKZ;
+	}
+
+	public void setNameKZ(String nameKZ) {
+		this.nameKZ = nameKZ;
+	}
+
+	public SUBJECT_MODULE getSubjectModule() {
+		return subjectModule;
+	}
+
+	public void setSubjectModule(SUBJECT_MODULE subjectModule) {
+		this.subjectModule = subjectModule;
+	}
 }

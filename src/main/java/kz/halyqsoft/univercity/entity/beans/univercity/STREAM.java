@@ -47,6 +47,10 @@ public class STREAM extends AbstractEntity {
     @Column(name = "deleted", nullable = false)
     private boolean deleted;
 
+    @Column(name = "UPDATED")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updated;
+
     public String getName() {
         return name;
     }
@@ -106,5 +110,13 @@ public class STREAM extends AbstractEntity {
 
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
+    }
+
+    public Date getUpdated() {
+        return updated;
+    }
+
+    public void setUpdated(Date updated) {
+        this.updated = updated;
     }
 }

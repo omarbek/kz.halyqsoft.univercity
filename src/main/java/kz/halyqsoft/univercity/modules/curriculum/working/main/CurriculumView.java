@@ -257,10 +257,10 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
 //        cyclePanel.initPanel();
 //        tabSheet.addTab(cyclePanel, getUILocaleUtil().getCaption("by.cycle"));
 //
-//        schedulePanel = new SchedulePanel(this);
-//        schedulePanel.setCurriculum(curriculum);
-//        schedulePanel.initPanel();
-//        tabSheet.addTab(schedulePanel, getUILocaleUtil().getCaption("curriculum.schedule"));
+        schedulePanel = new SchedulePanel(this);//TODO add entrance year
+        schedulePanel.setCurriculum(curriculum);
+        schedulePanel.initPanel();
+        mainTS.addTab(schedulePanel, getUILocaleUtil().getCaption("curriculum.schedule"));
     }
 
     private void initCreditSum() {
@@ -1224,8 +1224,8 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
 //            creditCountByComponentsPanel.refresh();
 //            cyclePanel.setCurriculum(curriculum);
 //            cyclePanel.refresh();
-//            schedulePanel.setCurriculum(curriculum);
-//            schedulePanel.refresh();
+            schedulePanel.setCurriculum(curriculum);//TODO add entrance year maybe
+            schedulePanel.refresh();
         } catch (Exception ex) {
             LOG.error("Unable to refresh semester panel: ", ex);
         }
@@ -1245,21 +1245,6 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
 
     }
 
-    public void save() {
-        for (SubjectsTab subjectsTab : subjectsTabs) {
-            subjectsTab.setCurriculum(curriculum);
-        }
-
-        addProgramPanel.setCurriculum(curriculum);
-        afterSemesterProgamPanel.setCurriculum(curriculum);
-//            creditCountByComponentsPanel.setCurriculum(curriculum);//TODO return
-//            cyclePanel.setCurriculum(curriculum);
-//            //			cyclePanel.saveButton();
-//            schedulePanel.setCurriculum(curriculum);
-//            schedulePanel.generateSchedule();
-//            schedulePanel.save();
-    }
-
     private void conform() throws Exception {
 //        checkForConform();//TODO return
 
@@ -1274,14 +1259,14 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
     private void approve() throws Exception {
 //        checkForConform();//TODO return
 
-//        addProgramPanel.approve();//TODO replace code here
-//        afterSemesterProgamPanel.approve();//TODO return
-//        cyclePanel.checkForApprove();
+        //TODO Assyl add subjects to student_subject
 
         curriculum.setCurriculumStatus(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(CURRICULUM_STATUS.class, CURRICULUM_STATUS.APPROVED));
         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(curriculum);
 
         statusLabel.setValue(getUILocaleUtil().getEntityFieldLabel(CURRICULUM.class, "curriculumStatus") + ": " + curriculum.getCurriculumStatus().getStatusName());
+
+        schedulePanel.generateSchedule();
         refresh();
     }
 
@@ -1296,7 +1281,7 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
 
         addProgramPanel.checkForConform();
         afterSemesterProgamPanel.checkForConform();
-//        schedulePanel.checkForConform();//TODO return
+        schedulePanel.checkForConform();
     }
 
     public final boolean isBachelorCurriculum() throws Exception {

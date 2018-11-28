@@ -6,13 +6,10 @@ import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.event.EntityListener;
 import org.r3a.common.entity.query.QueryModel;
-import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static kz.halyqsoft.univercity.utils.CommonUtils.getUILocaleUtil;
 
 /**
  * @author Omarbek
@@ -63,7 +60,7 @@ public abstract class EntityUtils implements EntityListener {
             refresh();
         } catch (Exception ex) {
             CommonUtils.LOG.error("Unable to delete" + moduleName + ": ", ex);
-            Message.showError(getUILocaleUtil().getMessage("error.cannotdelentity"));
+            //Message.showError(getUILocaleUtil().getMessage("error.cannotdelentity"));
         }
         return false;
     }

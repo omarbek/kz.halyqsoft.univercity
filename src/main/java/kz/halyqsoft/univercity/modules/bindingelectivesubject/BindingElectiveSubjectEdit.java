@@ -123,7 +123,7 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
                 "                  pair.id,\n" +
                 "                  cycle.CYCLE_SHORT_NAME cycleShortName,\n" +
                 "                  subj.name_" + CommonUtils.getLanguage() + "      subjectName,\n" +
-                "                  traject.name trajectoryName," +
+                "                  traject.type_name trajectoryName," +
                 "                  credit.credit,\n" +
                 "                  ects.ects,\n" +
                 "                  sem.semester_name semesterName,\n" +

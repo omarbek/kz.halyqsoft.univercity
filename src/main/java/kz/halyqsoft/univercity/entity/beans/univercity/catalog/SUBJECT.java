@@ -15,7 +15,8 @@ import javax.persistence.*;
 @Entity
 public class SUBJECT extends AbstractEntity {
 
-    private static final long serialVersionUID = -648721786979090913L;
+    public static final long DIPLOM = 1388L;
+    public static final long EXAM = 1387L;
 
     @FieldInfo(type = EFieldType.TEXT, max = 256, order = 1)
     @Column(name = "NAME_KZ", nullable = false)
@@ -153,7 +154,11 @@ public class SUBJECT extends AbstractEntity {
             @JoinColumn(name = "TRAJECTORY_ID", referencedColumnName = "ID")})
     private TRAJECTORY trajectory;
 
-    @FieldInfo(type = EFieldType.BOOLEAN, order = 31, required = false, inEdit = false, inGrid = false, inView = false)
+    @FieldInfo(type = EFieldType.BOOLEAN, order = 31, required = false, columnWidth = 100)
+    @Column(name = "TICKET", nullable = false)
+    private boolean ticket;
+
+    @FieldInfo(type = EFieldType.BOOLEAN, order = 32, required = false, inEdit = false, inGrid = false, inView = false)
     @Column(name = "DELETED", nullable = false)
     private boolean deleted;
 
@@ -349,8 +354,8 @@ public class SUBJECT extends AbstractEntity {
         } else {
             name = nameRU;
         }
-        return name + " (" + trajectory + "), "
-                + creditability.toString() + " кр.";
+        return name + " (" + (trajectory == null ? '-' : trajectory) + "), "
+                + creditability.toString() + " кр." + ", " + subjectModule.getModuleShortName();
     }
 
     public boolean isCourseWork() {
@@ -399,5 +404,13 @@ public class SUBJECT extends AbstractEntity {
 
     public void setTrajectory(TRAJECTORY trajectory) {
         this.trajectory = trajectory;
+    }
+
+    public boolean isTicket() {
+        return ticket;
+    }
+
+    public void setTicket(boolean ticket) {
+        this.ticket = ticket;
     }
 }

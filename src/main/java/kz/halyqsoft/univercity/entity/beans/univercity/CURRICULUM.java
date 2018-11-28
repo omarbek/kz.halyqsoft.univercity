@@ -116,4 +116,12 @@ public class CURRICULUM extends AbstractEntity {
     public void setDiplomaType(STUDENT_DIPLOMA_TYPE diplomaType) {
         this.diplomaType = diplomaType;
     }
+
+    @Override
+    public String toString() {
+        return speciality + " "+
+               entranceYear + " "+
+               curriculumStatus + " "+
+               diplomaType + " "+ created ;
+    }
 }

@@ -1,6 +1,8 @@
 package kz.halyqsoft.univercity.entity.beans.univercity;
 
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.EDUCATION_MODULE_TYPE;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_DATA;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
@@ -20,6 +22,16 @@ public class CURRICULUM_AFTER_SEMESTER extends AbstractEntity {
     @JoinColumns({
             @JoinColumn(name = "CURRICULUM_ID", referencedColumnName = "ID")})
     private CURRICULUM curriculum;
+
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "SEMESTER_ID", referencedColumnName = "ID")})
+    private SEMESTER semester;
+
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "SEMESTER_DATA_ID", referencedColumnName = "ID", nullable = false)})
+    private SEMESTER_DATA semesterData;
 
     @ManyToOne
     @JoinColumns({
@@ -101,5 +113,21 @@ public class CURRICULUM_AFTER_SEMESTER extends AbstractEntity {
 
     public void setEducationModuleType(EDUCATION_MODULE_TYPE educationModuleType) {
         this.educationModuleType = educationModuleType;
+    }
+
+    public SEMESTER getSemester() {
+        return semester;
+    }
+
+    public void setSemester(SEMESTER semester) {
+        this.semester = semester;
+    }
+
+    public SEMESTER_DATA getSemesterData() {
+        return semesterData;
+    }
+
+    public void setSemesterData(SEMESTER_DATA semesterData) {
+        this.semesterData = semesterData;
     }
 }
