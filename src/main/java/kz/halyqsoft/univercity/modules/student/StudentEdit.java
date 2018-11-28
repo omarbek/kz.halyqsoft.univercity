@@ -78,7 +78,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
     private STUDENT student;
     private USERS users;
     private VerticalLayout mainVL;
-    private static Button pdfDownload, pdfDownloadDorm,pdfDownloadDormKaz, pdfDownloadLetter;
+    private static Button pdfDownload, pdfDownloadDorm, pdfDownloadDormKaz, pdfDownloadLetter;
     private StudentOrApplicantView studentOrApplicantView;
     private HorizontalLayout downloadHL;
     private static FileDownloader fileDownloaderDorm, fileDownloader,
@@ -1229,17 +1229,11 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
             subjectsCB.add(subjectCB);
 
             QueryModel<SUBJECT> subjectQueryModel = new QueryModel<>(SUBJECT.class);
-            FromItem subj = subjectQueryModel.addJoin(EJoin.INNER_JOIN, "id", STUDENT_SUBJECT.class, "subject");
-            FromItem edu = subj.addJoin(EJoin.INNER_JOIN, "student_id", STUDENT_EDUCATION.class, "student");
+            FromItem semesterSubjectFI = subjectQueryModel.addJoin(EJoin.INNER_JOIN, "id", SEMESTER_SUBJECT.class, "subject");
+            FromItem subj = semesterSubjectFI.addJoin(EJoin.INNER_JOIN, "id", STUDENT_SUBJECT.class, "subject");
+            FromItem edu = subj.addJoin(EJoin.INNER_JOIN, "studentEducation", STUDENT_EDUCATION.class, "id");
             FromItem spe = edu.addJoin(EJoin.INNER_JOIN, "speciality", SPECIALITY.class, "id");
             subjectQueryModel.addWhere(edu, "student", ECriteria.EQUAL, s.getId());
-
-
-            QueryModel<SEMESTER_SUBJECT> semesterSubjectQM = new QueryModel<>(SEMESTER_SUBJECT.class);
-            FromItem FI1 = semesterSubjectQM.addJoin(EJoin.INNER_JOIN, "id",
-                    STUDENT_EDUCATION.class, "student");
-            FromItem specFI = FI1.addJoin(EJoin.INNER_JOIN, "id",
-                    SPECIALITY.class, "speciality");
 
             List<SUBJECT> subjects = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
                     lookup(subjectQueryModel);
@@ -1343,16 +1337,11 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                         final FormModel differenceFM = repatriateDocFW.getWidgetModel();
 
                         QueryModel<SUBJECT> subjectQueryModel = new QueryModel<>(SUBJECT.class);
-                        FromItem subj = subjectQueryModel.addJoin(EJoin.INNER_JOIN, "id", STUDENT_SUBJECT.class, "subject");
-                        FromItem edu = subj.addJoin(EJoin.INNER_JOIN, "student_id", STUDENT_EDUCATION.class, "student");
+                        FromItem semesterSubjectFI = subjectQueryModel.addJoin(EJoin.INNER_JOIN, "id", SEMESTER_SUBJECT.class, "subject");
+                        FromItem subj = semesterSubjectFI.addJoin(EJoin.INNER_JOIN, "id", STUDENT_SUBJECT.class, "subject");
+                        FromItem edu = subj.addJoin(EJoin.INNER_JOIN, "studentEducation", STUDENT_EDUCATION.class, "id");
                         FromItem spe = edu.addJoin(EJoin.INNER_JOIN, "speciality", SPECIALITY.class, "id");
                         subjectQueryModel.addWhere(edu, "student", ECriteria.EQUAL, s.getId());
-
-                        QueryModel<SEMESTER_SUBJECT> semesterSubjectQM = new QueryModel<>(SEMESTER_SUBJECT.class);
-                        FromItem FI1 = semesterSubjectQM.addJoin(EJoin.INNER_JOIN, "id",
-                                STUDENT_EDUCATION.class, "student");
-                        FromItem specFI = FI1.addJoin(EJoin.INNER_JOIN, "id",
-                                SPECIALITY.class, "speciality");
 
                         List<SUBJECT> subjects = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
                                 lookup(subjectQueryModel);

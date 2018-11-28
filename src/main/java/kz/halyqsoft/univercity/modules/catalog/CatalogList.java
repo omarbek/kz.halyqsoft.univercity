@@ -72,6 +72,7 @@ class CatalogList {
         addCatalogEntityToList(WEEKEND_DAYS.class);
         addCatalogEntityToList(TRAJECTORY.class);
         addCatalogEntityToList(CURRICULUM_INDIVIDUAL_PLAN.class);
+        addCatalogEntityToList(ABSENCE_CAUSE.class);
 
         return new ArrayList<>(list);
     }

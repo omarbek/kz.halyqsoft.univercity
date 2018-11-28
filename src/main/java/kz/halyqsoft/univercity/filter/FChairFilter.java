@@ -1,6 +1,7 @@
 package kz.halyqsoft.univercity.filter;
 
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEPARTMENT;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_PERIOD;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDENT_DIPLOMA_TYPE;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDY_YEAR;
 import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
@@ -10,9 +11,7 @@ public class FChairFilter extends AbstractFilterBean {
     private DEPARTMENT chair;
     private STUDENT_DIPLOMA_TYPE studentDiplomaType;
     private STUDY_YEAR studyYear;
-
-    public FChairFilter() {
-    }
+    private SEMESTER_PERIOD semesterPeriod;
 
     public DEPARTMENT getChair() {
         return chair;
@@ -36,6 +35,14 @@ public class FChairFilter extends AbstractFilterBean {
 
     public void setStudyYear(STUDY_YEAR studyYear) {
         this.studyYear = studyYear;
+    }
+
+    public SEMESTER_PERIOD getSemesterPeriod() {
+        return semesterPeriod;
+    }
+
+    public void setSemesterPeriod(SEMESTER_PERIOD semesterPeriod) {
+        this.semesterPeriod = semesterPeriod;
     }
 
     @Override

@@ -258,9 +258,6 @@ public final class SubjectEdit extends AbstractFormWidgetView {
         DBGridModel teacherGM = (DBGridModel) teacherGW.getWidgetModel();
         teacherGM.setReadOnly(true);
         teacherGM.getColumnModel("code").setInGrid(false);
-        teacherGM.getColumnModel("lecture").setInGrid(true);
-        teacherGM.getColumnModel("laboratory").setInGrid(true);
-        teacherGM.getColumnModel("practice").setInGrid(true);
         teacherGM.getColumnModel("fall").setInGrid(true);
         teacherGM.getColumnModel("spring").setInGrid(true);
         teacherGM.setRefreshType(ERefreshType.MANUAL);
@@ -285,15 +282,6 @@ public final class SubjectEdit extends AbstractFormWidgetView {
                 "  trim(usr.LAST_NAME || ' ' || usr.FIRST_NAME || ' ' || coalesce(usr.MIDDLE_NAME, '')) TEACHER_FIO, " +
                 "  dept.DEPT_NAME, " +
                 "  post.POST_NAME, " +
-                "  CASE WHEN teach_subj.GROUP_LEC_COUNT = 0 " +
-                "    THEN 0 " +
-                "  ELSE 1 END                                                                           LEC, " +
-                "  CASE WHEN teach_subj.GROUP_LAB_COUNT = 0 " +
-                "    THEN 0 " +
-                "  ELSE 1 END                                                                           LAB, " +
-                "  CASE WHEN teach_subj.GROUP_PRAC_COUNT = 0 " +
-                "    THEN 0 " +
-                "  ELSE 1 END                                                                           PRAC, " +
                 "  teach_subj.FALL, " +
                 "  teach_subj.SPRING " +
                 "FROM EMPLOYEE empl INNER JOIN USERS usr ON empl.ID = usr.ID " +
@@ -315,11 +303,8 @@ public final class SubjectEdit extends AbstractFormWidgetView {
                 emp.setFio((String) oo[1]);
                 emp.setDeptName((String) oo[2]);
                 emp.setPostName((String) oo[3]);
-                emp.setLecture((int) oo[4] == 1);
-                emp.setLaboratory((int) oo[5] == 1);
-                emp.setPractice((int) oo[6] == 1);
-                emp.setFall((Boolean) oo[7]);
-                emp.setSpring((Boolean) oo[8]);
+                emp.setFall((Boolean) oo[4]);
+                emp.setSpring((Boolean) oo[5]);
                 list.add(emp);
             }
 

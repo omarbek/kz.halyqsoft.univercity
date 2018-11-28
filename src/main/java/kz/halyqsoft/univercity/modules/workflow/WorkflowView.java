@@ -17,7 +17,7 @@ public class WorkflowView extends AbstractTaskView {
     VerticalLayout secondMainVL;
 
     public static String MY_DOCUMENTS ;
-    public static String MAIN ;
+
     public static String CREATE ;
 
     public static String INCOMING ;
@@ -38,7 +38,6 @@ public class WorkflowView extends AbstractTaskView {
     @Override
     public void initView(boolean b) throws Exception {
         MY_DOCUMENTS = getUILocaleUtil().getCaption("my_documents");
-        MAIN = getUILocaleUtil().getCaption("main");
         CREATE = getUILocaleUtil().getCaption("create");
 
         INCOMING = getUILocaleUtil().getCaption("incoming");
@@ -70,7 +69,6 @@ public class WorkflowView extends AbstractTaskView {
         HierarchicalContainer optionHC = new HierarchicalContainer();
         ArrayList<MyItem> myItems = new ArrayList<>();
 
-        myItems.add(new MyItem(optionHC.addItem(MAIN) ,MAIN , null));
         myItems.add(new MyItem(optionHC.addItem(CREATE) ,CREATE, null));
         myItems.add(new MyItem(optionHC.addItem(INCOMING), INCOMING , null));
         myItems.add(new MyItem(optionHC.addItem(OUTCOMING) , OUTCOMING, null));

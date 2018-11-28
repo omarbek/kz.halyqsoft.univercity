@@ -37,7 +37,6 @@ public class PdfEdit extends AbstractCommonView {
     private PDF_DOCUMENT mainFile;
     public PdfEdit(PDF_DOCUMENT file, Object prevClassWithEmbedded) {
         openPdfButton.setEnabled(false);
-        this.pdfEmbedded = pdfEmbedded;
         this.prevClassWithEmbedded = prevClassWithEmbedded;
         try {
             addOrEdit(file);
