@@ -103,6 +103,21 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
                         loads = SessionFacadeFactory.getSessionFacade(
                                 CommonEntityFacadeBean.class).lookup(loadToChairQM);
                         for (LOAD_TO_CHAIR loadToChair : loads) {
+
+//                            if (loadToChair.getSemester().getId().equals(SEMESTER.EIGHTH_SEMESTER)) {
+//                                if (loadToChair.getSubject().getPracticeType() != null) {
+//                                    int studentNumber = (int) (loadToChair.getStudentNumber() * 0.4);
+//                                    loadToChair.setStudentNumber(studentNumber);
+//                                    double practiceCount = (double)
+//                                            studentNumber * loadToChair.getSubject().getWeekNumber();
+//                                    loadToChair.setPracticeCount(practiceCount);
+//                                    loadToChair.setTotalCount(practiceCount);
+//
+//
+//                                    LOAD_TO_CHAIR dividingLoadToChair
+//                                }
+//                            }
+
                             loadToChair.setStudyYear(SessionFacadeFactory.getSessionFacade(
                                     CommonEntityFacadeBean.class).lookup(STUDY_YEAR.class,
                                     ID.valueOf(CommonUtils.getStudyYearByEntranceYear(
@@ -467,10 +482,10 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
 
     @Override
     public boolean onEdit(Object source, Entity e, int buttonId) {
-        try{
-            onCreateOrEdit(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(LOAD_TO_CHAIR.class,e.getId()));
-        }catch (Exception ex){
-            CommonUtils.showMessageAndWriteLog("Uanble to edit or create load_to_chair" , ex);
+        try {
+            onCreateOrEdit(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(LOAD_TO_CHAIR.class, e.getId()));
+        } catch (Exception ex) {
+            CommonUtils.showMessageAndWriteLog("Uanble to edit or create load_to_chair", ex);
             return false;
         }
         return true;
