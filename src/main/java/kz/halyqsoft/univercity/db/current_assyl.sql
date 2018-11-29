@@ -77,3 +77,19 @@ ALTER TABLE load_to_teacher ADD CONSTRAINT fk_load_to_teacher_stream FOREIGN KEY
 ALTER TABLE load_to_teacher ADD CONSTRAINT fk_load_to_teacher_groups FOREIGN KEY (group_id) REFERENCES groups(id) ON UPDATE RESTRICT ON DELETE RESTRICT ;
 ALTER TABLE load_to_teacher ADD CONSTRAINT fk_load_to_teacher_semester FOREIGN KEY (semester_id) REFERENCES semester(id) ON UPDATE RESTRICT ON DELETE RESTRICT ;
 ALTER TABLE load_to_teacher ADD CONSTRAINT fk_load_to_teacher_teacher FOREIGN KEY (teacher_id) REFERENCES employee(id) ON UPDATE RESTRICT ON DELETE RESTRICT ;
+
+ALTER TABLE ABSENCE_CAUSE ADD COLUMN letter VARCHAR(10);
+
+INSERT INTO public.absence_cause (id, name, letter) VALUES (4, 'Фактической работы', 'Ф');
+INSERT INTO public.absence_cause (id, name, letter) VALUES (5, 'Целосменных простоев', 'Ц');
+INSERT INTO public.absence_cause (id, name, letter) VALUES (6, 'Очередной отпуск', 'О');
+INSERT INTO public.absence_cause (id, name, letter) VALUES (7, 'Отпуск в связи с родами', 'Д');
+INSERT INTO public.absence_cause (id, name, letter) VALUES (8, 'Болезнь', 'Б');
+INSERT INTO public.absence_cause (id, name, letter) VALUES (9, 'Прочие неявки с разрешением закона', 'ПЗ');
+INSERT INTO public.absence_cause (id, name, letter) VALUES (10, 'Прочие неявки с разрешением администрации', 'ПА');
+INSERT INTO public.absence_cause (id, name, letter) VALUES (11, 'Прогулы', 'П');
+INSERT INTO public.absence_cause (id, name, letter) VALUES (12, 'Выходные и праздничные дни', 'Выходной');
+INSERT INTO public.absence_cause (id, name, letter) VALUES (13, 'Опоздание и преждевременный уход', 'ОУ');
+INSERT INTO public.absence_cause (id, name, letter) VALUES (14, 'Всего', 'Всего');
+INSERT INTO public.absence_cause (id, name, letter) VALUES (15, 'Сверхурочный', 'С');
+INSERT INTO public.absence_cause (id, name, letter) VALUES (16, 'Ночной', 'Н');
