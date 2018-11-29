@@ -321,3 +321,37 @@ update shift_study_year set shift_id=1;
 insert into shift_study_year values (nextval('s_shift_study_year'),2,2);
 insert into shift_study_year values (nextval('s_shift_study_year'),3,2);
 insert into shift_study_year values (nextval('s_shift_study_year'),4,1);
+
+UPDATE LESSON_TIME
+SET BEGIN_TIME_ID = 18,
+    END_TIME_ID   = 20
+WHERE (ID = 7);
+UPDATE LESSON_TIME
+SET BEGIN_TIME_ID = 21,
+    END_TIME_ID   = 23
+WHERE (ID = 4);
+UPDATE LESSON_TIME
+SET BEGIN_TIME_ID = 6,
+    END_TIME_ID   = 28
+WHERE (ID = 11);
+UPDATE LESSON_TIME
+SET BEGIN_TIME_ID = 31,
+    END_TIME_ID   = 9
+WHERE (ID = 7);
+
+drop view V_TEACHER_SUBJECT_MODULE;
+CREATE OR REPLACE VIEW V_TEACHER_SUBJECT_MODULE AS
+  SELECT teacher_subject.ID,
+         teacher_subject.EMPLOYEE_ID,
+         subj.NAME_RU SUBJECT_NAME_RU,
+         subj.name_kz SUBJECT_NAME_KZ,
+         credit.credit,
+         subjm.module_name,
+         teacher_subject.FALL,
+         teacher_subject.SPRING,
+         teacher_subject.SUMMER,
+         teacher_subject.LOAD_PER_HOURS
+  FROM TEACHER_SUBJECT teacher_subject
+         INNER JOIN SUBJECT subj ON teacher_subject.SUBJECT_ID = subj.ID
+         INNER JOIN creditability credit ON subj.creditability_id = credit.id
+         INNER JOIN subject_module subjm ON subj.module_id = subjm.id;

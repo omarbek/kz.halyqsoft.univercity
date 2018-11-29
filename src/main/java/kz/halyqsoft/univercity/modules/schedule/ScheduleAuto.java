@@ -297,6 +297,7 @@ public class ScheduleAuto extends AbstractCommonView {
     private boolean choosedDayAndTime(LOAD_TO_TEACHER loadToTeacher, GROUPS group,
                                       boolean notComputer, List<GROUPS> groups, Integer shift) throws Exception {
         QueryModel<WEEK_DAY> weekDayQM = new QueryModel<>(WEEK_DAY.class);
+        weekDayQM.addWhere("value", ECriteria.NOT_EQUAL, 0);
         List<WEEK_DAY> weekDays = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
                 lookup(weekDayQM);
         QueryModel<LESSON_TIME> lessonTimeQM = new QueryModel<>(LESSON_TIME.class);

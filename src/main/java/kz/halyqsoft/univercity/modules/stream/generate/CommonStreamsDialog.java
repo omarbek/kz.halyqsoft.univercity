@@ -29,8 +29,7 @@ import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class CommonStreamsDialog extends WindowUtils implements EntityListener {
 
@@ -72,6 +71,7 @@ public class CommonStreamsDialog extends WindowUtils implements EntityListener {
 
         DBGridModel subjectGM = (DBGridModel) subjectGW.getWidgetModel();
         subjectGM.setRefreshType(ERefreshType.MANUAL);
+        subjectGM.setRowNumberVisible(true);
 
         setSubjects();
 
