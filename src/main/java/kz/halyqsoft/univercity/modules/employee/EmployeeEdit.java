@@ -440,6 +440,7 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         content.setSizeFull();
 
         /* Subject PPS */
+//        with 2 language
         subjectPPSTW = new TableWidget(V_TEACHER_SUBJECT_MODULE.class);
         subjectPPSTW.setButtonVisible(AbstractToolbar.REFRESH_BUTTON, false);
         subjectPPSTW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
@@ -448,7 +449,11 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         DBTableModel subjectPPSTM = (DBTableModel) subjectPPSTW.getWidgetModel();
         subjectPPSTM.setReadOnly(baseDataFW.getWidgetModel().isReadOnly());
         subjectPPSTM.setCrudEntityClass(TEACHER_SUBJECT.class);
-
+        if(CommonUtils.getLanguage().equals("kz")) {
+            subjectPPSTM.getColumnModel("subjectNameRu").setInTable(false);
+        } if(CommonUtils.getLanguage().equals("ru")) {
+            subjectPPSTM.getColumnModel("subjectNameKz").setInTable(false);
+        }
 
         FormModel subjectPPSFM = ((DBTableModel) subjectPPSTW.getWidgetModel()).getFormModel();
         FKFieldModel subjectFM = (FKFieldModel) subjectPPSFM.getFieldModel("subject");
@@ -456,7 +461,6 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
         subjectFM.setDialogHeight(360);
         subjectFM.setDialogWidth(800);
         QueryModel subjectQM = subjectFM.getQueryModel();
-//        ((DBTableModel) subjectPPSTW.getWidgetModel()).getColumnModel("").setInTable(true);
 
         QueryModel subjectPPSQM = subjectPPSTM.getQueryModel();
         ID employeeId = ID.valueOf(-1);

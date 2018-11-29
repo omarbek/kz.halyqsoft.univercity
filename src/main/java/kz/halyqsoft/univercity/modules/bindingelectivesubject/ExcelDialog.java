@@ -1,4 +1,4 @@
-package kz.halyqsoft.univercity.modules.userarrival.subview.dialogs;
+package kz.halyqsoft.univercity.modules.bindingelectivesubject;
 
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Font;
@@ -9,6 +9,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 import com.vaadin.server.FileDownloader;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
+import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.CreateExcel;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.EmployeePdfCreator;
 import org.apache.poi.ss.usermodel.Cell;
@@ -23,7 +24,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.Iterator;
 import java.util.List;
 
-public class PrintDialog extends AbstractDialog{
+public class ExcelDialog extends AbstractDialog{
 
     private List<String> tableHeader;
     private List<List<String>> tableBody;
@@ -34,7 +35,8 @@ public class PrintDialog extends AbstractDialog{
     private Button excelBtn;
     private CreateExcel createExcel = null;
     private Font currentFont;
-    public PrintDialog(List<String> tableHeader, List<List<String>> tableBody,String title ,String fileName){
+    private Paragraph header;
+    public ExcelDialog(List<String> tableHeader, List<List<String>> tableBody,String title ,String fileName){
         currentFont = EmployeePdfCreator.getFont(12, Font.BOLD);
         print(tableHeader, tableBody,title ,fileName);
     }
@@ -42,6 +44,7 @@ public class PrintDialog extends AbstractDialog{
     private void print(List<String> tableHeader, List<List<String>> tableBody,String title ,String fileName){
         this.tableBody = tableBody;
         this.tableHeader = tableHeader;
+        this.header = header;
 
         setImmediate(true);
         this.title = title;
@@ -68,6 +71,7 @@ public class PrintDialog extends AbstractDialog{
             fileDownloaderr.extend(pdfBtn);
         }
 
+
         excelBtn = new Button("EXCEL");
         excelBtn.setImmediate(true);
 
@@ -83,7 +87,7 @@ public class PrintDialog extends AbstractDialog{
         AbstractWebUI.getInstance().addWindow(this);
     }
 
-    public PrintDialog(List<String> tableHeader, List<List<String>> tableBody,String title ,String fileName, Font font){
+    public ExcelDialog(List<String> tableHeader, List<List<String>> tableBody,String title ,String fileName, Font font){
         setCurrentFont(font);
         print(tableHeader, tableBody,title ,fileName);
     }
@@ -96,35 +100,35 @@ public class PrintDialog extends AbstractDialog{
         XSSFSheet my_worksheet = my_xls_workbook.getSheetAt(0);
         Iterator<Row> rowIterator = my_worksheet.iterator();
         Document iText_xls_2_pdf = new Document();
-            PdfWriter.getInstance(iText_xls_2_pdf, byteArrayOutputStream);
-            iText_xls_2_pdf.open();
-            PdfPTable my_table = new PdfPTable(createExcel.getTableHeader().size());
-            PdfPCell table_cell;
+        PdfWriter.getInstance(iText_xls_2_pdf, byteArrayOutputStream);
+        iText_xls_2_pdf.open();
+        PdfPTable my_table = new PdfPTable(createExcel.getTableHeader().size());
+        PdfPCell table_cell;
 
-            while (rowIterator.hasNext()) {
-                Row row = rowIterator.next();
-                Iterator<Cell> cellIterator = row.cellIterator();
-                while (cellIterator.hasNext()) {
-                    Cell cell = cellIterator.next();
-                    switch (cell.getCellTypeEnum()) {
+        while (rowIterator.hasNext()) {
+            Row row = rowIterator.next();
+            Iterator<Cell> cellIterator = row.cellIterator();
+            while (cellIterator.hasNext()) {
+                Cell cell = cellIterator.next();
+                switch (cell.getCellTypeEnum()) {
 
-                        case STRING:
+                    case STRING:
 
-                            Paragraph paragraph = new Paragraph(cell.getStringCellValue(), currentFont);
-                            table_cell = new PdfPCell(paragraph);
+                        Paragraph paragraph = new Paragraph(cell.getStringCellValue(), currentFont);
+                        table_cell = new PdfPCell(paragraph);
 
-                                //table_cell=new PdfPCell(new Phrase(cell.getStringCellValue()));
-                                my_table.addCell(table_cell);
-                                break;
+                        //table_cell=new PdfPCell(new Phrase(cell.getStringCellValue()));
+                        my_table.addCell(table_cell);
+                        break;
 
-                    }
                 }
-
             }
-            iText_xls_2_pdf.add(my_table);
-            iText_xls_2_pdf.close();
 
-            bais.close();
+        }
+        iText_xls_2_pdf.add(my_table);
+        iText_xls_2_pdf.close();
+
+        bais.close();
 
         return byteArrayOutputStream.toByteArray();
     }
@@ -140,7 +144,6 @@ public class PrintDialog extends AbstractDialog{
         PdfWriter.getInstance(iText_xls_2_pdf, byteArrayOutputStream);
         iText_xls_2_pdf.open();
         PdfPTable my_table = new PdfPTable(createExcel.getTableHeader().size());
-        my_table.setWidthPercentage(100);
         PdfPCell table_cell;
 
         while (rowIterator.hasNext()) {
@@ -185,6 +188,7 @@ public class PrintDialog extends AbstractDialog{
 
     @Override
     protected String createTitle() {
+
         return null;
     }
 }

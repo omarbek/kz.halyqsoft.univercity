@@ -247,3 +247,111 @@ CREATE OR REPLACE VIEW V_LOAD_TO_CHAIR AS
   WHERE subj.deleted = FALSE
     AND curr.deleted = FALSE
     AND sem.study_year_id = gr.study_year_id;
+
+update groups
+set deleted = true
+where id not in (select id from v_group);
+
+CREATE TABLE load_to_teacher
+(
+  id                    BIGINT NOT NULL ,
+  subject_id            BIGINT NOT NULL ,
+  curriculum_id         BIGINT NOT NULL ,
+  study_year_id         BIGINT,
+  stream_id             BIGINT ,
+  group_id              BIGINT,
+  semester_id           BIGINT,
+  student_number        NUMERIC,
+  credit                NUMERIC(2) ,
+  lc_count              NUMERIC(3),
+  pr_count              NUMERIC,
+  lb_count              NUMERIC,
+  with_teacher_count    NUMERIC,
+  rating_count          NUMERIC,
+  exam_count            BIGINT,
+  control_count         NUMERIC,
+  course_work_count     NUMERIC,
+  diploma_count         NUMERIC,
+  practice_count        NUMERIC,
+  mek                   NUMERIC,
+  protect_diploma_count NUMERIC,
+  total_count           NUMERIC,
+  teacher_id            BIGINT
+);
+CREATE SEQUENCE s_load_to_teacher MINVALUE 0 START WITH 1 no CYCLE;
+
+ALTER TABLE load_to_teacher ADD CONSTRAINT pk_load_to_teacher PRIMARY KEY (id);
+ALTER TABLE load_to_teacher ADD CONSTRAINT fk_load_to_teacher_subject FOREIGN KEY (subject_id) REFERENCES subject(id) ON UPDATE RESTRICT ON DELETE RESTRICT ;
+ALTER TABLE load_to_teacher ADD CONSTRAINT fk_load_to_teacher_curriculum FOREIGN KEY (curriculum_id) REFERENCES curriculum(id) ON UPDATE RESTRICT ON DELETE RESTRICT ;
+ALTER TABLE load_to_teacher ADD CONSTRAINT fk_load_to_teacher_study_year FOREIGN KEY (study_year_id) REFERENCES study_year(id) ON UPDATE RESTRICT ON DELETE RESTRICT ;
+ALTER TABLE load_to_teacher ADD CONSTRAINT fk_load_to_teacher_stream FOREIGN KEY (stream_id) REFERENCES stream(id) ON UPDATE RESTRICT ON DELETE RESTRICT ;
+ALTER TABLE load_to_teacher ADD CONSTRAINT fk_load_to_teacher_groups FOREIGN KEY (group_id) REFERENCES groups(id) ON UPDATE RESTRICT ON DELETE RESTRICT ;
+ALTER TABLE load_to_teacher ADD CONSTRAINT fk_load_to_teacher_semester FOREIGN KEY (semester_id) REFERENCES semester(id) ON UPDATE RESTRICT ON DELETE RESTRICT ;
+ALTER TABLE load_to_teacher ADD CONSTRAINT fk_load_to_teacher_teacher FOREIGN KEY (teacher_id) REFERENCES employee(id) ON UPDATE RESTRICT ON DELETE RESTRICT ;
+
+update lesson_time set lesson_number=5 where id=11;
+
+ALTER TABLE schedule_detail ADD COLUMN stream_id int;
+
+ALTER TABLE ONLY schedule_detail
+  ADD CONSTRAINT fk_t_schedule_detail_stream FOREIGN KEY (stream_id)
+REFERENCES stream (id)
+ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+CREATE OR REPLACE VIEW V_TEACHER_SUBJECT_MODULE AS
+  SELECT
+         teacher_subject.ID,
+         teacher_subject.EMPLOYEE_ID,
+         subj.NAME_RU SUBJECT_NAME,
+         credit.credit,
+         subjm.module_name,
+         teacher_subject.FALL,
+         teacher_subject.SPRING,
+         teacher_subject.SUMMER,
+         teacher_subject.LOAD_PER_HOURS
+  FROM TEACHER_SUBJECT teacher_subject
+         INNER JOIN SUBJECT subj ON teacher_subject.SUBJECT_ID = subj.ID
+         INNER JOIN creditability credit ON subj.creditability_id = credit.id
+         INNER JOIN subject_module subjm ON subj.module_id = subjm.id;
+
+delete from lesson_detail;
+delete from lesson;
+
+update shift_study_year set shift_id=1;
+insert into shift_study_year values (nextval('s_shift_study_year'),2,2);
+insert into shift_study_year values (nextval('s_shift_study_year'),3,2);
+insert into shift_study_year values (nextval('s_shift_study_year'),4,1);
+
+UPDATE LESSON_TIME
+SET BEGIN_TIME_ID = 18,
+    END_TIME_ID   = 20
+WHERE (ID = 7);
+UPDATE LESSON_TIME
+SET BEGIN_TIME_ID = 21,
+    END_TIME_ID   = 23
+WHERE (ID = 4);
+UPDATE LESSON_TIME
+SET BEGIN_TIME_ID = 6,
+    END_TIME_ID   = 28
+WHERE (ID = 11);
+UPDATE LESSON_TIME
+SET BEGIN_TIME_ID = 31,
+    END_TIME_ID   = 9
+WHERE (ID = 7);
+
+drop view V_TEACHER_SUBJECT_MODULE;
+CREATE OR REPLACE VIEW V_TEACHER_SUBJECT_MODULE AS
+  SELECT teacher_subject.ID,
+         teacher_subject.EMPLOYEE_ID,
+         subj.NAME_RU SUBJECT_NAME_RU,
+         subj.name_kz SUBJECT_NAME_KZ,
+         credit.credit,
+         subjm.module_name,
+         teacher_subject.FALL,
+         teacher_subject.SPRING,
+         teacher_subject.SUMMER,
+         teacher_subject.LOAD_PER_HOURS
+  FROM TEACHER_SUBJECT teacher_subject
+         INNER JOIN SUBJECT subj ON teacher_subject.SUBJECT_ID = subj.ID
+         INNER JOIN creditability credit ON subj.creditability_id = credit.id
+         INNER JOIN subject_module subjm ON subj.module_id = subjm.id;

@@ -17,6 +17,7 @@ import org.r3a.common.entity.event.EntityListener;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
+import sun.plugin2.message.Message;
 
 /**
  * @author Omarbek
@@ -77,6 +78,7 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
         String absent = getUILocaleUtil().getCaption("absent");
         String manuallySign = getUILocaleUtil().getCaption("manuallySign");
         String manuallySignedReport = getUILocaleUtil().getCaption("manuallySign.report");
+        String pdfAbsent = getUILocaleUtil().getCaption("pdfAttendance");
 
         hierarchicalContainer.addItem(main);
         hierarchicalContainer.setChildrenAllowed(main, false);
@@ -97,8 +99,11 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
         hierarchicalContainer.setChildrenAllowed(latecomers, false);
         hierarchicalContainer.addItem(absent);
         hierarchicalContainer.setChildrenAllowed(absent, false);
+        hierarchicalContainer.addItem(pdfAbsent);
+        hierarchicalContainer.setChildrenAllowed(pdfAbsent, false);
         hierarchicalContainer.setParent(latecomers,yearlyAttendance);
         hierarchicalContainer.setParent(absent,yearlyAttendance);
+
 
         if (CommonUtils.getCurrentUser().getId().getId().longValue() == 2) {
             hierarchicalContainer.addItem(manuallySign);
@@ -148,7 +153,6 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
                             EmployeeYearLatecomers groupLatecomers = new EmployeeYearLatecomers();
                             mainHL.addComponent(groupLatecomers.getMainVL());
                             setAbsentsInfo();
-
                         } else if (manuallySignedReport.equalsIgnoreCase(menu)
                                 && CommonUtils.isCurrentUserHasAdminPrivileges()) {
                             SigningReport signingReport = new SigningReport();
@@ -167,6 +171,10 @@ public class UserArrivalView extends AbstractTaskView implements EntityListener 
                             EmployeeAbsent employeeLatecomers = new EmployeeAbsent();
                             mainHL.addComponent(employeeLatecomers.getMainVL());
                             setAbsentsInfo();
+                        }
+                        else if (pdfAbsent.equalsIgnoreCase(menu)) {
+                            PdfAttendence facultyAttendance = new PdfAttendence();
+                            mainHL.addComponent(facultyAttendance.getMainVL());
                         }
                         mainHSP.addComponent(mainHL);
                     }

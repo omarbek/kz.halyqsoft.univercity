@@ -11,6 +11,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.CARD;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEPARTMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.POST;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VEmployee;
 import kz.halyqsoft.univercity.filter.FEmployeeFilter;
 import kz.halyqsoft.univercity.filter.panel.EmployeeFilterPanel;
@@ -124,6 +125,21 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
             cb.addItem(i);
         }
         filterPanel.addFilterComponent("childAge", cb);
+
+        cb = new ComboBox();
+        cb.setNullSelectionAllowed(true);
+        cb.setTextInputAllowed(false);
+        cb.setFilteringMode(FilteringMode.OFF);
+        cb.setPageLength(0);
+        cb.setWidth(220, Unit.PIXELS);
+        QueryModel<SUBJECT> subjectQM = new QueryModel<>(SUBJECT.class);
+        BeanItemContainer<SUBJECT> subjectBIC = new BeanItemContainer<>(SUBJECT.class,
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(subjectQM));
+        cb.setContainerDataSource(subjectBIC);
+        filterPanel.addFilterComponent("subject", cb);
+
+        getContent().addComponent(filterPanel);
+        getContent().setComponentAlignment(filterPanel, Alignment.TOP_CENTER);
 
         teacherGW = new GridWidget(VEmployee.class);
         teacherGW.addEntityListener(this);
@@ -309,6 +325,14 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
             sb.append(" date_part('year',age(c2.birth_date)) <= " + ef.getChildAge() + " ");
             i++;
         }
+        if(ef.getSubject()!=null){
+            params.put(i, ef.getSubject().getId().getId());
+            if (sb.length() > 0) {
+                sb.append(" and ");
+            }
+            sb.append("subj.subject_id = ?");
+            sb.append(i++);
+        }
 
         List<VEmployee> list = new ArrayList<>();
 
@@ -324,6 +348,7 @@ public class EmployeeView extends AbstractTaskView implements EntityListener, Fi
                 "  LEFT JOIN EMPLOYEE_DEPT empl_dept ON empl_dept.EMPLOYEE_ID = empl.ID AND empl_dept.DISMISS_DATE IS NULL\n" +
                 "  LEFT JOIN DEPARTMENT dep ON empl_dept.DEPT_ID = dep.ID\n" +
                 "  LEFT JOIN POST post ON empl_dept.POST_ID = post.id\n" +
+                "  LEFT JOIN teacher_subject subj ON empl.id = subj.employee_id" +
                 "  LEFT JOIN child c2 on empl.id = c2.employee_id\n" + sb.toString() +
                 "   usr.id not in (1,2) and usr.deleted = FALSE  \n" +
                 "GROUP BY empl.ID,  usr.CODE,\n" +

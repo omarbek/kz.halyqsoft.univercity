@@ -122,7 +122,6 @@ public class LateEmployeesAttendance implements EntityListener {
                     VLateEmployees userArrival = (VLateEmployees) usersGW.getAllEntities().get(i);
                     String slqEmpl = "SELECT\n" +
                             "  dep.DEPT_NAME,\n" +
-                            "  post.post_name\n" +
                             "FROM EMPLOYEE empl INNER JOIN USERS usr ON empl.ID = usr.ID\n" +
                             "  LEFT JOIN EMPLOYEE_DEPT empl_dept ON empl_dept.EMPLOYEE_ID = empl.ID AND empl_dept.DISMISS_DATE IS NULL\n" +
                             "  LEFT JOIN DEPARTMENT dep ON empl_dept.DEPT_ID = dep.ID\n" +
