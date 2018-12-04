@@ -1204,7 +1204,7 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
             afterSemesterProgamPanel.setCurriculum(curriculum);
             afterSemesterProgamPanel.setEntranceYear((ENTRANCE_YEAR) entranceYearCB.getValue());
             afterSemesterProgamPanel.refresh();
-//            creditCountByComponentsPanel.setCurriculum(curriculum);//TODO return
+//            creditCountByComponentsPanel.setCurriculum(curriculum);//TODO return maybe
 //            creditCountByComponentsPanel.refresh();
 //            cyclePanel.setCurriculum(curriculum);
 //            cyclePanel.refresh();
