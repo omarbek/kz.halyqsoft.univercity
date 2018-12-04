@@ -369,10 +369,10 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
                 Document document = new Document();
                 ByteArrayOutputStream byteArr = new ByteArrayOutputStream();
                 int allCredits = 0,allEcts = 0, allLcount =0, allPcount=0, allLbcount=0,allwtcount =0,allOcount=0,allCnt=0,allexam=0;
-                int creditNum = 0;
+                int creditNum = 0 , countadd=0,fcountadd=0,ffcountadd=0 ,countall=0;
                 int ectsNum = 0, lcount =0, pcount=0, lbcount=0,wtcount =0,ocount=0,allcount=0,examc=0;
                 int fallCredits = 0,fallEcts = 0, fallLcount =0, fallPcount=0, fallLbcount=0,fallwtcount =0,fallOcount=0,fallCnt=0,fallexam=0;
-                int ffallCredits = 0,ffallEcts = 0, ffallLcount =0, ffallPcount=0, ffallLbcount=0,ffallwtcount =0,ffallOcount=0,ffallCnt=0,ffallexam=0;
+                int ffallCredits = 0,ffallEcts = 0, ffallLcount =0, ffallPcount=0, ffallLbcount=0,ffallwtcount =0,ffallOcount=0,ffallCnt=0,ffallexam=0, fin=0,ffin=0;
                 PdfPTable table = new PdfPTable(15);
                 insertCell(table, "Білім беру бағдарламасының оқу жоспары (модульдердің еңбек мөлшері мен меңгерілу ретіне қарай оқу жылдарына бөлінуі)  \n" +
                         "Учебный план образовательной программы (распределение модулей по годам обучения с учетом трудоемкости и порядка освоения)", Element.ALIGN_CENTER, 16, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
@@ -579,6 +579,7 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
                             for (String value : myRow) {
                                 insertCell(table, value, Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
                             }
+                            creditNum += Integer.parseInt(myRow.get(6).trim().length()>0 ? myRow.get(6) :"0");
                             ectsNum += Integer.parseInt(myRow.get(7).trim().length()>0 ? myRow.get(7) :"0");
                             lcount += Integer.parseInt(myRow.get(8).trim().length()>0 ? myRow.get(8) :"0");
                             pcount += Integer.parseInt(myRow.get(9).trim().length()>0 ? myRow.get(9) :"0");
@@ -902,12 +903,14 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
                         creditNum=0;ectsNum=0;lcount=0;pcount=0;lbcount=0;wtcount=0;ocount=0;allcount=0;examc=0;
                         allCredits =0; allEcts =0; allLcount =0; allPcount=0; allLbcount=0; allwtcount=0; allOcount=0; allCnt=0;allexam=0;
 
-                        insertCell(table,"-------", Element.ALIGN_LEFT, 15,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table,"     ", Element.ALIGN_LEFT, 15,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        String var = null;
                         myData = getData(curriculum.getId().getId().intValue(), 0, IUPS_TYPE.ADDITIONAL);
                         for (List<String> myRow : myData) {
                             for (String value : myRow) {
                                 insertCell(table, value, Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
                             }
+                            var=myRow.get(6);
                             creditNum += Integer.parseInt(myRow.get(6).trim().length()>0 ? myRow.get(6) :"0");
                             ectsNum += Integer.parseInt(myRow.get(7).trim().length()>0 ? myRow.get(7) :"0");
                             lcount += Integer.parseInt(myRow.get(8).trim().length()>0 ? myRow.get(8) :"0");
@@ -917,10 +920,10 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
                             ocount += Integer.parseInt(myRow.get(12).trim().length()>0 ? myRow.get(12) :"0");
                             allcount += Integer.parseInt(myRow.get(13).trim().length()>0 ? myRow.get(13) :"0");
                             if(myRow.get(14).trim().length()>0){
-                                examc++;
+                                countadd++;
                             }
                         }
-                        allCredits +=creditNum; allEcts +=ectsNum; allLcount +=lcount; allPcount+=pcount; allLbcount+=lbcount; allwtcount+=wtcount; allOcount+=ocount; allCnt+=allcount;allexam+=examc;
+                        allCredits +=creditNum; allEcts +=ectsNum; allLcount +=lcount; allPcount+=pcount; allLbcount+=lbcount; allwtcount+=wtcount; allOcount+=ocount; allCnt+=allcount;countall+=countadd;
 
                         insertCell(table,"Всего ", Element.ALIGN_LEFT, 6,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
                         insertCell(table,String.valueOf(allCredits), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
@@ -931,17 +934,19 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
                         insertCell(table,String.valueOf(allwtcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
                         insertCell(table,String.valueOf(allOcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
                         insertCell(table,String.valueOf(allCnt), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allexam)+"Е/Э", Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        ffallCredits +=allCredits; ffallEcts +=allEcts; ffallLcount +=allLcount; ffallPcount+=allPcount; ffallLbcount+=allLbcount; ffallwtcount+=allwtcount; ffallOcount+=allOcount; ffallCnt+=allCnt;ffallexam+=allexam;
-                        allCredits =0; allEcts =0; allLcount =0; allPcount=0; allLbcount=0; allwtcount=0; allOcount=0; allCnt=0;allexam=0;
+                        insertCell(table, allCredits + "кр  " + String.valueOf(countall) + "д/з", Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+
+                        ffallCredits +=allCredits; ffallEcts +=allEcts; ffallLcount +=allLcount; ffallPcount+=allPcount; ffallLbcount+=allLbcount; ffallwtcount+=allwtcount; ffallOcount+=allOcount; ffallCnt+=allCnt;ffallexam+=allexam;fin+=countall;
+                        allCredits =0; allEcts =0; allLcount =0; allPcount=0; allLbcount=0; allwtcount=0; allOcount=0; allCnt=0;allexam=0;countall=0;
                         creditNum=0;ectsNum=0;lcount=0;pcount=0;lbcount=0;wtcount=0;ocount=0;allcount=0;examc=0;
 
-                        insertCell(table,"-------", Element.ALIGN_LEFT, 15,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table,"     ", Element.ALIGN_LEFT, 15,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
                         myData = getData(curriculum.getId().getId().intValue(), 0, IUPS_TYPE.AFTER_SEMESTER);
                         for (List<String> myRow : myData) {
-                            for (String value : myRow) {
-                                insertCell(table, value, Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
-                            }
+                                for (String value : myRow) {
+                                    insertCell(table, value, Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
+                                }
+
                             creditNum += Integer.parseInt(myRow.get(6).trim().length()>0 ? myRow.get(6) :"0");
                             ectsNum += Integer.parseInt(myRow.get(7).trim().length()>0 ? myRow.get(7) :"0");
                             lcount += Integer.parseInt(myRow.get(8).trim().length()>0 ? myRow.get(8) :"0");
@@ -950,12 +955,16 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
                             wtcount += Integer.parseInt(myRow.get(11).trim().length()>0 ? myRow.get(11) :"0");
                             ocount += Integer.parseInt(myRow.get(12).trim().length()>0 ? myRow.get(12) :"0");
                             allcount += Integer.parseInt(myRow.get(13).trim().length()>0 ? myRow.get(13) :"0");
-                            if(myRow.get(14).trim().length()>0){
+                            if(myRow.get(14).trim().length()==0){
                                 examc++;
                             }
+                            if(myRow.get(14).trim().length()>0){
+                                countall++;
+                            }
                         }
+                        fin+=countall;
                         allCredits +=creditNum; allEcts +=ectsNum; allLcount +=lcount; allPcount+=pcount; allLbcount+=lbcount; allwtcount+=wtcount; allOcount+=ocount; allCnt+=allcount;allexam+=examc;
-                        ffallCredits +=allCredits; ffallEcts +=allEcts; ffallLcount +=allLcount; ffallPcount+=allPcount; ffallLbcount+=allLbcount; ffallwtcount+=allwtcount; ffallOcount+=allOcount; ffallCnt+=allCnt;ffallexam+=allexam;
+                        ffallCredits +=allCredits; ffallEcts +=allEcts; ffallLcount +=allLcount; ffallPcount+=allPcount; ffallLbcount+=allLbcount; ffallwtcount+=allwtcount; ffallOcount+=allOcount; ffallCnt+=allCnt;//ffallexam+=allexam;
                         insertCell(table,"Всего ", Element.ALIGN_LEFT, 6,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
                         insertCell(table,String.valueOf(allCredits), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
                         insertCell(table,String.valueOf(allEcts), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
@@ -965,7 +974,11 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
                         insertCell(table,String.valueOf(allwtcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
                         insertCell(table,String.valueOf(allOcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
                         insertCell(table,String.valueOf(allCnt), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allexam), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        if(countall>0) {
+                            insertCell(table, String.valueOf(countall) + "д/з", Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        }else {
+                            insertCell(table, String.valueOf(allexam) + "МЕ/ГЭ", Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        }
 
 
                         insertCell(table,"ИТОГО по учебному плану ", Element.ALIGN_LEFT, 6,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
@@ -977,12 +990,11 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
                         insertCell(table,String.valueOf(ffallwtcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
                         insertCell(table,String.valueOf(ffallOcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
                         insertCell(table,String.valueOf(ffallCnt), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(ffallexam), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table,String.valueOf(ffallexam)+"Е/Э "+String.valueOf(fin)+"д/з", Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
 
 
                     }
                     document.add(table);
-
                     document.close();
 
                 } catch (DocumentException e) {
@@ -1098,8 +1110,8 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
         }
         }if(iupsType==IUPS_TYPE.ADDITIONAL){
             String sql = "select t0.module_short_name, t0.cycle_short_name,t0.education_module_type_name, t0.subject_code,t0.subject_name_kz,t0.subject_name_ru,\n" +
-                    "  t0.credit,t0.ects_count,t0.lc_count,t0.pr_count,t0.lb_count,t0.with_teacher_count,t0.own_count,t0.total_count,t0.control_type_name\n" +
-                    "from v_curriculum_add_program t0 where t0.CURRICULUM_ID = "+curriculumId;
+                    "                     t0.credit,t0.ects_count,t0.lc_count,t0.pr_count,t0.lb_count,t0.with_teacher_count,t0.own_count,t0.total_count,(t0.semester_data_id ,'сем', t0.creditability_id,'кр')\n" +
+                    "                    from v_curriculum_add_program t0 where t0.CURRICULUM_ID = "+curriculumId;
             try {
                 List<Object> tmpList = new ArrayList<>();
                 tmpList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, param));
@@ -1123,9 +1135,12 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
                 CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
             }
         }if(iupsType==IUPS_TYPE.AFTER_SEMESTER){
-            String sql = "select t0.module_short_name, t0.module_short_name,t0.education_module_type_name, t0.subject_code,t0.subject_name_kz,t0.subject_name_ru,\n" +
-                    "  t0.credit,t0.ects_count,t0.lc_count,t0.week_number,t0.lb_count,t0.with_teacher_count,t0.own_count,t0.total_count,t0.control_type_name\n" +
-                    "from v_curriculum_after_semester t0  where t0.CURRICULUM_ID = "+curriculumId;
+            String sql = "select t0.module_short_name, t0.module_short_name,t0.education_module_type_name,\n" +
+                    "  t0.subject_code,t0.subject_name_kz,t0.subject_name_ru,\n" +
+                    "                      t0.credit,t0.ects_count,t0.lc_count,t0.week_number,\n" +
+                    "  t0.lb_count,t0.with_teacher_count,t0.own_count,t0.total_count,\n" +
+                    "  CASE WHEN t0.week_number IS NOT NULL\n" +
+                    "    THEN  (t0.semester_data_id,'сем',t0.week_number,'апта') END from v_curriculum_after_semester t0  where t0.CURRICULUM_ID = "+curriculumId;
             try {
                 List<Object> tmpList = new ArrayList<>();
                 tmpList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, param));
