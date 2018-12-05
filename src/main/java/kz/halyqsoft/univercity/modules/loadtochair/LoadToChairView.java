@@ -90,122 +90,7 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
             generateButton.addClickListener(new Button.ClickListener() {
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
-                    try {
-                        Set<GROUPS> groups = new HashSet<>();
-
-                        QueryModel<LOAD_TO_CHAIR> loadToChairQM = new QueryModel<>(LOAD_TO_CHAIR.class);
-                        List<LOAD_TO_CHAIR> loads = SessionFacadeFactory.getSessionFacade(
-                                CommonEntityFacadeBean.class).lookup(loadToChairQM);
-                        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(loads);
-
-                        insert("v_load_to_chair", false);
-                        insert("v_load_to_chair_work", true);
-
-                        loads = SessionFacadeFactory.getSessionFacade(
-                                CommonEntityFacadeBean.class).lookup(loadToChairQM);
-                        for (LOAD_TO_CHAIR loadToChair : loads) {
-
-                            if (loadToChair.getSemester().getId().equals(SEMESTER.SEVENTH)) {
-                                for (GROUPS group : CommonUtils.getGroupsByStream(loadToChair.getStream())) {
-                                    if (!groups.contains(group)) {
-
-                                        V_GROUP groupView = SessionFacadeFactory.getSessionFacade(
-                                                CommonEntityFacadeBean.class).lookup(V_GROUP.class, group.getId());
-
-                                        LOAD_TO_CHAIR diplomLoadToChair = new LOAD_TO_CHAIR();
-                                        diplomLoadToChair.setId(SessionFacadeFactory.getSessionFacade(
-                                                CommonIDFacadeBean.class).getID("s_v_load_to_chair"));
-                                        SUBJECT subject = SessionFacadeFactory.getSessionFacade(
-                                                CommonEntityFacadeBean.class)
-                                                .lookup(SUBJECT.class, SUBJECT.MANAGE_DIPLOM);
-                                        diplomLoadToChair.setSubject(subject);
-                                        diplomLoadToChair.setCurriculum(loadToChair.getCurriculum());
-                                        diplomLoadToChair.setGroup(group);
-                                        diplomLoadToChair.setSemester(loadToChair.getSemester());
-                                        Integer studentNumber = (int) Math.round(groupView.getStudentCount() * 0.4);
-                                        diplomLoadToChair.setStudentNumber(studentNumber);
-                                        diplomLoadToChair.setCredit(subject.getCreditability().getCredit().
-                                                doubleValue());
-                                        double diplomaCount = studentNumber.doubleValue() * 12;
-                                        diplomLoadToChair.setStudyYear(SessionFacadeFactory.getSessionFacade(
-                                                CommonEntityFacadeBean.class).lookup(STUDY_YEAR.class,
-                                                STUDY_YEAR.FOURTH_STUDY_YEAR));
-                                        diplomLoadToChair.setDiplomaCount(diplomaCount);
-                                        diplomLoadToChair.setTotalCount(diplomaCount);
-
-                                        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(
-                                                diplomLoadToChair);
-
-                                        groups.add(group);
-                                    }
-                                }
-                            }
-
-//                            if (loadToChair.getSemester().getId().equals(SEMESTER.EIGHTH)) {
-//                                if (loadToChair.getSubject().getPracticeType() != null) {
-//                                    int studentNumber = (int) (loadToChair.getStudentNumber() * 0.4);
-//                                    loadToChair.setStudentNumber(studentNumber);
-//                                    double practiceCount = (double)
-//                                            studentNumber * loadToChair.getSubject().getWeekNumber();
-//                                    loadToChair.setPracticeCount(practiceCount);
-//                                    loadToChair.setTotalCount(practiceCount);
-//
-//
-//                                    LOAD_TO_CHAIR dividingLoadToChair
-//                                }
-//                            }
-
-                            loadToChair.setStudyYear(SessionFacadeFactory.getSessionFacade(
-                                    CommonEntityFacadeBean.class).lookup(STUDY_YEAR.class,
-                                    ID.valueOf(CommonUtils.getStudyYearByEntranceYear(
-                                            loadToChair.getCurriculum().getEntranceYear()))));
-                        }
-                        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(loads);
-                    } catch (Exception e) {
-                        CommonUtils.showMessageAndWriteLog("Unable to get loads to chair", e);
-                    }
-                }
-
-                private void insert(String table, boolean workingChair) {
-                    try {
-                        StringBuilder sqlSB = new StringBuilder("INSERT INTO load_to_chair " +
-                                "  SELECT " +
-                                "    nextval('s_v_load_to_chair'), " +
-                                "    subject_id, " +
-                                "    curriculum_id, " +
-                                "    study_year_id, " +
-                                "    case when stream_id=0 then null else stream_id end stream_id, " +
-                                "    case when group_id=0 then null else group_id end group_id, " +
-                                "    semester_id, " +
-                                "    student_number, " +
-                                "    credit, " +
-                                "    lc_count, " +
-                                "    pr_count, " +
-                                "    lb_count, " +
-                                "    with_teacher_count, " +
-                                "    rating_count, " +
-                                "    exam_count, " +
-                                "    control_count, " +
-                                "    course_work_count, " +
-                                "    diploma_count, " +
-                                "    practice_count, " +
-                                "    mek, " +
-                                "    protect_diploma_count, " +
-                                "    total_count " +
-                                "  FROM ");
-                        sqlSB.append(table);
-                        if (workingChair) {
-                            sqlSB.append(" inner join curriculum curr" +
-                                    " on curr.id = curriculum_id" +
-                                    " inner join speciality spec" +
-                                    " on spec.id = curr.speciality_id" +
-                                    " where spec.chair_id != 23");
-                        }
-
-                        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
-                                lookupItemsList(sqlSB.toString(), new HashMap<>());
-                    } catch (Exception ignored) {
-                    }
+                    generate();
                 }
             });
             loadHL.addComponent(generateButton);
@@ -390,11 +275,12 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
                                                      STUDENT_DIPLOMA_TYPE studentDiplomaType, STUDY_YEAR studyYear, SEMESTER_PERIOD semesterPeriod) {
         QueryModel<V_LOAD_TO_CHAIR_COUNT> loadQM = new QueryModel<>(V_LOAD_TO_CHAIR_COUNT.class);
         FromItem curriculumFI = loadQM.addJoin(EJoin.INNER_JOIN, "curriculum", CURRICULUM.class, "id");
+        FromItem specFI = curriculumFI.addJoin(EJoin.INNER_JOIN, "speciality", SPECIALITY.class, "id");
         if (semesterPeriod != null) {
             FromItem semFI = loadQM.addJoin(EJoin.INNER_JOIN, "semester", SEMESTER.class, "id");
             loadQM.addWhere(semFI, "semesterPeriod", ECriteria.EQUAL, semesterPeriod.getId());
         }
-        loadQM.addWhere("chair", ECriteria.EQUAL, chair.getId());
+        loadQM.addWhere(specFI, "department", ECriteria.EQUAL, chair.getId());
         loadQM.addWhere(curriculumFI, "diplomaType", ECriteria.EQUAL, studentDiplomaType.getId());
 //        loadQM.addWhere(curriculumFI, "entranceYear", ECriteria.EQUAL, currentYear.getId());
         loadQM.addWhere("studyYear", ECriteria.EQUAL, studyYear.getId());
@@ -453,7 +339,6 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
     private List<V_LOAD_TO_CHAIR_COUNT_ALL> getJoinList(List<V_LOAD_TO_CHAIR_COUNT_ALL> loadAllCounts) {
         V_LOAD_TO_CHAIR_COUNT_ALL loadCountSum = new V_LOAD_TO_CHAIR_COUNT_ALL();
         for (V_LOAD_TO_CHAIR_COUNT_ALL count : loadAllCounts) {
-            loadCountSum.setChair(count.getChair());
 
             loadCountSum.setLcCount(loadCountSum.getLcCount() + count.getLcCount());
             loadCountSum.setPrCount(loadCountSum.getPracticeCount() + count.getPrCount());
@@ -483,7 +368,6 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
                 loadCountSum.setSemester(count.getSemester());
             }
             loadCountSum.setStudyYear(count.getStudyYear());
-            loadCountSum.setChair(count.getChair());
 
             loadCountSum.setLcCount(loadCountSum.getLcCount() + count.getLcCount());
             loadCountSum.setPrCount(loadCountSum.getPracticeCount() + count.getPrCount());
@@ -583,5 +467,128 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
             ex.printStackTrace();
         }
         return true;
+    }
+
+    private void generate() {
+        try {
+            Set<GROUPS> groups = new HashSet<>();
+
+            QueryModel<LOAD_TO_CHAIR> loadToChairQM = new QueryModel<>(LOAD_TO_CHAIR.class);
+            List<LOAD_TO_CHAIR> loads = SessionFacadeFactory.getSessionFacade(
+                    CommonEntityFacadeBean.class).lookup(loadToChairQM);
+            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(loads);
+
+            insert("v_load_to_chair", false);
+            insert("v_load_to_chair_work", true);
+
+            loads = SessionFacadeFactory.getSessionFacade(
+                    CommonEntityFacadeBean.class).lookup(loadToChairQM);
+            for (LOAD_TO_CHAIR loadToChair : loads) {
+
+                if (loadToChair.getSemester().getId().equals(SEMESTER.SEVENTH)) {
+                    for (GROUPS group : CommonUtils.getGroupsByStream(loadToChair.getStream())) {
+                        if (!groups.contains(group)) {
+
+                            V_GROUP groupView = SessionFacadeFactory.getSessionFacade(
+                                    CommonEntityFacadeBean.class).lookup(V_GROUP.class, group.getId());
+
+                            LOAD_TO_CHAIR diplomLoadToChair = new LOAD_TO_CHAIR();
+                            diplomLoadToChair.setId(SessionFacadeFactory.getSessionFacade(
+                                    CommonIDFacadeBean.class).getID("s_v_load_to_chair"));
+                            SUBJECT subject = SessionFacadeFactory.getSessionFacade(
+                                    CommonEntityFacadeBean.class)
+                                    .lookup(SUBJECT.class, SUBJECT.MANAGE_DIPLOM);
+                            diplomLoadToChair.setSubject(subject);
+                            diplomLoadToChair.setCurriculum(loadToChair.getCurriculum());
+                            diplomLoadToChair.setGroup(group);
+                            diplomLoadToChair.setSemester(loadToChair.getSemester());
+                            Integer studentNumber = (int) Math.round(groupView.getStudentCount() * 0.4);
+                            diplomLoadToChair.setStudentNumber(studentNumber);
+                            diplomLoadToChair.setCredit(subject.getCreditability().getCredit().
+                                    doubleValue());
+                            double diplomaCount = studentNumber.doubleValue() * 12;
+                            diplomLoadToChair.setStudyYear(SessionFacadeFactory.getSessionFacade(
+                                    CommonEntityFacadeBean.class).lookup(STUDY_YEAR.class,
+                                    STUDY_YEAR.FOURTH_STUDY_YEAR));
+                            diplomLoadToChair.setDiplomaCount(diplomaCount);
+                            diplomLoadToChair.setTotalCount(diplomaCount);
+
+                            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(
+                                    diplomLoadToChair);
+
+                            diplomLoadToChair.setSemester(CommonUtils.getQuery().lookup(SEMESTER.class,
+                                    SEMESTER.EIGHTH));
+                            CommonUtils.getQuery().createNoID(diplomLoadToChair);
+
+                            groups.add(group);
+                        }
+                    }
+                }
+
+//                            if (loadToChair.getSemester().getId().equals(SEMESTER.EIGHTH)) {
+//                                if (loadToChair.getSubject().getPracticeType() != null) {
+//                                    int studentNumber = (int) (loadToChair.getStudentNumber() * 0.4);
+//                                    loadToChair.setStudentNumber(studentNumber);
+//                                    double practiceCount = (double)
+//                                            studentNumber * loadToChair.getSubject().getWeekNumber();
+//                                    loadToChair.setPracticeCount(practiceCount);
+//                                    loadToChair.setTotalCount(practiceCount);
+//
+//
+//                                    LOAD_TO_CHAIR dividingLoadToChair
+//                                }
+//                            }
+
+                loadToChair.setStudyYear(SessionFacadeFactory.getSessionFacade(
+                        CommonEntityFacadeBean.class).lookup(STUDY_YEAR.class,
+                        ID.valueOf(CommonUtils.getStudyYearByEntranceYear(
+                                loadToChair.getCurriculum().getEntranceYear()))));
+            }
+            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(loads);
+        } catch (Exception e) {
+            CommonUtils.showMessageAndWriteLog("Unable to get loads to chair", e);
+        }
+    }
+
+    private void insert(String table, boolean workingChair) {
+        try {
+            StringBuilder sqlSB = new StringBuilder("INSERT INTO load_to_chair " +
+                    "  SELECT " +
+                    "    nextval('s_v_load_to_chair'), " +
+                    "    subject_id, " +
+                    "    curriculum_id, " +
+                    "    study_year_id, " +
+                    "    case when stream_id=0 then null else stream_id end stream_id, " +
+                    "    case when group_id=0 then null else group_id end group_id, " +
+                    "    semester_id, " +
+                    "    student_number, " +
+                    "    credit, " +
+                    "    lc_count, " +
+                    "    pr_count, " +
+                    "    lb_count, " +
+                    "    with_teacher_count, " +
+                    "    rating_count, " +
+                    "    exam_count, " +
+                    "    control_count, " +
+                    "    course_work_count, " +
+                    "    diploma_count, " +
+                    "    practice_count, " +
+                    "    mek, " +
+                    "    protect_diploma_count, " +
+                    "    total_count " +
+                    "  FROM ");
+            sqlSB.append(table);
+            if (workingChair) {
+                sqlSB.append(" inner join curriculum curr" +
+                        " on curr.id = curriculum_id" +
+                        " inner join speciality spec" +
+                        " on spec.id = curr.speciality_id" +
+                        " where spec.chair_id != 23");
+            }
+
+            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                    lookupItemsList(sqlSB.toString(), new HashMap<>());
+        } catch (Exception ignored) {
+        }
     }
 }
