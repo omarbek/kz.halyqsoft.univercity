@@ -18,7 +18,7 @@ public class SUBJECT extends AbstractEntity {
 
     public static final long DIPLOM = 1388L;
     public static final long EXAM = 1387L;
-    public static final ID MANAGE_DIPLOM = ID.valueOf(1400);
+    public static final ID MANAGE_DIPLOM = ID.valueOf(1395);
 
     @FieldInfo(type = EFieldType.TEXT, max = 256, order = 1)
     @Column(name = "NAME_KZ", nullable = false)

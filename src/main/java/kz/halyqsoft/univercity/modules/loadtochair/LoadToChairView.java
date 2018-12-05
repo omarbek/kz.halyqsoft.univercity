@@ -105,35 +105,42 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
                                 CommonEntityFacadeBean.class).lookup(loadToChairQM);
                         for (LOAD_TO_CHAIR loadToChair : loads) {
 
-//                            if (loadToChair.getSemester().getId().equals(SEMESTER.SEVENTH)) {
-//                                for (GROUPS group : CommonUtils.getGroupsByStream(loadToChair.getStream())) {
-//                                    if (!groups.contains(group)) {
-//
-//                                        LOAD_TO_CHAIR diplomLoadToChair = new LOAD_TO_CHAIR();
-//                                        loadToChair.setId(SessionFacadeFactory.getSessionFacade(
-//                                                CommonIDFacadeBean.class).getID("s_v_load_to_chair"));
-//                                        SUBJECT subject = SessionFacadeFactory.getSessionFacade(
-//                                                CommonEntityFacadeBean.class)
-//                                                .lookup(SUBJECT.class, SUBJECT.MANAGE_DIPLOM);
-//                                        diplomLoadToChair.setSubject(subject);
-//                                        diplomLoadToChair.setCurriculum(loadToChair.getCurriculum());
-//                                        diplomLoadToChair.setGroup(group);
-//                                        diplomLoadToChair.setSemester(loadToChair.getSemester());
-//                                        Integer studentNumber = (int) (loadToChair.getStudentNumber() * 0.4);
-//                                        diplomLoadToChair.setStudentNumber(studentNumber);
-//                                        diplomLoadToChair.setCredit(subject.getCreditability().getCredit().
-//                                                doubleValue());
-//                                        double diplomaCount = studentNumber.doubleValue() * 12;
-//                                        diplomLoadToChair.setDiplomaCount(diplomaCount);
-//                                        diplomLoadToChair.setTotalCount(diplomaCount);
-//
-//                                        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(
-//                                                diplomLoadToChair);
-//
-//                                        groups.add(group);
-//                                    }
-//                                }
-//                            }
+                            if (loadToChair.getSemester().getId().equals(SEMESTER.SEVENTH)) {
+                                for (GROUPS group : CommonUtils.getGroupsByStream(loadToChair.getStream())) {
+                                    if (!groups.contains(group)) {
+
+                                        V_GROUP groupView = SessionFacadeFactory.getSessionFacade(
+                                                CommonEntityFacadeBean.class).lookup(V_GROUP.class, group.getId());
+
+                                        LOAD_TO_CHAIR diplomLoadToChair = new LOAD_TO_CHAIR();
+                                        diplomLoadToChair.setId(SessionFacadeFactory.getSessionFacade(
+                                                CommonIDFacadeBean.class).getID("s_v_load_to_chair"));
+                                        SUBJECT subject = SessionFacadeFactory.getSessionFacade(
+                                                CommonEntityFacadeBean.class)
+                                                .lookup(SUBJECT.class, SUBJECT.MANAGE_DIPLOM);
+                                        diplomLoadToChair.setSubject(subject);
+                                        diplomLoadToChair.setCurriculum(loadToChair.getCurriculum());
+                                        diplomLoadToChair.setGroup(group);
+                                        diplomLoadToChair.setSemester(loadToChair.getSemester());
+                                        Integer studentNumber = (int) Math.round(groupView.getStudentCount() * 0.4);
+                                        diplomLoadToChair.setStudentNumber(studentNumber);
+                                        diplomLoadToChair.setCredit(subject.getCreditability().getCredit().
+                                                doubleValue());
+                                        double diplomaCount = studentNumber.doubleValue() * 12;
+                                        diplomLoadToChair.setStudyYear(SessionFacadeFactory.getSessionFacade(
+                                                CommonEntityFacadeBean.class).lookup(STUDY_YEAR.class,
+                                                STUDY_YEAR.FOURTH_STUDY_YEAR));
+                                        diplomLoadToChair.setDiplomaCount(diplomaCount);
+                                        diplomLoadToChair.setTotalCount(diplomaCount);
+
+                                        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(
+                                                diplomLoadToChair);
+
+                                        groups.add(group);
+                                    }
+                                }
+                            }
+
 //                            if (loadToChair.getSemester().getId().equals(SEMESTER.EIGHTH)) {
 //                                if (loadToChair.getSubject().getPracticeType() != null) {
 //                                    int studentNumber = (int) (loadToChair.getStudentNumber() * 0.4);
@@ -359,12 +366,12 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
                                                        STUDY_YEAR studyYear, SEMESTER_PERIOD semesterPeriod) {
         QueryModel<V_LOAD_TO_CHAIR_WITH_GROUPS> loadQM = new QueryModel<>(V_LOAD_TO_CHAIR_WITH_GROUPS.class);
         FromItem curriculumFI = loadQM.addJoin(EJoin.INNER_JOIN, "curriculum", CURRICULUM.class, "id");
-        FromItem subjFI = loadQM.addJoin(EJoin.INNER_JOIN, "subject", SUBJECT.class, "id");
+        FromItem specFI = curriculumFI.addJoin(EJoin.INNER_JOIN, "speciality", SPECIALITY.class, "id");
         if (semesterPeriod != null) {
             FromItem semFI = loadQM.addJoin(EJoin.INNER_JOIN, "semester", SEMESTER.class, "id");
             loadQM.addWhere(semFI, "semesterPeriod", ECriteria.EQUAL, semesterPeriod.getId());
         }
-        loadQM.addWhere(subjFI, "chair", ECriteria.EQUAL, chair.getId());
+        loadQM.addWhere(specFI, "department", ECriteria.EQUAL, chair.getId());
 //        loadQM.addWhere(curriculumFI, "entranceYear", ECriteria.EQUAL, currentYear.getId());
         loadQM.addWhere(curriculumFI, "diplomaType", ECriteria.EQUAL, studentDiplomaType.getId());
         loadQM.addWhere("studyYear", ECriteria.EQUAL, studyYear.getId());
