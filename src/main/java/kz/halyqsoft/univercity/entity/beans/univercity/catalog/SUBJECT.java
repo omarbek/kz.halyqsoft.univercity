@@ -5,6 +5,7 @@ import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
+import org.r3a.common.entity.ID;
 
 import javax.persistence.*;
 
@@ -17,6 +18,7 @@ public class SUBJECT extends AbstractEntity {
 
     public static final long DIPLOM = 1388L;
     public static final long EXAM = 1387L;
+    public static final ID MANAGE_DIPLOM = ID.valueOf(1400);
 
     @FieldInfo(type = EFieldType.TEXT, max = 256, order = 1)
     @Column(name = "NAME_KZ", nullable = false)

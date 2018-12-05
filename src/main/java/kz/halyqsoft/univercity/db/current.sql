@@ -1,0 +1,9 @@
+INSERT INTO SUBJECT (CLASS_ROOM, COURSE_WORK, DELETED, LANG_EN, LANG_KZ, LANG_RU, LB_COUNT, LC_COUNT,
+                     MANDATORY, NAME_EN, NAME_KZ, NAME_RU, OWN_COUNT, PR_COUNT, TOTAL_COUNT, WEEK_NUMBER,
+                     WITH_TEACHER_COUNT, ID, ACADEMIC_FORMULA_ID, CHAIR_ID, CONTROL_TYPE_ID,
+                     CREDITABILITY_ID, ECTS_ID, LEVEL_ID, PRACTICE_BREAKDOWN_ID, PRACTICE_TYPE_ID,
+                     STUDY_DIRECT_ID, SUBJECT_CYCLE_ID, MODULE_ID, TRAJECTORY_ID)
+VALUES (NULL, FALSE, FALSE, FALSE, FALSE, FALSE, NULL, null, FALSE, 'Диплом жұмысына жетекшілік',
+        'Диплом жұмысына жетекшілік', 'Диплом жұмысына жетекшілік', 0, NULL,
+        0, NULL, NULL, nextval('s_subject'), NULL, NULL, 1,
+        1, 1, 1, NULL, NULL, null, NULL, 1, NULL);

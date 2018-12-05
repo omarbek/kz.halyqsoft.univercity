@@ -18,6 +18,7 @@ import kz.halyqsoft.univercity.filter.panel.ChairFilterPanel;
 import kz.halyqsoft.univercity.modules.stream.dialogs.DetailDialog;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
+import org.r3a.common.dblink.facade.CommonIDFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.ID;
@@ -37,9 +38,7 @@ import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Omarbek
@@ -92,6 +91,8 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
                 @Override
                 public void buttonClick(Button.ClickEvent event) {
                     try {
+                        Set<GROUPS> groups = new HashSet<>();
+
                         QueryModel<LOAD_TO_CHAIR> loadToChairQM = new QueryModel<>(LOAD_TO_CHAIR.class);
                         List<LOAD_TO_CHAIR> loads = SessionFacadeFactory.getSessionFacade(
                                 CommonEntityFacadeBean.class).lookup(loadToChairQM);
@@ -104,7 +105,36 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
                                 CommonEntityFacadeBean.class).lookup(loadToChairQM);
                         for (LOAD_TO_CHAIR loadToChair : loads) {
 
-//                            if (loadToChair.getSemester().getId().equals(SEMESTER.EIGHTH_SEMESTER)) {
+//                            if (loadToChair.getSemester().getId().equals(SEMESTER.SEVENTH)) {
+//                                for (GROUPS group : CommonUtils.getGroupsByStream(loadToChair.getStream())) {
+//                                    if (!groups.contains(group)) {
+//
+//                                        LOAD_TO_CHAIR diplomLoadToChair = new LOAD_TO_CHAIR();
+//                                        loadToChair.setId(SessionFacadeFactory.getSessionFacade(
+//                                                CommonIDFacadeBean.class).getID("s_v_load_to_chair"));
+//                                        SUBJECT subject = SessionFacadeFactory.getSessionFacade(
+//                                                CommonEntityFacadeBean.class)
+//                                                .lookup(SUBJECT.class, SUBJECT.MANAGE_DIPLOM);
+//                                        diplomLoadToChair.setSubject(subject);
+//                                        diplomLoadToChair.setCurriculum(loadToChair.getCurriculum());
+//                                        diplomLoadToChair.setGroup(group);
+//                                        diplomLoadToChair.setSemester(loadToChair.getSemester());
+//                                        Integer studentNumber = (int) (loadToChair.getStudentNumber() * 0.4);
+//                                        diplomLoadToChair.setStudentNumber(studentNumber);
+//                                        diplomLoadToChair.setCredit(subject.getCreditability().getCredit().
+//                                                doubleValue());
+//                                        double diplomaCount = studentNumber.doubleValue() * 12;
+//                                        diplomLoadToChair.setDiplomaCount(diplomaCount);
+//                                        diplomLoadToChair.setTotalCount(diplomaCount);
+//
+//                                        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(
+//                                                diplomLoadToChair);
+//
+//                                        groups.add(group);
+//                                    }
+//                                }
+//                            }
+//                            if (loadToChair.getSemester().getId().equals(SEMESTER.EIGHTH)) {
 //                                if (loadToChair.getSubject().getPracticeType() != null) {
 //                                    int studentNumber = (int) (loadToChair.getStudentNumber() * 0.4);
 //                                    loadToChair.setStudentNumber(studentNumber);
@@ -138,7 +168,7 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
                                 "    curriculum_id, " +
                                 "    study_year_id, " +
                                 "    case when stream_id=0 then null else stream_id end stream_id, " +
-                                "    case when group_id=0 then null else group_id end stream_id, " +
+                                "    case when group_id=0 then null else group_id end group_id, " +
                                 "    semester_id, " +
                                 "    student_number, " +
                                 "    credit, " +
