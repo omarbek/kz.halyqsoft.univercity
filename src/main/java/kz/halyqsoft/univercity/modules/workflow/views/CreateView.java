@@ -1,35 +1,46 @@
 package kz.halyqsoft.univercity.modules.workflow.views;
 
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.HorizontalSplitPanel;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.shared.ui.combobox.FilteringMode;
+import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_STUDENT;
+import kz.halyqsoft.univercity.filter.FPdfDocumentFilter;
+import kz.halyqsoft.univercity.filter.FStudentFilter;
+import kz.halyqsoft.univercity.filter.panel.PdfDocumentFilterPanel;
+import kz.halyqsoft.univercity.filter.panel.StudentFilterPanel;
 import kz.halyqsoft.univercity.utils.WorkflowCommonUtils;
 import kz.halyqsoft.univercity.modules.workflow.views.dialogs.CreateViewDialog;
 import kz.halyqsoft.univercity.utils.EmployeePdfCreator;
 import kz.halyqsoft.univercity.utils.CommonUtils;
+import kz.halyqsoft.univercity.utils.changelisteners.FacultyChangeListener;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
+import org.r3a.common.entity.ID;
 import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.event.EntityListener;
 import org.r3a.common.entity.query.QueryModel;
+import org.r3a.common.entity.query.from.EJoin;
+import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
+import org.r3a.common.vaadin.widget.ERefreshType;
 import org.r3a.common.vaadin.widget.dialog.Message;
+import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
+import org.r3a.common.vaadin.widget.filter2.FilterPanelListener;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 import org.r3a.common.vaadin.widget.toolbar.IconToolbar;
 
+import java.util.*;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
 
-public class CreateView extends BaseView implements EntityListener{
+public class CreateView extends BaseView implements EntityListener, FilterPanelListener{
 
     private HorizontalSplitPanel mainHSP;
-
+    private PdfDocumentFilterPanel pdfDocumentFilterPanel;
     private VerticalLayout firstVL;
     private VerticalLayout secondVL;
 
@@ -66,7 +77,10 @@ public class CreateView extends BaseView implements EntityListener{
         pdfDocumentGW.setButtonVisible(IconToolbar.ADD_BUTTON, false);
 
         DBGridModel pdfDocumentGM = (DBGridModel) pdfDocumentGW.getWidgetModel();
-        pdfDocumentGM.getQueryModel().addWhere("deleted" , ECriteria.EQUAL , false);
+        pdfDocumentGM.setRefreshType(ERefreshType.MANUAL);
+        pdfDocumentGM.setRowNumberVisible(true);
+        pdfDocumentGM.setRowNumberWidth(100);
+
         btnCreate = new Button(getUILocaleUtil().getCaption("create"));
         btnCreate.addClickListener(new Button.ClickListener() {
             @Override
@@ -135,11 +149,21 @@ public class CreateView extends BaseView implements EntityListener{
         firstVL.addComponent(btnCreate);
         firstVL.setComponentAlignment(btnCreate, Alignment.MIDDLE_CENTER);
 
+        try {
+            pdfDocumentFilterPanel = createPdfDocumentFilterPanel();
+            firstVL.addComponent(pdfDocumentFilterPanel);
+            firstVL.setComponentAlignment(pdfDocumentFilterPanel, Alignment.TOP_CENTER);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         firstVL.addComponent(pdfDocumentGW);
 
         mainHSP.setFirstComponent(firstVL);
         mainHSP.setSecondComponent(secondVL);
         getContent().addComponent(mainHSP);
+        doFilter(pdfDocumentFilterPanel.getFilterBean());
     }
 
     @Override
@@ -160,6 +184,31 @@ public class CreateView extends BaseView implements EntityListener{
                 secondVL.addComponent(pdfDocSignerPostGW);
             }
         }
+    }
+
+    public PdfDocumentFilterPanel createPdfDocumentFilterPanel() {
+        PdfDocumentFilterPanel pdfDocumentFilterPanel = new PdfDocumentFilterPanel(new FPdfDocumentFilter());
+        pdfDocumentFilterPanel.addFilterPanelListener(this);
+        pdfDocumentFilterPanel.setImmediate(true);
+
+        TextField tf = new TextField();
+        tf.setNullRepresentation("");
+        tf.setNullSettingAllowed(true);
+        pdfDocumentFilterPanel.addFilterComponent("fileName", tf);
+
+        List<PDF_DOCUMENT_TYPE> pdfDocumentTypes = null;
+        try{
+            QueryModel<PDF_DOCUMENT_TYPE>documentTypeQueryModel = new QueryModel<>(PDF_DOCUMENT_TYPE.class);
+            pdfDocumentTypes = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(documentTypeQueryModel);
+        }catch (Exception e){
+            CommonUtils.showMessageAndWriteLog(e.getMessage(), e);
+        }
+        ComboBox documentTypesCB = new ComboBox();
+        BeanItemContainer bic = new BeanItemContainer(PDF_DOCUMENT_TYPE.class,pdfDocumentTypes);
+        documentTypesCB.setContainerDataSource(bic);
+        pdfDocumentFilterPanel.addFilterComponent("pdfDocumentType", documentTypesCB);
+
+        return pdfDocumentFilterPanel;
     }
 
     @Override
@@ -230,5 +279,46 @@ public class CreateView extends BaseView implements EntityListener{
     @Override
     public void onException(Object o, Throwable throwable) {
 
+    }
+
+    @Override
+    public void doFilter(AbstractFilterBean abstractFilterBean) {
+        FPdfDocumentFilter sf = (FPdfDocumentFilter) abstractFilterBean;
+        Map<Integer, Object> params = new HashMap<Integer, Object>();
+        List<PDF_DOCUMENT> list = new ArrayList<>();
+        String sql = "select id, user_id, title, file_name, deleted, period, created, for_students from pdf_document where deleted = false " ;
+        if(((FPdfDocumentFilter) abstractFilterBean).getFileName()!=null && !((FPdfDocumentFilter) abstractFilterBean).getFileName().trim().equals("")){
+            sql += " and file_name ilike '" + sf.getFileName().trim() + "%' ";
+        }
+        if(((FPdfDocumentFilter) abstractFilterBean).getPdfDocumentType()!=null){
+            sql += " and PDF_DOCUMENT_TYPE_ID = " + sf.getPdfDocumentType().getId().getId().longValue() + " ";
+        }
+        try {
+            List tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                    lookupItemsList(
+                            sql, params);
+            if (!tmpList.isEmpty()) {
+                for (Object o : tmpList) {
+                    Object[] oo = (Object[]) o;
+                    PDF_DOCUMENT pdfDoc = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                            lookup(PDF_DOCUMENT.class, ID.valueOf((long) oo[0]));
+                    list.add(pdfDoc);
+                }
+            }
+        } catch (Exception ex) {
+            CommonUtils.showMessageAndWriteLog("Unable to load pdf_document list", ex);
+        }
+
+        ((DBGridModel) pdfDocumentGW.getWidgetModel()).setEntities(list);
+        try {
+            pdfDocumentGW.refresh();
+        } catch (Exception ex) {
+            CommonUtils.showMessageAndWriteLog("Unable to refresh pdf_document grid", ex);
+        }
+    }
+
+    @Override
+    public void clearFilter() {
+        doFilter(pdfDocumentFilterPanel.getFilterBean());
     }
 }

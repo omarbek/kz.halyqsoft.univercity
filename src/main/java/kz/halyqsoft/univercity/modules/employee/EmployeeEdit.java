@@ -148,6 +148,13 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
                 userPhotoBytes = userPhoto.getPhoto();
                 userPhotoFilename = userPhoto.getFileName();
             }
+            List<ID> ids = new ArrayList<>();
+            ids.add(ID.valueOf(1));
+            ids.add(ID.valueOf(3));
+            ids.add(ID.valueOf(14));
+            if(!CommonUtils.isCurrentUserHasAtLeastOnePrivilegesOf(ids)){
+                baseDataFW.setEnabled(false);
+            }
         } else {
             baseDataFM.getFieldModel("login").setInEdit(false);
             baseDataFM.getFieldModel("login").setInView(false);
