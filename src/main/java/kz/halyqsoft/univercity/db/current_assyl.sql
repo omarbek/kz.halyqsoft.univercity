@@ -77,3 +77,39 @@ ALTER TABLE load_to_teacher ADD CONSTRAINT fk_load_to_teacher_stream FOREIGN KEY
 ALTER TABLE load_to_teacher ADD CONSTRAINT fk_load_to_teacher_groups FOREIGN KEY (group_id) REFERENCES groups(id) ON UPDATE RESTRICT ON DELETE RESTRICT ;
 ALTER TABLE load_to_teacher ADD CONSTRAINT fk_load_to_teacher_semester FOREIGN KEY (semester_id) REFERENCES semester(id) ON UPDATE RESTRICT ON DELETE RESTRICT ;
 ALTER TABLE load_to_teacher ADD CONSTRAINT fk_load_to_teacher_teacher FOREIGN KEY (teacher_id) REFERENCES employee(id) ON UPDATE RESTRICT ON DELETE RESTRICT ;
+
+ALTER TABLE ABSENCE_CAUSE ADD COLUMN letter VARCHAR(10);
+
+INSERT INTO public.absence_cause (id, name, letter) VALUES (4, 'Фактической работы', 'Ф');
+INSERT INTO public.absence_cause (id, name, letter) VALUES (5, 'Целосменных простоев', 'Ц');
+INSERT INTO public.absence_cause (id, name, letter) VALUES (6, 'Очередной отпуск', 'О');
+INSERT INTO public.absence_cause (id, name, letter) VALUES (7, 'Отпуск в связи с родами', 'Д');
+INSERT INTO public.absence_cause (id, name, letter) VALUES (8, 'Болезнь', 'Б');
+INSERT INTO public.absence_cause (id, name, letter) VALUES (9, 'Прочие неявки с разрешением закона', 'ПЗ');
+INSERT INTO public.absence_cause (id, name, letter) VALUES (10, 'Прочие неявки с разрешением администрации', 'ПА');
+INSERT INTO public.absence_cause (id, name, letter) VALUES (11, 'Прогулы', 'П');
+INSERT INTO public.absence_cause (id, name, letter) VALUES (12, 'Выходные и праздничные дни', 'Выходной');
+INSERT INTO public.absence_cause (id, name, letter) VALUES (13, 'Опоздание и преждевременный уход', 'ОУ');
+INSERT INTO public.absence_cause (id, name, letter) VALUES (14, 'Всего', 'Всего');
+INSERT INTO public.absence_cause (id, name, letter) VALUES (15, 'Сверхурочный', 'С');
+INSERT INTO public.absence_cause (id, name, letter) VALUES (16, 'Ночной', 'Н');
+
+CREATE TABLE pdf_document_type (
+  id      BIGINT    NOT NULL,
+  TYPE_NAME VARCHAR(255) NOT NULL
+);
+
+ALTER TABLE pdf_document_type
+  ADD CONSTRAINT pk_pdf_document_type PRIMARY KEY (id);
+
+CREATE SEQUENCE S_PDF_DOCUMENT_TYPE
+  MINVALUE 0
+  START WITH 1
+  NO CYCLE;
+
+ALTER TABLE pdf_document ADD COLUMN for_students BOOLEAN NOT NULL DEFAULT FALSE ;
+ALTER TABLE pdf_document ADD COLUMN pdf_document_type_id BIGINT NULL ;
+
+ALTER TABLE pdf_document ADD CONSTRAINT fk_pdf_document_pdf_document_type FOREIGN KEY (pdf_document_type_id) REFERENCES pdf_document_type (id) ON UPDATE restrict ON DELETE restrict;
+
+INSERT INTO tasks (id, name, title, task_type, task_order, class_path, parent_id, icon_name, descr, visible) VALUES (nextval('s_tasks'), 'KK=Кадрлар бөлімі;RU=Отдел кадров;EN=Employees department;', 'KK=Кадрлар бөлімі;RU=Отдел кадров;EN=Employees department;', false, 520, 'kz.halyqsoft.univercity.modules.workflowforemp.WorflowViewForEmp', 3, null, 'KK=Кадрлар бөлімі;RU=Отдел кадров;EN=Employees department;', true);

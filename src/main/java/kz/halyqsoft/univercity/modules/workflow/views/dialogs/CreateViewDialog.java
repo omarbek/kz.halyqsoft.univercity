@@ -73,6 +73,13 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
             ex.printStackTrace();
         }
 
+        Embedded pdf = new Embedded(null, EmployeePdfCreator.getStreamResourceFromDocument( document));
+        pdf.setImmediate(true);
+        pdf.setSizeFull();
+        pdf.setMimeType("application/pdf");
+        pdf.setType(2);
+        pdf.setHeight(570,Unit.PIXELS);
+        this.getContent().addComponent(pdf);
 
         this.importanceCB = new ComboBox();
         this.importanceCB.setCaption(this.getUILocaleUtil().getEntityLabel(DOCUMENT_IMPORTANCE.class));

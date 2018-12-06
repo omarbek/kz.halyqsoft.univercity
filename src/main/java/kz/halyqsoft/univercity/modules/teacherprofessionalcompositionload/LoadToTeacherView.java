@@ -22,11 +22,17 @@ import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.from.EJoin;
 import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
+import org.r3a.common.vaadin.AbstractWebUI;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.ERefreshType;
+import org.r3a.common.vaadin.widget.dialog.AbstractDialog;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 import org.r3a.common.vaadin.widget.filter2.FilterPanelListener;
+import org.r3a.common.vaadin.widget.form.CommonFormWidget;
+import org.r3a.common.vaadin.widget.form.FormModel;
+import org.r3a.common.vaadin.widget.form.FormWidgetDialog;
+import org.r3a.common.vaadin.widget.form.GridFormWidget;
 import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
@@ -355,53 +361,12 @@ public class LoadToTeacherView extends AbstractTaskView implements FilterPanelLi
     @Override
     public boolean onEdit(Object source, Entity e, int buttonId) {
         if(source.equals(loadGW)){
-            LOAD_TO_TEACHER loadToTeacher = (LOAD_TO_TEACHER) e;
-            teacherQM.addWhere(teacherFI, "subject" , ECriteria.EQUAL, loadToTeacher.getSubject().getId());
-
-
-            List<LOAD_TO_TEACHER> loadToTeachers = new ArrayList<>();
-
-            DBGridModel loadGM = (DBGridModel) loadGW.getWidgetModel();
-            ComboBox comboBox = new ComboBox();
-            QueryModel<LOAD_TO_TEACHER> loadQM = new QueryModel<>(LOAD_TO_TEACHER.class);
-            loadQM.addWhere("subject" , ECriteria.EQUAL, loadToTeacher.getSubject().getId());
-            loadQM.addWhereAnd("curriculum" , ECriteria.EQUAL, loadToTeacher.getCurriculum().getId());
-            loadQM.addWhereAnd("studyYear" , ECriteria.EQUAL, loadToTeacher.getStudyYear().getId());
-            loadQM.addWhereAnd("semester" , ECriteria.EQUAL, loadToTeacher.getSemester().getId());
-            if(loadToTeacher.getStream() != null){
-                loadQM.addWhereAnd("stream" , ECriteria.EQUAL, loadToTeacher.getStream().getId());
-                try{
-                    loadToTeachers.addAll(CommonUtils.getQuery().lookup(loadQM));
-                }catch (Exception ex){
-                    CommonUtils.showMessageAndWriteLog("Unable to load LoadToTeacher",ex);
-                }
-            }else if(loadToTeacher.getGroup() != null){
-                loadQM.addWhereAnd("group" , ECriteria.EQUAL, loadToTeacher.getGroup().getId());
-                try{
-                    loadToTeachers.addAll(CommonUtils.getQuery().lookup(loadQM));
-                }catch (Exception ex){
-                    CommonUtils.showMessageAndWriteLog("Unable to load LoadToTeacher",ex);
-                }
-            }
-
-
-            int max = 0;
-            for(LOAD_TO_TEACHER ltt : loadToTeachers){
-                max+=ltt.getDiplomaCount();
-            }
-            List numList = new ArrayList();
-            for(int i  = 0 ; i <= max ; i++){
-                numList.add(i);
-            }
-            BeanItemContainer<Integer> bic = new BeanItemContainer<Integer>(Integer.class,numList);
-            ComboBox totalNumCB = new ComboBox();
-            totalNumCB.setContainerDataSource(bic);
-            //loadGM.getFormModel().getWidgetItemModel("protectDiplomaCount").setType(EFieldType.FK_COMBO);
-            //loadGM.getFormModel().getFieldModel("protectDiplomaCount").setField(totalNumCB);
-            //loadGM.getFormModel().getWidgetItemModel("").
-
+//            LOAD_TO_TEACHER loadToTeacher = (LOAD_TO_TEACHER) e;
+//            teacherQM.addWhere(teacherFI, "subject" , ECriteria.EQUAL, loadToTeacher.getSubject().getId());
+            LoadToTeacherEditDialog loadToTeacherEditDialog = new LoadToTeacherEditDialog(this, (LOAD_TO_TEACHER) e);
         }
-        return true;
+
+        return false;
     }
 
     @Override
@@ -413,5 +378,9 @@ public class LoadToTeacherView extends AbstractTaskView implements FilterPanelLi
     @Override
     public boolean preSave(Object source, Entity e, boolean isNew, int buttonId) {
         return true;
+    }
+
+    public ChairFilterPanel getFilterPanel() {
+        return filterPanel;
     }
 }

@@ -319,9 +319,7 @@ public class CommonUtils {
                 "group");
         groupsQM.addWhere(streamGroupFI, "stream", ECriteria.EQUAL, stream.getId());
         groupsQM.addWhere("deleted", Boolean.FALSE);
-        return SessionFacadeFactory.getSessionFacade(
-                CommonEntityFacadeBean.class).
-                lookup(groupsQM);
+        return SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(groupsQM);
     }
 
     public static SEMESTER_DATA createSemesterDataBySemester(SEMESTER semester, CURRICULUM curriculum) throws Exception {
@@ -411,6 +409,19 @@ public class CommonUtils {
         return sd;
     }
 
+    public static boolean isCurrentUserHasAtLeastOnePrivilegesOf(List<ID> roleIDs) {
+        List<USER_ROLES> userRoles = getCurrentUser().getUserRoles();
+        for(USER_ROLES userRole: userRoles){
+            for(ID id : roleIDs){
+                if(userRole.getRole().getId().equals(id)){
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     public static boolean isCurrentUserHasAdminPrivileges() {
         List<USER_ROLES> userRoles = getCurrentUser().getUserRoles();
         for (USER_ROLES userRole : userRoles) {
@@ -490,9 +501,7 @@ public class CommonUtils {
         return entranceYear;
     }
 
-    public static CommonEntityFacadeBean getQuery() throws Exception{
-        return  SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class);
+    public static CommonEntityFacadeBean getQuery() throws Exception {
+        return SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class);
     }
-
-
 }
