@@ -57,36 +57,36 @@ public class OutOnAgreeView extends BaseView implements EntityListener{
         linkedTables.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
-                AbstractDialog abstractDialog = new AbstractDialog() {
-
-                    public void init(){
-                        setWidth(50, Unit.PERCENTAGE);
-                        GridWidget outMyDocsSignerGW = new GridWidget(DOCUMENT_SIGNER.class);
-                        outMyDocsSignerGW.setSizeFull();
-                        outMyDocsSignerGW.setImmediate(true);
-
-                        outMyDocsSignerGW.setResponsive(true);
-                        outMyDocsSignerGW.setButtonVisible(IconToolbar.ADD_BUTTON , false);
-                        outMyDocsSignerGW.setButtonVisible(IconToolbar.PREVIEW_BUTTON, false);
-                        outMyDocsSignerGW.setButtonVisible(IconToolbar.EDIT_BUTTON, false);
-                        outMyDocsSignerGW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
-
-                        DBGridModel dbGridModel = (DBGridModel) outMyDocsSignerGW.getWidgetModel();
-                        dbGridModel.getFormModel().getFieldModel("documentSignerStatus").setInView(true);
-
-                        dbGridModel.getQueryModel().addWhere("document" , ECriteria.EQUAL , outMyDocsTW.getSelectedEntity().getId());
-
-                        getContent().addComponent(outMyDocsSignerGW);
-
-                    }
-
-                    @Override
-                    protected String createTitle() {
-                        init();
-                        return getViewName();
-                    }
-                };
                 if(outMyDocsTW.getSelectedEntity()!=null){
+                    AbstractDialog abstractDialog = new AbstractDialog() {
+
+                        public void init(){
+                            setWidth(50, Unit.PERCENTAGE);
+                            GridWidget outMyDocsSignerGW = new GridWidget(DOCUMENT_SIGNER.class);
+                            outMyDocsSignerGW.setSizeFull();
+                            outMyDocsSignerGW.setImmediate(true);
+
+                            outMyDocsSignerGW.setResponsive(true);
+                            outMyDocsSignerGW.setButtonVisible(IconToolbar.ADD_BUTTON , false);
+                            outMyDocsSignerGW.setButtonVisible(IconToolbar.PREVIEW_BUTTON, false);
+                            outMyDocsSignerGW.setButtonVisible(IconToolbar.EDIT_BUTTON, false);
+                            outMyDocsSignerGW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
+
+                            DBGridModel dbGridModel = (DBGridModel) outMyDocsSignerGW.getWidgetModel();
+                            dbGridModel.getFormModel().getFieldModel("documentSignerStatus").setInView(true);
+
+                            dbGridModel.getQueryModel().addWhere("document" , ECriteria.EQUAL , outMyDocsTW.getSelectedEntity().getId());
+
+                            getContent().addComponent(outMyDocsSignerGW);
+
+                        }
+
+                        @Override
+                        protected String createTitle() {
+                            init();
+                            return getViewName();
+                        }
+                    };
                     abstractDialog.open();
                 }else{
                     Message.showError(getUILocaleUtil().getCaption("chooseARecord"));

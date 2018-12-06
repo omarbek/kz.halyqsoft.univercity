@@ -409,6 +409,19 @@ public class CommonUtils {
         return sd;
     }
 
+    public static boolean isCurrentUserHasAtLeastOnePrivilegesOf(List<ID> roleIDs) {
+        List<USER_ROLES> userRoles = getCurrentUser().getUserRoles();
+        for(USER_ROLES userRole: userRoles){
+            for(ID id : roleIDs){
+                if(userRole.getRole().getId().equals(id)){
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     public static boolean isCurrentUserHasAdminPrivileges() {
         List<USER_ROLES> userRoles = getCurrentUser().getUserRoles();
         for (USER_ROLES userRole : userRoles) {
