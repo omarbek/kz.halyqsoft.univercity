@@ -227,10 +227,6 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
             mainTS.addTab(subjectsTab, getUILocaleUtil().getCaption("semester." + semester.getId().toString()));
         }
 
-//        for (SubjectsTab semesterDetailPanel : subjectsTabs) {//TODO maybe
-//            semesterDetailPanel.setCreditCountByComponentsPanel(creditCountByComponentsPanel);
-//        }
-
         addProgramPanel = new SubjectsTab(this, null, SubjectsTab.SubjectsType.ADDING_SUBJECTS);
         addProgramPanel.setWidth(100, Unit.PERCENTAGE);
         addProgramPanel.setCurriculum(curriculum);
@@ -246,17 +242,7 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
         afterSemesterProgamPanel.initPanel();
         mainTS.addTab(afterSemesterProgamPanel, getUILocaleUtil().getEntityLabel(
                 V_CURRICULUM_AFTER_SEMESTER.class));
-//
-//        creditCountByComponentsPanel = new CreditCountByComponentsPanel(this);//TODO return
-//        creditCountByComponentsPanel.setCurriculum(curriculum);
-//        creditCountByComponentsPanel.initPanel();
-//        tabSheet.addTab(creditCountByComponentsPanel, getUILocaleUtil().getEntityLabel(VCurriculumCreditCycleSum.class));
-//
-//        cyclePanel = new CyclePanel(this);
-//        cyclePanel.setCurriculum(curriculum);
-//        cyclePanel.initPanel();
-//        tabSheet.addTab(cyclePanel, getUILocaleUtil().getCaption("by.cycle"));
-//
+
         schedulePanel = new SchedulePanel(this);//TODO add entrance year
         schedulePanel.setCurriculum(curriculum);
         schedulePanel.initPanel();
@@ -364,8 +350,6 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
         printButton.addClickListener(new ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
-                //TODO Damira
-
                 Document document = new Document();
                 ByteArrayOutputStream byteArr = new ByteArrayOutputStream();
                 int allCredits = 0,allEcts = 0, allLcount =0, allPcount=0, allLbcount=0,allwtcount =0,allOcount=0,allCnt=0,allexam=0;
@@ -1220,7 +1204,7 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
             afterSemesterProgamPanel.setCurriculum(curriculum);
             afterSemesterProgamPanel.setEntranceYear((ENTRANCE_YEAR) entranceYearCB.getValue());
             afterSemesterProgamPanel.refresh();
-//            creditCountByComponentsPanel.setCurriculum(curriculum);//TODO return
+//            creditCountByComponentsPanel.setCurriculum(curriculum);//TODO return maybe
 //            creditCountByComponentsPanel.refresh();
 //            cyclePanel.setCurriculum(curriculum);
 //            cyclePanel.refresh();
@@ -1246,7 +1230,7 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
     }
 
     private void conform() throws Exception {
-//        checkForConform();//TODO return
+//        checkForConform();
 
         curriculum.setCurriculumStatus(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(CURRICULUM_STATUS.class, CURRICULUM_STATUS.IN_CONFORMING));
         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(curriculum);
@@ -1257,7 +1241,7 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
     }
 
     private void approve() throws Exception {
-//        checkForConform();//TODO return
+//        checkForConform();
 
         //TODO Assyl add subjects to student_subject
 

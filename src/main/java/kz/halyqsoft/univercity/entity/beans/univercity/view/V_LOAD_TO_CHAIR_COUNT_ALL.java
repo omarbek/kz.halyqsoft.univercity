@@ -22,12 +22,6 @@ public class V_LOAD_TO_CHAIR_COUNT_ALL extends AbstractEntity{
             @JoinColumn(name = "CURRICULUM_ID", referencedColumnName = "ID")})
     private CURRICULUM curriculum;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 4)
-    @ManyToOne
-    @JoinColumns({
-            @JoinColumn(name = "CHAIR_ID", referencedColumnName = "ID")})
-    private DEPARTMENT chair;
-
     @FieldInfo(type = EFieldType.FK_COMBO, order = 5)
     @ManyToOne
     @JoinColumns({
@@ -196,14 +190,6 @@ public class V_LOAD_TO_CHAIR_COUNT_ALL extends AbstractEntity{
 
     public void setCurriculum(CURRICULUM curriculum) {
         this.curriculum = curriculum;
-    }
-
-    public DEPARTMENT getChair() {
-        return chair;
-    }
-
-    public void setChair(DEPARTMENT chair) {
-        this.chair = chair;
     }
 
     public SEMESTER getSemester() {

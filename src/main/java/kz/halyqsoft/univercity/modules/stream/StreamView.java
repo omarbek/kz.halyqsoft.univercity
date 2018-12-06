@@ -61,11 +61,11 @@ public class StreamView extends AbstractTaskView implements FilterPanelListener 
         getContent().addComponent(buttonsHL);
         getContent().setComponentAlignment(buttonsHL, Alignment.MIDDLE_CENTER);
 
-        ProgressBar samplePB = new ProgressBar();
-        samplePB.setWidth("80%");
+//        ProgressBar samplePB = new ProgressBar();
+//        samplePB.setWidth("80%");
 
         Button generateSpecStreamsButton = new Button(getUILocaleUtil().getCaption("generate.spec.streams"));
-        generateSpecStreamsButton.addClickListener(new GenerateSpecStreams(samplePB));
+        generateSpecStreamsButton.addClickListener(new GenerateSpecStreams(/*samplePB*/));
 
         buttonsHL = CommonUtils.createButtonPanel();
         buttonsHL.addComponent(generateSpecStreamsButton);
@@ -74,8 +74,8 @@ public class StreamView extends AbstractTaskView implements FilterPanelListener 
 
         buttonsHL = CommonUtils.createButtonPanel();
         buttonsHL.setSizeFull();
-        buttonsHL.addComponent(samplePB);
-        buttonsHL.setComponentAlignment(samplePB, Alignment.MIDDLE_CENTER);
+//        buttonsHL.addComponent(samplePB);
+//        buttonsHL.setComponentAlignment(samplePB, Alignment.MIDDLE_CENTER);
 
         getContent().addComponent(buttonsHL);
         getContent().setComponentAlignment(buttonsHL, Alignment.MIDDLE_CENTER);

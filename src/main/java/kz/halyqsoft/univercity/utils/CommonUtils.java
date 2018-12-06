@@ -319,9 +319,7 @@ public class CommonUtils {
                 "group");
         groupsQM.addWhere(streamGroupFI, "stream", ECriteria.EQUAL, stream.getId());
         groupsQM.addWhere("deleted", Boolean.FALSE);
-        return SessionFacadeFactory.getSessionFacade(
-                CommonEntityFacadeBean.class).
-                lookup(groupsQM);
+        return SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(groupsQM);
     }
 
     public static SEMESTER_DATA createSemesterDataBySemester(SEMESTER semester, CURRICULUM curriculum) throws Exception {
@@ -503,9 +501,7 @@ public class CommonUtils {
         return entranceYear;
     }
 
-    public static CommonEntityFacadeBean getQuery() throws Exception{
-        return  SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class);
+    public static CommonEntityFacadeBean getQuery() throws Exception {
+        return SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class);
     }
-
-
 }

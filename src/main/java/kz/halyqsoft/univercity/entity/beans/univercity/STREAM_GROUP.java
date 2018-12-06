@@ -12,13 +12,13 @@ import javax.persistence.ManyToOne;
 @Entity
 public class STREAM_GROUP extends AbstractEntity {
 
-    @FieldInfo(type = EFieldType.FK_COMBO,order = 1)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 1)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "GROUP_ID", referencedColumnName = "ID", nullable = false)})
     private GROUPS group;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 2)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 2, inEdit = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "STREAM_ID", referencedColumnName = "ID", nullable = false)})

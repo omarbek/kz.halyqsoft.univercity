@@ -1,16 +1,11 @@
 package kz.halyqsoft.univercity.entity.beans.univercity.catalog;
 
-import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
 import org.r3a.common.entity.ID;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 /**
  * @author Omarbek
@@ -19,7 +14,8 @@ import javax.persistence.ManyToOne;
 @Entity
 public class SEMESTER extends AbstractEntity {
 
-    public static final ID EIGHTH_SEMESTER = ID.valueOf(8);
+    public static final ID SEVENTH = ID.valueOf(7);
+    public static final ID EIGHTH = ID.valueOf(8);
 
     @FieldInfo(type = EFieldType.FK_COMBO, order = 1)
     @ManyToOne
