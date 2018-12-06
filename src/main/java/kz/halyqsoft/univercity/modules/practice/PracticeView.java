@@ -154,8 +154,6 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
                         Message.showError(getUILocaleUtil().getCaption("chooseARecord"));
                     }
 
-                } catch (DocumentException e) {
-                    e.printStackTrace();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -167,7 +165,7 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
         informationPracticeGW.removeEntityListener(informationPracticeGW);
         informationPracticeGW.showToolbar(true);
         informationPracticeGW.addEntityListener(this);
-        informationPracticeGW.setMultiSelect(true);
+        informationPracticeGW.setMultiSelect(false);
         informationPracticeGW.setButtonVisible(IconToolbar.REFRESH_BUTTON, false);
 
         informationPracticeGW.getToolbarPanel().addComponent(reportBtn);
@@ -178,7 +176,7 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
 
         informationPracticeGM = (DBGridModel) informationPracticeGW.getWidgetModel();
         informationPracticeGM.setRefreshType(ERefreshType.MANUAL);
-        informationPracticeGM.setMultiSelect(true);
+        informationPracticeGM.setMultiSelect(false);
         informationPracticeGM.setRowNumberVisible(true);
         informationPracticeGM.setRowNumberWidth(50);
         FKFieldModel groupsFM = (FKFieldModel) informationPracticeGM.getFormModel().getFieldModel("groups");
