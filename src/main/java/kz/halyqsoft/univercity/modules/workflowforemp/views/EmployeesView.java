@@ -2,25 +2,24 @@ package kz.halyqsoft.univercity.modules.workflowforemp.views;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.combobox.FilteringMode;
-import com.vaadin.ui.*;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.TextField;
 import kz.halyqsoft.univercity.entity.beans.USERS;
-import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT;
-import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_STATUS;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.CARD;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEPARTMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.POST;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VEmployee;
 import kz.halyqsoft.univercity.filter.FEmployeeFilter;
 import kz.halyqsoft.univercity.filter.panel.EmployeeFilterPanel;
-import kz.halyqsoft.univercity.modules.employeeabsence.dialogs.AbsenceCauseDialog;
+import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.PrintDialog;
 import kz.halyqsoft.univercity.modules.workflow.views.BaseView;
-import kz.halyqsoft.univercity.modules.workflow.views.dialogs.OpenPdfDialog;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.ID;
-import org.r3a.common.entity.beans.AbstractTask;
 import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.event.EntityListener;
 import org.r3a.common.entity.query.QueryModel;
@@ -28,13 +27,11 @@ import org.r3a.common.entity.query.from.EJoin;
 import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.widget.ERefreshType;
-import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 import org.r3a.common.vaadin.widget.filter2.FilterPanelListener;
-import org.r3a.common.vaadin.widget.filter2.panel.AbstractFilterPanel;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
-import org.r3a.common.vaadin.widget.toolbar.IconToolbar;
+import org.r3a.common.vaadin.widget.grid.model.GridColumnModel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,17 +43,18 @@ import java.util.Map;
  * on 06.12.2018
  * @project kz.halyqsoft.univercity
  */
-public class EmployeesView extends BaseView implements EntityListener , FilterPanelListener {
+public class EmployeesView extends BaseView implements EntityListener, FilterPanelListener {
 
 
     private EmployeeFilterPanel filterPanel;
     private GridWidget teacherGW;
-    private ComboBox cb;
+    private ComboBox cb, sd;
 
 
     public EmployeesView(String title) {
         super(title);
     }
+
     @Override
     public void onCreate(Object o, Entity entity, int i) {
 
@@ -101,6 +99,7 @@ public class EmployeesView extends BaseView implements EntityListener , FilterPa
     public void onException(Object o, Throwable throwable) {
 
     }
+
     @Override
     public void initView(boolean b) throws Exception {
         filterPanel = new EmployeeFilterPanel(new FEmployeeFilter());
@@ -172,6 +171,15 @@ public class EmployeesView extends BaseView implements EntityListener , FilterPa
         }
         filterPanel.addFilterComponent("childAge", cb);
 
+        sd = new ComboBox();
+        sd.setNullSelectionAllowed(true);
+        sd.setTextInputAllowed(true);
+        sd.setFilteringMode(FilteringMode.OFF);
+        for (int i = 1; i < 30; i++) {
+            sd.addItem(i);
+        }
+        filterPanel.addFilterComponent("childCount", sd);
+
         teacherGW = new GridWidget(VEmployee.class);
         teacherGW.addEntityListener(this);
         teacherGW.showToolbar(false);
@@ -184,7 +192,40 @@ public class EmployeesView extends BaseView implements EntityListener , FilterPa
 
         doFilter(filterPanel.getFilterBean());
 
+        Button printBtn = new Button(CommonUtils.getUILocaleUtil().getCaption("export"));
+        printBtn.setImmediate(true);
+        printBtn.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
 
+                List<String> tableHeader = new ArrayList<>();
+                List<List<String>> tableBody = new ArrayList<>();
+
+                String fileName = "document";
+
+
+                for (GridColumnModel gcm : teacherGM.getColumnModels()) {
+                    tableHeader.add(gcm.getLabel());
+                }
+                for (int i = 0; i < teacherGW.getAllEntities().size(); i++) {
+                    VEmployee vEmployee = (VEmployee) teacherGW.getAllEntities().get(i);
+                    if (teacherGW.getCaption() != null) {
+                        fileName = teacherGW.getCaption();
+                    }
+                    List<String> list = new ArrayList<>();
+                    list.add(vEmployee.getCode());
+                    list.add(vEmployee.getFio());
+                    list.add(vEmployee.getDeptName());
+                    list.add(vEmployee.getPostName());
+                    tableBody.add(list);
+                }
+
+
+                PrintDialog printDialog = new PrintDialog(tableHeader, tableBody, CommonUtils.getUILocaleUtil().getCaption("print"), fileName);
+            }
+        });
+
+        getContent().addComponent(printBtn);
         getContent().addComponent(teacherGW);
         getContent().setComponentAlignment(teacherGW, Alignment.MIDDLE_CENTER);
     }
@@ -192,9 +233,11 @@ public class EmployeesView extends BaseView implements EntityListener , FilterPa
     @Override
     public void doFilter(AbstractFilterBean abstractFilterBean) {
         FEmployeeFilter ef = (FEmployeeFilter) abstractFilterBean;
+        int count;
         int i = 1;
         Map<Integer, Object> params = new HashMap<>();
         StringBuilder sb = new StringBuilder();
+        StringBuilder sb2 = new StringBuilder();
         if (ef.getCode() != null && ef.getCode().trim().length() >= 2) {
             sb.append("lower(usr.CODE) like '");
             sb.append(ef.getCode().trim().toLowerCase());
@@ -244,7 +287,10 @@ public class EmployeesView extends BaseView implements EntityListener , FilterPa
             sb.append(" date_part('year',age(c2.birth_date)) <= " + ef.getChildAge() + " ");
             i++;
         }
+        if (ef.getChildCount() != null) {
+            sb2.append(" AND count(c2.id)= " + sd.getValue() + " ");
 
+        }
         List<VEmployee> list = new ArrayList<>();
 
         if (sb.length() > 0) {
@@ -264,7 +310,7 @@ public class EmployeesView extends BaseView implements EntityListener , FilterPa
                 "GROUP BY empl.ID,  usr.CODE,\n" +
                 "  FIO,\n" +
                 "  dep.DEPT_NAME,post.post_name,post.post_name,empl_dept.priority\n" +
-                "  HAVING count(empl_dept.priority)>=0" +
+                "  HAVING count(empl_dept.priority)>=0 " + sb2.toString() +
                 " ORDER by FIO,empl_dept.priority DESC\n";
 
         try {
