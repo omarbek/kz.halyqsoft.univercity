@@ -49,6 +49,7 @@ public class ScheduleView extends AbstractTaskView {
         mainTS.setImmediate(true);
         String autoGenStr = getUILocaleUtil().getCaption("schedule.auto");
         String manualGenStr = getUILocaleUtil().getCaption("schedule.manual");
+        String employeeStr = getUILocaleUtil().getCaption("employeeByDepartmentGW");
 
         ScheduleAuto scheduleAuto =  new ScheduleAuto(autoGenStr);
         TabSheet.Tab autoTab = mainTS.addTab(scheduleAuto.getMainVL() , getUILocaleUtil().getCaption("schedule.auto") );
@@ -57,6 +58,10 @@ public class ScheduleView extends AbstractTaskView {
         ScheduleManual scheduleManual   = new ScheduleManual(manualGenStr);
         TabSheet.Tab manualTab = mainTS.addTab(scheduleManual.getMainVL() , getUILocaleUtil().getCaption("schedule.manual") );
         scheduleManual.initView(true);
+
+        ScheduleEmployee scheduleEmployee = new ScheduleEmployee(manualGenStr);
+        TabSheet.Tab emplTab = mainTS.addTab(scheduleEmployee.getMainVL() , getUILocaleUtil().getCaption("employeeByDepartmentGW") );
+        scheduleEmployee.initView(true);
 
         getContent().addComponent(mainTS);
 

@@ -102,6 +102,6 @@ public final class FEmployeeFilter extends AbstractFilterBean {
     @Override
     public boolean hasFilter() {
         return (!(code == null && firstname == null && lastname == null
-                && department == null && post == null && card == null && childAge == null && childCount == null && subject == null));
+                && department == null && post == null && card == null && childAge == null && subject == null && childCount==null));
     }
 }

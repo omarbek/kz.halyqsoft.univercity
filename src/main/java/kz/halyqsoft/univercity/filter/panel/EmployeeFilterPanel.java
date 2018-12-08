@@ -18,7 +18,7 @@ public final class EmployeeFilterPanel extends AbstractFilterPanel {
 	}
 
 	@Override
-	protected void initWidget() {
+	protected void initWidget() throws Exception {
 		HorizontalLayout hl = new HorizontalLayout();
 		hl.setSpacing(true);
 		hl.setWidthUndefined();
@@ -71,10 +71,9 @@ public final class EmployeeFilterPanel extends AbstractFilterPanel {
 		}
 
 		af = getFilterComponent("childCount");
-		if (af != null) {
+	   	if (af != null) {
 			hl.addComponent(af);
 		}
-
 
 		getContent().addComponent(hl);
 		getContent().setComponentAlignment(hl, Alignment.MIDDLE_CENTER);
