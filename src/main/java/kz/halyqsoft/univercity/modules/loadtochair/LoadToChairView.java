@@ -271,8 +271,8 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
         return new ArrayList<>();
     }
 
-    private List<V_LOAD_TO_CHAIR_COUNT> getLoadCount(DEPARTMENT chair,
-                                                     STUDENT_DIPLOMA_TYPE studentDiplomaType, STUDY_YEAR studyYear, SEMESTER_PERIOD semesterPeriod) {
+    private List<V_LOAD_TO_CHAIR_COUNT> getLoadCount(DEPARTMENT chair, STUDENT_DIPLOMA_TYPE studentDiplomaType,
+                                                     STUDY_YEAR studyYear, SEMESTER_PERIOD semesterPeriod) {
         QueryModel<V_LOAD_TO_CHAIR_COUNT> loadQM = new QueryModel<>(V_LOAD_TO_CHAIR_COUNT.class);
         FromItem curriculumFI = loadQM.addJoin(EJoin.INNER_JOIN, "curriculum", CURRICULUM.class, "id");
         FromItem specFI = curriculumFI.addJoin(EJoin.INNER_JOIN, "speciality", SPECIALITY.class, "id");
@@ -286,7 +286,7 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
         loadQM.addWhere("studyYear", ECriteria.EQUAL, studyYear.getId());
         try {
             return SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
-                    lookup(loadQM);//TODO
+                    lookup(loadQM);
         } catch (Exception e) {
             CommonUtils.showMessageAndWriteLog("Unable to refresh count of loading to chair", e);
         }
@@ -297,11 +297,12 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
                                                             STUDENT_DIPLOMA_TYPE studentDiplomaType, SEMESTER_PERIOD semesterPeriod) {
         QueryModel<V_LOAD_TO_CHAIR_COUNT_ALL> loadQM = new QueryModel<>(V_LOAD_TO_CHAIR_COUNT_ALL.class);
         FromItem curriculumFI = loadQM.addJoin(EJoin.INNER_JOIN, "curriculum", CURRICULUM.class, "id");
+        FromItem specFI = curriculumFI.addJoin(EJoin.INNER_JOIN, "speciality", SPECIALITY.class, "id");
         if (semesterPeriod != null) {
             FromItem semFI = loadQM.addJoin(EJoin.INNER_JOIN, "semester", SEMESTER.class, "id");
             loadQM.addWhere(semFI, "semesterPeriod", ECriteria.EQUAL, semesterPeriod.getId());
         }
-        loadQM.addWhere("chair", ECriteria.EQUAL, chair.getId());
+        loadQM.addWhere(specFI, "department", ECriteria.EQUAL, chair.getId());
         loadQM.addWhere(curriculumFI, "diplomaType", ECriteria.EQUAL, studentDiplomaType.getId());
 //        loadQM.addWhere(curriculumFI, "entranceYear", ECriteria.EQUAL, currentYear.getId());
         try {
@@ -471,83 +472,145 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
 
     private void generate() {
         try {
-            Set<GROUPS> groups = new HashSet<>();
 
             QueryModel<LOAD_TO_CHAIR> loadToChairQM = new QueryModel<>(LOAD_TO_CHAIR.class);
             List<LOAD_TO_CHAIR> loads = SessionFacadeFactory.getSessionFacade(
                     CommonEntityFacadeBean.class).lookup(loadToChairQM);
-            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(loads);
+            for (LOAD_TO_CHAIR load : loads) {
+                CommonUtils.getQuery().delete(load);
+            }
 
             insert("v_load_to_chair", false);
             insert("v_load_to_chair_work", true);
 
-            loads = SessionFacadeFactory.getSessionFacade(
-                    CommonEntityFacadeBean.class).lookup(loadToChairQM);
-            for (LOAD_TO_CHAIR loadToChair : loads) {
+            setSeventhSemester(loadToChairQM);
+            setEighthSemester(loadToChairQM);
+            setPractice(loadToChairQM);
+            setStudyYear(loadToChairQM);
 
-                if (loadToChair.getSemester().getId().equals(SEMESTER.SEVENTH)) {
-                    for (GROUPS group : CommonUtils.getGroupsByStream(loadToChair.getStream())) {
-                        if (!groups.contains(group)) {
-
-                            V_GROUP groupView = SessionFacadeFactory.getSessionFacade(
-                                    CommonEntityFacadeBean.class).lookup(V_GROUP.class, group.getId());
-
-                            LOAD_TO_CHAIR diplomLoadToChair = new LOAD_TO_CHAIR();
-                            diplomLoadToChair.setId(SessionFacadeFactory.getSessionFacade(
-                                    CommonIDFacadeBean.class).getID("s_v_load_to_chair"));
-                            SUBJECT subject = SessionFacadeFactory.getSessionFacade(
-                                    CommonEntityFacadeBean.class)
-                                    .lookup(SUBJECT.class, SUBJECT.MANAGE_DIPLOM);
-                            diplomLoadToChair.setSubject(subject);
-                            diplomLoadToChair.setCurriculum(loadToChair.getCurriculum());
-                            diplomLoadToChair.setGroup(group);
-                            diplomLoadToChair.setSemester(loadToChair.getSemester());
-                            Integer studentNumber = (int) Math.round(groupView.getStudentCount() * 0.4);
-                            diplomLoadToChair.setStudentNumber(studentNumber);
-                            diplomLoadToChair.setCredit(subject.getCreditability().getCredit().
-                                    doubleValue());
-                            double diplomaCount = studentNumber.doubleValue() * 12;
-                            diplomLoadToChair.setStudyYear(SessionFacadeFactory.getSessionFacade(
-                                    CommonEntityFacadeBean.class).lookup(STUDY_YEAR.class,
-                                    STUDY_YEAR.FOURTH_STUDY_YEAR));
-                            diplomLoadToChair.setDiplomaCount(diplomaCount);
-                            diplomLoadToChair.setTotalCount(diplomaCount);
-
-                            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(
-                                    diplomLoadToChair);
-
-                            diplomLoadToChair.setSemester(CommonUtils.getQuery().lookup(SEMESTER.class,
-                                    SEMESTER.EIGHTH));
-                            CommonUtils.getQuery().createNoID(diplomLoadToChair);
-
-                            groups.add(group);
-                        }
-                    }
-                }
-
-//                            if (loadToChair.getSemester().getId().equals(SEMESTER.EIGHTH)) {
-//                                if (loadToChair.getSubject().getPracticeType() != null) {
-//                                    int studentNumber = (int) (loadToChair.getStudentNumber() * 0.4);
-//                                    loadToChair.setStudentNumber(studentNumber);
-//                                    double practiceCount = (double)
-//                                            studentNumber * loadToChair.getSubject().getWeekNumber();
-//                                    loadToChair.setPracticeCount(practiceCount);
-//                                    loadToChair.setTotalCount(practiceCount);
-//
-//
-//                                    LOAD_TO_CHAIR dividingLoadToChair
-//                                }
-//                            }
-
-                loadToChair.setStudyYear(SessionFacadeFactory.getSessionFacade(
-                        CommonEntityFacadeBean.class).lookup(STUDY_YEAR.class,
-                        ID.valueOf(CommonUtils.getStudyYearByEntranceYear(
-                                loadToChair.getCurriculum().getEntranceYear()))));
-            }
-            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(loads);
         } catch (Exception e) {
             CommonUtils.showMessageAndWriteLog("Unable to get loads to chair", e);
         }
+    }
+
+    private void setSeventhSemester(QueryModel<LOAD_TO_CHAIR> loadToChairQM) throws Exception {
+        Set<GROUPS> groups = new HashSet<>();
+        List<LOAD_TO_CHAIR> loads = SessionFacadeFactory.getSessionFacade(
+                CommonEntityFacadeBean.class).lookup(loadToChairQM);
+        for (LOAD_TO_CHAIR loadToChair : loads) {
+            if (loadToChair.getSemester().getId().equals(SEMESTER.SEVENTH)) {
+                for (GROUPS group : CommonUtils.getGroupsByStream(loadToChair.getStream())) {
+                    SUBJECT subject = SessionFacadeFactory.getSessionFacade(
+                            CommonEntityFacadeBean.class)
+                            .lookup(SUBJECT.class, SUBJECT.MANAGE_DIPLOM);
+                    setLoadToChair(groups, loadToChair, group, subject, true);
+                }
+            }
+        }
+    }
+
+    private void setEighthSemester(QueryModel<LOAD_TO_CHAIR> loadToChairQM) throws Exception {
+        Set<GROUPS> groups = new HashSet<>();
+        List<LOAD_TO_CHAIR> loads = SessionFacadeFactory.getSessionFacade(
+                CommonEntityFacadeBean.class).lookup(loadToChairQM);
+        for (LOAD_TO_CHAIR loadToChair : loads) {
+            if (loadToChair.getSemester().getId().equals(SEMESTER.EIGHTH)) {
+                if (loadToChair.getSubject().getPracticeType() != null) {
+                    int studentNumber = (int) (loadToChair.getStudentNumber() * 0.4);
+                    loadToChair.setStudentNumber(studentNumber);
+                    double practiceCount = (double)
+                            studentNumber * loadToChair.getSubject().getWeekNumber();
+                    loadToChair.setPracticeCount(practiceCount);
+                    loadToChair.setTotalCount(practiceCount);
+
+                } else if (loadToChair.getSubject().getId().getId().longValue() == SUBJECT.DIPLOM) {
+                    loadToChair.setDiplomaCount(0.0);
+                    double mek = loadToChair.getStudentNumber() * 0.6;
+                    loadToChair.setMek(mek);
+                    double protectDiplomaCount = loadToChair.getStudentNumber() * 0.6 * 0.4;
+                    loadToChair.setProtectDiplomaCount(protectDiplomaCount);
+                    loadToChair.setTotalCount(mek + protectDiplomaCount);
+                }
+            }
+        }
+        CommonUtils.getQuery().merge(loads);
+    }
+
+    private void setPractice(QueryModel<LOAD_TO_CHAIR> loadToChairQM) throws Exception {
+        Set<GROUPS> groups = new HashSet<>();
+        List<LOAD_TO_CHAIR> loads = SessionFacadeFactory.getSessionFacade(
+                CommonEntityFacadeBean.class).lookup(loadToChairQM);
+        for (LOAD_TO_CHAIR loadToChair : loads) {
+            if (loadToChair.getSemester().getId().equals(SEMESTER.EIGHTH)) {
+                QueryModel<SUBJECT> subjectQM = new QueryModel<>(SUBJECT.class);
+                subjectQM.addWhere("deleted", false);
+                subjectQM.addWhere("weekNumber", ECriteria.EQUAL, 10);
+                subjectQM.addWhereNotNull("practiceType");
+                subjectQM.addWhere("chair", ECriteria.EQUAL, loadToChair.getCurriculum().getSpeciality().
+                        getDepartment().getId());
+                SUBJECT subject = CommonUtils.getQuery().lookupSingle(subjectQM);
+                GROUPS group = loadToChair.getGroup();
+                setLoadToChair(groups, loadToChair, group, subject, false);
+            }
+        }
+
+    }
+
+    private void setLoadToChair(Set<GROUPS> groups, LOAD_TO_CHAIR loadToChair, GROUPS group, SUBJECT subject,
+                                boolean isDiploma) throws Exception {
+        if (!groups.contains(group)) {
+            V_GROUP groupView = SessionFacadeFactory.getSessionFacade(
+                    CommonEntityFacadeBean.class).lookup(V_GROUP.class, group.getId());
+
+            LOAD_TO_CHAIR newLoadToChair = new LOAD_TO_CHAIR();
+            newLoadToChair.setId(SessionFacadeFactory.getSessionFacade(
+                    CommonIDFacadeBean.class).getID("s_v_load_to_chair"));
+            newLoadToChair.setSubject(subject);
+            newLoadToChair.setCurriculum(loadToChair.getCurriculum());
+            newLoadToChair.setGroup(group);
+            newLoadToChair.setSemester(loadToChair.getSemester());
+            newLoadToChair.setCredit(subject.getCreditability().getCredit().
+                    doubleValue());
+            newLoadToChair.setStudyYear(SessionFacadeFactory.getSessionFacade(
+                    CommonEntityFacadeBean.class).lookup(STUDY_YEAR.class,
+                    STUDY_YEAR.FOURTH_STUDY_YEAR));
+
+            if (isDiploma) {
+                Integer studentNumber = (int) Math.round(groupView.getStudentCount() * 0.4);
+                newLoadToChair.setStudentNumber(studentNumber);
+                double diplomaCount = studentNumber.doubleValue() * 12;
+                newLoadToChair.setDiplomaCount(diplomaCount);
+                newLoadToChair.setTotalCount(diplomaCount);
+
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(
+                        newLoadToChair);
+
+                newLoadToChair.setId(SessionFacadeFactory.getSessionFacade(
+                        CommonIDFacadeBean.class).getID("s_v_load_to_chair"));
+                newLoadToChair.setSemester(CommonUtils.getQuery().lookup(SEMESTER.class,
+                        SEMESTER.EIGHTH));
+            } else {
+                Integer studentNumber = (int) Math.round(groupView.getStudentCount() * 0.6);
+                newLoadToChair.setStudentNumber(studentNumber);
+                double practiceCount = studentNumber.doubleValue() * subject.getWeekNumber();
+                newLoadToChair.setPracticeCount(practiceCount);
+                newLoadToChair.setTotalCount(practiceCount);
+            }
+            CommonUtils.getQuery().createNoID(newLoadToChair);
+            groups.add(group);
+        }
+    }
+
+    private void setStudyYear(QueryModel<LOAD_TO_CHAIR> loadToChairQM) throws Exception {
+        List<LOAD_TO_CHAIR> loads = SessionFacadeFactory.getSessionFacade(
+                CommonEntityFacadeBean.class).lookup(loadToChairQM);
+        for (LOAD_TO_CHAIR loadToChair : loads) {
+            loadToChair.setStudyYear(SessionFacadeFactory.getSessionFacade(
+                    CommonEntityFacadeBean.class).lookup(STUDY_YEAR.class,
+                    ID.valueOf(CommonUtils.getStudyYearByEntranceYear(
+                            loadToChair.getCurriculum().getEntranceYear()))));
+        }
+        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(loads);
     }
 
     private void insert(String table, boolean workingChair) {
