@@ -70,7 +70,7 @@ public class PdfEdit extends AbstractCommonView {
 
         final double[] order = {1};
 
-        if(fileDoc.getId() != null){
+        if(fileDoc.getId() != null) {
             QueryModel<PDF_PROPERTY> propertyQM = new QueryModel<>(PDF_PROPERTY.class);
             propertyQM.addWhere("pdfDocument", ECriteria.EQUAL, fileDoc.getId());
             propertyQM.addSelect("orderNumber", EAggregate.MAX);
@@ -83,7 +83,6 @@ public class PdfEdit extends AbstractCommonView {
                 e.printStackTrace();
             }
         }
-
         else{
             order[0] = 1;
         }

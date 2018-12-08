@@ -172,6 +172,16 @@ public class EmployeesView extends BaseView implements EntityListener , FilterPa
         }
         filterPanel.addFilterComponent("childAge", cb);
 
+        cb = new ComboBox();
+        cb.setNullSelectionAllowed(true);
+        cb.setTextInputAllowed(true);
+        cb.setFilteringMode(FilteringMode.OFF);
+        for (int i = 1; i < 19; i++) {
+            cb.addItem(i);
+        }
+        filterPanel.addFilterComponent("childCount", cb);
+
+
         teacherGW = new GridWidget(VEmployee.class);
         teacherGW.addEntityListener(this);
         teacherGW.showToolbar(false);
@@ -264,8 +274,11 @@ public class EmployeesView extends BaseView implements EntityListener , FilterPa
                 "GROUP BY empl.ID,  usr.CODE,\n" +
                 "  FIO,\n" +
                 "  dep.DEPT_NAME,post.post_name,post.post_name,empl_dept.priority\n" +
-                "  HAVING count(empl_dept.priority)>=0" +
-                " ORDER by FIO,empl_dept.priority DESC\n";
+                "  HAVING count(empl_dept.priority)>=0 ";
+                if (ef.getChildCount() != null) {
+                    sql += " and COUNT(c2.id) = " + ef.getChildCount();
+                }
+                sql += " ORDER by FIO,empl_dept.priority DESC\n";
 
         try {
             List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);

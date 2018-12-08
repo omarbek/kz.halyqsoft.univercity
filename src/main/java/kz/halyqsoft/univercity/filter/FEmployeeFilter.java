@@ -22,6 +22,7 @@ public final class FEmployeeFilter extends AbstractFilterBean {
     private CARD card;
     private SUBJECT subject;
     private Integer childAge;
+    private Integer childCount;
 
     public FEmployeeFilter() {
     }
@@ -90,9 +91,17 @@ public final class FEmployeeFilter extends AbstractFilterBean {
         this.subject = subject;
     }
 
+    public Integer getChildCount() {
+        return childCount;
+    }
+
+    public void setChildCount(Integer childCount) {
+        this.childCount = childCount;
+    }
+
     @Override
     public boolean hasFilter() {
         return (!(code == null && firstname == null && lastname == null
-                && department == null && post == null && card == null && childAge == null && subject == null));
+                && department == null && post == null && card == null && childAge == null && childCount == null && subject == null));
     }
 }
