@@ -20,35 +20,23 @@ public class WorkflowViewContent {
     HorizontalSplitPanel mainHSP;
     VerticalLayout secondMainVL;
 
-    public static String MY_DOCUMENTS ;
+    public static String MY_DOCUMENTS = getUILocaleUtil().getCaption("my_documents");
 
-    public static String CREATE ;
+    public static String CREATE = getUILocaleUtil().getCaption("create");
 
-    public static String INCOMING ;
-    public static String OUTCOMING ;
+    public static String INCOMING = getUILocaleUtil().getCaption("incoming");
+    public static String OUTCOMING = getUILocaleUtil().getCaption("outcoming");
 
-    public static String O_ON_AGREE ;
-    public static String O_ON_SIGN ;
-    public static String I_ON_AGREE ;
-    public static String I_ON_SIGN ;
+    public static String O_ON_AGREE = getUILocaleUtil().getCaption("on_agree");
+    public static String O_ON_SIGN = getUILocaleUtil().getCaption("on_sign");
+    public static String I_ON_AGREE = getUILocaleUtil().getCaption("on_agree")+" ";
+    public static String I_ON_SIGN = getUILocaleUtil().getCaption("on_sign")+" ";
 
     public WorkflowViewContent() {
         initView();
     }
 
     public void initView(){
-        MY_DOCUMENTS = getUILocaleUtil().getCaption("my_documents");
-        CREATE = getUILocaleUtil().getCaption("create");
-
-        INCOMING = getUILocaleUtil().getCaption("incoming");
-        OUTCOMING = getUILocaleUtil().getCaption("outcoming");
-
-        O_ON_AGREE = getUILocaleUtil().getCaption("on_agree");
-        O_ON_SIGN = getUILocaleUtil().getCaption("on_sign");
-
-        I_ON_AGREE = getUILocaleUtil().getCaption("on_agree")+" ";
-        I_ON_SIGN = getUILocaleUtil().getCaption("on_sign")+" ";
-
         mainVL = new VerticalLayout();
         initTab1();
     }

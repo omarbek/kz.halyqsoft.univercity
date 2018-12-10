@@ -110,24 +110,6 @@ public class CustomDocument {
 
     }
 
-
-    private void insertCell(PdfPTable table, String text, int align, int colspan, Font font) {
-
-        //create a new cell with the specified Text and Font
-        PdfPCell cell = new PdfPCell(new Phrase(text.trim(), font));
-        //set the cell alignment
-        cell.setHorizontalAlignment(align);
-        //set the cell column span in case you want to merge two or more cells
-        cell.setColspan(colspan);
-        //in case there is no text and you wan to create an empty row
-        if (text.trim().equalsIgnoreCase("")) {
-            cell.setMinimumHeight(2f);
-        }
-        //add the call to the table
-        table.addCell(cell);
-
-    }
-
     public void createPdf(String dest) throws IOException, DocumentException {
         Document document = new Document();
         PdfWriter.getInstance(document, new FileOutputStream(dest));

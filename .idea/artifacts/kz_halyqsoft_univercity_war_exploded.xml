@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
   <artifact type="exploded-war" name="kz.halyqsoft.univercity:war exploded">
-    <output-path>$PROJECT_DIR$/target/ukpu</output-path>
+    <output-path>$PROJECT_DIR$/target/univer</output-path>
     <root id="root">
       <element id="directory" name="WEB-INF">
         <element id="directory" name="classes">
@@ -115,7 +115,7 @@
         </element>
       </element>
       <element id="directory" name="META-INF">
-        <element id="file-copy" path="$PROJECT_DIR$/target/ukpu/META-INF/MANIFEST.MF" />
+        <element id="file-copy" path="$PROJECT_DIR$/target/univer/META-INF/MANIFEST.MF" />
       </element>
       <element id="javaee-facet-resources" facet="kz.halyqsoft.univercity/web/Web" />
     </root>

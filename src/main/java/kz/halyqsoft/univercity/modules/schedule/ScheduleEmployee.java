@@ -1,20 +1,18 @@
-package kz.halyqsoft.univercity.modules.workflowforemp.views;
+package kz.halyqsoft.univercity.modules.schedule;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.combobox.FilteringMode;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.TextField;
+import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.USERS;
+import kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.CARD;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEPARTMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.POST;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VEmployee;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_EMPLOYEE;
 import kz.halyqsoft.univercity.filter.FEmployeeFilter;
 import kz.halyqsoft.univercity.filter.panel.EmployeeFilterPanel;
-import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.PrintDialog;
-import kz.halyqsoft.univercity.modules.workflow.views.BaseView;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -26,83 +24,51 @@ import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.from.EJoin;
 import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
+import org.r3a.common.vaadin.view.AbstractCommonView;
 import org.r3a.common.vaadin.widget.ERefreshType;
 import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 import org.r3a.common.vaadin.widget.filter2.FilterPanelListener;
+import org.r3a.common.vaadin.widget.form.FormModel;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
-import org.r3a.common.vaadin.widget.grid.model.GridColumnModel;
+import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-/**
- * @author Assylkhan
- * on 06.12.2018
- * @project kz.halyqsoft.univercity
- */
-public class EmployeesView extends BaseView implements EntityListener, FilterPanelListener {
+import java.util.*;
 
 
-    private EmployeeFilterPanel filterPanel;
+public class ScheduleEmployee extends AbstractCommonView implements EntityListener, FilterPanelListener {
+
+    private VerticalLayout tablesVL = new VerticalLayout();
+    private VerticalLayout mainVL;
+    private String title;
     private GridWidget teacherGW;
-    private ComboBox cb, sd;
+    private final EmployeeFilterPanel filterPanel;
+    private ComboBox cb;
 
-
-    public EmployeesView(String title) {
-        super(title);
+    public ScheduleEmployee(String task) {
+        this.title = task;
+        mainVL = new VerticalLayout();
+        filterPanel = new EmployeeFilterPanel(new FEmployeeFilter());
     }
 
     @Override
-    public void onCreate(Object o, Entity entity, int i) {
-
+    public String getViewName() {
+        return null;
     }
 
     @Override
-    public void beforeRefresh(Object o, int i) {
-
+    protected String getViewTitle(Locale locale) {
+        return null;
     }
 
-    @Override
-    public void onRefresh(Object o, List<Entity> list) {
 
+    public VerticalLayout getMainVL() {
+        return mainVL;
     }
 
-    @Override
-    public void onFilter(Object o, QueryModel queryModel, int i) {
-
-    }
-
-    @Override
-    public void onAccept(Object o, List<Entity> list, int i) {
-
-    }
-
-    @Override
-    public void onDelete(Object o, List<Entity> list, int i) {
-
-    }
-
-    @Override
-    public void deferredCreate(Object o, Entity entity) {
-
-    }
-
-    @Override
-    public void deferredDelete(Object o, List<Entity> list) {
-
-    }
-
-    @Override
-    public void onException(Object o, Throwable throwable) {
-
-    }
 
     @Override
     public void initView(boolean b) throws Exception {
-        filterPanel = new EmployeeFilterPanel(new FEmployeeFilter());
         filterPanel.addFilterPanelListener(this);
 
         TextField tf = new TextField();
@@ -171,73 +137,65 @@ public class EmployeesView extends BaseView implements EntityListener, FilterPan
         }
         filterPanel.addFilterComponent("childAge", cb);
 
-        sd = new ComboBox();
-        sd.setNullSelectionAllowed(true);
-        sd.setTextInputAllowed(true);
-        sd.setFilteringMode(FilteringMode.OFF);
-        for (int i = 1; i < 30; i++) {
-            sd.addItem(i);
-        }
-        filterPanel.addFilterComponent("childCount", sd);
+        cb = new ComboBox();
+        cb.setNullSelectionAllowed(true);
+        cb.setTextInputAllowed(false);
+        cb.setFilteringMode(FilteringMode.OFF);
+        cb.setPageLength(0);
+        cb.setWidth(220, Unit.PIXELS);
+        QueryModel<SUBJECT> subjectQM = new QueryModel<>(SUBJECT.class);
+        BeanItemContainer<SUBJECT> subjectBIC = new BeanItemContainer<>(SUBJECT.class,
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(subjectQM));
+        cb.setContainerDataSource(subjectBIC);
+        filterPanel.addFilterComponent("subject", cb);
 
-        teacherGW = new GridWidget(VEmployee.class);
+        mainVL.addComponent(filterPanel);
+        mainVL.setComponentAlignment(filterPanel, Alignment.TOP_CENTER);
+
+
+
+        HorizontalLayout buttonsHL = CommonUtils.createButtonPanel();
+        mainVL.addComponent(buttonsHL);
+        mainVL.setComponentAlignment(buttonsHL, Alignment.MIDDLE_CENTER);
+
+        teacherGW = new GridWidget(V_EMPLOYEE.class);
+        teacherGW.showToolbar(true);
         teacherGW.addEntityListener(this);
-        teacherGW.showToolbar(false);
+        teacherGW.setButtonVisible(AbstractToolbar.REFRESH_BUTTON, false);
+        teacherGW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
+        teacherGW.setButtonVisible(AbstractToolbar.EDIT_BUTTON, false);
+        teacherGW.setButtonVisible(AbstractToolbar.DELETE_BUTTON, false);
+        teacherGW.setButtonVisible(AbstractToolbar.ADD_BUTTON, false);
         DBGridModel teacherGM = (DBGridModel) teacherGW.getWidgetModel();
         teacherGM.setTitleVisible(false);
         teacherGM.setMultiSelect(false);
         teacherGM.setRefreshType(ERefreshType.MANUAL);
-        teacherGM.setRowNumberVisible(true);
-        teacherGM.setRowNumberWidth(60);
 
         doFilter(filterPanel.getFilterBean());
+        mainVL.addComponent(teacherGW);
+        mainVL.addComponent(tablesVL);
+        mainVL.setComponentAlignment(tablesVL, Alignment.MIDDLE_CENTER);
+    }
 
-        Button printBtn = new Button(CommonUtils.getUILocaleUtil().getCaption("export"));
-        printBtn.setImmediate(true);
-        printBtn.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent clickEvent) {
-
-                List<String> tableHeader = new ArrayList<>();
-                List<List<String>> tableBody = new ArrayList<>();
-
-                String fileName = "document";
-
-
-                for (GridColumnModel gcm : teacherGM.getColumnModels()) {
-                    tableHeader.add(gcm.getLabel());
-                }
-                for (int i = 0; i < teacherGW.getAllEntities().size(); i++) {
-                    VEmployee vEmployee = (VEmployee) teacherGW.getAllEntities().get(i);
-                    if (teacherGW.getCaption() != null) {
-                        fileName = teacherGW.getCaption();
-                    }
-                    List<String> list = new ArrayList<>();
-                    list.add(vEmployee.getCode());
-                    list.add(vEmployee.getFio());
-                    list.add(vEmployee.getDeptName());
-                    list.add(vEmployee.getPostName());
-                    tableBody.add(list);
+    @Override
+    public void handleEntityEvent(EntityEvent ev) {
+        if (ev.getSource().equals(teacherGW)) {
+            if (ev.getAction() == EntityEvent.SELECTED) {
+                List<Entity> selectedList = ev.getEntities();
+                if (!selectedList.isEmpty()) {
+                    onEdit(ev.getSource(), selectedList.get(0), 2);
                 }
 
-
-                PrintDialog printDialog = new PrintDialog(tableHeader, tableBody, CommonUtils.getUILocaleUtil().getCaption("print"), fileName);
             }
-        });
-
-        getContent().addComponent(printBtn);
-        getContent().addComponent(teacherGW);
-        getContent().setComponentAlignment(teacherGW, Alignment.MIDDLE_CENTER);
+        }
     }
 
     @Override
     public void doFilter(AbstractFilterBean abstractFilterBean) {
         FEmployeeFilter ef = (FEmployeeFilter) abstractFilterBean;
-        int count;
         int i = 1;
         Map<Integer, Object> params = new HashMap<>();
         StringBuilder sb = new StringBuilder();
-        StringBuilder sb2 = new StringBuilder();
         if (ef.getCode() != null && ef.getCode().trim().length() >= 2) {
             sb.append("lower(usr.CODE) like '");
             sb.append(ef.getCode().trim().toLowerCase());
@@ -287,41 +245,49 @@ public class EmployeesView extends BaseView implements EntityListener, FilterPan
             sb.append(" date_part('year',age(c2.birth_date)) <= " + ef.getChildAge() + " ");
             i++;
         }
-        if (ef.getChildCount() != null) {
-            sb2.append(" AND count(c2.id)= " + sd.getValue() + " ");
-
+        if(ef.getSubject()!=null){
+            params.put(i, ef.getSubject().getId().getId());
+            if (sb.length() > 0) {
+                sb.append(" and ");
+            }
+            sb.append("subj.subject_id = ?");
+            sb.append(i++);
         }
-        List<VEmployee> list = new ArrayList<>();
+
+        List<V_EMPLOYEE> list = new ArrayList<>();
 
         if (sb.length() > 0) {
             sb.append(" and ");
         }
         sb.insert(0, " where ");
         String sql = "SELECT  empl.ID,  usr.CODE,\n" +
-                "  trim(usr.LAST_NAME || ' ' || usr.FIRST_NAME || ' ' || coalesce(usr.MIDDLE_NAME, '')) FIO,\n" +
+                "  usr.LAST_NAME,usr.FIRST_NAME, usr.MIDDLE_NAME,\n" +
                 "  dep.DEPT_NAME,\n" +
                 "  post.post_name \n" +
                 "FROM EMPLOYEE empl INNER JOIN USERS usr ON empl.ID = usr.ID\n" +
                 "  LEFT JOIN EMPLOYEE_DEPT empl_dept ON empl_dept.EMPLOYEE_ID = empl.ID AND empl_dept.DISMISS_DATE IS NULL\n" +
                 "  LEFT JOIN DEPARTMENT dep ON empl_dept.DEPT_ID = dep.ID\n" +
                 "  LEFT JOIN POST post ON empl_dept.POST_ID = post.id\n" +
+                "  LEFT JOIN teacher_subject subj ON empl.id = subj.employee_id" +
                 "  LEFT JOIN child c2 on empl.id = c2.employee_id\n" + sb.toString() +
                 "   usr.id not in (1,2) and usr.deleted = FALSE  \n" +
                 "GROUP BY empl.ID,  usr.CODE,\n" +
-                "  FIO,\n" +
+                "   usr.LAST_NAME,usr.FIRST_NAME, usr.MIDDLE_NAME,\n" +
                 "  dep.DEPT_NAME,post.post_name,post.post_name,empl_dept.priority\n" +
-                "  HAVING count(empl_dept.priority)>=0 " + sb2.toString() +
-                " ORDER by FIO,empl_dept.priority DESC\n";
+                "  HAVING count(empl_dept.priority)>=0" +
+                " ORDER by empl_dept.priority DESC\n";
 
         try {
             List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
             if (!tmpList.isEmpty()) {
                 for (Object o : tmpList) {
                     Object[] oo = (Object[]) o;
-                    VEmployee ve = new VEmployee();
+                    V_EMPLOYEE ve = new V_EMPLOYEE();
                     ve.setId(ID.valueOf((long) oo[0]));
                     ve.setCode((String) oo[1]);
-                    ve.setFio((String) oo[2]);
+                    ve.setLastName((String)oo[2]);
+                    ve.setFirstName((String)oo[2]);
+                    ve.setMiddleName((String)oo[2]);
                     ve.setDeptName((String) oo[3]);
                     ve.setPostName((String) oo[4]);
                     list.add(ve);
@@ -339,46 +305,115 @@ public class EmployeesView extends BaseView implements EntityListener, FilterPan
         }
     }
 
+    public EmployeeFilterPanel getFilterPanel() {
+        return filterPanel;
+    }
+
     @Override
     public void clearFilter() {
         doFilter(filterPanel.getFilterBean());
     }
 
     @Override
-    public void handleEntityEvent(EntityEvent ev) {
-    }
-
-    @Override
-    public boolean preCreate(Object source, int buttonId) {
+    public boolean preCreate(Object o, int i) {
         return false;
     }
 
+    @Override
+    public void onCreate(Object o, Entity entity, int i) {
+
+    }
 
     @Override
     public boolean onEdit(Object source, Entity e, int buttonId) {
-        return false;
+        return openEmployeeEdit(source, e, false);
     }
-
     @Override
     public boolean onPreview(Object source, Entity e, int buttonId) {
-        return false;
+        return openEmployeeEdit(source, e, true);
     }
 
-    @Override
-    public boolean preSave(Object source, Entity e, boolean isNew, int buttonId) {
-        return false;
-    }
+    private boolean openEmployeeEdit(Object source, Entity e, boolean readOnly) {
+        if (source.equals(teacherGW)) {
+            FormModel fm = new FormModel(EMPLOYEE.class);
+            fm.setReadOnly(readOnly);
+            fm.setTitleVisible(false);
+            try {
+                if (e != null) {
+                    fm.loadEntity(e.getId());
+                } else {
+                    fm.createNew();
+                }
+                mainVL.removeComponent(teacherGW);
 
-    @Override
-    public boolean preDelete(Object source, List<Entity> entities, int buttonId) {
-        return false;
-    }
+                ScheduleEmployeeView employeeView = new ScheduleEmployeeView(fm, mainVL, this);
+                mainVL.addComponent(employeeView);
 
-    public EmployeeFilterPanel getFilterPanel() {
-        return filterPanel;
+                return false;
+            } catch (Exception ex) {
+                CommonUtils.showMessageAndWriteLog("Unable to open employeeEdit", ex);
+            }
+        }
+
+        return true;
     }
 
     public GridWidget getTeacherGW() {
         return teacherGW;
     }
+
+   // public boolean onPreview(Object source, Entity e, int buttonId) {
+//        return openEmployeeEdit(source, e, true);
+//    }
+
+    @Override
+    public void beforeRefresh(Object o, int i) {
+
+    }
+
+    @Override
+    public void onRefresh(Object o, List<Entity> list) {
+
+    }
+
+    @Override
+    public void onFilter(Object o, QueryModel queryModel, int i) {
+
+    }
+
+    @Override
+    public void onAccept(Object o, List<Entity> list, int i) {
+
+    }
+
+    @Override
+    public boolean preSave(Object o, Entity entity, boolean b, int i) throws Exception {
+        return false;
+    }
+
+    @Override
+    public boolean preDelete(Object o, List<Entity> list, int i) {
+        return false;
+    }
+
+    @Override
+    public void onDelete(Object o, List<Entity> list, int i) {
+
+    }
+
+    @Override
+    public void deferredCreate(Object o, Entity entity) {
+
+    }
+
+    @Override
+    public void deferredDelete(Object o, List<Entity> list) {
+
+    }
+
+    @Override
+    public void onException(Object o, Throwable throwable) {
+
+    }
+
 }

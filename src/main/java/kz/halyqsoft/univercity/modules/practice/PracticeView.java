@@ -46,6 +46,9 @@ import org.r3a.common.vaadin.widget.toolbar.IconToolbar;
 
 import javax.persistence.NoResultException;
 import java.io.ByteArrayOutputStream;
+import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 
@@ -151,8 +154,6 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
                         Message.showError(getUILocaleUtil().getCaption("chooseARecord"));
                     }
 
-                } catch (DocumentException e) {
-                    e.printStackTrace();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -164,7 +165,7 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
         informationPracticeGW.removeEntityListener(informationPracticeGW);
         informationPracticeGW.showToolbar(true);
         informationPracticeGW.addEntityListener(this);
-        informationPracticeGW.setMultiSelect(true);
+        informationPracticeGW.setMultiSelect(false);
         informationPracticeGW.setButtonVisible(IconToolbar.REFRESH_BUTTON, false);
 
         informationPracticeGW.getToolbarPanel().addComponent(reportBtn);
@@ -175,7 +176,7 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
 
         informationPracticeGM = (DBGridModel) informationPracticeGW.getWidgetModel();
         informationPracticeGM.setRefreshType(ERefreshType.MANUAL);
-        informationPracticeGM.setMultiSelect(true);
+        informationPracticeGM.setMultiSelect(false);
         informationPracticeGM.setRowNumberVisible(true);
         informationPracticeGM.setRowNumberWidth(50);
         FKFieldModel groupsFM = (FKFieldModel) informationPracticeGM.getFormModel().getFieldModel("groups");
@@ -308,31 +309,45 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
         studentPracticeFP.addFilterComponent("comeOutDate", comeOutDF);
     }
 
-    public void createTable(List entities) throws Exception {
+    private void createTable(List entities) {
 
         List<PRACTICE_INFORMATION> practiceInformations = (List<PRACTICE_INFORMATION>) entities;
 
         Document document = new Document();
-
-        QueryModel<PRACTICE_STUDENT> psQM = new QueryModel<>(PRACTICE_STUDENT.class);
-        FromItem oItem = psQM.addJoin(EJoin.INNER_JOIN, "organization", ORGANIZATION.class, "id");
-        psQM.addWhere("student", ECriteria.EQUAL, CommonUtils.getCurrentUser().getId());
         ByteArrayOutputStream byteArr = new ByteArrayOutputStream();
 
-        List<PRACTICE_STUDENT> practiceStudents = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(psQM);
 
         try {
             for (PRACTICE_INFORMATION pi : practiceInformations) {
 
+                String pracType = "-";
+                int credi = 0;
+                String getPracSql = "SELECT pt.type_name,c.credit\n" +
+                        "FROM student_subject ss\n" +
+                        "  INNER JOIN subject s on ss.subject_id=s.id\n" +
+                        "  INNER JOIN creditability c on s.creditability_id=c.id\n" +
+                        "INNER JOIN student_education se ON ss.student_id = se.id\n" +
+                        "  INNER JOIN speciality spec on se.speciality_id=spec.id\n" +
+                        "  INNER JOIN groups g ON se.groups_id = g.id\n" +
+                        "  inner JOIN practice_type pt ON s.practice_type_id = pt.id\n" +
+                        "WHERE se.groups_id=" + pi.getGroups().getId() + " and ss.semester_data_id=" + CommonUtils.getCurrentSemesterData().getId();
 
-                String sql2 = "  SELECT c.credit,sd.year_id  FROM subject s\n" +
-                        "    INNER JOIN creditability c on s.creditability_id=c.id\n" +
-                        "    INNER JOIN student_subject ss on s.id=ss.subject_id\n" +
-                        "    INNER JOIN student_education se ON ss.student_id = se.id\n" +
-                        "    INNER JOIN practice_student ps on  s.id = ps.student_id\n" +
-                        "    INNER JOIN semester_data sd ON ss.semester_data_id = sd.id\n" +
-                        "    INNER JOIN practice_information pi on  pi.groups_id=se.groups_id\n" +
-                        "  WHERE s.practice_type_id!=null and pi.groups_id= " + pi.getGroups().getId();
+                Map<Integer, Object> params = new HashMap<>();
+                try {
+                    List tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(getPracSql, params);
+                    if (!tmpList.isEmpty()) {
+                        for (Object o : tmpList) {
+                            Object[] oo = (Object[]) o;
+
+                            for (int i = 0; i < 2; i++) {
+                                pracType = (String) oo[0];
+                                credi = ((BigDecimal) oo[1]).intValue();
+                            }
+                        }
+                    }
+                } catch (Exception ex) {
+                    CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
+                }
 
 
                 QueryModel<PRACTICE_STUDENT> practiceStudentQM = new QueryModel<>(PRACTICE_STUDENT.class);
@@ -355,6 +370,8 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
                     title1.setAlignment(Element.ALIGN_CENTER);
                     document.add(title);
                     document.add(title1);
+                    DateField comeInDF = new DateField();
+                    studentPracticeFP.addFilterComponent("comeInDate", comeInDF);
                     if (practiceStudents1.size() == 0) {
 
                         Paragraph contentEmpty = new Paragraph("Факультет: " + pi.getGroups().getSpeciality().getSpecName() + //pi.getSpeciality().getSpecName() +
@@ -368,27 +385,27 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
                                 pi.getEmployee().getFirstName().toUpperCase().charAt(0) + "." +
                                 (pi.getEmployee().getMiddleName() != null ?
                                         pi.getEmployee().getMiddleName().toUpperCase().charAt(0) : "") + " " +
-                                "\nІс тәжірибе түрі/Наименование практики: Производственная(педагогическая) практика \n", EmployeePdfCreator.getFont(12, Font.NORMAL));
+                                "\nІс тәжірибе түрі/Наименование практики:  \n", EmployeePdfCreator.getFont(12, Font.NORMAL));
 
 
                         document.add(contentEmpty);
                     } else {
                         Paragraph content = null;
+                        DateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
                         for (PRACTICE_STUDENT ps : practiceStudents1) {
                             content = new Paragraph("Факультет: " + pi.getGroups().getSpeciality().getSpecName() +
                                     "\nТобы/группа: " + pi.getGroups().getName() +
                                     "\nБаза аты/Вид базы:" + ps.getOrganization().getOrganizationName() +
                                     "      База аты/Наименование базы:" + (ps.getOrganization().getAddress() != null ? ps.getOrganization().getAddress() : " ") +
                                     "\nСтуденттің іс тәжірибесінің мерзімі/" +
-                                    "Срок практики студентов " + ps.getComeInDate().getTime() + "     "
-                                    + (ps.getComeOutDate() != null ? ps.getComeOutDate().toString() : " ") +
+                                    "Срок практики студентов " + sdf.format(ps.getComeInDate()) + (ps.getComeOutDate() != null ? "-" + sdf.format(ps.getComeOutDate()) : " ") +
                                     "\n Кафедраның іс тәжірибе жетекшісі /" +
                                     "Руководитель практики от кафедры " + pi.getEmployee().getLastName() + " " +
                                     pi.getEmployee().getFirstName().toUpperCase().charAt(0) + "." +
                                     (pi.getEmployee().getMiddleName() != null ?
                                             pi.getEmployee().getMiddleName().toUpperCase().charAt(0) : "") + " " +
-                                    "\nІс тәжірибе түрі/Наименование практики: Производственная(педагогическая) практика " +
-                                    "\nКредиттер саны/Количество кредитов \n", EmployeePdfCreator.getFont(12, Font.NORMAL));
+                                    "\nІс тәжірибе түрі/Наименование практики:" + pracType +
+                                    "\nКредиттер саны/Количество кредитов " + credi + "\n", EmployeePdfCreator.getFont(12, Font.NORMAL));
 
 
                         }
@@ -436,12 +453,12 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
                             "  WHEN (final BETWEEN 50 AND 74) THEN  '3'\n" +
                             "  ELSE '2' END point\n" +
                             "FROM  v_student vs\n" +
-                            "INNER JOIN student_edu_rate ser on vs.id=ser.student_id\n" +
+                            "LEFT JOIN student_edu_rate ser on vs.id=ser.student_id\n" +
                             "WHERE vs.groups_id=" + pi.getGroups().getId();
 //
-                    Map<Integer, Object> params = new HashMap<>();
+                    Map<Integer, Object> par = new HashMap<>();
                     try {
-                        List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql1, params);
+                        List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql1, par);
                         if (!tmpList.isEmpty()) {
                             for (Object o : tmpList) {
                                 Object[] oo = (Object[]) o;

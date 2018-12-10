@@ -291,6 +291,9 @@ ALTER TABLE load_to_teacher ADD CONSTRAINT fk_load_to_teacher_teacher FOREIGN KE
 
 update lesson_time set lesson_number=5 where id=11;
 
+--domik
+
+
 ALTER TABLE schedule_detail ADD COLUMN stream_id int;
 
 ALTER TABLE ONLY schedule_detail

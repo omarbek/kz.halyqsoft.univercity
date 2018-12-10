@@ -61,6 +61,7 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
 
         HorizontalLayout mainHL = new HorizontalLayout();
         mainHL.setSizeFull();
+        mainHL.setSpacing(true);
         mainHL.setImmediate(true);
         mainHL.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
 
@@ -72,24 +73,32 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-
+        HorizontalLayout sectionHL = new HorizontalLayout();
+        sectionHL.setSizeFull();
+        sectionHL.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
         Embedded pdf = new Embedded(null, EmployeePdfCreator.getStreamResourceFromDocument( document));
         pdf.setImmediate(true);
         pdf.setSizeFull();
         pdf.setMimeType("application/pdf");
         pdf.setType(2);
-        pdf.setHeight(570,Unit.PIXELS);
-        this.getContent().addComponent(pdf);
+        pdf.setHeight(270,Unit.PIXELS);
 
+        sectionHL.addComponent(pdf);
+
+        VerticalLayout sectionVL = new VerticalLayout();
+        sectionVL.setSizeFull();
         this.importanceCB = new ComboBox();
         this.importanceCB.setCaption(this.getUILocaleUtil().getEntityLabel(DOCUMENT_IMPORTANCE.class));
         this.importanceCB.setSizeFull();
         this.importanceCB.setContainerDataSource(importanceBIC);
-        this.getContent().addComponent(this.importanceCB);
+        sectionVL.addComponent(this.importanceCB);
 
         this.messageTA = new TextArea(this.getUILocaleUtil().getCaption("message"));
         this.messageTA.setWidth(100, Unit.PERCENTAGE);
-        this.getContent().addComponent(this.messageTA);
+        sectionVL.addComponent(this.messageTA);
+        sectionHL.addComponent(sectionVL);
+
+        getContent().addComponent(sectionHL);
 
         Button clearUpload = new Button();
         clearUpload.setCaption(getUILocaleUtil().getCaption("clear"));
@@ -367,7 +376,8 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
         public OutputStream receiveUpload(String filename, String mimeType) {
             FileOutputStream fos = null;
             try {
-                relatedFilePath = "/tmp/files/"  + document.getId().getId().longValue()+ "-"+ filename;
+                relatedFilePath = "tmp/files/relateddocument/"  + document.getId().getId().longValue()+ "-";
+                relatedFilePath+=filename;
                 relatedFile = new File(relatedFilePath);
 
                 if(document.getRelatedDocumentFilePath()!=null){
