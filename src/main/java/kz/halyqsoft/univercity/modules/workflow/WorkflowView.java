@@ -41,7 +41,7 @@ public class WorkflowView extends AbstractTaskView {
         I_ON_AGREE = getUILocaleUtil().getCaption("on_agree")+" ";
         I_ON_SIGN = getUILocaleUtil().getCaption("on_sign")+" ";
 
-        WorkflowViewContent content = new WorkflowViewContent();
+        WorkflowViewContent content = new WorkflowViewContent(false);
         getContent().addComponent(content.getMainVL());
     }
 }

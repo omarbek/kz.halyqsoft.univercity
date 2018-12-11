@@ -6,9 +6,12 @@ import com.vaadin.ui.Window;
 import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_SIGNER;
 import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_STATUS;
+import kz.halyqsoft.univercity.entity.beans.univercity.PDF_DOCUMENT;
 import kz.halyqsoft.univercity.modules.workflow.views.BaseView;
 import kz.halyqsoft.univercity.modules.workflow.views.InOnAgreeView;
 import kz.halyqsoft.univercity.modules.workflow.views.dialogs.OpenPdfDialog;
+import org.r3a.common.entity.query.from.EJoin;
+import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.widget.dialog.AbstractDialog;
 import org.r3a.common.vaadin.widget.dialog.Message;
@@ -78,7 +81,9 @@ public class JournalView extends BaseView{
         documentGW.getToolbarPanel().addComponent(previewBtn);
 
         DBGridModel documentGM = (DBGridModel) documentGW.getWidgetModel();
+        FromItem fi = documentGM.getQueryModel().addJoin(EJoin.INNER_JOIN , "pdf_document_id" , PDF_DOCUMENT.class , "id");
         documentGM.getQueryModel().addWhere("documentStatus", ECriteria.EQUAL , DOCUMENT_STATUS.ACCEPTED_ID);
+        documentGM.getQueryModel().addWhereAnd(fi,"forHumanResourceDepartment", ECriteria.EQUAL , true);
         documentGM.getFormModel().getFieldModel("deleted").setInView(true);
         documentGM.getFormModel().getFieldModel("deleted").setInEdit(true);
         documentGM.getColumnModel("deleted").setInGrid(true);

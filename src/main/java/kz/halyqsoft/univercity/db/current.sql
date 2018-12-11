@@ -9,4 +9,7 @@ ALTER TABLE ONLY privileges
 
 insert into privileges values (1,'ИУПС',true);
 
+
+ALTER TABLE pdf_document RENAME COLUMN for_students TO for_human_resource_department;
+
 update curriculum set status_id=1;
