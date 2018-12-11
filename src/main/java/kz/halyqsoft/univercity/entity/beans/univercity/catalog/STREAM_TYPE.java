@@ -10,5 +10,6 @@ import javax.persistence.Entity;
  */
 @Entity
 public class STREAM_TYPE extends AbstractTypeEntity {
+    public static final ID COMMON = ID.valueOf(1);
     public static final ID SPEC = ID.valueOf(2);
 }

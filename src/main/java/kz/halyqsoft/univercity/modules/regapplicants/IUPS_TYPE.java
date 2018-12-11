@@ -8,5 +8,6 @@ package kz.halyqsoft.univercity.modules.regapplicants;
 public enum IUPS_TYPE {
     MANDATORY,
     CHOOSEN,
-    ADDITIONAL
+    ADDITIONAL,
+    AFTER_SEMESTER
 }

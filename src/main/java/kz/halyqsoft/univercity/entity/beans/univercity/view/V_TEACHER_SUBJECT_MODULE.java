@@ -1,6 +1,7 @@
 package kz.halyqsoft.univercity.entity.beans.univercity.view;
 
 import kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE;
+import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
@@ -10,6 +11,7 @@ import javax.persistence.*;
 @Entity
 public class V_TEACHER_SUBJECT_MODULE extends AbstractEntity {
 
+	//
     private static final long serialVersionUID = 3570162232421096031L;
 
 	@ManyToOne
@@ -17,15 +19,19 @@ public class V_TEACHER_SUBJECT_MODULE extends AbstractEntity {
         @JoinColumn(name = "EMPLOYEE_ID", referencedColumnName = "ID")})
     private EMPLOYEE employee;
 
-	@FieldInfo(type = EFieldType.TEXT, max = 64, order = 3, inEdit = false, inGrid = true)
-	@Column(name = "SUBJECT_NAME", nullable = false)
-	private String subjectName;
+	@FieldInfo(type = EFieldType.TEXT, max = 64,order = 3,  inEdit = false, inGrid = true)
+	@Column(name = "SUBJECT_NAME_RU", nullable = false)
+        private String subjectNameRu;
 
-	@FieldInfo(type = EFieldType.TEXT, max = 64, order = 4, inEdit = false, inGrid = true)
+	@FieldInfo(type = EFieldType.TEXT, max = 64,order = 4,inEdit = false, inGrid = true)
+	@Column(name = "SUBJECT_NAME_KZ", nullable = false)
+	private String subjectNameKz;
+
+	@FieldInfo(type = EFieldType.TEXT, max = 64, order = 6, inEdit = false, inGrid = true)
 	@Column(name = "CREDIT", nullable = false)
 	private String credit;
 
-	@FieldInfo(type = EFieldType.TEXT, max = 64, order = 5, inEdit = false, inGrid = true)
+	@FieldInfo(type = EFieldType.TEXT, max = 64, order = 7, inEdit = false, inGrid = true)
 	@Column(name = "MODULE_NAME", nullable = false)
 	private String moduleName;
 
@@ -44,7 +50,14 @@ public class V_TEACHER_SUBJECT_MODULE extends AbstractEntity {
 	@Column(name = "LOAD_PER_HOURS", nullable = false)
     private boolean loadPerHours;
 
-	public V_TEACHER_SUBJECT_MODULE() {
+	public String toString() {
+		String name;
+		if (CommonUtils.getLanguage().equals("kz")) {
+			name = subjectNameKz;
+		} else {
+			name = subjectNameRu;
+		}
+		return name;
 	}
 
 	public EMPLOYEE getEmployee() {
@@ -55,12 +68,20 @@ public class V_TEACHER_SUBJECT_MODULE extends AbstractEntity {
 		this.employee = employee;
 	}
 
-	public String getSubjectName() {
-		return subjectName;
+	public String getSubjectNameRu() {
+		return subjectNameRu;
 	}
 
-	public void setSubjectName(String subjectName) {
-		this.subjectName = subjectName;
+	public void setSubjectNameRu(String subjectNameRu) {
+		this.subjectNameRu = subjectNameRu;
+	}
+
+	public String getSubjectNameKz() {
+		return subjectNameKz;
+	}
+
+	public void setSubjectNameKz(String subjectNameKz) {
+		this.subjectNameKz = subjectNameKz;
 	}
 
 	public static long getSerialVersionUID() {
@@ -114,4 +135,6 @@ public class V_TEACHER_SUBJECT_MODULE extends AbstractEntity {
 	public void setLoadPerHours(boolean loadPerHours) {
 		this.loadPerHours = loadPerHours;
 	}
+
+
 }

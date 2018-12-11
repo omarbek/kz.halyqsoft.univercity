@@ -20,9 +20,8 @@ import org.r3a.common.vaadin.widget.dialog.Message;
 import javax.persistence.NoResultException;
 import java.util.*;
 
-public class SemesterPanel extends AbstractCommonPanel {
+public class SubjectsPanel extends AbstractCommonPanel {
 
-    private IndividualEducationPlanView registrationView;
     private STUDENT_EDUCATION studentEducation;
     private SEMESTER semester;
     private List<SEMESTER_DATA> semesterData;
@@ -30,12 +29,12 @@ public class SemesterPanel extends AbstractCommonPanel {
     private TreeTable chairsAndSubjectsTT;
     private Grid mainSubjectGrid;
     private List<SUBJECT> chosenMainlist;
+    private boolean isAdmin;
 
-    public SemesterPanel(IndividualEducationPlanView registrationView, SEMESTER semester,
-                         STUDENT_EDUCATION studentEducation) throws Exception {
+    SubjectsPanel(SEMESTER semester, STUDENT_EDUCATION studentEducation, boolean isAdmin) {
         this.semester = semester;
         this.studentEducation = studentEducation;
-        this.registrationView = registrationView;
+        this.isAdmin = isAdmin;
         chosenMainlist = new ArrayList<>();
     }
 
@@ -67,11 +66,13 @@ public class SemesterPanel extends AbstractCommonPanel {
         allSubjectsHL.addComponent(electiveSubjectsVL);
 
         Button saveButton = CommonUtils.createSaveButton();
-        saveButton.addClickListener(saveListener(pairSubjects, optionGroups, saveButton));
+        saveButton.addClickListener(saveListener(pairSubjects, optionGroups, saveButton, studentSubjects));
 
         getContent().addComponent(allSubjectsHL);
 
-        setDisableButton(studentSubjects, saveButton);
+        if (!isAdmin) {
+            setDisableButton(studentSubjects, saveButton);
+        }
 
         getContent().addComponent(saveButton);
         getContent().setComponentAlignment(saveButton, Alignment.MIDDLE_CENTER);
@@ -82,7 +83,7 @@ public class SemesterPanel extends AbstractCommonPanel {
     private void addGrid(ArrayList<STUDENT_SUBJECT> studentSubjects, List<SUBJECT> mainSubjects) {
         mainSubjectGrid = new Grid();
         mainSubjectGrid.setSizeFull();
-        mainSubjectGrid.setCaption("chosen main subjects");
+        mainSubjectGrid.setCaption(getUILocaleUtil().getCaption("choosen.main.subjects"));
         mainSubjectGrid.setColumns("nameKZ", "chair");
         mainSubjectGrid.getColumn("nameKZ").setHeaderCaption("name");
         mainSubjectGrid.getColumn("chair").setHeaderCaption("chair");
@@ -155,29 +156,31 @@ public class SemesterPanel extends AbstractCommonPanel {
         }
     }
 
-    private Button.ClickListener saveListener(List<PAIR_SUBJECT> pairSubjects, ArrayList<OptionGroup> optionGroups, Button saveButton) {
+    private Button.ClickListener saveListener(List<PAIR_SUBJECT> pairSubjects, ArrayList<OptionGroup> optionGroups,
+                                              Button saveButton, ArrayList<STUDENT_SUBJECT> studentSubjects) {
         return new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 try {
                     setStudentSubject();
                 } catch (Exception e) {
-                    e.printStackTrace();//TODO catch
+                    CommonUtils.showMessageAndWriteLog(e.getMessage(), e);
+                    e.printStackTrace();
                 }
             }
 
             private void setStudentSubject() {
                 Collection<SUBJECT> mainSubjects = (Collection<SUBJECT>) mainSubjectGrid.getContainerDataSource().getItemIds();
 
-                if (pairSubjects.isEmpty()) {
-                    Message.showInfo("elective subjects are empty");//TODO resource
-                    return;
-                }
-
-                if (mainSubjects.size() < 1) {
-                    Message.showInfo("main subjects are empty");//TODO resource
-                    return;
-                }
+//                if (pairSubjects.isEmpty()) {
+//                    Message.showInfo("elective subjects are empty");//TODO resource
+//                    return;
+//                }
+//
+//                if (mainSubjects.size() < 1) {
+//                    Message.showInfo("main subjects are empty");//TODO resource
+//                    return;
+//                }
 
                 for (OptionGroup sub : optionGroups) {
                     if (sub.getValue() == null) {
@@ -192,11 +195,11 @@ public class SemesterPanel extends AbstractCommonPanel {
                         QueryModel<SEMESTER_SUBJECT> semesterSubjectQM = new QueryModel<>(SEMESTER_SUBJECT.class);
                         QueryModel<SEMESTER_DATA> semesterDataQM = new QueryModel<>(SEMESTER_DATA.class);
 
-                        ArrayList<STUDENT_SUBJECT> studentSubjects = new ArrayList<>();
+                        ArrayList<STUDENT_SUBJECT> electiveStudentSubjects = new ArrayList<>();
 
                         for (OptionGroup sub : optionGroups) {
                             ENTRANCE_YEAR entranceYear = CommonUtils.getCurrentSemesterData().getYear();
-                            SEMESTER_PERIOD semesterPeriod = null;
+                            SEMESTER_PERIOD semesterPeriod = semester.getSemesterPeriod();
                             for (PAIR_SUBJECT pairSubject : pairSubjects) {
                                 semesterPeriod = pairSubject.getElectveBindedSubject().getSemester().getSemesterPeriod();
                             }
@@ -224,13 +227,13 @@ public class SemesterPanel extends AbstractCommonPanel {
                             studentSubject.setRegDate(new Date());
                             studentSubject.setSubject(semesterSubject);
 
-                            studentSubjects.add(studentSubject);
+                            electiveStudentSubjects.add(studentSubject);
                         }
 
-                        ArrayList<STUDENT_SUBJECT> studentSubjectAll = new ArrayList<>();
+                        ArrayList<STUDENT_SUBJECT> mainStudentSubjects = new ArrayList<>();
 
                         ENTRANCE_YEAR entranceYear = CommonUtils.getCurrentSemesterData().getYear();
-                        SEMESTER_PERIOD semesterPeriod = null;
+                        SEMESTER_PERIOD semesterPeriod = semester.getSemesterPeriod();
                         for (PAIR_SUBJECT pairSubject : pairSubjects) {
                             semesterPeriod = pairSubject.getElectveBindedSubject().getSemester().getSemesterPeriod();
                         }
@@ -259,21 +262,31 @@ public class SemesterPanel extends AbstractCommonPanel {
                             subjectOfStudent.setRegDate(new Date());
                             subjectOfStudent.setSubject(semesterSubject);
 
-                            studentSubjectAll.add(subjectOfStudent);
+                            mainStudentSubjects.add(subjectOfStudent);
                         }
 
-                        if (!studentSubjects.isEmpty() && !studentSubjectAll.isEmpty()) {
-                            try {
-                                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
-                                        create(studentSubjects);
-                                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
-                                        create(studentSubjectAll);
-                                saveButton.setEnabled(false);
 
-                                setTeachers();
-                            } catch (Exception e) {
-                                CommonUtils.showMessageAndWriteLog("Unable to save subject", e);
+                        try {
+                            if (isAdmin) {
+                                for (STUDENT_SUBJECT studentSubject : studentSubjects) {
+                                    studentSubject.setDeleted(true);
+                                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(
+                                            studentSubject);
+                                }
                             }
+                            if (!electiveStudentSubjects.isEmpty()) {
+                                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                                        create(electiveStudentSubjects);
+                            }
+                            if (!mainStudentSubjects.isEmpty()) {
+                                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                                        create(mainStudentSubjects);
+                            }
+                            saveButton.setEnabled(false);
+
+                            setTeachers();
+                        } catch (Exception e) {
+                            CommonUtils.showMessageAndWriteLog("Unable to save subject", e);
                         }
                     }
                 });
@@ -298,7 +311,7 @@ public class SemesterPanel extends AbstractCommonPanel {
 
     private ArrayList<OptionGroup> setElectiveSubjects(ArrayList<STUDENT_SUBJECT> studentSubjects,
                                                        VerticalLayout electiveSubjectsVL,
-                                                       List<PAIR_SUBJECT> pairSubjects) throws Exception {
+                                                       List<PAIR_SUBJECT> pairSubjects) {
         Map<Integer, ArrayList<SUBJECT>> map = new HashMap<>();
 
         for (PAIR_SUBJECT pairSubject : pairSubjects) {
@@ -368,15 +381,15 @@ public class SemesterPanel extends AbstractCommonPanel {
         chairsAndSubjectsTT.setPageLength(14);
         SubjectsMenuColumn menuColumn = new SubjectsMenuColumn();
         chairsAndSubjectsTT.addGeneratedColumn("subject", menuColumn);
-        chairsAndSubjectsTT.setColumnHeader("subject", "choose some");//TODO resource
+        chairsAndSubjectsTT.setColumnHeader("subject", getUILocaleUtil().getMessage("choose.field"));
 
         mainSubjectsVL.addComponent(chairsAndSubjectsTT);
     }
 
     private List<SUBJECT> getMainSubjects() throws Exception {
         QueryModel<SUBJECT> mainSubjectQM = new QueryModel<>(SUBJECT.class);
-        mainSubjectQM.addWhereNotNull("subjectCycle");
         mainSubjectQM.addWhere("deleted", false);
+        mainSubjectQM.addWhere("level", ECriteria.EQUAL, LEVEL.BACHELOR);
         mainSubjectQM.addWhere("mandatory", true);
         return SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
                 lookup(mainSubjectQM);
@@ -391,6 +404,7 @@ public class SemesterPanel extends AbstractCommonPanel {
         studentSubjectQM.addWhere(semesterDataFI, "semesterPeriod", ECriteria.EQUAL, semester.
                 getSemesterPeriod().getId());
         studentSubjectQM.addWhere("studentEducation", ECriteria.EQUAL, studentEducation.getId());
+        studentSubjectQM.addWhere("deleted", ECriteria.EQUAL, false);
         studentSubjectQM.addOrder("id");
         ArrayList<STUDENT_SUBJECT> studentSubjects = new ArrayList<>();
         try {
@@ -439,7 +453,7 @@ public class SemesterPanel extends AbstractCommonPanel {
     private void setTeachers() throws Exception {
         ArrayList<STUDENT_SUBJECT> studentSubjects = getStudentSubjects();
         if (!studentSubjects.isEmpty()) {
-            Label subjectLabel = new Label("choose a teacher");//TODO resource
+            Label subjectLabel = new Label(getUILocaleUtil().getCaption("choose.a.teacher"));
             getContent().addComponent(subjectLabel);
 
             List<OptionGroup> optionGroups = new ArrayList<>();
@@ -451,7 +465,7 @@ public class SemesterPanel extends AbstractCommonPanel {
                     teacherSubjectQM.addWhere("subject", ECriteria.EQUAL, subject.getId());
                     List<TEACHER_SUBJECT> teacherSubjects = SessionFacadeFactory.getSessionFacade(
                             CommonEntityFacadeBean.class).lookup(teacherSubjectQM);
-                    teacherOG.setMultiSelect(false);
+                    teacherOG.setMultiSelect(true);
                     for (TEACHER_SUBJECT teacherSubject : teacherSubjects) {
                         EMPLOYEE employee = teacherSubject.getEmployee();
                         teacherOG.addItem(teacherSubject);
@@ -473,17 +487,20 @@ public class SemesterPanel extends AbstractCommonPanel {
                     try {
                         List<STUDENT_TEACHER_SUBJECT> studentTeacherSubjects = new ArrayList<>();
                         for (OptionGroup optionGroup : optionGroups) {
-                            TEACHER_SUBJECT teacherSubject = ((TEACHER_SUBJECT) optionGroup.getValue());
+                            Set<TEACHER_SUBJECT> teacherSubjects = ((Set) optionGroup.getValue());
 
-                            if (teacherSubject != null) {
-                                STUDENT_TEACHER_SUBJECT studentTeacherSubject = new STUDENT_TEACHER_SUBJECT();
-                                studentTeacherSubject.setSemester(semester);
-                                studentTeacherSubject.setStudentEducation(studentEducation);
-                                studentTeacherSubject.setTeacherSubject(teacherSubject);
-                                studentTeacherSubjects.add(studentTeacherSubject);
+                            for (TEACHER_SUBJECT teacherSubject : teacherSubjects) {
+                                if (teacherSubject != null) {
+                                    STUDENT_TEACHER_SUBJECT studentTeacherSubject = new STUDENT_TEACHER_SUBJECT();
+                                    studentTeacherSubject.setSemester(semester);
+                                    studentTeacherSubject.setStudentEducation(studentEducation);
+                                    studentTeacherSubject.setTeacherSubject(teacherSubject);
+                                    studentTeacherSubjects.add(studentTeacherSubject);
+                                }
                             }
+                            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(studentTeacherSubjects);
                         }
-                        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(studentTeacherSubjects);
+
                         saveButton.setEnabled(false);
                         CommonUtils.showSavedNotification();
                     } catch (Exception e) {
@@ -491,10 +508,12 @@ public class SemesterPanel extends AbstractCommonPanel {
                     }
                 }
             });
-            for (STUDENT_TEACHER_SUBJECT studentTeacherSubject : getStudentTeacherSubject()) {
-                if (studentTeacherSubject.getSemester().equals(semester)) {
-                    saveButton.setEnabled(false);
-                    break;
+            if (!isAdmin) {
+                for (STUDENT_TEACHER_SUBJECT studentTeacherSubject : getStudentTeacherSubject()) {
+                    if (studentTeacherSubject.getSemester().equals(semester)) {
+                        saveButton.setEnabled(false);
+                        break;
+                    }
                 }
             }
             getContent().addComponent(saveButton);

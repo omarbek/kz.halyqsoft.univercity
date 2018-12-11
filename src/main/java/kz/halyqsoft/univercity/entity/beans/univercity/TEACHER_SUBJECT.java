@@ -26,19 +26,19 @@ public class TEACHER_SUBJECT extends AbstractEntity {
     @JoinColumns({
         @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
     private V_SUBJECT_SELECT subject;
-	
+
 	@FieldInfo(type = EFieldType.BOOLEAN, order = 9, required = false)
 	@Column(name = "FALL", nullable = false)
     private boolean fall;
-	
+
 	@FieldInfo(type = EFieldType.BOOLEAN, order = 10, required = false)
 	@Column(name = "SPRING", nullable = false)
     private boolean spring;
-	
+
 	@FieldInfo(type = EFieldType.BOOLEAN, order = 11, required = false)
 	@Column(name = "SUMMER", nullable = false)
     private boolean summer;
-	
+
 	@Column(name = "LOAD_PER_HOURS", nullable = false)
     private boolean loadPerHours;
 	
@@ -73,7 +73,7 @@ public class TEACHER_SUBJECT extends AbstractEntity {
 	public void setSpring(boolean spring) {
 		this.spring = spring;
 	}
-	
+
 	public boolean isSummer() {
 		return summer;
 	}

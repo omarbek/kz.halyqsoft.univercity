@@ -2,19 +2,29 @@ package kz.halyqsoft.univercity.utils;
 
 import org.apache.commons.lang3.math.NumberUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Omarbek
  * @created on 26.04.2018
  */
 public class TestUtils {
     public static void main(String[] args) {
-        String a = "1";
-        String b = "s";
-        if (NumberUtils.isCreatable(a)) {
-            System.out.println("a is number");
+        List<Integer> a=new ArrayList<>();
+        a.add(1);
+        a.add(2);
+        List<Integer> b=new ArrayList<>();
+        b.add(3);
+        b.add(4);
+        b.add(2);
+        a.addAll(b);
+        for(Integer i:a){
+            System.out.println(i);
         }
-        if (NumberUtils.isCreatable(b)) {
-            System.out.println("b is number");
+        System.out.println();
+        for (Integer i:b){
+            System.out.println(i);
         }
     }
 }

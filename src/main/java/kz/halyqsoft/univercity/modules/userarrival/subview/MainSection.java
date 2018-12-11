@@ -31,6 +31,7 @@ import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.DownloadDialo
 import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.MainDialog;
 import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.PrintDialog;
 import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.SimpleStatistics;
+import kz.halyqsoft.univercity.modules.userarrival.subview.reports.EmployeesArrivalReport;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.EmployeePdfCreator;
 import kz.halyqsoft.univercity.utils.PdfCreator;
@@ -346,6 +347,7 @@ public class MainSection implements FilterPanelListener {
                         "FROM (\n" +
                         "       SELECT\n" +
                         "         vs.groups_id,\n" +
+                        "         vs.id, \n" +
                         "         vs.group_name,\n" +
                         "         sy.study_year,\n" +
                         "         vs.speciality_id,\n" +
@@ -353,8 +355,8 @@ public class MainSection implements FilterPanelListener {
                         "         count(DISTINCT days.days)     cameDays,\n" +
                         "         count(DISTINCT all_days.days) allDays,\n" +
                         "         vs.advisor_name\n" +
-                        "       FROM user_arrival ua INNER JOIN v_student vs ON ua.user_id = vs.id\n" +
-                        "         INNER JOIN (\n" +
+                        "       FROM v_student vs LEFT JOIN user_arrival ua  ON ua.user_id = vs.id\n" +
+                        "         LEFT JOIN (\n" +
                         "                      SELECT date_trunc('day', dd) :: DATE days\n" +
                         "                      FROM generate_series\n" +
                         "                           ('"+formattedStartingDate+"' :: TIMESTAMP\n" +
@@ -379,12 +381,12 @@ public class MainSection implements FilterPanelListener {
                         "         INNER JOIN study_year sy ON sy.id = vs.study_year_id\n" +
                         "       GROUP BY vs.groups_id, vs.group_name, sy.study_year, ua.user_id, vs.advisor_name,\n" +
                         "         vs.speciality_id,\n" +
-                        "         vs.faculty_id\n" +
+                        "         vs.faculty_id, vs.id \n" +
                         "     ) newTable\n" +
                         "  INNER JOIN v_student vs ON newTable.groups_id = vs.groups_id\n" +
                         "  INNER JOIN groups vg ON newTable.groups_id = vg.id \n" +
                         "  LEFT JOIN v_employee ve ON ve.id = vg.curator_id "+
-                        " WHERE vs.student_status_id = 1 AND newTable.faculty_id = "+department.getId().getId().longValue()+"\n" +
+                        " WHERE vs.student_status_id = 1 and vg.deleted = false AND newTable.faculty_id = "+department.getId().getId().longValue()+"\n" +
                         " GROUP BY newTable.groups_id, newTable.group_name, newTable.study_year, \n" +
                         "  newTable.faculty_id,\n" +
                         "  newTable.speciality_id, FIO;";
@@ -422,7 +424,7 @@ public class MainSection implements FilterPanelListener {
 
                 PdfCreator pdfCreator = new PdfCreator();
 
-                Paragraph paragraph = new Paragraph("Халықаралық SILKWAY университеті", PdfUtils.getMainFont());
+                Paragraph paragraph = new Paragraph("SILKWAY Халықаралық Университеті", PdfUtils.getMainFont());
                 paragraph.setAlignment(Element.ALIGN_CENTER);
                 pdfCreator.add(paragraph);
 
@@ -541,7 +543,7 @@ public class MainSection implements FilterPanelListener {
         facultyCB.setWidth(200, Sizeable.Unit.PIXELS);
         QueryModel<DEPARTMENT> facultyQM = new QueryModel<>(DEPARTMENT.class);
         facultyQM.addWhere("deleted", ECriteria.EQUAL, false);
-        facultyQM.addWhereNullAnd("parent");
+        facultyQM.addWhereNotNullAnd("parent");
         BeanItemContainer<DEPARTMENT> facultyBIC = new BeanItemContainer<>(DEPARTMENT.class,
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(facultyQM));
         facultyCB.setContainerDataSource(facultyBIC);
@@ -555,115 +557,6 @@ public class MainSection implements FilterPanelListener {
         return statisticsFP;
     }
 
-
-    public Component setFooterTables() {
-        VerticalLayout innerVL = new VerticalLayout();
-        innerVL.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
-        innerVL.setSizeFull();
-        innerVL.setImmediate(true);
-
-        Label label = new Label();
-        label.setImmediate(true);
-        label.setCaptionAsHtml(true);
-        label.setCaption("<h2>    " + CommonUtils.getUILocaleUtil().getCaption("best.attendance") + "</h2>");
-        label.setSizeFull();
-
-        GridLayout topPerformanceGL = new GridLayout();
-        topPerformanceGL.setSizeFull();
-        topPerformanceGL.setColumns(2);
-        topPerformanceGL.setRows(2);
-        topPerformanceGL.setSpacing(true);
-
-        GridWidget bestStudentsGW = new GridWidget(VTopUserArrival.class);
-        bestStudentsGW.setSizeFull();
-        bestStudentsGW.showToolbar(false);
-        bestStudentsGW.setCaption(CommonUtils.getUILocaleUtil().getCaption("top.ten.students"));
-
-        DBGridModel bestStudentsGM = (DBGridModel) bestStudentsGW.getWidgetModel();
-        bestStudentsGM.setRefreshType(ERefreshType.MANUAL);
-        bestStudentsGM.setEntities(getUserList(dateField.getValue()));
-
-        GridWidget bestGroupsGW = new GridWidget(VTopGroupArrival.class);
-        bestGroupsGW.setSizeFull();
-        bestGroupsGW.showToolbar(false);
-        bestGroupsGW.setCaption(CommonUtils.getUILocaleUtil().getCaption("top.ten.groups"));
-
-        DBGridModel bestGroupsGM = (DBGridModel) bestGroupsGW.getWidgetModel();
-        bestGroupsGM.setRefreshType(ERefreshType.MANUAL);
-        bestGroupsGM.setEntities(getGroupList(dateField.getValue()));
-
-        Button printBtn1 = new Button(CommonUtils.getUILocaleUtil().getCaption("export"));
-        printBtn1.setImmediate(true);
-        printBtn1.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent clickEvent) {
-
-                List<String> tableHeader = new ArrayList<>();
-                List<List<String>> tableBody = new ArrayList<>();
-
-                String fileName = "document";
-
-                for (GridColumnModel gcm : bestStudentsGM.getColumnModels()) {
-                    tableHeader.add(gcm.getLabel());
-                }
-                for (int i = 0; i < bestStudentsGW.getAllEntities().size(); i++) {
-                    VTopUserArrival vUser = (VTopUserArrival) bestStudentsGW.getAllEntities().get(i);
-                    if (bestStudentsGW.getCaption() != null) {
-                        fileName = bestStudentsGW.getCaption();
-                    }
-                    List<String> list = new ArrayList<>();
-                    list.add(vUser.getFio());
-                    list.add(vUser.getGroup());
-                    list.add(vUser.getPercentage().toString());
-                    tableBody.add(list);
-                }
-
-
-                PrintDialog printDialog = new PrintDialog(tableHeader, tableBody, CommonUtils.getUILocaleUtil().getCaption("print"), fileName);
-            }
-        });
-
-        Button printBtn2 = new Button(CommonUtils.getUILocaleUtil().getCaption("export"));
-        printBtn2.setImmediate(true);
-        printBtn2.addClickListener(new Button.ClickListener() {
-            @Override
-            public void buttonClick(Button.ClickEvent clickEvent) {
-
-                List<String> tableHeader = new ArrayList<>();
-                List<List<String>> tableBody = new ArrayList<>();
-
-                String fileName = "document";
-
-                for (GridColumnModel gcm : bestGroupsGM.getColumnModels()) {
-                    tableHeader.add(gcm.getLabel());
-                }
-                for (int i = 0; i < bestGroupsGW.getAllEntities().size(); i++) {
-                    VTopGroupArrival vGroup = (VTopGroupArrival) bestGroupsGW.getAllEntities().get(i);
-                    if (bestGroupsGW.getCaption() != null) {
-                        fileName = bestGroupsGW.getCaption();
-                    }
-                    List<String> list = new ArrayList<>();
-                    list.add(vGroup.getGroup());
-                    list.add(vGroup.getTeacher());
-                    list.add(vGroup.getAttend() + "");
-                    list.add(vGroup.getPercent() + "");
-                    list.add(vGroup.getSumOfStudent() + "");
-                    tableBody.add(list);
-                }
-                PrintDialog printDialog = new PrintDialog(tableHeader, tableBody, CommonUtils.getUILocaleUtil().getCaption("print"), fileName);
-            }
-        });
-
-        topPerformanceGL.addComponent(printBtn1);
-        topPerformanceGL.addComponent(printBtn2);
-        topPerformanceGL.addComponent(bestStudentsGW);
-        topPerformanceGL.addComponent(bestGroupsGW);
-
-        innerVL.addComponent(label);
-        innerVL.addComponent(topPerformanceGL);
-
-        return innerVL;
-    }
 
 
     private void setValues() {
@@ -687,10 +580,10 @@ public class MainSection implements FilterPanelListener {
             mainHL.addComponent(setEmployees());
             mainHL.addComponent(setLaters());
             mainHL.addComponent(setNoCards());
-
             mainVL.addComponent(mainHL);
+
+            mainVL.addComponent(getEmployeesAttendanceReport());
             mainVL.addComponent(getStatistics());
-            mainVL.addComponent(setFooterTables());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -701,6 +594,16 @@ public class MainSection implements FilterPanelListener {
         return mainVL;
     }
 
+    private VerticalLayout getEmployeesAttendanceReport(){
+        EmployeesArrivalReport employeesArrivalReport = new EmployeesArrivalReport();
+        Label label = new Label();
+        label.setSizeFull();
+        label.setCaptionAsHtml(true);
+        label.setImmediate(true);
+        label.setCaption("<h2>    " + CommonUtils.getUILocaleUtil().getCaption("employeeAttendance") + "</h2>");
+        employeesArrivalReport.addComponentAsFirst(label);
+        return employeesArrivalReport;
+    }
     private Panel setNoCards() {
         Object[] info = getCardInfo();
         long all = (Long) info[0];
@@ -731,13 +634,17 @@ public class MainSection implements FilterPanelListener {
         allEmployees = (Long) SessionFacadeFactory.
                 getSessionFacade(CommonEntityFacadeBean.class).lookupItems(employeeQM);
 
-        String sql = "SELECT count(1) " +
-                "FROM user_arrival arriv INNER JOIN v_employee empl ON empl.id = arriv.user_id " +
-                "WHERE date_trunc('day', arriv.created) = date_trunc('day', TIMESTAMP '" + CommonUtils.getFormattedDate(dateField.getValue()) + "') " +
-                "      AND arriv.created = (SELECT max(max_arriv.created) " +
-                "                           FROM user_arrival max_arriv " +
-                " WHERE max_arriv.user_id = arriv.user_id) " +
-                "      AND come_in = TRUE";
+        String sql = "SELECT count(1)\n" +
+                "FROM user_arrival arriv\n" +
+                "  INNER JOIN v_employee empl ON empl.id = arriv.user_id\n" +
+                "  INNER JOIN (SELECT\n" +
+                "                max_arriv.user_id,\n" +
+                "                max(max_arriv.created) max\n" +
+                "              FROM user_arrival max_arriv\n" +
+                "              GROUP BY max_arriv.user_id\n" +
+                "    ) newTable on newTable.user_id = empl.id AND arriv.created = newTable.max\n" +
+                "WHERE date_trunc('day', arriv.created) = date_trunc('day', TIMESTAMP '"+CommonUtils.getFormattedDate(dateField.getValue())+"') AND\n" +
+                "       come_in = TRUE";
         Long inEmployees = (Long) SessionFacadeFactory.getSessionFacade(
                 CommonEntityFacadeBean.class).lookupSingle(sql, new HashMap<>());
         long inPercent = inEmployees * 100 / allEmployees;
@@ -774,15 +681,15 @@ public class MainSection implements FilterPanelListener {
     }
 
     private Panel setLaters() throws Exception {
-        String sql = "SELECT count(1) " +
-                "FROM user_arrival arriv INNER JOIN v_employee empl ON empl.id = arriv.user_id " +
-                "WHERE date_trunc('day', arriv.created) = date_trunc('day', now()) " +
-                "      AND arriv.created = (SELECT min(max_arriv.created) " +
-                "                           FROM user_arrival max_arriv " +
-                "                           WHERE max_arriv.user_id = arriv.user_id " +
-                "                                 AND date_trunc('day', max_arriv.created) = date_trunc('day', now()) " +
-                "                                 AND come_in = TRUE) " +
-                "      AND come_in = TRUE AND arriv.created :: TIME > '08:40:00';";
+        String sql = "SELECT count(1)\n" +
+                "                FROM user_arrival arriv INNER JOIN v_employee empl ON empl.id = arriv.user_id\n" +
+                "                  INNER JOIN (SELECT max_arriv.user_id , min(max_arriv.created) min\n" +
+                "                              FROM user_arrival max_arriv\n" +
+                "                              WHERE  date_trunc('day', max_arriv.created) = date_trunc('day', now())\n" +
+                "                                     AND come_in = TRUE GROUP BY max_arriv.user_id) newTable ON newTable.user_id = empl.id AND arriv.created = newTable.min\n" +
+                "                WHERE date_trunc('day', arriv.created) = date_trunc('day', now())\n" +
+                "\n" +
+                "                AND come_in = TRUE AND arriv.created :: TIME > '08:40:00';";
         Long lateEmpl = (Long) SessionFacadeFactory.getSessionFacade(
                 CommonEntityFacadeBean.class).lookupSingle(sql, new HashMap<>());
         long inPercent = lateEmpl * 100 / allEmployees;
@@ -807,13 +714,17 @@ public class MainSection implements FilterPanelListener {
         Long allStudents = (Long) SessionFacadeFactory.
                 getSessionFacade(CommonEntityFacadeBean.class).lookupItems(studentQM);
 
-        String sql = "SELECT count(1) " +
-                "FROM user_arrival arriv INNER JOIN v_student stu ON stu.id = arriv.user_id " +
-                "WHERE date_trunc('day', arriv.created) = date_trunc('day',  TIMESTAMP '" + CommonUtils.getFormattedDate(dateField.getValue()) + "') " +
-                "      AND arriv.created = (SELECT max(max_arriv.created) " +
-                "                           FROM user_arrival max_arriv " +
-                "                           WHERE max_arriv.user_id = arriv.user_id) " +
-                "      AND come_in = TRUE";
+        String sql = "SELECT count(1)\n" +
+                "FROM user_arrival arriv\n" +
+                "  INNER JOIN v_student empl ON empl.id = arriv.user_id\n" +
+                "  INNER JOIN (SELECT\n" +
+                "                max_arriv.user_id,\n" +
+                "                max(max_arriv.created) max\n" +
+                "              FROM user_arrival max_arriv\n" +
+                "              GROUP BY max_arriv.user_id\n" +
+                "             ) newTable on newTable.user_id = empl.id AND arriv.created = newTable.max\n" +
+                "WHERE date_trunc('day', arriv.created) = date_trunc('day', TIMESTAMP '"+CommonUtils.getFormattedDate(dateField.getValue())+"') AND\n" +
+                "      come_in = TRUE;";
         Long inStudents = (Long) SessionFacadeFactory.getSessionFacade(
                 CommonEntityFacadeBean.class).lookupSingle(sql, new HashMap<>());
         long inPercent = inStudents * 100 / allStudents;

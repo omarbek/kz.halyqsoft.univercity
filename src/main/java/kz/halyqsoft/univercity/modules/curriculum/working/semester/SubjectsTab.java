@@ -2,15 +2,13 @@ package kz.halyqsoft.univercity.modules.curriculum.working.semester;
 
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM;
-import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM_ADD_PROGRAM;
-import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM_DETAIL;
-import kz.halyqsoft.univercity.entity.beans.univercity.ELECTIVE_SUBJECT;
+import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_DATA;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_CURRICULUM_ADD_PROGRAM;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_CURRICULUM_AFTER_SEMESTER;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_CURRICULUM_DETAIL;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_ELECTIVE_SUBJECT;
 import kz.halyqsoft.univercity.modules.curriculum.working.main.AbstractCurriculumPanel;
@@ -40,60 +38,82 @@ import java.util.*;
  * @created 02.11.2018
  */
 @SuppressWarnings({"serial", "unchecked"})
-public final class SemesterDetailPanel extends AbstractCurriculumPanel implements EntityListener {
+public final class SubjectsTab extends AbstractCurriculumPanel implements EntityListener {
 
     private final SEMESTER semester;
     private CURRICULUM curriculum;
     private ENTRANCE_YEAR entranceYear;
+    private SubjectsType subjectType;
+
     private GridWidget mainSubjectsGW;
     private GridWidget electiveSubjectsGW;
     private GridWidget addingSubjectsGW;
+    private GridWidget afterSemesterSubjectsGW;
 
-    public SemesterDetailPanel(CurriculumView parentView, SEMESTER semester) {
+    public SubjectsTab(CurriculumView parentView, SEMESTER semester, SubjectsType subjectType) {
         super(parentView);
         this.semester = semester;
+        this.subjectType = subjectType;
     }
 
     @Override
     public void initPanel() {
         if (semester != null) {
-            mainSubjectsGW = initGridWidget(V_CURRICULUM_DETAIL.class, CURRICULUM_DETAIL.class,
-                    SubjectsType.MAIN_SUBJECTS);
-            electiveSubjectsGW = initGridWidget(V_ELECTIVE_SUBJECT.class, ELECTIVE_SUBJECT.class,
-                    SubjectsType.ELECTIVE_SUBJECTS);
+            mainSubjectsGW = initGridWidget(V_CURRICULUM_DETAIL.class, CURRICULUM_DETAIL.class, SubjectsType.MAIN_SUBJECTS);
+            electiveSubjectsGW = initGridWidget(V_ELECTIVE_SUBJECT.class, ELECTIVE_SUBJECT.class, SubjectsType.ELECTIVE_SUBJECTS);
         } else {
-            addingSubjectsGW = initGridWidget(V_CURRICULUM_ADD_PROGRAM.class, CURRICULUM_ADD_PROGRAM.class,
-                    SubjectsType.ADDING_SUBJECTS);
+            if (subjectType.equals(SubjectsType.ADDING_SUBJECTS)) {
+                addingSubjectsGW = initGridWidget(V_CURRICULUM_ADD_PROGRAM.class, CURRICULUM_ADD_PROGRAM.class, subjectType);
+            } else {
+                afterSemesterSubjectsGW = initGridWidget(V_CURRICULUM_AFTER_SEMESTER.class,
+                        CURRICULUM_AFTER_SEMESTER.class, subjectType);
+            }
         }
-
         if (curriculum != null) {
             refreshSubjects(curriculum, semester);
         }
     }
 
     private GridWidget initGridWidget(Class<? extends Entity> view,
-                                      Class<? extends Entity> table,
-                                      SubjectsType subjectsType) {
+                                      Class<? extends Entity> table, SubjectsType subjectType) {
         GridWidget currentGW = new GridWidget(view);
         currentGW.addEntityListener(this);
         currentGW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
-        currentGW.setButtonDescription(AbstractToolbar.ADD_BUTTON, "add.from.iups");
-        //currentGW.setButt(AbstractToolbar.ADD_BUTTON, "150px");
+        currentGW.addButtonClickListener(AbstractToolbar.REFRESH_BUTTON, new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                refreshSubjects(curriculum, semester);
+            }
+        });
+
+        currentGW.setButtonDescription(AbstractToolbar.ADD_BUTTON, "add.from.one.student");
+        //currentGW.setButtonWidth(AbstractToolbar.ADD_BUTTON, "180px");
+        currentGW.setButtonIcon(AbstractToolbar.ADD_BUTTON, "img/button/users.png");
         currentGW.addButtonClickListener(AbstractToolbar.ADD_BUTTON, new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
                 Message.showConfirm(getUILocaleUtil().getMessage("confirmation.save"), new AbstractYesButtonListener() {
                     @Override
                     public void buttonClick(Button.ClickEvent event) {
-                        addSubjectsFromIups(curriculum, semester, subjectsType);
+                        addSubjectsFromIups(curriculum, semester, subjectType, true);
                     }
                 });
             }
         });
-        currentGW.addButtonClickListener(AbstractToolbar.REFRESH_BUTTON, new Button.ClickListener() {
+
+        currentGW.setButtonVisible(AbstractToolbar.HELP_BUTTON, true);
+        currentGW.setButtonDescription(AbstractToolbar.HELP_BUTTON, "add.from.iups");
+        //currentGW.setButtonWidth(AbstractToolbar.HELP_BUTTON, "150px");
+        currentGW.setButtonIcon(AbstractToolbar.HELP_BUTTON, "img/button/add.png");
+        currentGW.addButtonClickListener(AbstractToolbar.HELP_BUTTON, new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent event) {
-                refreshSubjects(curriculum, semester);
+                Message.showConfirm(getUILocaleUtil().getMessage("confirmation.save"), new AbstractYesButtonListener() {
+                    @Override
+                    public void buttonClick(Button.ClickEvent event) {
+                        addSubjectsFromIups(curriculum, semester, subjectType, false);
+                    }
+                });
             }
         });
 
@@ -113,14 +133,15 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
         return currentGW;
     }
 
-    private void addSubjectsFromIups(CURRICULUM curriculum, SEMESTER semester,
-                                     SubjectsType subjectsType) {
-        boolean isMainSubjects = subjectsType.equals(SubjectsType.MAIN_SUBJECTS);
-        boolean isElectiveSubjects = subjectsType.equals(SubjectsType.ELECTIVE_SUBJECTS);
-        boolean isAddingSubjects = subjectsType.equals(SubjectsType.ADDING_SUBJECTS);
+    private void addSubjectsFromIups(CURRICULUM curriculum, SEMESTER semester, SubjectsType subjectType,
+                                     boolean fromOneStudent) {
+        boolean isMainSubjects = subjectType.equals(SubjectsType.MAIN_SUBJECTS);
+        boolean isElectiveSubjects = subjectType.equals(SubjectsType.ELECTIVE_SUBJECTS);
+        boolean isAddingSubjects = subjectType.equals(SubjectsType.ADDING_SUBJECTS);
+        boolean isAfterSemesterSubjects = subjectType.equals(SubjectsType.AFTER_SEMESTER_SUBJECTS);
         try {
             StringBuilder sqlSB = new StringBuilder("SELECT DISTINCT sem_subj.subject_id");
-            if (isAddingSubjects) {
+            if (isAddingSubjects || isAfterSemesterSubjects) {
                 sqlSB.append(", sem_subj.semester_data_id");
             }
             sqlSB.append(" FROM student_subject stu_subj " +
@@ -133,8 +154,15 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                     "  INNER JOIN teacher_subject teach_subj  " +
                     "    ON sem_subj.subject_id = teach_subj.subject_id " +
                     "  INNER JOIN student_teacher_subject stu_teach_subj " +
-                    "    ON stu_teach_subj.teacher_subject_id = teach_subj.id " +
-                    "WHERE usr.deleted = FALSE AND usr.locked = FALSE " +
+                    "    ON stu_teach_subj.teacher_subject_id = teach_subj.id ");
+            if (fromOneStudent) {
+                sqlSB.append("  INNER JOIN curriculum_individual_plan ind_plan" +
+                        "   on ind_plan.speciality_id = stu_edu.speciality_id" +
+                        "      and ind_plan.entrance_year_id = stu.entrance_year_id" +
+                        "      and ind_plan.diploma_type_id = stu.diploma_type_id" +
+                        "      and ind_plan.student_code = usr.code ");
+            }
+            sqlSB.append("WHERE usr.deleted = FALSE AND usr.locked = FALSE " +
                     "      AND subj.deleted = FALSE AND subj.level_id = 1 ");
             if (isMainSubjects) {
                 sqlSB.append(" AND subj.mandatory = TRUE AND subj.practice_type_id IS NULL" +
@@ -143,12 +171,14 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                 sqlSB.append(" AND subj.mandatory = FALSE AND subj.practice_type_id IS NULL" +
                         " AND subj.subject_cycle_id < 4");
             } else if (isAddingSubjects) {
-                sqlSB.append(" AND subj.practice_type_id IS NULL" +
+                sqlSB.append(" AND subj.mandatory = TRUE and subj.practice_type_id IS NULL" +
                         " AND subj.subject_cycle_id = 4");
+            } else {//after sem
+                sqlSB.append(" and subj.practice_type_id is not null and subject_cycle_id = 4");
             }
             sqlSB.append(" AND stu_edu.speciality_id = ?1 AND stu.diploma_type_id = ?2 " +
                     "      AND stu.entrance_year_id = ?3 ");
-            if (!isAddingSubjects) {
+            if (isMainSubjects || isElectiveSubjects) {
                 sqlSB.append("AND sem_subj.semester_data_id = ?4 ");
             }
             sqlSB.append("ORDER BY sem_subj.subject_id");
@@ -156,21 +186,28 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
             params.put(1, curriculum.getSpeciality().getId().getId());
             params.put(2, curriculum.getDiplomaType().getId().getId());
             params.put(3, curriculum.getEntranceYear().getId().getId());
-            if (!isAddingSubjects) {
-                SEMESTER_DATA semesterData = CommonUtils.getSemesterDataBySemesterAndEntranceYear(semester,
-                       entranceYear);
-                params.put(4, semesterData.getId().getId());
+            if (isMainSubjects || isElectiveSubjects) {
+                SEMESTER_DATA semesterData = null;
+                if (!isAfterSemesterSubjects) {
+                    semesterData = CommonUtils.getSemesterDataBySemesterAndEntranceYear(semester,
+                            entranceYear);
+                    params.put(4, semesterData.getId().getId());
+                }
                 List<Long> subjectIds = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
                         lookupItemsList(sqlSB.toString(), params);
                 if (isMainSubjects) {
                     initCurriculumDetail(curriculum, semester, subjectIds, semesterData);
-                } else {
+                } else {//elective subj
                     initElectiveSubject(curriculum, semester, subjectIds, semesterData);
                 }
             } else {
                 List<Object> subjectsBySemester = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class)
                         .lookupItemsList(sqlSB.toString(), params);
-                initAddingSubjects(curriculum, subjectsBySemester);
+                if (isAddingSubjects) {
+                    initAddingSubjects(curriculum, subjectsBySemester);
+                } else {//after sem
+                    initAfterSemesterSubject(curriculum, subjectsBySemester);
+                }
             }
             CommonUtils.showSavedNotification();
             refreshSubjects(curriculum, semester);
@@ -180,14 +217,63 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
         }
     }
 
+    private void initAfterSemesterSubject(CURRICULUM curriculum, List<Object> subjectsBySemester) throws Exception {
+        QueryModel<CURRICULUM_AFTER_SEMESTER> curriculumAfterSemesterQM = new QueryModel<>(
+                CURRICULUM_AFTER_SEMESTER.class);
+        curriculumAfterSemesterQM.addWhere("curriculum", ECriteria.EQUAL, curriculum.getId());
+        curriculumAfterSemesterQM.addWhere("deleted", false);
+        List<CURRICULUM_AFTER_SEMESTER> curriculumAfterSemesters = SessionFacadeFactory.getSessionFacade(
+                CommonEntityFacadeBean.class).lookup(curriculumAfterSemesterQM);
+        for (CURRICULUM_AFTER_SEMESTER curriculumAfterSemester : curriculumAfterSemesters) {
+            curriculumAfterSemester.setDeleted(true);
+            curriculumAfterSemester.setUpdated(new Date());
+        }
+        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(curriculumAfterSemesters);
+        for (Object object : subjectsBySemester) {
+            Object[] objects = (Object[]) object;
+            Long subjectId = (Long) objects[0];
+            Long semesterDataId = (Long) objects[1];
+
+            createCurriculumAfterSemester(curriculum, subjectId, semesterDataId);
+        }
+        List<Long> subjectIds = new ArrayList<>();
+        subjectIds.add(SUBJECT.DIPLOM);
+        subjectIds.add(SUBJECT.EXAM);
+        for (Long subjectId : subjectIds) {
+            createCurriculumAfterSemester(curriculum, subjectId, null);
+        }
+    }
+
+    private void createCurriculumAfterSemester(CURRICULUM curriculum, Long subjectId, Long semesterDataId) throws Exception {
+        CURRICULUM_AFTER_SEMESTER curriculumAfterSemester = new CURRICULUM_AFTER_SEMESTER();
+        curriculumAfterSemester.setDeleted(false);
+        curriculumAfterSemester.setCreated(new Date());
+        curriculumAfterSemester.setCurriculum(curriculum);
+        curriculumAfterSemester.setSubject(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean
+                .class).lookup(SUBJECT.class, ID.valueOf(subjectId)));
+        if (subjectId.equals(SUBJECT.DIPLOM)) {
+            curriculumAfterSemester.setCode("-");
+        }
+        if (semesterDataId != null) {
+            SEMESTER_DATA semesterData = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean
+                    .class).lookup(SEMESTER_DATA.class, ID.valueOf(semesterDataId));
+            curriculumAfterSemester.setSemesterData(semesterData);
+            curriculumAfterSemester.setSemester(CommonUtils.getSemesterBySemesterDataAndEntranceYear(
+                    semesterData, entranceYear));
+        }
+        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(curriculumAfterSemester);
+    }
+
     private void initAddingSubjects(CURRICULUM curriculum, List<Object> subjectsBySemester)
             throws Exception {
         QueryModel<CURRICULUM_ADD_PROGRAM> curriculumAddProgramQM = new QueryModel<>(CURRICULUM_ADD_PROGRAM.class);
         curriculumAddProgramQM.addWhere("curriculum", ECriteria.EQUAL, curriculum.getId());
+        curriculumAddProgramQM.addWhere("deleted", false);
         List<CURRICULUM_ADD_PROGRAM> curriculumAddPrograms = SessionFacadeFactory.getSessionFacade(
                 CommonEntityFacadeBean.class).lookup(curriculumAddProgramQM);
         for (CURRICULUM_ADD_PROGRAM curriculumAddProgram : curriculumAddPrograms) {
             curriculumAddProgram.setDeleted(true);
+            curriculumAddProgram.setUpdated(new Date());
         }
         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(curriculumAddPrograms);
         for (Object object : subjectsBySemester) {
@@ -212,14 +298,16 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
 
     private void initElectiveSubject(CURRICULUM curriculum, SEMESTER semester,
                                      List<Long> subjectIds, SEMESTER_DATA semesterData) throws Exception {
-        QueryModel<ELECTIVE_SUBJECT> curriculumDetailQM = new QueryModel<>(
+        QueryModel<ELECTIVE_SUBJECT> electSubjQM = new QueryModel<>(
                 ELECTIVE_SUBJECT.class);
-        curriculumDetailQM.addWhere("curriculum", ECriteria.EQUAL, curriculum.getId());
-        curriculumDetailQM.addWhere("semester", ECriteria.EQUAL, semester.getId());
+        electSubjQM.addWhere("curriculum", ECriteria.EQUAL, curriculum.getId());
+        electSubjQM.addWhere("semester", ECriteria.EQUAL, semester.getId());
+        electSubjQM.addWhere("deleted", false);
         List<ELECTIVE_SUBJECT> electiveSubjects = SessionFacadeFactory.getSessionFacade(
-                CommonEntityFacadeBean.class).lookup(curriculumDetailQM);
+                CommonEntityFacadeBean.class).lookup(electSubjQM);
         for (ELECTIVE_SUBJECT electiveSubject : electiveSubjects) {
             electiveSubject.setDeleted(true);
+            electiveSubject.setUpdated(new Date());
         }
         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(
                 electiveSubjects);
@@ -244,10 +332,12 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                 CURRICULUM_DETAIL.class);
         curriculumDetailQM.addWhere("curriculum", ECriteria.EQUAL, curriculum.getId());
         curriculumDetailQM.addWhere("semester", ECriteria.EQUAL, semester.getId());
+        curriculumDetailQM.addWhere("deleted", false);
         List<CURRICULUM_DETAIL> curriculumDetails = SessionFacadeFactory.getSessionFacade(
                 CommonEntityFacadeBean.class).lookup(curriculumDetailQM);
         for (CURRICULUM_DETAIL curriculumDetail : curriculumDetails) {
             curriculumDetail.setDeleted(true);
+            curriculumDetail.setUpdated(new Date());
         }
         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(
                 curriculumDetails);
@@ -271,13 +361,31 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                 refreshMainSubjects(curriculum, semester);
                 refreshElectiveSubjects(curriculum, semester);
             } else {
-                refreshAddingSubjects(curriculum);
+                if (subjectType.equals(SubjectsType.ADDING_SUBJECTS)) {
+                    refreshAddingSubjects(curriculum);
+                } else {
+                    refreshAfterSemesterSubjects(curriculum);
+                }
             }
             getParentView().setTotalCreditSum();
             getParentView().countSumOfCreditBySemester();
         } catch (Exception e) {
             CommonUtils.showMessageAndWriteLog("Unable to refresh subjects", e);
         }
+    }
+
+    private void refreshAfterSemesterSubjects(CURRICULUM curriculum) throws Exception {
+        List<V_CURRICULUM_AFTER_SEMESTER> curriculumAfterSemesters = new ArrayList<>();
+        if (curriculum.getId() != null) {
+            QueryModel<V_CURRICULUM_AFTER_SEMESTER> curriculumAfterSemesterQM = new QueryModel<>(
+                    V_CURRICULUM_AFTER_SEMESTER.class);
+            curriculumAfterSemesterQM.addWhere("curriculum", ECriteria.EQUAL, curriculum.getId());
+            curriculumAfterSemesters = SessionFacadeFactory.getSessionFacade(
+                    CommonEntityFacadeBean.class).lookup(curriculumAfterSemesterQM);
+
+        }
+        ((DBGridModel) afterSemesterSubjectsGW.getWidgetModel()).setEntities(curriculumAfterSemesters);
+        afterSemesterSubjectsGW.refresh();
     }
 
     private void refreshMainSubjects(CURRICULUM curriculum, SEMESTER semester) throws Exception {
@@ -325,13 +433,12 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
     }
 
     @Override
-    public void refresh() throws Exception {
+    public void refresh() {
         refreshSubjects(curriculum, semester);
     }
 
-    public Integer getTotalCredit(SubjectsType subjectsType) {
-        if (SubjectsType.ADDING_SUBJECTS.equals(subjectsType)) {
-
+    public Integer getTotalCredit() {
+        if (SubjectsType.ADDING_SUBJECTS.equals(subjectType)) {
             Integer addingSubjectsCredit = (Integer) ((DBGridModel) addingSubjectsGW.getWidgetModel()).
                     getFooterValue("credit");
             List<Entity> addingSubjects = addingSubjectsGW.getAllEntities();
@@ -343,6 +450,18 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
             }
             addingSubjectsGW.setFooterValue("credit", addingSubjectsCredit);
             return addingSubjectsCredit;
+        } else if (SubjectsType.AFTER_SEMESTER_SUBJECTS.equals(subjectType)) {
+            Integer afterSemesterSubjectsCredit = (Integer) ((DBGridModel) afterSemesterSubjectsGW
+                    .getWidgetModel()).getFooterValue("credit");
+            List<Entity> afterSemesterSubjects = afterSemesterSubjectsGW.getAllEntities();
+            for (Entity item : afterSemesterSubjects) {
+                V_CURRICULUM_AFTER_SEMESTER curriculumAfterSemester = (V_CURRICULUM_AFTER_SEMESTER) item;
+                if (curriculumAfterSemester.getSubjectCode() == null) {
+                    afterSemesterSubjectsCredit -= curriculumAfterSemester.getCredit();
+                }
+            }
+            afterSemesterSubjectsGW.setFooterValue("credit", afterSemesterSubjectsCredit);
+            return afterSemesterSubjectsCredit;
         } else {
             Integer mainSubjectsCredit = (Integer) ((DBGridModel) mainSubjectsGW.getWidgetModel()).
                     getFooterValue("credit");
@@ -371,9 +490,9 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
         }
     }
 
-    public void checkForConform(SubjectsType subjectsType) throws Exception {
+    public void checkForConform() throws Exception {
         if (isCheckSemester()) {
-            if (getTotalCredit(subjectsType) == 0) {
+            if (getTotalCredit() == 0) {
                 String message = String.format(getUILocaleUtil().getMessage(
                         "no.subject.for.semester"), getSemester().getId().toString());
                 throw new Exception(message);
@@ -434,7 +553,7 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
     }
 
     @Override
-    public boolean preSave(Object o, Entity entity, boolean b, int i) throws Exception {
+    public boolean preSave(Object o, Entity entity, boolean b, int i) {
         return true;
     }
 
@@ -446,6 +565,7 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                     CURRICULUM_DETAIL curriculumDetail = SessionFacadeFactory.getSessionFacade(
                             CommonEntityFacadeBean.class).lookup(CURRICULUM_DETAIL.class, entity.getId());
                     curriculumDetail.setDeleted(true);
+                    curriculumDetail.setUpdated(new Date());
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
                             merge(curriculumDetail);
                 }
@@ -454,6 +574,7 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                     ELECTIVE_SUBJECT electiveSubject = SessionFacadeFactory.getSessionFacade(
                             CommonEntityFacadeBean.class).lookup(ELECTIVE_SUBJECT.class, entity.getId());
                     electiveSubject.setDeleted(true);
+                    electiveSubject.setUpdated(new Date());
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
                             merge(electiveSubject);
                 }
@@ -462,8 +583,18 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
                     CURRICULUM_ADD_PROGRAM curriculumAddProgram = SessionFacadeFactory.getSessionFacade(
                             CommonEntityFacadeBean.class).lookup(CURRICULUM_ADD_PROGRAM.class, entity.getId());
                     curriculumAddProgram.setDeleted(true);
+                    curriculumAddProgram.setUpdated(new Date());
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
                             merge(curriculumAddProgram);
+                }
+            } else if (o.equals(afterSemesterSubjectsGW)) {
+                for (Entity entity : list) {
+                    CURRICULUM_AFTER_SEMESTER curriculumAfterSemester = SessionFacadeFactory.getSessionFacade(
+                            CommonEntityFacadeBean.class).lookup(CURRICULUM_AFTER_SEMESTER.class, entity.getId());
+                    curriculumAfterSemester.setDeleted(true);
+                    curriculumAfterSemester.setUpdated(new Date());
+                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
+                            merge(curriculumAfterSemester);
                 }
             }
             refreshSubjects(curriculum, semester);
@@ -506,9 +637,14 @@ public final class SemesterDetailPanel extends AbstractCurriculumPanel implement
         this.entranceYear = entranceYear;
     }
 
+    public SubjectsType getSubjectType() {
+        return subjectType;
+    }
+
     public enum SubjectsType {
         MAIN_SUBJECTS,
         ELECTIVE_SUBJECTS,
-        ADDING_SUBJECTS
+        ADDING_SUBJECTS,
+        AFTER_SEMESTER_SUBJECTS
     }
 }

@@ -68,7 +68,6 @@ public class PrintDialog extends AbstractDialog{
             fileDownloaderr.extend(pdfBtn);
         }
 
-
         excelBtn = new Button("EXCEL");
         excelBtn.setImmediate(true);
 
@@ -141,6 +140,7 @@ public class PrintDialog extends AbstractDialog{
         PdfWriter.getInstance(iText_xls_2_pdf, byteArrayOutputStream);
         iText_xls_2_pdf.open();
         PdfPTable my_table = new PdfPTable(createExcel.getTableHeader().size());
+        my_table.setWidthPercentage(100);
         PdfPCell table_cell;
 
         while (rowIterator.hasNext()) {

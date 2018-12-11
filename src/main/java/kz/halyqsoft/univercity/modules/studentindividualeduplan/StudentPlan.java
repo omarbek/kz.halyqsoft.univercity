@@ -15,7 +15,6 @@ import java.util.LinkedList;
 
 public class StudentPlan extends AbstractTaskView{
 
-    private LinkedList pagesList = new LinkedList<GridWidget>();
     private VerticalLayout mainVL;
     private Button backBtn;
     public StudentPlan(AbstractTask task) throws Exception {
