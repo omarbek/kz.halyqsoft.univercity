@@ -3,14 +3,13 @@ package kz.halyqsoft.univercity.modules.pdf;
 import com.vaadin.data.Property;
 import com.vaadin.server.BrowserWindowOpener;
 import com.vaadin.server.StreamResource;
-import com.vaadin.shared.ui.window.WindowMode;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.PDF_DOCUMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.PDF_PROPERTY;
 import kz.halyqsoft.univercity.modules.pdf.dialogs.CustomFieldsView;
-import kz.halyqsoft.univercity.utils.EmployeePdfCreator;
 import kz.halyqsoft.univercity.utils.CommonUtils;
+import kz.halyqsoft.univercity.utils.EmployeePdfCreator;
 import kz.halyqsoft.univercity.utils.FieldValidator;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -20,7 +19,6 @@ import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.view.AbstractCommonView;
 import org.r3a.common.vaadin.widget.dialog.Message;
 
-import javax.persistence.NoResultException;
 import java.io.ByteArrayOutputStream;
 import java.util.*;
 import java.util.Calendar;
@@ -28,7 +26,7 @@ import java.util.Calendar;
 public class PdfEdit extends AbstractCommonView {
 
     private StreamResource myResource;
-    private ArrayList<CustomField> customFieldList = new ArrayList<>();
+    private ArrayList<CustomField>  customFieldList = new ArrayList<>();
     private StreamResource.StreamSource streamSource;
     private BrowserWindowOpener opener;
     private Button openPdfButton = new Button(getUILocaleUtil().getCaption("open"));

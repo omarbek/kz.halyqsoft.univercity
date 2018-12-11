@@ -1,12 +1,12 @@
 package kz.halyqsoft.univercity.modules.schedule;
 
-import com.vaadin.data.Property;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.server.ThemeResource;
+import com.vaadin.shared.ui.combobox.FilteringMode;
+import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.USERS;
+import kz.halyqsoft.univercity.entity.beans.univercity.GROUPS;
 import kz.halyqsoft.univercity.entity.beans.univercity.SCHEDULE_DETAIL;
-import kz.halyqsoft.univercity.entity.beans.univercity.STREAM_GROUP;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.EMPLOYEE_TYPE;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.LESSON_TYPE;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_DATA;
@@ -32,6 +32,7 @@ import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 
 import javax.persistence.NoResultException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ScheduleDetailEdit extends AbstractDialog implements EntityListener {
@@ -43,11 +44,11 @@ public class ScheduleDetailEdit extends AbstractDialog implements EntityListener
     private final boolean isNew;
     private ID scheduleDeatilID;
     private  LESSON_TYPE lessonTypes;
-    private FormModel scheduleFM;
-
+    private ComboBox groupsCB;
+    private VerticalLayout mainVL;
     private static final int INFORMATIONAL_STUDY_DIRECT = 9;
     private static final String COMPUTER = "Компьютер";
-
+    private ArrayList<ComboBox> groupsCBs = new ArrayList<>();
     private static final int LECTURE = 1;
     private static final int PRACTICE = 3;
 
@@ -74,27 +75,79 @@ public class ScheduleDetailEdit extends AbstractDialog implements EntityListener
         setWidth("700");
         center();
 
+        HorizontalLayout HL = new HorizontalLayout();
+        HL.setSpacing(true);
         scheduleDetailCFW = getScheduleDetailCFW();
-        FKFieldModel lessonFM = (FKFieldModel) scheduleFM.getFieldModel("lessonType");
-        if(scheduleFM.getFieldModel("group").getValue()!=null&&scheduleFM.getFieldModel("stream").getValue()!=null) {
-            lessonFM.getListeners().add(new Property.ValueChangeListener() {
-                @Override
-                public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
-                    if (lessonFM.getValue() != null) {
-                        if (lessonFM.getValue().equals(lessonTypes)) {
-                            scheduleFM.getFieldModel("group").setReadOnly(true);
-                            scheduleFM.getFieldModel("stream").getField().setEnabled(true);
-                        } else {
-                            scheduleFM.getFieldModel("group").setReadOnly(false);
-                            scheduleFM.getFieldModel("stream").getField().setEnabled(false);
-                        }
-                    }
+
+        Label label = new Label(getUILocaleUtil().getEntityLabel(GROUPS.class));
+
+        mainVL = new VerticalLayout();
+        mainVL.setSpacing(true);
+
+        groupsCB = new ComboBox();
+        groupsCB.setNullSelectionAllowed(true);
+        groupsCB.setTextInputAllowed(true);
+        groupsCB.setWidth("300");
+        groupsCB.setFilteringMode(FilteringMode.STARTSWITH);
+        QueryModel<GROUPS> groupsQueryModel = new QueryModel<>(GROUPS.class);
+        groupsQueryModel.addWhere("deleted",ECriteria.EQUAL,false);
+        BeanItemContainer<GROUPS> groupsBIC = new BeanItemContainer<>(GROUPS.class,
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(groupsQueryModel));
+        groupsCB.setContainerDataSource(groupsBIC);
+
+        Button addComponentButton = new Button(new ThemeResource("img/button/add.png"));
+        addComponentButton.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+
+                HorizontalLayout HLayout = new HorizontalLayout();
+                HLayout.setSpacing(true);
+
+                Label label = new Label(getUILocaleUtil().getEntityLabel(GROUPS.class));
+
+                groupsCB = new ComboBox();
+                groupsCB.setNullSelectionAllowed(true);
+                groupsCB.setTextInputAllowed(true);
+                groupsCB.setWidth("300");
+                groupsCB.setFilteringMode(FilteringMode.STARTSWITH);
+                QueryModel<GROUPS> groupsQM = new QueryModel<>(GROUPS.class);
+                groupsQM.addWhere("deleted",ECriteria.EQUAL,false);
+                BeanItemContainer<GROUPS> groupsBIC = null;
+                try {
+                    groupsBIC = new BeanItemContainer<>(GROUPS.class,
+                            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(groupsQM));
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            });
-        }
+                groupsCB.setContainerDataSource(groupsBIC);
+                groupsCBs.add(groupsCB);
+                HLayout.addComponent(label);
+                HLayout.setComponentAlignment(label,Alignment.MIDDLE_CENTER);
+                HLayout.addComponent(groupsCB);
+                HLayout.setComponentAlignment(groupsCB,Alignment.MIDDLE_CENTER);
+                HLayout.addComponent(addComponentButton);
+                HLayout.setComponentAlignment(addComponentButton,Alignment.MIDDLE_CENTER);
+
+                mainVL.addComponent(HLayout);
+                mainVL.setComponentAlignment(HLayout,Alignment.MIDDLE_CENTER);
+
+            }
+        });
+
+        HL.addComponent(label);
+        HL.setComponentAlignment(label,Alignment.MIDDLE_CENTER);
+        HL.addComponent(groupsCB);
+        groupsCBs.add(groupsCB);
+        HL.setComponentAlignment(groupsCB,Alignment.MIDDLE_LEFT);
+        HL.addComponent(addComponentButton);
+        HL.setComponentAlignment(addComponentButton,Alignment.MIDDLE_CENTER);
 
         getContent().addComponent(scheduleDetailCFW);
         getContent().setComponentAlignment(scheduleDetailCFW,Alignment.MIDDLE_CENTER);
+        mainVL.addComponent(HL);
+        mainVL.setComponentAlignment(HL,Alignment.MIDDLE_CENTER);
+        getContent().addComponent(mainVL);
+        getContent().setComponentAlignment(mainVL,Alignment.MIDDLE_CENTER);
 
         Button saveButton = CommonUtils.createSaveButton();
         saveButton.addClickListener(new Button.ClickListener() {
@@ -108,6 +161,13 @@ public class ScheduleDetailEdit extends AbstractDialog implements EntityListener
             }
         });
 
+        Button cancelButton = CommonUtils.createCancelButton();
+        cancelButton.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent ev) {
+                scheduleDetailCFW.cancel();
+            }
+        });
         Button closeButton = new Button(getUILocaleUtil().getCaption("close"));
         closeButton.addClickListener(new Button.ClickListener() {
             @Override
@@ -121,11 +181,13 @@ public class ScheduleDetailEdit extends AbstractDialog implements EntityListener
         });
 
         HorizontalLayout buttonsHL = CommonUtils.createButtonPanel();
-        buttonsHL.addComponents(saveButton, closeButton);
+        buttonsHL.addComponents(saveButton, cancelButton);
         buttonsHL.setComponentAlignment(saveButton, Alignment.MIDDLE_CENTER);
-        buttonsHL.setComponentAlignment(closeButton, Alignment.MIDDLE_CENTER);
+        buttonsHL.setComponentAlignment(cancelButton, Alignment.MIDDLE_CENTER);
         getContent().addComponent(buttonsHL);
         getContent().setComponentAlignment(buttonsHL, Alignment.MIDDLE_CENTER);
+        getContent().addComponent(closeButton);
+        getContent().setComponentAlignment(closeButton,Alignment.MIDDLE_CENTER);
 
         AbstractWebUI.getInstance().addWindow(this);
     }
@@ -134,18 +196,14 @@ public class ScheduleDetailEdit extends AbstractDialog implements EntityListener
 
         CommonFormWidget scheduleDetailCFW = new CommonFormWidget(SCHEDULE_DETAIL.class);
         scheduleDetailCFW.addEntityListener(new ScheduleDetailListener());
-        scheduleFM = scheduleDetailCFW.getWidgetModel();
-        FKFieldModel fkfm = (FKFieldModel) scheduleFM.getFieldModel("stream");
-        fkfm.setDialogHeight(400);
-        fkfm.setDialogWidth(500);
-        QueryModel streamQM = ((FKFieldModel)scheduleFM.getFieldModel("stream")).getQueryModel();
-        streamQM.addJoin(EJoin.LEFT_JOIN,"id",STREAM_GROUP.class,"stream_id");
+        FormModel scheduleFM = scheduleDetailCFW.getWidgetModel();
+        scheduleFM.getFieldModel("group").setInView(false);
+        scheduleFM.getFieldModel("group").setInEdit(false);
         QueryModel scheduleDetailTeacherQM = ((FKFieldModel)scheduleFM.getFieldModel("teacher")).getQueryModel();
         scheduleDetailTeacherQM.addJoin(EJoin.INNER_JOIN,"id" , USERS.class ,"id");
         FromItem vEmployeeFI = scheduleDetailTeacherQM.addJoin(EJoin.INNER_JOIN,"id", V_EMPLOYEE.class,"id");
         scheduleDetailTeacherQM.addWhere(vEmployeeFI , "employeeType" , ECriteria.EQUAL , EMPLOYEE_TYPE.TEACHER_ID);
         ((FKFieldModel)scheduleFM.getFieldModel("subject")).getQueryModel().addWhere("deleted", ECriteria.EQUAL , false);
-        ((FKFieldModel)scheduleFM.getFieldModel("group")).getQueryModel().addWhere("deleted", ECriteria.EQUAL , false);
 
         String errorMessage = getUILocaleUtil().getCaption("title.error").concat(": ").
                 concat("Binding elective subject");
@@ -182,13 +240,24 @@ public class ScheduleDetailEdit extends AbstractDialog implements EntityListener
             SCHEDULE_DETAIL scheduleDetail = (SCHEDULE_DETAIL) e;
             if (isNew) {
 
-                if(scheduleFM.getFieldModel("group").getField()!=null&&scheduleFM.getFieldModel("stream").getField()!=null) {
+                for(ComboBox cb : groupsCBs) {
+                    if(cb.getValue()==null){
+                        Message.showError("Fill all cbs");
+                        return false;
+                    }
+                }
 
+                for(ComboBox cb : groupsCBs) {
+                    GROUPS groups = (GROUPS) cb.getValue();
+                    scheduleDetail.setId(null);
+                    scheduleDetail.setGroup(groups);
                     scheduleDetail.setWeekDay((WEEK_DAY) scheduleManual.getWeekDayGW().getSelectedEntity());
                     scheduleDetail.setSemesterData((SEMESTER_DATA) scheduleManual.getSemesterDataCB().getValue());
-                }
-                try {
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(scheduleDetail);
+                }
+
+
+                try {
                     scheduleDetailCFW.getWidgetModel().loadEntity(scheduleDetail.getId());
                     scheduleDetailCFW.refresh();
 
@@ -227,15 +296,14 @@ public class ScheduleDetailEdit extends AbstractDialog implements EntityListener
 
         @Override
         public void onCreate(Object o, Entity entity, int i) {
-            if(o.equals(scheduleFM)){
-                scheduleFM.getFieldModel("group").getField().setEnabled(false);
-                scheduleFM.getFieldModel("stream").getField().setEnabled(false);
 
-            }
         }
 
         @Override
         public boolean onEdit(Object o, Entity entity, int i) {
+            SCHEDULE_DETAIL scheduleDetailEdit = (SCHEDULE_DETAIL)groupsCB.getValue();
+            groupsCB.setValue(scheduleDetailEdit);
+
             return true;
         }
 
@@ -368,4 +436,11 @@ public class ScheduleDetailEdit extends AbstractDialog implements EntityListener
 
     }
 
+    public ComboBox getGroupsCB() {
+        return groupsCB;
+    }
+
+    public void setGroupsCB(ComboBox groupsCB) {
+        this.groupsCB = groupsCB;
+    }
 }

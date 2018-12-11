@@ -211,6 +211,7 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
         if (!isNew) {
             studentBindingElectiveFM.getFieldModel("semester").setReadOnly(true);
         }
+
         QueryModel<SEMESTER> semesterQM = new QueryModel<>(SEMESTER.class);
         semesterQM.addJoin(EJoin.INNER_JOIN, "id", ELECTIVE_BINDED_SUBJECT.class,
                 "semester");
@@ -222,7 +223,6 @@ public class BindingElectiveSubjectEdit extends AbstractDialog {
         }
 
         QueryModel studentQM = ((FKFieldModel) studentBindingElectiveFM.getFieldModel("semester")).getQueryModel();
-
         if (isNew) {
             ELECTIVE_BINDED_SUBJECT studentCreativeExam = (ELECTIVE_BINDED_SUBJECT) studentBindingElectiveFM.createNew();
         } else {
