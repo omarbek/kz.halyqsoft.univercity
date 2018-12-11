@@ -6,8 +6,6 @@ import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.TreeTable;
 import com.vaadin.ui.VerticalLayout;
 import kz.halyqsoft.univercity.modules.reports.MenuColumn;
-import org.r3a.common.entity.beans.AbstractTask;
-import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.dialog.Message;
 
 import java.util.ArrayList;
@@ -19,7 +17,7 @@ public class WorkflowViewContent {
     VerticalLayout tab2MainVL;
     HorizontalSplitPanel mainHSP;
     VerticalLayout secondMainVL;
-
+    public static boolean isForHRD;
     public static String MY_DOCUMENTS = getUILocaleUtil().getCaption("my_documents");
 
     public static String CREATE = getUILocaleUtil().getCaption("create");
@@ -32,8 +30,9 @@ public class WorkflowViewContent {
     public static String I_ON_AGREE = getUILocaleUtil().getCaption("on_agree")+" ";
     public static String I_ON_SIGN = getUILocaleUtil().getCaption("on_sign")+" ";
 
-    public WorkflowViewContent() {
+    public WorkflowViewContent(boolean isForHRD) {
         initView();
+        WorkflowViewContent.isForHRD = isForHRD;
     }
 
     public void initView(){

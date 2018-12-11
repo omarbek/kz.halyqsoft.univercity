@@ -7,5 +7,11 @@
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://localhost:5432/college</jdbc-url>
     </data-source>
+    <data-source source="LOCAL" name="univerdb@localhost" uuid="6c0f0188-366c-4344-bf35-ce43b5e7482f">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:5432/univerdb</jdbc-url>
+    </data-source>
   </component>
 </project>

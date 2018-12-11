@@ -6,7 +6,6 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.CheckBox;
-import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.PDF_DOCUMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.PDF_DOCUMENT_TYPE;
 import kz.halyqsoft.univercity.utils.CommonUtils;
@@ -33,7 +32,7 @@ public class CustomField {
     TextField pdfTitle;
     TextField title;
     TextField deadlineDays;
-    CheckBox forStudentsCheckBox;
+    CheckBox forHumanResourceDepartmentCheckBox;
     TextField order;
 
     static final String BOLD = "Bold";
@@ -67,7 +66,7 @@ public class CustomField {
         this.centerCheckBox = new CheckBox();
         this.rightCheckBox = new CheckBox();
         this.customCheckBox = new CheckBox();
-        this.forStudentsCheckBox= new CheckBox();
+        this.forHumanResourceDepartmentCheckBox = new CheckBox();
 
         this.textField = new TextArea(CommonUtils.getUILocaleUtil().getCaption("text") + ":");
         this.pdfDocumentTypeComboBox.setCaption(CommonUtils.getUILocaleUtil().getEntityLabel(PDF_DOCUMENT_TYPE.class) + ":");
@@ -82,7 +81,7 @@ public class CustomField {
         this.centerCheckBox.setCaption(CommonUtils.getUILocaleUtil().getCaption("text.center") + ":");
         this.rightCheckBox.setCaption(CommonUtils.getUILocaleUtil().getCaption("text.right") + ":");
         this.customCheckBox.setCaption(CommonUtils.getUILocaleUtil().getCaption("text.custom") + ":");
-        this.forStudentsCheckBox.setCaption(CommonUtils.getUILocaleUtil().getEntityFieldLabel(PDF_DOCUMENT.class, "forStudents") + ":");
+        this.forHumanResourceDepartmentCheckBox.setCaption(CommonUtils.getUILocaleUtil().getEntityFieldLabel(PDF_DOCUMENT.class, "forHumanResourceDepartment") + ":");
 
         this.textField.setRequired(true);
         this.xComboBox.setRequired(true);
@@ -107,7 +106,7 @@ public class CustomField {
         this.centerCheckBox.setImmediate(true);
         this.rightCheckBox.setImmediate(true);
         this.customCheckBox.setImmediate(true);
-        this.forStudentsCheckBox.setImmediate(true);
+        this.forHumanResourceDepartmentCheckBox.setImmediate(true);
 
         List<PDF_DOCUMENT_TYPE> list = null;
         try{
@@ -244,12 +243,12 @@ public class CustomField {
         this.customCheckBox = customCheckBox;
     }
 
-    public CheckBox getForStudentsCheckBox() {
-        return forStudentsCheckBox;
+    public CheckBox getForHumanResourceDepartmentCheckBox() {
+        return forHumanResourceDepartmentCheckBox;
     }
 
-    public void setForStudentsCheckBox(CheckBox forStudentsCheckBox) {
-        this.forStudentsCheckBox = forStudentsCheckBox;
+    public void setForHumanResourceDepartmentCheckBox(CheckBox forHumanResourceDepartmentCheckBox) {
+        this.forHumanResourceDepartmentCheckBox = forHumanResourceDepartmentCheckBox;
     }
 
     public ComboBox getPdfDocumentTypeComboBox() {
