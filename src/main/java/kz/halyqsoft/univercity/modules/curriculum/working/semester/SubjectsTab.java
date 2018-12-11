@@ -87,7 +87,7 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
         });
 
         currentGW.setButtonDescription(AbstractToolbar.ADD_BUTTON, "add.from.one.student");
-        //currentGW.setButtonWidth(AbstractToolbar.ADD_BUTTON, "180px");
+        currentGW.setButtonWidth(AbstractToolbar.ADD_BUTTON, "180px");//DO NOT COMMENT!!!
         currentGW.setButtonIcon(AbstractToolbar.ADD_BUTTON, "img/button/users.png");
         currentGW.addButtonClickListener(AbstractToolbar.ADD_BUTTON, new Button.ClickListener() {
             @Override
@@ -103,7 +103,7 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
 
         currentGW.setButtonVisible(AbstractToolbar.HELP_BUTTON, true);
         currentGW.setButtonDescription(AbstractToolbar.HELP_BUTTON, "add.from.iups");
-        //currentGW.setButtonWidth(AbstractToolbar.HELP_BUTTON, "150px");
+        currentGW.setButtonWidth(AbstractToolbar.HELP_BUTTON, "150px");//DO NOT COMMENT!!!
         currentGW.setButtonIcon(AbstractToolbar.HELP_BUTTON, "img/button/add.png");
         currentGW.addButtonClickListener(AbstractToolbar.HELP_BUTTON, new Button.ClickListener() {
             @Override
@@ -646,5 +646,21 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
         ELECTIVE_SUBJECTS,
         ADDING_SUBJECTS,
         AFTER_SEMESTER_SUBJECTS
+    }
+
+    public GridWidget getMainSubjectsGW() {
+        return mainSubjectsGW;
+    }
+
+    public GridWidget getElectiveSubjectsGW() {
+        return electiveSubjectsGW;
+    }
+
+    public GridWidget getAddingSubjectsGW() {
+        return addingSubjectsGW;
+    }
+
+    public GridWidget getAfterSemesterSubjectsGW() {
+        return afterSemesterSubjectsGW;
     }
 }

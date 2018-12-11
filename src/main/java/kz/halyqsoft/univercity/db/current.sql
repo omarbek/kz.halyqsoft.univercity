@@ -8,3 +8,5 @@ ALTER TABLE ONLY privileges
   ADD CONSTRAINT pk_privileges PRIMARY KEY (id);
 
 insert into privileges values (1,'ИУПС',true);
+
+update curriculum set status_id=1;
