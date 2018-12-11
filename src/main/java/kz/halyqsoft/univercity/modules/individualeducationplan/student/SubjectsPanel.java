@@ -9,7 +9,6 @@ import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
-import org.r3a.common.entity.ID;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.from.EJoin;
 import org.r3a.common.entity.query.from.FromItem;
@@ -33,13 +32,19 @@ public class SubjectsPanel extends AbstractCommonPanel {
     private boolean isAdmin;
     private VerticalLayout teacherVL;
     private List<STUDENT_SUBJECT> studentSubjects;
+    private boolean canAccess;
 
-    SubjectsPanel(SEMESTER semester, STUDENT_EDUCATION studentEducation, boolean isAdmin) {
+    SubjectsPanel(SEMESTER semester, STUDENT_EDUCATION studentEducation, boolean isAdmin) throws Exception {
         this.semester = semester;
         this.studentEducation = studentEducation;
         this.isAdmin = isAdmin;
         chosenMainlist = new ArrayList<>();
         teacherVL = new VerticalLayout();
+
+        QueryModel<PRIVILEGES> privilegesQM = new QueryModel<>(PRIVILEGES.class);
+        privilegesQM.addWhere("id", ECriteria.EQUAL, PRIVILEGES.IUPS);
+        PRIVILEGES privileges = CommonUtils.getQuery().lookupSingle(privilegesQM);
+        canAccess = privileges.isCanAccess();
     }
 
     public void initPanel() throws Exception {
@@ -74,7 +79,7 @@ public class SubjectsPanel extends AbstractCommonPanel {
 
         getContent().addComponent(allSubjectsHL);
 
-        if (!isAdmin) {
+        if (!isAdmin && !canAccess) {
             setDisableButton(saveButton);
         }
 
@@ -272,7 +277,7 @@ public class SubjectsPanel extends AbstractCommonPanel {
 
                         try {
 //                            mainStudentSubjects.addAll(electiveStudentSubjects);
-                            if (isAdmin) {
+                            if (isAdmin || canAccess) {
                                 for (STUDENT_SUBJECT studentSubject : studentSubjects) {
                                     studentSubject.setDeleted(true);
                                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(
@@ -526,7 +531,7 @@ public class SubjectsPanel extends AbstractCommonPanel {
                     }
                 }
             });
-            if (!isAdmin) {
+            if (!isAdmin && !canAccess) {
                 for (STUDENT_TEACHER_SUBJECT studentTeacherSubject : getStudentTeacherSubject()) {
                     if (studentTeacherSubject.getSemester().equals(semester)) {
                         saveButton.setEnabled(false);
