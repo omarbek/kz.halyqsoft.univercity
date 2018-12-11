@@ -52,7 +52,6 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="Maven: org.vaadin.addons:jsconsole:0.1.0" level="project" />
-    <orderEntry type="library" name="Maven: org.vaadin.addons:jsconsole:0.1.0" level="project" />
     <orderEntry type="library" name="Maven: com.google.cloud:google-cloud-speech:0.23.1-alpha" level="project" />
     <orderEntry type="library" name="Maven: io.netty:netty-tcnative-boringssl-static:2.0.3.Final" level="project" />
     <orderEntry type="library" name="Maven: com.google.cloud:google-cloud-core:1.5.1" level="project" />

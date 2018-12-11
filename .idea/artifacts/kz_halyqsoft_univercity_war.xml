@@ -1,7 +1,7 @@
 <component name="ArtifactManager">
   <artifact type="war" name="kz.halyqsoft.univercity:war">
     <output-path>$PROJECT_DIR$/target</output-path>
-    <root id="archive" name="univer.war">
+    <root id="archive" name="ukpu.war">
       <element id="artifact" artifact-name="kz.halyqsoft.univercity:war exploded" />
     </root>
   </artifact>
