@@ -17,6 +17,7 @@ import org.r3a.common.entity.event.EntityListener;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
+
 /**
  * @author Omarbek
  * @created on 16.04.2018
