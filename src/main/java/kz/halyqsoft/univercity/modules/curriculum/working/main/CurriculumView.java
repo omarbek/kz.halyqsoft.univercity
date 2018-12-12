@@ -1650,6 +1650,12 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
 
         statusLabel.setValue(getUILocaleUtil().getEntityFieldLabel(CURRICULUM.class, "curriculumStatus") + ": " + curriculum.getCurriculumStatus().getStatusName());
 
+        setStudentSubjects();
+
+        refresh();
+    }
+
+    private void setStudentSubjects() throws Exception {
         if (CommonUtils.getStudyYearByEntranceYear(curriculum.getEntranceYear()) == 1) {
             List<STUDENT_SUBJECT> starStudentSubjects = getStarStudentSubjects();
             STUDENT_EDUCATION starStudentEducation = starStudentSubjects.get(0).getStudentEducation();
@@ -1666,8 +1672,6 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
                 createStudentTeacherSubject(starStudentEducation, studentEducation);
             }
         }
-
-        refresh();
     }
 
     private List<STUDENT_EDUCATION> getStudentEducations(STUDENT_EDUCATION starStudentEducation) throws Exception {
