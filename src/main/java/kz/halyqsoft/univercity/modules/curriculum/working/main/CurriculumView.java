@@ -23,7 +23,6 @@ import kz.halyqsoft.univercity.entity.beans.univercity.view.V_ELECTIVE_SUBJECT;
 import kz.halyqsoft.univercity.modules.curriculum.working.changelisteners.DiplomaTypeChangeListener;
 import kz.halyqsoft.univercity.modules.curriculum.working.changelisteners.EntranceYearChangeListener;
 import kz.halyqsoft.univercity.modules.curriculum.working.changelisteners.SpecialityChangeListener;
-import kz.halyqsoft.univercity.modules.curriculum.working.cycle.CyclePanel;
 import kz.halyqsoft.univercity.modules.curriculum.working.schedule.SchedulePanel;
 import kz.halyqsoft.univercity.modules.curriculum.working.semester.CreditCountByComponentsPanel;
 import kz.halyqsoft.univercity.modules.curriculum.working.semester.SubjectsTab;
@@ -83,7 +82,6 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
     private SubjectsTab addProgramPanel;
     private SubjectsTab afterSemesterProgamPanel;
     private CreditCountByComponentsPanel creditCountByComponentsPanel;
-    private CyclePanel cyclePanel;
     private SchedulePanel schedulePanel;
     private static int fontSize = 7;
     private Document document;
@@ -1561,6 +1559,7 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
             countSumOfCreditBySemester();
             if (curriculum.getId() != null) {
                 createButton.setEnabled(false);
+                setAllButtonsEnabled(true);
                 if (curriculum.getCurriculumStatus().getId().equals(CURRICULUM_STATUS.IN_CREATING)) {
                     conformButton.setEnabled(true);
                     approveButton.setEnabled(false);
@@ -1570,14 +1569,7 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
                 } else {//APPROVE
                     conformButton.setEnabled(false);
                     approveButton.setEnabled(false);
-
-                    for (SubjectsTab subjectsTab : subjectsTabs) {
-                        setButtonsDisabled(subjectsTab.getMainSubjectsGW());
-                        setButtonsDisabled(subjectsTab.getElectiveSubjectsGW());
-                    }
-                    setButtonsDisabled(addProgramPanel.getAddingSubjectsGW());
-                    setButtonsDisabled(afterSemesterProgamPanel.getAfterSemesterSubjectsGW());
-                    schedulePanel.getEditButton().setEnabled(false);
+                    setAllButtonsEnabled(false);
                 }
             } else {
                 createButton.setEnabled(true);
@@ -1604,12 +1596,22 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
         }
     }
 
-    private void setButtonsDisabled(GridWidget mainSubjectsGW) {
-        mainSubjectsGW.setButtonEnabled(AbstractToolbar.ADD_BUTTON, false);
-        mainSubjectsGW.setButtonEnabled(AbstractToolbar.EDIT_BUTTON, false);
-        mainSubjectsGW.setButtonEnabled(AbstractToolbar.DELETE_BUTTON, false);
-        mainSubjectsGW.setButtonEnabled(AbstractToolbar.REFRESH_BUTTON, false);
-        mainSubjectsGW.setButtonEnabled(AbstractToolbar.HELP_BUTTON, false);
+    private void setAllButtonsEnabled(boolean enabled) {
+        for (SubjectsTab subjectsTab : subjectsTabs) {
+            setButtonsEnabled(subjectsTab.getMainSubjectsGW(),enabled);
+            setButtonsEnabled(subjectsTab.getElectiveSubjectsGW(),enabled);
+        }
+        setButtonsEnabled(addProgramPanel.getAddingSubjectsGW(), enabled);
+        setButtonsEnabled(afterSemesterProgamPanel.getAfterSemesterSubjectsGW(), enabled);
+        schedulePanel.getEditButton().setEnabled(enabled);
+    }
+
+    private void setButtonsEnabled(GridWidget mainSubjectsGW, boolean enabled) {
+        mainSubjectsGW.setButtonEnabled(AbstractToolbar.ADD_BUTTON, enabled);
+        mainSubjectsGW.setButtonEnabled(AbstractToolbar.EDIT_BUTTON, enabled);
+        mainSubjectsGW.setButtonEnabled(AbstractToolbar.DELETE_BUTTON, enabled);
+        mainSubjectsGW.setButtonEnabled(AbstractToolbar.REFRESH_BUTTON, enabled);
+        mainSubjectsGW.setButtonEnabled(AbstractToolbar.HELP_BUTTON, enabled);
     }
 
     public void setTotalCreditSum() {
@@ -1634,6 +1636,9 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
         approveButton.setEnabled(true);
 
         statusLabel.setValue(getUILocaleUtil().getEntityFieldLabel(CURRICULUM.class, "curriculumStatus") + ": " + curriculum.getCurriculumStatus().getStatusName());
+
+        schedulePanel.generateSchedule();
+
         refresh();
     }
 
@@ -1644,8 +1649,6 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(curriculum);
 
         statusLabel.setValue(getUILocaleUtil().getEntityFieldLabel(CURRICULUM.class, "curriculumStatus") + ": " + curriculum.getCurriculumStatus().getStatusName());
-
-        schedulePanel.generateSchedule();
 
         if (CommonUtils.getStudyYearByEntranceYear(curriculum.getEntranceYear()) == 1) {
             List<STUDENT_SUBJECT> starStudentSubjects = getStarStudentSubjects();

@@ -44,6 +44,7 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
     private CURRICULUM curriculum;
     private ENTRANCE_YEAR entranceYear;
     private SubjectsType subjectType;
+    private String userLogin;
 
     private GridWidget mainSubjectsGW;
     private GridWidget electiveSubjectsGW;
@@ -54,6 +55,7 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
         super(parentView);
         this.semester = semester;
         this.subjectType = subjectType;
+        userLogin = CommonUtils.getCurrentUserLogin();
     }
 
     @Override
@@ -227,6 +229,7 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
         for (CURRICULUM_AFTER_SEMESTER curriculumAfterSemester : curriculumAfterSemesters) {
             curriculumAfterSemester.setDeleted(true);
             curriculumAfterSemester.setUpdated(new Date());
+            curriculumAfterSemester.setUpdatedBy(userLogin);
         }
         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(curriculumAfterSemesters);
         for (Object object : subjectsBySemester) {
@@ -274,6 +277,7 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
         for (CURRICULUM_ADD_PROGRAM curriculumAddProgram : curriculumAddPrograms) {
             curriculumAddProgram.setDeleted(true);
             curriculumAddProgram.setUpdated(new Date());
+            curriculumAddProgram.setUpdatedBy(userLogin);
         }
         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(curriculumAddPrograms);
         for (Object object : subjectsBySemester) {
@@ -308,6 +312,7 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
         for (ELECTIVE_SUBJECT electiveSubject : electiveSubjects) {
             electiveSubject.setDeleted(true);
             electiveSubject.setUpdated(new Date());
+            electiveSubject.setUpdatedBy(userLogin);
         }
         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(
                 electiveSubjects);
@@ -338,6 +343,7 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
         for (CURRICULUM_DETAIL curriculumDetail : curriculumDetails) {
             curriculumDetail.setDeleted(true);
             curriculumDetail.setUpdated(new Date());
+            curriculumDetail.setUpdatedBy(userLogin);
         }
         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(
                 curriculumDetails);
@@ -566,6 +572,7 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
                             CommonEntityFacadeBean.class).lookup(CURRICULUM_DETAIL.class, entity.getId());
                     curriculumDetail.setDeleted(true);
                     curriculumDetail.setUpdated(new Date());
+                    curriculumDetail.setUpdatedBy(userLogin);
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
                             merge(curriculumDetail);
                 }
@@ -575,6 +582,7 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
                             CommonEntityFacadeBean.class).lookup(ELECTIVE_SUBJECT.class, entity.getId());
                     electiveSubject.setDeleted(true);
                     electiveSubject.setUpdated(new Date());
+                    electiveSubject.setUpdatedBy(userLogin);
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
                             merge(electiveSubject);
                 }
@@ -584,6 +592,7 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
                             CommonEntityFacadeBean.class).lookup(CURRICULUM_ADD_PROGRAM.class, entity.getId());
                     curriculumAddProgram.setDeleted(true);
                     curriculumAddProgram.setUpdated(new Date());
+                    curriculumAddProgram.setUpdatedBy(userLogin);
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
                             merge(curriculumAddProgram);
                 }
@@ -593,6 +602,7 @@ public final class SubjectsTab extends AbstractCurriculumPanel implements Entity
                             CommonEntityFacadeBean.class).lookup(CURRICULUM_AFTER_SEMESTER.class, entity.getId());
                     curriculumAfterSemester.setDeleted(true);
                     curriculumAfterSemester.setUpdated(new Date());
+                    curriculumAfterSemester.setUpdatedBy(userLogin);
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
                             merge(curriculumAfterSemester);
                 }

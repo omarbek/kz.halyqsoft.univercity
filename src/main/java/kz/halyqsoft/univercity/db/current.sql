@@ -1,15 +1,7 @@
-create table privileges (
-  id         bigint       not null,
-  type_name  varchar(255) not null,
-  can_access boolean      not null
-);
+delete from semester_period where id>3;
+update semester_period set period_name='Летний' where id=3;
 
-ALTER TABLE ONLY privileges
-  ADD CONSTRAINT pk_privileges PRIMARY KEY (id);
-
-insert into privileges values (1,'ИУПС',true);
-
-
-ALTER TABLE pdf_document RENAME COLUMN for_students TO for_human_resource_department;
-
-update curriculum set status_id=1;
+create sequence s_curriculum_summer
+  minvalue 0
+  start with 1
+  no cycle;

@@ -59,6 +59,9 @@ public class CURRICULUM_AFTER_SEMESTER extends AbstractEntity {
             @JoinColumn(name = "EDUCATION_MODULE_TYPE_ID", referencedColumnName = "ID")})
     private EDUCATION_MODULE_TYPE educationModuleType;
 
+    @Column(name = "UPDATED_BY")
+    private String updatedBy;
+
     public CURRICULUM getCurriculum() {
         return curriculum;
     }
@@ -129,5 +132,13 @@ public class CURRICULUM_AFTER_SEMESTER extends AbstractEntity {
 
     public void setSemesterData(SEMESTER_DATA semesterData) {
         this.semesterData = semesterData;
+    }
+
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
     }
 }

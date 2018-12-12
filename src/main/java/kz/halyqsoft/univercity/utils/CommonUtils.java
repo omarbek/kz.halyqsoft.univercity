@@ -275,7 +275,8 @@ public class CommonUtils {
     public static String getCode(String beginYear) {
         String code = null;
         try {
-            Integer usersCode = SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USERS_CODE").getId().intValue();
+            Integer usersCode = SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USERS_CODE")
+                    .getId().intValue();
             if (usersCode < 10) {
                 code = beginYear + "000" + usersCode;
             } else if (usersCode < 100) {
@@ -292,7 +293,7 @@ public class CommonUtils {
                 code = getCode(beginYear);
             }
         } catch (Exception e) {
-            e.printStackTrace();//TODO catch
+            CommonUtils.showMessageAndWriteLog("Unable to get code", e);
         }
         return code;
     }
@@ -404,7 +405,7 @@ public class CommonUtils {
         try {
             SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(sd);
         } catch (Exception e) {
-            e.printStackTrace();//TODO catch
+            CommonUtils.showMessageAndWriteLog("Unable to create semester data", e);
         }
         return sd;
     }
@@ -460,7 +461,7 @@ public class CommonUtils {
         } catch (NoResultException e) {
             semesterData = createSemesterData(entranceYear, semester.getSemesterPeriod());
         } catch (Exception e) {
-            e.printStackTrace();//TODO catch
+            CommonUtils.showMessageAndWriteLog("Unable to get semester data", e);
         }
         return semesterData;
     }
@@ -477,7 +478,7 @@ public class CommonUtils {
         } catch (NoResultException e) {
             semester = null;
         } catch (Exception e) {
-            e.printStackTrace();//TODO catch
+            CommonUtils.showMessageAndWriteLog("Unable to get semester", e);
         }
         return semester;
     }
