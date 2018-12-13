@@ -23,6 +23,7 @@ import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.from.EJoin;
 import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
+import org.r3a.common.utility.CommonUtil;
 import org.r3a.common.vaadin.AbstractSecureWebUI;
 import org.r3a.common.vaadin.AbstractWebUI;
 import org.r3a.common.vaadin.locale.UILocaleUtil;
@@ -384,10 +385,7 @@ public class CommonUtils {
     }
 
     public static boolean isAdmin() {
-        if (getCurrentUser().getId().getId().intValue() == 1
-                || getCurrentUser().getId().getId().intValue() == 2) {
-            return true;
-        }
-        return false;
+        return getCurrentUser().getId().getId().intValue() == 1
+                || getCurrentUser().getId().getId().intValue() == 2;
     }
 }

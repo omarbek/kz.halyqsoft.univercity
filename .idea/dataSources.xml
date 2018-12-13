@@ -7,37 +7,11 @@
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://localhost:5432/univerdb</jdbc-url>
     </data-source>
-    <data-source source="LOCAL" name="vuz@localhost" uuid="a27f1c9f-e38d-48e4-9f3d-80d78e92734c">
-      <driver-ref>mysql</driver-ref>
-      <synchronize>true</synchronize>
-      <jdbc-driver>com.mysql.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql://localhost:3306/vuz</jdbc-url>
-      <driver-properties>
-        <property name="autoReconnect" value="true" />
-        <property name="zeroDateTimeBehavior" value="convertToNull" />
-        <property name="tinyInt1isBit" value="false" />
-        <property name="characterEncoding" value="utf8" />
-        <property name="characterSetResults" value="utf8" />
-        <property name="yearIsDateType" value="false" />
-      </driver-properties>
-    </data-source>
-    <data-source source="LOCAL" name="univerdbb@localhost" uuid="e6f18269-3786-477d-946b-505d94c98efa">
-      <driver-ref>postgresql</driver-ref>
-      <synchronize>true</synchronize>
-      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost:5432/univerdbb</jdbc-url>
-    </data-source>
-    <data-source source="LOCAL" name="college@185.146.3.193" uuid="12bdc91f-d690-444d-bf23-27810abbfc59">
+    <data-source source="LOCAL" name="college@185.146.3.193" uuid="7584f0cd-4424-41a3-9b58-bcf77a3194a3">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://185.146.3.193:5432/college</jdbc-url>
-    </data-source>
-    <data-source source="LOCAL" name="univerdb@ukpu-systems.kz" uuid="0dc20a76-b93f-42c0-81d6-26502c6f925f">
-      <driver-ref>postgresql</driver-ref>
-      <synchronize>true</synchronize>
-      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://ukpu-systems.kz:5432/univerdb</jdbc-url>
     </data-source>
   </component>
 </project>
