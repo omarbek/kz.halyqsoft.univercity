@@ -73,6 +73,8 @@ class CatalogList {
         addCatalogEntityToList(TRAJECTORY.class);
         addCatalogEntityToList(CURRICULUM_INDIVIDUAL_PLAN.class);
         addCatalogEntityToList(ABSENCE_CAUSE.class);
+        addCatalogEntityToList(PDF_DOCUMENT_TYPE.class);
+        addCatalogEntityToList(PRIVILEGES.class);
 
         return new ArrayList<>(list);
     }

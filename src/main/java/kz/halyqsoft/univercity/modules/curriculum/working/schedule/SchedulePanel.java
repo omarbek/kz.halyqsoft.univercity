@@ -15,10 +15,6 @@ import kz.halyqsoft.univercity.entity.beans.univercity.catalog.WEEK;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VCurriculumSchedule;
 import kz.halyqsoft.univercity.modules.curriculum.working.main.AbstractCurriculumPanel;
 import kz.halyqsoft.univercity.modules.curriculum.working.main.CurriculumView;
-import kz.halyqsoft.univercity.utils.excel.ExcelStyles;
-import kz.halyqsoft.univercity.utils.excel.ExcelUtil;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.util.CellRangeAddress;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.ID;
@@ -43,6 +39,7 @@ public class SchedulePanel extends AbstractCurriculumPanel {
     private VerticalLayout registerVL;
     private boolean removeAll = false;
     private Grid grid;
+    private Button editButton;
 
     private List<WEEK> weekList;
     private Map<String, CURRICULUM_SCHEDULE_SYMBOL> symbolMap = new HashMap<String, CURRICULUM_SCHEDULE_SYMBOL>();
@@ -52,12 +49,10 @@ public class SchedulePanel extends AbstractCurriculumPanel {
     }
 
 
-
-
     @Override
     public void initPanel() throws Exception {
 
-        Button editButton = new Button("Edit");
+        editButton = new Button("Edit");
         editButton.setCaption(getUILocaleUtil().getCaption("edit"));
         editButton.setWidth(120, Unit.PIXELS);
         editButton.setIcon(new ThemeResource("img/button/edit.png"));
@@ -68,22 +63,21 @@ public class SchedulePanel extends AbstractCurriculumPanel {
                     @Override
                     public void buttonClick(Button.ClickEvent clickEvent) {
 
-                       try{
-                           if(grid.getSelectedRow()!=null)
-                           {
-                               STUDY_YEAR study_year = ((ScheduleBean)grid.getSelectedRow()).getStudyYear();
-                               QueryModel<CURRICULUM_SCHEDULE> scheduleQueryModel = new QueryModel<>(CURRICULUM_SCHEDULE.class);
-                               scheduleQueryModel.addWhere("studyYear" , ECriteria.EQUAL , study_year.getId());
-                               scheduleQueryModel.addOrder("id");
-                               List<CURRICULUM_SCHEDULE> scheduleList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(scheduleQueryModel);
-                               SchedulePanelEdit schedulePanelEdit = new SchedulePanelEdit((scheduleList), SchedulePanel.this );
+                        try {
+                            if (grid.getSelectedRow() != null) {
+                                STUDY_YEAR study_year = ((ScheduleBean) grid.getSelectedRow()).getStudyYear();
+                                QueryModel<CURRICULUM_SCHEDULE> scheduleQueryModel = new QueryModel<>(CURRICULUM_SCHEDULE.class);
+                                scheduleQueryModel.addWhere("studyYear", ECriteria.EQUAL, study_year.getId());
+                                scheduleQueryModel.addOrder("id");
+                                List<CURRICULUM_SCHEDULE> scheduleList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(scheduleQueryModel);
+                                SchedulePanelEdit schedulePanelEdit = new SchedulePanelEdit((scheduleList), SchedulePanel.this);
 
-                           }else{
-                               Message.showError("Choose one row");
-                           }
-                       }catch (Exception e){
-                           e.printStackTrace();
-                       }
+                            } else {
+                                Message.showError("Choose one row");
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
         );
@@ -193,6 +187,7 @@ public class SchedulePanel extends AbstractCurriculumPanel {
 
 
     }
+
     @Override
     public void refresh() throws Exception {
         QueryModel<STUDY_YEAR> qmStudyYear = new QueryModel<STUDY_YEAR>(STUDY_YEAR.class);
@@ -604,5 +599,9 @@ public class SchedulePanel extends AbstractCurriculumPanel {
         if (getRecordCount() == 0) {
             throw new Exception(getUILocaleUtil().getMessage("no.curriculum.schedule"));
         }
+    }
+
+    public Button getEditButton() {
+        return editButton;
     }
 }

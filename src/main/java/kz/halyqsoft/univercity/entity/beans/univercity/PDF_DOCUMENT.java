@@ -1,6 +1,7 @@
 package kz.halyqsoft.univercity.entity.beans.univercity;
 
 import kz.halyqsoft.univercity.entity.beans.USERS;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.PDF_DOCUMENT_TYPE;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
@@ -38,6 +39,14 @@ public class PDF_DOCUMENT extends AbstractEntity {
     @Column(name = "period")
     private int period;
 
+    @FieldInfo(type = EFieldType.BOOLEAN,inEdit = false,  order = 7)
+    @Column(name = "for_human_resource_department")
+    private boolean forHumanResourceDepartment = false;
+
+    @FieldInfo(type = EFieldType.FK_COMBO,inEdit = true,  order = 8,required = false)
+    @ManyToOne
+    @JoinColumns({@JoinColumn(name = "PDF_DOCUMENT_TYPE_ID", referencedColumnName = "ID", nullable = true)})
+    private PDF_DOCUMENT_TYPE pdfDocumentType;
 
     public PDF_DOCUMENT() {
     }
@@ -93,5 +102,21 @@ public class PDF_DOCUMENT extends AbstractEntity {
 
     public void setCreated(Date created) {
         this.created = created;
+    }
+
+    public boolean isForHumanResourceDepartment() {
+        return forHumanResourceDepartment;
+    }
+
+    public void setForHumanResourceDepartment(boolean forHumanResourceDepartment) {
+        this.forHumanResourceDepartment = forHumanResourceDepartment;
+    }
+
+    public PDF_DOCUMENT_TYPE getPdfDocumentType() {
+        return pdfDocumentType;
+    }
+
+    public void setPdfDocumentType(PDF_DOCUMENT_TYPE pdfDocumentType) {
+        this.pdfDocumentType = pdfDocumentType;
     }
 }

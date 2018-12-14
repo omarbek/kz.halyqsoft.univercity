@@ -26,26 +26,26 @@ import java.util.Map;
  */
 abstract class Generate implements Button.ClickListener {
 
-    private ProgressBar samplePB;
-
-    public Generate(ProgressBar samplePB) {
-        this.samplePB = samplePB;
-    }
-
-    private void updateProgressBar(UI ui, int progress, int maxProgress) {
-        ui.access(() -> {
-            final float newValue;
-            if (progress == maxProgress) {
-                ui.setPollInterval(-1);
-                newValue = 0f;
-                samplePB.setVisible(!samplePB.isIndeterminate());
-            } else {
-                newValue = (float) progress / maxProgress;
-            }
-            samplePB.setValue(newValue);
-//            Notification.show("Value changed:", Float.toString(newValue), Notification.Type.TRAY_NOTIFICATION);
-        });
-    }
+//    private ProgressBar samplePB;
+//
+//    public Generate(ProgressBar samplePB) {
+//        this.samplePB = samplePB;
+//    }
+//
+//    private void updateProgressBar(UI ui, int progress, int maxProgress) {
+//        ui.access(() -> {
+//            final float newValue;
+//            if (progress == maxProgress) {
+//                ui.setPollInterval(-1);
+//                newValue = 0f;
+//                samplePB.setVisible(!samplePB.isIndeterminate());
+//            } else {
+//                newValue = (float) progress / maxProgress;
+//            }
+//            samplePB.setValue(newValue);
+////            Notification.show("Value changed:", Float.toString(newValue), Notification.Type.TRAY_NOTIFICATION);
+//        });
+//    }
 
 //    private void launchProgressUpdater(UI ui) {
 //        new Thread(() -> {
@@ -72,11 +72,11 @@ abstract class Generate implements Button.ClickListener {
     }
 
     private void generate() {
-        samplePB.setValue(0f);
-        samplePB.setVisible(true);
-        UI.getCurrent().setPollInterval(500);
-
-        new Thread(() -> {
+//        samplePB.setValue(0f);
+//        samplePB.setVisible(true);
+//        UI.getCurrent().setPollInterval(500);
+//
+//        new Thread(() -> {
 //        launchProgressUpdater(UI.getCurrent());
             try {
                 String sql = "SELECT DISTINCT " +
@@ -86,7 +86,8 @@ abstract class Generate implements Button.ClickListener {
                         "WHERE capacity = (SELECT max(max_room.capacity) " +
                         "                  FROM room max_room " +
                         "                  WHERE max_room.corpus_id = room.corpus_id " +
-                        "                        AND max_room.deleted = FALSE) " +
+                        "                        AND max_room.deleted = FALSE" +
+                        "                       and max_room.room_type_id in (1, 4, 5)) " +
                         "      AND deleted = FALSE;";
                 List list = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class)
                         .lookupItemsList(sql, new HashMap<>());
@@ -132,23 +133,23 @@ abstract class Generate implements Button.ClickListener {
                         for (LEVEL level : levels) {
                             currentLoop++;
                             distribute(corpusAndCapacityMap, languages, studyYear, corpus, level);
-                            try {
-                                Thread.sleep(1000);
-                            } catch (final InterruptedException e) {
-                                throw new RuntimeException("Unexpected interruption", e);
-                            }
-                            int maxProgress = studyYears.size() * corpuses.size() * levels.size();
-                            updateProgressBar(UI.getCurrent(), currentLoop, maxProgress);
+//                            try {
+//                                Thread.sleep(1000);
+//                            } catch (final InterruptedException e) {
+//                                throw new RuntimeException("Unexpected interruption", e);
+//                            }
+//                            int maxProgress = studyYears.size() * corpuses.size() * levels.size();
+//                            updateProgressBar(UI.getCurrent(), currentLoop, maxProgress);
                         }
                     }
                 }
-                samplePB.setValue(0f);
+//                samplePB.setValue(0f);
                 CommonUtils.showSavedNotification();
 
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }).start();
+//        }).start();
     }
 
     protected abstract void distribute(Map<Long, Integer> corpusAndCapacityMap, List<LANGUAGE> languages,

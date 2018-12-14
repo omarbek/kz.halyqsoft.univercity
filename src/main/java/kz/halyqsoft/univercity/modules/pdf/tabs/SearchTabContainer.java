@@ -8,6 +8,7 @@ import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.PDF_DOCUMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.PDF_PROPERTY;
 import kz.halyqsoft.univercity.modules.pdf.MyFileEdit;
+import kz.halyqsoft.univercity.modules.pdf.PdfViewContent;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.apache.commons.io.FileUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
@@ -117,8 +118,13 @@ public class SearchTabContainer extends AbstractCommonView {
         USERS user = CommonUtils.getCurrentUser();
         QueryModel<PDF_DOCUMENT> docQM = new QueryModel<>(PDF_DOCUMENT.class);
         docQM.addWhere("deleted", ECriteria.EQUAL, false);
-        if (user != null) {
-            docQM.addWhere("user", ECriteria.EQUAL, user.getId());
+        if(!CommonUtils.isAdmin()){
+            if (user != null) {
+                docQM.addWhere("user", ECriteria.EQUAL, user.getId());
+            }
+        }
+        if(PdfViewContent.isForHRD){
+            docQM.addWhere("forHumanResourceDepartment", ECriteria.EQUAL, PdfViewContent.isForHRD);
         }
         BeanItemContainer<PDF_DOCUMENT> docBIC = new BeanItemContainer<>(PDF_DOCUMENT.class, SessionFacadeFactory.
                 getSessionFacade(CommonEntityFacadeBean.class).lookup(docQM));

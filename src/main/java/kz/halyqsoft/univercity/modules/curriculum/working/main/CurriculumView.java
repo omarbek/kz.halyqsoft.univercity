@@ -5,30 +5,29 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.server.*;
+import com.vaadin.server.ClassResource;
+import com.vaadin.server.FileDownloader;
+import com.vaadin.server.StreamResource;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.TabSheet.SelectedTabChangeEvent;
 import com.vaadin.ui.TabSheet.SelectedTabChangeListener;
-import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM;
+import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.VDetailEmployeeLate;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_CURRICULUM_AFTER_SEMESTER;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_CURRICULUM_DETAIL;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_ELECTIVE_SUBJECT;
 import kz.halyqsoft.univercity.modules.curriculum.working.changelisteners.DiplomaTypeChangeListener;
 import kz.halyqsoft.univercity.modules.curriculum.working.changelisteners.EntranceYearChangeListener;
 import kz.halyqsoft.univercity.modules.curriculum.working.changelisteners.SpecialityChangeListener;
-import kz.halyqsoft.univercity.modules.curriculum.working.cycle.CyclePanel;
 import kz.halyqsoft.univercity.modules.curriculum.working.schedule.SchedulePanel;
 import kz.halyqsoft.univercity.modules.curriculum.working.semester.CreditCountByComponentsPanel;
 import kz.halyqsoft.univercity.modules.curriculum.working.semester.SubjectsTab;
 import kz.halyqsoft.univercity.modules.regapplicants.IUPS_TYPE;
-import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.PrintDialog;
 import kz.halyqsoft.univercity.utils.CommonUtils;
-import kz.halyqsoft.univercity.utils.DocumentIDs;
 import kz.halyqsoft.univercity.utils.EmployeePdfCreator;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -38,18 +37,16 @@ import org.r3a.common.entity.beans.AbstractTask;
 import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.event.EntityListener;
 import org.r3a.common.entity.query.QueryModel;
+import org.r3a.common.entity.query.from.EJoin;
+import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.view.AbstractTaskView;
 import org.r3a.common.vaadin.widget.dialog.Message;
-import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
-import org.r3a.common.vaadin.widget.grid.model.GridColumnModel;
+import org.r3a.common.vaadin.widget.grid.GridWidget;
+import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
 
 import javax.persistence.NoResultException;
-import javax.print.attribute.standard.DocumentName;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.util.*;
 import java.util.Calendar;
 import java.util.List;
@@ -85,7 +82,6 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
     private SubjectsTab addProgramPanel;
     private SubjectsTab afterSemesterProgamPanel;
     private CreditCountByComponentsPanel creditCountByComponentsPanel;
-    private CyclePanel cyclePanel;
     private SchedulePanel schedulePanel;
     private static int fontSize = 7;
     private Document document;
@@ -227,10 +223,6 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
             mainTS.addTab(subjectsTab, getUILocaleUtil().getCaption("semester." + semester.getId().toString()));
         }
 
-//        for (SubjectsTab semesterDetailPanel : subjectsTabs) {//TODO maybe
-//            semesterDetailPanel.setCreditCountByComponentsPanel(creditCountByComponentsPanel);
-//        }
-
         addProgramPanel = new SubjectsTab(this, null, SubjectsTab.SubjectsType.ADDING_SUBJECTS);
         addProgramPanel.setWidth(100, Unit.PERCENTAGE);
         addProgramPanel.setCurriculum(curriculum);
@@ -246,18 +238,8 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
         afterSemesterProgamPanel.initPanel();
         mainTS.addTab(afterSemesterProgamPanel, getUILocaleUtil().getEntityLabel(
                 V_CURRICULUM_AFTER_SEMESTER.class));
-//
-//        creditCountByComponentsPanel = new CreditCountByComponentsPanel(this);//TODO return
-//        creditCountByComponentsPanel.setCurriculum(curriculum);
-//        creditCountByComponentsPanel.initPanel();
-//        tabSheet.addTab(creditCountByComponentsPanel, getUILocaleUtil().getEntityLabel(VCurriculumCreditCycleSum.class));
-//
-//        cyclePanel = new CyclePanel(this);
-//        cyclePanel.setCurriculum(curriculum);
-//        cyclePanel.initPanel();
-//        tabSheet.addTab(cyclePanel, getUILocaleUtil().getCaption("by.cycle"));
-//
-        schedulePanel = new SchedulePanel(this);//TODO add entrance year
+
+        schedulePanel = new SchedulePanel(this);
         schedulePanel.setCurriculum(curriculum);
         schedulePanel.initPanel();
         mainTS.addTab(schedulePanel, getUILocaleUtil().getCaption("curriculum.schedule"));
@@ -364,15 +346,13 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
         printButton.addClickListener(new ClickListener() {
             @Override
             public void buttonClick(ClickEvent event) {
-                //TODO Damira
-
                 Document document = new Document();
                 ByteArrayOutputStream byteArr = new ByteArrayOutputStream();
-                int allCredits = 0,allEcts = 0, allLcount =0, allPcount=0, allLbcount=0,allwtcount =0,allOcount=0,allCnt=0,allexam=0;
-                int creditNum = 0;
-                int ectsNum = 0, lcount =0, pcount=0, lbcount=0,wtcount =0,ocount=0,allcount=0,examc=0;
-                int fallCredits = 0,fallEcts = 0, fallLcount =0, fallPcount=0, fallLbcount=0,fallwtcount =0,fallOcount=0,fallCnt=0,fallexam=0;
-                int ffallCredits = 0,ffallEcts = 0, ffallLcount =0, ffallPcount=0, ffallLbcount=0,ffallwtcount =0,ffallOcount=0,ffallCnt=0,ffallexam=0;
+                int allCredits = 0, allEcts = 0, allLcount = 0, allPcount = 0, allLbcount = 0, allwtcount = 0, allOcount = 0, allCnt = 0, allexam = 0;
+                int creditNum = 0, countadd = 0, fcountadd = 0, ffcountadd = 0, countall = 0;
+                int ectsNum = 0, lcount = 0, pcount = 0, lbcount = 0, wtcount = 0, ocount = 0, allcount = 0, examc = 0;
+                int fallCredits = 0, fallEcts = 0, fallLcount = 0, fallPcount = 0, fallLbcount = 0, fallwtcount = 0, fallOcount = 0, fallCnt = 0, fallexam = 0;
+                int ffallCredits = 0, ffallEcts = 0, ffallLcount = 0, ffallPcount = 0, ffallLbcount = 0, ffallwtcount = 0, ffallOcount = 0, ffallCnt = 0, ffallexam = 0, fin = 0, ffin = 0;
                 PdfPTable table = new PdfPTable(15);
                 insertCell(table, "Білім беру бағдарламасының оқу жоспары (модульдердің еңбек мөлшері мен меңгерілу ретіне қарай оқу жылдарына бөлінуі)  \n" +
                         "Учебный план образовательной программы (распределение модулей по годам обучения с учетом трудоемкости и порядка освоения)", Element.ALIGN_CENTER, 16, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
@@ -395,58 +375,91 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
 
 
                         List<ArrayList<String>> myData = getData(curriculum.getId().getId().intValue(), 1, IUPS_TYPE.MANDATORY);
-                        for (List<String> myRow :myData) {
+                        for (List<String> myRow : myData) {
                             for (String value : myRow) {
                                 insertCell(table, value, Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
                             }
-                            creditNum += Integer.parseInt(myRow.get(6).trim().length()>0 ? myRow.get(6) :"0");
-                            ectsNum += Integer.parseInt(myRow.get(7).trim().length()>0 ? myRow.get(7) :"0");
-                            lcount += Integer.parseInt(myRow.get(8).trim().length()>0 ? myRow.get(8) :"0");
-                            pcount += Integer.parseInt(myRow.get(9).trim().length()>0 ? myRow.get(9) :"0");
-                            lbcount += Integer.parseInt(myRow.get(10).trim().length()>0 ? myRow.get(10) :"0");
-                            wtcount += Integer.parseInt(myRow.get(11).trim().length()>0 ? myRow.get(11) :"0");
-                            ocount += Integer.parseInt(myRow.get(12).trim().length()>0 ? myRow.get(12) :"0");
-                            allcount += Integer.parseInt(myRow.get(13).trim().length()>0 ? myRow.get(13) :"0");
-                            if(myRow.get(14).trim().length()>0){
+                            creditNum += Integer.parseInt(myRow.get(6).trim().length() > 0 ? myRow.get(6) : "0");
+                            ectsNum += Integer.parseInt(myRow.get(7).trim().length() > 0 ? myRow.get(7) : "0");
+                            lcount += Integer.parseInt(myRow.get(8).trim().length() > 0 ? myRow.get(8) : "0");
+                            pcount += Integer.parseInt(myRow.get(9).trim().length() > 0 ? myRow.get(9) : "0");
+                            lbcount += Integer.parseInt(myRow.get(10).trim().length() > 0 ? myRow.get(10) : "0");
+                            wtcount += Integer.parseInt(myRow.get(11).trim().length() > 0 ? myRow.get(11) : "0");
+                            ocount += Integer.parseInt(myRow.get(12).trim().length() > 0 ? myRow.get(12) : "0");
+                            allcount += Integer.parseInt(myRow.get(13).trim().length() > 0 ? myRow.get(13) : "0");
+                            if (myRow.get(14).trim().length() > 0) {
                                 examc++;
                             }
                         }
 
                         insertCell(table, "Таңдау компоненті    Компонент по выбору", Element.ALIGN_CENTER, 15, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        myData = getData(curriculum.getId().getId().intValue(),1,IUPS_TYPE.CHOOSEN);
+                        myData = getData(curriculum.getId().getId().intValue(), 1, IUPS_TYPE.CHOOSEN);
                         for (List<String> myRow : myData) {
                             for (String value : myRow) {
                                 insertCell(table, value, Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
                             }
-                            creditNum += Integer.parseInt(myRow.get(6).trim().length()>0 ? myRow.get(6) :"0");
-                            ectsNum += Integer.parseInt(myRow.get(7).trim().length()>0 ? myRow.get(7) :"0");
-                            lcount += Integer.parseInt(myRow.get(8).trim().length()>0 ? myRow.get(8) :"0");
-                            pcount += Integer.parseInt(myRow.get(9).trim().length()>0 ? myRow.get(9) :"0");
-                            lbcount += Integer.parseInt(myRow.get(10).trim().length()>0 ? myRow.get(10) :"0");
-                            wtcount += Integer.parseInt(myRow.get(11).trim().length()>0 ? myRow.get(11) :"0");
-                            ocount += Integer.parseInt(myRow.get(12).trim().length()>0 ? myRow.get(12) :"0");
-                            allcount += Integer.parseInt(myRow.get(13).trim().length()>0 ? myRow.get(13) :"0");
-                            if(myRow.get(14).trim().length()>0){
+                            creditNum += Integer.parseInt(myRow.get(6).trim().length() > 0 ? myRow.get(6) : "0");
+                            ectsNum += Integer.parseInt(myRow.get(7).trim().length() > 0 ? myRow.get(7) : "0");
+                            lcount += Integer.parseInt(myRow.get(8).trim().length() > 0 ? myRow.get(8) : "0");
+                            pcount += Integer.parseInt(myRow.get(9).trim().length() > 0 ? myRow.get(9) : "0");
+                            lbcount += Integer.parseInt(myRow.get(10).trim().length() > 0 ? myRow.get(10) : "0");
+                            wtcount += Integer.parseInt(myRow.get(11).trim().length() > 0 ? myRow.get(11) : "0");
+                            ocount += Integer.parseInt(myRow.get(12).trim().length() > 0 ? myRow.get(12) : "0");
+                            allcount += Integer.parseInt(myRow.get(13).trim().length() > 0 ? myRow.get(13) : "0");
+                            if (myRow.get(14).trim().length() > 0) {
                                 examc++;
                             }
 
                         }
 
-                        allCredits +=creditNum; allEcts +=ectsNum; allLcount +=lcount; allPcount+=pcount; allLbcount+=lbcount; allwtcount+=wtcount; allOcount+=ocount; allCnt+=allcount; allexam+=examc;
-                        fallCredits +=allCredits; fallEcts +=allEcts; fallLcount +=allLcount; fallPcount+=allPcount; fallLbcount+=allLbcount; fallwtcount+=allwtcount; fallOcount+=allOcount; fallCnt+=allCnt; fallexam+=allexam;
+                        allCredits += creditNum;
+                        allEcts += ectsNum;
+                        allLcount += lcount;
+                        allPcount += pcount;
+                        allLbcount += lbcount;
+                        allwtcount += wtcount;
+                        allOcount += ocount;
+                        allCnt += allcount;
+                        allexam += examc;
+                        fallCredits += allCredits;
+                        fallEcts += allEcts;
+                        fallLcount += allLcount;
+                        fallPcount += allPcount;
+                        fallLbcount += allLbcount;
+                        fallwtcount += allwtcount;
+                        fallOcount += allOcount;
+                        fallCnt += allCnt;
+                        fallexam += allexam;
 
-                        insertCell(table,"Всего за 1 семестр", Element.ALIGN_LEFT, 6,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allCredits), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allEcts), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allLcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allPcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allLbcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allwtcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allOcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allCnt), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allexam)+"Е/Э", Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        creditNum=0;ectsNum=0;lcount=0;pcount=0;lbcount=0;wtcount=0;ocount=0;allcount=0; examc=0;
-                        allCredits =0; allEcts =0; allLcount =0; allPcount=0; allLbcount=0; allwtcount=0; allOcount=0; allCnt=0;allcount=0; allexam=0;
+                        insertCell(table, "Всего за 1 семестр", Element.ALIGN_LEFT, 6, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allCredits), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allEcts), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allLcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allPcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allLbcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allwtcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allOcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allCnt), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allexam) + "Е/Э", Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        creditNum = 0;
+                        ectsNum = 0;
+                        lcount = 0;
+                        pcount = 0;
+                        lbcount = 0;
+                        wtcount = 0;
+                        ocount = 0;
+                        allcount = 0;
+                        examc = 0;
+                        allCredits = 0;
+                        allEcts = 0;
+                        allLcount = 0;
+                        allPcount = 0;
+                        allLbcount = 0;
+                        allwtcount = 0;
+                        allOcount = 0;
+                        allCnt = 0;
+                        allcount = 0;
+                        allexam = 0;
 
                         insertCell(table, "2 семестр", Element.ALIGN_CENTER, 15, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
                         insertCell(table, "Міндетті компонент    Обязательный компонент", Element.ALIGN_CENTER, 15, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
@@ -455,66 +468,114 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
                             for (String value : myRow) {
                                 insertCell(table, value, Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
                             }
-                            creditNum += Integer.parseInt(myRow.get(6).trim().length()>0 ? myRow.get(6) :"0");
-                            ectsNum += Integer.parseInt(myRow.get(7).trim().length()>0 ? myRow.get(7) :"0");
-                            lcount += Integer.parseInt(myRow.get(8).trim().length()>0 ? myRow.get(8) :"0");
-                            pcount += Integer.parseInt(myRow.get(9).trim().length()>0 ? myRow.get(9) :"0");
-                            lbcount += Integer.parseInt(myRow.get(10).trim().length()>0 ? myRow.get(10) :"0");
-                            wtcount += Integer.parseInt(myRow.get(11).trim().length()>0 ? myRow.get(11) :"0");
-                            ocount += Integer.parseInt(myRow.get(12).trim().length()>0 ? myRow.get(12) :"0");
-                            allcount += Integer.parseInt(myRow.get(13).trim().length()>0 ? myRow.get(13) :"0");
-                            if(myRow.get(14).trim().length()>0){
+                            creditNum += Integer.parseInt(myRow.get(6).trim().length() > 0 ? myRow.get(6) : "0");
+                            ectsNum += Integer.parseInt(myRow.get(7).trim().length() > 0 ? myRow.get(7) : "0");
+                            lcount += Integer.parseInt(myRow.get(8).trim().length() > 0 ? myRow.get(8) : "0");
+                            pcount += Integer.parseInt(myRow.get(9).trim().length() > 0 ? myRow.get(9) : "0");
+                            lbcount += Integer.parseInt(myRow.get(10).trim().length() > 0 ? myRow.get(10) : "0");
+                            wtcount += Integer.parseInt(myRow.get(11).trim().length() > 0 ? myRow.get(11) : "0");
+                            ocount += Integer.parseInt(myRow.get(12).trim().length() > 0 ? myRow.get(12) : "0");
+                            allcount += Integer.parseInt(myRow.get(13).trim().length() > 0 ? myRow.get(13) : "0");
+                            if (myRow.get(14).trim().length() > 0) {
                                 examc++;
                             }
 
                         }
                         insertCell(table, "Таңдау компоненті    Компонент по выбору", Element.ALIGN_CENTER, 15, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        myData = getData(curriculum.getId().getId().intValue(),2,IUPS_TYPE.CHOOSEN);
+                        myData = getData(curriculum.getId().getId().intValue(), 2, IUPS_TYPE.CHOOSEN);
                         for (List<String> myRow : myData) {
                             for (String value : myRow) {
                                 insertCell(table, value, Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
                             }
-                            creditNum += Integer.parseInt(myRow.get(6).trim().length()>0 ? myRow.get(6) :"0");
-                            ectsNum += Integer.parseInt(myRow.get(7).trim().length()>0 ? myRow.get(7) :"0");
-                            lcount += Integer.parseInt(myRow.get(8).trim().length()>0 ? myRow.get(8) :"0");
-                            pcount += Integer.parseInt(myRow.get(9).trim().length()>0 ? myRow.get(9) :"0");
-                            lbcount += Integer.parseInt(myRow.get(10).trim().length()>0 ? myRow.get(10) :"0");
-                            wtcount += Integer.parseInt(myRow.get(11).trim().length()>0 ? myRow.get(11) :"0");
-                            ocount += Integer.parseInt(myRow.get(12).trim().length()>0 ? myRow.get(12) :"0");
-                            allcount += Integer.parseInt(myRow.get(13).trim().length()>0 ? myRow.get(13) :"0");
-                            if(myRow.get(14).trim().length()>0){
+                            creditNum += Integer.parseInt(myRow.get(6).trim().length() > 0 ? myRow.get(6) : "0");
+                            ectsNum += Integer.parseInt(myRow.get(7).trim().length() > 0 ? myRow.get(7) : "0");
+                            lcount += Integer.parseInt(myRow.get(8).trim().length() > 0 ? myRow.get(8) : "0");
+                            pcount += Integer.parseInt(myRow.get(9).trim().length() > 0 ? myRow.get(9) : "0");
+                            lbcount += Integer.parseInt(myRow.get(10).trim().length() > 0 ? myRow.get(10) : "0");
+                            wtcount += Integer.parseInt(myRow.get(11).trim().length() > 0 ? myRow.get(11) : "0");
+                            ocount += Integer.parseInt(myRow.get(12).trim().length() > 0 ? myRow.get(12) : "0");
+                            allcount += Integer.parseInt(myRow.get(13).trim().length() > 0 ? myRow.get(13) : "0");
+                            if (myRow.get(14).trim().length() > 0) {
                                 examc++;
                             }
 
                         }
 
-                        allCredits +=creditNum; allEcts +=ectsNum; allLcount +=lcount; allPcount+=pcount; allLbcount+=lbcount; allwtcount+=wtcount; allOcount+=ocount; allCnt+=allcount; allexam+=examc;
-                        fallCredits +=allCredits; fallEcts +=allEcts; fallLcount +=allLcount; fallPcount+=allPcount; fallLbcount+=allLbcount; fallwtcount+=allwtcount; fallOcount+=allOcount; fallCnt+=allCnt;fallexam+=allexam;
-                        ffallCredits +=fallCredits; ffallEcts +=fallEcts; ffallLcount +=fallLcount; ffallPcount+=fallPcount; ffallLbcount+=fallLbcount; ffallwtcount+=fallwtcount; ffallOcount+=fallOcount; ffallCnt+=fallCnt;ffallexam+=fallexam;
-                        insertCell(table,"Всего за 2 семестр", Element.ALIGN_LEFT, 6,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allCredits), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allEcts), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allLcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allPcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allLbcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allwtcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allOcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allCnt), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allexam)+"Е/Э", Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        allCredits += creditNum;
+                        allEcts += ectsNum;
+                        allLcount += lcount;
+                        allPcount += pcount;
+                        allLbcount += lbcount;
+                        allwtcount += wtcount;
+                        allOcount += ocount;
+                        allCnt += allcount;
+                        allexam += examc;
+                        fallCredits += allCredits;
+                        fallEcts += allEcts;
+                        fallLcount += allLcount;
+                        fallPcount += allPcount;
+                        fallLbcount += allLbcount;
+                        fallwtcount += allwtcount;
+                        fallOcount += allOcount;
+                        fallCnt += allCnt;
+                        fallexam += allexam;
+                        ffallCredits += fallCredits;
+                        ffallEcts += fallEcts;
+                        ffallLcount += fallLcount;
+                        ffallPcount += fallPcount;
+                        ffallLbcount += fallLbcount;
+                        ffallwtcount += fallwtcount;
+                        ffallOcount += fallOcount;
+                        ffallCnt += fallCnt;
+                        ffallexam += fallexam;
+                        insertCell(table, "Всего за 2 семестр", Element.ALIGN_LEFT, 6, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allCredits), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allEcts), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allLcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allPcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allLbcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allwtcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allOcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allCnt), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allexam) + "Е/Э", Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
 
-                        insertCell(table,"Всего за 1 курс", Element.ALIGN_LEFT, 6,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(fallCredits), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(fallEcts), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(fallLcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(fallPcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(fallLbcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(fallwtcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(fallOcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(fallCnt), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(fallexam)+"Е/Э", Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        creditNum=0;ectsNum=0;lcount=0;pcount=0;lbcount=0;wtcount=0;ocount=0;allcount=0;examc=0;
-                        allCredits =0; allEcts =0; allLcount =0; allPcount=0; allLbcount=0; allwtcount=0; allOcount=0; allCnt=0; allexam=0;
-                        fallCredits = 0;fallEcts = 0; fallLcount =0; fallPcount=0; fallLbcount=0;fallwtcount =0;fallOcount=0;fallCnt=0;fallexam=0;
+                        insertCell(table, "Всего за 1 курс", Element.ALIGN_LEFT, 6, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(fallCredits), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(fallEcts), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(fallLcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(fallPcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(fallLbcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(fallwtcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(fallOcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(fallCnt), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(fallexam) + "Е/Э", Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        creditNum = 0;
+                        ectsNum = 0;
+                        lcount = 0;
+                        pcount = 0;
+                        lbcount = 0;
+                        wtcount = 0;
+                        ocount = 0;
+                        allcount = 0;
+                        examc = 0;
+                        allCredits = 0;
+                        allEcts = 0;
+                        allLcount = 0;
+                        allPcount = 0;
+                        allLbcount = 0;
+                        allwtcount = 0;
+                        allOcount = 0;
+                        allCnt = 0;
+                        allexam = 0;
+                        fallCredits = 0;
+                        fallEcts = 0;
+                        fallLcount = 0;
+                        fallPcount = 0;
+                        fallLbcount = 0;
+                        fallwtcount = 0;
+                        fallOcount = 0;
+                        fallCnt = 0;
+                        fallexam = 0;
                         insertCell(table, "2 курс", Element.ALIGN_CENTER, 15, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
                         insertCell(table, "3 семестр", Element.ALIGN_CENTER, 15, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
                         insertCell(table, "Міндетті компонент    Обязательный компонент", Element.ALIGN_CENTER, 15, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
@@ -523,54 +584,86 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
                             for (String value : myRow) {
                                 insertCell(table, value, Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
                             }
-                            creditNum += Integer.parseInt(myRow.get(6).trim().length()>0 ? myRow.get(6) :"0");
-                            ectsNum += Integer.parseInt(myRow.get(7).trim().length()>0 ? myRow.get(7) :"0");
-                            lcount += Integer.parseInt(myRow.get(8).trim().length()>0 ? myRow.get(8) :"0");
-                            pcount += Integer.parseInt(myRow.get(9).trim().length()>0 ? myRow.get(9) :"0");
-                            lbcount += Integer.parseInt(myRow.get(10).trim().length()>0 ? myRow.get(10) :"0");
-                            wtcount += Integer.parseInt(myRow.get(11).trim().length()>0 ? myRow.get(11) :"0");
-                            ocount += Integer.parseInt(myRow.get(12).trim().length()>0 ? myRow.get(12) :"0");
-                            allcount += Integer.parseInt(myRow.get(13).trim().length()>0 ? myRow.get(13) :"0");
-                            if(myRow.get(14).trim().length()>0){
+                            creditNum += Integer.parseInt(myRow.get(6).trim().length() > 0 ? myRow.get(6) : "0");
+                            ectsNum += Integer.parseInt(myRow.get(7).trim().length() > 0 ? myRow.get(7) : "0");
+                            lcount += Integer.parseInt(myRow.get(8).trim().length() > 0 ? myRow.get(8) : "0");
+                            pcount += Integer.parseInt(myRow.get(9).trim().length() > 0 ? myRow.get(9) : "0");
+                            lbcount += Integer.parseInt(myRow.get(10).trim().length() > 0 ? myRow.get(10) : "0");
+                            wtcount += Integer.parseInt(myRow.get(11).trim().length() > 0 ? myRow.get(11) : "0");
+                            ocount += Integer.parseInt(myRow.get(12).trim().length() > 0 ? myRow.get(12) : "0");
+                            allcount += Integer.parseInt(myRow.get(13).trim().length() > 0 ? myRow.get(13) : "0");
+                            if (myRow.get(14).trim().length() > 0) {
                                 examc++;
                             }
 
                         }
                         insertCell(table, "Таңдау компоненті    Компонент по выбору", Element.ALIGN_CENTER, 15, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        myData = getData(curriculum.getId().getId().intValue(),3,IUPS_TYPE.CHOOSEN);
+                        myData = getData(curriculum.getId().getId().intValue(), 3, IUPS_TYPE.CHOOSEN);
                         for (List<String> myRow : myData) {
                             for (String value : myRow) {
                                 insertCell(table, value, Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
                             }
-                            creditNum += Integer.parseInt(myRow.get(6).trim().length()>0 ? myRow.get(6) :"0");
-                            ectsNum += Integer.parseInt(myRow.get(7).trim().length()>0 ? myRow.get(7) :"0");
-                            lcount += Integer.parseInt(myRow.get(8).trim().length()>0 ? myRow.get(8) :"0");
-                            pcount += Integer.parseInt(myRow.get(9).trim().length()>0 ? myRow.get(9) :"0");
-                            lbcount += Integer.parseInt(myRow.get(10).trim().length()>0 ? myRow.get(10) :"0");
-                            wtcount += Integer.parseInt(myRow.get(11).trim().length()>0 ? myRow.get(11) :"0");
-                            ocount += Integer.parseInt(myRow.get(12).trim().length()>0 ? myRow.get(12) :"0");
-                            allcount += Integer.parseInt(myRow.get(13).trim().length()>0 ? myRow.get(13) :"0");
-                            if(myRow.get(14).trim().length()>0){
+                            creditNum += Integer.parseInt(myRow.get(6).trim().length() > 0 ? myRow.get(6) : "0");
+                            ectsNum += Integer.parseInt(myRow.get(7).trim().length() > 0 ? myRow.get(7) : "0");
+                            lcount += Integer.parseInt(myRow.get(8).trim().length() > 0 ? myRow.get(8) : "0");
+                            pcount += Integer.parseInt(myRow.get(9).trim().length() > 0 ? myRow.get(9) : "0");
+                            lbcount += Integer.parseInt(myRow.get(10).trim().length() > 0 ? myRow.get(10) : "0");
+                            wtcount += Integer.parseInt(myRow.get(11).trim().length() > 0 ? myRow.get(11) : "0");
+                            ocount += Integer.parseInt(myRow.get(12).trim().length() > 0 ? myRow.get(12) : "0");
+                            allcount += Integer.parseInt(myRow.get(13).trim().length() > 0 ? myRow.get(13) : "0");
+                            if (myRow.get(14).trim().length() > 0) {
                                 examc++;
                             }
 
                         }
-                        allCredits +=creditNum; allEcts +=ectsNum; allLcount +=lcount; allPcount+=pcount; allLbcount+=lbcount; allwtcount+=wtcount; allOcount+=ocount; allCnt+=allcount; allexam+=examc;
+                        allCredits += creditNum;
+                        allEcts += ectsNum;
+                        allLcount += lcount;
+                        allPcount += pcount;
+                        allLbcount += lbcount;
+                        allwtcount += wtcount;
+                        allOcount += ocount;
+                        allCnt += allcount;
+                        allexam += examc;
 
 
-                        insertCell(table,"Всего за 3 семестр", Element.ALIGN_LEFT, 6,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allCredits), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allEcts), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allLcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allPcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allLbcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allwtcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allOcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allCnt), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allexam)+"Е/Э", Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        fallCredits +=allCredits; fallEcts +=allEcts; fallLcount +=allLcount; fallPcount+=allPcount; fallLbcount+=allLbcount; fallwtcount+=allwtcount; fallOcount+=allOcount; fallCnt+=allCnt;fallexam+=allexam;
-                        allCredits =0; allEcts =0; allLcount =0; allPcount=0; allLbcount=0; allwtcount=0; allOcount=0; allCnt=0;allexam=0;
-                        creditNum=0;ectsNum=0;lcount=0;pcount=0;lbcount=0;wtcount=0;ocount=0;allcount=0;examc=0;
+                        insertCell(table, "Всего за 3 семестр", Element.ALIGN_LEFT, 6, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allCredits), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allEcts), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allLcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allPcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allLbcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allwtcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allOcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allCnt), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allexam) + "Е/Э", Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        fallCredits += allCredits;
+                        fallEcts += allEcts;
+                        fallLcount += allLcount;
+                        fallPcount += allPcount;
+                        fallLbcount += allLbcount;
+                        fallwtcount += allwtcount;
+                        fallOcount += allOcount;
+                        fallCnt += allCnt;
+                        fallexam += allexam;
+                        allCredits = 0;
+                        allEcts = 0;
+                        allLcount = 0;
+                        allPcount = 0;
+                        allLbcount = 0;
+                        allwtcount = 0;
+                        allOcount = 0;
+                        allCnt = 0;
+                        allexam = 0;
+                        creditNum = 0;
+                        ectsNum = 0;
+                        lcount = 0;
+                        pcount = 0;
+                        lbcount = 0;
+                        wtcount = 0;
+                        ocount = 0;
+                        allcount = 0;
+                        examc = 0;
 
                         insertCell(table, "4 семестр", Element.ALIGN_CENTER, 15, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
                         insertCell(table, "Міндетті компонент    Обязательный компонент", Element.ALIGN_CENTER, 15, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
@@ -579,65 +672,113 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
                             for (String value : myRow) {
                                 insertCell(table, value, Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
                             }
-                            ectsNum += Integer.parseInt(myRow.get(7).trim().length()>0 ? myRow.get(7) :"0");
-                            lcount += Integer.parseInt(myRow.get(8).trim().length()>0 ? myRow.get(8) :"0");
-                            pcount += Integer.parseInt(myRow.get(9).trim().length()>0 ? myRow.get(9) :"0");
-                            lbcount += Integer.parseInt(myRow.get(10).trim().length()>0 ? myRow.get(10) :"0");
-                            wtcount += Integer.parseInt(myRow.get(11).trim().length()>0 ? myRow.get(11) :"0");
-                            ocount += Integer.parseInt(myRow.get(12).trim().length()>0 ? myRow.get(12) :"0");
-                            allcount += Integer.parseInt(myRow.get(13).trim().length()>0 ? myRow.get(13) :"0");
-                            if(myRow.get(14).trim().length()>0){
+                            creditNum += Integer.parseInt(myRow.get(6).trim().length() > 0 ? myRow.get(6) : "0");
+                            ectsNum += Integer.parseInt(myRow.get(7).trim().length() > 0 ? myRow.get(7) : "0");
+                            lcount += Integer.parseInt(myRow.get(8).trim().length() > 0 ? myRow.get(8) : "0");
+                            pcount += Integer.parseInt(myRow.get(9).trim().length() > 0 ? myRow.get(9) : "0");
+                            lbcount += Integer.parseInt(myRow.get(10).trim().length() > 0 ? myRow.get(10) : "0");
+                            wtcount += Integer.parseInt(myRow.get(11).trim().length() > 0 ? myRow.get(11) : "0");
+                            ocount += Integer.parseInt(myRow.get(12).trim().length() > 0 ? myRow.get(12) : "0");
+                            allcount += Integer.parseInt(myRow.get(13).trim().length() > 0 ? myRow.get(13) : "0");
+                            if (myRow.get(14).trim().length() > 0) {
                                 examc++;
                             }
 
                         }
                         insertCell(table, "Таңдау компоненті    Компонент по выбору", Element.ALIGN_CENTER, 15, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        myData = getData(curriculum.getId().getId().intValue(),4,IUPS_TYPE.CHOOSEN);
+                        myData = getData(curriculum.getId().getId().intValue(), 4, IUPS_TYPE.CHOOSEN);
                         for (List<String> myRow : myData) {
                             for (String value : myRow) {
                                 insertCell(table, value, Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
                             }
-                            creditNum += Integer.parseInt(myRow.get(6).trim().length()>0 ? myRow.get(6) :"0");
-                            ectsNum += Integer.parseInt(myRow.get(7).trim().length()>0 ? myRow.get(7) :"0");
-                            lcount += Integer.parseInt(myRow.get(8).trim().length()>0 ? myRow.get(8) :"0");
-                            pcount += Integer.parseInt(myRow.get(9).trim().length()>0 ? myRow.get(9) :"0");
-                            lbcount += Integer.parseInt(myRow.get(10).trim().length()>0 ? myRow.get(10) :"0");
-                            wtcount += Integer.parseInt(myRow.get(11).trim().length()>0 ? myRow.get(11) :"0");
-                            ocount += Integer.parseInt(myRow.get(12).trim().length()>0 ? myRow.get(12) :"0");
-                            allcount += Integer.parseInt(myRow.get(13).trim().length()>0 ? myRow.get(13) :"0");
-                            if(myRow.get(14).trim().length()>0){
+                            creditNum += Integer.parseInt(myRow.get(6).trim().length() > 0 ? myRow.get(6) : "0");
+                            ectsNum += Integer.parseInt(myRow.get(7).trim().length() > 0 ? myRow.get(7) : "0");
+                            lcount += Integer.parseInt(myRow.get(8).trim().length() > 0 ? myRow.get(8) : "0");
+                            pcount += Integer.parseInt(myRow.get(9).trim().length() > 0 ? myRow.get(9) : "0");
+                            lbcount += Integer.parseInt(myRow.get(10).trim().length() > 0 ? myRow.get(10) : "0");
+                            wtcount += Integer.parseInt(myRow.get(11).trim().length() > 0 ? myRow.get(11) : "0");
+                            ocount += Integer.parseInt(myRow.get(12).trim().length() > 0 ? myRow.get(12) : "0");
+                            allcount += Integer.parseInt(myRow.get(13).trim().length() > 0 ? myRow.get(13) : "0");
+                            if (myRow.get(14).trim().length() > 0) {
                                 examc++;
                             }
                         }
 
-                        allCredits +=creditNum; allEcts +=ectsNum; allLcount +=lcount; allPcount+=pcount; allLbcount+=lbcount; allwtcount+=wtcount; allOcount+=ocount; allCnt+=allcount;allexam+=examc;
-                        fallCredits +=allCredits; fallEcts +=allEcts; fallLcount +=allLcount; fallPcount+=allPcount; fallLbcount+=allLbcount; fallwtcount+=allwtcount; fallOcount+=allOcount; fallCnt+=allCnt; fallexam+=allexam;
-                        ffallCredits +=fallCredits; ffallEcts +=fallEcts; ffallLcount +=fallLcount; ffallPcount+=fallPcount; ffallLbcount+=fallLbcount; ffallwtcount+=fallwtcount; ffallOcount+=fallOcount; ffallCnt+=fallCnt;ffallexam+=fallexam;
+                        allCredits += creditNum;
+                        allEcts += ectsNum;
+                        allLcount += lcount;
+                        allPcount += pcount;
+                        allLbcount += lbcount;
+                        allwtcount += wtcount;
+                        allOcount += ocount;
+                        allCnt += allcount;
+                        allexam += examc;
+                        fallCredits += allCredits;
+                        fallEcts += allEcts;
+                        fallLcount += allLcount;
+                        fallPcount += allPcount;
+                        fallLbcount += allLbcount;
+                        fallwtcount += allwtcount;
+                        fallOcount += allOcount;
+                        fallCnt += allCnt;
+                        fallexam += allexam;
+                        ffallCredits += fallCredits;
+                        ffallEcts += fallEcts;
+                        ffallLcount += fallLcount;
+                        ffallPcount += fallPcount;
+                        ffallLbcount += fallLbcount;
+                        ffallwtcount += fallwtcount;
+                        ffallOcount += fallOcount;
+                        ffallCnt += fallCnt;
+                        ffallexam += fallexam;
 
-                        insertCell(table,"Всего за 4 семестр", Element.ALIGN_LEFT, 6,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allCredits), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allEcts), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allLcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allPcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allLbcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allwtcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allOcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allCnt), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allexam)+"Е/Э", Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        allCredits =0; allEcts =0; allLcount =0; allPcount=0; allLbcount=0; allwtcount=0; allOcount=0; allCnt=0;
-                        creditNum=0;ectsNum=0;lcount=0;pcount=0;lbcount=0;wtcount=0;ocount=0;allcount=0;examc=0;
-                        insertCell(table,"Всего за 2 курс", Element.ALIGN_LEFT, 6,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(fallCredits), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(fallEcts), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(fallLcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(fallPcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(fallLbcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(fallwtcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(fallOcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(fallCnt), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(fallexam)+"Е/Э", Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        fallCredits = 0;fallEcts = 0; fallLcount =0; fallPcount=0; fallLbcount=0;fallwtcount =0;fallOcount=0;fallCnt=0;
-                        allexam=0;fallexam=0;
+                        insertCell(table, "Всего за 4 семестр", Element.ALIGN_LEFT, 6, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allCredits), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allEcts), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allLcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allPcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allLbcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allwtcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allOcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allCnt), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allexam) + "Е/Э", Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        allCredits = 0;
+                        allEcts = 0;
+                        allLcount = 0;
+                        allPcount = 0;
+                        allLbcount = 0;
+                        allwtcount = 0;
+                        allOcount = 0;
+                        allCnt = 0;
+                        creditNum = 0;
+                        ectsNum = 0;
+                        lcount = 0;
+                        pcount = 0;
+                        lbcount = 0;
+                        wtcount = 0;
+                        ocount = 0;
+                        allcount = 0;
+                        examc = 0;
+                        insertCell(table, "Всего за 2 курс", Element.ALIGN_LEFT, 6, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(fallCredits), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(fallEcts), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(fallLcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(fallPcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(fallLbcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(fallwtcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(fallOcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(fallCnt), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(fallexam) + "Е/Э", Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        fallCredits = 0;
+                        fallEcts = 0;
+                        fallLcount = 0;
+                        fallPcount = 0;
+                        fallLbcount = 0;
+                        fallwtcount = 0;
+                        fallOcount = 0;
+                        fallCnt = 0;
+                        allexam = 0;
+                        fallexam = 0;
                         insertCell(table, "3 курс", Element.ALIGN_CENTER, 15, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
                         insertCell(table, "5 семестр", Element.ALIGN_CENTER, 15, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
                         insertCell(table, "Міндетті компонент    Обязательный компонент", Element.ALIGN_CENTER, 15, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
@@ -646,56 +787,88 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
                             for (String value : myRow) {
                                 insertCell(table, value, Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
                             }
-                            creditNum += Integer.parseInt(myRow.get(6).trim().length()>0 ? myRow.get(6) :"0");
-                            ectsNum += Integer.parseInt(myRow.get(7).trim().length()>0 ? myRow.get(7) :"0");
-                            lcount += Integer.parseInt(myRow.get(8).trim().length()>0 ? myRow.get(8) :"0");
-                            pcount += Integer.parseInt(myRow.get(9).trim().length()>0 ? myRow.get(9) :"0");
-                            lbcount += Integer.parseInt(myRow.get(10).trim().length()>0 ? myRow.get(10) :"0");
-                            wtcount += Integer.parseInt(myRow.get(11).trim().length()>0 ? myRow.get(11) :"0");
-                            ocount += Integer.parseInt(myRow.get(12).trim().length()>0 ? myRow.get(12) :"0");
-                            allcount += Integer.parseInt(myRow.get(13).trim().length()>0 ? myRow.get(13) :"0");
-                            if(myRow.get(14).trim().length()>0){
+                            creditNum += Integer.parseInt(myRow.get(6).trim().length() > 0 ? myRow.get(6) : "0");
+                            ectsNum += Integer.parseInt(myRow.get(7).trim().length() > 0 ? myRow.get(7) : "0");
+                            lcount += Integer.parseInt(myRow.get(8).trim().length() > 0 ? myRow.get(8) : "0");
+                            pcount += Integer.parseInt(myRow.get(9).trim().length() > 0 ? myRow.get(9) : "0");
+                            lbcount += Integer.parseInt(myRow.get(10).trim().length() > 0 ? myRow.get(10) : "0");
+                            wtcount += Integer.parseInt(myRow.get(11).trim().length() > 0 ? myRow.get(11) : "0");
+                            ocount += Integer.parseInt(myRow.get(12).trim().length() > 0 ? myRow.get(12) : "0");
+                            allcount += Integer.parseInt(myRow.get(13).trim().length() > 0 ? myRow.get(13) : "0");
+                            if (myRow.get(14).trim().length() > 0) {
                                 examc++;
                             }
 
                         }
                         insertCell(table, "Таңдау компоненті    Компонент по выбору", Element.ALIGN_CENTER, 15, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        myData = getData(curriculum.getId().getId().intValue(),5,IUPS_TYPE.CHOOSEN);
+                        myData = getData(curriculum.getId().getId().intValue(), 5, IUPS_TYPE.CHOOSEN);
                         for (List<String> myRow : myData) {
                             for (String value : myRow) {
                                 insertCell(table, value, Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
                             }
-                            creditNum += Integer.parseInt(myRow.get(6).trim().length()>0 ? myRow.get(6) :"0");
-                            ectsNum += Integer.parseInt(myRow.get(7).trim().length()>0 ? myRow.get(7) :"0");
-                            lcount += Integer.parseInt(myRow.get(8).trim().length()>0 ? myRow.get(8) :"0");
-                            pcount += Integer.parseInt(myRow.get(9).trim().length()>0 ? myRow.get(9) :"0");
-                            lbcount += Integer.parseInt(myRow.get(10).trim().length()>0 ? myRow.get(10) :"0");
-                            wtcount += Integer.parseInt(myRow.get(11).trim().length()>0 ? myRow.get(11) :"0");
-                            ocount += Integer.parseInt(myRow.get(12).trim().length()>0 ? myRow.get(12) :"0");
-                            allcount += Integer.parseInt(myRow.get(13).trim().length()>0 ? myRow.get(13) :"0");
-                            if(myRow.get(14).trim().length()>0){
+                            creditNum += Integer.parseInt(myRow.get(6).trim().length() > 0 ? myRow.get(6) : "0");
+                            ectsNum += Integer.parseInt(myRow.get(7).trim().length() > 0 ? myRow.get(7) : "0");
+                            lcount += Integer.parseInt(myRow.get(8).trim().length() > 0 ? myRow.get(8) : "0");
+                            pcount += Integer.parseInt(myRow.get(9).trim().length() > 0 ? myRow.get(9) : "0");
+                            lbcount += Integer.parseInt(myRow.get(10).trim().length() > 0 ? myRow.get(10) : "0");
+                            wtcount += Integer.parseInt(myRow.get(11).trim().length() > 0 ? myRow.get(11) : "0");
+                            ocount += Integer.parseInt(myRow.get(12).trim().length() > 0 ? myRow.get(12) : "0");
+                            allcount += Integer.parseInt(myRow.get(13).trim().length() > 0 ? myRow.get(13) : "0");
+                            if (myRow.get(14).trim().length() > 0) {
                                 examc++;
                             }
 
                         }
 
-                        allCredits +=creditNum; allEcts +=ectsNum; allLcount +=lcount; allPcount+=pcount; allLbcount+=lbcount; allwtcount+=wtcount; allOcount+=ocount; allCnt+=allcount;allexam+=examc;
+                        allCredits += creditNum;
+                        allEcts += ectsNum;
+                        allLcount += lcount;
+                        allPcount += pcount;
+                        allLbcount += lbcount;
+                        allwtcount += wtcount;
+                        allOcount += ocount;
+                        allCnt += allcount;
+                        allexam += examc;
 
-                        insertCell(table,"Всего за 5 семестр", Element.ALIGN_LEFT, 6,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allCredits), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allEcts), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allLcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allPcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allLbcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allwtcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allOcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allCnt), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allexam)+"Е/Э", Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, "Всего за 5 семестр", Element.ALIGN_LEFT, 6, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allCredits), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allEcts), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allLcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allPcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allLbcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allwtcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allOcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allCnt), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allexam) + "Е/Э", Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
 
-                        fallCredits +=allCredits; fallEcts +=allEcts; fallLcount +=allLcount; fallPcount+=allPcount; fallLbcount+=allLbcount; fallwtcount+=allwtcount; fallOcount+=allOcount; fallCnt+=allCnt; fallexam+=allexam;
+                        fallCredits += allCredits;
+                        fallEcts += allEcts;
+                        fallLcount += allLcount;
+                        fallPcount += allPcount;
+                        fallLbcount += allLbcount;
+                        fallwtcount += allwtcount;
+                        fallOcount += allOcount;
+                        fallCnt += allCnt;
+                        fallexam += allexam;
 
-                        allCredits =0; allEcts =0; allLcount =0; allPcount=0; allLbcount=0; allwtcount=0; allOcount=0; allCnt=0;examc=0;
-                        creditNum=0;ectsNum=0;lcount=0;pcount=0;lbcount=0;wtcount=0;ocount=0;allcount=0;allexam=0;
+                        allCredits = 0;
+                        allEcts = 0;
+                        allLcount = 0;
+                        allPcount = 0;
+                        allLbcount = 0;
+                        allwtcount = 0;
+                        allOcount = 0;
+                        allCnt = 0;
+                        examc = 0;
+                        creditNum = 0;
+                        ectsNum = 0;
+                        lcount = 0;
+                        pcount = 0;
+                        lbcount = 0;
+                        wtcount = 0;
+                        ocount = 0;
+                        allcount = 0;
+                        allexam = 0;
 
 
                         insertCell(table, "6 семестр", Element.ALIGN_CENTER, 15, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
@@ -705,67 +878,115 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
                             for (String value : myRow) {
                                 insertCell(table, value, Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
                             }
-                            creditNum += Integer.parseInt(myRow.get(6).trim().length()>0 ? myRow.get(6) :"0");
-                            ectsNum += Integer.parseInt(myRow.get(7).trim().length()>0 ? myRow.get(7) :"0");
-                            lcount += Integer.parseInt(myRow.get(8).trim().length()>0 ? myRow.get(8) :"0");
-                            pcount += Integer.parseInt(myRow.get(9).trim().length()>0 ? myRow.get(9) :"0");
-                            lbcount += Integer.parseInt(myRow.get(10).trim().length()>0 ? myRow.get(10) :"0");
-                            wtcount += Integer.parseInt(myRow.get(11).trim().length()>0 ? myRow.get(11) :"0");
-                            ocount += Integer.parseInt(myRow.get(12).trim().length()>0 ? myRow.get(12) :"0");
-                            allcount += Integer.parseInt(myRow.get(13).trim().length()>0 ? myRow.get(13) :"0");
-                            if(myRow.get(14).trim().length()>0){
+                            creditNum += Integer.parseInt(myRow.get(6).trim().length() > 0 ? myRow.get(6) : "0");
+                            ectsNum += Integer.parseInt(myRow.get(7).trim().length() > 0 ? myRow.get(7) : "0");
+                            lcount += Integer.parseInt(myRow.get(8).trim().length() > 0 ? myRow.get(8) : "0");
+                            pcount += Integer.parseInt(myRow.get(9).trim().length() > 0 ? myRow.get(9) : "0");
+                            lbcount += Integer.parseInt(myRow.get(10).trim().length() > 0 ? myRow.get(10) : "0");
+                            wtcount += Integer.parseInt(myRow.get(11).trim().length() > 0 ? myRow.get(11) : "0");
+                            ocount += Integer.parseInt(myRow.get(12).trim().length() > 0 ? myRow.get(12) : "0");
+                            allcount += Integer.parseInt(myRow.get(13).trim().length() > 0 ? myRow.get(13) : "0");
+                            if (myRow.get(14).trim().length() > 0) {
                                 examc++;
                             }
 
                         }
                         insertCell(table, "Таңдау компоненті    Компонент по выбору", Element.ALIGN_CENTER, 15, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        myData = getData(curriculum.getId().getId().intValue(),6,IUPS_TYPE.CHOOSEN);
+                        myData = getData(curriculum.getId().getId().intValue(), 6, IUPS_TYPE.CHOOSEN);
                         for (List<String> myRow : myData) {
                             for (String value : myRow) {
                                 insertCell(table, value, Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
                             }
-                            creditNum += Integer.parseInt(myRow.get(6).trim().length()>0 ? myRow.get(6) :"0");
-                            ectsNum += Integer.parseInt(myRow.get(7).trim().length()>0 ? myRow.get(7) :"0");
-                            lcount += Integer.parseInt(myRow.get(8).trim().length()>0 ? myRow.get(8) :"0");
-                            pcount += Integer.parseInt(myRow.get(9).trim().length()>0 ? myRow.get(9) :"0");
-                            lbcount += Integer.parseInt(myRow.get(10).trim().length()>0 ? myRow.get(10) :"0");
-                            wtcount += Integer.parseInt(myRow.get(11).trim().length()>0 ? myRow.get(11) :"0");
-                            ocount += Integer.parseInt(myRow.get(12).trim().length()>0 ? myRow.get(12) :"0");
-                            allcount += Integer.parseInt(myRow.get(13).trim().length()>0 ? myRow.get(13) :"0");
-                            if(myRow.get(14).trim().length()>0){
+                            creditNum += Integer.parseInt(myRow.get(6).trim().length() > 0 ? myRow.get(6) : "0");
+                            ectsNum += Integer.parseInt(myRow.get(7).trim().length() > 0 ? myRow.get(7) : "0");
+                            lcount += Integer.parseInt(myRow.get(8).trim().length() > 0 ? myRow.get(8) : "0");
+                            pcount += Integer.parseInt(myRow.get(9).trim().length() > 0 ? myRow.get(9) : "0");
+                            lbcount += Integer.parseInt(myRow.get(10).trim().length() > 0 ? myRow.get(10) : "0");
+                            wtcount += Integer.parseInt(myRow.get(11).trim().length() > 0 ? myRow.get(11) : "0");
+                            ocount += Integer.parseInt(myRow.get(12).trim().length() > 0 ? myRow.get(12) : "0");
+                            allcount += Integer.parseInt(myRow.get(13).trim().length() > 0 ? myRow.get(13) : "0");
+                            if (myRow.get(14).trim().length() > 0) {
                                 examc++;
                             }
 
                         }
 
-                        allCredits +=creditNum; allEcts +=ectsNum; allLcount +=lcount; allPcount+=pcount; allLbcount+=lbcount; allwtcount+=wtcount; allOcount+=ocount; allCnt+=allcount;allexam+=examc;
+                        allCredits += creditNum;
+                        allEcts += ectsNum;
+                        allLcount += lcount;
+                        allPcount += pcount;
+                        allLbcount += lbcount;
+                        allwtcount += wtcount;
+                        allOcount += ocount;
+                        allCnt += allcount;
+                        allexam += examc;
 
-                        insertCell(table,"Всего за 6 семестр", Element.ALIGN_LEFT, 6,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allCredits), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allEcts), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allLcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allPcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allLbcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allwtcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allOcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allCnt), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allexam)+"Е/Э", Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        fallCredits +=allCredits; fallEcts +=allEcts; fallLcount +=allLcount; fallPcount+=allPcount; fallLbcount+=allLbcount; fallwtcount+=allwtcount; fallOcount+=allOcount; fallCnt+=allCnt; fallexam+=examc;
-                        ffallCredits +=fallCredits; ffallEcts +=fallEcts; ffallLcount +=fallLcount; ffallPcount+=fallPcount; ffallLbcount+=fallLbcount; ffallwtcount+=fallwtcount; ffallOcount+=fallOcount; ffallCnt+=fallCnt;ffallexam+=fallexam;
-                        allCredits =0; allEcts =0; allLcount =0; allPcount=0; allLbcount=0; allwtcount=0; allOcount=0; allCnt=0;allexam=0;
+                        insertCell(table, "Всего за 6 семестр", Element.ALIGN_LEFT, 6, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allCredits), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allEcts), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allLcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allPcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allLbcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allwtcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allOcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allCnt), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allexam) + "Е/Э", Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        fallCredits += allCredits;
+                        fallEcts += allEcts;
+                        fallLcount += allLcount;
+                        fallPcount += allPcount;
+                        fallLbcount += allLbcount;
+                        fallwtcount += allwtcount;
+                        fallOcount += allOcount;
+                        fallCnt += allCnt;
+                        fallexam += examc;
+                        ffallCredits += fallCredits;
+                        ffallEcts += fallEcts;
+                        ffallLcount += fallLcount;
+                        ffallPcount += fallPcount;
+                        ffallLbcount += fallLbcount;
+                        ffallwtcount += fallwtcount;
+                        ffallOcount += fallOcount;
+                        ffallCnt += fallCnt;
+                        ffallexam += fallexam;
+                        allCredits = 0;
+                        allEcts = 0;
+                        allLcount = 0;
+                        allPcount = 0;
+                        allLbcount = 0;
+                        allwtcount = 0;
+                        allOcount = 0;
+                        allCnt = 0;
+                        allexam = 0;
 
-                        insertCell(table,"Всего за 3 курс", Element.ALIGN_LEFT, 6,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(fallCredits), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(fallEcts), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(fallLcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(fallPcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(fallLbcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(fallwtcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(fallOcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(fallCnt), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(fallexam)+"Е/Э", Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        fallCredits = 0;fallEcts = 0; fallLcount =0; fallPcount=0; fallLbcount=0;fallwtcount =0;fallOcount=0;fallCnt=0;fallexam=0;
-                        creditNum=0;ectsNum=0;lcount=0;pcount=0;lbcount=0;wtcount=0;ocount=0;allcount=0;examc=0;
+                        insertCell(table, "Всего за 3 курс", Element.ALIGN_LEFT, 6, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(fallCredits), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(fallEcts), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(fallLcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(fallPcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(fallLbcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(fallwtcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(fallOcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(fallCnt), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(fallexam) + "Е/Э", Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        fallCredits = 0;
+                        fallEcts = 0;
+                        fallLcount = 0;
+                        fallPcount = 0;
+                        fallLbcount = 0;
+                        fallwtcount = 0;
+                        fallOcount = 0;
+                        fallCnt = 0;
+                        fallexam = 0;
+                        creditNum = 0;
+                        ectsNum = 0;
+                        lcount = 0;
+                        pcount = 0;
+                        lbcount = 0;
+                        wtcount = 0;
+                        ocount = 0;
+                        allcount = 0;
+                        examc = 0;
 
                         insertCell(table, "4 курс", Element.ALIGN_CENTER, 15, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
                         insertCell(table, "7 семестр", Element.ALIGN_CENTER, 15, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
@@ -775,54 +996,86 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
                             for (String value : myRow) {
                                 insertCell(table, value, Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
                             }
-                            creditNum += Integer.parseInt(myRow.get(6).trim().length()>0 ? myRow.get(6) :"0");
-                            ectsNum += Integer.parseInt(myRow.get(7).trim().length()>0 ? myRow.get(7) :"0");
-                            lcount += Integer.parseInt(myRow.get(8).trim().length()>0 ? myRow.get(8) :"0");
-                            pcount += Integer.parseInt(myRow.get(9).trim().length()>0 ? myRow.get(9) :"0");
-                            lbcount += Integer.parseInt(myRow.get(10).trim().length()>0 ? myRow.get(10) :"0");
-                            wtcount += Integer.parseInt(myRow.get(11).trim().length()>0 ? myRow.get(11) :"0");
-                            ocount += Integer.parseInt(myRow.get(12).trim().length()>0 ? myRow.get(12) :"0");
-                            allcount += Integer.parseInt(myRow.get(13).trim().length()>0 ? myRow.get(13) :"0");
-                            if(myRow.get(14).trim().length()>0){
+                            creditNum += Integer.parseInt(myRow.get(6).trim().length() > 0 ? myRow.get(6) : "0");
+                            ectsNum += Integer.parseInt(myRow.get(7).trim().length() > 0 ? myRow.get(7) : "0");
+                            lcount += Integer.parseInt(myRow.get(8).trim().length() > 0 ? myRow.get(8) : "0");
+                            pcount += Integer.parseInt(myRow.get(9).trim().length() > 0 ? myRow.get(9) : "0");
+                            lbcount += Integer.parseInt(myRow.get(10).trim().length() > 0 ? myRow.get(10) : "0");
+                            wtcount += Integer.parseInt(myRow.get(11).trim().length() > 0 ? myRow.get(11) : "0");
+                            ocount += Integer.parseInt(myRow.get(12).trim().length() > 0 ? myRow.get(12) : "0");
+                            allcount += Integer.parseInt(myRow.get(13).trim().length() > 0 ? myRow.get(13) : "0");
+                            if (myRow.get(14).trim().length() > 0) {
                                 examc++;
                             }
 
                         }
                         insertCell(table, "Таңдау компоненті    Компонент по выбору", Element.ALIGN_CENTER, 15, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        myData = getData(curriculum.getId().getId().intValue(),7,IUPS_TYPE.CHOOSEN);
+                        myData = getData(curriculum.getId().getId().intValue(), 7, IUPS_TYPE.CHOOSEN);
                         for (List<String> myRow : myData) {
                             for (String value : myRow) {
                                 insertCell(table, value, Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
                             }
-                            creditNum += Integer.parseInt(myRow.get(6).trim().length()>0 ? myRow.get(6) :"0");
-                            ectsNum += Integer.parseInt(myRow.get(7).trim().length()>0 ? myRow.get(7) :"0");
-                            lcount += Integer.parseInt(myRow.get(8).trim().length()>0 ? myRow.get(8) :"0");
-                            pcount += Integer.parseInt(myRow.get(9).trim().length()>0 ? myRow.get(9) :"0");
-                            lbcount += Integer.parseInt(myRow.get(10).trim().length()>0 ? myRow.get(10) :"0");
-                            wtcount += Integer.parseInt(myRow.get(11).trim().length()>0 ? myRow.get(11) :"0");
-                            ocount += Integer.parseInt(myRow.get(12).trim().length()>0 ? myRow.get(12) :"0");
-                            allcount += Integer.parseInt(myRow.get(13).trim().length()>0 ? myRow.get(13) :"0");
-                            if(myRow.get(14).trim().length()>0){
+                            creditNum += Integer.parseInt(myRow.get(6).trim().length() > 0 ? myRow.get(6) : "0");
+                            ectsNum += Integer.parseInt(myRow.get(7).trim().length() > 0 ? myRow.get(7) : "0");
+                            lcount += Integer.parseInt(myRow.get(8).trim().length() > 0 ? myRow.get(8) : "0");
+                            pcount += Integer.parseInt(myRow.get(9).trim().length() > 0 ? myRow.get(9) : "0");
+                            lbcount += Integer.parseInt(myRow.get(10).trim().length() > 0 ? myRow.get(10) : "0");
+                            wtcount += Integer.parseInt(myRow.get(11).trim().length() > 0 ? myRow.get(11) : "0");
+                            ocount += Integer.parseInt(myRow.get(12).trim().length() > 0 ? myRow.get(12) : "0");
+                            allcount += Integer.parseInt(myRow.get(13).trim().length() > 0 ? myRow.get(13) : "0");
+                            if (myRow.get(14).trim().length() > 0) {
                                 examc++;
                             }
                         }
 
-                        allCredits +=creditNum; allEcts +=ectsNum; allLcount +=lcount; allPcount+=pcount; allLbcount+=lbcount; allwtcount+=wtcount; allOcount+=ocount; allCnt+=allcount;allexam+=examc;
+                        allCredits += creditNum;
+                        allEcts += ectsNum;
+                        allLcount += lcount;
+                        allPcount += pcount;
+                        allLbcount += lbcount;
+                        allwtcount += wtcount;
+                        allOcount += ocount;
+                        allCnt += allcount;
+                        allexam += examc;
 
-                        insertCell(table,"Всего за 7 семестр", Element.ALIGN_LEFT, 6,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allCredits), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allEcts), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allLcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allPcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allLbcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allwtcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allOcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allCnt), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allexam)+"Е/Э", Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        fallCredits +=allCredits; fallEcts +=allEcts; fallLcount +=allLcount; fallPcount+=allPcount; fallLbcount+=allLbcount; fallwtcount+=allwtcount; fallOcount+=allOcount; fallCnt+=allCnt;fallexam+=allexam;
+                        insertCell(table, "Всего за 7 семестр", Element.ALIGN_LEFT, 6, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allCredits), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allEcts), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allLcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allPcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allLbcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allwtcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allOcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allCnt), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allexam) + "Е/Э", Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        fallCredits += allCredits;
+                        fallEcts += allEcts;
+                        fallLcount += allLcount;
+                        fallPcount += allPcount;
+                        fallLbcount += allLbcount;
+                        fallwtcount += allwtcount;
+                        fallOcount += allOcount;
+                        fallCnt += allCnt;
+                        fallexam += allexam;
 
-                        allCredits =0; allEcts =0; allLcount =0; allPcount=0; allLbcount=0; allwtcount=0; allOcount=0; allCnt=0;allexam=0;
-                        creditNum=0;ectsNum=0;lcount=0;pcount=0;lbcount=0;wtcount=0;ocount=0;allcount=0;examc=0;
+                        allCredits = 0;
+                        allEcts = 0;
+                        allLcount = 0;
+                        allPcount = 0;
+                        allLbcount = 0;
+                        allwtcount = 0;
+                        allOcount = 0;
+                        allCnt = 0;
+                        allexam = 0;
+                        creditNum = 0;
+                        ectsNum = 0;
+                        lcount = 0;
+                        pcount = 0;
+                        lbcount = 0;
+                        wtcount = 0;
+                        ocount = 0;
+                        allcount = 0;
+                        examc = 0;
 
                         insertCell(table, "8 семестр", Element.ALIGN_CENTER, 15, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
                         insertCell(table, "Міндетті компонент    Обязательный компонент", Element.ALIGN_CENTER, 15, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
@@ -831,158 +1084,266 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
                             for (String value : myRow) {
                                 insertCell(table, value, Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
                             }
-                            creditNum += Integer.parseInt(myRow.get(6).trim().length()>0 ? myRow.get(6) :"0");
-                            ectsNum += Integer.parseInt(myRow.get(7).trim().length()>0 ? myRow.get(7) :"0");
-                            lcount += Integer.parseInt(myRow.get(8).trim().length()>0 ? myRow.get(8) :"0");
-                            pcount += Integer.parseInt(myRow.get(9).trim().length()>0 ? myRow.get(9) :"0");
-                            lbcount += Integer.parseInt(myRow.get(10).trim().length()>0 ? myRow.get(10) :"0");
-                            wtcount += Integer.parseInt(myRow.get(11).trim().length()>0 ? myRow.get(11) :"0");
-                            ocount += Integer.parseInt(myRow.get(12).trim().length()>0 ? myRow.get(12) :"0");
-                            allcount += Integer.parseInt(myRow.get(13).trim().length()>0 ? myRow.get(13) :"0");
-                            if(myRow.get(14).trim().length()>0){
+                            creditNum += Integer.parseInt(myRow.get(6).trim().length() > 0 ? myRow.get(6) : "0");
+                            ectsNum += Integer.parseInt(myRow.get(7).trim().length() > 0 ? myRow.get(7) : "0");
+                            lcount += Integer.parseInt(myRow.get(8).trim().length() > 0 ? myRow.get(8) : "0");
+                            pcount += Integer.parseInt(myRow.get(9).trim().length() > 0 ? myRow.get(9) : "0");
+                            lbcount += Integer.parseInt(myRow.get(10).trim().length() > 0 ? myRow.get(10) : "0");
+                            wtcount += Integer.parseInt(myRow.get(11).trim().length() > 0 ? myRow.get(11) : "0");
+                            ocount += Integer.parseInt(myRow.get(12).trim().length() > 0 ? myRow.get(12) : "0");
+                            allcount += Integer.parseInt(myRow.get(13).trim().length() > 0 ? myRow.get(13) : "0");
+                            if (myRow.get(14).trim().length() > 0) {
                                 examc++;
                             }
                         }
                         insertCell(table, "Таңдау компоненті    Компонент по выбору", Element.ALIGN_CENTER, 15, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        myData = getData(curriculum.getId().getId().intValue(),8,IUPS_TYPE.CHOOSEN);
+                        myData = getData(curriculum.getId().getId().intValue(), 8, IUPS_TYPE.CHOOSEN);
                         for (List<String> myRow : myData) {
                             for (String value : myRow) {
                                 insertCell(table, value, Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
                             }
-                            creditNum += Integer.parseInt(myRow.get(6).trim().length()>0 ? myRow.get(6) :"0");
-                            ectsNum += Integer.parseInt(myRow.get(7).trim().length()>0 ? myRow.get(7) :"0");
-                            lcount += Integer.parseInt(myRow.get(8).trim().length()>0 ? myRow.get(8) :"0");
-                            pcount += Integer.parseInt(myRow.get(9).trim().length()>0 ? myRow.get(9) :"0");
-                            lbcount += Integer.parseInt(myRow.get(10).trim().length()>0 ? myRow.get(10) :"0");
-                            wtcount += Integer.parseInt(myRow.get(11).trim().length()>0 ? myRow.get(11) :"0");
-                            ocount += Integer.parseInt(myRow.get(12).trim().length()>0 ? myRow.get(12) :"0");
-                            allcount += Integer.parseInt(myRow.get(13).trim().length()>0 ? myRow.get(13) :"0");
-                            if(myRow.get(14).trim().length()>0){
+                            creditNum += Integer.parseInt(myRow.get(6).trim().length() > 0 ? myRow.get(6) : "0");
+                            ectsNum += Integer.parseInt(myRow.get(7).trim().length() > 0 ? myRow.get(7) : "0");
+                            lcount += Integer.parseInt(myRow.get(8).trim().length() > 0 ? myRow.get(8) : "0");
+                            pcount += Integer.parseInt(myRow.get(9).trim().length() > 0 ? myRow.get(9) : "0");
+                            lbcount += Integer.parseInt(myRow.get(10).trim().length() > 0 ? myRow.get(10) : "0");
+                            wtcount += Integer.parseInt(myRow.get(11).trim().length() > 0 ? myRow.get(11) : "0");
+                            ocount += Integer.parseInt(myRow.get(12).trim().length() > 0 ? myRow.get(12) : "0");
+                            allcount += Integer.parseInt(myRow.get(13).trim().length() > 0 ? myRow.get(13) : "0");
+                            if (myRow.get(14).trim().length() > 0) {
                                 examc++;
                             }
                         }
-                        allCredits +=creditNum; allEcts +=ectsNum; allLcount +=lcount; allPcount+=pcount; allLbcount+=lbcount; allwtcount+=wtcount; allOcount+=ocount; allCnt+=allcount;allexam+=examc;
-                        fallCredits +=allCredits; fallEcts +=allEcts; fallLcount +=allLcount; fallPcount+=allPcount; fallLbcount+=allLbcount; fallwtcount+=allwtcount; fallOcount+=allOcount; fallCnt+=allCnt;fallexam+=allexam;
-                        ffallCredits +=fallCredits; ffallEcts +=fallEcts; ffallLcount +=fallLcount; ffallPcount+=fallPcount; ffallLbcount+=fallLbcount; ffallwtcount+=fallwtcount; ffallOcount+=fallOcount; ffallCnt+=fallCnt;ffallexam+=fallexam;
-                        insertCell(table,"Всего за 8 семестр", Element.ALIGN_LEFT, 6,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allCredits), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allEcts), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allLcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allPcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allLbcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allwtcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allOcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allCnt), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allexam)+"Е/Э", Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        allCredits += creditNum;
+                        allEcts += ectsNum;
+                        allLcount += lcount;
+                        allPcount += pcount;
+                        allLbcount += lbcount;
+                        allwtcount += wtcount;
+                        allOcount += ocount;
+                        allCnt += allcount;
+                        allexam += examc;
+                        fallCredits += allCredits;
+                        fallEcts += allEcts;
+                        fallLcount += allLcount;
+                        fallPcount += allPcount;
+                        fallLbcount += allLbcount;
+                        fallwtcount += allwtcount;
+                        fallOcount += allOcount;
+                        fallCnt += allCnt;
+                        fallexam += allexam;
+                        ffallCredits += fallCredits;
+                        ffallEcts += fallEcts;
+                        ffallLcount += fallLcount;
+                        ffallPcount += fallPcount;
+                        ffallLbcount += fallLbcount;
+                        ffallwtcount += fallwtcount;
+                        ffallOcount += fallOcount;
+                        ffallCnt += fallCnt;
+                        ffallexam += fallexam;
+                        insertCell(table, "Всего за 8 семестр", Element.ALIGN_LEFT, 6, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allCredits), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allEcts), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allLcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allPcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allLbcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allwtcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allOcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allCnt), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allexam) + "Е/Э", Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
 
-                        insertCell(table,"Всего за 4 курс", Element.ALIGN_LEFT, 6,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(fallCredits), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(fallEcts), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(fallLcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(fallPcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(fallLbcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(fallwtcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(fallOcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(fallCnt), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(fallexam)+"Е/Э", Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, "Всего за 4 курс", Element.ALIGN_LEFT, 6, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(fallCredits), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(fallEcts), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(fallLcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(fallPcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(fallLbcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(fallwtcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(fallOcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(fallCnt), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(fallexam) + "Е/Э", Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
 
 
-                        insertCell(table,"Итого ", Element.ALIGN_LEFT, 6,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(ffallCredits), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(ffallEcts), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(ffallLcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(ffallPcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(ffallLbcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(ffallwtcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(ffallOcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(ffallCnt), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(ffallexam)+"Е/Э", Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, "Итого ", Element.ALIGN_LEFT, 6, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(ffallCredits), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(ffallEcts), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(ffallLcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(ffallPcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(ffallLbcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(ffallwtcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(ffallOcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(ffallCnt), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(ffallexam) + "Е/Э", Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
 
-                        fallCredits = 0;fallEcts = 0; fallLcount =0; fallPcount=0; fallLbcount=0;fallwtcount =0;fallOcount=0;fallCnt=0;allexam=0;
-                        creditNum=0;ectsNum=0;lcount=0;pcount=0;lbcount=0;wtcount=0;ocount=0;allcount=0;examc=0;
-                        allCredits =0; allEcts =0; allLcount =0; allPcount=0; allLbcount=0; allwtcount=0; allOcount=0; allCnt=0;allexam=0;
+                        fallCredits = 0;
+                        fallEcts = 0;
+                        fallLcount = 0;
+                        fallPcount = 0;
+                        fallLbcount = 0;
+                        fallwtcount = 0;
+                        fallOcount = 0;
+                        fallCnt = 0;
+                        allexam = 0;
+                        creditNum = 0;
+                        ectsNum = 0;
+                        lcount = 0;
+                        pcount = 0;
+                        lbcount = 0;
+                        wtcount = 0;
+                        ocount = 0;
+                        allcount = 0;
+                        examc = 0;
+                        allCredits = 0;
+                        allEcts = 0;
+                        allLcount = 0;
+                        allPcount = 0;
+                        allLbcount = 0;
+                        allwtcount = 0;
+                        allOcount = 0;
+                        allCnt = 0;
+                        allexam = 0;
 
-                        insertCell(table,"-------", Element.ALIGN_LEFT, 15,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, "     ", Element.ALIGN_LEFT, 15, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        String var = null;
                         myData = getData(curriculum.getId().getId().intValue(), 0, IUPS_TYPE.ADDITIONAL);
                         for (List<String> myRow : myData) {
                             for (String value : myRow) {
                                 insertCell(table, value, Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
                             }
-                            creditNum += Integer.parseInt(myRow.get(6).trim().length()>0 ? myRow.get(6) :"0");
-                            ectsNum += Integer.parseInt(myRow.get(7).trim().length()>0 ? myRow.get(7) :"0");
-                            lcount += Integer.parseInt(myRow.get(8).trim().length()>0 ? myRow.get(8) :"0");
-                            pcount += Integer.parseInt(myRow.get(9).trim().length()>0 ? myRow.get(9) :"0");
-                            lbcount += Integer.parseInt(myRow.get(10).trim().length()>0 ? myRow.get(10) :"0");
-                            wtcount += Integer.parseInt(myRow.get(11).trim().length()>0 ? myRow.get(11) :"0");
-                            ocount += Integer.parseInt(myRow.get(12).trim().length()>0 ? myRow.get(12) :"0");
-                            allcount += Integer.parseInt(myRow.get(13).trim().length()>0 ? myRow.get(13) :"0");
-                            if(myRow.get(14).trim().length()>0){
-                                examc++;
+                            var = myRow.get(6);
+                            creditNum += Integer.parseInt(myRow.get(6).trim().length() > 0 ? myRow.get(6) : "0");
+                            ectsNum += Integer.parseInt(myRow.get(7).trim().length() > 0 ? myRow.get(7) : "0");
+                            lcount += Integer.parseInt(myRow.get(8).trim().length() > 0 ? myRow.get(8) : "0");
+                            pcount += Integer.parseInt(myRow.get(9).trim().length() > 0 ? myRow.get(9) : "0");
+                            lbcount += Integer.parseInt(myRow.get(10).trim().length() > 0 ? myRow.get(10) : "0");
+                            wtcount += Integer.parseInt(myRow.get(11).trim().length() > 0 ? myRow.get(11) : "0");
+                            ocount += Integer.parseInt(myRow.get(12).trim().length() > 0 ? myRow.get(12) : "0");
+                            allcount += Integer.parseInt(myRow.get(13).trim().length() > 0 ? myRow.get(13) : "0");
+                            if (myRow.get(14).trim().length() > 0) {
+                                countadd++;
                             }
                         }
-                        allCredits +=creditNum; allEcts +=ectsNum; allLcount +=lcount; allPcount+=pcount; allLbcount+=lbcount; allwtcount+=wtcount; allOcount+=ocount; allCnt+=allcount;allexam+=examc;
+                        allCredits += creditNum;
+                        allEcts += ectsNum;
+                        allLcount += lcount;
+                        allPcount += pcount;
+                        allLbcount += lbcount;
+                        allwtcount += wtcount;
+                        allOcount += ocount;
+                        allCnt += allcount;
+                        countall += countadd;
 
-                        insertCell(table,"Всего ", Element.ALIGN_LEFT, 6,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allCredits), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allEcts), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allLcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allPcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allLbcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allwtcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allOcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allCnt), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allexam)+"Е/Э", Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        ffallCredits +=allCredits; ffallEcts +=allEcts; ffallLcount +=allLcount; ffallPcount+=allPcount; ffallLbcount+=allLbcount; ffallwtcount+=allwtcount; ffallOcount+=allOcount; ffallCnt+=allCnt;ffallexam+=allexam;
-                        allCredits =0; allEcts =0; allLcount =0; allPcount=0; allLbcount=0; allwtcount=0; allOcount=0; allCnt=0;allexam=0;
-                        creditNum=0;ectsNum=0;lcount=0;pcount=0;lbcount=0;wtcount=0;ocount=0;allcount=0;examc=0;
+                        insertCell(table, "Всего ", Element.ALIGN_LEFT, 6, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allCredits), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allEcts), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allLcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allPcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allLbcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allwtcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allOcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allCnt), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, allCredits + "кр  " + String.valueOf(countall) + "д/з", Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
 
-                        insertCell(table,"-------", Element.ALIGN_LEFT, 15,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        ffallCredits += allCredits;
+                        ffallEcts += allEcts;
+                        ffallLcount += allLcount;
+                        ffallPcount += allPcount;
+                        ffallLbcount += allLbcount;
+                        ffallwtcount += allwtcount;
+                        ffallOcount += allOcount;
+                        ffallCnt += allCnt;
+                        ffallexam += allexam;
+                        fin += countall;
+                        allCredits = 0;
+                        allEcts = 0;
+                        allLcount = 0;
+                        allPcount = 0;
+                        allLbcount = 0;
+                        allwtcount = 0;
+                        allOcount = 0;
+                        allCnt = 0;
+                        allexam = 0;
+                        countall = 0;
+                        creditNum = 0;
+                        ectsNum = 0;
+                        lcount = 0;
+                        pcount = 0;
+                        lbcount = 0;
+                        wtcount = 0;
+                        ocount = 0;
+                        allcount = 0;
+                        examc = 0;
+
+                        insertCell(table, "     ", Element.ALIGN_LEFT, 15, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
                         myData = getData(curriculum.getId().getId().intValue(), 0, IUPS_TYPE.AFTER_SEMESTER);
                         for (List<String> myRow : myData) {
                             for (String value : myRow) {
                                 insertCell(table, value, Element.ALIGN_LEFT, 1, EmployeePdfCreator.getFont(fontSize, Font.NORMAL));
                             }
-                            creditNum += Integer.parseInt(myRow.get(6).trim().length()>0 ? myRow.get(6) :"0");
-                            ectsNum += Integer.parseInt(myRow.get(7).trim().length()>0 ? myRow.get(7) :"0");
-                            lcount += Integer.parseInt(myRow.get(8).trim().length()>0 ? myRow.get(8) :"0");
-                            pcount += Integer.parseInt(myRow.get(9).trim().length()>0 ? myRow.get(9) :"0");
-                            lbcount += Integer.parseInt(myRow.get(10).trim().length()>0 ? myRow.get(10) :"0");
-                            wtcount += Integer.parseInt(myRow.get(11).trim().length()>0 ? myRow.get(11) :"0");
-                            ocount += Integer.parseInt(myRow.get(12).trim().length()>0 ? myRow.get(12) :"0");
-                            allcount += Integer.parseInt(myRow.get(13).trim().length()>0 ? myRow.get(13) :"0");
-                            if(myRow.get(14).trim().length()>0){
+
+                            creditNum += Integer.parseInt(myRow.get(6).trim().length() > 0 ? myRow.get(6) : "0");
+                            ectsNum += Integer.parseInt(myRow.get(7).trim().length() > 0 ? myRow.get(7) : "0");
+                            lcount += Integer.parseInt(myRow.get(8).trim().length() > 0 ? myRow.get(8) : "0");
+                            pcount += Integer.parseInt(myRow.get(9).trim().length() > 0 ? myRow.get(9) : "0");
+                            lbcount += Integer.parseInt(myRow.get(10).trim().length() > 0 ? myRow.get(10) : "0");
+                            wtcount += Integer.parseInt(myRow.get(11).trim().length() > 0 ? myRow.get(11) : "0");
+                            ocount += Integer.parseInt(myRow.get(12).trim().length() > 0 ? myRow.get(12) : "0");
+                            allcount += Integer.parseInt(myRow.get(13).trim().length() > 0 ? myRow.get(13) : "0");
+                            if (myRow.get(14).trim().length() == 0) {
                                 examc++;
                             }
+                            if (myRow.get(14).trim().length() > 0) {
+                                countall++;
+                            }
                         }
-                        allCredits +=creditNum; allEcts +=ectsNum; allLcount +=lcount; allPcount+=pcount; allLbcount+=lbcount; allwtcount+=wtcount; allOcount+=ocount; allCnt+=allcount;allexam+=examc;
-                        ffallCredits +=allCredits; ffallEcts +=allEcts; ffallLcount +=allLcount; ffallPcount+=allPcount; ffallLbcount+=allLbcount; ffallwtcount+=allwtcount; ffallOcount+=allOcount; ffallCnt+=allCnt;ffallexam+=allexam;
-                        insertCell(table,"Всего ", Element.ALIGN_LEFT, 6,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allCredits), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allEcts), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allLcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allPcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allLbcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allwtcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allOcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allCnt), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(allexam), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        fin += countall;
+                        allCredits += creditNum;
+                        allEcts += ectsNum;
+                        allLcount += lcount;
+                        allPcount += pcount;
+                        allLbcount += lbcount;
+                        allwtcount += wtcount;
+                        allOcount += ocount;
+                        allCnt += allcount;
+                        allexam += examc;
+                        ffallCredits += allCredits;
+                        ffallEcts += allEcts;
+                        ffallLcount += allLcount;
+                        ffallPcount += allPcount;
+                        ffallLbcount += allLbcount;
+                        ffallwtcount += allwtcount;
+                        ffallOcount += allOcount;
+                        ffallCnt += allCnt;//ffallexam+=allexam;
+                        insertCell(table, "Всего ", Element.ALIGN_LEFT, 6, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allCredits), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allEcts), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allLcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allPcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allLbcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allwtcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allOcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(allCnt), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        if (countall > 0) {
+                            insertCell(table, String.valueOf(countall) + "д/з", Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        } else {
+                            insertCell(table, String.valueOf(allexam) + "МЕ/ГЭ", Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        }
 
 
-                        insertCell(table,"ИТОГО по учебному плану ", Element.ALIGN_LEFT, 6,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(ffallCredits), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(ffallEcts), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(ffallLcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(ffallPcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(ffallLbcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(ffallwtcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(ffallOcount), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(ffallCnt), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
-                        insertCell(table,String.valueOf(ffallexam), Element.ALIGN_RIGHT, 1,  EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, "ИТОГО по учебному плану ", Element.ALIGN_LEFT, 6, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(ffallCredits), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(ffallEcts), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(ffallLcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(ffallPcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(ffallLbcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(ffallwtcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(ffallOcount), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(ffallCnt), Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
+                        insertCell(table, String.valueOf(ffallexam) + "Е/Э " + String.valueOf(fin) + "д/з", Element.ALIGN_RIGHT, 1, EmployeePdfCreator.getFont(fontSize, Font.BOLD));
 
 
                     }
                     document.add(table);
-
                     document.close();
 
                 } catch (DocumentException e) {
@@ -1029,21 +1390,21 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
         table.addCell(cell);
     }
 
-    public void updateCount(int id){
-        int allCredits = 0,allEcts = 0, allLcount =0, allPcount=0, allLbcount=0,allwtcount =0,allOcount=0,allCnt=0;
+    public void updateCount(int id) {
+        int allCredits = 0, allEcts = 0, allLcount = 0, allPcount = 0, allLbcount = 0, allwtcount = 0, allOcount = 0, allCnt = 0;
         int creditNum = 0;
-        int ectsNum = 0, lcount =0, pcount=0, lbcount=0,wtcount =0,ocount=0,allcount=0;
+        int ectsNum = 0, lcount = 0, pcount = 0, lbcount = 0, wtcount = 0, ocount = 0, allcount = 0;
 
 
     }
 
-    public static List<ArrayList<String>> getData(int curriculumId, int semesterId, IUPS_TYPE iupsType ) {
+    public static List<ArrayList<String>> getData(int curriculumId, int semesterId, IUPS_TYPE iupsType) {
 
         List<ArrayList<String>> result = new ArrayList();
         List<V_CURRICULUM_DETAIL> detailList = new ArrayList<>();
         Map<Integer, Object> param = new HashMap<>();
 
-        if(iupsType==IUPS_TYPE.MANDATORY) {
+        if (iupsType == IUPS_TYPE.MANDATORY) {
             String sql = "select t0.module_short_name, t0.cycle_short_name,t0.education_module_type_name, t0.subject_code,t0.subject_name_kz,t0.subject_name_ru,\n" +
                     "  t0.credit,t0.ects_count,t0.lc_count,t0.pr_count,t0.lb_count,t0.with_teacher_count,t0.own_count,t0.total_count,t0.control_type_name\n" +
                     "from V_CURRICULUM_DETAIL t0 where t0.CURRICULUM_ID = " + curriculumId +
@@ -1070,36 +1431,11 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
             } catch (Exception ex) {
                 CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
             }
-        }if(iupsType==IUPS_TYPE.CHOOSEN){
+        }
+        if (iupsType == IUPS_TYPE.CHOOSEN) {
             String sql = "select t0.module_short_name, t0.cycle_short_name,t0.education_module_type_name, t0.subject_code,t0.subject_name_kz,t0.subject_name_ru,\n" +
                     "  t0.credit,t0.ects_count,t0.lc_count,t0.pr_count,t0.lb_count,t0.with_teacher_count,t0.own_count,t0.total_count,t0.control_type_name \n" +
-                    "from V_ELECTIVE_SUBJECT t0 where t0.CURRICULUM_ID = "+curriculumId+" AND t0.SEMESTER_ID = "+semesterId;
-            try {
-                List<Object> tmpList = new ArrayList<>();
-                tmpList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, param));
-                if (!tmpList.isEmpty()) {
-                    for (Object o : tmpList) {
-                        Object[] oo = (Object[]) o;
-                        ArrayList<String> valuesList = new ArrayList();
-                        for (int i = 0; i < oo.length; i++) {
-                            valuesList.add(oo[i] != null ? (String.valueOf(oo[i])) : "");
-                        }
-                        result.add(valuesList);
-                    }
-                } else {
-                    ArrayList<String> valuesList = new ArrayList();
-                    for (int i = 0; i < 15; i++) {
-                        valuesList.add(" ");
-                    }
-                    result.add(valuesList);
-                }
-            } catch (Exception ex) {
-            CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
-        }
-        }if(iupsType==IUPS_TYPE.ADDITIONAL){
-            String sql = "select t0.module_short_name, t0.cycle_short_name,t0.education_module_type_name, t0.subject_code,t0.subject_name_kz,t0.subject_name_ru,\n" +
-                    "  t0.credit,t0.ects_count,t0.lc_count,t0.pr_count,t0.lb_count,t0.with_teacher_count,t0.own_count,t0.total_count,t0.control_type_name\n" +
-                    "from v_curriculum_add_program t0 where t0.CURRICULUM_ID = "+curriculumId;
+                    "from V_ELECTIVE_SUBJECT t0 where t0.CURRICULUM_ID = " + curriculumId + " AND t0.SEMESTER_ID = " + semesterId;
             try {
                 List<Object> tmpList = new ArrayList<>();
                 tmpList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, param));
@@ -1122,10 +1458,41 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
             } catch (Exception ex) {
                 CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
             }
-        }if(iupsType==IUPS_TYPE.AFTER_SEMESTER){
-            String sql = "select t0.module_short_name, t0.module_short_name,t0.education_module_type_name, t0.subject_code,t0.subject_name_kz,t0.subject_name_ru,\n" +
-                    "  t0.credit,t0.ects_count,t0.lc_count,t0.week_number,t0.lb_count,t0.with_teacher_count,t0.own_count,t0.total_count,t0.control_type_name\n" +
-                    "from v_curriculum_after_semester t0  where t0.CURRICULUM_ID = "+curriculumId;
+        }
+        if (iupsType == IUPS_TYPE.ADDITIONAL) {
+            String sql = "select t0.module_short_name, t0.cycle_short_name,t0.education_module_type_name, t0.subject_code,t0.subject_name_kz,t0.subject_name_ru,\n" +
+                    "                     t0.credit,t0.ects_count,t0.lc_count,t0.pr_count,t0.lb_count,t0.with_teacher_count,t0.own_count,t0.total_count,(t0.semester_data_id ,'сем', t0.creditability_id,'кр')\n" +
+                    "                    from v_curriculum_add_program t0 where t0.CURRICULUM_ID = " + curriculumId;
+            try {
+                List<Object> tmpList = new ArrayList<>();
+                tmpList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, param));
+                if (!tmpList.isEmpty()) {
+                    for (Object o : tmpList) {
+                        Object[] oo = (Object[]) o;
+                        ArrayList<String> valuesList = new ArrayList();
+                        for (int i = 0; i < oo.length; i++) {
+                            valuesList.add(oo[i] != null ? (String.valueOf(oo[i])) : "");
+                        }
+                        result.add(valuesList);
+                    }
+                } else {
+                    ArrayList<String> valuesList = new ArrayList();
+                    for (int i = 0; i < 15; i++) {
+                        valuesList.add(" ");
+                    }
+                    result.add(valuesList);
+                }
+            } catch (Exception ex) {
+                CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
+            }
+        }
+        if (iupsType == IUPS_TYPE.AFTER_SEMESTER) {
+            String sql = "select t0.module_short_name, t0.module_short_name,t0.education_module_type_name,\n" +
+                    "  t0.subject_code,t0.subject_name_kz,t0.subject_name_ru,\n" +
+                    "                      t0.credit,t0.ects_count,t0.lc_count,t0.week_number,\n" +
+                    "  t0.lb_count,t0.with_teacher_count,t0.own_count,t0.total_count,\n" +
+                    "  CASE WHEN t0.week_number IS NOT NULL\n" +
+                    "    THEN  (t0.semester_data_id,'сем',t0.week_number,'апта') END from v_curriculum_after_semester t0  where t0.CURRICULUM_ID = " + curriculumId;
             try {
                 List<Object> tmpList = new ArrayList<>();
                 tmpList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, param));
@@ -1153,7 +1520,7 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
 
     }
 
-        private void create() throws Exception {
+    private void create() throws Exception {
         if (curriculum == null) {
             throw new Exception(getUILocaleUtil().getMessage("select.speciality.and.entry.year"));
         }
@@ -1192,15 +1559,17 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
             countSumOfCreditBySemester();
             if (curriculum.getId() != null) {
                 createButton.setEnabled(false);
+                setAllButtonsEnabled(true);
                 if (curriculum.getCurriculumStatus().getId().equals(CURRICULUM_STATUS.IN_CREATING)) {
                     conformButton.setEnabled(true);
                     approveButton.setEnabled(false);
                 } else if (curriculum.getCurriculumStatus().getId().equals(CURRICULUM_STATUS.IN_CONFORMING)) {
                     conformButton.setEnabled(false);
                     approveButton.setEnabled(true);
-                } else {
+                } else {//APPROVE
                     conformButton.setEnabled(false);
                     approveButton.setEnabled(false);
+                    setAllButtonsEnabled(false);
                 }
             } else {
                 createButton.setEnabled(true);
@@ -1220,15 +1589,29 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
             afterSemesterProgamPanel.setCurriculum(curriculum);
             afterSemesterProgamPanel.setEntranceYear((ENTRANCE_YEAR) entranceYearCB.getValue());
             afterSemesterProgamPanel.refresh();
-//            creditCountByComponentsPanel.setCurriculum(curriculum);//TODO return
-//            creditCountByComponentsPanel.refresh();
-//            cyclePanel.setCurriculum(curriculum);
-//            cyclePanel.refresh();
-            schedulePanel.setCurriculum(curriculum);//TODO add entrance year maybe
+            schedulePanel.setCurriculum(curriculum);
             schedulePanel.refresh();
         } catch (Exception ex) {
             LOG.error("Unable to refresh semester panel: ", ex);
         }
+    }
+
+    private void setAllButtonsEnabled(boolean enabled) {
+        for (SubjectsTab subjectsTab : subjectsTabs) {
+            setButtonsEnabled(subjectsTab.getMainSubjectsGW(),enabled);
+            setButtonsEnabled(subjectsTab.getElectiveSubjectsGW(),enabled);
+        }
+        setButtonsEnabled(addProgramPanel.getAddingSubjectsGW(), enabled);
+        setButtonsEnabled(afterSemesterProgamPanel.getAfterSemesterSubjectsGW(), enabled);
+        schedulePanel.getEditButton().setEnabled(enabled);
+    }
+
+    private void setButtonsEnabled(GridWidget mainSubjectsGW, boolean enabled) {
+        mainSubjectsGW.setButtonEnabled(AbstractToolbar.ADD_BUTTON, enabled);
+        mainSubjectsGW.setButtonEnabled(AbstractToolbar.EDIT_BUTTON, enabled);
+        mainSubjectsGW.setButtonEnabled(AbstractToolbar.DELETE_BUTTON, enabled);
+        mainSubjectsGW.setButtonEnabled(AbstractToolbar.REFRESH_BUTTON, enabled);
+        mainSubjectsGW.setButtonEnabled(AbstractToolbar.HELP_BUTTON, enabled);
     }
 
     public void setTotalCreditSum() {
@@ -1246,28 +1629,122 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
     }
 
     private void conform() throws Exception {
-//        checkForConform();//TODO return
+//        checkForConform();
 
         curriculum.setCurriculumStatus(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(CURRICULUM_STATUS.class, CURRICULUM_STATUS.IN_CONFORMING));
         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(curriculum);
         approveButton.setEnabled(true);
 
         statusLabel.setValue(getUILocaleUtil().getEntityFieldLabel(CURRICULUM.class, "curriculumStatus") + ": " + curriculum.getCurriculumStatus().getStatusName());
+
+        schedulePanel.generateSchedule();
+
         refresh();
     }
 
     private void approve() throws Exception {
-//        checkForConform();//TODO return
-
-        //TODO Assyl add subjects to student_subject
+//        checkForConform();
 
         curriculum.setCurriculumStatus(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(CURRICULUM_STATUS.class, CURRICULUM_STATUS.APPROVED));
         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(curriculum);
 
         statusLabel.setValue(getUILocaleUtil().getEntityFieldLabel(CURRICULUM.class, "curriculumStatus") + ": " + curriculum.getCurriculumStatus().getStatusName());
 
-        schedulePanel.generateSchedule();
+        setStudentSubjects();
+
         refresh();
+    }
+
+    private void setStudentSubjects() throws Exception {
+        if (CommonUtils.getStudyYearByEntranceYear(curriculum.getEntranceYear()) == 1) {
+            List<STUDENT_SUBJECT> starStudentSubjects = getStarStudentSubjects();
+            STUDENT_EDUCATION starStudentEducation = starStudentSubjects.get(0).getStudentEducation();
+
+            List<STUDENT_EDUCATION> studentEducations = getStudentEducations(starStudentEducation);
+
+            for (STUDENT_EDUCATION studentEducation : studentEducations) {
+                deleteStudentSubject(studentEducation);
+
+                createStudentSubject(starStudentSubjects, studentEducation);
+
+                deleteStudentTeacherSubject(studentEducation);
+
+                createStudentTeacherSubject(starStudentEducation, studentEducation);
+            }
+        }
+    }
+
+    private List<STUDENT_EDUCATION> getStudentEducations(STUDENT_EDUCATION starStudentEducation) throws Exception {
+        QueryModel<STUDENT_EDUCATION> studentEducationQM = new QueryModel<>(STUDENT_EDUCATION.class);
+        FromItem studentFI = studentEducationQM.addJoin(EJoin.INNER_JOIN, "student", STUDENT.class, "id");
+        studentEducationQM.addWhere("id", ECriteria.NOT_EQUAL, starStudentEducation.getId());
+        studentEducationQM.addWhereNull("child");
+        studentEducationQM.addWhere("speciality", ECriteria.EQUAL, curriculum.getSpeciality().getId());
+        studentEducationQM.addWhere(studentFI, "entranceYear", ECriteria.EQUAL,
+                curriculum.getEntranceYear().getId());
+        studentEducationQM.addWhere(studentFI, "diplomaType", ECriteria.EQUAL,
+                curriculum.getDiplomaType().getId());
+        return CommonUtils.getQuery().lookup(studentEducationQM);
+    }
+
+    private List<STUDENT_SUBJECT> getStarStudentSubjects() throws Exception {
+        String sql = "select stu_subj.* " +
+                "from curriculum_individual_plan curr " +
+                "       inner join users usr on usr.code = curr.student_code " +
+                "       inner join student stu on usr.id = stu.id " +
+                "       inner join student_education stu_edu on stu.id = stu_edu.student_id " +
+                "                                                 and stu_edu.child_id is null " +
+                "       inner join student_subject stu_subj on stu_edu.id = stu_subj.student_id " +
+                "where curr.speciality_id = ? " +
+                "  and curr.entrance_year_id = ? " +
+                "  and curr.diploma_type_id = ? ";
+        Map<Integer, Object> params = new HashMap<>();
+        params.put(1, curriculum.getSpeciality().getId().getId());
+        params.put(2, curriculum.getEntranceYear().getId().getId());
+        params.put(3, curriculum.getDiplomaType().getId().getId());
+        return CommonUtils.getQuery().lookup(sql, params,
+                STUDENT_SUBJECT.class);
+    }
+
+    private void deleteStudentSubject(STUDENT_EDUCATION studentEducation) throws Exception {
+        QueryModel<STUDENT_SUBJECT> studentSubjectQM = new QueryModel<>(STUDENT_SUBJECT.class);
+        studentSubjectQM.addWhere("studentEducation", ECriteria.EQUAL, studentEducation.getId());
+        studentSubjectQM.addWhere("deleted", false);
+        List<STUDENT_SUBJECT> studentSubjects = CommonUtils.getQuery().lookup(studentSubjectQM);
+        for (STUDENT_SUBJECT studentSubject : studentSubjects) {
+            studentSubject.setDeleted(true);
+        }
+        CommonUtils.getQuery().merge(studentSubjects);
+    }
+
+    private void createStudentSubject(List<STUDENT_SUBJECT> starStudentSubjects, STUDENT_EDUCATION studentEducation) throws Exception {
+        for (STUDENT_SUBJECT studentSubject : starStudentSubjects) {
+            studentSubject.setStudentEducation(studentEducation);
+            studentSubject.setRegDate(new Date());
+            CommonUtils.getQuery().create(studentSubject);
+        }
+    }
+
+    private void deleteStudentTeacherSubject(STUDENT_EDUCATION studentEducation) throws Exception {
+        QueryModel<STUDENT_TEACHER_SUBJECT> studentTeacherSubjectQM = new QueryModel<>(
+                STUDENT_TEACHER_SUBJECT.class);
+        studentTeacherSubjectQM.addWhere("studentEducation", ECriteria.EQUAL, studentEducation.getId());
+        List<STUDENT_TEACHER_SUBJECT> studentTeacherSubjects = CommonUtils.getQuery().lookup(
+                studentTeacherSubjectQM);
+        CommonUtils.getQuery().delete(studentTeacherSubjects);
+    }
+
+    private void createStudentTeacherSubject(STUDENT_EDUCATION starStudentEducation,
+                                             STUDENT_EDUCATION studentEducation) throws Exception {
+        QueryModel<STUDENT_TEACHER_SUBJECT> starStudentTeacherSubjectQM = new QueryModel<>(
+                STUDENT_TEACHER_SUBJECT.class);
+        starStudentTeacherSubjectQM.addWhere("studentEducation", ECriteria.EQUAL, starStudentEducation.getId());
+        List<STUDENT_TEACHER_SUBJECT> starStudentTeacherSubjects = CommonUtils.getQuery().lookup(
+                starStudentTeacherSubjectQM);
+        for (STUDENT_TEACHER_SUBJECT studentTeacherSubject : starStudentTeacherSubjects) {
+            studentTeacherSubject.setStudentEducation(studentEducation);
+            CommonUtils.getQuery().create(studentTeacherSubject);
+        }
     }
 
     private void checkForConform() throws Exception {

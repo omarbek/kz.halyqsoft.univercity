@@ -27,8 +27,8 @@ import java.util.Map;
  */
 public class GenerateSpecStreams extends Generate {
 
-    public GenerateSpecStreams(ProgressBar samplePB) {
-        super(samplePB);
+    public GenerateSpecStreams(/*ProgressBar samplePB*/) {
+        super(/*samplePB*/);
     }
 
     @Override

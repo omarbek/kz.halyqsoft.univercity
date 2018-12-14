@@ -69,9 +69,11 @@ public class CommonStreamsDialog extends WindowUtils implements EntityListener {
         subjectGW.setSizeFull();
         subjectGW.showToolbar(false);
         widgetsHL.addComponent(subjectGW);
+        widgetsHL.setExpandRatio(subjectGW, 0.4f);
 
         DBGridModel subjectGM = (DBGridModel) subjectGW.getWidgetModel();
         subjectGM.setRefreshType(ERefreshType.MANUAL);
+        subjectGM.setRowNumberVisible(true);
 
         setSubjects();
 
@@ -100,7 +102,37 @@ public class CommonStreamsDialog extends WindowUtils implements EntityListener {
                 refreshStreams();
             }
         });
+        streamGW.setButtonDescription(AbstractToolbar.HELP_BUTTON,"copy");
+        streamGW.setButtonIcon(AbstractToolbar.HELP_BUTTON, "img/button/copy.png");
+        streamGW.setButtonVisible(AbstractToolbar.HELP_BUTTON, true);
+        streamGW.addButtonClickListener(AbstractToolbar.HELP_BUTTON, new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent event) {
+                if (streamGW.getSelectedEntities().isEmpty()) {
+                    Message.showInfo(getUILocaleUtil().getMessage("info.noentityedit"));
+                } else {
+                    try {
+                        STREAM stream = CommonUtils.getQuery().lookup(STREAM.class, streamGW.getSelectedEntity().
+                                getId());
+                        List<GROUPS> groupsByStream = CommonUtils.getGroupsByStream(stream);
+                        stream.setCreated(new Date());
+                        CommonUtils.getQuery().create(stream);
+
+                        for (GROUPS group : groupsByStream) {
+                            STREAM_GROUP streamGroup = new STREAM_GROUP();
+                            streamGroup.setStream(stream);
+                            streamGroup.setGroup(group);
+                            CommonUtils.getQuery().create(streamGroup);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();//TODO catch
+                    }
+
+                }
+            }
+        });
         widgetsHL.addComponent(streamGW);
+        widgetsHL.setExpandRatio(streamGW, 0.6f);
 
         DBGridModel streamGM = (DBGridModel) streamGW.getWidgetModel();
         streamGM.setCrudEntityClass(STREAM.class);
