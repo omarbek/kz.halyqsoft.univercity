@@ -471,7 +471,7 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
                         try {
                             userId2 = dataAFW.getWidgetModel().getEntity().getId();
                         } catch (Exception e) {
-                            e.printStackTrace();//TODO catch
+                            CommonUtils.showMessageAndWriteLog("Unable to get user id", e);
                         }
                     }
                     medicalCheckupQM.addWhereAnd("user", ECriteria.EQUAL, userId2);
@@ -1077,7 +1077,7 @@ public abstract class UsersForm extends AbstractFormWidgetView implements PhotoW
             try {
                 userId = dataAFW.getWidgetModel().getEntity().getId();
             } catch (Exception e) {
-                e.printStackTrace();//TODO catch
+                CommonUtils.showMessageAndWriteLog("Unable to get user id", e);
             }
         }
         currentQM.addWhere(fieldName, ECriteria.EQUAL, userId);

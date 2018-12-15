@@ -40,8 +40,8 @@ public class PDF_DOCUMENT extends AbstractEntity {
     private int period;
 
     @FieldInfo(type = EFieldType.BOOLEAN,inEdit = false,  order = 7)
-    @Column(name = "for_students")
-    private boolean forStudents = false;
+    @Column(name = "for_human_resource_department")
+    private boolean forHumanResourceDepartment = false;
 
     @FieldInfo(type = EFieldType.FK_COMBO,inEdit = true,  order = 8,required = false)
     @ManyToOne
@@ -104,12 +104,12 @@ public class PDF_DOCUMENT extends AbstractEntity {
         this.created = created;
     }
 
-    public boolean isForStudents() {
-        return forStudents;
+    public boolean isForHumanResourceDepartment() {
+        return forHumanResourceDepartment;
     }
 
-    public void setForStudents(boolean forStudents) {
-        this.forStudents = forStudents;
+    public void setForHumanResourceDepartment(boolean forHumanResourceDepartment) {
+        this.forHumanResourceDepartment = forHumanResourceDepartment;
     }
 
     public PDF_DOCUMENT_TYPE getPdfDocumentType() {

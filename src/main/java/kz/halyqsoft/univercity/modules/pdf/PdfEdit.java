@@ -3,15 +3,14 @@ package kz.halyqsoft.univercity.modules.pdf;
 import com.vaadin.data.Property;
 import com.vaadin.server.BrowserWindowOpener;
 import com.vaadin.server.StreamResource;
-import com.vaadin.shared.ui.window.WindowMode;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.PDF_DOCUMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.PDF_PROPERTY;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.PDF_DOCUMENT_TYPE;
 import kz.halyqsoft.univercity.modules.pdf.dialogs.CustomFieldsView;
-import kz.halyqsoft.univercity.utils.EmployeePdfCreator;
 import kz.halyqsoft.univercity.utils.CommonUtils;
+import kz.halyqsoft.univercity.utils.EmployeePdfCreator;
 import kz.halyqsoft.univercity.utils.FieldValidator;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -21,22 +20,22 @@ import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.view.AbstractCommonView;
 import org.r3a.common.vaadin.widget.dialog.Message;
 
-import javax.persistence.NoResultException;
 import java.io.ByteArrayOutputStream;
 import java.util.*;
 import java.util.Calendar;
 
 public class PdfEdit extends AbstractCommonView {
-
+    private boolean isForHumanResourceDepartment;
     private StreamResource myResource;
-    private ArrayList<CustomField> customFieldList = new ArrayList<>();
+    private ArrayList<CustomField>  customFieldList = new ArrayList<>();
     private StreamResource.StreamSource streamSource;
     private BrowserWindowOpener opener;
     private Button openPdfButton = new Button(getUILocaleUtil().getCaption("open"));
     private Embedded pdfEmbedded;
     private Object prevClassWithEmbedded;
     private PDF_DOCUMENT mainFile;
-    public PdfEdit(PDF_DOCUMENT file, Object prevClassWithEmbedded) {
+    public PdfEdit(PDF_DOCUMENT file, Object prevClassWithEmbedded , boolean isForHumanResourceDepartment) {
+        this.isForHumanResourceDepartment = isForHumanResourceDepartment;
         openPdfButton.setEnabled(false);
         this.prevClassWithEmbedded = prevClassWithEmbedded;
         try {
@@ -70,7 +69,7 @@ public class PdfEdit extends AbstractCommonView {
 
         final double[] order = {1};
 
-        if(fileDoc.getId() != null){
+        if(fileDoc.getId() != null) {
             QueryModel<PDF_PROPERTY> propertyQM = new QueryModel<>(PDF_PROPERTY.class);
             propertyQM.addWhere("pdfDocument", ECriteria.EQUAL, fileDoc.getId());
             propertyQM.addSelect("orderNumber", EAggregate.MAX);
@@ -83,7 +82,6 @@ public class PdfEdit extends AbstractCommonView {
                 e.printStackTrace();
             }
         }
-
         else{
             order[0] = 1;
         }
@@ -110,7 +108,7 @@ public class PdfEdit extends AbstractCommonView {
             }
         });
 
-        cf.forStudentsCheckBox.addValueChangeListener(new Property.ValueChangeListener() {
+        cf.forHumanResourceDepartmentCheckBox.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 refresh(cf);
@@ -127,7 +125,9 @@ public class PdfEdit extends AbstractCommonView {
         mainHL.addComponent(cf.title);
         mainHL.addComponent(cf.deadlineDays);
         mainHL.addComponent(cf.pdfDocumentTypeComboBox);
-        mainHL.addComponent(cf.forStudentsCheckBox);
+        if(isForHumanResourceDepartment){
+            mainHL.addComponent(cf.forHumanResourceDepartmentCheckBox);
+        }
         itemsVL.addComponent(mainHL);
         itemsVL.setComponentAlignment(mainHL, Alignment.MIDDLE_CENTER);
 
@@ -340,7 +340,7 @@ public class PdfEdit extends AbstractCommonView {
                                 }
                                 fileDoc.setTitle(cf.title.getValue());
                                 fileDoc.setPeriod(Integer.parseInt(cf.deadlineDays.getValue()));
-                                fileDoc.setForStudents(cf.getForStudentsCheckBox().getValue());
+                                fileDoc.setForHumanResourceDepartment(cf.getForHumanResourceDepartmentCheckBox().getValue());
                                 fileDoc.setPdfDocumentType((PDF_DOCUMENT_TYPE) cf.getPdfDocumentTypeComboBox().getValue());
                                 fileDoc.setUser(user);
                                 fileDoc.setDeleted(false);
@@ -381,7 +381,7 @@ public class PdfEdit extends AbstractCommonView {
                                     fileDoc.setFileName(cf.pdfTitle.getValue());
                                 }
                                 fileDoc.setPeriod(Integer.parseInt(cf.deadlineDays.getValue()));
-                                fileDoc.setForStudents(cf.getForStudentsCheckBox().getValue());
+                                fileDoc.setForHumanResourceDepartment(cf.getForHumanResourceDepartmentCheckBox().getValue());
                                 fileDoc.setPdfDocumentType((PDF_DOCUMENT_TYPE) cf.getPdfDocumentTypeComboBox().getValue());
                                 fileDoc.setTitle(cf.title.getValue());
 
@@ -621,7 +621,7 @@ public class PdfEdit extends AbstractCommonView {
 
             }
             cf.pdfTitle.setValue(fileDoc.getFileName());
-            cf.forStudentsCheckBox.setValue(fileDoc.isForStudents());
+            cf.forHumanResourceDepartmentCheckBox.setValue(fileDoc.isForHumanResourceDepartment());
             cf.deadlineDays.setValue(fileDoc.getPeriod()+"");
             cf.pdfDocumentTypeComboBox.setValue(fileDoc.getPdfDocumentType());
             cf.title.setValue(fileDoc.getTitle());

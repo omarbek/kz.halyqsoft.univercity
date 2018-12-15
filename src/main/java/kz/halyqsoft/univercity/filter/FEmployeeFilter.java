@@ -91,10 +91,6 @@ public final class FEmployeeFilter extends AbstractFilterBean {
         this.subject = subject;
     }
 
-    public static long getSerialVersionUID() {
-        return serialVersionUID;
-    }
-
     public Integer getChildCount() {
         return childCount;
     }

@@ -12,7 +12,7 @@ import kz.halyqsoft.univercity.modules.workflow.views.BaseView;
 public class MainView extends BaseView{
     public MainView(String title) {
         super(title);
-        WorkflowViewContent content = new WorkflowViewContent();
+        WorkflowViewContent content = new WorkflowViewContent(true);
         getContent().addComponent(content.getMainVL());
     }
 }

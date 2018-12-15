@@ -11,6 +11,7 @@ import kz.halyqsoft.univercity.filter.FPdfDocumentFilter;
 import kz.halyqsoft.univercity.filter.FStudentFilter;
 import kz.halyqsoft.univercity.filter.panel.PdfDocumentFilterPanel;
 import kz.halyqsoft.univercity.filter.panel.StudentFilterPanel;
+import kz.halyqsoft.univercity.modules.workflow.WorkflowViewContent;
 import kz.halyqsoft.univercity.utils.WorkflowCommonUtils;
 import kz.halyqsoft.univercity.modules.workflow.views.dialogs.CreateViewDialog;
 import kz.halyqsoft.univercity.utils.EmployeePdfCreator;
@@ -43,7 +44,6 @@ public class CreateView extends BaseView implements EntityListener, FilterPanelL
     private PdfDocumentFilterPanel pdfDocumentFilterPanel;
     private VerticalLayout firstVL;
     private VerticalLayout secondVL;
-
     private GridWidget pdfDocumentGW;
     private GridWidget pdfDocSignerPostGW;
     private Button btnCreate;
@@ -286,12 +286,16 @@ public class CreateView extends BaseView implements EntityListener, FilterPanelL
         FPdfDocumentFilter sf = (FPdfDocumentFilter) abstractFilterBean;
         Map<Integer, Object> params = new HashMap<Integer, Object>();
         List<PDF_DOCUMENT> list = new ArrayList<>();
-        String sql = "select id, user_id, title, file_name, deleted, period, created, for_students from pdf_document where deleted = false " ;
+        String sql = "select id, user_id, title, file_name, deleted, period, created, for_human_resource_department from pdf_document where deleted = false " ;
         if(((FPdfDocumentFilter) abstractFilterBean).getFileName()!=null && !((FPdfDocumentFilter) abstractFilterBean).getFileName().trim().equals("")){
             sql += " and file_name ilike '" + sf.getFileName().trim() + "%' ";
         }
         if(((FPdfDocumentFilter) abstractFilterBean).getPdfDocumentType()!=null){
             sql += " and PDF_DOCUMENT_TYPE_ID = " + sf.getPdfDocumentType().getId().getId().longValue() + " ";
+        }
+
+        if(WorkflowViewContent.isForHRD){
+            sql += " and for_human_resource_department = " + WorkflowViewContent.isForHRD+ " ";
         }
         try {
             List tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).

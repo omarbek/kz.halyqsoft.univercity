@@ -17,6 +17,7 @@ public class SEMESTER_PERIOD extends AbstractEntity {
 
     public static final ID FALL_ID = ID.valueOf(1);
     public static final ID SPRING_ID = ID.valueOf(2);
+    public static final ID SUMMER_ID = ID.valueOf(3);
 
     @FieldInfo(type = EFieldType.TEXT, order = 2)
     @Column(name = "PERIOD_NAME", nullable = false)

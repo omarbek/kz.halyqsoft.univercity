@@ -2,7 +2,6 @@ package kz.halyqsoft.univercity.utils;
 
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
 import org.r3a.common.vaadin.AbstractWebUI;
 import org.r3a.common.vaadin.widget.dialog.AbstractDialog;
@@ -37,7 +36,7 @@ public abstract class WindowUtils extends AbstractDialog {
         if (width != null && height != null) {
             setWidth(width, defaultUnit);
             setHeight(height, defaultUnit);
-        }else{
+        } else {
             setSizeFull();//1300-500
         }
 
@@ -54,7 +53,7 @@ public abstract class WindowUtils extends AbstractDialog {
                 try {
                     refresh();
                 } catch (Exception e) {
-                    e.printStackTrace();//TODO catch
+                    CommonUtils.showMessageAndWriteLog("Unable to refresh during close", e);
                 }
             }
         });

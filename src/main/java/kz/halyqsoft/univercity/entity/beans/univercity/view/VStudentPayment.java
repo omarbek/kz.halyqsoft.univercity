@@ -21,6 +21,9 @@ public class VStudentPayment extends AbstractEntity {
 	@FieldInfo(type = EFieldType.DOUBLE, order = 5)
 	private Double paymentSum;
 
+	@FieldInfo(type = EFieldType.TEXT, order = 6)
+	private String time;
+
 	public String getFio() {
 		return fio;
 	}
@@ -43,6 +46,14 @@ public class VStudentPayment extends AbstractEntity {
 
 	public void setPaymentSum(Double paymentSum) {
 		this.paymentSum = paymentSum;
+	}
+
+	public String getTime() {
+		return time;
+	}
+
+	public void setTime(String time) {
+		this.time = time;
 	}
 
 	public VStudentPayment() {

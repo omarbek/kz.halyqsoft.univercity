@@ -156,11 +156,11 @@ public class SUBJECT extends AbstractEntity {
             @JoinColumn(name = "TRAJECTORY_ID", referencedColumnName = "ID")})
     private TRAJECTORY trajectory;
 
-    @FieldInfo(type = EFieldType.BOOLEAN, order = 31, required = false, columnWidth = 100)
-    @Column(name = "TICKET", nullable = false)
-    private boolean ticket;
+//    @FieldInfo(type = EFieldType.BOOLEAN, order = 31, required = false, columnWidth = 100)
+//    @Column(name = "TICKET", nullable = false)
+//    private boolean ticket;
 
-    @FieldInfo(type = EFieldType.BOOLEAN, order = 32, required = false, inEdit = false, inGrid = false, inView = false)
+    @FieldInfo(type = EFieldType.BOOLEAN, order = 31, required = false, inEdit = false, inGrid = false, inView = false)
     @Column(name = "DELETED", nullable = false)
     private boolean deleted;
 
@@ -408,11 +408,11 @@ public class SUBJECT extends AbstractEntity {
         this.trajectory = trajectory;
     }
 
-    public boolean isTicket() {
-        return ticket;
-    }
-
-    public void setTicket(boolean ticket) {
-        this.ticket = ticket;
-    }
+//    public boolean isTicket() {
+//        return ticket;
+//    }
+//
+//    public void setTicket(boolean ticket) {
+//        this.ticket = ticket;
+//    }
 }

@@ -2,6 +2,7 @@ package kz.halyqsoft.univercity.utils.changelisteners;
 
 import com.vaadin.data.Property;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.COUNTRY;
+import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.entity.ID;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.where.ECriteria;
@@ -33,7 +34,7 @@ public class RegionChangeListener implements Property.ValueChangeListener {
         try {
             cityFM.refresh(city);
         } catch (Exception e) {
-            e.printStackTrace();//TODO catch
+            CommonUtils.showMessageAndWriteLog("Unable to refresh region", e);
         }
     }
 }

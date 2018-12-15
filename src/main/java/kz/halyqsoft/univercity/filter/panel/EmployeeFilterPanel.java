@@ -4,7 +4,6 @@ import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.HorizontalLayout;
 import kz.halyqsoft.univercity.filter.FEmployeeFilter;
-import kz.halyqsoft.univercity.modules.schedule.ScheduleEmployee;
 import org.r3a.common.vaadin.widget.filter2.panel.AbstractFilterPanel;
 
 /**
@@ -19,7 +18,7 @@ public final class EmployeeFilterPanel extends AbstractFilterPanel {
 	}
 
 	@Override
-	protected void initWidget() {
+	protected void initWidget() throws Exception {
 		HorizontalLayout hl = new HorizontalLayout();
 		hl.setSpacing(true);
 		hl.setWidthUndefined();

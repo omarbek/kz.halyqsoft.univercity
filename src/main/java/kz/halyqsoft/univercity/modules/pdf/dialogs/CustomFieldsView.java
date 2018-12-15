@@ -3,6 +3,7 @@ package kz.halyqsoft.univercity.modules.pdf.dialogs;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_USER_INPUT;
+import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT_USER_REAL_INPUT;
 import kz.halyqsoft.univercity.entity.beans.univercity.PDF_DOCUMENT;
 import kz.halyqsoft.univercity.modules.pdf.CustomField;
 import kz.halyqsoft.univercity.modules.pdf.dialogs.fields.CustomComponentHL;
@@ -10,6 +11,7 @@ import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.FieldValidator;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
+import org.r3a.common.entity.ID;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.AbstractWebUI;
@@ -24,6 +26,7 @@ import java.util.List;
 public class CustomFieldsView extends AbstractDialog{
     private String title;
     private List<CustomComponentHL> customComponentHLS = new ArrayList<>();
+
     public CustomFieldsView(String title, List<CustomField> customFields, PDF_DOCUMENT fileDoc){
         setClosable(false);
         this.title = title;
@@ -53,6 +56,25 @@ public class CustomFieldsView extends AbstractDialog{
                         return;
                     }
                 }
+
+                try{
+                    List<DOCUMENT_USER_INPUT> documentUserInputList = null;
+                    QueryModel<DOCUMENT_USER_INPUT> documentUserInputQM = new QueryModel<DOCUMENT_USER_INPUT>(DOCUMENT_USER_INPUT.class);
+                    documentUserInputQM.addWhere("pdfDocument" , ECriteria.EQUAL, fileDoc.getId());
+                    documentUserInputList = CommonUtils.getQuery().lookup(documentUserInputQM);
+                    List<ID> ids = new ArrayList<>();
+                    for(DOCUMENT_USER_INPUT documentUserInput :documentUserInputList){
+                        ids.add(documentUserInput.getId());
+                    }
+                    QueryModel<DOCUMENT_USER_REAL_INPUT> documentUserRealInputQM = new QueryModel<>(DOCUMENT_USER_REAL_INPUT.class);
+                    documentUserInputQM.addWhereIn("documentUserInput" , ids);
+                    List<DOCUMENT_USER_REAL_INPUT> documentUserRealInputList = CommonUtils.getQuery().lookup(documentUserRealInputQM);
+                    CommonUtils.getQuery().delete(documentUserRealInputList);
+                    CommonUtils.getQuery().delete(documentUserInputList);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
 
                 List<DOCUMENT_USER_INPUT> documentUserInputs = new ArrayList<>();
                 for(CustomComponentHL customComponentHL : customComponentHLS){
