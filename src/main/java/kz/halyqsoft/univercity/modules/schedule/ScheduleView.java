@@ -9,6 +9,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_EMPLOYEE;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_GROUP;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_STUDENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_TEACHER_LOAD_ASSIGN_DETAIL;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.TimeUtils;
@@ -30,6 +31,7 @@ import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.form.field.fk.FKFieldModel;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
+import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
 import org.r3a.common.vaadin.widget.toolbar.IconToolbar;
 
 import java.time.DayOfWeek;
@@ -46,7 +48,7 @@ import java.util.Calendar;
 public class ScheduleView extends AbstractTaskView {
 
     private VerticalLayout tablesVL = new VerticalLayout();
-    private ComboBox semesterDataCB;
+    protected ComboBox semesterDataCB;
 
     private static SEMESTER_DATA currentSemesterData;
 
@@ -59,9 +61,9 @@ public class ScheduleView extends AbstractTaskView {
     private static final int LECTURE_COUNT = 2;
     private static final int PRACTICE_COUNT = 2;
 
-    private GridWidget weekDayGW;
-    private GridWidget scheduleDetailGW;
-    private DBGridModel scheduleDetailGM;
+    protected GridWidget weekDayGW;
+    protected GridWidget scheduleDetailGW;
+    protected DBGridModel scheduleDetailGM;
 
     public ScheduleView(AbstractTask task) throws Exception {
         super(task);
@@ -102,19 +104,24 @@ public class ScheduleView extends AbstractTaskView {
         scheduleDetailGW = new GridWidget(SCHEDULE_DETAIL.class);
         scheduleDetailGW.setImmediate(true);
         scheduleDetailGW.setSizeFull();
+        scheduleDetailGW.setButtonVisible(AbstractToolbar.EDIT_BUTTON , false);
         scheduleDetailGW.addEntityListener(this);
         scheduleDetailGM = (DBGridModel)scheduleDetailGW.getWidgetModel();
         scheduleDetailGM.setRefreshType(ERefreshType.MANUAL);
         scheduleDetailGM.setDeferredCreate(true);
         scheduleDetailGM.setDeferredDelete(true);
+        FKFieldModel subjectFM = (FKFieldModel) scheduleDetailGM.getFormModel().getFieldModel("subject");
+        scheduleDetailGM.getFormModel().getFieldModel("teacher").setInView(false);
+        scheduleDetailGM.getFormModel().getFieldModel("teacher").setInEdit(false);
         mainHL.addComponent(scheduleDetailGW);
 
-        QueryModel scheduleDetailTeacherQM = ((FKFieldModel)scheduleDetailGM.getFormModel().getFieldModel("teacher")).getQueryModel();
-        scheduleDetailTeacherQM.addJoin(EJoin.INNER_JOIN,"id" , USERS.class ,"id");
-        FromItem vEmployeeFI = scheduleDetailTeacherQM.addJoin(EJoin.INNER_JOIN,"id", V_EMPLOYEE.class,"id");
-        scheduleDetailTeacherQM.addWhere(vEmployeeFI , "employeeType" , ECriteria.EQUAL , EMPLOYEE_TYPE.TEACHER_ID);
-        ((FKFieldModel)scheduleDetailGM.getFormModel().getFieldModel("subject")).getQueryModel().addWhere("deleted", ECriteria.EQUAL , false);
-        ((FKFieldModel)scheduleDetailGM.getFormModel().getFieldModel("group")).getQueryModel().addWhere("deleted", ECriteria.EQUAL , false);
+        QueryModel<SUBJECT> subjectQM = ((FKFieldModel)scheduleDetailGM.getFormModel().getFieldModel("subject")).getQueryModel();
+        subjectQM.addWhere("deleted", ECriteria.EQUAL , false);
+        FromItem fi = subjectQM.addJoin(EJoin.INNER_JOIN, "id" , SEMESTER_SUBJECT.class , "subject");
+        subjectQM.addWhereAnd(fi, "semesterData" ,ECriteria.EQUAL, CommonUtils.getCurrentSemesterData().getId());
+        QueryModel<GROUPS> groupsQM = ((FKFieldModel)scheduleDetailGM.getFormModel().getFieldModel("group")).getQueryModel();
+        groupsQM.addJoin(EJoin.INNER_JOIN , "id" ,  V_GROUP.class , "id");
+
         semesterDataCB = new ComboBox();
         semesterDataCB.setWidth(300,Unit.PIXELS);
         semesterDataCB.setTextInputAllowed(true);
@@ -146,7 +153,7 @@ public class ScheduleView extends AbstractTaskView {
 
     }
 
-    private void refresh() throws Exception {
+    protected void refresh() throws Exception {
 
         if(semesterDataCB.getValue()==null){
             Message.showError(getUILocaleUtil().getMessage("select.semester"));
@@ -163,6 +170,7 @@ public class ScheduleView extends AbstractTaskView {
         List<SCHEDULE_DETAIL> scheduleDetails = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(scheduleDetailQM);
         scheduleDetailGM.setEntities(scheduleDetails);
         scheduleDetailGW.refresh();
+
     }
 
     static boolean groupHasEnoughLessons(GROUPS group, SUBJECT subject) throws Exception {
@@ -440,40 +448,90 @@ public class ScheduleView extends AbstractTaskView {
     }
 
     @Override
+    public void onCreate(Object source, Entity e, int buttonId) {
+        super.onCreate(source, e, buttonId);
+    }
+
+    @Override
     public boolean preSave(Object source, Entity e, boolean isNew, int buttonId) {
-        if(isNew){
-          if(source.equals(scheduleDetailGW)){
-              SCHEDULE_DETAIL scheduleDetail = (SCHEDULE_DETAIL) e;
-              scheduleDetail.setWeekDay((WEEK_DAY) weekDayGW.getSelectedEntity());
-              scheduleDetail.setSemesterData((SEMESTER_DATA) semesterDataCB.getValue());
-
-              try{
-                  if(isAllEmpty(scheduleDetail)){
-                      SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(scheduleDetail);
-                      refresh();
-                  }
-              }catch (Exception ex){
-                  ex.printStackTrace();
-              }
-          }
-
-        }else{
-
-            try{
-                SCHEDULE_DETAIL scheduleDetail = (SCHEDULE_DETAIL) e;
-                if(isAllEmpty(scheduleDetail)){
-                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(scheduleDetail);
-                    refresh();
-                }
-            }catch (Exception ex){
-                ex.printStackTrace();
-            }
+        if(source.equals(scheduleDetailGW)){
+            TeacherDialog teacherDialog = new TeacherDialog(this, source, e, isNew, buttonId);
         }
         return false;
     }
 
+    public void deleteStudentSubjects(SCHEDULE_DETAIL scheduleDetail){
+        QueryModel<STUDENT_SUBJECT> studentSubjectQM = new QueryModel<>(STUDENT_SUBJECT.class);
+        studentSubjectQM.addWhere("semesterData" , ECriteria.EQUAL, scheduleDetail.getSemesterData().getId());
+        studentSubjectQM.addWhereAnd("deleted" , ECriteria.EQUAL, false);
+        FromItem fi = studentSubjectQM.addJoin(EJoin.INNER_JOIN, "subject" , SEMESTER_SUBJECT.class, "id");
+        studentSubjectQM.addWhereAnd(fi,"subject" , ECriteria.EQUAL, scheduleDetail.getSubject().getId() );
+        try{
+            List list = CommonUtils.getQuery().lookup(studentSubjectQM);
+            CommonUtils.getQuery().delete(list);
+        }catch (Exception e){
+            CommonUtils.showMessageAndWriteLog("unable to delete student subjects" , e);
+        }
+    }
 
-    private boolean isAllEmpty(SCHEDULE_DETAIL scheduleDetail) throws Exception{
+    public void deleteStudentTeacherSubjects(SCHEDULE_DETAIL scheduleDetail){
+        QueryModel<STUDENT_TEACHER_SUBJECT> studentTeacherSubjectQM = new QueryModel<>(STUDENT_TEACHER_SUBJECT.class);
+        studentTeacherSubjectQM.addWhere("semester",ECriteria.EQUAL, TeacherDialog.getSemester(scheduleDetail.getGroup()).getId());
+        FromItem fi = studentTeacherSubjectQM.addJoin(EJoin.INNER_JOIN, "studentEducation" , STUDENT_EDUCATION.class , "id");
+        studentTeacherSubjectQM.addWhereNullAnd(fi , "child" );
+        studentTeacherSubjectQM.addWhereAnd(fi ,"groups" , ECriteria.EQUAL ,scheduleDetail.getGroup().getId());
+        FromItem fi2 = studentTeacherSubjectQM.addJoin(EJoin.INNER_JOIN , "teacherSubject" ,TEACHER_SUBJECT.class  , "id");
+        studentTeacherSubjectQM.addWhereAnd(fi2 ,"employee" ,ECriteria.EQUAL , scheduleDetail.getTeacher().getId());
+        studentTeacherSubjectQM.addWhereAnd(fi2 ,"subject" ,ECriteria.EQUAL , scheduleDetail.getSubject().getId());
+
+        try{
+            List<STUDENT_TEACHER_SUBJECT> studentTeacherSubjects = CommonUtils.getQuery().lookup(studentTeacherSubjectQM);
+            CommonUtils.getQuery().delete(studentTeacherSubjects);
+        }catch (Exception e){
+            CommonUtils.showMessageAndWriteLog("unable to delete student teacher subject", e);
+        }
+
+    }
+
+    public List<STUDENT_SUBJECT> createStudentSubjects(SCHEDULE_DETAIL scheduleDetail){
+        SEMESTER_SUBJECT semesterSubject = null;
+        QueryModel<SEMESTER_SUBJECT> semesterSubjectQM = new QueryModel<>(SEMESTER_SUBJECT.class);
+        semesterSubjectQM.addWhere("semesterData",ECriteria.EQUAL, scheduleDetail.getSemesterData().getId());
+        semesterSubjectQM.addWhereAnd("subject",ECriteria.EQUAL, scheduleDetail.getSubject().getId());
+        try{
+            semesterSubject = (SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(semesterSubjectQM));
+        }catch (Exception e){
+            CommonUtils.showMessageAndWriteLog("No instance in semester_subject with such subject and semester", e);
+            return new ArrayList<>();
+        }
+
+        QueryModel<STUDENT_EDUCATION> studentEducationQM = new QueryModel<>(STUDENT_EDUCATION.class);
+        studentEducationQM.addWhere("groups"  , ECriteria.EQUAL ,scheduleDetail.getGroup().getId());
+        studentEducationQM.addWhereNullAnd("child");
+        List<STUDENT_EDUCATION> studentEducations = null;
+        try{
+            studentEducations = CommonUtils.getQuery().lookup(studentEducationQM);
+        }catch (Exception e){
+            CommonUtils.showMessageAndWriteLog("Do not found student educations", e);
+        }
+        List<STUDENT_SUBJECT> studentSubjects = new ArrayList<>();
+        for(STUDENT_EDUCATION studentEducation : studentEducations){
+            STUDENT_SUBJECT studentSubject = new STUDENT_SUBJECT();
+            studentSubject.setStudentEducation(studentEducation);
+            studentSubject.setSemesterData(scheduleDetail.getSemesterData());
+            studentSubject.setRegDate(new Date());
+            studentSubject.setSubject(semesterSubject);
+            studentSubjects.add(studentSubject);
+        }
+        try{
+            CommonUtils.getQuery().create(studentSubjects);
+        }catch (Exception e){
+            CommonUtils.showMessageAndWriteLog("Can not create student subjects", e);
+        }
+        return studentSubjects;
+    }
+
+    protected boolean isAllEmpty(SCHEDULE_DETAIL scheduleDetail) throws Exception{
         if(scheduleDetail.getLessonType().getId().getId().longValue()!=LECTURE){
             if(scheduleAlreadyHas(scheduleDetail.getTeacher(), scheduleDetail.getGroup(),scheduleDetail.getWeekDay(),scheduleDetail.getLessonTime())){
                 Message.showError(getUILocaleUtil().getMessage("group.or.teacher.not.free.this.time"));
@@ -507,6 +565,27 @@ public class ScheduleView extends AbstractTaskView {
     @Override
     public void onDelete(Object source, List<Entity> entities, int buttonId) {
         try{
+            List<ID> ids = new ArrayList<>();
+            for(Entity  entity: entities){
+                if(entity instanceof  SCHEDULE_DETAIL ){
+                    SCHEDULE_DETAIL scheduleDetail = (SCHEDULE_DETAIL)entity;
+                    deleteStudentSubjects(scheduleDetail);
+                    deleteStudentTeacherSubjects(scheduleDetail);
+                    ids.add(scheduleDetail.getId());
+                }
+            }
+            QueryModel<LESSON> lessonQM = new QueryModel<>(LESSON.class);
+            lessonQM.addWhereIn("scheduleDetail" , ids);
+            List<LESSON> lessonList = CommonUtils.getQuery().lookup(lessonQM);
+            List<ID> lessonIds = new ArrayList<>();
+            for(LESSON lesson : lessonList){
+                lessonIds.add(lesson.getId());
+            }
+
+            QueryModel<LESSON_DETAIL> lessonDetailQM = new QueryModel<>(LESSON_DETAIL.class);
+            lessonQM.addWhereIn("lesson" , lessonIds);
+            CommonUtils.getQuery().delete(CommonUtils.getQuery().lookup(lessonDetailQM));
+            CommonUtils.getQuery().delete(lessonList);
             SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(entities);
             refresh();
         }catch (Exception e){

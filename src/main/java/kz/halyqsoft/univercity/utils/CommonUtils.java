@@ -14,6 +14,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_DATA;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_PERIOD;
+import org.r3a.common.dblink.facade.AbstractSessionFacade;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.facade.CommonIDFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -134,6 +135,15 @@ public class CommonUtils {
         fontMap.put("Underline", Font.UNDERLINE);
         fontMap.put("BoldItalic", Font.BOLDITALIC);
         return fontMap.get(font);
+    }
+
+    public static CommonEntityFacadeBean getQuery(){
+        try{
+            return SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private static String getCodeBuilder(Integer count) {
