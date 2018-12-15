@@ -81,6 +81,7 @@ public class EmployeesView extends BaseView implements EntityListener, FilterPan
     }
 
     @Override
+
     public void onDelete(Object o, List<Entity> list, int i) {
 
     }
@@ -204,6 +205,7 @@ public class EmployeesView extends BaseView implements EntityListener, FilterPan
                 String fileName = "document";
 
 
+                String sqlList="";
                 for (GridColumnModel gcm : teacherGM.getColumnModels()) {
                     tableHeader.add(gcm.getLabel());
                 }
@@ -218,6 +220,7 @@ public class EmployeesView extends BaseView implements EntityListener, FilterPan
                     list.add(vEmployee.getDeptName());
                     list.add(vEmployee.getPostName());
                     tableBody.add(list);
+
                 }
 
 

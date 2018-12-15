@@ -5,6 +5,7 @@ import kz.halyqsoft.univercity.modules.workflowforemp.views.DocumentTypesView;
 import kz.halyqsoft.univercity.modules.workflowforemp.views.EmployeesView;
 import kz.halyqsoft.univercity.modules.workflowforemp.views.JournalView;
 import kz.halyqsoft.univercity.modules.workflowforemp.views.MainView;
+import kz.halyqsoft.univercity.modules.workflowforemp.views.DocumentDownloadView;
 
 public class ViewResolver {
     public BaseView getViewByTitle(String title) throws IllegalArgumentException{
@@ -17,6 +18,8 @@ public class ViewResolver {
             return new EmployeesView(title);
         }else if(title.equals(WorflowViewForEmp.DOCUMENT_TYPES)){
             return new DocumentTypesView(title);
+        }else if(title.equals(WorflowViewForEmp.DOCUMENT_DOWNLOAD)){
+            return new DocumentDownloadView(title);
         }else{
             throw new IllegalArgumentException("No such view:" + title );
         }

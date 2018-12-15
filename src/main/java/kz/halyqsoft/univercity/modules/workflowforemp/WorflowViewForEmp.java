@@ -27,6 +27,7 @@ public class WorflowViewForEmp extends AbstractTaskView {
     public static String JOURNAL = getUILocaleUtil().getCaption("journal");
     public static String EMPLOYEES = getUILocaleUtil().getCaption("employees");
     public static String DOCUMENT_TYPES = getUILocaleUtil().getCaption("documentTypes");
+    public static String DOCUMENT_DOWNLOAD = getUILocaleUtil().getCaption("documentDownload");
     public WorflowViewForEmp(AbstractTask task) throws Exception {
         super(task);
     }
@@ -47,6 +48,7 @@ public class WorflowViewForEmp extends AbstractTaskView {
         myItems.add(new MyItem(optionHC.addItem(JOURNAL),JOURNAL, null));
         myItems.add(new MyItem(optionHC.addItem(EMPLOYEES),EMPLOYEES, null));
         myItems.add(new MyItem(optionHC.addItem(DOCUMENT_TYPES),DOCUMENT_TYPES, null));
+        myItems.add(new MyItem(optionHC.addItem(DOCUMENT_DOWNLOAD),DOCUMENT_DOWNLOAD, null));
 
         for(MyItem myItem : myItems){
             if(myItem.getParentId()!=null){
