@@ -17,7 +17,7 @@ public class TimeUtils {
         String timeName = time.getTimeName();
         String symbol = timeName.substring(timeName.length() - 3, timeName.length() - 2);
         if (!(symbol.equals(":") || symbol.equals("-"))) {
-            Message.showInfo("please fill time with definite format");//TODO
+            Message.showInfo(CommonUtils.getUILocaleUtil().getMessage("please.fill.time.with.definite.format"));
             error = true;
             return;
         }

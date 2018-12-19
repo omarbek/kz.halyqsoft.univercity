@@ -152,6 +152,8 @@ public class DeleteDataView extends AbstractTaskView implements EntityListener, 
                         deleteMainTable(user, "employee_work_hour", "EMPLOYEE_ID");
                         deleteMainTable(user, "child", "EMPLOYEE_ID");
                         deleteMainTable(user, "employee", "ID");
+                        updateGroups(user, "groups", "CURATOR_ID");
+
                     } else {
                         deleteMainTable(user, "entrant_speciality", "STUDENT_ID");
                         deleteUntRates(user);
@@ -161,8 +163,22 @@ public class DeleteDataView extends AbstractTaskView implements EntityListener, 
                         deleteUserDoc(user, "student_contract", 9);
                         deleteUserDoc(user, "order_doc", 10);
                         deleteMainTable(user, "graduation_project", "ID");
-                        deleteMainTable(user, "student_education", "student_id");
+                        deleteNonAdmissionExam(user,"non_admission_exam");
+                        deleteMainTable(user, "student_creative_exam", "STUDENT_ID");
+                        deleteMainTable(user, "student_education", "STUDENT_ID");
                         deleteMainTable(user, "student", "ID");
+                        deleteMainTable(user,"complaint","USER_ID");
+                        deleteMainTable(user,"user_roles","USER_ID");
+                        deleteMainTable(user,"user_address","USER_ID");
+                        deleteMainTable(user,"lost_and_found","CREATED_BY");
+                        deleteMainTable(user,"student_fin_debt","STUDENT_ID");
+                        deleteMainTable(user,"student_payment","STUDENT_ID");
+                        deleteMainTable(user,"student_subject","STUDENT_ID");
+                        deleteMainTable(user,"student_edu_rate","STUDENT_ID");
+                        deleteMainTable(user,"student_edu_task","STUDENT_ID");
+                        deleteMainTable(user,"student_journal_rate","STUDENT_ID");
+                        deleteMainTable(user,"student_relative","STUDENT_ID");
+                        deleteMainTable(user,"student_schedule","STUDENT_ID");
                     }
                     deleteMainTable(user, "user_award", "USER_ID");
                     deleteMainTable(user, "user_social_category", "USER_ID");
@@ -179,6 +195,9 @@ public class DeleteDataView extends AbstractTaskView implements EntityListener, 
                     deleteMainTable(user, "user_photo", "USER_ID");
                     deleteMainTable(user, "user_document", "USER_ID");
                     deleteMainTable(user, "users", "id");
+                    deleteMainTable(user,"user_arrival","USER_ID");
+                    deleteMainTable(user,"student_attendance_log","USER_ID");
+
                 }
             } catch (Exception ignored) {
             }
@@ -226,6 +245,27 @@ public class DeleteDataView extends AbstractTaskView implements EntityListener, 
     private void deleteMainTable(USERS user, String table, String field) {
         try {
             String sql = "delete from " + table + " where " + field + " = ?1";
+            Map<Integer, Object> params = new HashMap<>();
+            params.put(1, user.getId().getId());
+            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
+        } catch (Exception ignored) {
+        }
+    }
+
+    private void updateGroups(USERS user, String table, String field) {
+        try {
+            String sql = "UPDATE "+ table +" SET "+ field+ " = null WHERE "+ field+ " = ?1";
+            Map<Integer, Object> params = new HashMap<>();
+            params.put(1, user.getId().getId());
+            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
+        } catch (Exception ignored) {
+        }
+    }
+
+    private void deleteNonAdmissionExam(USERS user, String table) {
+        try {
+            String sql = "DELETE " + table + " \n" +
+                    "where u.student_education_id = (SELECT id from student_education se where se.student_id=?1);";
             Map<Integer, Object> params = new HashMap<>();
             params.put(1, user.getId().getId());
             SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);

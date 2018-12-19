@@ -499,47 +499,6 @@ public class ScheduleTableView extends AbstractTaskView {
                     matrixGL.removeComponent(weekDays.size() + 1, j + 1);
                 }
             }
-        } if (stream!=null){
-            QueryModel<SCHEDULE_DETAIL> sdQM = new QueryModel<>(SCHEDULE_DETAIL.class);
-            FromItem lessonTimeFI = sdQM.addJoin(EJoin.INNER_JOIN, "lessonTime", LESSON_TIME.class, "id");
-            sdQM.addWhere("stream", ECriteria.EQUAL, stream.getId());
-            sdQM.addWhereAnd("semesterData", ECriteria.EQUAL, semesterData.getId());
-            for (int i = 0; i < weekDays.size(); i++) {
-                sdQM.addWhere("weekDay", ECriteria.EQUAL, weekDays.get(i).getId());
-                for (int j = 0; j < times.size(); j++) {
-                    sdQM.addWhere(lessonTimeFI, "beginTime", ECriteria.EQUAL, times.get(j).getId());
-                    try {
-                        SCHEDULE_DETAIL scheduleDetail = null;
-                        List<SCHEDULE_DETAIL> list = SessionFacadeFactory.getSessionFacade(
-                                CommonEntityFacadeBean.class).lookup(sdQM);
-                        if (!list.isEmpty()) {
-                            scheduleDetail = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
-                                    lookup(SCHEDULE_DETAIL.class, list.get(0).getId());
-                        }
-
-                        ScheduleCellStudent sc = new ScheduleCellStudent(scheduleDetail);
-                        int col = i  + 1;
-                        int row = j + 1;
-
-                        matrixGL.removeComponent(col, row);
-                        if (scheduleDetail != null && (scheduleDetail.getLessonTime().getEndTime().getTimeValue()
-                                - scheduleDetail.getLessonTime().getBeginTime().getTimeValue() == 2)) {
-                            matrixGL.removeComponent(col, row + 1);
-                            matrixGL.addComponent(sc, col, row, col, row + 1);
-                            addComponent = false;
-                        } else if (addComponent) {
-                            matrixGL.addComponent(sc, col, row);
-                        } else {
-                            addComponent = true;
-                        }
-
-
-                    } catch (Exception ex) {
-                        CommonUtils.showMessageAndWriteLog("Unable to load schedule detail", ex);
-                    }
-                    matrixGL.removeComponent(weekDays.size() + 1, j + 1);
-                }
-            }
         }
     }
 

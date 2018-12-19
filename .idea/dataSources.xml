@@ -10,11 +10,11 @@
         <property name="ApplicationName" value="DataGrip" />
       </driver-properties>
     </data-source>
-    <data-source source="LOCAL" name="univerdb@localhost" uuid="6c0f0188-366c-4344-bf35-ce43b5e7482f">
+    <data-source source="LOCAL" name="univerdb@ukpu-systems" uuid="6c0f0188-366c-4344-bf35-ce43b5e7482f">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost:5432/univerdb</jdbc-url>
+      <jdbc-url>jdbc:postgresql://ukpu-systems.kz:5432/univerdb</jdbc-url>
     </data-source>
     <data-source source="LOCAL" name="college@185.146.3.193" uuid="f90802eb-db87-4caf-963a-0fddec4fa735">
       <driver-ref>postgresql</driver-ref>

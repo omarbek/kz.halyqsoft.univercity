@@ -3,13 +3,19 @@ package kz.halyqsoft.univercity.modules.dorm;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import kz.halyqsoft.univercity.entity.beans.univercity.DORM_STUDENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DORM;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DORM_ROOM;
 import kz.halyqsoft.univercity.modules.dorm.mappedclasses.DormBuilding;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.ID;
 import org.r3a.common.entity.event.EntityEvent;
+import org.r3a.common.entity.query.QueryModel;
+import org.r3a.common.entity.query.from.EJoin;
+import org.r3a.common.entity.query.from.FromItem;
+import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.view.AbstractCommonView;
 import org.r3a.common.vaadin.widget.ERefreshType;
 import org.r3a.common.vaadin.widget.dialog.Message;
@@ -20,10 +26,7 @@ import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
 import org.r3a.common.vaadin.widget.toolbar.IconToolbar;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * @author Dinassil Omarbek
@@ -39,9 +42,38 @@ public class DormBuildingEdit extends AbstractFormWidgetView {
         setBackButtonVisible(false);
         dormBuildingsGrid.addEntityListener(this);
         dormBuildingsGrid.setWidth(GRID_WIDTH, Unit.PERCENTAGE);
-
         AbstractToolbar toolbarPanel = (AbstractToolbar) dormBuildingsGrid.getToolbarPanel().getComponent(0);
         toolbarPanel.setButtonVisible(IconToolbar.REFRESH_BUTTON, false);
+        toolbarPanel.addButtonClickListener(AbstractToolbar.DELETE_BUTTON, new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                try{
+                    DormBuilding dormStudent = (DormBuilding) dormBuildingsGrid.getSelectedEntity();
+
+                    QueryModel<DORM_STUDENT> dormStudentQM = new QueryModel<>(DORM_STUDENT.class);
+                    FromItem fi = dormStudentQM.addJoin(EJoin.INNER_JOIN,"room",DORM_ROOM.class,"id");
+                    FromItem from = fi.addJoin(EJoin.INNER_JOIN,"dorm",DORM.class,"id");
+                    dormStudentQM.addWhere(from,"id",ECriteria.EQUAL,dormStudent.getId());
+                    dormStudentQM.addWhereAnd("deleted", false);
+                    dormStudentQM.addWhere("checkOutDate",null);
+                    List<DORM_STUDENT> dormS = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(dormStudentQM);
+
+                    for(DORM_STUDENT ds:dormS) {
+                       ds.setDeleted(true);
+                       ds.setCheckOutDate(new Date());
+                    }
+
+                    QueryModel<DORM> dormQM = new QueryModel<>(DORM.class);
+                    dormQM.addWhere("id",ECriteria.EQUAL,dormStudent.getId());
+                    DORM dorm = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(dormQM);
+
+                    dorm.setDeleted(true);
+
+                } catch (Exception e) {
+                e.printStackTrace();
+            }
+            }
+        });
         int buttonIndex = toolbarPanel.addButtonFirst(createEnterButton());
         toolbarPanel.setButtonDescription(buttonIndex, "enter");
         buttonIndex = toolbarPanel.addButtonLast(createRefreshButton());
@@ -54,8 +86,7 @@ public class DormBuildingEdit extends AbstractFormWidgetView {
         dbGridModel.getColumnModel(DormBuilding.NAME_COLUMN).setLabelResource("dorm.building.name");
         dbGridModel.getColumnModel(DormBuilding.ADDRESS_COLUMN).setLabelResource("dorm.building.address");
         dbGridModel.getColumnModel(DormBuilding.ROOM_COUNT_COLUMN).setLabelResource("dorm.building.roomCount");
-        dbGridModel.getColumnModel(DormBuilding.BUSY_ROOM_COUNT_COLUMN)
-                .setLabelResource("dorm.building.busyRoomCount");
+        dbGridModel.getColumnModel(DormBuilding.BUSY_ROOM_COUNT_COLUMN).setLabelResource("dorm.building.busyRoomCount");
         dbGridModel.getColumnModel(DormBuilding.BED_COUNT_COLUMN).setLabelResource("dorm.building.bedCount");
         dbGridModel.getColumnModel(DormBuilding.BUSY_BED_COUNT_COLUMN).setLabelResource("dorm.building.busyBedCount");
         fillDormBuildingsGrid();

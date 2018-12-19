@@ -282,22 +282,24 @@ public class FinanceView extends AbstractTaskView implements EntityListener, Fil
                 "   x.id," +
                 "  trim(x.LAST_NAME || ' ' || x.FIRST_NAME || ' ' || coalesce(x.MIDDLE_NAME, '')) fio, " +
                 "  x.user_code," +
-                "  (sum(payment_sum)/(vsd.debt_sum+sum(payment_sum)))*100 " +
+                "  (sum(payment_sum)/(vsd.debt_sum+sum(payment_sum)))*100," +
+                "  (x2.created::date)::text " +
                 " from student_payment x2 " +
                 "  inner join v_student x on x.id = x2.student_id " +
                 "  inner join v_student_debts vsd on x.user_code = vsd.user_code " +
                 " where x.deleted = false " +
-                " group by  x.id , x.LAST_NAME, x.FIRST_NAME, x.MIDDLE_NAME ,x.user_code, vsd.debt_sum";
+                " group by  x.id , x.LAST_NAME, x.FIRST_NAME, x.MIDDLE_NAME ,x.user_code, vsd.debt_sum,x2.created";
         String sqlStudent  = "select\n" +
                 "   x.id,\n" +
                 "  trim(x.LAST_NAME || ' ' || x.FIRST_NAME || ' ' || coalesce(x.MIDDLE_NAME, '')) fio,\n" +
                 "  x.user_code,\n" +
-                "  (sum(payment_sum)/(vsd.debt_sum+sum(payment_sum)))*100                                                     paymentSum\n" +
+                "  (sum(payment_sum)/(vsd.debt_sum+sum(payment_sum)))*100  paymentSum," +
+                "  (x2.created::date)::text\n" +
                 "from student_payment x2\n" +
                 "  inner join v_student x on x.id = x2.student_id\n" +
                 "  inner join v_student_debts vsd on x.user_code = vsd.user_code\n" +
                 "where x.deleted = false  and student_id = " + CommonUtils.getCurrentUser().getId() +
-                " group by  x.id , x.LAST_NAME,x.FIRST_NAME,x.MIDDLE_NAME ,x.user_code, vsd.debt_sum;";
+                " group by  x.id , x.LAST_NAME,x.FIRST_NAME,x.MIDDLE_NAME ,x.user_code, vsd.debt_sum,x2.created;";
 
         if(CommonUtils.getCurrentUser().getTypeIndex()==2) {
             fillList(list, sqlStudent , params);
@@ -329,6 +331,7 @@ public class FinanceView extends AbstractTaskView implements EntityListener, Fil
                     sp.setFio((String) oo[1]);
                     sp.setCode((String) oo[2]);
                     sp.setPaymentSum(((BigDecimal) oo[3]).doubleValue());
+                    sp.setTime((String)oo[4]);
                     list.add(sp);
                 }
             }

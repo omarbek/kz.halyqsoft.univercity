@@ -9,8 +9,8 @@ import kz.halyqsoft.univercity.entity.beans.univercity.PDF_DOCUMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.PDF_PROPERTY;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.PDF_DOCUMENT_TYPE;
 import kz.halyqsoft.univercity.modules.pdf.dialogs.CustomFieldsView;
-import kz.halyqsoft.univercity.utils.EmployeePdfCreator;
 import kz.halyqsoft.univercity.utils.CommonUtils;
+import kz.halyqsoft.univercity.utils.EmployeePdfCreator;
 import kz.halyqsoft.univercity.utils.FieldValidator;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -27,7 +27,7 @@ import java.util.Calendar;
 public class PdfEdit extends AbstractCommonView {
     private boolean isForHumanResourceDepartment;
     private StreamResource myResource;
-    private ArrayList<CustomField> customFieldList = new ArrayList<>();
+    private ArrayList<CustomField>  customFieldList = new ArrayList<>();
     private StreamResource.StreamSource streamSource;
     private BrowserWindowOpener opener;
     private Button openPdfButton = new Button(getUILocaleUtil().getCaption("open"));

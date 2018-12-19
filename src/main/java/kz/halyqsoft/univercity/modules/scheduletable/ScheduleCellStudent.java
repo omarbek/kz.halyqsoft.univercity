@@ -69,10 +69,7 @@ final class ScheduleCellStudent extends VerticalLayout {
                 sb.append(" ");
                 sb.append(scheduleDetail.getGroup().getName());
             }
-            if(scheduleDetail.getStream()!=null) {
-                sb.append(" ");
-                sb.append(scheduleDetail.getStream().getName());
-            }
+
             sb.append(" ");
             sb.append(scheduleDetail.getRoom().getRoomNo());
             addStyleName("schedule-cell-full");

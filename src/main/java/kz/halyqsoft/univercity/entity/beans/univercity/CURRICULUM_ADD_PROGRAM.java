@@ -18,116 +18,127 @@ import java.util.Date;
 @Entity
 public class CURRICULUM_ADD_PROGRAM extends AbstractEntity {
 
-	@ManyToOne
-	@JoinColumns({
-			@JoinColumn(name = "CURRICULUM_ID", referencedColumnName = "ID")})
-	private CURRICULUM curriculum;
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "CURRICULUM_ID", referencedColumnName = "ID")})
+    private CURRICULUM curriculum;
 
-	@ManyToOne
-	@JoinColumns({
-			@JoinColumn(name = "SEMESTER_ID", referencedColumnName = "ID")})
-	private SEMESTER semester;
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "SEMESTER_ID", referencedColumnName = "ID")})
+    private SEMESTER semester;
 
-	@ManyToOne
-	@JoinColumns({
-			@JoinColumn(name = "SEMESTER_DATA_ID", referencedColumnName = "ID", nullable = false)})
-	private SEMESTER_DATA semesterData;
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "SEMESTER_DATA_ID", referencedColumnName = "ID", nullable = false)})
+    private SEMESTER_DATA semesterData;
 
-	@ManyToOne
-	@JoinColumns({
-			@JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
-	private SUBJECT subject;
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "SUBJECT_ID", referencedColumnName = "ID")})
+    private SUBJECT subject;
 
-	@Column(name = "CREATED")
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date created;
+    @Column(name = "CREATED")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date created;
 
-	@Column(name = "UPDATED")
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date updated;
+    @Column(name = "UPDATED")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date updated;
 
-	@Column(name = "DELETED", nullable = false)
-	private boolean deleted;
+    @Column(name = "DELETED", nullable = false)
+    private boolean deleted;
 
-	@FieldInfo(type = EFieldType.TEXT, required = false)
-	@Column(name = "CODE", nullable = false)
-	private String code;
+    @FieldInfo(type = EFieldType.TEXT, required = false)
+    @Column(name = "CODE", nullable = false)
+    private String code;
 
-	@FieldInfo(type = EFieldType.FK_COMBO, order = 2, required = false)
-	@ManyToOne
-	@JoinColumns({
-			@JoinColumn(name = "EDUCATION_MODULE_TYPE_ID", referencedColumnName = "ID")})
-	private EDUCATION_MODULE_TYPE educationModuleType;
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 2, required = false)
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "EDUCATION_MODULE_TYPE_ID", referencedColumnName = "ID")})
+    private EDUCATION_MODULE_TYPE educationModuleType;
 
-	public CURRICULUM getCurriculum() {
-		return curriculum;
-	}
+    @Column(name = "UPDATED_BY")
+    private String updatedBy;
 
-	public void setCurriculum(CURRICULUM curriculum) {
-		this.curriculum = curriculum;
-	}
+    public CURRICULUM getCurriculum() {
+        return curriculum;
+    }
 
-	public SEMESTER getSemester() {
-		return semester;
-	}
+    public void setCurriculum(CURRICULUM curriculum) {
+        this.curriculum = curriculum;
+    }
 
-	public void setSemester(SEMESTER semester) {
-		this.semester = semester;
-	}
+    public SEMESTER getSemester() {
+        return semester;
+    }
 
-	public SEMESTER_DATA getSemesterData() {
-		return semesterData;
-	}
+    public void setSemester(SEMESTER semester) {
+        this.semester = semester;
+    }
 
-	public void setSemesterData(SEMESTER_DATA semesterData) {
-		this.semesterData = semesterData;
-	}
+    public SEMESTER_DATA getSemesterData() {
+        return semesterData;
+    }
 
-	public SUBJECT getSubject() {
-		return subject;
-	}
+    public void setSemesterData(SEMESTER_DATA semesterData) {
+        this.semesterData = semesterData;
+    }
 
-	public void setSubject(SUBJECT subject) {
-		this.subject = subject;
-	}
+    public SUBJECT getSubject() {
+        return subject;
+    }
 
-	public Date getCreated() {
-		return created;
-	}
+    public void setSubject(SUBJECT subject) {
+        this.subject = subject;
+    }
 
-	public void setCreated(Date created) {
-		this.created = created;
-	}
+    public Date getCreated() {
+        return created;
+    }
 
-	public Date getUpdated() {
-		return updated;
-	}
+    public void setCreated(Date created) {
+        this.created = created;
+    }
 
-	public void setUpdated(Date updated) {
-		this.updated = updated;
-	}
+    public Date getUpdated() {
+        return updated;
+    }
 
-	public boolean isDeleted() {
-		return deleted;
-	}
+    public void setUpdated(Date updated) {
+        this.updated = updated;
+    }
 
-	public void setDeleted(boolean deleted) {
-		this.deleted = deleted;
-	}
+    public boolean isDeleted() {
+        return deleted;
+    }
 
-	public String getCode() {
-		return code;
-	}
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
 
-	public void setCode(String code) {
-		this.code = code;
-	}
+    public String getCode() {
+        return code;
+    }
 
-	public EDUCATION_MODULE_TYPE getEducationModuleType() {
-		return educationModuleType;
-	}
+    public void setCode(String code) {
+        this.code = code;
+    }
 
-	public void setEducationModuleType(EDUCATION_MODULE_TYPE educationModuleType) {
-		this.educationModuleType = educationModuleType;
-	}
+    public EDUCATION_MODULE_TYPE getEducationModuleType() {
+        return educationModuleType;
+    }
+
+    public void setEducationModuleType(EDUCATION_MODULE_TYPE educationModuleType) {
+        this.educationModuleType = educationModuleType;
+    }
+
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
+    }
 }

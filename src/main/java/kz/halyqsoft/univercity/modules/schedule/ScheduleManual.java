@@ -55,6 +55,7 @@ public class ScheduleManual extends AbstractCommonView implements EntityListener
     private DBGridModel scheduleDetailGM;
     private VerticalLayout mainVL;
     private String title;
+    private ScheduleDetailEdit scheduleDetailEdit;
 
     public ComboBox getSemesterDataCB() {
         return semesterDataCB;
@@ -132,6 +133,7 @@ public class ScheduleManual extends AbstractCommonView implements EntityListener
         scheduleDetailGM.setRefreshType(ERefreshType.MANUAL);
         scheduleDetailGM.setDeferredCreate(true);
         scheduleDetailGM.setDeferredDelete(true);
+
         mainHL.addComponent(scheduleDetailGW);
 
         semesterDataCB = new ComboBox();
@@ -169,6 +171,7 @@ public class ScheduleManual extends AbstractCommonView implements EntityListener
 
         @Override
         public boolean preCreate(Object source, int buttonId) {
+
             if(semesterDataCB.getValue()==null){
                 Message.showError(getUILocaleUtil().getMessage("select.semester"));
                 return false;
@@ -177,13 +180,15 @@ public class ScheduleManual extends AbstractCommonView implements EntityListener
                 Message.showError(getUILocaleUtil().getMessage("select.week.day"));
                 return false;
             }
+
             return super.preCreate(source, buttonId);
+
         }
 
         @Override
         protected void init(Object source, Entity e, boolean isNew) throws Exception {
             SCHEDULE_DETAIL scheduleDetail = (SCHEDULE_DETAIL) e;
-            ScheduleDetailEdit scheduleDetailEdit = new ScheduleDetailEdit(ScheduleManual.this, scheduleDetail, isNew);
+             scheduleDetailEdit = new ScheduleDetailEdit(ScheduleManual.this, scheduleDetail, isNew);
         }
 
         @Override
@@ -219,12 +224,15 @@ public class ScheduleManual extends AbstractCommonView implements EntityListener
 
         @Override
         public boolean onEdit(Object source, Entity e, int buttonId) {
+
+            SCHEDULE_DETAIL scheduleDetail1 = (SCHEDULE_DETAIL) e;
+
+            try {
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(scheduleDetail1);
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
             return super.onEdit(source, e, buttonId);
-        }
-
-        @Override
-        public void onCreate(Object o, Entity entity, int i) {
-
         }
     }
 

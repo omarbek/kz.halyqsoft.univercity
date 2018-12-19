@@ -221,7 +221,7 @@ public class EmployeePdfCreator {
             timesNewRoman = BaseFont.createFont(fontPath + "/TimesNewRoman/times.ttf", BaseFont.IDENTITY_H,
                     BaseFont.EMBEDDED);
         } catch (Exception e) {
-            e.printStackTrace();//TODO catch
+            CommonUtils.showMessageAndWriteLog("Unable to get times new roman font", e);
         }
         return new Font(timesNewRoman, fontSize, font);
     }
