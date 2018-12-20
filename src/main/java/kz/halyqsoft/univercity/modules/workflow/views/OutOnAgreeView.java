@@ -174,7 +174,7 @@ public class OutOnAgreeView extends BaseView implements EntityListener{
             fileDownloader.extend(downloadBtn);
 
             Embedded embedded = new Embedded(getUILocaleUtil().getCaption("download") );
-            embedded.setSource(EmployeePdfCreator.getStreamResourceFromByte(document.getFileByte(), document.getPdfDocument().getFileName()));
+            embedded.setSource(EmployeePdfCreator.getStreamResourceFromByte(document.getFileByte(), "document.pdf"));
             embedded.setImmediate(true);
             embedded.setMimeType("application/pdf");
             embedded.setType(2);

@@ -93,7 +93,7 @@ public class EmployeePdfCreator {
                                             if(map.get(key)==null){
                                                 map.put(key,new ArrayList<>());
                                             }
-                                            map.get(key).add(tempMap.get(key));
+                                            map.get(key).add(tempMap.get(key) != null ? tempMap.get(key) : "");
                                         }
                                     }
 
@@ -125,7 +125,7 @@ public class EmployeePdfCreator {
                                 for(Object value : map.get(key)){
 
                                     PdfPCell cell = new PdfPCell();
-                                    Paragraph paragraph = new Paragraph((String)value);
+                                    Paragraph paragraph = new Paragraph(value!=null ? (String)value : "");
                                     paragraph.setFont(font);
                                     cell.addElement(paragraph);
 

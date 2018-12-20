@@ -148,7 +148,6 @@ public class CreateView extends BaseView implements EntityListener{
             PDF_DOCUMENT pdfDocument = (PDF_DOCUMENT) pdfDocumentGW.getSelectedEntity();
             secondVL.removeAllComponents();
             if(pdfDocument!=null){
-
                 pdfDocSignerPostGW = new GridWidget(PDF_DOCUMENT_SIGNER_POST.class);
                 DBGridModel pdfDocSignerPostGM = (DBGridModel) pdfDocSignerPostGW.getWidgetModel();
                 pdfDocSignerPostGM.getQueryModel().addWhere("pdfDocument", ECriteria.EQUAL , pdfDocument.getId());
@@ -156,7 +155,6 @@ public class CreateView extends BaseView implements EntityListener{
                 pdfDocSignerPostGW.setButtonVisible(IconToolbar.EDIT_BUTTON, false);
                 pdfDocSignerPostGW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
                 pdfDocSignerPostGW.setButtonVisible(IconToolbar.ADD_BUTTON, false);
-
                 secondVL.addComponent(pdfDocSignerPostGW);
             }
         }
