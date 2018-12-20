@@ -2,10 +2,7 @@ package kz.halyqsoft.univercity.modules.workflowforemp.views;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.combobox.FilteringMode;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.TextField;
+import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.CARD;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEPARTMENT;
@@ -49,6 +46,7 @@ public class EmployeesView extends BaseView implements EntityListener, FilterPan
     private EmployeeFilterPanel filterPanel;
     private GridWidget teacherGW;
     private ComboBox cb, sd;
+    Button printBtn,  printBtnchild;
 
 
     public EmployeesView(String title) {
@@ -193,8 +191,11 @@ public class EmployeesView extends BaseView implements EntityListener, FilterPan
 
         doFilter(filterPanel.getFilterBean());
 
-        Button printBtn = new Button(CommonUtils.getUILocaleUtil().getCaption("export"));
+        HorizontalLayout hl = new HorizontalLayout();
+        printBtn = new Button(CommonUtils.getUILocaleUtil().getCaption("export"));
         printBtn.setImmediate(true);
+        printBtnchild = new Button("Экпорт для детей");
+        printBtnchild.setImmediate(true);
         printBtn.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
@@ -204,8 +205,6 @@ public class EmployeesView extends BaseView implements EntityListener, FilterPan
 
                 String fileName = "document";
 
-
-                String sqlList="";
                 for (GridColumnModel gcm : teacherGM.getColumnModels()) {
                     tableHeader.add(gcm.getLabel());
                 }
@@ -228,7 +227,61 @@ public class EmployeesView extends BaseView implements EntityListener, FilterPan
             }
         });
 
-        getContent().addComponent(printBtn);
+        printBtnchild.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                List<String> tableHeader = new ArrayList<>();
+                List<List<String>> tableBody = new ArrayList<>();
+
+                String fileName = "document";
+                String headers[]={"ФИО","Подразделение","Должность","Количество детей до 18 лет","Количество детей от 18 лет"};
+                for (String h :headers){
+                    tableHeader.add(h);
+                }
+
+                String sql="SELECT\n" +
+                        "  trim(\n" +
+                        "      usr.LAST_NAME || ' ' || usr.FIRST_NAME || ' ' || coalesce(usr.MIDDLE_NAME, '')) FIO,\n" +
+                        "  dep.DEPT_NAME,\n" +
+                        "  post.post_name,\n" +
+                        "  CASE WHEN date_part('year',age(c2.birth_date)) <= 18 then   count(c2.id) ELSE 0 END,\n" +
+                        "  CASE WHEN date_part('year',age(c2.birth_date)) >= 18 then   count(c2.id) ELSE 0 END\n" +
+                        "FROM EMPLOYEE empl INNER JOIN USERS usr ON empl.ID = usr.ID\n" +
+                        "  LEFT JOIN EMPLOYEE_DEPT empl_dept ON empl_dept.EMPLOYEE_ID = empl.ID AND empl_dept.DISMISS_DATE IS NULL\n" +
+                        "  LEFT JOIN DEPARTMENT dep ON empl_dept.DEPT_ID = dep.ID\n" +
+                        "  LEFT JOIN POST post ON empl_dept.POST_ID = post.id\n" +
+                        "  LEFT JOIN child c2 on empl.id = c2.employee_id\n" +
+                        "where  usr.deleted = FALSE\n" +
+                        "GROUP BY FIO,\n" +
+                        "  dep.DEPT_NAME,post.post_name,post.post_name,empl_dept.priority,c2.birth_date,usr.id,empl_dept.id " +
+                        " ORDER by FIO,empl_dept.priority DESC;";
+
+                try {
+                    List<Object> tmpList = new ArrayList<>();
+                    Map<Integer, Object> param = null;
+                    tmpList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, param));
+                    if (!tmpList.isEmpty()) {
+                        for (Object o : tmpList) {
+                            Object[] oo = (Object[]) o;
+                            ArrayList<String> valuesList = new ArrayList();
+                            for (int i = 0; i < oo.length; i++) {
+                                valuesList.add(oo[i] != null ? String.valueOf(oo[i]) : "");
+
+                            }
+                            tableBody.add(valuesList);
+                        }
+                    }
+                } catch (Exception ex) {
+                    CommonUtils.showMessageAndWriteLog("Unable to load absents list", ex);
+                }
+
+                PrintDialog printDialog = new PrintDialog(tableHeader, tableBody, CommonUtils.getUILocaleUtil().getCaption("print"), fileName);
+
+            }
+        });
+
+        hl.addComponents(printBtn,printBtnchild);
+        getContent().addComponent(hl);
         getContent().addComponent(teacherGW);
         getContent().setComponentAlignment(teacherGW, Alignment.MIDDLE_CENTER);
     }

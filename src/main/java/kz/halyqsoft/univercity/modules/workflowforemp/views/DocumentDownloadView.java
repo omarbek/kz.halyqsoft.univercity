@@ -219,8 +219,6 @@ public class DocumentDownloadView extends BaseView implements EntityListener {
                         "  INNER JOIN degree d2 ON ed.degree_id = d2.id\n" +
                         "WHERE  u.sex_id=2  and u.deleted=FALSE  ORDER BY  1;";
 
-                List<String> list = new ArrayList<>();
-
                 try {
                     List<Object> tmpList = new ArrayList<>();
                     Map<Integer, Object> param = null;
