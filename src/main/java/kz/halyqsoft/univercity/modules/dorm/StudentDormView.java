@@ -69,7 +69,7 @@ public class StudentDormView extends AbstractTaskView {
 
         }
 
-        if (!isNew) {
+         if (!isNew) {
 
             if (ds.getCheckInDate() != null && ds.getCheckOutDate() == null && ds.getRequestStatus() == 1) {
 
@@ -204,6 +204,179 @@ public class StudentDormView extends AbstractTaskView {
 
                 getContent().addComponent(roomL);
                 getContent().setComponentAlignment(roomL, Alignment.MIDDLE_CENTER);
+                QueryModel<STUDENT_EDUCATION> studentQM = new QueryModel<STUDENT_EDUCATION>(STUDENT_EDUCATION.class);
+                studentQM.addWhere("student", ECriteria.EQUAL, CommonUtils.getCurrentUser().getId());
+                studentQM.addWhereNullAnd("child");
+
+                buildingCB = new ComboBox(getUILocaleUtil().getCaption("building"));
+                buildingCB.setRequired(true);
+                buildingCB.setTextInputAllowed(true);
+                buildingCB.setFilteringMode(FilteringMode.STARTSWITH);
+                buildingCB.setWidth(245, Unit.PIXELS);
+                QueryModel<DORM> buildingQM = new QueryModel<>(DORM.class);
+                buildingQM.addWhere("deleted", Boolean.FALSE);
+                BeanItemContainer<DORM> buildingBIC = buildingBIC = new BeanItemContainer<DORM>(DORM.class, SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(buildingQM));
+                buildingCB.setContainerDataSource(buildingBIC);
+                buildingCB.setNullSelectionAllowed(false);
+                buildingCB.addValueChangeListener(new Property.ValueChangeListener() {
+
+                    @Override
+                    public void valueChange(Property.ValueChangeEvent event) {
+                        if (event.getProperty().getValue() != null) {
+                            roomCB.setReadOnly(false);
+                            QueryModel<DORM_ROOM> roomQM = new QueryModel<DORM_ROOM>(DORM_ROOM.class);
+                            roomQM.addWhere("dorm", ECriteria.EQUAL, ((DORM) event.getProperty().getValue()).getId());
+                            roomQM.addWhere("deleted", Boolean.FALSE);
+                            BeanItemContainer<DORM_ROOM> roomBIC = null;
+                            try {
+                                roomBIC = new BeanItemContainer<DORM_ROOM>(DORM_ROOM.class, SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(roomQM));
+                            } catch (IllegalArgumentException e) {
+                                LOG.error("Unable to load room: IllegalArgumentException - ", e);
+                            } catch (Exception ex) {
+                                LOG.error("Unable to load room: ", ex);
+                                Message.showError(ex.toString());
+                            }
+                            roomCB.setContainerDataSource(roomBIC);
+                        } else {
+                            roomCB.setReadOnly(true);
+                        }
+                    }
+                });
+                inFL.addComponent(buildingCB);
+                getContent().addComponent(buildingCB);
+                getContent().setComponentAlignment(buildingCB, Alignment.MIDDLE_CENTER);
+
+                roomCB = new ComboBox(getUILocaleUtil().getCaption("room"));
+                roomCB.setRequired(true);
+                roomCB.setTextInputAllowed(true);
+                roomCB.setFilteringMode(FilteringMode.STARTSWITH);
+                roomCB.setWidth(245, Unit.PIXELS);
+                roomCB.setNullSelectionAllowed(false);
+                QueryModel<DORM_ROOM> dormRoomQM = new QueryModel<>(DORM_ROOM.class);
+                dormRoomQM.addWhere("deleted", Boolean.FALSE);
+                BeanItemContainer<DORM_ROOM> dormRoomBIC = new BeanItemContainer<DORM_ROOM>(DORM_ROOM.class, SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(dormRoomQM));
+                roomCB.setContainerDataSource(dormRoomBIC);
+
+                inFL.addComponent(roomCB);
+                getContent().addComponent(roomCB);
+                getContent().setComponentAlignment(roomCB, Alignment.MIDDLE_CENTER);
+
+                costL = new Label();
+                costL.setCaption(getUILocaleUtil().getCaption("cost"));
+                costL.setWidth(245, Unit.PIXELS);
+
+                roomCB.addValueChangeListener(new Property.ValueChangeListener() {
+
+                    @Override
+                    public void valueChange(Property.ValueChangeEvent event) {
+                        if (event != null && event.getProperty() != null && event.getProperty().getValue() != null) {
+                            QueryModel<DORM_ROOM> roomQM = new QueryModel<>(DORM_ROOM.class);
+                            FromItem fi = roomQM.addJoin(EJoin.INNER_JOIN, "dorm", DORM.class, "id");
+                            roomQM.addWhere("deleted", Boolean.FALSE);
+                            roomQM.addWhere(fi, "deleted", Boolean.FALSE);
+                            roomQM.addWhereAnd(fi, "name", ECriteria.EQUAL, buildingCB.getValue().toString());
+                            roomQM.addWhere("roomNo", ECriteria.EQUAL, event.getProperty().getValue().toString());
+                            List<DORM_ROOM> dormRooms = null;
+                            try {
+                                dormRooms = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(roomQM);
+                                if (dormRooms != null) {
+                                    LOG.info("dormRooms requested. List size= " + dormRooms.size());
+                                } else {
+                                    LOG.info("dormRooms requested. List empty !!! ");
+                                }
+                            } catch (NoResultException e) {
+                                LOG.error("Unable to load room: ", e);
+                            } catch (Exception ex) {
+                                LOG.error("Unable to load room: ", ex);
+                                Message.showError(ex.toString());
+                            }
+                            if (dormRooms != null && dormRooms.size() > 0 && dormRooms.get(0) != null &&
+                                    (dormRooms.get(0).getBedCount() - dormRooms.get(0).getBusyBedCount()) > 0) {
+                                if (dormRooms.get(0).getCost() != null) {
+                                    costL.setValue(dormRooms.get(0).getCost().toString());
+                                }
+                            } else {
+                                Message.showInfo(getUILocaleUtil().getMessage("no.free.beds"));
+                                clearIn();
+                            }
+                        }
+                    }
+                });
+                inFL.addComponent(costL);
+                getContent().addComponent(costL);
+                getContent().setComponentAlignment(costL, Alignment.MIDDLE_CENTER);
+
+                HorizontalLayout buttonsHL = new HorizontalLayout();
+                buttonsHL.setSpacing(true);
+
+                Button saveB = new Button(getUILocaleUtil().getCaption("saveB"));
+                saveB.setCaption(getUILocaleUtil().getCaption("saveB"));
+                Button cancelB = new Button(getUILocaleUtil().getCaption("clear"));
+
+
+                buttonsHL.addComponent(saveB);
+                buttonsHL.addComponent(cancelB);
+                inFL.addComponent(buttonsHL);
+                inFL.setComponentAlignment(buttonsHL, Alignment.MIDDLE_CENTER);
+
+                saveB.addClickListener(new Button.ClickListener() {
+
+                    @Override
+                    public void buttonClick(Button.ClickEvent event) {
+                        if (roomCB.getValue() != null && costL.getValue() != null && !costL.getValue().equals("")) {
+                            try {
+
+                                QueryModel<DORM_ROOM> roomQM = new QueryModel<DORM_ROOM>(DORM_ROOM.class);
+                                FromItem fi = roomQM.addJoin(EJoin.INNER_JOIN, "dorm", DORM.class, "id");
+                                roomQM.addWhere(fi, "name", ECriteria.EQUAL, buildingCB.getValue().toString());
+                                roomQM.addWhere("roomNo", ECriteria.EQUAL, roomCB.getValue().toString());
+                                roomQM.addWhere("deleted", Boolean.FALSE);
+                                roomQM.addWhere(fi, "deleted", Boolean.FALSE);
+
+                                STUDENT_EDUCATION studentEducation = null;
+                                DORM_ROOM dormRoom = null;
+                                try {
+                                    studentEducation = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(studentQM);
+                                    dormRoom = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(roomQM);
+                                } catch (NoResultException e) {
+                                    studentEducation = null;
+                                }
+                                DORM_STUDENT dormStudent = null;
+                                if (studentEducation != null && dormRoom != null) {
+
+                                    dormStudent = new DORM_STUDENT();
+                                    dormStudent.setCost(Double.parseDouble(costL.getValue()));
+                                    dormStudent.setCreated(new Date());
+                                    dormStudent.setDeleted(false);
+                                    dormStudent.setStudent(studentEducation);
+                                    dormStudent.setRoom(dormRoom);
+
+                                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(dormStudent);
+                                    AbstractWebUI.getInstance().showNotificationInfo(getUILocaleUtil().getMessage("info.record.saved"));
+                                }
+
+                            } catch (Exception ex) {
+                                LOG.error("Unable to create or update student dorm: ", ex);
+                                Message.showError(ex.toString());
+                            }
+                        } else {
+                            Message.showError(getUILocaleUtil().getCaption("add.news.required"));
+                        }
+                    }
+                });
+
+                cancelB.addClickListener(new Button.ClickListener() {
+                    @Override
+                    public void buttonClick(Button.ClickEvent event) {
+                        clearIn();
+                    }
+                });
+
+                getContent().addComponent(buttonsHL);
+                getContent().setComponentAlignment(buttonsHL, Alignment.MIDDLE_CENTER);
+
+                getContent().addComponent(inFL);
+                getContent().setComponentAlignment(inFL, Alignment.MIDDLE_CENTER);
 
             } else if (ds.getCheckInDate() == null && ds.getCheckOutDate() == null && ds.getRequestStatus() == 2) {
                 denyL = new Label();
