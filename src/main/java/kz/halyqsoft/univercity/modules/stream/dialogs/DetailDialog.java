@@ -32,11 +32,12 @@ public class DetailDialog extends AbstractDialog implements EntityListener {
     private GridWidget streamGroupGW;
     private DBGridModel streamGroupGM;
     private boolean isCRUD;
+
     public GridWidget getStreamGroupGW() {
         return streamGroupGW;
     }
 
-    public DetailDialog(STREAM stream , boolean isCRUD){
+    public DetailDialog(STREAM stream, boolean isCRUD) {
         this.isCRUD = isCRUD;
         init(stream, isCRUD);
     }
@@ -46,7 +47,7 @@ public class DetailDialog extends AbstractDialog implements EntityListener {
         init(stream, isCRUD);
     }
 
-    public void init(STREAM stream , boolean refreshable){
+    public void init(STREAM stream, boolean refreshable) {
         this.stream = stream;
 
         getContent().setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
@@ -70,8 +71,9 @@ public class DetailDialog extends AbstractDialog implements EntityListener {
         getContent().addComponent(streamGroupGW);
         AbstractWebUI.getInstance().addWindow(this);
     }
+
     private void refresh() {
-        if(isCRUD){
+        if (isCRUD) {
             QueryModel<GROUPS> groupsQM = new QueryModel<>(GROUPS.class);
             FromItem streamGrFI = groupsQM.addJoin(EJoin.INNER_JOIN, "id", STREAM_GROUP.class, "group");
             groupsQM.addWhere("deleted", false);
@@ -80,27 +82,29 @@ public class DetailDialog extends AbstractDialog implements EntityListener {
             List<ID> groupIdsInThisStream = new ArrayList<>();
 
             QueryModel<STREAM> streamQM = new QueryModel<>(STREAM.class);
-            streamQM.addWhere("deleted" , ECriteria.EQUAL, false);
-            if(stream.getSubject() !=null){
-                streamQM.addWhereAnd("subject" , ECriteria.EQUAL, stream.getSubject().getId());
+            streamQM.addWhere("deleted", ECriteria.EQUAL, false);
+            if (stream.getSubject() != null) {
+                streamQM.addWhereAnd("subject", ECriteria.EQUAL, stream.getSubject().getId());
             }
-            if(stream.getSemesterPeriod()!=null){
-                streamQM.addWhereAnd("semesterPeriod" , ECriteria.EQUAL, stream.getSemesterPeriod().getId());
+            if (stream.getSemesterPeriod() != null) {
+                streamQM.addWhereAnd("semesterPeriod", ECriteria.EQUAL, stream.getSemesterPeriod().getId());
             }
-            try{
-                List<STREAM> streams = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(streamQM);
-                for(STREAM stream : streams){
+            try {
+                List<STREAM> streams = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
+                        streamQM);
+                for (STREAM stream : streams) {
                     QueryModel<STREAM_GROUP> streamGroupQM = new QueryModel<>(STREAM_GROUP.class);
-                    streamGroupQM.addWhere("stream" , ECriteria.EQUAL, stream.getId());
-                    List<STREAM_GROUP> streamGroups = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(streamGroupQM);
-                    for(STREAM_GROUP streamGroup : streamGroups){
+                    streamGroupQM.addWhere("stream", ECriteria.EQUAL, stream.getId());
+                    List<STREAM_GROUP> streamGroups = SessionFacadeFactory.getSessionFacade(
+                            CommonEntityFacadeBean.class).lookup(streamGroupQM);
+                    for (STREAM_GROUP streamGroup : streamGroups) {
                         if (!groupIdsInThisStream.contains(streamGroup.getGroup().getId())) {
                             groupIdsInThisStream.add(streamGroup.getGroup().getId());
                         }
                     }
                 }
-            }catch (Exception e){
-                CommonUtils.showMessageAndWriteLog(e.getMessage(),e);
+            } catch (Exception e) {
+                CommonUtils.showMessageAndWriteLog(e.getMessage(), e);
                 e.printStackTrace();
             }
             try {
@@ -112,13 +116,12 @@ public class DetailDialog extends AbstractDialog implements EntityListener {
                     }
                 }
             } catch (Exception e) {
-                CommonUtils.showMessageAndWriteLog(e.getMessage(),e);
+                CommonUtils.showMessageAndWriteLog(e.getMessage(), e);
                 e.printStackTrace();
             }
 
             FKFieldModel groupFM = (FKFieldModel) streamGroupGM.getFormModel().getFieldModel("group");
             QueryModel groupQM = groupFM.getQueryModel();
-            FromItem fi = groupQM.addJoin(EJoin.LEFT_JOIN, "id", STREAM_GROUP.class, "group");
             groupQM.addWhere("deleted", ECriteria.EQUAL, false);
             groupQM.addWhereNotIn("id", groupIdsInThisStream);
             groupQM.addOrder("name");
@@ -126,15 +129,15 @@ public class DetailDialog extends AbstractDialog implements EntityListener {
 
         QueryModel<STREAM_GROUP> streamGroupQM = new QueryModel<>(STREAM_GROUP.class);
         streamGroupQM.addWhere("stream", ECriteria.EQUAL, stream.getId());
-        FromItem fi = streamGroupQM.addJoin(EJoin.INNER_JOIN,"group", GROUPS.class, "id");
-        streamGroupQM.addWhere(fi , "deleted" , ECriteria.EQUAL, false);
+        FromItem fi = streamGroupQM.addJoin(EJoin.INNER_JOIN, "group", GROUPS.class, "id");
+        streamGroupQM.addWhere(fi, "deleted", ECriteria.EQUAL, false);
         try {
             List<STREAM_GROUP> streamGroups = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class)
                     .lookup(streamGroupQM);
             streamGroupGM.setEntities(streamGroups);
             streamGroupGW.refresh();
         } catch (Exception e) {
-            CommonUtils.showMessageAndWriteLog(e.getMessage(),e);
+            CommonUtils.showMessageAndWriteLog(e.getMessage(), e);
             e.printStackTrace();
         }
     }
