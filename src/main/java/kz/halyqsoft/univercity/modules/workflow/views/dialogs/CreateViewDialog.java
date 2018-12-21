@@ -362,7 +362,8 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
             try {
                 relatedFilePath = "/tmp/files/"  + document.getId().getId().longValue()+ "-"+ filename;
                 relatedFile = new File(relatedFilePath);
-
+                relatedFile.mkdirs();
+                relatedFile.createNewFile();
                 if(document.getRelatedDocumentFilePath()!=null){
                     File file = new File(document.getRelatedDocumentFilePath());
                     if(file.exists()){
