@@ -22,5 +22,11 @@
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://185.146.3.193:5432/college</jdbc-url>
     </data-source>
+    <data-source source="LOCAL" name="college@78.40.109.78" uuid="96a70f99-7583-4f38-937d-f3c36dac6107">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://78.40.109.78:5432/college</jdbc-url>
+    </data-source>
   </component>
 </project>
