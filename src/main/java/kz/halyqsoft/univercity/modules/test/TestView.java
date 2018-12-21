@@ -30,10 +30,10 @@ public class TestView extends AbstractTaskView {
 //            qwe(2);
 //            qwe(5);
 //            qwe(9);
-            asd(1);
-            asd(2);
-            asd(3);
-            asd(4);
+//            asd(1);
+//            asd(2);
+//            asd(3);
+//            asd(4);
         } catch (Exception e) {
             e.printStackTrace();
         }

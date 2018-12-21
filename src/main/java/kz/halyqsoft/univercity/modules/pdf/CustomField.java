@@ -1,13 +1,21 @@
 package kz.halyqsoft.univercity.modules.pdf;
 import com.vaadin.data.Property;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.Sizeable;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.CheckBox;
+import kz.halyqsoft.univercity.entity.beans.univercity.PDF_DOCUMENT;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.PDF_DOCUMENT_TYPE;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
+import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.ID;
+import org.r3a.common.entity.query.QueryModel;
+
+import java.util.List;
 
 public class CustomField {
 
@@ -17,12 +25,14 @@ public class CustomField {
     ComboBox yComboBox;
     ComboBox fontComboBox;
     ComboBox textSizeComboBox;
+    ComboBox pdfDocumentTypeComboBox;
     CheckBox centerCheckBox;
     CheckBox rightCheckBox;
     CheckBox customCheckBox;
     TextField pdfTitle;
     TextField title;
     TextField deadlineDays;
+    CheckBox forHumanResourceDepartmentCheckBox;
     TextField order;
 
     static final String BOLD = "Bold";
@@ -36,6 +46,8 @@ public class CustomField {
         this.yComboBox = new ComboBox();
         this.fontComboBox = new ComboBox();
         this.textSizeComboBox = new ComboBox();
+        this.pdfDocumentTypeComboBox = new ComboBox();
+
         this.pdfTitle = new TextField();
         this.title = new TextField();
         this.order = new TextField();
@@ -54,8 +66,10 @@ public class CustomField {
         this.centerCheckBox = new CheckBox();
         this.rightCheckBox = new CheckBox();
         this.customCheckBox = new CheckBox();
+        this.forHumanResourceDepartmentCheckBox = new CheckBox();
 
         this.textField = new TextArea(CommonUtils.getUILocaleUtil().getCaption("text") + ":");
+        this.pdfDocumentTypeComboBox.setCaption(CommonUtils.getUILocaleUtil().getEntityLabel(PDF_DOCUMENT_TYPE.class) + ":");
         this.yComboBox.setCaption(CommonUtils.getUILocaleUtil().getCaption("space.top") + ":");
         this.xComboBox.setCaption(CommonUtils.getUILocaleUtil().getCaption("space.right") + ":");
         this.fontComboBox.setCaption(CommonUtils.getUILocaleUtil().getCaption("font") + ":");
@@ -67,6 +81,7 @@ public class CustomField {
         this.centerCheckBox.setCaption(CommonUtils.getUILocaleUtil().getCaption("text.center") + ":");
         this.rightCheckBox.setCaption(CommonUtils.getUILocaleUtil().getCaption("text.right") + ":");
         this.customCheckBox.setCaption(CommonUtils.getUILocaleUtil().getCaption("text.custom") + ":");
+        this.forHumanResourceDepartmentCheckBox.setCaption(CommonUtils.getUILocaleUtil().getEntityFieldLabel(PDF_DOCUMENT.class, "forHumanResourceDepartment") + ":");
 
         this.textField.setRequired(true);
         this.xComboBox.setRequired(true);
@@ -79,6 +94,7 @@ public class CustomField {
         this.deadlineDays.setRequired(true);
 
         this.textField.setImmediate(true);
+        this.pdfDocumentTypeComboBox.setImmediate(true);
         this.xComboBox.setImmediate(true);
         this.yComboBox.setImmediate(true);
         this.fontComboBox.setImmediate(true);
@@ -90,6 +106,17 @@ public class CustomField {
         this.centerCheckBox.setImmediate(true);
         this.rightCheckBox.setImmediate(true);
         this.customCheckBox.setImmediate(true);
+        this.forHumanResourceDepartmentCheckBox.setImmediate(true);
+
+        List<PDF_DOCUMENT_TYPE> list = null;
+        try{
+         list =  SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(new QueryModel<PDF_DOCUMENT_TYPE>(PDF_DOCUMENT_TYPE.class));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        BeanItemContainer bic = new BeanItemContainer(PDF_DOCUMENT_TYPE.class, list);
+        pdfDocumentTypeComboBox.setContainerDataSource(bic);
 
         this.fontComboBox.addItem(BOLD);
         this.fontComboBox.addItem(ITALIC);
@@ -110,6 +137,8 @@ public class CustomField {
         for(int i = 8; i <= 72; i+=2){
             this.textSizeComboBox.addItem(i);
         }
+
+
 
     }
 
@@ -212,5 +241,21 @@ public class CustomField {
 
     public void setCustomCheckBox(CheckBox customCheckBox) {
         this.customCheckBox = customCheckBox;
+    }
+
+    public CheckBox getForHumanResourceDepartmentCheckBox() {
+        return forHumanResourceDepartmentCheckBox;
+    }
+
+    public void setForHumanResourceDepartmentCheckBox(CheckBox forHumanResourceDepartmentCheckBox) {
+        this.forHumanResourceDepartmentCheckBox = forHumanResourceDepartmentCheckBox;
+    }
+
+    public ComboBox getPdfDocumentTypeComboBox() {
+        return pdfDocumentTypeComboBox;
+    }
+
+    public void setPdfDocumentTypeComboBox(ComboBox pdfDocumentTypeComboBox) {
+        this.pdfDocumentTypeComboBox = pdfDocumentTypeComboBox;
     }
 }

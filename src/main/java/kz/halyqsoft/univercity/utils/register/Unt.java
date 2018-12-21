@@ -193,7 +193,7 @@ public class Unt {
             try {
                 untCertificate = (UNT_CERTIFICATE) untCertificateFM.getEntity();
             } catch (Exception e) {
-                e.printStackTrace();//TODO catch
+                CommonUtils.showMessageAndWriteLog("Unable to get unt", e);
             }
             if (untCertificate != null) {
                 untCertificateId = untCertificate.getId();

@@ -118,110 +118,6 @@ public class MainSection implements FilterPanelListener {
         dateField.setValue(new Date());
     }
 
-    public List<VTopUserArrival> getUserList(Date date) {
-        List<VTopUserArrival> userList = new ArrayList<>();
-
-        Map<Integer, Object> params = new HashMap<>();
-        String formattedDate = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS").format(date);
-
-        String sql = "SELECT\n" +
-                "  id,\n" +
-                "  fio ,\n" +
-                "  (CASE WHEN present_lesson > 0 THEN all_lessons/present_lesson*100 ELSE 0 END)::DOUBLE PRECISION  as percentage,\n" +
-                "  group_name \n" +
-                "  from (SELECT\n" +
-                "  vs.id,\n" +
-                "  concat(vs.first_name, ' ', vs.last_name, ' ', vs.middle_name) AS fio,\n" +
-                "  l.lesson_date,\n" +
-                "  count(l.id)                                                   AS all_lessons,\n" +
-                "  sum(CASE WHEN ld.attendance_mark = 1\n" +
-                "    THEN 1\n" +
-                "      ELSE 0 END)                                               AS present_lesson,\n" +
-                "  sum(CASE WHEN ld.attendance_mark = 0\n" +
-                "    THEN 1\n" +
-                "      ELSE 0 END)                                               AS absent_lesson,\n" +
-                "  vs.group_name\n" +
-                "FROM v_student vs\n" +
-                "  INNER JOIN student_education se\n" +
-                "    ON vs.id = se.student_id\n" +
-                "  INNER JOIN lesson_detail ld\n" +
-                "    ON se.id = ld.student_id\n" +
-                "  INNER JOIN lesson l\n" +
-                "    ON ld.lesson_id = l.id\n" +
-                "WHERE date_trunc('month', l.lesson_date) IN (date_trunc('month', TIMESTAMP '" + CommonUtils.getFormattedDate(date) + "'))\n" +
-                "      AND l.canceled = FALSE\n" +
-                "GROUP BY vs.id, fio, l.lesson_date, vs.group_name) newselect ORDER BY CASE WHEN present_lesson > 0\n" +
-                "    THEN all_lessons / present_lesson * 100\n" +
-                "   ELSE 0 END DESC;";
-
-        try {
-            List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
-            if (!tmpList.isEmpty()) {
-                for (Object o : tmpList) {
-                    Object[] oo = (Object[]) o;
-                    VTopUserArrival topUser = new VTopUserArrival();
-                    topUser.setId(ID.valueOf((Long) oo[0]));
-                    topUser.setFio((String) oo[1]);
-                    topUser.setPercentage((Double) oo[2]);
-                    topUser.setGroup((String) oo[3]);
-                    userList.add(topUser);
-                }
-            }
-        } catch (Exception ex) {
-            CommonUtils.showMessageAndWriteLog("Unable to load vgroup list", ex);
-        }
-        return userList;
-    }
-
-    public List<VTopGroupArrival> getGroupList(Date date) {
-        List<VTopGroupArrival> groupList = new ArrayList<>();
-
-        Map<Integer, Object> params = new HashMap<>();
-        String formattedDate = new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss.SSS").format(date);
-
-        String sql = "SELECT foo.group_name ,foo.advisor_name , count(foo.count) all_student, sum(foo.data) all_coming ,\n" +
-                "  (CASE WHEN sum(foo.data) > 0 THEN sum(foo.data)* 100/count(foo.count) ELSE 0 END)::DOUBLE PRECISION as percentage\n" +
-                "\n" +
-                "from ( SELECT\n" +
-                "                vs.advisor_name,\n" +
-                "                 vs.group_name,\n" +
-                "\n" +
-                "                  CASE WHEN exists(SELECT *\n" +
-                "                                   FROM user_arrival ua\n" +
-                "                                   WHERE ua.user_id = vs.id AND\n" +
-                "                                         date_trunc('day', ua.created) IN (date_trunc('day', TIMESTAMP '" + CommonUtils.getFormattedDate(date) + "')))\n" +
-                "                    THEN 1\n" +
-                "                  ELSE 0 END as data,\n" +
-                "\n" +
-                "                 count(exists(SELECT *\n" +
-                "                                        FROM user_arrival ua\n" +
-                "                                        WHERE ua.user_id = vs.id AND\n" +
-                "                                              date_trunc('day', ua.created) IN (date_trunc('day', TIMESTAMP '" + CommonUtils.getFormattedDate(date) + "'))))\n" +
-                "               FROM v_student vs\n" +
-                "               WHERE vs.group_name NOTNULL\n" +
-                "               GROUP BY vs.group_name, vs.id,vs.advisor_name ORDER BY vs.group_name ) as foo GROUP BY foo.group_name , foo.advisor_name" +
-                " ORDER BY all_coming desc LIMIT 10";
-
-        try {
-            List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
-            if (!tmpList.isEmpty()) {
-                for (Object o : tmpList) {
-                    Object[] oo = (Object[]) o;
-                    VTopGroupArrival topGroup = new VTopGroupArrival();
-                    topGroup.setGroup((String) oo[0]);
-                    topGroup.setTeacher((String) oo[1]);
-                    topGroup.setSumOfStudent((Long) oo[2]);
-                    topGroup.setAttend((Long) oo[3]);
-                    topGroup.setPercent((double) oo[4]);
-                    groupList.add(topGroup);
-                }
-            }
-        } catch (Exception ex) {
-            CommonUtils.showMessageAndWriteLog("Unable to load vgroup list", ex);
-        }
-        return groupList;
-    }
-
     public List<SimpleStatistics> getStatisticList(Long id, Date startingDate, Date endingDate) {
         List<SimpleStatistics> simpleStatistics = new ArrayList<>();
         Map<Integer, Object> params = new HashMap<>();
@@ -556,8 +452,6 @@ public class MainSection implements FilterPanelListener {
         statisticsFP.addFilterComponent("endingDate", endingDateDF);
         return statisticsFP;
     }
-
-
 
     private void setValues() {
 

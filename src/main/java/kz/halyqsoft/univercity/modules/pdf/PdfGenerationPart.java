@@ -8,12 +8,13 @@ import kz.halyqsoft.univercity.entity.beans.univercity.PDF_DOCUMENT;
 public class PdfGenerationPart {
 
 
-
+    private boolean isForHRD;
     private PDF_DOCUMENT pdfDocument;
     private HorizontalSplitPanel pdfHSP;
     private Embedded pdfEmbedded;
     private String loading;
-    public PdfGenerationPart(PDF_DOCUMENT pdfDocument,  String loading){
+    public PdfGenerationPart(PDF_DOCUMENT pdfDocument,  String loading,boolean isForHRD){
+        this.isForHRD = isForHRD;
         this.pdfDocument = pdfDocument;
         this.loading = loading;
         pdfHSP = new HorizontalSplitPanel();
@@ -27,7 +28,7 @@ public class PdfGenerationPart {
     private void init(){
 
 
-        PdfEdit pdfEdit = new PdfEdit(this.pdfDocument, PdfGenerationPart.this);
+        PdfEdit pdfEdit = new PdfEdit(this.pdfDocument, PdfGenerationPart.this,isForHRD);
 
         pdfHSP.setFirstComponent(pdfEdit);
 

@@ -275,7 +275,8 @@ public class CommonUtils {
     public static String getCode(String beginYear) {
         String code = null;
         try {
-            Integer usersCode = SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USERS_CODE").getId().intValue();
+            Integer usersCode = SessionFacadeFactory.getSessionFacade(CommonIDFacadeBean.class).getID("S_USERS_CODE")
+                    .getId().intValue();
             if (usersCode < 10) {
                 code = beginYear + "000" + usersCode;
             } else if (usersCode < 100) {
@@ -292,7 +293,7 @@ public class CommonUtils {
                 code = getCode(beginYear);
             }
         } catch (Exception e) {
-            e.printStackTrace();//TODO catch
+            CommonUtils.showMessageAndWriteLog("Unable to get code", e);
         }
         return code;
     }
@@ -319,9 +320,7 @@ public class CommonUtils {
                 "group");
         groupsQM.addWhere(streamGroupFI, "stream", ECriteria.EQUAL, stream.getId());
         groupsQM.addWhere("deleted", Boolean.FALSE);
-        return SessionFacadeFactory.getSessionFacade(
-                CommonEntityFacadeBean.class).
-                lookup(groupsQM);
+        return SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(groupsQM);
     }
 
     public static SEMESTER_DATA createSemesterDataBySemester(SEMESTER semester, CURRICULUM curriculum) throws Exception {
@@ -406,9 +405,22 @@ public class CommonUtils {
         try {
             SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(sd);
         } catch (Exception e) {
-            e.printStackTrace();//TODO catch
+            CommonUtils.showMessageAndWriteLog("Unable to create semester data", e);
         }
         return sd;
+    }
+
+    public static boolean isCurrentUserHasAtLeastOnePrivilegesOf(List<ID> roleIDs) {
+        List<USER_ROLES> userRoles = getCurrentUser().getUserRoles();
+        for(USER_ROLES userRole: userRoles){
+            for(ID id : roleIDs){
+                if(userRole.getRole().getId().equals(id)){
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     public static boolean isCurrentUserHasAdminPrivileges() {
@@ -449,7 +461,7 @@ public class CommonUtils {
         } catch (NoResultException e) {
             semesterData = createSemesterData(entranceYear, semester.getSemesterPeriod());
         } catch (Exception e) {
-            e.printStackTrace();//TODO catch
+            CommonUtils.showMessageAndWriteLog("Unable to get semester data", e);
         }
         return semesterData;
     }
@@ -466,7 +478,7 @@ public class CommonUtils {
         } catch (NoResultException e) {
             semester = null;
         } catch (Exception e) {
-            e.printStackTrace();//TODO catch
+            CommonUtils.showMessageAndWriteLog("Unable to get semester", e);
         }
         return semester;
     }
@@ -490,9 +502,7 @@ public class CommonUtils {
         return entranceYear;
     }
 
-    public static CommonEntityFacadeBean getQuery() throws Exception{
-        return  SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class);
+    public static CommonEntityFacadeBean getQuery() throws Exception {
+        return SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class);
     }
-
-
 }

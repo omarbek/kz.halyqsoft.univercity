@@ -254,7 +254,7 @@ public class ScheduleAuto extends AbstractCommonView {
         for (SHIFT_STUDY_YEAR shiftStudyYear : shiftStudyYears) {
             List<GROUPS> groups = new ArrayList<>();
             if (loadToTeacher.getStream() != null) {
-                groups = getGroupsByStream(loadToTeacher.getStream(), shiftStudyYear);
+                groups = CommonUtils.getGroupsByStream(loadToTeacher.getStream());
             } else {
                 groups.add(loadToTeacher.getGroup());
             }
@@ -297,6 +297,7 @@ public class ScheduleAuto extends AbstractCommonView {
     private boolean choosedDayAndTime(LOAD_TO_TEACHER loadToTeacher, GROUPS group,
                                       boolean notComputer, List<GROUPS> groups, Integer shift) throws Exception {
         QueryModel<WEEK_DAY> weekDayQM = new QueryModel<>(WEEK_DAY.class);
+        weekDayQM.addWhere("value", ECriteria.NOT_EQUAL, 0);
         List<WEEK_DAY> weekDays = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
                 lookup(weekDayQM);
         QueryModel<LESSON_TIME> lessonTimeQM = new QueryModel<>(LESSON_TIME.class);
@@ -524,14 +525,5 @@ public class ScheduleAuto extends AbstractCommonView {
         params.put(4, time.getId().getId());
         List results = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
         return results.size() > 0;
-    }
-
-    private List<GROUPS> getGroupsByStream(STREAM stream, SHIFT_STUDY_YEAR shiftStudyYear) throws Exception {
-        QueryModel<GROUPS> groupsQM = new QueryModel<>(GROUPS.class);
-        FromItem streamGroupFI = groupsQM.addJoin(EJoin.INNER_JOIN, "id", STREAM_GROUP.class, "group");
-        groupsQM.addWhere(streamGroupFI, "stream", ECriteria.EQUAL, stream.getId());
-        groupsQM.addWhere("deleted", Boolean.FALSE);
-        groupsQM.addWhere("studyYear", ECriteria.EQUAL, shiftStudyYear.getStudyYear().getId());
-        return SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(groupsQM);
     }
 }

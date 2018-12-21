@@ -1,6 +1,7 @@
 package kz.halyqsoft.univercity.utils.changelisteners;
 
 import com.vaadin.data.Property;
+import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.vaadin.widget.form.field.FieldModel;
 
 /**
@@ -27,7 +28,7 @@ public class LiveLoadChangeListener implements Property.ValueChangeListener {
                 try {
                     rateLoadFM.refresh(rateLoad.toString());
                 } catch (Exception e) {
-                    e.printStackTrace();//TODO catch
+                    CommonUtils.showMessageAndWriteLog("Unable to refresh rate load", e);
                 }
             }
         }
