@@ -71,7 +71,7 @@ public class TeacherDialog extends AbstractDialog{
 
                     TEACHER_SUBJECT teacherSubject = null;
                     QueryModel<TEACHER_SUBJECT> teacherSubjectQM = new QueryModel<>(TEACHER_SUBJECT.class);
-                    teacherSubjectQM.addWhere("teacher" , ECriteria.EQUAL , ((EMPLOYEE)teacherCB.getValue()).getId());
+                    teacherSubjectQM.addWhere("employee" , ECriteria.EQUAL , ((EMPLOYEE)teacherCB.getValue()).getId());
                     teacherSubjectQM.addWhereAnd("subject" , ECriteria.EQUAL , scheduleDetail.getSubject().getId());
                     try{
                         teacherSubject = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(teacherSubjectQM);
