@@ -75,7 +75,7 @@ public class AddEmployeeDialog extends AbstractDialog{
             }
         });
         getContent().addComponent(saveButton);
-        AbstractWebUI.getInstance().addWindow(this);
+        open();
 
     }
 

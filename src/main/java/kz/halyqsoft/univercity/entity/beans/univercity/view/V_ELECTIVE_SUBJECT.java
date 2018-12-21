@@ -65,11 +65,16 @@ public class V_ELECTIVE_SUBJECT extends AbstractEntity {
             @JoinColumn(name = "SUBJECT_CYCLE_ID", referencedColumnName = "ID")})
     private SUBJECT_CYCLE subjectCycle;
 
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "TRAJECTORY_ID", referencedColumnName = "ID")})
+    private TRAJECTORY trajectory;
+
     @FieldInfo(type = EFieldType.TEXT)
     @Column(name = "SEMESTER_NAME")
     private String semesterName;
 
-    @FieldInfo(type = EFieldType.TEXT, order = 2)
+    @FieldInfo(type = EFieldType.TEXT, order = 17)
     @Column(name = "MODULE_SHORT_NAME")
     private String moduleShortName;
 
@@ -128,6 +133,10 @@ public class V_ELECTIVE_SUBJECT extends AbstractEntity {
     @FieldInfo(type = EFieldType.TEXT, order = 16)
     @Column(name = "CONTROL_TYPE_NAME")
     private String controlTypeName;
+
+    @FieldInfo(type = EFieldType.TEXT, order = 2)
+    @Column(name = "TRAJECTORY_NAME")
+    private String trajectoryName;
 
     @Column(name = "CONSIDER_CREDIT", nullable = false)
     private boolean considerCredit;
@@ -346,5 +355,21 @@ public class V_ELECTIVE_SUBJECT extends AbstractEntity {
 
     public void setConsiderCredit(boolean considerCredit) {
         this.considerCredit = considerCredit;
+    }
+
+    public TRAJECTORY getTrajectory() {
+        return trajectory;
+    }
+
+    public void setTrajectory(TRAJECTORY trajectory) {
+        this.trajectory = trajectory;
+    }
+
+    public String getTrajectoryName() {
+        return trajectoryName;
+    }
+
+    public void setTrajectoryName(String trajectoryName) {
+        this.trajectoryName = trajectoryName;
     }
 }
