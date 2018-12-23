@@ -363,7 +363,7 @@
 
 
             <!--LOCAL-->
-            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/college"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://185.146.3.193:5432/college"/>
             <property name="javax.persistence.jdbc.user" value="postgres"/>
             <property name="javax.persistence.jdbc.password" value="sbeezzs01"/>
 

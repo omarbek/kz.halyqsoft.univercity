@@ -92,4 +92,6 @@ public class STUDENT_SUBJECT extends AbstractEntity {
 	public void setDeleted(boolean deleted) {
 		this.deleted = deleted;
 	}
+
+
 }

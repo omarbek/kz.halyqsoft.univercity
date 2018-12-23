@@ -34,6 +34,7 @@ import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
 import org.r3a.common.vaadin.widget.toolbar.IconToolbar;
 
+import javax.persistence.NoResultException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -523,11 +524,25 @@ public class ScheduleView extends AbstractTaskView {
             studentSubject.setSubject(semesterSubject);
             studentSubjects.add(studentSubject);
         }
-        try{
-            CommonUtils.getQuery().create(studentSubjects);
-        }catch (Exception e){
-            CommonUtils.showMessageAndWriteLog("Can not create student subjects", e);
+
+        for(STUDENT_SUBJECT studentSubject : studentSubjects){
+            try{
+                QueryModel<STUDENT_SUBJECT> studentSubjectQM = new QueryModel<>(STUDENT_SUBJECT.class);
+                studentSubjectQM.addWhere("semesterData", ECriteria.EQUAL, studentSubject.getSemesterData().getId());
+                studentSubjectQM.addWhereAnd("subject", ECriteria.EQUAL, studentSubject.getSubject().getId());
+                studentSubjectQM.addWhereAnd("studentEducation", ECriteria.EQUAL, studentSubject.getStudentEducation().getId());
+                studentSubjectQM.addWhereAnd("deleted", ECriteria.EQUAL, false);
+                try{
+                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(semesterSubjectQM);
+                }catch (NoResultException nre){
+                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(studentSubject);
+                }
+            }catch (Exception e){
+                CommonUtils.showMessageAndWriteLog("Can not create student subjects", e);
+            }
+
         }
+
         return studentSubjects;
     }
 
