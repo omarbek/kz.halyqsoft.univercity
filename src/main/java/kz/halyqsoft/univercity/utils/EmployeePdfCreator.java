@@ -10,6 +10,7 @@ import com.vaadin.server.StreamResource;
 import com.vaadin.server.VaadinService;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_EMPLOYEE;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -165,7 +166,11 @@ public class EmployeePdfCreator {
                             }
 
                             if(flag){
-                                    text = setReplaced(property.getText(), document.getCreatorEmployee());
+                                QueryModel vEmployeeQM = new QueryModel<V_EMPLOYEE>(V_EMPLOYEE.class);
+                                vEmployeeQM.addWhere("id" , ECriteria.EQUAL,document.getCreatorEmployee().getId());
+                                V_EMPLOYEE vEmployee = (V_EMPLOYEE) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(vEmployeeQM);
+
+                                text = setReplaced(property.getText(), document.getCreatorEmployee(),vEmployee);
                             }
 
                             Paragraph paragraph = new Paragraph(text,
@@ -200,11 +205,12 @@ public class EmployeePdfCreator {
         return  sr;
     }
 
-    private static String setReplaced(String text, USERS employee) {
+    private static String setReplaced(String text, USERS employee,V_EMPLOYEE vEmployee) {
         String result = text.replaceAll("\\$fio", employee.getFirstName() +" " + employee.getLastName())
             .replaceAll("\\$phone", "+7" + employee.getPhoneMobile())
             .replaceAll("\\$aboutMe", "-")
             .replaceAll("\\$country", employee.getCitizenship().toString())
+            .replaceAll("\\$mypost", vEmployee.getPost().getPostName())
             .replaceAll("\\$status", employee.getMaritalStatus().toString())
             .replaceAll("\\$gender", employee.getSex().toString())
             .replaceAll("\\$nationality", employee.getNationality().toString())
@@ -213,7 +219,7 @@ public class EmployeePdfCreator {
     }
 
     public static Font getFont(int fontSize, int font) {
-        String fontPath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath() + "/WEB-INF/classes/fonts";
+        String fontPath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath() + "/WEB- /classes/fonts";
         BaseFont timesNewRoman = null;
         try {
             timesNewRoman = BaseFont.createFont(fontPath + "/TimesNewRoman/times.ttf", BaseFont.IDENTITY_H,

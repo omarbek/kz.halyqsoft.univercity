@@ -10,10 +10,7 @@ import kz.halyqsoft.univercity.entity.beans.ROLES;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.USER_ROLES;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_DATA;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_PERIOD;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import org.r3a.common.dblink.facade.AbstractSessionFacade;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.facade.CommonIDFacadeBean;
@@ -96,7 +93,20 @@ public class CommonUtils {
 
         return roles;
     }
-
+    public static List<POST> getCurrentUserPosts(){
+        ArrayList<POST> posts = new ArrayList<>();
+        QueryModel<EMPLOYEE_DEPT> employeeDeptQM = new QueryModel<>(EMPLOYEE_DEPT.class);
+        employeeDeptQM.addWhere("employee", ECriteria.EQUAL, CommonUtils.getCurrentUser().getId());
+        try{
+            List<EMPLOYEE_DEPT> employeeDepts = CommonUtils.getQuery().lookup(employeeDeptQM);
+            for(EMPLOYEE_DEPT employeeDept : employeeDepts){
+                posts.add(employeeDept.getPost());
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return posts;
+    }
     private static STUDENT getStudent(Map<String, Object> params) {
         try {
             return (STUDENT) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).

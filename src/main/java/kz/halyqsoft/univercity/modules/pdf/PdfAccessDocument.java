@@ -1,9 +1,13 @@
 package kz.halyqsoft.univercity.modules.pdf;
 
+import com.vaadin.server.FontAwesome;
+import com.vaadin.server.ThemeResource;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.VerticalLayout;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.POST;
+import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
@@ -19,8 +23,7 @@ import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 import org.r3a.common.vaadin.widget.toolbar.IconToolbar;
 
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 public class PdfAccessDocument extends AbstractCommonView implements EntityListener{
 
@@ -118,7 +121,34 @@ public class PdfAccessDocument extends AbstractCommonView implements EntityListe
                     postGW.setButtonVisible(IconToolbar.PREVIEW_BUTTON, false);
                     postGW.setButtonVisible(IconToolbar.EDIT_BUTTON, false);
                     postGW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
+                    Button allBtn = new Button(getUILocaleUtil().getCaption("send.all"));
+                    allBtn.setIcon(FontAwesome.PLUS_CIRCLE);
+                    allBtn.addClickListener(new Button.ClickListener() {
+                        @Override
+                        public void buttonClick(Button.ClickEvent event) {
+                            if(pdfDocumentGW.getSelectedEntity()!=null){
+                                List<Entity> all = postGW.getAllEntities();
+                                List<Entity> existing = pdfDocumentAccessPostGW.getAllEntities();
+                                all.removeAll(existing);
+                                List<PDF_DOCUMENT_ACCESS_POST> pdfDocumentAccessPosts = new ArrayList<>();
+                                for(Entity entity : all){
+                                    PDF_DOCUMENT_ACCESS_POST pdfDocumentAccessPost = new PDF_DOCUMENT_ACCESS_POST();
+                                    pdfDocumentAccessPost.setPdfDocument((PDF_DOCUMENT) pdfDocumentGW.getSelectedEntity());
+                                    pdfDocumentAccessPost.setPost((POST)entity);
+                                    pdfDocumentAccessPosts.add(pdfDocumentAccessPost);
+                                }
 
+                                try{
+                                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(pdfDocumentAccessPosts);
+                                    pdfDocumentAccessPostGW.refresh();
+                                }catch (Exception e){
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    });
+                    postGW.getToolbarPanel().addComponent(allBtn);
+                    postGW.getToolbarPanel().setSizeUndefined();
                     innerSecondHL.addComponent(postGW);
 
                     secondVL.addComponent(innerSecondHL);
@@ -127,7 +157,7 @@ public class PdfAccessDocument extends AbstractCommonView implements EntityListe
                     }
                     pdfDocumentAccessPostGW = new GridWidget(PDF_DOCUMENT_ACCESS_POST.class);
                     pdfDocumentAccessPostGW.setImmediate(true);
-                    pdfDocumentAccessPostGW.setMultiSelect(false);
+                    pdfDocumentAccessPostGW.setMultiSelect(true);
                     pdfDocumentAccessPostGW.setResponsive(true);
                     DBGridModel pdfDbGridModel = (DBGridModel) pdfDocumentAccessPostGW.getWidgetModel();
                     pdfDbGridModel.getQueryModel().addWhere("pdfDocument", ECriteria.EQUAL, pdfDocumentGW.getSelectedEntity().getId());
@@ -160,6 +190,16 @@ public class PdfAccessDocument extends AbstractCommonView implements EntityListe
     @Override
     public boolean preCreate(Object o, int i) {
         if(postGW.getSelectedEntity()!=null && pdfDocumentGW.getSelectedEntity()!=null){
+
+            for(Entity entity : pdfDocumentAccessPostGW.getAllEntities()){
+                if(entity instanceof PDF_DOCUMENT_ACCESS_POST){
+                    if( ((PDF_DOCUMENT_ACCESS_POST) entity).getPost().getId().getId().longValue()==postGW.getSelectedEntity().getId().getId().longValue()){
+                        Message.showInfo(String.format(getUILocaleUtil().getMessage("already.exists"), getUILocaleUtil().getEntityLabel(POST.class)));
+                        return false;
+                    }
+                }
+            }
+
             PDF_DOCUMENT_ACCESS_POST pdfDocumentAccessPost = new PDF_DOCUMENT_ACCESS_POST();
             pdfDocumentAccessPost.setPdfDocument((PDF_DOCUMENT) pdfDocumentGW.getSelectedEntity());
             pdfDocumentAccessPost.setPost((POST)postGW.getSelectedEntity());
@@ -217,7 +257,6 @@ public class PdfAccessDocument extends AbstractCommonView implements EntityListe
 
     @Override
     public boolean preSave(Object o, Entity entity, boolean b, int i) throws Exception {
-        Message.showError("Asdasdasdasd");
         return false;
     }
 

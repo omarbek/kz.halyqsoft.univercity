@@ -6,6 +6,7 @@ import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.VerticalLayout;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.POST;
 import kz.halyqsoft.univercity.utils.WorkflowCommonUtils;
 import kz.halyqsoft.univercity.modules.workflow.views.dialogs.CreateViewDialog;
 import kz.halyqsoft.univercity.utils.EmployeePdfCreator;
@@ -13,15 +14,19 @@ import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
+import org.r3a.common.entity.ID;
 import org.r3a.common.entity.event.EntityEvent;
 import org.r3a.common.entity.event.EntityListener;
 import org.r3a.common.entity.query.QueryModel;
+import org.r3a.common.entity.query.from.EJoin;
+import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 import org.r3a.common.vaadin.widget.toolbar.IconToolbar;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -65,8 +70,20 @@ public class CreateView extends BaseView implements EntityListener{
         pdfDocumentGW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
         pdfDocumentGW.setButtonVisible(IconToolbar.ADD_BUTTON, false);
 
+
+
         DBGridModel pdfDocumentGM = (DBGridModel) pdfDocumentGW.getWidgetModel();
         pdfDocumentGM.getQueryModel().addWhere("deleted" , ECriteria.EQUAL , false);
+        if(!CommonUtils.isAdmin()){
+            List<ID> ids = new ArrayList<>();
+            ids.add(ID.valueOf(-1L));
+            for(POST post: CommonUtils.getCurrentUserPosts()){
+                ids.add(post.getId());
+            }
+            FromItem fi = pdfDocumentGM.getQueryModel().addJoin(EJoin.INNER_JOIN,"id" , PDF_DOCUMENT_ACCESS_POST.class, "pdfDocument");
+            pdfDocumentGM.getQueryModel().addWhereIn(fi, "post", ids);
+        }
+
         btnCreate = new Button(getUILocaleUtil().getCaption("create"));
         btnCreate.addClickListener(new Button.ClickListener() {
             @Override
