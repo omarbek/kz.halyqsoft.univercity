@@ -4,6 +4,7 @@ import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import kz.halyqsoft.univercity.entity.beans.univercity.DORM_STUDENT;
+import kz.halyqsoft.univercity.entity.beans.univercity.DORM_STUDENT_VIOLATION;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DORM;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DORM_ROOM;
 import kz.halyqsoft.univercity.modules.dorm.mappedclasses.DormBuilding;
@@ -26,7 +27,10 @@ import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
 import org.r3a.common.vaadin.widget.toolbar.IconToolbar;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * @author Dinassil Omarbek
@@ -50,24 +54,14 @@ public class DormBuildingEdit extends AbstractFormWidgetView {
                 try{
                     DormBuilding dormStudent = (DormBuilding) dormBuildingsGrid.getSelectedEntity();
 
-                    QueryModel<DORM_STUDENT> dormStudentQM = new QueryModel<>(DORM_STUDENT.class);
-                    FromItem fi = dormStudentQM.addJoin(EJoin.INNER_JOIN,"room",DORM_ROOM.class,"id");
-                    FromItem from = fi.addJoin(EJoin.INNER_JOIN,"dorm",DORM.class,"id");
-                    dormStudentQM.addWhere(from,"id",ECriteria.EQUAL,dormStudent.getId());
-                    dormStudentQM.addWhereAnd("deleted", false);
-                    dormStudentQM.addWhere("checkOutDate",null);
-                    List<DORM_STUDENT> dormS = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(dormStudentQM);
+                    QueryModel<DORM_STUDENT_VIOLATION> dsv = new QueryModel<>(DORM_STUDENT_VIOLATION.class);
+                    FromItem fi = dsv.addJoin(EJoin.INNER_JOIN,"dormStudent",DORM_STUDENT.class,"id");
+                    FromItem item = fi.addJoin(EJoin.INNER_JOIN,"room",DORM_ROOM.class,"id");
+                    FromItem fromItem = item.addJoin(EJoin.INNER_JOIN,"dorm",DORM.class,"id");
+                    dsv.addWhere(fromItem,"id",ECriteria.EQUAL,dormStudent.getId());
+                    DORM_STUDENT_VIOLATION violation = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(dsv);
 
-                    for(DORM_STUDENT ds:dormS) {
-                       ds.setDeleted(true);
-                       ds.setCheckOutDate(new Date());
-                    }
-
-                    QueryModel<DORM> dormQM = new QueryModel<>(DORM.class);
-                    dormQM.addWhere("id",ECriteria.EQUAL,dormStudent.getId());
-                    DORM dorm = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(dormQM);
-
-                    dorm.setDeleted(true);
+                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(violation);
 
                 } catch (Exception e) {
                 e.printStackTrace();

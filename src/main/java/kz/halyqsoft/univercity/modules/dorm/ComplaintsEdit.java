@@ -8,10 +8,10 @@ import kz.halyqsoft.univercity.entity.beans.univercity.COMPLAINT;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
+import org.r3a.common.entity.ID;
 import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.view.AbstractCommonView;
-import org.r3a.common.vaadin.widget.ERefreshType;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.form.AbstractFormWidgetView;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
@@ -122,8 +122,12 @@ public class ComplaintsEdit extends AbstractFormWidgetView {
         myComplaintsGM.setMultiSelect(false);
 
         QueryModel myComplaintsQM = myComplaintsGM.getQueryModel();
-        myComplaintsQM.addWhere("user", ECriteria.EQUAL, currentUser.getId());
-        myComplaintsQM.addOrderDesc("createDate");
+        if(currentUser.getId().equals(ID.valueOf(2))){
+            myComplaintsQM.addOrderDesc("createDate");
+        }else {
+            myComplaintsQM.addWhere("user", ECriteria.EQUAL, currentUser.getId());
+            myComplaintsQM.addOrderDesc("createDate");
+        }
 
         myComplaintsEditTab.addComponent(myComplaintsGW);
         myComplaintsEditTab.setComponentAlignment(myComplaintsGW, Alignment.MIDDLE_CENTER);
