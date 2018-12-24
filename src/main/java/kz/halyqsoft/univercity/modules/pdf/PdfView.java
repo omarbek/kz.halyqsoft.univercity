@@ -19,6 +19,7 @@ public class PdfView extends AbstractTaskView implements EntityListener {
 
     private final String FIRST_OPTION = getUILocaleUtil().getCaption("property");
     private final String SECOND_OPTION = getUILocaleUtil().getCaption("access");
+    private final String THIRD_OPTION = getUILocaleUtil().getCaption("document.access");
 
     private TabSheet mainTS;
     private Component searchComponent;
@@ -122,7 +123,8 @@ public class PdfView extends AbstractTaskView implements EntityListener {
         optionHC.setChildrenAllowed(FIRST_OPTION, false);
         optionHC.addItem(SECOND_OPTION);
         optionHC.setChildrenAllowed(SECOND_OPTION, false);
-
+        optionHC.addItem(THIRD_OPTION);
+        optionHC.setChildrenAllowed(THIRD_OPTION, false);
         sideBarGenerateTT.setContainerDataSource(optionHC);
         sideBarGenerateTT.setColumnReorderingAllowed(false);
         sideBarGenerateTT.setMultiSelect(false);
@@ -150,8 +152,11 @@ public class PdfView extends AbstractTaskView implements EntityListener {
                             PDF_DOCUMENT file = new PDF_DOCUMENT();
                             PdfGenerationPart pdfGenerationPart = new PdfGenerationPart(file, getUILocaleUtil().getCaption("loading"));
                             leftVl.addComponent(pdfGenerationPart.getPdfHSP());
-                        }else{
+                        }else if(valueChangeEvent.getProperty().getValue().toString().equals(SECOND_OPTION)){
                             PdfAccess pdfAccess = new PdfAccess();
+                            leftVl.addComponent(pdfAccess);
+                        }else if(valueChangeEvent.getProperty().getValue().toString().equals(THIRD_OPTION)){
+                            PdfAccessDocument pdfAccess = new PdfAccessDocument();
                             leftVl.addComponent(pdfAccess);
                         }
 

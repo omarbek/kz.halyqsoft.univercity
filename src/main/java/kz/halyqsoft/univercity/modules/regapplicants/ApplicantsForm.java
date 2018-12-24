@@ -122,7 +122,7 @@ public final class ApplicantsForm extends UsersForm {
 
     @Override
     protected void setOpeners() {
-        StreamResource myResource = createResourceStudent("85", null);
+        StreamResource myResource = createResourceStudent("103", null);
         contractBWO = new BrowserWindowOpener(myResource);
         contractBWO.extend(finishButton);
 
@@ -277,7 +277,7 @@ public final class ApplicantsForm extends UsersForm {
             if (student.getLevel().getLevelName().equalsIgnoreCase("Магистратура")) {
                 myResource = createResourceStudent("82", student);
             } else {
-                myResource = createResourceStudent("85", student);
+                myResource = createResourceStudent("103", student);
             }
             FileDownloader fileDownloader = new FileDownloader(myResource);
             myResource.setMIMEType("application/pdf");
@@ -531,7 +531,7 @@ public final class ApplicantsForm extends UsersForm {
             myResource = createResourceStudent("82", student);
             masgisterContractBWO.setResource(myResource);
         } else {
-            myResource = createResourceStudent("85", student);
+            myResource = createResourceStudent("103", student);
             contractBWO.setResource(myResource);
         }
 
@@ -624,7 +624,7 @@ public final class ApplicantsForm extends UsersForm {
         String fileName = "";
         if (value.equals("92")) {
             fileName = "Договор общага_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
-        } else if (value.equals("85")) {
+        } else if (value.equals("103")) {
             fileName = "Договор на рус_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
         } else if (value.equals("32")) {
             fileName = "Титул_" + Calendar.getInstance().getTimeInMillis() + ".pdf";

@@ -355,6 +355,7 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.LOAD_TO_CHAIR</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_ATTENDANCE_LOG</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_TEACHER_SUBJECT</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.PDF_DOCUMENT_ACCESS_POST</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
@@ -363,9 +364,9 @@
 
 
             <!--LOCAL-->
-            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://185.146.3.193:5432/college"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/college"/>
             <property name="javax.persistence.jdbc.user" value="postgres"/>
-            <property name="javax.persistence.jdbc.password" value="sbeezzs01"/>
+            <property name="javax.persistence.jdbc.password" value="ukpu18!"/>
 
             <!--COLLEGE-->
             <!--<property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/college"/>-->
