@@ -1,5 +1,6 @@
 package kz.halyqsoft.univercity.modules.workflow.views;
 
+import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.DOCUMENT;
@@ -15,6 +16,7 @@ import org.r3a.common.entity.query.QueryModel;
 import org.r3a.common.entity.query.from.EJoin;
 import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
+import org.r3a.common.vaadin.widget.dialog.AbstractDialog;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
@@ -27,6 +29,7 @@ public class InOnSignView extends BaseView {
 
     private USERS currentUser;
     private GridWidget inOnSignDocsGW;
+    private Button linkedTables;
 
     public InOnSignView(String title){
         super(title);
@@ -35,10 +38,56 @@ public class InOnSignView extends BaseView {
     @Override
     public void initView(boolean b) throws Exception {
         super.initView(b);
+        linkedTables = new Button(getUILocaleUtil().getCaption("employeesPanel"));
+        linkedTables.setIcon(new ThemeResource("img/button/users.png"));
+        linkedTables.setData(12);
+        linkedTables.setStyleName("preview");
+
+        linkedTables.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                AbstractDialog abstractDialog = new AbstractDialog() {
+
+                    public void init(){
+                        setWidth(50, Unit.PERCENTAGE);
+                        GridWidget outMyDocsSignerGW = new GridWidget(DOCUMENT_SIGNER.class);
+                        outMyDocsSignerGW.setSizeFull();
+                        outMyDocsSignerGW.setImmediate(true);
+
+                        outMyDocsSignerGW.setResponsive(true);
+                        outMyDocsSignerGW.setButtonVisible(IconToolbar.ADD_BUTTON , false);
+                        outMyDocsSignerGW.setButtonVisible(IconToolbar.PREVIEW_BUTTON, false);
+                        outMyDocsSignerGW.setButtonVisible(IconToolbar.EDIT_BUTTON, false);
+                        outMyDocsSignerGW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
+
+                        DBGridModel dbGridModel = (DBGridModel) outMyDocsSignerGW.getWidgetModel();
+                        dbGridModel.getFormModel().getFieldModel("documentSignerStatus").setInView(true);
+
+                        dbGridModel.getQueryModel().addWhere("document" , ECriteria.EQUAL , inOnSignDocsGW.getSelectedEntity().getId());
+
+                        getContent().addComponent(outMyDocsSignerGW);
+
+                    }
+
+                    @Override
+                    protected String createTitle() {
+                        init();
+                        return getViewName();
+                    }
+                };
+                if(inOnSignDocsGW.getSelectedEntity()!=null){
+                    abstractDialog.open();
+                }else{
+                    Message.showError(getUILocaleUtil().getCaption("chooseARecord"));
+                }
+            }
+        });
 
         currentUser = WorkflowCommonUtils.getCurrentUser();
         inOnSignDocsGW = new GridWidget(DOCUMENT.class);
         inOnSignDocsGW.setSizeFull();
+        inOnSignDocsGW.getToolbarPanel().addComponent(linkedTables);
+        inOnSignDocsGW.getToolbarPanel().setSizeUndefined();
         inOnSignDocsGW.setImmediate(true);
         inOnSignDocsGW.setResponsive(true);
         inOnSignDocsGW.setButtonVisible(IconToolbar.ADD_BUTTON , false);

@@ -1,6 +1,7 @@
 package kz.halyqsoft.univercity.modules.workflow.views;
 
 import com.vaadin.event.MouseEvents;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
@@ -24,6 +25,7 @@ import org.r3a.common.entity.query.from.EJoin;
 import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.widget.ERefreshType;
+import org.r3a.common.vaadin.widget.dialog.AbstractDialog;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
@@ -36,6 +38,7 @@ public class InOnAgreeView extends BaseView implements EntityListener{
     private USERS currentUser;
     private GridWidget inOnAgreeDocsGW;
     private DBGridModel dbGridModel;
+    private Button linkedTables;
 
     public InOnAgreeView(String title){
         super(title);
@@ -45,10 +48,56 @@ public class InOnAgreeView extends BaseView implements EntityListener{
     public void initView(boolean b) throws Exception {
         super.initView(b);
 
+        linkedTables = new Button(getUILocaleUtil().getCaption("employeesPanel"));
+        linkedTables.setIcon(new ThemeResource("img/button/users.png"));
+        linkedTables.setData(12);
+        linkedTables.setStyleName("preview");
+
+        linkedTables.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                AbstractDialog abstractDialog = new AbstractDialog() {
+
+                    public void init(){
+                        setWidth(50, Unit.PERCENTAGE);
+                        GridWidget outMyDocsSignerGW = new GridWidget(DOCUMENT_SIGNER.class);
+                        outMyDocsSignerGW.setSizeFull();
+                        outMyDocsSignerGW.setImmediate(true);
+
+                        outMyDocsSignerGW.setResponsive(true);
+                        outMyDocsSignerGW.setButtonVisible(IconToolbar.ADD_BUTTON , false);
+                        outMyDocsSignerGW.setButtonVisible(IconToolbar.PREVIEW_BUTTON, false);
+                        outMyDocsSignerGW.setButtonVisible(IconToolbar.EDIT_BUTTON, false);
+                        outMyDocsSignerGW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
+
+                        DBGridModel dbGridModel = (DBGridModel) outMyDocsSignerGW.getWidgetModel();
+                        dbGridModel.getFormModel().getFieldModel("documentSignerStatus").setInView(true);
+
+                        dbGridModel.getQueryModel().addWhere("document" , ECriteria.EQUAL , inOnAgreeDocsGW.getSelectedEntity().getId());
+
+                        getContent().addComponent(outMyDocsSignerGW);
+
+                    }
+
+                    @Override
+                    protected String createTitle() {
+                        init();
+                        return getViewName();
+                    }
+                };
+                if(inOnAgreeDocsGW.getSelectedEntity()!=null){
+                    abstractDialog.open();
+                }else{
+                    Message.showError(getUILocaleUtil().getCaption("chooseARecord"));
+                }
+            }
+        });
+
         currentUser = WorkflowCommonUtils.getCurrentUser();
         inOnAgreeDocsGW = new GridWidget(DOCUMENT.class);
         inOnAgreeDocsGW.setSizeFull();
-
+        inOnAgreeDocsGW.getToolbarPanel().addComponent(linkedTables);
+        inOnAgreeDocsGW.getToolbarPanel().setSizeUndefined();
         inOnAgreeDocsGW.setImmediate(true);
         inOnAgreeDocsGW.setResponsive(true);
         inOnAgreeDocsGW.setButtonVisible(IconToolbar.ADD_BUTTON , false);
@@ -78,6 +127,7 @@ public class InOnAgreeView extends BaseView implements EntityListener{
                         public void windowClose(Window.CloseEvent closeEvent) {
                             try{
                                 dbGridModel.setEntities(getList());
+                                inOnAgreeDocsGW.refresh();
                             }catch (Exception e){
                                 e.printStackTrace();
                             }
@@ -104,28 +154,44 @@ public class InOnAgreeView extends BaseView implements EntityListener{
 
         List<DOCUMENT> list = new ArrayList<>();
         Map<Integer, Object> params = new HashMap<>();
-
-        String sql = "SELECT d.id  FROM\n" +
+        long userId = CommonUtils.getCurrentUser().getId().getId().longValue();
+        String sql = "SELECT d.id\n" +
+                "FROM\n" +
                 "  document d\n" +
-                "INNER JOIN document_signer ds\n" +
+                "  INNER JOIN document_signer ds\n" +
                 "    ON d.id = ds.document_id\n" +
-                "INNER JOIN pdf_document_signer_post pdsp\n" +
-                "    ON pdsp.pdf_document_id=d.pdf_document_id\n" +
-                "WHERE d.document_status_id in (1,2)\n" +
+                "  INNER JOIN pdf_document_signer_post pdsp\n" +
+                "    ON pdsp.pdf_document_id = d.pdf_document_id\n" +
+                "  INNER JOIN (SELECT\n" +
+                "                min(pdsp2.id) AS id,\n" +
+                "                d2.id         AS d2id\n" +
+                "              FROM pdf_document pd\n" +
+                "                INNER JOIN pdf_document_signer_post pdsp2\n" +
+                "                  ON pd.id = pdsp2.pdf_document_id\n" +
+                "                INNER JOIN document d2\n" +
+                "                  ON pd.id = d2.pdf_document_id\n" +
+                "                INNER JOIN document_signer s2\n" +
+                "                  ON d2.id = s2.document_id\n" +
+                "                INNER JOIN document d3 ON pd.id = d3.pdf_document_id\n" +
+                "              WHERE s2.document_signer_status_id = 1 AND s2.post_id = pdsp2.post_id\n" +
+                "              GROUP BY d2.id\n" +
+                "             ) newtab\n" +
+                "    ON pdsp.id = newtab.id AND newtab.d2id = d.id\n" +
+                "WHERE d.document_status_id IN (1, 2)\n" +
                 "      AND ds.document_signer_status_id = 1\n" +
                 "      AND pdsp.post_id = ds.post_id\n" +
-                "      AND ds.employee_id = "+CommonUtils.getCurrentUser().getId().getId().longValue()+"\n" +
-                "      AND pdsp.id = (\n" +
-                "  select min(pdsp2.id) as id from pdf_document pd\n" +
-                "    INNER JOIN pdf_document_signer_post pdsp2\n" +
-                "      ON pd.id = pdsp2.pdf_document_id\n" +
-                "    INNER JOIN document d2\n" +
-                "      ON pd.id = d2.pdf_document_id\n" +
-                "    INNER JOIN document_signer s2\n" +
-                "      ON d2.id = s2.document_id\n" +
-                "    INNER JOIN document d3 ON pd.id = d3.pdf_document_id\n" +
-                "  WHERE d2.id = d.id and s2.document_signer_status_id = 1 and s2.post_id=pdsp2.post_id" +
-                ");" ;
+                "      AND ds.employee_id = "+ userId +" AND d.is_parallel = FALSE\n" +
+                "UNION ALL\n" +
+                "SELECT d2.id\n" +
+                "FROM document d2\n" +
+                "  INNER JOIN document_signer ds2 ON d2.id = ds2.document_id\n" +
+                "  INNER JOIN pdf_document_signer_post pdsp2\n" +
+                "    ON pdsp2.pdf_document_id = d2.pdf_document_id\n" +
+                "  INNER JOIN pdf_document pd2 ON d2.pdf_document_id = pd2.id\n" +
+                "WHERE d2.document_status_id IN (1, 2)\n" +
+                "      AND ds2.document_signer_status_id = 1\n" +
+                "      AND pdsp2.post_id = ds2.post_id\n" +
+                "      AND ds2.employee_id = " + userId + " AND d2.is_parallel = TRUE;" ;
 
         try {
             List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);

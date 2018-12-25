@@ -50,7 +50,7 @@ public class OutOnAgreeView extends BaseView implements EntityListener{
         super.initView(b);
 
         linkedTables = new Button(getUILocaleUtil().getCaption("employeesPanel"));
-        linkedTables.setIcon(new ThemeResource("img/button/preview.png"));
+        linkedTables.setIcon(new ThemeResource("img/button/users.png"));
         linkedTables.setData(12);
         linkedTables.setStyleName("preview");
 
