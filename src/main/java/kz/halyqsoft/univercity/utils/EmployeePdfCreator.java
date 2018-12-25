@@ -168,7 +168,12 @@ public class EmployeePdfCreator {
                             if(flag){
                                 QueryModel vEmployeeQM = new QueryModel<V_EMPLOYEE>(V_EMPLOYEE.class);
                                 vEmployeeQM.addWhere("id" , ECriteria.EQUAL,document.getCreatorEmployee().getId());
-                                V_EMPLOYEE vEmployee = (V_EMPLOYEE) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(vEmployeeQM);
+                                V_EMPLOYEE vEmployee = null;
+                                try{
+                                    vEmployee =(V_EMPLOYEE) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(vEmployeeQM);
+                                }catch (Exception ignored){
+                                    System.out.println("ignored");
+                                }
 
                                 text = setReplaced(property.getText(), document.getCreatorEmployee(),vEmployee);
                             }
@@ -210,7 +215,7 @@ public class EmployeePdfCreator {
             .replaceAll("\\$phone", "+7" + employee.getPhoneMobile())
             .replaceAll("\\$aboutMe", "-")
             .replaceAll("\\$country", employee.getCitizenship().toString())
-            .replaceAll("\\$mypost", vEmployee.getPost().getPostName())
+            .replaceAll("\\$mypost", vEmployee != null ? vEmployee.getPost().getPostName() : "")
             .replaceAll("\\$status", employee.getMaritalStatus().toString())
             .replaceAll("\\$gender", employee.getSex().toString())
             .replaceAll("\\$nationality", employee.getNationality().toString())
@@ -219,7 +224,7 @@ public class EmployeePdfCreator {
     }
 
     public static Font getFont(int fontSize, int font) {
-        String fontPath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath() + "/WEB- /classes/fonts";
+        String fontPath = VaadinService.getCurrent().getBaseDirectory().getAbsolutePath() + "/WEB-INF/classes/fonts";
         BaseFont timesNewRoman = null;
         try {
             timesNewRoman = BaseFont.createFont(fontPath + "/TimesNewRoman/times.ttf", BaseFont.IDENTITY_H,

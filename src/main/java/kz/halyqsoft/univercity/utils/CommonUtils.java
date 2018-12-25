@@ -244,10 +244,8 @@ public class CommonUtils {
     public static void setCards(FormModel baseDataFM) throws Exception {
         String sql = "SELECT id " +
                 "FROM card " +
-                "WHERE created = (SELECT max(card.created) " +
-                "                 FROM card card LEFT " +
-                "                   JOIN users usr ON usr.card_id = card.id " +
-                "                 WHERE usr.card_id IS NULL)";
+                "WHERE created = (SELECT max(card.created) FROM card card LEFT JOIN users usr ON " +
+                "usr.card_id = card.id WHERE usr.card_id IS NULL)";
         Long cardId;
         try {
             cardId = (Long) SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(sql,

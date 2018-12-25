@@ -161,8 +161,6 @@ public class PdfAccessDocument extends AbstractCommonView implements EntityListe
                     pdfDocumentAccessPostGW.setResponsive(true);
                     DBGridModel pdfDbGridModel = (DBGridModel) pdfDocumentAccessPostGW.getWidgetModel();
                     pdfDbGridModel.getQueryModel().addWhere("pdfDocument", ECriteria.EQUAL, pdfDocumentGW.getSelectedEntity().getId());
-                    pdfDbGridModel.setRowNumberVisible(true);
-
                     pdfDocumentAccessPostGW.setButtonVisible(IconToolbar.PREVIEW_BUTTON, false);
                     pdfDocumentAccessPostGW.setButtonVisible(IconToolbar.EDIT_BUTTON, false);
                     pdfDocumentAccessPostGW.setButtonVisible(IconToolbar.ADD_BUTTON, false);

@@ -1,0 +1,1 @@
+ALTER TABLE college.public.document add column is_parallel BOOLEAN DEFAULT false;

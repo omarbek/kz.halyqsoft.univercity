@@ -77,6 +77,10 @@ public class DOCUMENT extends AbstractEntity{
     @Column(name = "related_document_file_path")
     private String relatedDocumentFilePath;
 
+    @FieldInfo(type = EFieldType.TEXT,inEdit = false, inView = false , inGrid = false, order = 12)
+    @Column(name = "is_parallel")
+    private boolean isParallel = false;
+
     public USERS getCreatorEmployee() {
         return creatorEmployee;
     }
@@ -163,6 +167,14 @@ public class DOCUMENT extends AbstractEntity{
 
     public void setUpdated(Date updated) {
         this.updated = updated;
+    }
+
+    public boolean isParallel() {
+        return isParallel;
+    }
+
+    public void setParallel(boolean parallel) {
+        isParallel = parallel;
     }
 
     public DOCUMENT() {

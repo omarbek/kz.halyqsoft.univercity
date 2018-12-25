@@ -13,3 +13,5 @@ CREATE TABLE pdf_document_access_post
 );
 
 CREATE SEQUENCE s_pdf_document_access_post START WITH 1 MINVALUE 0 NO CYCLE ;
+
+ALTER TABLE college.public.document add column is_parallel BOOLEAN DEFAULT false;

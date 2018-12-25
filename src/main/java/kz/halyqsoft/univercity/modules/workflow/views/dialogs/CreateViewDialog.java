@@ -47,7 +47,7 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
     private boolean customDocumentFlag = false;
     private List<CustomComponentHL> customComponentHLS = new ArrayList<>();
     private Button emptyRelatedUpload = new Button();
-
+    private CheckBox isParallelCB;
 
     public CreateViewDialog(AbstractCommonView prevView, String title, final DOCUMENT document, List<PDF_DOCUMENT_SIGNER_POST> pdfDocumentSignerPosts) {
         getContent().setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
@@ -72,13 +72,20 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+        HorizontalLayout innerHL = new HorizontalLayout();
+        innerHL.setSizeFull();
+        innerHL.setWidth("100%");
+
 
 
         this.importanceCB = new ComboBox();
         this.importanceCB.setCaption(this.getUILocaleUtil().getEntityLabel(DOCUMENT_IMPORTANCE.class));
         this.importanceCB.setSizeFull();
         this.importanceCB.setContainerDataSource(importanceBIC);
-        this.getContent().addComponent(this.importanceCB);
+        isParallelCB = new CheckBox(getUILocaleUtil().getEntityFieldLabel(DOCUMENT.class, "isParallel"));
+        innerHL.addComponent(importanceCB);
+        innerHL.addComponent(isParallelCB);
+        this.getContent().addComponent(innerHL);
 
         this.messageTA = new TextArea(this.getUILocaleUtil().getCaption("message"));
         this.messageTA.setWidth(100, Unit.PERCENTAGE);
@@ -232,7 +239,7 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
 
                 document.setMessage(CreateViewDialog.this.messageTA.getValue());
                 document.setDocumentImportance((DOCUMENT_IMPORTANCE)CreateViewDialog.this.importanceCB.getValue());
-
+                document.setParallel(isParallelCB.getValue());
                 if(!customDocumentFlag){
                     EmployeePdfCreator.createResourceWithReloadingResource(document).getStreamSource().getStream();
                 }
