@@ -173,6 +173,7 @@ CREATE OR REPLACE VIEW V_LOAD_TO_CHAIR AS
   FROM v_curriculum_detail curr_det
          INNER JOIN subject subj ON subj.id = curr_det.subject_id
          INNER JOIN curriculum curr ON curr_det.curriculum_id = curr.id
+         INNER JOIN speciality spec on curr.speciality_id = spec.id
          INNER JOIN semester sem ON sem.id = curr_det.semester_id
          INNER JOIN (SELECT DISTINCT str.id, str.group_count, str.student_count, gr.speciality_id, gr.study_year_id
                      FROM v_stream str
@@ -183,6 +184,7 @@ CREATE OR REPLACE VIEW V_LOAD_TO_CHAIR AS
   WHERE subj.deleted = FALSE
     AND curr.deleted = FALSE
     AND sem.study_year_id = str.study_year_id
+    and spec.chair_id = subj.chair_id
   UNION ALL
   SELECT DISTINCT floor(random() * (1000) + 1) :: BIGINT id,
                   subj.id                                subject_id,
@@ -236,6 +238,7 @@ CREATE OR REPLACE VIEW V_LOAD_TO_CHAIR AS
   FROM v_elective_subject elect_subj
          INNER JOIN subject subj ON subj.id = elect_subj.subject_id
          INNER JOIN curriculum curr ON elect_subj.curriculum_id = curr.id
+         INNER JOIN speciality spec on curr.speciality_id = spec.id
          INNER JOIN semester sem ON sem.id = elect_subj.semester_id
          INNER JOIN (SELECT DISTINCT str.id, str.group_count, str.student_count, gr.speciality_id, gr.study_year_id
                      FROM v_stream str
@@ -246,6 +249,7 @@ CREATE OR REPLACE VIEW V_LOAD_TO_CHAIR AS
   WHERE subj.deleted = FALSE
     AND curr.deleted = FALSE
     AND sem.study_year_id = str.study_year_id
+    and spec.chair_id = subj.chair_id
   UNION ALL
   SELECT DISTINCT floor(random() * (1000) + 1) :: BIGINT id,
                   subj.id                                subject_id,
@@ -299,6 +303,7 @@ CREATE OR REPLACE VIEW V_LOAD_TO_CHAIR AS
   FROM v_curriculum_add_program curr_add_pr
          INNER JOIN subject subj ON subj.id = curr_add_pr.subject_id
          INNER JOIN curriculum curr ON curr_add_pr.curriculum_id = curr.id
+         INNER JOIN speciality spec on curr.speciality_id = spec.id
          INNER JOIN semester sem ON sem.id = curr_add_pr.semester_id
          INNER JOIN study_year year ON year.id = sem.study_year_id
          INNER JOIN (SELECT DISTINCT str.id, str.group_count, str.student_count, gr.speciality_id, gr.study_year_id
@@ -310,6 +315,7 @@ CREATE OR REPLACE VIEW V_LOAD_TO_CHAIR AS
   WHERE subj.deleted = FALSE
     AND curr.deleted = FALSE
     AND sem.study_year_id = str.study_year_id
+    and spec.chair_id = subj.chair_id
   UNION ALL
   SELECT DISTINCT floor(random() * (1000) + 1) :: BIGINT id,
                   subj.id                                subject_id,
