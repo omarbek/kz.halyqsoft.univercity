@@ -1,6 +1,7 @@
 package kz.halyqsoft.univercity.modules.workflow.views;
 
 import com.vaadin.event.MouseEvents;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -93,30 +94,8 @@ public class InOnAgreeView extends BaseView implements EntityListener{
             }
         });
 
-        currentUser = WorkflowCommonUtils.getCurrentUser();
-        inOnAgreeDocsGW = new GridWidget(DOCUMENT.class);
-        inOnAgreeDocsGW.setSizeFull();
-        inOnAgreeDocsGW.getToolbarPanel().addComponent(linkedTables);
-        inOnAgreeDocsGW.getToolbarPanel().setSizeUndefined();
-        inOnAgreeDocsGW.setImmediate(true);
-        inOnAgreeDocsGW.setResponsive(true);
-        inOnAgreeDocsGW.setButtonVisible(IconToolbar.ADD_BUTTON , false);
-        inOnAgreeDocsGW.setButtonVisible(IconToolbar.EDIT_BUTTON, false);
-        inOnAgreeDocsGW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
-        inOnAgreeDocsGW.setButtonVisible(IconToolbar.PREVIEW_BUTTON, false);
-
-        List<ID> ids = new ArrayList<>();
-        ids.add(WorkflowCommonUtils.getDocumentStatusByName(DOCUMENT_STATUS.CREATED).getId());
-        ids.add(WorkflowCommonUtils.getDocumentStatusByName(DOCUMENT_STATUS.IN_PROCESS).getId());
-
-        dbGridModel = (DBGridModel) inOnAgreeDocsGW.getWidgetModel();
-        dbGridModel.setRefreshType(ERefreshType.MANUAL);
-        dbGridModel.setEntities(getList());
-
-        QueryModel inOnAgreeDocsQM = dbGridModel.getQueryModel();
-
-        HorizontalLayout buttonsPanel = new HorizontalLayout();
         Button previewBtn = new Button(getUILocaleUtil().getCaption("preview"));
+        previewBtn.setIcon(new ThemeResource("img/button/preview.png"));
         previewBtn.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
@@ -140,11 +119,29 @@ public class InOnAgreeView extends BaseView implements EntityListener{
             }
         });
 
-        buttonsPanel.addComponent(previewBtn);
-        buttonsPanel.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
+        currentUser = WorkflowCommonUtils.getCurrentUser();
+        inOnAgreeDocsGW = new GridWidget(DOCUMENT.class);
+        inOnAgreeDocsGW.setSizeFull();
+        inOnAgreeDocsGW.getToolbarPanel().addComponent(linkedTables);
+        inOnAgreeDocsGW.getToolbarPanel().addComponent(previewBtn);
+        inOnAgreeDocsGW.getToolbarPanel().setSizeUndefined();
+        inOnAgreeDocsGW.setImmediate(true);
+        inOnAgreeDocsGW.setResponsive(true);
+        inOnAgreeDocsGW.setButtonVisible(IconToolbar.ADD_BUTTON , false);
+        inOnAgreeDocsGW.setButtonVisible(IconToolbar.EDIT_BUTTON, false);
+        inOnAgreeDocsGW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
+        inOnAgreeDocsGW.setButtonVisible(IconToolbar.PREVIEW_BUTTON, false);
 
-        getContent().addComponent(buttonsPanel);
-        getContent().setComponentAlignment(buttonsPanel,Alignment.MIDDLE_CENTER);
+        List<ID> ids = new ArrayList<>();
+        ids.add(WorkflowCommonUtils.getDocumentStatusByName(DOCUMENT_STATUS.CREATED).getId());
+        ids.add(WorkflowCommonUtils.getDocumentStatusByName(DOCUMENT_STATUS.IN_PROCESS).getId());
+
+        dbGridModel = (DBGridModel) inOnAgreeDocsGW.getWidgetModel();
+        dbGridModel.setRefreshType(ERefreshType.MANUAL);
+        dbGridModel.setEntities(getList());
+
+        QueryModel inOnAgreeDocsQM = dbGridModel.getQueryModel();
+
         getContent().addComponent(inOnAgreeDocsGW);
 
     }

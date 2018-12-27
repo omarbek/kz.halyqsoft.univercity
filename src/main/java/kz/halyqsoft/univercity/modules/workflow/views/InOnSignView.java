@@ -1,5 +1,6 @@
 package kz.halyqsoft.univercity.modules.workflow.views;
 
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.USERS;
@@ -83,31 +84,8 @@ public class InOnSignView extends BaseView {
             }
         });
 
-        currentUser = WorkflowCommonUtils.getCurrentUser();
-        inOnSignDocsGW = new GridWidget(DOCUMENT.class);
-        inOnSignDocsGW.setSizeFull();
-        inOnSignDocsGW.getToolbarPanel().addComponent(linkedTables);
-        inOnSignDocsGW.getToolbarPanel().setSizeUndefined();
-        inOnSignDocsGW.setImmediate(true);
-        inOnSignDocsGW.setResponsive(true);
-        inOnSignDocsGW.setButtonVisible(IconToolbar.ADD_BUTTON , false);
-        inOnSignDocsGW.setButtonVisible(IconToolbar.EDIT_BUTTON, false);
-        inOnSignDocsGW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
-        inOnSignDocsGW.setButtonVisible(IconToolbar.PREVIEW_BUTTON, false);
-
-        List<ID> ids = new ArrayList<>();
-        ids.add(WorkflowCommonUtils.getDocumentStatusByName(DOCUMENT_STATUS.IN_PROCESS).getId());
-        ids.add(WorkflowCommonUtils.getDocumentStatusByName(DOCUMENT_STATUS.CREATED).getId());
-
-        DBGridModel dbGridModel = (DBGridModel) inOnSignDocsGW.getWidgetModel();
-        QueryModel inOnSignDocsQM = dbGridModel.getQueryModel();
-        FromItem fi = inOnSignDocsQM.addJoin(EJoin.INNER_JOIN, "id", DOCUMENT_SIGNER.class , "document");
-        inOnSignDocsQM.addWhereIn("documentStatus" , ids);
-        inOnSignDocsQM.addWhereAnd(fi , "employee", ECriteria.EQUAL , CommonUtils.getCurrentUser().getId());
-        inOnSignDocsQM.addWhereAnd(fi , "documentSignerStatus", ECriteria.EQUAL, WorkflowCommonUtils.getDocumentSignerStatusByName(DOCUMENT_SIGNER_STATUS.IN_PROCESS).getId());
-
-        HorizontalLayout buttonsPanel = new HorizontalLayout();
         Button previewBtn = new Button(getUILocaleUtil().getCaption("preview"));
+        previewBtn.setIcon(new ThemeResource("img/button/preview.png"));
         previewBtn.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
@@ -129,6 +107,7 @@ public class InOnSignView extends BaseView {
             }
         });
         Button signBtn = new Button(getUILocaleUtil().getCaption("signdocument"));
+        signBtn.setIcon(FontAwesome.PENCIL);
         signBtn.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
@@ -149,12 +128,33 @@ public class InOnSignView extends BaseView {
                 }
             }
         });
-        //buttonsPanel.addComponent(previewBtn);
-        buttonsPanel.addComponent(signBtn);
-        buttonsPanel.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
 
-        getContent().addComponent(buttonsPanel);
-        getContent().setComponentAlignment(buttonsPanel,Alignment.MIDDLE_CENTER);
+        currentUser = WorkflowCommonUtils.getCurrentUser();
+        inOnSignDocsGW = new GridWidget(DOCUMENT.class);
+        inOnSignDocsGW.setSizeFull();
+
+        inOnSignDocsGW.getToolbarPanel().addComponent(signBtn);
+        inOnSignDocsGW.getToolbarPanel().addComponent(previewBtn);
+        inOnSignDocsGW.getToolbarPanel().addComponent(linkedTables);
+        inOnSignDocsGW.getToolbarPanel().setSizeUndefined();
+        inOnSignDocsGW.setImmediate(true);
+        inOnSignDocsGW.setResponsive(true);
+        inOnSignDocsGW.setButtonVisible(IconToolbar.ADD_BUTTON , false);
+        inOnSignDocsGW.setButtonVisible(IconToolbar.EDIT_BUTTON, false);
+        inOnSignDocsGW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
+        inOnSignDocsGW.setButtonVisible(IconToolbar.PREVIEW_BUTTON, false);
+
+        List<ID> ids = new ArrayList<>();
+        ids.add(WorkflowCommonUtils.getDocumentStatusByName(DOCUMENT_STATUS.IN_PROCESS).getId());
+        ids.add(WorkflowCommonUtils.getDocumentStatusByName(DOCUMENT_STATUS.CREATED).getId());
+
+        DBGridModel dbGridModel = (DBGridModel) inOnSignDocsGW.getWidgetModel();
+        QueryModel inOnSignDocsQM = dbGridModel.getQueryModel();
+        FromItem fi = inOnSignDocsQM.addJoin(EJoin.INNER_JOIN, "id", DOCUMENT_SIGNER.class , "document");
+        inOnSignDocsQM.addWhereIn("documentStatus" , ids);
+        inOnSignDocsQM.addWhereAnd(fi , "employee", ECriteria.EQUAL , CommonUtils.getCurrentUser().getId());
+        inOnSignDocsQM.addWhereAnd(fi , "documentSignerStatus", ECriteria.EQUAL, WorkflowCommonUtils.getDocumentSignerStatusByName(DOCUMENT_SIGNER_STATUS.IN_PROCESS).getId());
+
         getContent().addComponent(inOnSignDocsGW);
 
     }

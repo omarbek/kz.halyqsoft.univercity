@@ -72,9 +72,7 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        HorizontalLayout innerHL = new HorizontalLayout();
-        innerHL.setSizeFull();
-        innerHL.setWidth("100%");
+
 
 
 
@@ -83,9 +81,7 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
         this.importanceCB.setSizeFull();
         this.importanceCB.setContainerDataSource(importanceBIC);
         isParallelCB = new CheckBox(getUILocaleUtil().getEntityFieldLabel(DOCUMENT.class, "isParallel"));
-        innerHL.addComponent(importanceCB);
-        innerHL.addComponent(isParallelCB);
-        this.getContent().addComponent(innerHL);
+        getContent().addComponent(importanceCB);
 
         this.messageTA = new TextArea(this.getUILocaleUtil().getCaption("message"));
         this.messageTA.setWidth(100, Unit.PERCENTAGE);
@@ -280,6 +276,9 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
 
             }
         });
+
+        getContent().addComponent(isParallelCB);
+        getContent().setComponentAlignment(isParallelCB, Alignment.MIDDLE_LEFT);
     }
 
     private void setInabilityOfCustomComponents(boolean flag){

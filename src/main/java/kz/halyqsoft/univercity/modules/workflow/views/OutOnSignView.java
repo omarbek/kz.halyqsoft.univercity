@@ -95,6 +95,8 @@ public class OutOnSignView extends BaseView implements EntityListener{
 
         currentUser = WorkflowCommonUtils.getCurrentUser();
         outMyDocsTW = new TableWidget(DOCUMENT.class);
+        outMyDocsTW.getToolbarPanel().addComponent(linkedTables);
+        outMyDocsTW.getToolbarPanel().setSizeUndefined();
         outMyDocsTW.setSizeFull();
         outMyDocsTW.setImmediate(true);
         outMyDocsTW.setResponsive(true);
@@ -117,8 +119,6 @@ public class OutOnSignView extends BaseView implements EntityListener{
         dbTableModel.getQueryModel().addWhere("creatorEmployee" , ECriteria.EQUAL , currentUser.getId());
         dbTableModel.getQueryModel().addWhereInAnd("documentStatus" ,  ids);
 
-        getContent().addComponent(linkedTables);
-        getContent().setComponentAlignment(linkedTables, Alignment.MIDDLE_CENTER);
         getContent().addComponent(outMyDocsTW);
     }
 

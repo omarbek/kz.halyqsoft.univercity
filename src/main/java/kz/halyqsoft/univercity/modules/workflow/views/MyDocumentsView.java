@@ -38,7 +38,7 @@ public class MyDocumentsView extends BaseView implements EntityListener{
 
     private TableWidget signedByMeDocsTW;
 
-    private Button linkedTables;
+
     public MyDocumentsView(String title){
         super(title);
     }
@@ -47,8 +47,8 @@ public class MyDocumentsView extends BaseView implements EntityListener{
     public void initView(boolean b) throws Exception {
         super.initView(b);
 
-        linkedTables = new Button(getUILocaleUtil().getCaption("employeesPanel"));
-        linkedTables.setIcon(new ThemeResource("img/button/preview.png"));
+        Button linkedTables = new Button(getUILocaleUtil().getCaption("employeesPanel"));
+        linkedTables.setIcon(new ThemeResource("img/button/users.png"));
         linkedTables.setData(12);
         linkedTables.setStyleName("preview");
 
@@ -75,8 +75,6 @@ public class MyDocumentsView extends BaseView implements EntityListener{
                         dbGridModel.getQueryModel().addWhere("document" , ECriteria.EQUAL , myDocsTW.getSelectedEntity().getId());
 
                         getContent().addComponent(myDocsSignerGW);
-
-
                     }
 
                     @Override
@@ -93,8 +91,54 @@ public class MyDocumentsView extends BaseView implements EntityListener{
             }
         });
 
+        Button linkedTables2 = new Button(getUILocaleUtil().getCaption("employeesPanel"));
+        linkedTables2.setIcon(new ThemeResource("img/button/users.png"));
+        linkedTables2.setData(12);
+        linkedTables2.setStyleName("preview");
+
+        linkedTables2.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                AbstractDialog abstractDialog = new AbstractDialog() {
+
+                    public void init(){
+                        setWidth(50, Unit.PERCENTAGE);
+                        GridWidget myDocsSignerGW = new GridWidget(DOCUMENT_SIGNER.class);
+                        myDocsSignerGW.setSizeFull();
+                        myDocsSignerGW.setImmediate(true);
+
+                        myDocsSignerGW.setResponsive(true);
+                        myDocsSignerGW.setButtonVisible(IconToolbar.ADD_BUTTON , false);
+                        myDocsSignerGW.setButtonVisible(IconToolbar.PREVIEW_BUTTON, false);
+                        myDocsSignerGW.setButtonVisible(IconToolbar.EDIT_BUTTON, false);
+                        myDocsSignerGW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
+
+                        DBGridModel dbGridModel = (DBGridModel) myDocsSignerGW.getWidgetModel();
+                        dbGridModel.getFormModel().getFieldModel("documentSignerStatus").setInView(true);
+
+                        dbGridModel.getQueryModel().addWhere("document" , ECriteria.EQUAL , signedByMeDocsTW.getSelectedEntity().getId());
+
+                        getContent().addComponent(myDocsSignerGW);
+                    }
+
+                    @Override
+                    protected String createTitle() {
+                        init();
+                        return getViewName();
+                    }
+                };
+                if(signedByMeDocsTW.getSelectedEntity()!=null){
+                    abstractDialog.open();
+                }else{
+                    Message.showError(getUILocaleUtil().getCaption("chooseARecord"));
+                }
+            }
+        });
+
         currentUser = WorkflowCommonUtils.getCurrentUser();
         myDocsTW = new TableWidget(DOCUMENT.class);
+        myDocsTW.getToolbarPanel().addComponent(linkedTables);
+        myDocsTW.getToolbarPanel().setSizeUndefined();
         myDocsTW.setSizeFull();
         myDocsTW.setImmediate(true);
         myDocsTW.setResponsive(true);
@@ -114,6 +158,8 @@ public class MyDocumentsView extends BaseView implements EntityListener{
 
         signedByMeDocsTW = new TableWidget(DOCUMENT.class);
         signedByMeDocsTW.setCaption(getUILocaleUtil().getCaption("signed.by.me.docs"));
+        signedByMeDocsTW.getToolbarPanel().addComponent(linkedTables2);
+        signedByMeDocsTW.getToolbarPanel().setSizeUndefined();
         signedByMeDocsTW.setSizeFull();
         signedByMeDocsTW.setImmediate(true);
         signedByMeDocsTW.setResponsive(true);
@@ -129,11 +175,6 @@ public class MyDocumentsView extends BaseView implements EntityListener{
         FromItem fi = signedByMeTM.getQueryModel().addJoin(EJoin.INNER_JOIN , "id" , DOCUMENT_SIGNER.class,"document");
         signedByMeTM.getQueryModel().addWhere(fi , "employee" ,ECriteria.EQUAL , currentUser.getId());
         signedByMeTM.getQueryModel().addWhereAnd("documentStatus" ,  ECriteria.EQUAL, WorkflowCommonUtils.getDocumentStatusByName(DOCUMENT_STATUS.ACCEPTED).getId());
-
-
-        getContent().addComponent(linkedTables);
-        getContent().setComponentAlignment(linkedTables, Alignment.MIDDLE_CENTER);
-
 
         getContent().addComponent(myDocsTW);
 

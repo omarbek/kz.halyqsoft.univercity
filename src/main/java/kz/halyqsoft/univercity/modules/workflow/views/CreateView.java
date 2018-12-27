@@ -1,5 +1,6 @@
 package kz.halyqsoft.univercity.modules.workflow.views;
 
+import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalSplitPanel;
@@ -49,42 +50,9 @@ public class CreateView extends BaseView implements EntityListener{
     @Override
     public void initView(boolean b) throws Exception {
         super.initView(b);
-        mainHSP = new HorizontalSplitPanel();
-        mainHSP.setSplitPosition(72);
-        mainHSP.setSizeFull();
-        mainHSP.setResponsive(true);
-        mainHSP.setImmediate(true);
-
-        firstVL = new VerticalLayout();
-        firstVL.setImmediate(true);
-        firstVL.setSizeFull();
-        secondVL = new VerticalLayout();
-        secondVL.setImmediate(true);
-        secondVL.setSizeFull();
-
-        pdfDocumentGW = new GridWidget(PDF_DOCUMENT.class);
-        pdfDocumentGW.addEntityListener(this);
-        pdfDocumentGW.setImmediate(true);
-        pdfDocumentGW.setButtonVisible(IconToolbar.PREVIEW_BUTTON, false);
-        pdfDocumentGW.setButtonVisible(IconToolbar.EDIT_BUTTON, false);
-        pdfDocumentGW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
-        pdfDocumentGW.setButtonVisible(IconToolbar.ADD_BUTTON, false);
-
-
-
-        DBGridModel pdfDocumentGM = (DBGridModel) pdfDocumentGW.getWidgetModel();
-        pdfDocumentGM.getQueryModel().addWhere("deleted" , ECriteria.EQUAL , false);
-        if(!CommonUtils.isAdmin()){
-            List<ID> ids = new ArrayList<>();
-            ids.add(ID.valueOf(-1L));
-            for(POST post: CommonUtils.getCurrentUserPosts()){
-                ids.add(post.getId());
-            }
-            FromItem fi = pdfDocumentGM.getQueryModel().addJoin(EJoin.INNER_JOIN,"id" , PDF_DOCUMENT_ACCESS_POST.class, "pdfDocument");
-            pdfDocumentGM.getQueryModel().addWhereIn(fi, "post", ids);
-        }
 
         btnCreate = new Button(getUILocaleUtil().getCaption("create"));
+        btnCreate.setIcon(FontAwesome.PLUS);
         btnCreate.addClickListener(new Button.ClickListener() {
             @Override
             public void buttonClick(Button.ClickEvent clickEvent) {
@@ -149,8 +117,44 @@ public class CreateView extends BaseView implements EntityListener{
                 }
             }
         });
-        firstVL.addComponent(btnCreate);
-        firstVL.setComponentAlignment(btnCreate, Alignment.MIDDLE_CENTER);
+
+        mainHSP = new HorizontalSplitPanel();
+        mainHSP.setSplitPosition(72);
+        mainHSP.setSizeFull();
+        mainHSP.setResponsive(true);
+        mainHSP.setImmediate(true);
+
+        firstVL = new VerticalLayout();
+        firstVL.setImmediate(true);
+        firstVL.setSizeFull();
+        secondVL = new VerticalLayout();
+        secondVL.setImmediate(true);
+        secondVL.setSizeFull();
+
+        pdfDocumentGW = new GridWidget(PDF_DOCUMENT.class);
+        pdfDocumentGW.getToolbarPanel().addComponent(btnCreate);
+        pdfDocumentGW.getToolbarPanel().setSizeUndefined();
+        pdfDocumentGW.addEntityListener(this);
+        pdfDocumentGW.setImmediate(true);
+        pdfDocumentGW.setButtonVisible(IconToolbar.PREVIEW_BUTTON, false);
+        pdfDocumentGW.setButtonVisible(IconToolbar.EDIT_BUTTON, false);
+        pdfDocumentGW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
+        pdfDocumentGW.setButtonVisible(IconToolbar.ADD_BUTTON, false);
+
+
+
+        DBGridModel pdfDocumentGM = (DBGridModel) pdfDocumentGW.getWidgetModel();
+        pdfDocumentGM.getQueryModel().addWhere("deleted" , ECriteria.EQUAL , false);
+        if(!CommonUtils.isAdmin()){
+            List<ID> ids = new ArrayList<>();
+            ids.add(ID.valueOf(-1L));
+            for(POST post: CommonUtils.getCurrentUserPosts()){
+                ids.add(post.getId());
+            }
+            FromItem fi = pdfDocumentGM.getQueryModel().addJoin(EJoin.INNER_JOIN,"id" , PDF_DOCUMENT_ACCESS_POST.class, "pdfDocument");
+            pdfDocumentGM.getQueryModel().addWhereIn(fi, "post", ids);
+        }
+
 
         firstVL.addComponent(pdfDocumentGW);
 

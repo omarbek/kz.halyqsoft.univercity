@@ -96,6 +96,8 @@ public class OutOnAgreeView extends BaseView implements EntityListener{
 
         currentUser = WorkflowCommonUtils.getCurrentUser();
         outMyDocsTW = new TableWidget(DOCUMENT.class);
+        outMyDocsTW.getToolbarPanel().addComponent(linkedTables);
+        outMyDocsTW.getToolbarPanel().setSizeUndefined();
         outMyDocsTW.setSizeFull();
         outMyDocsTW.setImmediate(true);
         outMyDocsTW.setResponsive(true);
@@ -110,8 +112,6 @@ public class OutOnAgreeView extends BaseView implements EntityListener{
         dbTableModel.setDeferredDelete(true);
         dbTableModel.getQueryModel().addWhere("creatorEmployee" , ECriteria.EQUAL , currentUser.getId());
         dbTableModel.getQueryModel().addWhereAnd("documentStatus" ,  ECriteria.EQUAL, WorkflowCommonUtils.getDocumentStatusByName(DOCUMENT_STATUS.CREATED).getId());
-        getContent().addComponent(linkedTables);
-        getContent().setComponentAlignment(linkedTables, Alignment.MIDDLE_CENTER);
         getContent().addComponent(outMyDocsTW);
     }
 

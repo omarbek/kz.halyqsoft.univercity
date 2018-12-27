@@ -7,12 +7,6 @@
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://localhost:5432/univerdb</jdbc-url>
     </data-source>
-    <data-source source="LOCAL" name="college@185.146.3.193" uuid="7584f0cd-4424-41a3-9b58-bcf77a3194a3">
-      <driver-ref>postgresql</driver-ref>
-      <synchronize>true</synchronize>
-      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://185.146.3.193:5432/college</jdbc-url>
-    </data-source>
     <data-source source="LOCAL" name="college@78.40.109.78" uuid="9672c892-37ae-4019-8fc0-ea58fcc5099f">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>

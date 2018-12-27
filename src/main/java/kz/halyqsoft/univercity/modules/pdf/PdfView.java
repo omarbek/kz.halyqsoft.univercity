@@ -18,7 +18,7 @@ import org.r3a.common.vaadin.view.AbstractTaskView;
 public class PdfView extends AbstractTaskView implements EntityListener {
 
     private final String FIRST_OPTION = getUILocaleUtil().getCaption("property");
-    private final String SECOND_OPTION = getUILocaleUtil().getCaption("access");
+    private final String SECOND_OPTION = getUILocaleUtil().getCaption("signers");
     private final String THIRD_OPTION = getUILocaleUtil().getCaption("document.access");
 
     private TabSheet mainTS;
@@ -114,7 +114,7 @@ public class PdfView extends AbstractTaskView implements EntityListener {
         VerticalLayout leftVl = new VerticalLayout();
 
         generateTabHSP.setSizeFull();
-        generateTabHSP.setSplitPosition(8);
+        generateTabHSP.setSplitPosition(12);
 
         sideBarGenerateTT = new TreeTable();
         HierarchicalContainer optionHC = new HierarchicalContainer();

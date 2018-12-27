@@ -70,7 +70,7 @@ public class WorkflowView extends AbstractTaskView {
         HierarchicalContainer optionHC = new HierarchicalContainer();
         ArrayList<MyItem> myItems = new ArrayList<>();
 
-        myItems.add(new MyItem(optionHC.addItem(MAIN) ,MAIN , null));
+        //myItems.add(new MyItem(optionHC.addItem(MAIN) ,MAIN , null));
         myItems.add(new MyItem(optionHC.addItem(CREATE) ,CREATE, null));
         myItems.add(new MyItem(optionHC.addItem(INCOMING), INCOMING , null));
         myItems.add(new MyItem(optionHC.addItem(OUTCOMING) , OUTCOMING, null));
