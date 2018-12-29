@@ -23,6 +23,7 @@ import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
 
 import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import java.io.*;
 import java.util.*;
 import java.util.List;
@@ -158,6 +159,8 @@ public class EmployeePdfCreator {
                                             }
                                         }catch (NoResultException nre){
                                             System.out.println(nre.getMessage());
+                                        }catch (NonUniqueResultException nure){
+                                            System.out.println(nure.getMessage());
                                         }
                                     }
                                 }

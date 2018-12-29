@@ -28,7 +28,7 @@
         <class>kz.halyqsoft.univercity.entity.beans.EMAIL_STATUS</class>
         <class>kz.halyqsoft.univercity.entity.beans.LOG</class>
         <class>kz.halyqsoft.univercity.entity.beans.LOG_TYPES</class>
-        <class>kz.halyqsoft.univercity.entity.beans.ROLE_TASK_FUNCTIONS</class>
+        <class>kz.halyqsoft.univercity.entity.beans.ROLE_TASK_FUNCTIONS</class>e
         <class>kz.halyqsoft.univercity.entity.beans.ROLE_TASKS</class>
         <class>kz.halyqsoft.univercity.entity.beans.ROLES</class>
         <class>kz.halyqsoft.univercity.entity.beans.SEQUENCES</class>

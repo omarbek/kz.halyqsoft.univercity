@@ -2,6 +2,7 @@ package kz.halyqsoft.univercity.modules.workflow.views.dialogs;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.Page;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -9,7 +10,6 @@ import com.vaadin.ui.Button.ClickListener;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
@@ -17,6 +17,7 @@ import kz.halyqsoft.univercity.modules.workflow.views.fields.CustomComponentHL;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.EmployeePdfCreator;
 import kz.halyqsoft.univercity.utils.FieldValidator;
+import kz.halyqsoft.univercity.utils.OpenPdfDialogUtil;
 import org.apache.commons.io.IOUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -48,19 +49,32 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
     private List<CustomComponentHL> customComponentHLS = new ArrayList<>();
     private Button emptyRelatedUpload = new Button();
     private CheckBox isParallelCB;
+    private Button openPdf;
+    private VerticalLayout mainVL;
 
     public CreateViewDialog(AbstractCommonView prevView, String title, final DOCUMENT document, List<PDF_DOCUMENT_SIGNER_POST> pdfDocumentSignerPosts) {
+        setModal(true);
+        mainVL = new VerticalLayout();
+        mainVL.setSizeFull();
+        mainVL.setSpacing(true);
+        mainVL.setMargin(true);
+        mainVL.setImmediate(true);
+        mainVL.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
+        getContent().addComponent(mainVL);
         getContent().setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
         this.title = title;
         this.prevView = prevView;
         this.document = document;
-        this.setWidth(80.0F, Unit.PERCENTAGE);
+        this.setWidth("90%");
+        this.setHeight("90%");
         this.setImmediate(true);
         this.setResponsive(true);
         this.setClosable(false);
 
         HorizontalLayout mainHL = new HorizontalLayout();
         mainHL.setSizeFull();
+        mainHL.setSpacing(true);
+        mainHL.setMargin(true);
         mainHL.setImmediate(true);
         mainHL.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
 
@@ -73,19 +87,16 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
             ex.printStackTrace();
         }
 
-
-
-
         this.importanceCB = new ComboBox();
         this.importanceCB.setCaption(this.getUILocaleUtil().getEntityLabel(DOCUMENT_IMPORTANCE.class));
         this.importanceCB.setSizeFull();
         this.importanceCB.setContainerDataSource(importanceBIC);
         isParallelCB = new CheckBox(getUILocaleUtil().getEntityFieldLabel(DOCUMENT.class, "isParallel"));
-        getContent().addComponent(importanceCB);
+        mainVL.addComponent(importanceCB);
 
         this.messageTA = new TextArea(this.getUILocaleUtil().getCaption("message"));
         this.messageTA.setWidth(100, Unit.PERCENTAGE);
-        this.getContent().addComponent(this.messageTA);
+        this.mainVL.addComponent(this.messageTA);
 
         Button clearUpload = new Button();
         clearUpload.setCaption(getUILocaleUtil().getCaption("clear"));
@@ -163,7 +174,7 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
         mainHL.addComponent(upload);
         mainHL.addComponent(clearUpload);
 
-        getContent().addComponent(mainHL);
+        this.mainVL.addComponent(mainHL);
 
         QueryModel<DOCUMENT_USER_INPUT> documentUserInputQM = new QueryModel<>(DOCUMENT_USER_INPUT.class);
         documentUserInputQM.addWhere("pdfDocument" ,ECriteria.EQUAL , document.getPdfDocument().getId());
@@ -198,53 +209,13 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
         this.setYesListener(new AbstractYesButtonListener() {
             @Override
             public void buttonClick(ClickEvent clickEvent) {
-                Iterator var2 = CreateViewDialog.this.documentSignerGW.getAllEntities().iterator();
 
-                while(var2.hasNext()) {
-                    Entity ds = (Entity)var2.next();
-                    if (((DOCUMENT_SIGNER)ds).getEmployee() == null || CreateViewDialog.this.importanceCB.getValue() == null) {
-                        Message.showError(CreateViewDialog.this.getUILocaleUtil().getMessage("pdf.field.empty"));
-                        CreateViewDialog.this.open();
-                        break;
-                    }
+                if(!isDocumentSignersValid() || !isComponentsValid()){
+                    return;
                 }
+                deleteDocumentUserRealInputs(document);
 
-                for(CustomComponentHL componentt : customComponentHLS){
-                    if(!FieldValidator.isNotEmpty(componentt.getValueTA().getValue())){
-                        Message.showError(CreateViewDialog.this.getUILocaleUtil().getMessage("pdf.field.empty"));
-                        CreateViewDialog.this.open();
-                        break;
-                    }
-                }
-
-                List<DOCUMENT_USER_REAL_INPUT> documentUserRealInputList = new ArrayList<>();
-                for(CustomComponentHL componentt : customComponentHLS){
-                    DOCUMENT_USER_REAL_INPUT documentUserRealInput = new DOCUMENT_USER_REAL_INPUT();
-                    documentUserRealInput.setCreated(new Date());
-                    documentUserRealInput.setDocument(document);
-                    documentUserRealInput.setValue(componentt.getValueTA().getValue());
-                    documentUserRealInput.setDocumentUserInput(componentt.getDocumentUserInput());
-                    documentUserRealInputList.add(documentUserRealInput);
-                }
-
-                try{
-                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(documentUserRealInputList);
-                }catch (Exception e){
-                    e.printStackTrace();
-                }
-
-                document.setMessage(CreateViewDialog.this.messageTA.getValue());
-                document.setDocumentImportance((DOCUMENT_IMPORTANCE)CreateViewDialog.this.importanceCB.getValue());
-                document.setParallel(isParallelCB.getValue());
-                if(!customDocumentFlag){
-                    EmployeePdfCreator.createResourceWithReloadingResource(document).getStreamSource().getStream();
-                }
-
-                try {
-                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(document);
-                } catch (Exception var4) {
-                    var4.printStackTrace();
-                }
+                saveAll();
 
                 CreateViewDialog.this.close();
             }
@@ -252,31 +223,42 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
         this.setNoListener(new ClickListener() {
             @Override
             public void buttonClick(ClickEvent clickEvent) {
-                Message.showConfirm(CreateViewDialog.this.getUILocaleUtil().getMessage("all.values.deleted"), new AbstractYesButtonListener() {
-                    @Override
-                    public void buttonClick(ClickEvent clickEvent) {
-                        deleteRelatedFile();
+                deleteRelatedFile();
 
-                        try {
-                            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(CreateViewDialog.this.documentSignerGW.getAllEntities());
-                        } catch (Exception var4) {
-                            var4.printStackTrace();
-                        }
+                try {
+                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(CreateViewDialog.this.documentSignerGW.getAllEntities());
+                } catch (Exception var4) {
+                    var4.printStackTrace();
+                }
 
-                        try {
-                            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(document);
-                        } catch (Exception var3) {
-                            var3.printStackTrace();
-                        }
+                deleteDocumentUserRealInputs(document);
 
-                        CreateViewDialog.this.close();
-                    }
-                });
-                    CreateViewDialog.this.open();
-
+                try {
+                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(document);
+                } catch (Exception var3) {
+                    var3.printStackTrace();
+                }
             }
         });
+        openPdf = new Button(getUILocaleUtil().getCaption("open"));
+        openPdf.setIcon(new ThemeResource("img/book_open.png"));
+        openPdf.addClickListener(new Button.ClickListener(){
+            @Override
+            public void buttonClick(ClickEvent event) {
 
+                if(!isComponentsValid()){
+                    return;
+                }
+
+                deleteDocumentUserRealInputs(document);
+
+                saveAll();
+
+                OpenPdfDialogUtil openPdfDialog = new OpenPdfDialogUtil(document, 80,80);
+            }
+        });
+        getContent().addComponent(openPdf);
+        getContent().setComponentAlignment(openPdf, Alignment.MIDDLE_LEFT);
         getContent().addComponent(isParallelCB);
         getContent().setComponentAlignment(isParallelCB, Alignment.MIDDLE_LEFT);
     }
@@ -288,6 +270,65 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
         }
     }
 
+    private void saveAll(){
+        List<DOCUMENT_USER_REAL_INPUT> documentUserRealInputList = new ArrayList<>();
+        for(CustomComponentHL componentt : customComponentHLS){
+            DOCUMENT_USER_REAL_INPUT documentUserRealInput = new DOCUMENT_USER_REAL_INPUT();
+            documentUserRealInput.setCreated(new Date());
+            documentUserRealInput.setDocument(document);
+            documentUserRealInput.setValue(componentt.getValueTA().getValue());
+            documentUserRealInput.setDocumentUserInput(componentt.getDocumentUserInput());
+            documentUserRealInputList.add(documentUserRealInput);
+        }
+
+        try{
+            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(documentUserRealInputList);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        document.setMessage(CreateViewDialog.this.messageTA.getValue());
+        document.setDocumentImportance((DOCUMENT_IMPORTANCE)CreateViewDialog.this.importanceCB.getValue());
+        document.setParallel(isParallelCB.getValue());
+        if(!customDocumentFlag){
+            EmployeePdfCreator.createResourceWithReloadingResource(document).getStreamSource().getStream();
+        }
+
+        try {
+            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(document);
+        } catch (Exception var4) {
+            var4.printStackTrace();
+        }
+    }
+
+    boolean isComponentsValid(){
+        for(CustomComponentHL componentt : customComponentHLS){
+            if(!FieldValidator.isNotEmpty(componentt.getValueTA().getValue())){
+                Message.showError(CreateViewDialog.this.getUILocaleUtil().getMessage("pdf.field.empty"));
+                return false;
+            }
+        }
+
+        if(importanceCB.getValue()==null){
+            Message.showError(CreateViewDialog.this.getUILocaleUtil().getMessage("fill.all.fields"));
+            return false;
+        }
+
+        return true;
+    }
+
+
+
+    boolean isDocumentSignersValid(){
+        for(Entity ds : CreateViewDialog.this.documentSignerGW.getAllEntities()) {
+            if (((DOCUMENT_SIGNER)ds).getEmployee() == null || CreateViewDialog.this.importanceCB.getValue() == null
+                    ) {
+                Message.showError(CreateViewDialog.this.getUILocaleUtil().getMessage("pdf.field.empty"));
+                return false;
+            }
+        }
+        return true;
+    }
     public String getTitle() {
         return this.title;
     }
@@ -421,6 +462,17 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
 
     @Override
     public void handleEntityEvent(EntityEvent entityEvent) {
+    }
+
+    public void deleteDocumentUserRealInputs(DOCUMENT document){
+        QueryModel<DOCUMENT_USER_REAL_INPUT> documentUserRealInputQM = new QueryModel<>(DOCUMENT_USER_REAL_INPUT.
+                class);
+        documentUserRealInputQM.addWhere("document" , ECriteria.EQUAL , document.getId());
+        try{
+            CommonUtils.getQuery().delete(CommonUtils.getQuery().lookup(documentUserRealInputQM));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override

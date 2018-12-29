@@ -149,9 +149,13 @@ public class OpenPdfDialog extends WindowUtils{
                                     documentSignerQM.addWhereAnd("employee", ECriteria.EQUAL, CommonUtils.getCurrentUser().getId());
                                     List<DOCUMENT_SIGNER> documentSigners = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(documentSignerQM);
                                     if (documentSigners.size() > 0) {
-                                        documentSigners.get(0).setDocumentSignerStatus(dss);
-                                        documentSigners.get(0).setMessage(messageTA.getValue());
-                                        documentSigners.get(0).setUpdated(new Date());
+                                        for(DOCUMENT_SIGNER ds : documentSigners){
+                                            if(ds.getEmployee().getId().equals(CommonUtils.getCurrentUser().getId())){
+                                                ds.setDocumentSignerStatus(dss);
+                                                ds.setMessage(messageTA.getValue());
+                                                ds.setUpdated(new Date());
+                                            }
+                                        }
                                         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(documentSigners.get(0));
                                         if (dss.getStatusName().equalsIgnoreCase(DOCUMENT_SIGNER_STATUS.FINALLY_REFUSED)) {
                                             document.setDocumentStatus(WorkflowCommonUtils.getDocumentStatusByName(DOCUMENT_STATUS.FINALLY_REFUSED));
