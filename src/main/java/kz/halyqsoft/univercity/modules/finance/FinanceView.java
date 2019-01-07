@@ -1,11 +1,14 @@
 package kz.halyqsoft.univercity.modules.finance;
 
+import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.DateField;
 import com.vaadin.ui.TextField;
 import kz.halyqsoft.univercity.entity.beans.USERS;
+import kz.halyqsoft.univercity.entity.beans.univercity.GROUPS;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_PAYMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.VStudentPayment;
@@ -45,6 +48,7 @@ public class FinanceView extends AbstractTaskView implements EntityListener, Fil
     private final StudentFilterPanel filterPanel;
     private GridWidget studentDebtGW;
     private GridWidget studentPaymentGW;
+    private DateField dateField;
 
     public FinanceView(AbstractTask task) throws Exception {
         super(task);
@@ -148,6 +152,17 @@ public class FinanceView extends AbstractTaskView implements EntityListener, Fil
         filterPanel.addFilterComponent("educationType", cb);
         filterPanel.setVisible(true);
 
+        cb = new ComboBox();
+        cb.setNullSelectionAllowed(true);
+        cb.setTextInputAllowed(false);
+        cb.setFilteringMode(FilteringMode.STARTSWITH);
+        cb.setPageLength(0);
+        QueryModel<GROUPS> groupsQueryModel = new QueryModel<>(GROUPS.class);
+        BeanItemContainer<GROUPS> groupsBeanItemContainer = new BeanItemContainer<>(GROUPS.class,
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(groupsQueryModel));
+        cb.setContainerDataSource(groupsBeanItemContainer);
+        filterPanel.addFilterComponent("group", cb);
+
         getContent().addComponent(filterPanel);
         getContent().setComponentAlignment(filterPanel, Alignment.TOP_CENTER);
 
@@ -162,13 +177,25 @@ public class FinanceView extends AbstractTaskView implements EntityListener, Fil
         studentDebtGM.setRowNumberVisible(true);
         studentDebtGM.setRowNumberWidth(50);
 
+        dateField = new DateField();
+        dateField.setValue(new Date());
+
+        dateField.addValueChangeListener(new Property.ValueChangeListener() {
+            @Override
+            public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
+            }
+
+        });
+
+
         studentPaymentGW = new GridWidget(VStudentPayment.class);
-        studentPaymentGW.setCaption(getUILocaleUtil().getCaption("studentPaymentGW"));
+        //studentPaymentGW.setCaption(getUILocaleUtil().getCaption("studentPaymentGW"));
         studentPaymentGW.addEntityListener(this);
         studentPaymentGW.setButtonVisible(IconToolbar.REFRESH_BUTTON, false);
         DBGridModel studentPaymentGM = (DBGridModel) studentPaymentGW.getWidgetModel();
         studentPaymentGM.setHeightByRows(5);
         studentPaymentGM.setCrudEntityClass(STUDENT_PAYMENT.class);
+
         studentPaymentGM.setRefreshType(ERefreshType.MANUAL);
         studentPaymentGM.setMultiSelect(false);
         studentPaymentGM.setRowNumberVisible(true);
@@ -188,6 +215,9 @@ public class FinanceView extends AbstractTaskView implements EntityListener, Fil
 
         getContent().addComponent(studentDebtGW);
         getContent().setComponentAlignment(studentDebtGW, Alignment.MIDDLE_CENTER);
+
+        getContent().addComponent(dateField);
+        getContent().setComponentAlignment(dateField, Alignment.MIDDLE_CENTER);
 
         getContent().addComponent(studentPaymentGW);
         getContent().setComponentAlignment(studentPaymentGW, Alignment.MIDDLE_CENTER);
@@ -265,6 +295,11 @@ public class FinanceView extends AbstractTaskView implements EntityListener, Fil
         if (sf.getEducationType() != null) {
             params.put(i, sf.getEducationType().getId().getId());
             sb.append(" and x.education_type_id = ?");
+            sb.append(i++);
+        }
+        if (sf.getGroup() != null) {
+            params.put(i, sf.getGroup().getId().getId());
+            sb.append(" and x.groups_id = ?");
             sb.append(i);
         }
 
@@ -278,6 +313,7 @@ public class FinanceView extends AbstractTaskView implements EntityListener, Fil
 
     private void filterPayment(StringBuilder sb, Map<Integer, Object> params) {
         List<VStudentPayment> list = new ArrayList<>();
+
         String sql  = "select  " +
                 "   x.id," +
                 "  trim(x.LAST_NAME || ' ' || x.FIRST_NAME || ' ' || coalesce(x.MIDDLE_NAME, '')) fio, " +
@@ -289,6 +325,7 @@ public class FinanceView extends AbstractTaskView implements EntityListener, Fil
                 "  inner join v_student_debts vsd on x.user_code = vsd.user_code " +
                 " where x.deleted = false " +
                 " group by  x.id , x.LAST_NAME, x.FIRST_NAME, x.MIDDLE_NAME ,x.user_code, vsd.debt_sum,x2.created";
+
         String sqlStudent  = "select\n" +
                 "   x.id,\n" +
                 "  trim(x.LAST_NAME || ' ' || x.FIRST_NAME || ' ' || coalesce(x.MIDDLE_NAME, '')) fio,\n" +
@@ -301,7 +338,7 @@ public class FinanceView extends AbstractTaskView implements EntityListener, Fil
                 "where x.deleted = false  and student_id = " + CommonUtils.getCurrentUser().getId() +
                 " group by  x.id , x.LAST_NAME,x.FIRST_NAME,x.MIDDLE_NAME ,x.user_code, vsd.debt_sum,x2.created;";
 
-        if(CommonUtils.getCurrentUser().getTypeIndex()==2) {
+         if(CommonUtils.getCurrentUser().getTypeIndex()==2) {
             fillList(list, sqlStudent , params);
         }else{
             fillList(list, sql, params);
