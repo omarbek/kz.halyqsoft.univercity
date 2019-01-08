@@ -1,6 +1,7 @@
 package kz.halyqsoft.univercity.modules.workflow.views;
 
 import com.vaadin.event.MouseEvents;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
@@ -24,6 +25,7 @@ import org.r3a.common.entity.query.from.EJoin;
 import org.r3a.common.entity.query.from.FromItem;
 import org.r3a.common.entity.query.where.ECriteria;
 import org.r3a.common.vaadin.widget.ERefreshType;
+import org.r3a.common.vaadin.widget.dialog.AbstractDialog;
 import org.r3a.common.vaadin.widget.dialog.Message;
 import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
@@ -36,6 +38,7 @@ public class InOnAgreeView extends BaseView implements EntityListener{
     private USERS currentUser;
     private GridWidget inOnAgreeDocsGW;
     private DBGridModel dbGridModel;
+    private Button linkedTables;
 
     public InOnAgreeView(String title){
         super(title);
@@ -44,6 +47,53 @@ public class InOnAgreeView extends BaseView implements EntityListener{
     @Override
     public void initView(boolean b) throws Exception {
         super.initView(b);
+
+        linkedTables = new Button(getUILocaleUtil().getCaption("employeesPanel"));
+        linkedTables.setIcon(new ThemeResource("img/button/preview.png"));
+        linkedTables.setData(12);
+        linkedTables.setStyleName("preview");
+
+        linkedTables.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                if(inOnAgreeDocsGW.getSelectedEntity()!=null){
+                    AbstractDialog abstractDialog = new AbstractDialog() {
+
+                        public void init(){
+                            setWidth(50, Unit.PERCENTAGE);
+                            GridWidget outMyDocsSignerGW = new GridWidget(DOCUMENT_SIGNER.class);
+                            outMyDocsSignerGW.setSizeFull();
+                            outMyDocsSignerGW.setImmediate(true);
+
+                            outMyDocsSignerGW.setResponsive(true);
+                            outMyDocsSignerGW.setButtonVisible(IconToolbar.ADD_BUTTON , false);
+                            outMyDocsSignerGW.setButtonVisible(IconToolbar.PREVIEW_BUTTON, false);
+                            outMyDocsSignerGW.setButtonVisible(IconToolbar.EDIT_BUTTON, false);
+                            outMyDocsSignerGW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
+
+                            DBGridModel dbGridModel = (DBGridModel) outMyDocsSignerGW.getWidgetModel();
+                            dbGridModel.getFormModel().getFieldModel("documentSignerStatus").setInView(true);
+
+                            dbGridModel.getQueryModel().addWhere("document" , ECriteria.EQUAL , inOnAgreeDocsGW.getSelectedEntity().getId());
+
+                            getContent().addComponent(outMyDocsSignerGW);
+
+                        }
+
+                        @Override
+                        protected String createTitle() {
+                            init();
+                            return getViewName();
+                        }
+                    };
+                    abstractDialog.open();
+                }else{
+                    Message.showError(getUILocaleUtil().getCaption("chooseARecord"));
+                }
+            }
+        });
+
+
 
         currentUser = WorkflowCommonUtils.getCurrentUser();
         inOnAgreeDocsGW = new GridWidget(DOCUMENT.class);
@@ -67,6 +117,7 @@ public class InOnAgreeView extends BaseView implements EntityListener{
         QueryModel inOnAgreeDocsQM = dbGridModel.getQueryModel();
 
         HorizontalLayout buttonsPanel = new HorizontalLayout();
+        buttonsPanel.setSpacing(true);
         Button previewBtn = new Button(getUILocaleUtil().getCaption("preview"));
         previewBtn.addClickListener(new Button.ClickListener() {
             @Override
@@ -78,6 +129,7 @@ public class InOnAgreeView extends BaseView implements EntityListener{
                         public void windowClose(Window.CloseEvent closeEvent) {
                             try{
                                 dbGridModel.setEntities(getList());
+                                inOnAgreeDocsGW.refresh();
                             }catch (Exception e){
                                 e.printStackTrace();
                             }
@@ -91,6 +143,7 @@ public class InOnAgreeView extends BaseView implements EntityListener{
         });
 
         buttonsPanel.addComponent(previewBtn);
+        buttonsPanel.addComponent(linkedTables);
         buttonsPanel.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
 
         getContent().addComponent(buttonsPanel);
@@ -157,7 +210,15 @@ public class InOnAgreeView extends BaseView implements EntityListener{
 
     @Override
     public void handleEntityEvent(EntityEvent entityEvent) {
-
+        if(entityEvent.getAction() == EntityEvent.MERGED
+                || entityEvent.getAction() == EntityEvent.CREATED
+                || entityEvent.getAction() == EntityEvent.REMOVED ){
+            try{
+                inOnAgreeDocsGW.refresh();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
