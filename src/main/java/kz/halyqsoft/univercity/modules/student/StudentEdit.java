@@ -312,13 +312,13 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
             buttonPanel.setComponentAlignment(lockUnlock, Alignment.MIDDLE_CENTER);
 
             pdfDownloadDorm = createDownloadButtonDorm();
-            buttonPanel.addComponent(pdfDownloadDorm);
-            buttonPanel.setComponentAlignment(pdfDownloadDorm, Alignment.MIDDLE_CENTER);
+//            buttonPanel.addComponent(pdfDownloadDorm);
+//            buttonPanel.setComponentAlignment(pdfDownloadDorm, Alignment.MIDDLE_CENTER);
             pdfDownloadDorm.setEnabled(false);
 
             pdfDownloadLetter = createDownloadButtonLetter();
-            buttonPanel.addComponent(pdfDownloadLetter);
-            buttonPanel.setComponentAlignment(pdfDownloadLetter, Alignment.MIDDLE_CENTER);
+//            buttonPanel.addComponent(pdfDownloadLetter);
+//            buttonPanel.setComponentAlignment(pdfDownloadLetter, Alignment.MIDDLE_CENTER);
 
             content.addComponent(buttonPanel);
             content.setComponentAlignment(buttonPanel, Alignment.BOTTOM_CENTER);
@@ -341,19 +341,20 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         downloadTableButton.setImmediate(true);
         downloadTableButton.setWidth("80");
         downloadTableButton.setCaption(getUILocaleUtil().getCaption("iups"));
-        hl.addComponent(downloadTableButton);
+        //hl.addComponent(downloadTableButton);
 
         downloadTableRusButton=new Button();
+
         downloadTableRusButton.setImmediate(true);
         downloadTableRusButton.setWidth("80");
         downloadTableRusButton.setCaption(getUILocaleUtil().getCaption("iupsrus"));
-        hl.addComponent(downloadTableRusButton);
+        //hl.addComponent(downloadTableRusButton);
 
         hl.addComponents(kazCheckBox, rusCheckBox);
         hl.setComponentAlignment(kazCheckBox, Alignment.MIDDLE_CENTER);
         hl.setComponentAlignment(rusCheckBox, Alignment.MIDDLE_CENTER);
-        hl.setComponentAlignment(downloadTableButton, Alignment.MIDDLE_LEFT);
-        hl.setComponentAlignment(downloadTableRusButton, Alignment.TOP_LEFT);
+//        hl.setComponentAlignment(downloadTableButton, Alignment.MIDDLE_LEFT);
+//        hl.setComponentAlignment(downloadTableRusButton, Alignment.TOP_LEFT);
 
         downloadTableButton.addClickListener(new ClickListener() {
              @Override
@@ -404,7 +405,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                        myResource = createResourceStudent("90", student);
+                        myResource = createResourceStudent("104", student);
                         fileDownloader = new FileDownloader(myResource);
                         myResource.setMIMEType("application/pdf");
                         fileDownloader.extend(pdfDownload);
@@ -421,7 +422,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    myResource = createResourceStudent("85", student);
+                    myResource = createResourceStudent("103", student);
                     fileDownloader = new FileDownloader(myResource);
                     myResource.setMIMEType("application/pdf");
                     fileDownloader.extend(pdfDownload);

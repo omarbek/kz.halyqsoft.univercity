@@ -3,6 +3,7 @@ package kz.halyqsoft.univercity.modules.regapplicants;
 import com.itextpdf.text.*;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.pdf.*;
+import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.*;
 import com.vaadin.shared.ui.combobox.FilteringMode;
@@ -1196,7 +1197,7 @@ public final class ApplicantsForm extends UsersForm {
                 .replaceAll("\\$surname", student.getLastName())
                 .replaceAll("\\$firstName", student.getMiddleName())
                 .replaceAll("\\$education", educationDoc.getEducationType().toString())
-                .replaceAll("\\$technic", tecnhik.toString())
+                .replaceAll("\\$technic", tecnhik != null ? tecnhik.toString() : "")
                 .replaceAll("\\$attestat", attestationDate)
                 .replaceAll("\\$course", String.valueOf(educationDoc.getEntryYear()))
                 .replaceAll("\\$nomer", educationDoc.getDocumentNo())

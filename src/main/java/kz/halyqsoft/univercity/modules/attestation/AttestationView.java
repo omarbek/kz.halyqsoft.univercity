@@ -44,6 +44,9 @@ public class AttestationView extends AbstractTaskView{
         semesterDataGW = new GridWidget(SEMESTER_DATA.class);
         semesterDataGW.setImmediate(true);
         semesterDataGW.setButtonVisible(IconToolbar.EDIT_BUTTON,false);
+        semesterDataGW.setButtonVisible(IconToolbar.ADD_BUTTON,false);
+        semesterDataGW.setButtonVisible(IconToolbar.PREVIEW_BUTTON,false);
+        semesterDataGW.setButtonVisible(IconToolbar.DELETE_BUTTON,false);
         semesterDataGW.addEntityListener(this);
         mainHL.setFirstComponent(semesterDataGW);
 

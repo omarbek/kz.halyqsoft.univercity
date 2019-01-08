@@ -86,7 +86,7 @@ public class ScheduleView extends AbstractTaskView {
                 }
             }
         });
-        getContent().addComponent(generateLessonsButton);
+       // getContent().addComponent(generateLessonsButton);
         HorizontalLayout mainHL = new HorizontalLayout();
         mainHL.setSizeFull();
 
