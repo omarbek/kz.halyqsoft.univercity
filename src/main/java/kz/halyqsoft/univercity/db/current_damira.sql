@@ -19,3 +19,15 @@ WHERE id=4;
 INSERT INTO DEGREE (DEGREE_NAME, ID) VALUES ('профессор', 7);
 INSERT INTO DEGREE (DEGREE_NAME, ID) VALUES ('доцент', 8);
 INSERT INTO DEGREE (DEGREE_NAME, ID) VALUES ('профессоров (по новой квалификации)', 9);
+
+
+_________________ABSOLUTE
+
+
+
+ALTER TABLE department
+  ADD dep_language BOOLEAN  NOT NULL  DEFAULT TRUE ;
+
+
+ALTER TABLE employee
+  ADD retiree BOOLEAN  NOT NULL  DEFAULT FALSE ;

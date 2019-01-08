@@ -53,6 +53,10 @@ public class DEPARTMENT extends AbstractEntity implements CommonTree<DEPARTMENT>
     @Column(name = "DELETED", nullable = false)
     private boolean deleted;
 
+    @FieldInfo(type = EFieldType.BOOLEAN, order = 7, required = false)
+    @Column(name = "DEP_LANGUAGE", nullable = false)
+    private boolean depLanguage;
+
     @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
     private List<DEPARTMENT> children = new ArrayList<>();
 
@@ -146,5 +150,17 @@ public class DEPARTMENT extends AbstractEntity implements CommonTree<DEPARTMENT>
     @Override
     public String toString() {
         return deptName;
+    }
+
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
+    public boolean isDepLanguage() {
+        return depLanguage;
+    }
+
+    public void setDepLanguage(boolean depLanguage) {
+        this.depLanguage = depLanguage;
     }
 }
