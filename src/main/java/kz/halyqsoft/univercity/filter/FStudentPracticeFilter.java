@@ -1,10 +1,10 @@
 package kz.halyqsoft.univercity.filter;
 
-import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.GROUPS;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEPARTMENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ORGANIZATION;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SPECIALITY;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDY_YEAR;
 import org.r3a.common.vaadin.widget.filter2.AbstractFilterBean;
 
@@ -14,6 +14,10 @@ public final class FStudentPracticeFilter extends AbstractFilterBean {
 
     private STUDENT student;
     private ORGANIZATION organization;
+    private DEPARTMENT department;
+    private SPECIALITY speciality;
+    private STUDY_YEAR studyYear;
+    private GROUPS groups;
     private Date comeInDate;
     private Date comeOutDate;
 
@@ -52,8 +56,41 @@ public final class FStudentPracticeFilter extends AbstractFilterBean {
         this.comeOutDate = comeOutDate;
     }
 
+    public DEPARTMENT getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(DEPARTMENT department) {
+        this.department = department;
+    }
+
+    public SPECIALITY getSpeciality() {
+        return speciality;
+    }
+
+    public void setSpeciality(SPECIALITY speciality) {
+        this.speciality = speciality;
+    }
+
+    public STUDY_YEAR getStudyYear() {
+        return studyYear;
+    }
+
+    public void setStudyYear(STUDY_YEAR studyYear) {
+        this.studyYear = studyYear;
+    }
+
+    public GROUPS getGroups() {
+        return groups;
+    }
+
+    public void setGroups(GROUPS groups) {
+        this.groups = groups;
+    }
+
     @Override
     public boolean hasFilter() {
-        return !( comeInDate == null && comeOutDate == null && organization == null && student ==null );
+        return !( comeInDate == null && comeOutDate == null && department == null &&
+                speciality == null && studyYear == null && groups ==null && organization == null && student ==null );
     }
 }
