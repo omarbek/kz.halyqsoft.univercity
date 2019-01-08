@@ -34,7 +34,7 @@ import java.util.*;
  * @author Omarbek
  * @created on 13.07.2018
  */
-public class ScheduleManual extends AbstractCommonView implements EntityListener{
+public class ScheduleManual extends AbstractCommonView implements EntityListener {
 
     private VerticalLayout tablesVL = new VerticalLayout();
     private ComboBox semesterDataCB;
@@ -82,7 +82,7 @@ public class ScheduleManual extends AbstractCommonView implements EntityListener
     }
 
     public ScheduleManual(String task) {
-        this.title=task;
+        this.title = task;
         mainVL = new VerticalLayout();
         //   super(task);
 
@@ -117,19 +117,26 @@ public class ScheduleManual extends AbstractCommonView implements EntityListener
         weekDayGW.setImmediate(true);
         weekDayGW.setSizeFull();
         weekDayGW.addEntityListener(this);
-        weekDayGW.setButtonVisible(IconToolbar.REFRESH_BUTTON,true);
-        weekDayGW.setButtonVisible(IconToolbar.ADD_BUTTON,false);
-        weekDayGW.setButtonVisible(IconToolbar.EDIT_BUTTON,false);
-        weekDayGW.setButtonVisible(IconToolbar.PREVIEW_BUTTON,false);
-        weekDayGW.setButtonVisible(IconToolbar.DELETE_BUTTON,false);
-
+        weekDayGW.setButtonVisible(IconToolbar.REFRESH_BUTTON, true);
+        weekDayGW.setButtonVisible(IconToolbar.ADD_BUTTON, false);
+        weekDayGW.setButtonVisible(IconToolbar.EDIT_BUTTON, false);
+        weekDayGW.setButtonVisible(IconToolbar.PREVIEW_BUTTON, false);
+        weekDayGW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
         mainHL.addComponent(weekDayGW);
+
+        DBGridModel weekDayGM = (DBGridModel) weekDayGW.getWidgetModel();
+        weekDayGM.setRefreshType(ERefreshType.MANUAL);
+
+        QueryModel<WEEK_DAY> weekDayQM = new QueryModel<>(WEEK_DAY.class);
+        weekDayQM.addWhere("id", ECriteria.LESS, 6);//exclude weekends
+        List<WEEK_DAY> weekDays = CommonUtils.getQuery().lookup(weekDayQM);
+        weekDayGM.setEntities(weekDays);
 
         scheduleDetailGW = new GridWidget(SCHEDULE_DETAIL.class);
         scheduleDetailGW.setImmediate(true);
         scheduleDetailGW.setSizeFull();
         scheduleDetailGW.addEntityListener(new ScheduleDetail());
-        scheduleDetailGM = (DBGridModel)scheduleDetailGW.getWidgetModel();
+        scheduleDetailGM = (DBGridModel) scheduleDetailGW.getWidgetModel();
         scheduleDetailGM.setRefreshType(ERefreshType.MANUAL);
         scheduleDetailGM.setDeferredCreate(true);
         scheduleDetailGM.setDeferredDelete(true);
@@ -137,7 +144,7 @@ public class ScheduleManual extends AbstractCommonView implements EntityListener
         mainHL.addComponent(scheduleDetailGW);
 
         semesterDataCB = new ComboBox();
-        semesterDataCB.setWidth(300,Unit.PIXELS);
+        semesterDataCB.setWidth(300, Unit.PIXELS);
         semesterDataCB.setTextInputAllowed(true);
         semesterDataCB.setFilteringMode(FilteringMode.CONTAINS);
         semesterDataCB.setCaption(getUILocaleUtil().getEntityLabel(SEMESTER_DATA.class));
@@ -147,16 +154,16 @@ public class ScheduleManual extends AbstractCommonView implements EntityListener
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(semesterDataQM));
         semesterDataCB.setContainerDataSource(semesterDataBIC);
 
-        if(CommonUtils.getCurrentSemesterData()!=null){
+        if (CommonUtils.getCurrentSemesterData() != null) {
             semesterDataCB.setValue(CommonUtils.getCurrentSemesterData());
         }
 
         semesterDataCB.addValueChangeListener(new Property.ValueChangeListener() {
             @Override
             public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
-                try{
+                try {
                     refresh();
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -172,11 +179,11 @@ public class ScheduleManual extends AbstractCommonView implements EntityListener
         @Override
         public boolean preCreate(Object source, int buttonId) {
 
-            if(semesterDataCB.getValue()==null){
+            if (semesterDataCB.getValue() == null) {
                 Message.showError(getUILocaleUtil().getMessage("select.semester"));
                 return false;
             }
-            if(weekDayGW.getSelectedEntity()==null){
+            if (weekDayGW.getSelectedEntity() == null) {
                 Message.showError(getUILocaleUtil().getMessage("select.week.day"));
                 return false;
             }
@@ -188,7 +195,7 @@ public class ScheduleManual extends AbstractCommonView implements EntityListener
         @Override
         protected void init(Object source, Entity e, boolean isNew) throws Exception {
             SCHEDULE_DETAIL scheduleDetail = (SCHEDULE_DETAIL) e;
-             scheduleDetailEdit = new ScheduleDetailEdit(ScheduleManual.this, scheduleDetail, isNew);
+            scheduleDetailEdit = new ScheduleDetailEdit(ScheduleManual.this, scheduleDetail, isNew);
         }
 
         @Override
@@ -213,12 +220,12 @@ public class ScheduleManual extends AbstractCommonView implements EntityListener
 
         @Override
         protected void removeChildrenEntity(List<Entity> delList) throws Exception {
-            for(Entity e: delList){
+            for (Entity e : delList) {
                 QueryModel<SCHEDULE_DETAIL> scheduleDetailQM = new QueryModel<>(SCHEDULE_DETAIL.class);
-                scheduleDetailQM.addWhere("id",ECriteria.EQUAL,scheduleDetailGW.getSelectedEntity().getId());
-            List<SCHEDULE_DETAIL> detail = SessionFacadeFactory.getSessionFacade(
-                    CommonEntityFacadeBean.class).lookup(scheduleDetailQM);
-            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(detail);
+                scheduleDetailQM.addWhere("id", ECriteria.EQUAL, scheduleDetailGW.getSelectedEntity().getId());
+                List<SCHEDULE_DETAIL> detail = SessionFacadeFactory.getSessionFacade(
+                        CommonEntityFacadeBean.class).lookup(scheduleDetailQM);
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(detail);
             }
         }
 
@@ -238,18 +245,18 @@ public class ScheduleManual extends AbstractCommonView implements EntityListener
 
     private void refresh() throws Exception {
 
-        if(semesterDataCB.getValue()==null){
+        if (semesterDataCB.getValue() == null) {
             Message.showError(getUILocaleUtil().getMessage("select.semester"));
             return;
         }
-        if(weekDayGW.getSelectedEntity()==null){
+        if (weekDayGW.getSelectedEntity() == null) {
             Message.showError(getUILocaleUtil().getMessage("select.week.day"));
             return;
         }
 
         QueryModel<SCHEDULE_DETAIL> scheduleDetailQM = new QueryModel<>(SCHEDULE_DETAIL.class);
         scheduleDetailQM.addWhere("weekDay", ECriteria.EQUAL, weekDayGW.getSelectedEntity().getId());
-        scheduleDetailQM.addWhereAnd("semesterData", ECriteria.EQUAL,((SEMESTER_DATA)semesterDataCB.getValue()).getId());
+        scheduleDetailQM.addWhereAnd("semesterData", ECriteria.EQUAL, ((SEMESTER_DATA) semesterDataCB.getValue()).getId());
         List<SCHEDULE_DETAIL> scheduleDetails = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(scheduleDetailQM);
         scheduleDetailGM.setEntities(scheduleDetails);
         scheduleDetailGW.refresh();
@@ -271,7 +278,7 @@ public class ScheduleManual extends AbstractCommonView implements EntityListener
         if (LECTURE == roomType) {
             List<ROOM> lectureRooms = getLectureRooms(numberOfStudents);
             for (ROOM room : lectureRooms) {
-                if (!scheduleAlreadyHas(room, weekDay, time,semesterData)) {
+                if (!scheduleAlreadyHas(room, weekDay, time, semesterData)) {
                     return room;
                 }
             }
@@ -279,7 +286,7 @@ public class ScheduleManual extends AbstractCommonView implements EntityListener
         } else {
             List<ROOM> practiceRooms = getPracticeRooms(numberOfStudents);
             for (ROOM room : practiceRooms) {
-                if (!scheduleAlreadyHas(room, weekDay, time,semesterData)) {
+                if (!scheduleAlreadyHas(room, weekDay, time, semesterData)) {
                     if (COMPUTER.equals(room.getEquipment()) || notComputer) {
                         return room;
                     }
@@ -289,7 +296,7 @@ public class ScheduleManual extends AbstractCommonView implements EntityListener
         return new ROOM();
     }
 
-    private boolean scheduleAlreadyHas(ROOM room, WEEK_DAY weekDay, LESSON_TIME time,SEMESTER_DATA semesterData) throws Exception {
+    private boolean scheduleAlreadyHas(ROOM room, WEEK_DAY weekDay, LESSON_TIME time, SEMESTER_DATA semesterData) throws Exception {
         String sql = "SELECT 1 " +
                 "FROM schedule_detail sched " +
                 "  INNER JOIN lesson_time time ON time.id = sched.lesson_time_id " +
@@ -416,17 +423,18 @@ public class ScheduleManual extends AbstractCommonView implements EntityListener
         groupsQM.addWhere("studyYear", ECriteria.EQUAL, shiftStudyYear.getStudyYear().getId());
         return SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(groupsQM);
     }
+
     @Override
     public void handleEntityEvent(EntityEvent ev) {
-        if(ev.getSource().equals(weekDayGW)){
-            if(ev.getAction() == EntityEvent.SELECTED){
-                if(semesterDataCB.getValue()==null){
+        if (ev.getSource().equals(weekDayGW)) {
+            if (ev.getAction() == EntityEvent.SELECTED) {
+                if (semesterDataCB.getValue() == null) {
                     Message.showError(getUILocaleUtil().getMessage("select.semester"));
                     return;
                 }
-                try{
+                try {
                     refresh();
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -436,12 +444,12 @@ public class ScheduleManual extends AbstractCommonView implements EntityListener
     @Override
     public boolean preCreate(Object source, int buttonId) {
 
-        if(source.equals(scheduleDetailGW)){
-            if(semesterDataCB.getValue()==null){
+        if (source.equals(scheduleDetailGW)) {
+            if (semesterDataCB.getValue() == null) {
                 Message.showError(getUILocaleUtil().getMessage("select.semester"));
                 return false;
             }
-            if(weekDayGW.getSelectedEntity()==null){
+            if (weekDayGW.getSelectedEntity() == null) {
                 Message.showError(getUILocaleUtil().getMessage("select.week.day"));
                 return false;
             }
@@ -451,7 +459,6 @@ public class ScheduleManual extends AbstractCommonView implements EntityListener
     }
 
 
-
     @Override
     public boolean preSave(Object source, Entity e, boolean isNew, int buttonId) {
 
@@ -459,29 +466,29 @@ public class ScheduleManual extends AbstractCommonView implements EntityListener
     }
 
 
-    private boolean isAllEmpty(SCHEDULE_DETAIL scheduleDetail) throws Exception{
-        if(scheduleDetail.getLessonType().getId().getId().longValue()!=LECTURE){
-            if(scheduleAlreadyHas(scheduleDetail.getTeacher(), scheduleDetail.getGroup(),scheduleDetail.getWeekDay(),scheduleDetail.getLessonTime())){
+    private boolean isAllEmpty(SCHEDULE_DETAIL scheduleDetail) throws Exception {
+        if (scheduleDetail.getLessonType().getId().getId().longValue() != LECTURE) {
+            if (scheduleAlreadyHas(scheduleDetail.getTeacher(), scheduleDetail.getGroup(), scheduleDetail.getWeekDay(), scheduleDetail.getLessonTime())) {
                 Message.showError(getUILocaleUtil().getMessage("group.or.teacher.not.free.this.time"));
                 return false;
             }
         }
 
-        if(scheduleAlreadyHas(scheduleDetail.getRoom(),scheduleDetail.getWeekDay(),scheduleDetail.getLessonTime(),scheduleDetail.getSemesterData())){
+        if (scheduleAlreadyHas(scheduleDetail.getRoom(), scheduleDetail.getWeekDay(), scheduleDetail.getLessonTime(), scheduleDetail.getSemesterData())) {
             QueryModel<SCHEDULE_DETAIL> scheduleDetailQM = new QueryModel<>(SCHEDULE_DETAIL.class);
-            scheduleDetailQM.addWhere("subject" ,ECriteria.EQUAL, scheduleDetail.getSubject().getId());
-            scheduleDetailQM.addWhereAnd("lessonType" ,ECriteria.EQUAL, scheduleDetail.getLessonType().getId());
-            scheduleDetailQM.addWhereAnd("teacher" ,ECriteria.EQUAL, scheduleDetail.getTeacher().getId());
-            scheduleDetailQM.addWhereAnd("lessonTime" ,ECriteria.EQUAL, scheduleDetail.getLessonTime().getId());
-            scheduleDetailQM.addWhereAnd("room" ,ECriteria.EQUAL, scheduleDetail.getRoom().getId());
-            scheduleDetailQM.addWhereAnd("semesterData" ,ECriteria.EQUAL, scheduleDetail.getSemesterData().getId());
+            scheduleDetailQM.addWhere("subject", ECriteria.EQUAL, scheduleDetail.getSubject().getId());
+            scheduleDetailQM.addWhereAnd("lessonType", ECriteria.EQUAL, scheduleDetail.getLessonType().getId());
+            scheduleDetailQM.addWhereAnd("teacher", ECriteria.EQUAL, scheduleDetail.getTeacher().getId());
+            scheduleDetailQM.addWhereAnd("lessonTime", ECriteria.EQUAL, scheduleDetail.getLessonTime().getId());
+            scheduleDetailQM.addWhereAnd("room", ECriteria.EQUAL, scheduleDetail.getRoom().getId());
+            scheduleDetailQM.addWhereAnd("semesterData", ECriteria.EQUAL, scheduleDetail.getSemesterData().getId());
             List<SCHEDULE_DETAIL> scheduleDetails = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(scheduleDetailQM);
-            if(scheduleDetails.size()==0){
+            if (scheduleDetails.size() == 0) {
                 Message.showError(getUILocaleUtil().getMessage("room.not.free.this.time"));
                 return false;
-            }else{
-                for(SCHEDULE_DETAIL sd : scheduleDetails){
-                    if(sd.getGroup().getId().getId().longValue()==scheduleDetail.getGroup().getId().getId().longValue()){
+            } else {
+                for (SCHEDULE_DETAIL sd : scheduleDetails) {
+                    if (sd.getGroup().getId().getId().longValue() == scheduleDetail.getGroup().getId().getId().longValue()) {
                         Message.showError(getUILocaleUtil().getMessage("group.already.has.lesson"));
                         return false;
                     }
@@ -493,10 +500,10 @@ public class ScheduleManual extends AbstractCommonView implements EntityListener
 
     @Override
     public void onDelete(Object source, List<Entity> entities, int buttonId) {
-        try{
+        try {
             SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(entities);
             refresh();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

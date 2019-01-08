@@ -224,7 +224,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>edu</finalName>
+		<finalName>ukpu</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
