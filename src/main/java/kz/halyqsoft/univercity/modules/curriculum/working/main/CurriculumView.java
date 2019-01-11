@@ -27,6 +27,7 @@ import kz.halyqsoft.univercity.modules.curriculum.working.schedule.SchedulePanel
 import kz.halyqsoft.univercity.modules.curriculum.working.semester.CreditCountByComponentsPanel;
 import kz.halyqsoft.univercity.modules.curriculum.working.semester.SubjectsTab;
 import kz.halyqsoft.univercity.modules.regapplicants.IUPS_TYPE;
+import kz.halyqsoft.univercity.modules.userarrival.subview.dialogs.PrintDialog;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.EmployeePdfCreator;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
@@ -339,6 +340,115 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
         printButton.setIcon(new ThemeResource("img/button/printer.png"));
         printButton.addStyleName("print");
         toolbarHL.addComponent(printButton);
+
+        Button printButtonC = new Button("Скачать ГУП");
+        toolbarHL.addComponent(printButtonC);
+
+        printButtonC.addClickListener(new ClickListener() {
+            @Override
+            public void buttonClick(ClickEvent clickEvent) {
+                List<String> tableHeader = new ArrayList<>();
+                List<List<String>> tableBody = new ArrayList<>();
+
+                String headers[] = {" ","Специальность","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50","51","52"};
+                tableHeader.addAll(Arrays.asList(headers));
+                String sql="";
+                for(int k=1; k<=4;k++) {
+                     sql = "select *\n" +
+                             "from crosstab('select spec.spec_name,w.week_code,css.symbol\n" +
+                             "from curriculum_schedule sched\n" +
+                             "       inner join curriculum_schedule_symbol css on sched.symbol_id = css.id\n" +
+                             "       inner join curriculum c on sched.curriculum_id = c.id\n" +
+                             "       inner join speciality spec on c.speciality_id = spec.id\n" +
+                             "       inner join week w on sched.week_id = w.id\n" +
+                             "where study_year_id ="+k+"',\n" +
+                             "              'select m from generate_series(1,52) m') as (\n" +
+                             "     spec_name varchar(255),\n" +
+                             "     \"1\" varchar(255),\n" +
+                             "     \"2\" varchar(255),\n" +
+                             "     \"3\" varchar(255),\n" +
+                             "     \"4\" varchar(255),\n" +
+                             "     \"5\" varchar(255),\n" +
+                             "     \"6\" varchar(255),\n" +
+                             "     \"7\" varchar(255),\n" +
+                             "     \"8\" varchar(255),\n" +
+                             "     \"9\" varchar(255),\n" +
+                             "     \"10\" varchar(255),\n" +
+                             "     \"11\" varchar(255),\n" +
+                             "     \"12\" varchar(255),\n" +
+                             "     \"13\" varchar(255),\n" +
+                             "     \"14\" varchar(255),\n" +
+                             "     \"15\" varchar(255),\n" +
+                             "     \"16\" varchar(255),\n" +
+                             "     \"17\" varchar(255),\n" +
+                             "     \"18\" varchar(255),\n" +
+                             "     \"19\" varchar(255),\n" +
+                             "     \"20\" varchar(255),\n" +
+                             "     \"21\" varchar(255),\n" +
+                             "     \"22\" varchar(255),\n" +
+                             "     \"23\" varchar(255),\n" +
+                             "     \"24\" varchar(255),\n" +
+                             "     \"25\" varchar(255),\n" +
+                             "     \"26\" varchar(255),\n" +
+                             "     \"27\" varchar(255),\n" +
+                             "     \"28\" varchar(255),\n" +
+                             "     \"29\" varchar(255),\n" +
+                             "     \"30\" varchar(255),\n" +
+                             "     \"31\" varchar(255),\n" +
+                             "     \"32\" varchar(255),\n" +
+                             "     \"33\" varchar(255),\n" +
+                             "     \"34\" varchar(255),\n" +
+                             "     \"35\" varchar(255),\n" +
+                             "     \"36\" varchar(255),\n" +
+                             "     \"37\" varchar(255),\n" +
+                             "     \"38\" varchar(255),\n" +
+                             "     \"39\" varchar(255),\n" +
+                             "     \"40\" varchar(255),\n" +
+                             "     \"41\" varchar(255),\n" +
+                             "     \"42\" varchar(255),\n" +
+                             "     \"43\" varchar(255),\n" +
+                             "     \"44\" varchar(255),\n" +
+                             "     \"45\" varchar(255),\n" +
+                             "     \"46\" varchar(255),\n" +
+                             "     \"47\" varchar(255),\n" +
+                             "     \"48\" varchar(255),\n" +
+                             "     \"49\" varchar(255),\n" +
+                             "     \"50\" varchar(255),\n" +
+                             "     \"51\" varchar(255),\n" +
+                             "     \"52\" varchar(255)\n" +
+                             "\n" +
+                             "     );";
+
+                    // getFirstMonday(2019, 1);
+
+                    List<String> list = new ArrayList<>();
+
+                    try {
+                        List<Object> tmpList = new ArrayList<>();
+                        Map<Integer, Object> param = null;
+                        tmpList.addAll(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, param));
+                        if (!tmpList.isEmpty()) {
+                            for (Object o : tmpList) {
+                                Object[] oo = (Object[]) o;
+                                ArrayList<String> valuesList = new ArrayList();
+                                for (int i = 0; i < oo.length; i++) {
+                                    valuesList.add(oo[i] != null ? String.valueOf(oo[i]) : "");
+                                }
+                                tableBody.add(Collections.singletonList("1"));
+                                tableBody.add(valuesList);
+
+                            }
+                        }
+                    } catch (Exception ex) {
+                        CommonUtils.showMessageAndWriteLog("Unable to load department list", ex);
+                    }
+                }
+                String fileName = "document";
+
+                PrintDialog printDialog = new PrintDialog(tableHeader, tableBody, CommonUtils.getUILocaleUtil().getCaption("print"), fileName);
+
+            }
+        });
 
         ByteArrayOutputStream byteArr = new ByteArrayOutputStream();
         String REPORT = getUILocaleUtil().getCaption("report");
@@ -1532,6 +1642,23 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
         curriculum.setCreated(new Date());
         SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(curriculum);
     }
+
+
+    private static int getFirstMonday(int year, int month) {
+
+        Calendar cacheCalendar = Calendar.getInstance();
+        cacheCalendar.set(Calendar.YEAR, year);
+        cacheCalendar.set(Calendar.MONTH, month);
+
+        if(cacheCalendar.getFirstDayOfWeek()!=Calendar.MONDAY ){
+            cacheCalendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY+1);
+        }
+        cacheCalendar.set(Calendar.DAY_OF_WEEK_IN_MONTH, 1);
+        cacheCalendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+
+        return cacheCalendar.get(Calendar.DATE);
+    }
+
 
     private void initLabels() {
         academicDegreeLabel = new Label();
