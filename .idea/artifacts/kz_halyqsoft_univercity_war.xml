@@ -7,7 +7,7 @@
         <packaging>war</packaging>
       </options>
     </properties>
-    <root id="archive" name="ukpu.war">
+    <root id="archive" name="edu.war">
       <element id="artifact" artifact-name="kz.halyqsoft.univercity:war exploded" />
     </root>
   </artifact>
