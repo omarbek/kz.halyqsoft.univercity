@@ -38,6 +38,7 @@ import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
 
+import javax.persistence.NoResultException;
 import java.util.*;
 
 /**
@@ -480,7 +481,7 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
                 CommonUtils.getQuery().delete(load);
             }
 
-            insert("v_load_to_chair", false);
+            insert("v_load_to_chair", false);//
             insert("v_load_to_chair_work", true);
 
             setSeventhSemester(loadToChairQM);
@@ -548,9 +549,16 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
                 subjectQM.addWhereNotNull("practiceType");
                 subjectQM.addWhere("chair", ECriteria.EQUAL, loadToChair.getCurriculum().getSpeciality().
                         getDepartment().getId());
-                SUBJECT subject = CommonUtils.getQuery().lookupSingle(subjectQM);
-                GROUPS group = loadToChair.getGroup();
-                setLoadToChair(groups, loadToChair, group, subject, false);
+                SUBJECT subject;
+                try {
+                    subject = CommonUtils.getQuery().lookupSingle(subjectQM);
+                } catch (NoResultException e) {
+                    subject = null;
+                }
+                if (subject != null) {
+                    GROUPS group = loadToChair.getGroup();
+                    setLoadToChair(groups, loadToChair, group, subject, false);
+                }
             }
         }
 
