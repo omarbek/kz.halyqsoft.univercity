@@ -22,12 +22,3 @@ INSERT INTO DEGREE (DEGREE_NAME, ID) VALUES ('профессоров (по но�
 
 
 _________________ABSOLUTE
-
-
-
-ALTER TABLE department
-  ADD dep_language BOOLEAN  NOT NULL  DEFAULT TRUE ;
-
-
-ALTER TABLE employee
-  ADD retiree BOOLEAN  NOT NULL  DEFAULT FALSE ;
