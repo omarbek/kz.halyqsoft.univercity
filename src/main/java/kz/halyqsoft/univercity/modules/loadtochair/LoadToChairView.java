@@ -481,7 +481,7 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
                 CommonUtils.getQuery().delete(load);
             }
 
-            insert("v_load_to_chair", false);
+            insert("v_load_to_chair", false);//
             insert("v_load_to_chair_work", true);
 
             setSeventhSemester(loadToChairQM);
