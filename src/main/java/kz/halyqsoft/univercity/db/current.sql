@@ -1,0 +1,4 @@
+ALTER TABLE employee
+  ADD retiree BOOLEAN  NOT NULL  DEFAULT FALSE ;
+ALTER TABLE department
+  ADD dep_language BOOLEAN  NOT NULL  DEFAULT TRUE ;
