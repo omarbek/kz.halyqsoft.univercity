@@ -392,7 +392,7 @@ public class ScheduleTableView extends AbstractTaskView {
                                     lookup(SCHEDULE_DETAIL.class, list.get(0).getId());
                         }
 
-                        ScheduleCellStudent sc = new ScheduleCellStudent(scheduleDetail);
+                        ScheduleCellStudent sc = new ScheduleCellStudent(list);
                         int col = i + 1;
                         int row = j + 1;
 
@@ -493,7 +493,7 @@ public class ScheduleTableView extends AbstractTaskView {
                                     lookup(SCHEDULE_DETAIL.class, list.get(0).getId());
                         }
 
-                        ScheduleCellStudent sc = new ScheduleCellStudent(scheduleDetail);
+                        ScheduleCellStudent sc = new ScheduleCellStudent(list);
                         int col = i + 1;
                         int row = j + 1;
 

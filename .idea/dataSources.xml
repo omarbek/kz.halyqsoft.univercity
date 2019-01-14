@@ -19,7 +19,7 @@
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://localhost:5432/college</jdbc-url>
     </data-source>
-    <data-source source="LOCAL" name="college@185.146.3.193" uuid="d9c9dc67-2bf2-4293-99cc-399378eae27e">
+    <data-source source="LOCAL" name="college@185.146.3.193" uuid="fa619fea-23c6-416c-a3a7-791699f05048">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>

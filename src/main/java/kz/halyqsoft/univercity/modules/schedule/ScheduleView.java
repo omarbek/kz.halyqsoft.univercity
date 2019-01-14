@@ -348,6 +348,21 @@ public class ScheduleView extends AbstractTaskView {
         return results.size() > 0;
     }
 
+    static boolean scheduleAlreadyHasForTwoSubjects(EMPLOYEE teacher, GROUPS group, WEEK_DAY weekDay, LESSON_TIME time)
+            throws Exception {
+        String sql = "SELECT teacher_id FROM schedule_detail WHERE  " +
+                "((teacher_id=?1 and week_day_id=?2 and lesson_time_id=?4) or " +
+                "(group_id=?3 and week_day_id=?2 and lesson_time_id=?4))";
+        Map<Integer, Object> params = new HashMap<>();
+        params.put(1, teacher.getId().getId());
+        params.put(2, weekDay.getId().getId());
+        params.put(3, group.getId().getId());
+        params.put(4, time.getId().getId());
+        List results = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql, params);
+
+        return results.size() > 0;
+    }
+
     private List<GROUPS> getGroupsByStream(STREAM stream, SHIFT_STUDY_YEAR shiftStudyYear) throws Exception {
         QueryModel<GROUPS> groupsQM = new QueryModel<>(GROUPS.class);
         FromItem streamGroupFI = groupsQM.addJoin(EJoin.INNER_JOIN, "id", STREAM_GROUP.class, "group");
@@ -547,12 +562,12 @@ public class ScheduleView extends AbstractTaskView {
     }
 
     protected boolean isAllEmpty(SCHEDULE_DETAIL scheduleDetail) throws Exception{
-        if(scheduleDetail.getLessonType().getId().getId().longValue()!=LECTURE){
-            if(scheduleAlreadyHas(scheduleDetail.getTeacher(), scheduleDetail.getGroup(),scheduleDetail.getWeekDay(),scheduleDetail.getLessonTime())){
-                Message.showError(getUILocaleUtil().getMessage("group.or.teacher.not.free.this.time"));
-                return false;
-            }
-        }
+//        if(scheduleDetail.getLessonType().getId().getId().longValue()!=LECTURE){
+//            if(scheduleAlreadyHasForTwoSubjects(scheduleDetail.getTeacher(), scheduleDetail.getGroup(),scheduleDetail.getWeekDay(),scheduleDetail.getLessonTime())){
+//                Message.showError(getUILocaleUtil().getMessage("group.or.teacher.not.free.this.time"));
+//                return false;
+//            }
+//        }
 
         if(scheduleAlreadyHas(scheduleDetail.getRoom(),scheduleDetail.getWeekDay(),scheduleDetail.getLessonTime())){
             QueryModel<SCHEDULE_DETAIL> scheduleDetailQM = new QueryModel<>(SCHEDULE_DETAIL.class);
@@ -565,7 +580,8 @@ public class ScheduleView extends AbstractTaskView {
             if(scheduleDetails.size()==0){
                 Message.showError(getUILocaleUtil().getMessage("room.not.free.this.time"));
                 return false;
-            }else{
+            }
+            else{
                 for(SCHEDULE_DETAIL sd : scheduleDetails){
                     if(sd.getGroup().getId().getId().longValue()==scheduleDetail.getGroup().getId().getId().longValue()){
                         Message.showError(getUILocaleUtil().getMessage("group.already.has.lesson"));
@@ -597,10 +613,14 @@ public class ScheduleView extends AbstractTaskView {
                 lessonIds.add(lesson.getId());
             }
 
-            QueryModel<LESSON_DETAIL> lessonDetailQM = new QueryModel<>(LESSON_DETAIL.class);
-            lessonQM.addWhereIn("lesson" , lessonIds);
-            CommonUtils.getQuery().delete(CommonUtils.getQuery().lookup(lessonDetailQM));
-            CommonUtils.getQuery().delete(lessonList);
+            if(lessonIds.size()> 0){
+                QueryModel<LESSON_DETAIL> lessonDetailQM = new QueryModel<>(LESSON_DETAIL.class);
+                lessonQM.addWhereIn("lesson" , lessonIds);
+                CommonUtils.getQuery().delete(CommonUtils.getQuery().lookup(lessonDetailQM));
+            }
+            if(lessonList.size()>0){
+                CommonUtils.getQuery().delete(lessonList);
+            }
             SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(entities);
             refresh();
         }catch (Exception e){

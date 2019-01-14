@@ -15,6 +15,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.entity.beans.univercity.enumeration.Flag;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.*;
 import kz.halyqsoft.univercity.utils.CommonUtils;
+import kz.halyqsoft.univercity.utils.DocumentUtils;
 import kz.halyqsoft.univercity.utils.EmployeePdfCreator;
 import kz.halyqsoft.univercity.utils.register.*;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
@@ -123,31 +124,28 @@ public final class ApplicantsForm extends UsersForm {
 
     @Override
     protected void setOpeners() {
-        StreamResource myResource = createResourceStudent("103", null);
+        StreamResource myResource = createResourceStudent(DocumentUtils.CONTRACT_RUS, null);
         contractBWO = new BrowserWindowOpener(myResource);
         contractBWO.extend(finishButton);
 
-        masgisterContractBWO = new BrowserWindowOpener(myResource);
-        masgisterContractBWO.extend(finishButton);
-
-        requestBWO = new BrowserWindowOpener(myResource);
-        requestBWO.extend(finishButton);
-
-        titleBWO = new BrowserWindowOpener(myResource);
-        titleBWO.extend(finishButton);
-
-        voucherBWO = new BrowserWindowOpener(myResource);
-        voucherBWO.extend(finishButton);
+//        requestBWO = new BrowserWindowOpener(myResource);
+//        requestBWO.extend(finishButton);
+//
+//        titleBWO = new BrowserWindowOpener(myResource);
+//        titleBWO.extend(finishButton);
+//
+//        voucherBWO = new BrowserWindowOpener(myResource);
+//        voucherBWO.extend(finishButton);
     }
 
     @Override
     protected List<Button> getButtons() {
         List<Button> buttons = new ArrayList<>();
-        buttons.add(specButton);
-        buttons.add(untButton);
-        buttons.add(grantDocButton);
-        buttons.add(motherButton);
-        buttons.add(fatherButton);
+//        buttons.add(specButton);
+//        buttons.add(untButton);
+//        buttons.add(grantDocButton);
+//        buttons.add(motherButton);
+//        buttons.add(fatherButton);
         buttons.add(contractButton);
         buttons.add(moreButton);
         return buttons;
@@ -278,7 +276,7 @@ public final class ApplicantsForm extends UsersForm {
             if (student.getLevel().getLevelName().equalsIgnoreCase("Магистратура")) {
                 myResource = createResourceStudent("82", student);
             } else {
-                myResource = createResourceStudent("103", student);
+                myResource = createResourceStudent(DocumentUtils.CONTRACT_RUS, student);
             }
             FileDownloader fileDownloader = new FileDownloader(myResource);
             myResource.setMIMEType("application/pdf");
@@ -532,18 +530,18 @@ public final class ApplicantsForm extends UsersForm {
             myResource = createResourceStudent("82", student);
             masgisterContractBWO.setResource(myResource);
         } else {
-            myResource = createResourceStudent("103", student);
+            myResource = createResourceStudent(DocumentUtils.CONTRACT_RUS, student);
             contractBWO.setResource(myResource);
         }
 
-        myResource = createResourceStudent("27", student);
-        requestBWO.setResource(myResource);
-
-        myResource = createResourceStudent("33", student);
-        voucherBWO.setResource(myResource);
-
-        myResource = createResourceStudent("32", student);
-        titleBWO.setResource(myResource);
+//        myResource = createResourceStudent("27", student);
+//        requestBWO.setResource(myResource);
+//
+//        myResource = createResourceStudent("33", student);
+//        voucherBWO.setResource(myResource);
+//
+//        myResource = createResourceStudent("32", student);
+//        titleBWO.setResource(myResource);
 
         if (student != null && student.isNeedDorm() && !came) {
             came = true;
@@ -623,9 +621,9 @@ public final class ApplicantsForm extends UsersForm {
 
     public static StreamResource createResourceStudent(String value, STUDENT student) {
         String fileName = "";
-        if (value.equals("92")) {
-            fileName = "Договор общага_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
-        } else if (value.equals("103")) {
+        if (value.equals(DocumentUtils.DORM_KAZ)) {
+            fileName = "Договор общ_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
+        } else if (value.equals(DocumentUtils.CONTRACT_RUS)) {
             fileName = "Договор на рус_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
         } else if (value.equals("32")) {
             fileName = "Титул_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
@@ -633,7 +631,7 @@ public final class ApplicantsForm extends UsersForm {
             fileName = "Қолхат_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
         } else if (value.equals("82")) {//TODO Assyl check all docs, not only yours
             fileName = "Договор магистрант_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
-        } else if (value.equals("90")) {
+        } else if (value.equals(DocumentUtils.CONTRACT_KAZ)) {
             fileName = "келісім-шарт_" + Calendar.getInstance().getTimeInMillis() + ".pdf";
         }  else if (value.equals("154")) {
             fileName = "ИУПС_" + Calendar.getInstance().getTimeInMillis() + ".pdf";

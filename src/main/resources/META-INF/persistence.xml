@@ -363,19 +363,25 @@
             <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
 
 
-            <!--LOCAL-->
+            <!--LOCAL -->
             <!--<property name="javax.persistence.jdbc.url" value="jdbc:postgresql://185.146.3.193:5432/college"/>-->
             <!--<property name="javax.persistence.jdbc.user" value="postgres"/>-->
             <!--<property name="javax.persistence.jdbc.password" value="sbeezzs01"/>-->
 
-            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://78.40.109.78:5432/college"/>
+            <!--<property name="javax.persistence.jdbc.url" value="jdbc:postgresql://78.40.109.78:5432/college"/>-->
+            <!--<property name="javax.persistence.jdbc.user" value="postgres"/>-->
+            <!--<property name="javax.persistence.jdbc.password" value="sbeezzs01"/>-->
+
+            <!--SEVER-LOCAL-->
+            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/college"/>
             <property name="javax.persistence.jdbc.user" value="postgres"/>
             <property name="javax.persistence.jdbc.password" value="sbeezzs01"/>
 
-            <!--COLLEGE-->
+            <!--LOCAL-->
             <!--<property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/college"/>-->
             <!--<property name="javax.persistence.jdbc.user" value="postgres"/>-->
-            <!--<property name="javax.persistence.jdbc.password" value="sbeezzs01"/>-->
+            <!--<property name="javax.persistence.jdbc.password" value="ukpu18!"/>-->
+
 
             <!--<property name="javax.persistence.jdbc.user" value="${javax.persistence.jdbc.user}"/>-->
             <!--<property name="javax.persistence.jdbc.password" value="${javax.persistence.jdbc.password}"/>-->

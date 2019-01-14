@@ -98,9 +98,7 @@ public class CustomDocument {
                 pdfProperty.setFont(cf.getFontComboBox().getValue().toString());
                 pdfProperty.setSize(Integer.parseInt(cf.getTextSizeComboBox().getValue().toString()));
                 pdfProperty.setOrderNumber(Double.parseDouble(cf.getOrder().getValue().toString()));
-
                 pdfProperty.setCenter(cf.getCenterCheckBox().getValue());
-                pdfProperty.setRight(cf.getRightCheckBox().getValue());
                 pdfProperty.setCustom(cf.getCustomCheckBox().getValue());
 
                 pdfProperties.add(pdfProperty);
@@ -108,54 +106,6 @@ public class CustomDocument {
                 document.add(paragraph1);
 
             }
-                PdfPTable table = new PdfPTable(3); // 3 columns.
-
-            table.setWidthPercentage(100);
-
-            Font font = new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD, BaseColor.WHITE);
-
-
-//            table.addCell(createLabelCell("Label 1"));
-//            table.addCell(createValueCell("Value 1"));
-//            table.addCell(createLabelCell("Label 2"));
-//            table.addCell(createValueCell("Value 2"));
-//            table.addCell(createLabelCell("Label 3"));
-//            table.addCell(createValueCell("Value 3"));
-
-            // 2nd Row
-//            table.addCell(createLabelCell("Label 4"));
-//            table.addCell(createValueCell("Value 4"));
-//            table.addCell(createLabelCell("Label 5"));
-//            table.addCell(createValueCell("Value 5"));
-//            table.addCell(createLabelCell("Label 6"));
-//            table.addCell(createValueCell("Value 6"));
-
-
-
-            QueryModel<SUBJECT> subjectQM = new QueryModel<>(SUBJECT.class);
-            FromItem ssItem = subjectQM.addJoin(EJoin.INNER_JOIN,"id", STUDENT_SUBJECT.class,"subject");
-            FromItem smItem =  subjectQM.addJoin(EJoin.INNER_JOIN,"subjectModule", SUBJECT_MODULE.class,"id");
-            FromItem cItem = subjectQM.addJoin(EJoin.INNER_JOIN,"creditability",CREDITABILITY.class,"id");
-            FromItem eItem = subjectQM.addJoin(EJoin.INNER_JOIN,"ects", ECTS.class,"id");
-            FromItem sdItem = ssItem.addJoin(EJoin.INNER_JOIN,"semesterData", SEMESTER_DATA.class,"id");
-            FromItem tsItem  =subjectQM.addJoin(EJoin.INNER_JOIN,"id", TEACHER_SUBJECT.class,"subject");
-            FromItem uItem  =tsItem.addJoin(EJoin.INNER_JOIN,"employee", USERS.class,"id");
-           // FromItem scItem  =subjectQM.addJoin(EJoin.INNER_JOIN,"subjectCode", SUBJECT_CODE.class,"id");
-          //  subjectQM.addWhere(ssItem,"studentEducation", ECriteria.EQUAL,1293);
-
-            List<SUBJECT> subjects = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
-                    lookup(subjectQM);
-            PdfPCell cell = new PdfPCell(new Phrase("HMKCODE.com - iText PDFTable Example",font));
-            cell.setColspan(6);
-
-            for(SUBJECT s:subjects){
-
-              //  table.addCell(createLabelCell(s.getSubjectCode().toString()));
-                table.addCell(createValueCell(s.getCreditability().toString()));
-                table.addCell(cell);
-            }
-
-            document.add(table);
 
             document.close();
             pdfWriter.close();
@@ -186,11 +136,6 @@ public class CustomDocument {
         Document document = new Document();
         PdfWriter.getInstance(document, new FileOutputStream(dest));
         document.open();
-        PdfPTable table = new PdfPTable(8);
-        for(int aw = 0; aw < 16; aw++){
-            table.addCell("hi");
-        }
-        document.add(table);
         document.close();
     }
 

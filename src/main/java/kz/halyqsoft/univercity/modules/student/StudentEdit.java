@@ -24,6 +24,7 @@ import kz.halyqsoft.univercity.filter.FStudentFilter;
 import kz.halyqsoft.univercity.filter.panel.StudentFilterPanel;
 import kz.halyqsoft.univercity.modules.student.tabs.*;
 import kz.halyqsoft.univercity.utils.CommonUtils;
+import kz.halyqsoft.univercity.utils.DocumentUtils;
 import kz.halyqsoft.univercity.utils.changelisteners.BirthCountryChangeListener;
 import kz.halyqsoft.univercity.utils.changelisteners.SchoolCountryChangeListener;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
@@ -405,7 +406,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                        myResource = createResourceStudent("104", student);
+                        myResource = createResourceStudent(DocumentUtils.CONTRACT_KAZ, student);
                         fileDownloader = new FileDownloader(myResource);
                         myResource.setMIMEType("application/pdf");
                         fileDownloader.extend(pdfDownload);
@@ -422,7 +423,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    myResource = createResourceStudent("103", student);
+                    myResource = createResourceStudent(DocumentUtils.CONTRACT_RUS, student);
                     fileDownloader = new FileDownloader(myResource);
                     myResource.setMIMEType("application/pdf");
                     fileDownloader.extend(pdfDownload);
@@ -448,7 +449,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
 
         if (student.isNeedDorm()) {
             pdfDownloadDorm.setEnabled(true);
-            myResourceDorm = createResourceStudent("92", student);
+            myResourceDorm = createResourceStudent(DocumentUtils.DORM_KAZ, student);
             fileDownloaderDorm = new FileDownloader(myResourceDorm);
             myResourceDorm.setMIMEType("application/pdf");
             fileDownloaderDorm.extend(pdfDownloadDorm);
@@ -538,7 +539,7 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
 
         if (student.isNeedDorm()) {
             pdfDownloadDorm.setEnabled(true);
-            myResourceDorm = createResourceStudent("92", student);
+            myResourceDorm = createResourceStudent(DocumentUtils.CONTRACT_RUS, student);
             fileDownloaderDorm = new FileDownloader(myResourceDorm);
             myResourceDorm.setMIMEType("application/pdf");
             fileDownloaderDorm.extend(pdfDownloadDorm);

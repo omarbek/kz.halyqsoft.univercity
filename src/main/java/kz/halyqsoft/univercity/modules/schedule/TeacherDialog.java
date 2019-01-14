@@ -145,7 +145,7 @@ public class TeacherDialog extends AbstractDialog{
         try{
             semester = CommonUtils.getQuery().lookupSingle(semesterQM);
         }catch (Exception e){
-            CommonUtils.showMessageAndWriteLog("unable to fin semester" , e);
+            CommonUtils.showMessageAndWriteLog("unable to find semester" , e);
 
         }
         return semester;
