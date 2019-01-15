@@ -236,7 +236,6 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
         QueryModel<USERS> employeeQM = new QueryModel<>(USERS.class);
         employeeQM.addJoin(EJoin.INNER_JOIN, "id", EMPLOYEE.class, "id");
         employeeQM.addWhere("deleted", ECriteria.EQUAL, false);
-
         BeanItemContainer<USERS> employeeBIC = new BeanItemContainer<>(USERS.class,
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(employeeQM));
         employeeCB.setContainerDataSource(employeeBIC);
