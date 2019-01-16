@@ -48,6 +48,7 @@ import org.r3a.common.vaadin.widget.toolbar.AbstractToolbar;
 
 import javax.persistence.NoResultException;
 import java.io.ByteArrayOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Calendar;
 import java.util.List;
@@ -208,6 +209,7 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
     }
 
     private void initTabs() throws Exception {
+
         QueryModel<SEMESTER> semesterQM = new QueryModel<>(SEMESTER.class);
         semesterQM.addWhere("id", ECriteria.LESS_EQUAL, ID.valueOf(8));
         semesterQM.addOrder("id");
@@ -347,81 +349,81 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
         printButtonC.addClickListener(new ClickListener() {
             @Override
             public void buttonClick(ClickEvent clickEvent) {
-                List<String> tableHeader = new ArrayList<>();
+                List<String> tableHeader1 = new ArrayList<>();
+                List<String> tableHeader3 = new ArrayList<>();
                 List<List<String>> tableBody = new ArrayList<>();
 
-                String headers[] = {" ","Специальность","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50","51","52"};
-                tableHeader.addAll(Arrays.asList(headers));
-                String sql="";
-                for(int k=1; k<=4;k++) {
-                     sql = "select *\n" +
-                             "from crosstab('select spec.spec_name,w.week_code,css.symbol\n" +
-                             "from curriculum_schedule sched\n" +
-                             "       inner join curriculum_schedule_symbol css on sched.symbol_id = css.id\n" +
-                             "       inner join curriculum c on sched.curriculum_id = c.id\n" +
-                             "       inner join speciality spec on c.speciality_id = spec.id\n" +
-                             "       inner join week w on sched.week_id = w.id\n" +
-                             "where study_year_id ="+k+"',\n" +
-                             "              'select m from generate_series(1,52) m') as (\n" +
-                             "     spec_name varchar(255),\n" +
-                             "     \"1\" varchar(255),\n" +
-                             "     \"2\" varchar(255),\n" +
-                             "     \"3\" varchar(255),\n" +
-                             "     \"4\" varchar(255),\n" +
-                             "     \"5\" varchar(255),\n" +
-                             "     \"6\" varchar(255),\n" +
-                             "     \"7\" varchar(255),\n" +
-                             "     \"8\" varchar(255),\n" +
-                             "     \"9\" varchar(255),\n" +
-                             "     \"10\" varchar(255),\n" +
-                             "     \"11\" varchar(255),\n" +
-                             "     \"12\" varchar(255),\n" +
-                             "     \"13\" varchar(255),\n" +
-                             "     \"14\" varchar(255),\n" +
-                             "     \"15\" varchar(255),\n" +
-                             "     \"16\" varchar(255),\n" +
-                             "     \"17\" varchar(255),\n" +
-                             "     \"18\" varchar(255),\n" +
-                             "     \"19\" varchar(255),\n" +
-                             "     \"20\" varchar(255),\n" +
-                             "     \"21\" varchar(255),\n" +
-                             "     \"22\" varchar(255),\n" +
-                             "     \"23\" varchar(255),\n" +
-                             "     \"24\" varchar(255),\n" +
-                             "     \"25\" varchar(255),\n" +
-                             "     \"26\" varchar(255),\n" +
-                             "     \"27\" varchar(255),\n" +
-                             "     \"28\" varchar(255),\n" +
-                             "     \"29\" varchar(255),\n" +
-                             "     \"30\" varchar(255),\n" +
-                             "     \"31\" varchar(255),\n" +
-                             "     \"32\" varchar(255),\n" +
-                             "     \"33\" varchar(255),\n" +
-                             "     \"34\" varchar(255),\n" +
-                             "     \"35\" varchar(255),\n" +
-                             "     \"36\" varchar(255),\n" +
-                             "     \"37\" varchar(255),\n" +
-                             "     \"38\" varchar(255),\n" +
-                             "     \"39\" varchar(255),\n" +
-                             "     \"40\" varchar(255),\n" +
-                             "     \"41\" varchar(255),\n" +
-                             "     \"42\" varchar(255),\n" +
-                             "     \"43\" varchar(255),\n" +
-                             "     \"44\" varchar(255),\n" +
-                             "     \"45\" varchar(255),\n" +
-                             "     \"46\" varchar(255),\n" +
-                             "     \"47\" varchar(255),\n" +
-                             "     \"48\" varchar(255),\n" +
-                             "     \"49\" varchar(255),\n" +
-                             "     \"50\" varchar(255),\n" +
-                             "     \"51\" varchar(255),\n" +
-                             "     \"52\" varchar(255)\n" +
-                             "\n" +
-                             "     );";
+                List<String> tableHeader2 = new ArrayList<>();
+                String headers[] = {"Специальность", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52"};
+                String course[] = {""};
 
-                    // getFirstMonday(2019, 1);
-
-                    List<String> list = new ArrayList<>();
+                tableHeader2.addAll(Arrays.asList(headers));
+                String sql = "";
+                for (int k = 1; k <= 4; k++) {
+                    sql = "select *\n" +
+                            "from crosstab('select spec.spec_name,w.week_code,css.symbol\n" +
+                            "from curriculum_schedule sched\n" +
+                            "       inner join curriculum_schedule_symbol css on sched.symbol_id = css.id\n" +
+                            "       inner join curriculum c on sched.curriculum_id = c.id\n" +
+                            "       inner join speciality spec on c.speciality_id = spec.id\n" +
+                            "       inner join week w on sched.week_id = w.id\n" +
+                            "where study_year_id =" + k + "',\n" +
+                            "              'select m from generate_series(1,52) m') as (\n" +
+                            "     spec_name varchar(255),\n" +
+                            "     \"1\" varchar(255),\n" +
+                            "     \"2\" varchar(255),\n" +
+                            "     \"3\" varchar(255),\n" +
+                            "     \"4\" varchar(255),\n" +
+                            "     \"5\" varchar(255),\n" +
+                            "     \"6\" varchar(255),\n" +
+                            "     \"7\" varchar(255),\n" +
+                            "     \"8\" varchar(255),\n" +
+                            "     \"9\" varchar(255),\n" +
+                            "     \"10\" varchar(255),\n" +
+                            "     \"11\" varchar(255),\n" +
+                            "     \"12\" varchar(255),\n" +
+                            "     \"13\" varchar(255),\n" +
+                            "     \"14\" varchar(255),\n" +
+                            "     \"15\" varchar(255),\n" +
+                            "     \"16\" varchar(255),\n" +
+                            "     \"17\" varchar(255),\n" +
+                            "     \"18\" varchar(255),\n" +
+                            "     \"19\" varchar(255),\n" +
+                            "     \"20\" varchar(255),\n" +
+                            "     \"21\" varchar(255),\n" +
+                            "     \"22\" varchar(255),\n" +
+                            "     \"23\" varchar(255),\n" +
+                            "     \"24\" varchar(255),\n" +
+                            "     \"25\" varchar(255),\n" +
+                            "     \"26\" varchar(255),\n" +
+                            "     \"27\" varchar(255),\n" +
+                            "     \"28\" varchar(255),\n" +
+                            "     \"29\" varchar(255),\n" +
+                            "     \"30\" varchar(255),\n" +
+                            "     \"31\" varchar(255),\n" +
+                            "     \"32\" varchar(255),\n" +
+                            "     \"33\" varchar(255),\n" +
+                            "     \"34\" varchar(255),\n" +
+                            "     \"35\" varchar(255),\n" +
+                            "     \"36\" varchar(255),\n" +
+                            "     \"37\" varchar(255),\n" +
+                            "     \"38\" varchar(255),\n" +
+                            "     \"39\" varchar(255),\n" +
+                            "     \"40\" varchar(255),\n" +
+                            "     \"41\" varchar(255),\n" +
+                            "     \"42\" varchar(255),\n" +
+                            "     \"43\" varchar(255),\n" +
+                            "     \"44\" varchar(255),\n" +
+                            "     \"45\" varchar(255),\n" +
+                            "     \"46\" varchar(255),\n" +
+                            "     \"47\" varchar(255),\n" +
+                            "     \"48\" varchar(255),\n" +
+                            "     \"49\" varchar(255),\n" +
+                            "     \"50\" varchar(255),\n" +
+                            "     \"51\" varchar(255),\n" +
+                            "     \"52\" varchar(255)\n" +
+                            "\n" +
+                            "     );";
 
                     try {
                         List<Object> tmpList = new ArrayList<>();
@@ -434,18 +436,57 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
                                 for (int i = 0; i < oo.length; i++) {
                                     valuesList.add(oo[i] != null ? String.valueOf(oo[i]) : "");
                                 }
-                                tableBody.add(Collections.singletonList("1"));
                                 tableBody.add(valuesList);
-
                             }
+                            tableBody.add(Collections.singletonList(" "));
                         }
                     } catch (Exception ex) {
                         CommonUtils.showMessageAndWriteLog("Unable to load department list", ex);
                     }
                 }
-                String fileName = "document";
 
-                PrintDialog printDialog = new PrintDialog(tableHeader, tableBody, CommonUtils.getUILocaleUtil().getCaption("print"), fileName);
+                if (entranceYearCB.getValue() != null) {
+                    ENTRANCE_YEAR year = (ENTRANCE_YEAR) entranceYearCB.getValue();
+
+                    ArrayList<String> list = null;
+                    ArrayList<String> list1 = null;
+                    tableHeader1.add(" ");
+
+                    for (int j = 8; j < 12; j++) {
+
+                        list = (ArrayList<String>) getMondayAndFriday(year.getBeginYear().intValue(), j).get(Calendar.MONDAY);
+
+                        ArrayList<String> list2 = (ArrayList<String>) getMondayAndFriday(year.getBeginYear().intValue(), j).get(Calendar.FRIDAY);
+
+                        for (int h = 0; h < list.size(); h++) {
+                            tableHeader1.add(list.get(h) + "\n" + list2.get(h));
+                        }
+                    }
+
+
+                    for (int j = 0; j < 8; j++) {
+
+                        list = (ArrayList<String>) getMondayAndFriday(year.getBeginYear().intValue() + 1, j).get(Calendar.MONDAY);
+
+                        ArrayList<String> list2 = (ArrayList<String>) getMondayAndFriday(year.getBeginYear().intValue() + 1, j).get(Calendar.FRIDAY);
+
+
+                        for (int h = 0; h < list.size(); h++) {
+                            tableHeader1.add(list.get(h) + "\n" + list2.get(h));
+                        }
+                    }
+                    for (int h = 0; h < tableHeader2.size(); h++) {
+                        tableHeader3.add(tableHeader1.get(h) + "\n\n" + tableHeader2.get(h));
+                    }
+
+                    tableHeader3.add(" ");
+                    String fileName = "document";
+
+                    PrintDialog printDialog = new PrintDialog(tableHeader3, tableBody, CommonUtils.getUILocaleUtil().getCaption("print"), fileName);
+
+                } else {
+                    org.r3a.common.vaadin.widget.dialog.Message.showInfo(getUILocaleUtil().getMessage("select.study.year"));
+                }
 
             }
         });
@@ -1644,19 +1685,38 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
     }
 
 
-    private static int getFirstMonday(int year, int month) {
+    private static HashMap getMondayAndFriday(int year, int month) {
 
-        Calendar cacheCalendar = Calendar.getInstance();
-        cacheCalendar.set(Calendar.YEAR, year);
-        cacheCalendar.set(Calendar.MONTH, month);
+        Calendar calendar = Calendar.getInstance();
+        ArrayList<Date> dateList = new ArrayList<>();
+        HashMap<Integer, ArrayList> map = new HashMap<>();
+        map.put(Calendar.MONDAY, new ArrayList());
+        map.put(Calendar.FRIDAY, new ArrayList());
+        calendar.set(Calendar.YEAR, year);
+        calendar.set(Calendar.MONTH, month);
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        int myMonth = calendar.get(Calendar.MONTH);
 
-        if(cacheCalendar.getFirstDayOfWeek()!=Calendar.MONDAY ){
-            cacheCalendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY+1);
+        while (myMonth == calendar.get(Calendar.MONTH)) {
+            if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY && myMonth == calendar.get(Calendar.MONTH)) {
+                Date mondayDate = calendar.getTime();
+                calendar.add(Calendar.DAY_OF_MONTH, 4);
+                Date fridayDate = calendar.getTime();
+                Calendar mondayCalendar = Calendar.getInstance();
+                Calendar fridayCalendar = Calendar.getInstance();
+                mondayCalendar.setTime(mondayDate);
+                fridayCalendar.setTime(fridayDate);
+                SimpleDateFormat sdf = new SimpleDateFormat("d MMMM");
+
+                map.get(mondayCalendar.get(Calendar.DAY_OF_WEEK)).add(sdf.format(mondayDate));
+                map.get(fridayCalendar.get(Calendar.DAY_OF_WEEK)).add(sdf.format(fridayDate));
+
+            }
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
+
         }
-        cacheCalendar.set(Calendar.DAY_OF_WEEK_IN_MONTH, 1);
-        cacheCalendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
 
-        return cacheCalendar.get(Calendar.DATE);
+        return map;
     }
 
 
@@ -1725,8 +1785,8 @@ public final class CurriculumView extends AbstractTaskView implements EntityList
 
     private void setAllButtonsEnabled(boolean enabled) {
         for (SubjectsTab subjectsTab : subjectsTabs) {
-            setButtonsEnabled(subjectsTab.getMainSubjectsGW(),enabled);
-            setButtonsEnabled(subjectsTab.getElectiveSubjectsGW(),enabled);
+            setButtonsEnabled(subjectsTab.getMainSubjectsGW(), enabled);
+            setButtonsEnabled(subjectsTab.getElectiveSubjectsGW(), enabled);
         }
         setButtonsEnabled(addProgramPanel.getAddingSubjectsGW(), enabled);
         setButtonsEnabled(afterSemesterProgamPanel.getAfterSemesterSubjectsGW(), enabled);
