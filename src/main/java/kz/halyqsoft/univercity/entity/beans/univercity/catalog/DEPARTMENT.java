@@ -5,18 +5,9 @@ import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
 import org.r3a.common.entity.tree.CommonTree;
 
-import java.math.BigInteger;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Transient;
 
 /**
  * @author Omarbek
@@ -52,6 +43,10 @@ public class DEPARTMENT extends AbstractEntity implements CommonTree<DEPARTMENT>
     @FieldInfo(type = EFieldType.BOOLEAN, order = 6, required = false, inEdit = false, inGrid = false, inView = false)
     @Column(name = "DELETED", nullable = false)
     private boolean deleted;
+
+    @FieldInfo(type = EFieldType.BOOLEAN, order = 7, required = false)
+    @Column(name = "DEP_LANGUAGE", nullable = false)
+    private boolean depLanguage;
 
     @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
     private List<DEPARTMENT> children = new ArrayList<>();
@@ -146,5 +141,17 @@ public class DEPARTMENT extends AbstractEntity implements CommonTree<DEPARTMENT>
     @Override
     public String toString() {
         return deptName;
+    }
+
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
+
+    public boolean isDepLanguage() {
+        return depLanguage;
+    }
+
+    public void setDepLanguage(boolean depLanguage) {
+        this.depLanguage = depLanguage;
     }
 }
