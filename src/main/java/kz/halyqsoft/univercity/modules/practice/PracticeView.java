@@ -12,9 +12,7 @@ import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.USERS;
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ORGANIZATION;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDY_YEAR;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import kz.halyqsoft.univercity.filter.FInformationPracticeFilter;
 import kz.halyqsoft.univercity.filter.FStudentPracticeFilter;
 import kz.halyqsoft.univercity.filter.panel.InformationPracticeFilterPanel;
@@ -238,7 +236,6 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
         QueryModel<USERS> employeeQM = new QueryModel<>(USERS.class);
         employeeQM.addJoin(EJoin.INNER_JOIN, "id", EMPLOYEE.class, "id");
         employeeQM.addWhere("deleted", ECriteria.EQUAL, false);
-
         BeanItemContainer<USERS> employeeBIC = new BeanItemContainer<>(USERS.class,
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(employeeQM));
         employeeCB.setContainerDataSource(employeeBIC);
@@ -302,6 +299,54 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
         organizationCB.setContainerDataSource(organizationBIC);
         studentPracticeFP.addFilterComponent("organization", organizationCB);
 
+        ComboBox departmentCB = new ComboBox();
+        departmentCB.setNullSelectionAllowed(true);
+        departmentCB.setTextInputAllowed(true);
+        departmentCB.setFilteringMode(FilteringMode.CONTAINS);
+        departmentCB.setWidth(200, Unit.PIXELS);
+        QueryModel<DEPARTMENT> departmentQM = new QueryModel<>(DEPARTMENT.class);
+
+        BeanItemContainer<DEPARTMENT> departmentBIC = new BeanItemContainer<>(DEPARTMENT.class,
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(departmentQM));
+        departmentCB.setContainerDataSource(departmentBIC);
+        studentPracticeFP.addFilterComponent("department", departmentCB);
+
+        ComboBox specialityCB = new ComboBox();
+        specialityCB.setNullSelectionAllowed(true);
+        specialityCB.setTextInputAllowed(true);
+        specialityCB.setFilteringMode(FilteringMode.CONTAINS);
+        specialityCB.setWidth(200, Unit.PIXELS);
+        QueryModel<SPECIALITY> specialityQM = new QueryModel<>(SPECIALITY.class);
+
+        BeanItemContainer<SPECIALITY> specialityBIC = new BeanItemContainer<>(SPECIALITY.class,
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(specialityQM));
+        specialityCB.setContainerDataSource(specialityBIC);
+        studentPracticeFP.addFilterComponent("speciality", specialityCB);
+
+        ComboBox courseCB = new ComboBox();
+        courseCB.setNullSelectionAllowed(true);
+        courseCB.setTextInputAllowed(true);
+        courseCB.setFilteringMode(FilteringMode.CONTAINS);
+        courseCB.setWidth(200, Unit.PIXELS);
+        QueryModel<STUDY_YEAR> courseQM = new QueryModel<>(STUDY_YEAR.class);
+
+        BeanItemContainer<STUDY_YEAR> courseBIC = new BeanItemContainer<>(STUDY_YEAR.class,
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(courseQM));
+        courseCB.setContainerDataSource(courseBIC);
+        studentPracticeFP.addFilterComponent("studyYear", courseCB);
+
+        ComboBox groupCB = new ComboBox();
+        groupCB.setNullSelectionAllowed(true);
+        groupCB.setTextInputAllowed(true);
+        groupCB.setFilteringMode(FilteringMode.CONTAINS);
+        groupCB.setWidth(200, Unit.PIXELS);
+        QueryModel<GROUPS> groupQM = new QueryModel<>(GROUPS.class);
+
+        BeanItemContainer<GROUPS> groupBIC = new BeanItemContainer<>(GROUPS.class,
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(groupQM));
+        groupCB.setContainerDataSource(groupBIC);
+        studentPracticeFP.addFilterComponent("groups", groupCB);
+
         DateField comeInDF = new DateField();
         studentPracticeFP.addFilterComponent("comeInDate", comeInDF);
 
@@ -323,14 +368,14 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
                 String pracType = "-";
                 int credi = 0;
                 String getPracSql = "SELECT pt.type_name,c.credit\n" +
-                        "FROM student_subject ss\n" +
+                        "  FROM student_subject ss\n" +
                         "  INNER JOIN subject s on ss.subject_id=s.id\n" +
                         "  INNER JOIN creditability c on s.creditability_id=c.id\n" +
-                        "INNER JOIN student_education se ON ss.student_id = se.id\n" +
+                        "  INNER JOIN student_education se ON ss.student_id = se.id\n" +
                         "  INNER JOIN speciality spec on se.speciality_id=spec.id\n" +
                         "  INNER JOIN groups g ON se.groups_id = g.id\n" +
                         "  inner JOIN practice_type pt ON s.practice_type_id = pt.id\n" +
-                        "WHERE se.groups_id=" + pi.getGroups().getId() + " and ss.semester_data_id=" + CommonUtils.getCurrentSemesterData().getId();
+                        "  WHERE se.groups_id=" + pi.getGroups().getId() + " and ss.semester_data_id=" + CommonUtils.getCurrentSemesterData().getId();
 
                 Map<Integer, Object> params = new HashMap<>();
                 try {
@@ -523,7 +568,6 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
 
     }
 
-
     @Override
     public void doFilter(AbstractFilterBean abstractFilterBean) {
         if (abstractFilterBean instanceof FInformationPracticeFilter) {
@@ -654,6 +698,45 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
 
             }
 
+            if (fStudentPracticeFilter.getDepartment() != null) {
+
+                if (i != 1) {
+                    sb.append(" and ");
+                }
+                params.put(i, fStudentPracticeFilter.getDepartment().getId().getId());
+                sb.append("se.chair_id = ?" + i++);
+
+            }
+
+            if (fStudentPracticeFilter.getSpeciality() != null) {
+
+                if (i != 1) {
+                    sb.append(" and ");
+                }
+                params.put(i, fStudentPracticeFilter.getSpeciality().getId().getId());
+                sb.append("se.speciality_id = ?" + i++);
+
+            }
+
+            if (fStudentPracticeFilter.getGroups() != null) {
+
+                if (i != 1) {
+                    sb.append(" and ");
+                }
+                params.put(i, fStudentPracticeFilter.getGroups().getId().getId());
+                sb.append("se.groups_id = ?" + i++);
+
+            }
+            if (fStudentPracticeFilter.getStudyYear() != null) {
+
+                if (i != 1) {
+                    sb.append(" and ");
+                }
+                params.put(i, fStudentPracticeFilter.getStudyYear().getId().getId());
+                sb.append("se.study_year_id = ?" + i++);
+
+            }
+
             if (fStudentPracticeFilter.getComeInDate() != null) {
 
                 if (i != 1) {
@@ -679,7 +762,9 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
             if (i > 1) {
                 sb.insert(0, " WHERE  ");
             }
-            String sql = " select ps.* from practice_student ps where true "
+            String sql = " select ps.*, se.* from practice_student ps\n" +
+                    "inner join student s2 on ps.student_id = s2.id\n" +
+                    "inner join student_education se on s2.id = se.student_id\n"
                     + sb.toString();
             try {
 

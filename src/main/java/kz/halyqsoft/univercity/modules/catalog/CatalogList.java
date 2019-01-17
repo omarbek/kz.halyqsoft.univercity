@@ -53,7 +53,7 @@ class CatalogList {
         addCatalogEntityToList(SPECIALITY.class);
         addCatalogEntityToList(ACADEMIC_DEGREE.class);
         addCatalogEntityToList(ORGANIZATION.class);
-//        addCatalogEntityToList(SEMESTER_DATA.class);
+        addCatalogEntityToList(SEMESTER_DATA.class);
 
         addCatalogEntityToList(ROLES.class);
         addCatalogEntityToList(TASKS.class);

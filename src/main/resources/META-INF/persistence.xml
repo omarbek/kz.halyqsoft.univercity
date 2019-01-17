@@ -370,13 +370,14 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE_ABSENCE_CAUSE</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.LOAD_TO_TEACHER</class>
 
+
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
         <properties>
             <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
-            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/univerdb"/>
-            <property name="javax.persistence.jdbc.user" value="postgres"/>
-            <property name="javax.persistence.jdbc.password" value="ukpu18!"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:1818/univerdb"/>
+            <property name="javax.persistence.jdbc.user" value="univer"/>
+            <property name="javax.persistence.jdbc.password" value="univer"/>
             <!--<property name="javax.persistence.jdbc.user" value="${javax.persistence.jdbc.user}"/>-->
             <!--<property name="javax.persistence.jdbc.password" value="${javax.persistence.jdbc.password}"/>-->
             <property name="eclipselink.connection-pool.default.initial" value="1"/>
@@ -387,7 +388,7 @@
             <property name="eclipselink.ddl-generation" value="none"/>
             <!-- <property name="eclipselink.ddl-generation.output-mode" value="database"/> -->
             <!-- <property name="eclipselink.jdbc.cache-statements" value="true"/> -->
-            <!-- <property name="eclipselink.jdbc.cache-statements.size" value="100"/> -->
+            <!-- <property name="eclipselink.jdbc.cache-statements.size" va lue="100"/> -->
             <property name="eclipselink.logging.level.sql" value="FINE"/>
             <property name="eclipselink.logging.parameters" value="true"/>
             <property name="show-sql" value="false"/>

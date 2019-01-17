@@ -16,7 +16,6 @@ import org.r3a.common.vaadin.widget.toolbar.IconToolbar;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -33,6 +32,7 @@ public class PaymentView extends AbstractTaskView implements EntityListener {
 
     @Override
     public void initView(boolean b) throws Exception {
+
         studentPaymentGW = new GridWidget(VStudentPayment.class);
         studentPaymentGW.addEntityListener(this);
         studentPaymentGW.setButtonVisible(IconToolbar.REFRESH_BUTTON, false);
@@ -57,7 +57,7 @@ public class PaymentView extends AbstractTaskView implements EntityListener {
                 + " inner join STUDENT_PAYMENT x2 on x2.student_id=x3.id"//
                 + " where x.deleted=false"//
                 + " order by x2.created desc";
-        FinanceView.fillList(list, sql, new HashMap<>());
+        //FinanceView.fillList(list, sql, new HashMap<>());
 
         ((DBGridModel) studentPaymentGW.getWidgetModel()).setEntities(list);
         try {

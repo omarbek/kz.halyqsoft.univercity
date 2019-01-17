@@ -59,9 +59,13 @@ public class DormBuildingEdit extends AbstractFormWidgetView {
                     FromItem item = fi.addJoin(EJoin.INNER_JOIN,"room",DORM_ROOM.class,"id");
                     FromItem fromItem = item.addJoin(EJoin.INNER_JOIN,"dorm",DORM.class,"id");
                     dsv.addWhere(fromItem,"id",ECriteria.EQUAL,dormStudent.getId());
-                    DORM_STUDENT_VIOLATION violation = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupSingle(dsv);
+                    List<DORM_STUDENT_VIOLATION> violation = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(dsv);
 
-                    SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(violation);
+                    for (DORM_STUDENT_VIOLATION dormStudentViolation: violation){
+
+                        SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(dormStudentViolation);
+
+                    }
 
                 } catch (Exception e) {
                 e.printStackTrace();

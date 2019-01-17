@@ -3,7 +3,6 @@ package kz.halyqsoft.univercity.filter.panel;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.HorizontalLayout;
-import kz.halyqsoft.univercity.filter.FInformationPracticeFilter;
 import kz.halyqsoft.univercity.filter.FStudentPracticeFilter;
 import org.r3a.common.vaadin.widget.filter2.panel.AbstractFilterPanel;
 
@@ -26,6 +25,34 @@ public final class StudentPracticeFilterPanel extends AbstractFilterPanel {
 		}
 
 		af = getFilterComponent("organization");
+		if (af != null) {
+			hl.addComponent(af);
+		}
+
+
+		af = getFilterComponent("department");
+		if (af != null) {
+			hl.addComponent(af);
+		}
+
+		getContent().addComponent(hl);
+		getContent().setComponentAlignment(hl, Alignment.MIDDLE_CENTER);
+
+		hl = new HorizontalLayout();
+		hl.setSpacing(true);
+		hl.setWidthUndefined();
+
+		af = getFilterComponent("speciality");
+		if (af != null) {
+			hl.addComponent(af);
+		}
+
+		af = getFilterComponent("studyYear");
+		if (af != null) {
+			hl.addComponent(af);
+		}
+
+		af = getFilterComponent("groups");
 		if (af != null) {
 			hl.addComponent(af);
 		}
