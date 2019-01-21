@@ -13,6 +13,7 @@ import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER_DATA;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.WEEK_DAY;
 import kz.halyqsoft.univercity.entity.beans.univercity.view.V_EMPLOYEE;
 import kz.halyqsoft.univercity.utils.CommonUtils;
+import org.apache.commons.lang3.SerializationUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
 import org.r3a.common.entity.Entity;
@@ -47,6 +48,7 @@ public class TeacherDialog extends AbstractDialog{
         getContent().setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
         FKFieldModel teacherFM  = (FKFieldModel)prevView.scheduleDetailGM.getFormModel().getFieldModel("teacher");
         QueryModel scheduleDetailTeacherQM = teacherFM.getQueryModel();
+        scheduleDetailTeacherQM = SerializationUtils.clone(scheduleDetailTeacherQM);
         scheduleDetailTeacherQM.addJoin(EJoin.INNER_JOIN,"id" , USERS.class ,"id");
         FromItem vEmployeeFI = scheduleDetailTeacherQM.addJoin(EJoin.INNER_JOIN,"id", V_EMPLOYEE.class,"id");
         scheduleDetailTeacherQM.addWhere(vEmployeeFI , "employeeType" , ECriteria.EQUAL , EMPLOYEE_TYPE.TEACHER_ID);

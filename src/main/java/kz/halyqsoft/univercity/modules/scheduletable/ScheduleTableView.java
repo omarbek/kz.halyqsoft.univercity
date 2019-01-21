@@ -216,7 +216,7 @@ public class ScheduleTableView extends AbstractTaskView {
                     }
                 });
                 QueryModel groupQM = new QueryModel(GROUPS.class);
-                groupQM.addJoin(EJoin.INNER_JOIN , "id" , V_GROUP.class, "id");
+                groupQM.addWhere("deleted", ECriteria.EQUAL ,false);
 
                 BeanItemContainer<GROUPS> groupBIC = null;
                 try{

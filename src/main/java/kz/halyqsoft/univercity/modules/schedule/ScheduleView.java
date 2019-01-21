@@ -121,7 +121,7 @@ public class ScheduleView extends AbstractTaskView {
         FromItem fi = subjectQM.addJoin(EJoin.INNER_JOIN, "id" , SEMESTER_SUBJECT.class , "subject");
         subjectQM.addWhereAnd(fi, "semesterData" ,ECriteria.EQUAL, CommonUtils.getCurrentSemesterData().getId());
         QueryModel<GROUPS> groupsQM = ((FKFieldModel)scheduleDetailGM.getFormModel().getFieldModel("group")).getQueryModel();
-        groupsQM.addJoin(EJoin.INNER_JOIN , "id" ,  V_GROUP.class , "id");
+        groupsQM.addWhere("deleted" , ECriteria.EQUAL , false);
 
         semesterDataCB = new ComboBox();
         semesterDataCB.setWidth(300,Unit.PIXELS);
