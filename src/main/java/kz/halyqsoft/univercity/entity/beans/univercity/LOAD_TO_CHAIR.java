@@ -113,7 +113,7 @@ public class LOAD_TO_CHAIR extends AbstractEntity {
     @Column(name = "TOTAL_COUNT",nullable = false)
     private Double totalCount;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 24)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 24,inGrid = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "CREATED_YEAR_ID", referencedColumnName = "ID")})
