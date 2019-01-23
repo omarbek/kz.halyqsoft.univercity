@@ -2,21 +2,16 @@ package kz.halyqsoft.univercity.modules.workflow.views.dialogs;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.Page;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
-
-import java.io.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-
 import kz.halyqsoft.univercity.entity.beans.univercity.*;
 import kz.halyqsoft.univercity.modules.workflow.views.fields.CustomComponentHL;
 import kz.halyqsoft.univercity.utils.CommonUtils;
 import kz.halyqsoft.univercity.utils.EmployeePdfCreator;
 import kz.halyqsoft.univercity.utils.FieldValidator;
+import kz.halyqsoft.univercity.utils.OpenPdfDialogUtil;
 import org.apache.commons.io.IOUtils;
 import org.r3a.common.dblink.facade.CommonEntityFacadeBean;
 import org.r3a.common.dblink.utils.SessionFacadeFactory;
@@ -34,6 +29,15 @@ import org.r3a.common.vaadin.widget.grid.GridWidget;
 import org.r3a.common.vaadin.widget.grid.model.DBGridModel;
 import org.r3a.common.vaadin.widget.toolbar.IconToolbar;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+
 public class CreateViewDialog extends AbstractDialog implements EntityListener {
     private final String title;
     private AbstractCommonView prevView;
@@ -47,7 +51,7 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
     private boolean customDocumentFlag = false;
     private List<CustomComponentHL> customComponentHLS = new ArrayList<>();
     private Button emptyRelatedUpload = new Button();
-
+    private Button openPdf;
 
     public CreateViewDialog(AbstractCommonView prevView, String title, final DOCUMENT document, List<PDF_DOCUMENT_SIGNER_POST> pdfDocumentSignerPosts) {
         getContent().setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
@@ -76,14 +80,6 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
         HorizontalLayout sectionHL = new HorizontalLayout();
         sectionHL.setSizeFull();
         sectionHL.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
-        Embedded pdf = new Embedded(null, EmployeePdfCreator.getStreamResourceFromDocument( document));
-        pdf.setImmediate(true);
-        pdf.setSizeFull();
-        pdf.setMimeType("application/pdf");
-        pdf.setType(2);
-        pdf.setHeight(270,Unit.PIXELS);
-
-        sectionHL.addComponent(pdf);
 
         VerticalLayout sectionVL = new VerticalLayout();
         sectionVL.setSizeFull();
@@ -206,6 +202,7 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
             DBGridModel dbGridModel = (DBGridModel)this.documentSignerGW.getWidgetModel();
             dbGridModel.getQueryModel().addWhere("document", ECriteria.EQUAL, document.getId());
             this.getContent().addComponent(this.documentSignerGW);
+
         }
 
         this.setYesListener(new AbstractYesButtonListener() {
@@ -242,6 +239,7 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
 
                 try{
                     SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(documentUserRealInputList);
+
                 }catch (Exception e){
                     e.printStackTrace();
                 }
@@ -289,6 +287,26 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
 
             }
         });
+
+        openPdf = new Button(getUILocaleUtil().getCaption("open"));
+        openPdf.setIcon(new ThemeResource("img/book_open.png"));
+        openPdf.addClickListener(new Button.ClickListener(){
+            @Override
+            public void buttonClick(ClickEvent event) {
+
+                if(!isComponentsValid()){
+                    return;
+                }
+
+                deleteDocumentUserRealInputs(document);
+
+                saveAll();
+
+                OpenPdfDialogUtil openPdfDialog = new OpenPdfDialogUtil(document, 80,80);
+            }
+        });
+        getContent().addComponent(openPdf);
+        getContent().setComponentAlignment(openPdf, Alignment.MIDDLE_LEFT);
     }
 
     private void setInabilityOfCustomComponents(boolean flag){
@@ -297,6 +315,56 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
             cc.getValueTA().setEnabled(flag);
         }
     }
+
+    private void saveAll(){
+        List<DOCUMENT_USER_REAL_INPUT> documentUserRealInputList = new ArrayList<>();
+        DOCUMENT_USER_REAL_INPUT documentUserRealInput = new DOCUMENT_USER_REAL_INPUT();
+        for(CustomComponentHL componentt : customComponentHLS){
+            documentUserRealInput.setCreated(new Date());
+            documentUserRealInput.setDocument(document);
+            documentUserRealInput.setValue(componentt.getValueTA().getValue());
+            documentUserRealInput.setDocumentUserInput(componentt.getDocumentUserInput());
+            documentUserRealInputList.add(documentUserRealInput);
+
+        }
+
+        try{
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).create(documentUserRealInputList);
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        document.setMessage(CreateViewDialog.this.messageTA.getValue());
+        document.setDocumentImportance((DOCUMENT_IMPORTANCE)CreateViewDialog.this.importanceCB.getValue());
+        if(!customDocumentFlag){
+            EmployeePdfCreator.createResourceWithReloadingResource(document).getStreamSource().getStream();
+        }
+
+
+        try {
+            SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(document);
+        } catch (Exception var4) {
+            var4.printStackTrace();
+        }
+    }
+
+    boolean isComponentsValid(){
+        for(CustomComponentHL componentt : customComponentHLS){
+            if(!FieldValidator.isNotEmpty(componentt.getValueTA().getValue())){
+                Message.showError(CreateViewDialog.this.getUILocaleUtil().getMessage("pdf.field.empty"));
+                return false;
+            }
+        }
+
+        if(importanceCB.getValue()==null){
+            Message.showError(CreateViewDialog.this.getUILocaleUtil().getMessage("fill.all.fields"));
+            return false;
+        }
+
+        return true;
+    }
+
 
     public String getTitle() {
         return this.title;
@@ -431,6 +499,17 @@ public class CreateViewDialog extends AbstractDialog implements EntityListener {
 
     @Override
     public void handleEntityEvent(EntityEvent entityEvent) {
+    }
+
+    public void deleteDocumentUserRealInputs(DOCUMENT document){
+        QueryModel<DOCUMENT_USER_REAL_INPUT> documentUserRealInputQM = new QueryModel<>(DOCUMENT_USER_REAL_INPUT.
+                class);
+        documentUserRealInputQM.addWhere("document" , ECriteria.EQUAL , document.getId());
+        try{
+            CommonUtils.getQuery().delete(CommonUtils.getQuery().lookup(documentUserRealInputQM));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override

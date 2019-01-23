@@ -2,6 +2,8 @@ package kz.halyqsoft.univercity.modules.catalog;
 
 import kz.halyqsoft.univercity.entity.beans.ROLES;
 import kz.halyqsoft.univercity.entity.beans.TASKS;
+import kz.halyqsoft.univercity.entity.beans.univercity.ACADEMIC_TITLE;
+import kz.halyqsoft.univercity.entity.beans.univercity.SPECIALITY_CODE;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import org.r3a.common.entity.Entity;
 import org.r3a.common.entity.ID;
@@ -75,6 +77,9 @@ class CatalogList {
         addCatalogEntityToList(ABSENCE_CAUSE.class);
         addCatalogEntityToList(PDF_DOCUMENT_TYPE.class);
         addCatalogEntityToList(PRIVILEGES.class);
+
+        addCatalogEntityToList(SPECIALITY_CODE.class);
+        addCatalogEntityToList(ACADEMIC_TITLE.class);
 
         return new ArrayList<>(list);
     }

@@ -369,13 +369,15 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.STUDENT_TEACHER_SUBJECT</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE_ABSENCE_CAUSE</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.LOAD_TO_TEACHER</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.SPECIALITY_CODE</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.ACADEMIC_TITLE</class>
 
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
         <properties>
             <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
-            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:1818/univerdb"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/realpostgre"/>
             <property name="javax.persistence.jdbc.user" value="univer"/>
             <property name="javax.persistence.jdbc.password" value="univer"/>
             <!--<property name="javax.persistence.jdbc.user" value="${javax.persistence.jdbc.user}"/>-->

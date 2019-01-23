@@ -22,3 +22,6 @@ WHERE id=4;
 INSERT INTO DEGREE (DEGREE_NAME, ID) VALUES ('профессор', 7);
 INSERT INTO DEGREE (DEGREE_NAME, ID) VALUES ('доцент', 8);
 INSERT INTO DEGREE (DEGREE_NAME, ID) VALUES ('профессоров (по новой квалификации)', 9);
+
+
+------domik
