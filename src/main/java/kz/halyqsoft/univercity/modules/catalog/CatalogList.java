@@ -75,6 +75,7 @@ class CatalogList {
         addCatalogEntityToList(ABSENCE_CAUSE.class);
         addCatalogEntityToList(PDF_DOCUMENT_TYPE.class);
         addCatalogEntityToList(PRIVILEGES.class);
+        addCatalogEntityToList(CONSTANTS.class);
 
         return new ArrayList<>(list);
     }
