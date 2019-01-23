@@ -38,6 +38,9 @@ public class EMPLOYEE extends USERS {
 	@Column(name = "MASTER", nullable = false)
     private boolean master;
 
+	@FieldInfo(type = EFieldType.BOOLEAN, order = 32, required = false, inGrid = false)
+	@Column(name = "retiree", nullable = false)
+	private boolean retiree;
 	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "employee")
 	private Set<EMPLOYEE_DEPT> employeeDepts;
 	
@@ -74,6 +77,18 @@ public class EMPLOYEE extends USERS {
 
 	public void setEmployeeDepts(Set<EMPLOYEE_DEPT> employeeDepts) {
 		this.employeeDepts = employeeDepts;
+	}
+
+	public static long getSerialVersionUID() {
+		return serialVersionUID;
+	}
+
+	public boolean isRetiree() {
+		return retiree;
+	}
+
+	public void setRetiree(boolean retiree) {
+		this.retiree = retiree;
 	}
 
 	@Override

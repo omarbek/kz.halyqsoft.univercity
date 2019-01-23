@@ -1,5 +1,6 @@
 package kz.halyqsoft.univercity.entity.beans.univercity;
 
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDY_YEAR;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT;
@@ -111,6 +112,12 @@ public class LOAD_TO_CHAIR extends AbstractEntity {
     @FieldInfo(type = EFieldType.DOUBLE, order = 23, inEdit = false)
     @Column(name = "TOTAL_COUNT",nullable = false)
     private Double totalCount;
+
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 24)
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "CREATED_YEAR_ID", referencedColumnName = "ID")})
+    private ENTRANCE_YEAR createdYear;
 
     public SUBJECT getSubject() {
         return subject;
@@ -278,5 +285,13 @@ public class LOAD_TO_CHAIR extends AbstractEntity {
 
     public void setTotalCount(Double totalCount) {
         this.totalCount = totalCount;
+    }
+
+    public ENTRANCE_YEAR getCreatedYear() {
+        return createdYear;
+    }
+
+    public void setCreatedYear(ENTRANCE_YEAR createdYear) {
+        this.createdYear = createdYear;
     }
 }
