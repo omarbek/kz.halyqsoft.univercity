@@ -44,6 +44,19 @@ public class EMPLOYEE_DEGREE extends USER_DOCUMENT {
 			@JoinColumn(name = "SPECIALITY_ID", referencedColumnName = "ID")})
 	private SPECIALITY speciality;
 
+	@FieldInfo(type = EFieldType.FK_COMBO, order = 10)
+	@ManyToOne
+	@JoinColumns({
+			@JoinColumn(name = "SPECIALITY_CODE_ID", referencedColumnName = "ID")})
+	private SPECIALITY_CODE specialityCode;
+
+	@FieldInfo(type = EFieldType.FK_COMBO, order = 11)
+	@ManyToOne
+	@JoinColumns({
+			@JoinColumn(name = "ACADEMIC_TITLE_ID", referencedColumnName = "ID")})
+	private ACADEMIC_TITLE academicTitle;
+
+
 
 	public EMPLOYEE_DEGREE() {
 	}
@@ -90,5 +103,21 @@ public class EMPLOYEE_DEGREE extends USER_DOCUMENT {
 
 	public void setSpeciality(SPECIALITY speciality) {
 		this.speciality = speciality;
+	}
+
+	public SPECIALITY_CODE getSpecialityCode() {
+		return specialityCode;
+	}
+
+	public void setSpecialityCode(SPECIALITY_CODE specialityCode) {
+		this.specialityCode = specialityCode;
+	}
+
+	public ACADEMIC_TITLE getAcademicTitle() {
+		return academicTitle;
+	}
+
+	public void setAcademicTitle(ACADEMIC_TITLE academicTitle) {
+		this.academicTitle = academicTitle;
 	}
 }

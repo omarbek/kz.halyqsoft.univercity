@@ -377,25 +377,23 @@ public class DocumentDownloadView extends BaseView implements EntityListener {
                     };
                     tableHeader.addAll(Arrays.asList(headers));
 
-                    String sql = "\n" +
-                            "SELECT  es.status_name,trim(u.LAST_NAME || ' ' || u.FIRST_NAME || ' ' || coalesce(u.MIDDLE_NAME, '')) FIO,\n" +
+                    String sql = "SELECT  es.status_name,trim(u.LAST_NAME || ' ' || u.FIRST_NAME || ' ' || coalesce(u.MIDDLE_NAME, '')) FIO,\n" +
                             "  u.birth_date,p.post_name,edd.school_name,Extract(YEAR from justify_days(  sum(age(case when pe.dismiss_date isnull then now()\n" +
-                            "when pe.dismiss_date NOTNULL THEN pe.dismiss_date END ,pe.hire_date)))) || ' год',d3.degree_name\n" +
-                            " FROM users u\n" +
-                            "INNER JOIN employee e ON u.id = e.id\n" +
-                            "INNER JOIN employee_dept ed ON e.id = ed.employee_id\n" +
+                            "                                                                                    when pe.dismiss_date NOTNULL THEN pe.dismiss_date END ,pe.hire_date)))) || ' год',d3.degree_name\n" +
+                            "FROM users u\n" +
+                            "  INNER JOIN employee e ON u.id = e.id\n" +
+                            "  INNER JOIN employee_dept ed ON e.id = ed.employee_id\n" +
                             "  INNER JOIN employee_status es ON e.employee_status_id = es.id\n" +
-                            "INNER JOIN department d2 ON ed.dept_id = d2.id\n" +
-                            "  INNER JOIN user_document userd on u.id = userd.user_id\n" +
-                            "  INNER JOIN education_doc edd on userd.id = edd.id\n" +
-                            "  INNER   JOIN previous_experience pe on pe.employee_id=e.id\n" +
-                            "INNER JOIN post p ON ed.post_id = p.id\n" +
+                            "  INNER JOIN department d2 ON ed.dept_id = d2.id\n" +
+                            "  INNER JOIN user_document userd on e.id = userd.user_id\n" +
+                            "  LEFT JOIN education_doc edd on userd.id = edd.id\n" +
+                            "  LEFT   JOIN previous_experience pe on pe.employee_id=e.id\n" +
+                            "  INNER JOIN post p ON ed.post_id = p.id\n" +
                             "  LEFT JOIN employee_degree ed2 ON userd.id = ed2.id\n" +
-                            " LEFT JOIN degree d3 ON ed2.degree_id = d3.id " +
-                            "WHERE d2.dept_name= '" + departmentCB.getValue() + "'" +
+                            "  LEFT JOIN degree d3 ON ed2.degree_id = d3.id " +
+                            " WHERE d2.dept_name= '" + departmentCB.getValue() + "'" +
                             " GROUP BY  u.birth_date,p.post_name,edd.school_name,FIO,u.id,es.status_name,d3.degree_name;";
 
-                    List<String> list = new ArrayList<>();
                     ArrayList<String> dep = new ArrayList();
                     for (int i = 0; i < 8; i++) {
                         dep.add(i == 0 ? departmentCB.getValue().toString() : " ");
@@ -432,7 +430,6 @@ public class DocumentDownloadView extends BaseView implements EntityListener {
                     String fileName = "document";
 
                     PrintDialog printDialog = new PrintDialog(tableHeader, tableBody, CommonUtils.getUILocaleUtil().getCaption("print"), fileName);
-                    //PrintDialog printDialog1 = new PrintDialog(tableHeader1, tableBody1, CommonUtils.getUILocaleUtil().getCaption("print"), fileName);
 
                 } else {
                     org.r3a.common.vaadin.widget.dialog.Message.showInfo(getUILocaleUtil().getMessage("more.records.not.required"));
@@ -452,8 +449,6 @@ public class DocumentDownloadView extends BaseView implements EntityListener {
                         "Возраст до 35 лет", "Возраст 35-50 лет", "Возраст свыше 50", "Пенсионный"
                 };
                 tableHeader1.addAll(Arrays.asList(headers1));
-
-                List<String> list = new ArrayList<>();
 
                 String sql = "SELECT d2.dept_name,\n" +
                         "  count(e.employee_status_id) || '/ ' || sum(CASE WHEN e.employee_status_id = 1 then 1 ELSE 0 end),\n" +
@@ -539,10 +534,8 @@ public class DocumentDownloadView extends BaseView implements EntityListener {
                             ArrayList<String> valuesList = new ArrayList();
                             for (int i = 0; i < oo.length; i++) {
                                 valuesList.add(oo[i] != null ? String.valueOf(oo[i]) : "");
-
                             }
                             tableBody1.add(valuesList);
-
                         }
                     }
                 } catch (Exception ex) {
@@ -551,8 +544,6 @@ public class DocumentDownloadView extends BaseView implements EntityListener {
 
 
                 String fileName = "document";
-
-//                    PrintDialog printDialog = new PrintDialog(tableHeader, tableBody, CommonUtils.getUILocaleUtil().getCaption("print"), fileName);
                 PrintDialog printDialog1 = new PrintDialog(tableHeader1, tableBody1, CommonUtils.getUILocaleUtil().getCaption("print"), fileName);
 
             }

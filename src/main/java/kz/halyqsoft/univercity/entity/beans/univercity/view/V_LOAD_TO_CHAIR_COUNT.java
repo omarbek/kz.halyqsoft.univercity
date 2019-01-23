@@ -1,7 +1,7 @@
 package kz.halyqsoft.univercity.entity.beans.univercity.view;
 
 import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEPARTMENT;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
@@ -83,6 +83,12 @@ public class V_LOAD_TO_CHAIR_COUNT extends AbstractEntity{
     @FieldInfo(type = EFieldType.DOUBLE, order = 22)
     @Column(name = "TOTAL_COUNT")
     private double totalCount;
+
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 23,inGrid = false)
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "CREATED_YEAR_ID", referencedColumnName = "ID")})
+    private ENTRANCE_YEAR createdYear;
 
     public Integer getStudyYear() {
         return studyYear;
@@ -210,5 +216,13 @@ public class V_LOAD_TO_CHAIR_COUNT extends AbstractEntity{
 
     public void setSemester(SEMESTER semester) {
         this.semester = semester;
+    }
+
+    public ENTRANCE_YEAR getCreatedYear() {
+        return createdYear;
+    }
+
+    public void setCreatedYear(ENTRANCE_YEAR createdYear) {
+        this.createdYear = createdYear;
     }
 }

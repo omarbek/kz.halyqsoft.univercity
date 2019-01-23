@@ -3031,6 +3031,8 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
                 ed.setDissertationTopic(ved.getDissertationTopic());
                 ed.setCandidate(ved.getCandidate());
                 ed.setSpeciality(ved.getSpeciality());
+                ed.setSpecialityCode(ved.getSpecialityCode());
+                ed.setAcademicTitle(ved.getAcademicTitle());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).createNoID(ed);
 
                 QueryModel scientificDegreeQM = ((DBTableModel) scientificDegreeTW.getWidgetModel()).getQueryModel();
@@ -3052,6 +3054,8 @@ public class EmployeeEdit extends AbstractFormWidgetView implements PhotoWidgetL
                 ed.setDissertationTopic(ved.getDissertationTopic());
                 ed.setCandidate(ved.getCandidate());
                 ed.setSpeciality(ved.getSpeciality());
+                ed.setSpecialityCode(ved.getSpecialityCode());
+                ed.setAcademicTitle(ved.getAcademicTitle());
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).merge(ed);
                 scientificDegreeTW.refresh();
                 showSavedNotification();

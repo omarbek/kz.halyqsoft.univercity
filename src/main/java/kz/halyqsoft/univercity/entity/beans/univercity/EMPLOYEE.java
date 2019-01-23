@@ -38,7 +38,7 @@ public class EMPLOYEE extends USERS {
 	@Column(name = "MASTER", nullable = false)
     private boolean master;
 
-	@FieldInfo(type = EFieldType.BOOLEAN, order = 32, required = false, inGrid = false)
+	@FieldInfo(type = EFieldType.BOOLEAN, order = 33, required = false, inGrid = false)
 	@Column(name = "retiree", nullable = false)
 	private boolean retiree;
 	@OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, mappedBy = "employee")
