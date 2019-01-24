@@ -1,27 +1,20 @@
 package kz.halyqsoft.univercity.entity.beans.univercity.view;
 
+import kz.halyqsoft.univercity.entity.beans.univercity.ACADEMIC_TITLE;
 import kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE;
+import kz.halyqsoft.univercity.entity.beans.univercity.SPECIALITY_CODE;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.CANDIDATE;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEGREE;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.QUALIFICATION;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SPECIALITY;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
 import org.r3a.common.entity.file.FileBean;
 
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.ManyToOne;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Transient;
 
 /**
  * @author Omarbek
@@ -74,7 +67,7 @@ public class V_EMPLOYEE_DEGREE extends AbstractEntity {
 	@FieldInfo(type = EFieldType.FK_COMBO, required = false, order = 9)
 	@ManyToOne
 	@JoinColumns({
-			@JoinColumn(name = "CANDIDATE_ID", referencedColumnName = "ID")})
+			@JoinColumn(name = "CONDIDATE_ID", referencedColumnName = "ID")})
 	private CANDIDATE candidate;
 
 	@FieldInfo(type = EFieldType.FK_COMBO, required = false, order = 10)
@@ -82,6 +75,18 @@ public class V_EMPLOYEE_DEGREE extends AbstractEntity {
 	@JoinColumns({
 			@JoinColumn(name = "SPECIALITY_ID", referencedColumnName = "ID")})
 	private SPECIALITY speciality;
+
+	@FieldInfo(type = EFieldType.FK_COMBO, required = false, order = 11)
+	@ManyToOne
+	@JoinColumns({
+			@JoinColumn(name = "SPECIALITY_CODE_ID", referencedColumnName = "ID")})
+	private SPECIALITY_CODE specialityCode;
+
+	@FieldInfo(type = EFieldType.FK_COMBO, required = false, order = 12)
+	@ManyToOne
+	@JoinColumns({
+			@JoinColumn(name = "ACADEMIC_TITLE_ID", referencedColumnName = "ID")})
+	private ACADEMIC_TITLE academicTitle;
 
 
 	@FieldInfo(type = EFieldType.BOOLEAN, order = 13, required = false, inEdit = false, inGrid = false, inView = false)
@@ -193,5 +198,21 @@ public class V_EMPLOYEE_DEGREE extends AbstractEntity {
 
 	public void setSpeciality(SPECIALITY speciality) {
 		this.speciality = speciality;
+	}
+
+	public SPECIALITY_CODE getSpecialityCode() {
+		return specialityCode;
+	}
+
+	public void setSpecialityCode(SPECIALITY_CODE specialityCode) {
+		this.specialityCode = specialityCode;
+	}
+
+	public ACADEMIC_TITLE getAcademicTitle() {
+		return academicTitle;
+	}
+
+	public void setAcademicTitle(ACADEMIC_TITLE academicTitle) {
+		this.academicTitle = academicTitle;
 	}
 }
