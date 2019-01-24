@@ -21,35 +21,16 @@ public class Main {
         for (int i = 0; i < array.length; i++) {
             array[i] = scanner.nextInt();
         }
-        int sum = 0;
-        int max = array[0];
-        int maxNumber = 0;
-        int min = array[0];
-        int minNumber = 0;
-        for (int i = 0; i < array.length; i++) {
-            if (array[i] > 0) {
-                sum += array[i];
-            }
-            if (array[i] > max) {
-                max = array[i];
-                maxNumber = i;
-            }
-            if (array[i] < min) {
-                min = array[i];
-                minNumber = i;
-            }
+        int sumOfFifthCourse=0;
+        int sumOfThirdCourse=0;
+        int sumOfFirstCourse=0;
+        int currentSum;
+        for(int i=0;i<array.length;i++){
+            currentSum=sumOfFifthCourse+array[i];
+            sumOfFifthCourse+=currentSum;
         }
-        int mult = 1;
-        if (maxNumber > minNumber) {
-            for (int i = minNumber + 1; i < maxNumber; i++) {
-                mult *= array[i];
-            }
-        } else {
-            for (int i = maxNumber + 1; i < minNumber; i++) {
-                mult *= array[i];
-            }
-        }
-        printWriter.print(sum + " " + mult);
+
+        printWriter.print(sumOfFifthCourse);
         printWriter.close();
     }
 }
