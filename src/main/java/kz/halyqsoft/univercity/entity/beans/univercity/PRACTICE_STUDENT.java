@@ -34,6 +34,12 @@ public class PRACTICE_STUDENT extends AbstractEntity {
     @Temporal(TemporalType.TIMESTAMP)
     Date comeOutDate;
 
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 5,required = false)
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "employee_id", referencedColumnName = "ID", nullable = false)})
+    USERS employee;
+
     public PRACTICE_STUDENT() {
     }
 
@@ -67,5 +73,13 @@ public class PRACTICE_STUDENT extends AbstractEntity {
 
     public void setComeOutDate(Date comeOutDate) {
         this.comeOutDate = comeOutDate;
+    }
+
+    public USERS getEmployee() {
+        return employee;
+    }
+
+    public void setEmployee(USERS employee) {
+        this.employee = employee;
     }
 }

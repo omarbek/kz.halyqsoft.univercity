@@ -66,7 +66,7 @@ final class ScheduleWidget extends AbstractWidgetPanel {
 
             matrixGL = new GridLayout();
             matrixGL.setHeight(100, Unit.PERCENTAGE);
-            matrixGL.setWidth(78, Unit.PERCENTAGE);
+            matrixGL.setWidth(100, Unit.PERCENTAGE);
             matrixGL.setColumns(cols);
             matrixGL.setRows(rows);
 

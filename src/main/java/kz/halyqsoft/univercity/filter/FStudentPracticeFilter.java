@@ -1,5 +1,6 @@
 package kz.halyqsoft.univercity.filter;
 
+import kz.halyqsoft.univercity.entity.beans.univercity.EMPLOYEE;
 import kz.halyqsoft.univercity.entity.beans.univercity.GROUPS;
 import kz.halyqsoft.univercity.entity.beans.univercity.STUDENT;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.DEPARTMENT;
@@ -20,6 +21,7 @@ public final class FStudentPracticeFilter extends AbstractFilterBean {
     private GROUPS groups;
     private Date comeInDate;
     private Date comeOutDate;
+    private EMPLOYEE employee;
 
     public STUDENT getStudent() {
         return student;
@@ -88,9 +90,17 @@ public final class FStudentPracticeFilter extends AbstractFilterBean {
         this.groups = groups;
     }
 
+    public EMPLOYEE getEmployee() {
+        return employee;
+    }
+
+    public void setEmployee(EMPLOYEE employee) {
+        this.employee = employee;
+    }
+
     @Override
     public boolean hasFilter() {
         return !( comeInDate == null && comeOutDate == null && department == null &&
-                speciality == null && studyYear == null && groups ==null && organization == null && student ==null );
+                speciality == null && studyYear == null && groups ==null && organization == null && student ==null && employee==null );
     }
 }

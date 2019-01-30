@@ -968,8 +968,6 @@ public final class StudentEdit extends AbstractFormWidgetView implements PhotoWi
         QueryModel languageLevelQM = languageLevelFM.getQueryModel();
         languageLevelQM.addOrder("levelName");
 
-        // List<V_USER_LANGUAGE> langs =
-        // SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(languageQM1);
         QueryModel languageQM = languageTM.getQueryModel();
         languageQM.addWhere("user", ECriteria.EQUAL, userId);
 

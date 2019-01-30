@@ -68,6 +68,11 @@ public final class StudentPracticeFilterPanel extends AbstractFilterPanel {
 			hl.addComponent(af);
 		}
 
+		af = getFilterComponent("employee");
+		if (af != null) {
+			hl.addComponent(af);
+		}
+
 
 		getContent().addComponent(hl);
 		getContent().setComponentAlignment(hl, Alignment.MIDDLE_CENTER);

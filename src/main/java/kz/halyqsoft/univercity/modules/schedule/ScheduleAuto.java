@@ -36,6 +36,7 @@ public class ScheduleAuto extends AbstractCommonView {
 
     private VerticalLayout tablesVL = new VerticalLayout();
     private ComboBox groupCB;
+    private HorizontalLayout scHL= new HorizontalLayout();
 
     private static SEMESTER_DATA currentSemesterData;
 
@@ -212,10 +213,22 @@ public class ScheduleAuto extends AbstractCommonView {
     }
 
     private void refresh(ComboBox groupCB) throws Exception {
+
+//        ScheduleWidget scheduleWidget = new ScheduleWidget(currentSemesterData, (GROUPS) groupCB.getValue());
+//        scheduleWidget.refresh();
+//        tablesVL.removeAllComponents();
+//        tablesVL.addComponent(scheduleWidget);
+
+        HorizontalLayout hl=new HorizontalLayout();
         ScheduleWidget scheduleWidget = new ScheduleWidget(currentSemesterData, (GROUPS) groupCB.getValue());
         scheduleWidget.refresh();
-        tablesVL.removeAllComponents();
-        tablesVL.addComponent(scheduleWidget);
+        Label title = new Label(((GROUPS) groupCB.getValue()).getName());
+//        mainVL.addComponent(title);
+        hl.addComponent(scheduleWidget);
+        scHL.addComponent(hl);
+        hl.setWidth(600, Unit.PIXELS);
+        mainVL.setWidth(2400, Unit.PIXELS);
+        mainVL.addComponent(scHL);
     }
 
     private void generateSchedule() throws Exception {

@@ -171,7 +171,6 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
         informationPracticeGW.getToolbarPanel().addComponent(downloadTableBtn);
         informationPracticeGW.getToolbarPanel().setComponentAlignment(downloadTableBtn, Alignment.MIDDLE_RIGHT);
 
-
         informationPracticeGM = (DBGridModel) informationPracticeGW.getWidgetModel();
         informationPracticeGM.setRefreshType(ERefreshType.MANUAL);
         informationPracticeGM.setMultiSelect(false);
@@ -183,7 +182,6 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
         FKFieldModel employeeFM = (FKFieldModel) informationPracticeGM.getFormModel().getFieldModel("employee");
         employeeFM.getQueryModel().addJoin(EJoin.INNER_JOIN, "id", EMPLOYEE.class, "id");
         employeeFM.getQueryModel().addWhere("deleted", ECriteria.EQUAL, false);
-
 
         studentPracticeGW = new GridWidget(PRACTICE_STUDENT.class);
         studentPracticeGW.setImmediate(true);
@@ -204,6 +202,10 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
         FromItem fi2 = fi1.addJoin(EJoin.INNER_JOIN, "id", STUDENT_EDUCATION.class, "student_id");
         FromItem fi3 = fi2.addJoin(EJoin.INNER_JOIN, "groups_id", GROUPS.class, "id");
         FromItem fi4 = fi3.addJoin(EJoin.INNER_JOIN, "id", PRACTICE_INFORMATION.class, "groups_id");
+
+        FKFieldModel employeeFM1 = (FKFieldModel) studentPracticeGM.getFormModel().getFieldModel("employee");
+        employeeFM1.getQueryModel().addJoin(EJoin.INNER_JOIN, "id", EMPLOYEE.class, "id");
+        employeeFM1.getQueryModel().addWhere("deleted", ECriteria.EQUAL, false);
 
         studentFM.getQueryModel().addWhere("deleted", ECriteria.EQUAL, false);
         studentFM.getQueryModel().addWhereAnd(fi3, "deleted", ECriteria.EQUAL, false);
@@ -346,6 +348,19 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(groupQM));
         groupCB.setContainerDataSource(groupBIC);
         studentPracticeFP.addFilterComponent("groups", groupCB);
+
+        ComboBox employeeCB1 = new ComboBox();
+        employeeCB1.setNullSelectionAllowed(true);
+        employeeCB1.setTextInputAllowed(true);
+        employeeCB1.setFilteringMode(FilteringMode.CONTAINS);
+        employeeCB1.setWidth(200, Unit.PIXELS);
+        QueryModel<USERS> employeeQM1 = new QueryModel<>(USERS.class);
+        employeeQM1.addJoin(EJoin.INNER_JOIN, "id", EMPLOYEE.class, "id");
+        employeeQM1.addWhere("deleted", ECriteria.EQUAL, false);
+        BeanItemContainer<USERS> employeeBIC1 = new BeanItemContainer<>(USERS.class,
+                SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(employeeQM1));
+        employeeCB1.setContainerDataSource(employeeBIC1);
+        studentPracticeFP.addFilterComponent("employee", employeeCB1);
 
         DateField comeInDF = new DateField();
         studentPracticeFP.addFilterComponent("comeInDate", comeInDF);
@@ -500,7 +515,7 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
                             "FROM  v_student vs\n" +
                             "LEFT JOIN student_edu_rate ser on vs.id=ser.student_id\n" +
                             "WHERE vs.groups_id=" + pi.getGroups().getId();
-//
+
                     Map<Integer, Object> par = new HashMap<>();
                     try {
                         List<Object> tmpList = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookupItemsList(sql1, par);
@@ -535,7 +550,6 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
         } catch (Exception e1) {
             e1.printStackTrace();
         }
-
 
         document.close();
 
@@ -727,6 +741,7 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
                 sb.append("se.groups_id = ?" + i++);
 
             }
+
             if (fStudentPracticeFilter.getStudyYear() != null) {
 
                 if (i != 1) {
@@ -756,6 +771,15 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
                 sb.append(" date_trunc ('day' ,  ps.come_out ) = date_trunc('day' , TIMESTAMP  '" + CommonUtils.getFormattedDate(fStudentPracticeFilter.getComeOutDate()) + "') ");
 
             }
+            if (fStudentPracticeFilter.getEmployee() != null) {
+
+                if (i != 1) {
+                    sb.append(" and ");
+                }
+                params.put(i, fStudentPracticeFilter.getEmployee().getId().getId());
+                sb.append("ps.employee_id = ?" + i++);
+
+            }
 
             List<PRACTICE_STUDENT> list = new ArrayList<>();
 
@@ -764,7 +788,7 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
             }
             String sql = " select ps.*, se.* from practice_student ps\n" +
                     "inner join student s2 on ps.student_id = s2.id\n" +
-                    "inner join student_education se on s2.id = se.student_id\n"
+                    "  inner join student_education se on s2.id = se.student_id\n"
                     + sb.toString();
             try {
 
@@ -790,6 +814,12 @@ public class PracticeView extends AbstractTaskView implements FilterPanelListene
 
                         practiceStudent.setComeInDate((Date) oo[3]);
                         practiceStudent.setComeOutDate((Date) oo[4]);
+
+                        try {
+                            practiceStudent.setEmployee(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(USERS.class, ID.valueOf((Long) oo[5])));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
 
                         list.add(practiceStudent);
                     }
