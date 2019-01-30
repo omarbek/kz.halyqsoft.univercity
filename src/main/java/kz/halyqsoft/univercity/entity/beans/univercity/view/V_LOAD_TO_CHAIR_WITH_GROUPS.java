@@ -3,10 +3,7 @@ package kz.halyqsoft.univercity.entity.beans.univercity.view;
 import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM;
 import kz.halyqsoft.univercity.entity.beans.univercity.GROUPS;
 import kz.halyqsoft.univercity.entity.beans.univercity.STREAM;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDY_YEAR;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
@@ -126,6 +123,12 @@ public class V_LOAD_TO_CHAIR_WITH_GROUPS extends AbstractEntity {
     @JoinColumns({
             @JoinColumn(name = "CREATED_YEAR_ID", referencedColumnName = "ID")})
     private ENTRANCE_YEAR createdYear;
+
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 25, inGrid = false)
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "CHAIR_ID", referencedColumnName = "ID")})
+    private DEPARTMENT department;
 
     public SUBJECT getSubject() {
         return subject;
@@ -309,5 +312,13 @@ public class V_LOAD_TO_CHAIR_WITH_GROUPS extends AbstractEntity {
 
     public void setCreatedYear(ENTRANCE_YEAR createdYear) {
         this.createdYear = createdYear;
+    }
+
+    public DEPARTMENT getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(DEPARTMENT department) {
+        this.department = department;
     }
 }

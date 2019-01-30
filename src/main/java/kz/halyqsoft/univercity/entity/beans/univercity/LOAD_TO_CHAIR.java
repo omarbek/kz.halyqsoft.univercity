@@ -1,9 +1,6 @@
 package kz.halyqsoft.univercity.entity.beans.univercity;
 
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDY_YEAR;
-import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
 import org.r3a.common.entity.AbstractEntity;
 import org.r3a.common.entity.EFieldType;
 import org.r3a.common.entity.FieldInfo;
@@ -29,7 +26,7 @@ public class LOAD_TO_CHAIR extends AbstractEntity {
             @JoinColumn(name = "CURRICULUM_ID", referencedColumnName = "ID")})
     private CURRICULUM curriculum;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 3, columnWidth = 80,readOnlyFixed = true)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 3, columnWidth = 80, readOnlyFixed = true)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "STUDY_YEAR_ID", referencedColumnName = "ID")})
@@ -54,11 +51,11 @@ public class LOAD_TO_CHAIR extends AbstractEntity {
     private SEMESTER semester;
 
     @FieldInfo(type = EFieldType.INTEGER, order = 9, inEdit = false)
-    @Column(name = "STUDENT_NUMBER",nullable = false)
+    @Column(name = "STUDENT_NUMBER", nullable = false)
     private Integer studentNumber;
 
     @FieldInfo(type = EFieldType.DOUBLE, order = 10, inEdit = false)
-    @Column(name = "CREDIT",nullable = false)
+    @Column(name = "CREDIT", nullable = false)
     private Double credit;
 
     @FieldInfo(type = EFieldType.DOUBLE, order = 11)
@@ -110,14 +107,20 @@ public class LOAD_TO_CHAIR extends AbstractEntity {
     private Double protectDiplomaCount;
 
     @FieldInfo(type = EFieldType.DOUBLE, order = 23, inEdit = false)
-    @Column(name = "TOTAL_COUNT",nullable = false)
+    @Column(name = "TOTAL_COUNT", nullable = false)
     private Double totalCount;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 24,inGrid = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 24, inGrid = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "CREATED_YEAR_ID", referencedColumnName = "ID")})
     private ENTRANCE_YEAR createdYear;
+
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 25, inGrid = false)
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "CHAIR_ID", referencedColumnName = "ID")})
+    private DEPARTMENT department;
 
     public SUBJECT getSubject() {
         return subject;
@@ -293,5 +296,13 @@ public class LOAD_TO_CHAIR extends AbstractEntity {
 
     public void setCreatedYear(ENTRANCE_YEAR createdYear) {
         this.createdYear = createdYear;
+    }
+
+    public DEPARTMENT getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(DEPARTMENT department) {
+        this.department = department;
     }
 }
