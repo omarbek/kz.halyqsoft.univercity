@@ -204,7 +204,6 @@ public class DepartmentAbsent implements EntityListener{
         employeeGW = new GridWidget(VLateEmployee.class);
         employeeGW.setImmediate(true);
         employeeGW.showToolbar(false);
-
         employeeGW.setButtonVisible(AbstractToolbar.REFRESH_BUTTON, true);
         employeeGW.addEntityListener(this);
 

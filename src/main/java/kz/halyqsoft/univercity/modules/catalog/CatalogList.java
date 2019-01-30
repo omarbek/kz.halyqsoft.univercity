@@ -77,6 +77,7 @@ class CatalogList {
         addCatalogEntityToList(ABSENCE_CAUSE.class);
         addCatalogEntityToList(PDF_DOCUMENT_TYPE.class);
         addCatalogEntityToList(PRIVILEGES.class);
+        addCatalogEntityToList(CONSTANTS.class);
 
         addCatalogEntityToList(SPECIALITY_CODE.class);
         addCatalogEntityToList(ACADEMIC_TITLE.class);

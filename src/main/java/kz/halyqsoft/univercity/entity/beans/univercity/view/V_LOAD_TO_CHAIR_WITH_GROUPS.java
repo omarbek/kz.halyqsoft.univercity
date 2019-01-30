@@ -3,6 +3,7 @@ package kz.halyqsoft.univercity.entity.beans.univercity.view;
 import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM;
 import kz.halyqsoft.univercity.entity.beans.univercity.GROUPS;
 import kz.halyqsoft.univercity.entity.beans.univercity.STREAM;
+import kz.halyqsoft.univercity.entity.beans.univercity.catalog.ENTRANCE_YEAR;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SEMESTER;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.STUDY_YEAR;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.SUBJECT;
@@ -119,6 +120,12 @@ public class V_LOAD_TO_CHAIR_WITH_GROUPS extends AbstractEntity {
     @FieldInfo(type = EFieldType.DOUBLE, order = 23, inEdit = false)
     @Column(name = "TOTAL_COUNT",nullable = false)
     private Double totalCount;
+
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 24,inGrid = false)
+    @ManyToOne
+    @JoinColumns({
+            @JoinColumn(name = "CREATED_YEAR_ID", referencedColumnName = "ID")})
+    private ENTRANCE_YEAR createdYear;
 
     public SUBJECT getSubject() {
         return subject;
@@ -294,5 +301,13 @@ public class V_LOAD_TO_CHAIR_WITH_GROUPS extends AbstractEntity {
 
     public void setGroups(String groups) {
         this.groups = groups;
+    }
+
+    public ENTRANCE_YEAR getCreatedYear() {
+        return createdYear;
+    }
+
+    public void setCreatedYear(ENTRANCE_YEAR createdYear) {
+        this.createdYear = createdYear;
     }
 }

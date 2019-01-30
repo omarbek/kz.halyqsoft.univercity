@@ -159,6 +159,7 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.ABSENCE_CAUSE</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.PDF_DOCUMENT_TYPE</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.PRIVILEGES</class>
+        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.CONSTANTS</class>
 
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_SPECIALITY</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.view.V_ORGANIZATION</class>
@@ -372,14 +373,13 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.SPECIALITY_CODE</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.ACADEMIC_TITLE</class>
 
-
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
         <properties>
             <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
-            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/realpostgre"/>
-            <property name="javax.persistence.jdbc.user" value="univer"/>
-            <property name="javax.persistence.jdbc.password" value="univer"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/univerdb"/>
+            <property name="javax.persistence.jdbc.user" value="postgres"/>
+            <property name="javax.persistence.jdbc.password" value="ukpu18!"/>
             <!--<property name="javax.persistence.jdbc.user" value="${javax.persistence.jdbc.user}"/>-->
             <!--<property name="javax.persistence.jdbc.password" value="${javax.persistence.jdbc.password}"/>-->
             <property name="eclipselink.connection-pool.default.initial" value="1"/>

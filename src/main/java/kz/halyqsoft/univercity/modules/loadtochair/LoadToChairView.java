@@ -4,13 +4,19 @@ import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.shared.ui.combobox.FilteringMode;
-import com.vaadin.ui.*;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.HorizontalLayout;
 import kz.halyqsoft.univercity.entity.beans.univercity.CURRICULUM;
 import kz.halyqsoft.univercity.entity.beans.univercity.GROUPS;
 import kz.halyqsoft.univercity.entity.beans.univercity.LOAD_TO_CHAIR;
 import kz.halyqsoft.univercity.entity.beans.univercity.STREAM_GROUP;
 import kz.halyqsoft.univercity.entity.beans.univercity.catalog.*;
-import kz.halyqsoft.univercity.entity.beans.univercity.view.*;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_GROUP;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_LOAD_TO_CHAIR_COUNT;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_LOAD_TO_CHAIR_COUNT_ALL;
+import kz.halyqsoft.univercity.entity.beans.univercity.view.V_LOAD_TO_CHAIR_WITH_GROUPS;
 import kz.halyqsoft.univercity.filter.FChairFilter;
 import kz.halyqsoft.univercity.filter.panel.ChairFilterPanel;
 import kz.halyqsoft.univercity.modules.stream.dialogs.DetailDialog;
@@ -62,21 +68,39 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
     private ComboBox studyYearCB;
     private ComboBox diplomaTypeCB;
     private ComboBox semesterPeriodCB;
+    private ComboBox yearCB;
 
-    private int withTeacherCount = 5;
-    private double ratingCount = 0.25;
-    private double ticketExamCount = 0.25;
-    private int notTicketExamCount = 2;
-    private double controlCount = 0.2;
-    private double courseWorkCount = 0.25;
+    private double withTeacherCount;
+    private double ratingCount;
+    private double ticketExamCount;
+    private double notTicketExamCount;
+    private double controlCount;
+    private double courseWorkCount;
 
-    private int diplomaCount = 12;
-    private double mekCount = 0.5;
-    private double protectDiplomaCount = 0.6;
+    private double diplomaCount;
+    private double mekCount;
+    private double protectDiplomaCount;
 
     public LoadToChairView(AbstractTask task) throws Exception {
         super(task);
         filterPanel = new ChairFilterPanel(new FChairFilter());
+
+        withTeacherCount = setValue(CONSTANTS.WITH_TEACHER);
+        ratingCount = setValue(CONSTANTS.RATING);
+        ticketExamCount = setValue(CONSTANTS.TICKET);
+        notTicketExamCount = setValue(CONSTANTS.EXAM);
+        controlCount = setValue(CONSTANTS.CONTROL);
+        courseWorkCount = setValue(CONSTANTS.COURSE);
+        diplomaCount = setValue(CONSTANTS.DIPLOMA);
+        mekCount = setValue(CONSTANTS.MEK);
+        protectDiplomaCount = setValue(CONSTANTS.PROTECT_DIPLOMA);
+    }
+
+    private double setValue(ID id) throws Exception {
+        QueryModel<CONSTANTS> constantsQM = new QueryModel<>(CONSTANTS.class);
+        constantsQM.addWhere("id", ECriteria.EQUAL, id);
+        CONSTANTS constant = CommonUtils.getQuery().lookupSingle(constantsQM);
+        return constant.getValue();
     }
 
 
@@ -89,7 +113,7 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
         QueryModel<ENTRANCE_YEAR> entranceYearQM = new QueryModel<>(ENTRANCE_YEAR.class);
         BeanItemContainer<ENTRANCE_YEAR> entranceYearBIC = new BeanItemContainer<>(ENTRANCE_YEAR.class,
                 CommonUtils.getQuery().lookup(entranceYearQM));
-        ComboBox yearCB = new ComboBox();
+        yearCB = new ComboBox();
         yearCB.setContainerDataSource(entranceYearBIC);
         yearCB.setNullSelectionAllowed(false);
         yearCB.setTextInputAllowed(true);
@@ -250,23 +274,25 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
     }
 
     private void refresh(List<V_LOAD_TO_CHAIR_WITH_GROUPS> loads, List<V_LOAD_TO_CHAIR_COUNT> loadCounts,
-                         List<V_LOAD_TO_CHAIR_COUNT_ALL> loadAllCounts) {
-        try {
-            ((DBGridModel) loadGW.getWidgetModel()).setEntities(loads);
-            loadGW.refresh();
+                         List<V_LOAD_TO_CHAIR_COUNT_ALL> loadAllCounts, ENTRANCE_YEAR year) {
+        if(year!=null) {
+            try {
+                ((DBGridModel) loadGW.getWidgetModel()).setEntities(loads);
+                loadGW.refresh();
 
-            ((DBGridModel) countGW.getWidgetModel()).setEntities(loadCounts);
-            countGW.refresh();
+                ((DBGridModel) countGW.getWidgetModel()).setEntities(loadCounts);
+                countGW.refresh();
 
-            ((DBGridModel) totalCountGW.getWidgetModel()).setEntities(loadAllCounts);
-            totalCountGW.refresh();
-        } catch (Exception ex) {
-            CommonUtils.showMessageAndWriteLog("Unable to refresh loading to chair", ex);
+                ((DBGridModel) totalCountGW.getWidgetModel()).setEntities(loadAllCounts);
+                totalCountGW.refresh();
+            } catch (Exception ex) {
+                CommonUtils.showMessageAndWriteLog("Unable to refresh loading to chair", ex);
+            }
         }
     }
 
     private List<V_LOAD_TO_CHAIR_WITH_GROUPS> getLoads(DEPARTMENT chair, STUDENT_DIPLOMA_TYPE studentDiplomaType,
-                                                       STUDY_YEAR studyYear, SEMESTER_PERIOD semesterPeriod) {
+                                                       STUDY_YEAR studyYear, SEMESTER_PERIOD semesterPeriod, ENTRANCE_YEAR year) {
         QueryModel<V_LOAD_TO_CHAIR_WITH_GROUPS> loadQM = new QueryModel<>(V_LOAD_TO_CHAIR_WITH_GROUPS.class);
         FromItem curriculumFI = loadQM.addJoin(EJoin.INNER_JOIN, "curriculum", CURRICULUM.class, "id");
         FromItem specFI = curriculumFI.addJoin(EJoin.INNER_JOIN, "speciality", SPECIALITY.class, "id");
@@ -275,7 +301,7 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
             loadQM.addWhere(semFI, "semesterPeriod", ECriteria.EQUAL, semesterPeriod.getId());
         }
         loadQM.addWhere(specFI, "department", ECriteria.EQUAL, chair.getId());
-//        loadQM.addWhere(curriculumFI, "entranceYear", ECriteria.EQUAL, currentYear.getId());
+        loadQM.addWhere("createdYear", ECriteria.EQUAL, year.getId());
         loadQM.addWhere(curriculumFI, "diplomaType", ECriteria.EQUAL, studentDiplomaType.getId());
         loadQM.addWhere("studyYear", ECriteria.EQUAL, studyYear.getId());
         loadQM.addOrder("semester");
@@ -290,7 +316,7 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
     }
 
     private List<V_LOAD_TO_CHAIR_COUNT> getLoadCount(DEPARTMENT chair, STUDENT_DIPLOMA_TYPE studentDiplomaType,
-                                                     STUDY_YEAR studyYear, SEMESTER_PERIOD semesterPeriod) {
+                                                     STUDY_YEAR studyYear, SEMESTER_PERIOD semesterPeriod, ENTRANCE_YEAR year) {
         QueryModel<V_LOAD_TO_CHAIR_COUNT> loadQM = new QueryModel<>(V_LOAD_TO_CHAIR_COUNT.class);
         FromItem curriculumFI = loadQM.addJoin(EJoin.INNER_JOIN, "curriculum", CURRICULUM.class, "id");
         FromItem specFI = curriculumFI.addJoin(EJoin.INNER_JOIN, "speciality", SPECIALITY.class, "id");
@@ -300,7 +326,7 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
         }
         loadQM.addWhere(specFI, "department", ECriteria.EQUAL, chair.getId());
         loadQM.addWhere(curriculumFI, "diplomaType", ECriteria.EQUAL, studentDiplomaType.getId());
-//        loadQM.addWhere(curriculumFI, "entranceYear", ECriteria.EQUAL, currentYear.getId());
+        loadQM.addWhere("createdYear", ECriteria.EQUAL, year.getId());
         loadQM.addWhere("studyYear", ECriteria.EQUAL, studyYear.getId());
         try {
             return SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
@@ -312,7 +338,7 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
     }
 
     private List<V_LOAD_TO_CHAIR_COUNT_ALL> getLoadAllCount(DEPARTMENT chair,
-                                                            STUDENT_DIPLOMA_TYPE studentDiplomaType, SEMESTER_PERIOD semesterPeriod) {
+                                                            STUDENT_DIPLOMA_TYPE studentDiplomaType, SEMESTER_PERIOD semesterPeriod, ENTRANCE_YEAR year) {
         QueryModel<V_LOAD_TO_CHAIR_COUNT_ALL> loadQM = new QueryModel<>(V_LOAD_TO_CHAIR_COUNT_ALL.class);
         FromItem curriculumFI = loadQM.addJoin(EJoin.INNER_JOIN, "curriculum", CURRICULUM.class, "id");
         FromItem specFI = curriculumFI.addJoin(EJoin.INNER_JOIN, "speciality", SPECIALITY.class, "id");
@@ -322,7 +348,7 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
         }
         loadQM.addWhere(specFI, "department", ECriteria.EQUAL, chair.getId());
         loadQM.addWhere(curriculumFI, "diplomaType", ECriteria.EQUAL, studentDiplomaType.getId());
-//        loadQM.addWhere(curriculumFI, "entranceYear", ECriteria.EQUAL, currentYear.getId());
+        loadQM.addWhere("createdYear", ECriteria.EQUAL, year.getId());
         try {
             return SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).
                     lookup(loadQM);
@@ -336,20 +362,21 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
     public void doFilter(AbstractFilterBean abstractFilterBean) {
         FChairFilter chairFilter = (FChairFilter) abstractFilterBean;
         if (chairFilter.getChair() != null && chairFilter.getStudentDiplomaType() != null
-                && chairFilter.getStudyYear() != null) {
+                && chairFilter.getStudyYear() != null && yearCB.getValue() != null) {
             loadGW.setButtonEnabled(AbstractToolbar.ADD_BUTTON, true);
+            ENTRANCE_YEAR year =(ENTRANCE_YEAR) yearCB.getValue();
             List<V_LOAD_TO_CHAIR_WITH_GROUPS> loads = getLoads(chairFilter.getChair(), chairFilter.getStudentDiplomaType(),
-                    chairFilter.getStudyYear(), chairFilter.getSemesterPeriod());
+                    chairFilter.getStudyYear(), chairFilter.getSemesterPeriod(),year);
 
             List<V_LOAD_TO_CHAIR_COUNT> loadCounts = getLoadCount(chairFilter.getChair(),
-                    chairFilter.getStudentDiplomaType(), chairFilter.getStudyYear(), chairFilter.getSemesterPeriod());
+                    chairFilter.getStudentDiplomaType(), chairFilter.getStudyYear(), chairFilter.getSemesterPeriod(),year);
             List<V_LOAD_TO_CHAIR_COUNT> loadCountSums = getJoinListByStudyYear(loadCounts,
                     chairFilter.getSemesterPeriod() != null);
 
             List<V_LOAD_TO_CHAIR_COUNT_ALL> loadAllCounts = getLoadAllCount(chairFilter.getChair(),
-                    chairFilter.getStudentDiplomaType(), chairFilter.getSemesterPeriod());
+                    chairFilter.getStudentDiplomaType(), chairFilter.getSemesterPeriod(),year);
             List<V_LOAD_TO_CHAIR_COUNT_ALL> loadAllCountSums = getJoinList(loadAllCounts);
-            refresh(loads, loadCountSums, loadAllCountSums);
+            refresh(loads, loadCountSums, loadAllCountSums,year);
         } else {
             loadGW.setButtonEnabled(AbstractToolbar.ADD_BUTTON, false);
         }
@@ -360,7 +387,7 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
         for (V_LOAD_TO_CHAIR_COUNT_ALL count : loadAllCounts) {
 
             loadCountSum.setLcCount(loadCountSum.getLcCount() + count.getLcCount());
-            loadCountSum.setPrCount(loadCountSum.getPracticeCount() + count.getPrCount());
+            loadCountSum.setPrCount(loadCountSum.getPrCount() + count.getPrCount());
             loadCountSum.setLbCount(loadCountSum.getLbCount() + count.getLbCount());
             loadCountSum.setWithTeacherCount(loadCountSum.getWithTeacherCount() + count.getWithTeacherCount());
             loadCountSum.setRatingCount(loadCountSum.getRatingCount() + count.getRatingCount());
@@ -389,7 +416,7 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
             loadCountSum.setStudyYear(count.getStudyYear());
 
             loadCountSum.setLcCount(loadCountSum.getLcCount() + count.getLcCount());
-            loadCountSum.setPrCount(loadCountSum.getPracticeCount() + count.getPrCount());
+            loadCountSum.setPrCount(loadCountSum.getPrCount() + count.getPrCount());
             loadCountSum.setLbCount(loadCountSum.getLbCount() + count.getLbCount());
             loadCountSum.setWithTeacherCount(loadCountSum.getWithTeacherCount() + count.getWithTeacherCount());
             loadCountSum.setRatingCount(loadCountSum.getRatingCount() + count.getRatingCount());
@@ -410,7 +437,7 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
 
     @Override
     public void clearFilter() {
-        refresh(new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
+        refresh(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), null);
     }
 
     @Override
@@ -498,14 +525,14 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
                 CommonUtils.getQuery().delete(load);
             }
 
-            insert(entranceYear,false);
-            insert(entranceYear,true);
+            insert(entranceYear, false);
+            insert(entranceYear, true);
 //              insert("v_load_to_chair", false);
 //            insert("v_load_to_chair_work", true);
 
-            setSeventhSemester(entranceYear,loadToChairQM);
+            setSeventhSemester(entranceYear, loadToChairQM);
             setEighthSemester(loadToChairQM);
-            setPractice(entranceYear,loadToChairQM);
+            setPractice(entranceYear, loadToChairQM);
             setStudyYear(loadToChairQM);
 
         } catch (Exception e) {
@@ -513,11 +540,11 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
         }
     }
 
-    private void insert(ENTRANCE_YEAR entranceYear,boolean workingChair) throws Exception{
-        insert(entranceYear, "v_curriculum_detail",workingChair);
-        insert(entranceYear, "v_elective_subject",workingChair);
-        insert(entranceYear, "v_curriculum_add_program",workingChair);
-        insert(entranceYear, "v_curriculum_after_semester",workingChair);
+    private void insert(ENTRANCE_YEAR entranceYear, boolean workingChair) throws Exception {
+        insert(entranceYear, "v_curriculum_detail", workingChair);
+        insert(entranceYear, "v_elective_subject", workingChair);
+        insert(entranceYear, "v_curriculum_add_program", workingChair);
+        insert(entranceYear, "v_curriculum_after_semester", workingChair);
     }
 
     private void insert(ENTRANCE_YEAR entranceYear, String mainTable, boolean workingChair) throws Exception {
@@ -561,7 +588,7 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
                     "         INNER JOIN subject subj ON subj.id = curr_after_sem.subject_id " +
                     "         INNER JOIN curriculum curr ON curr_after_sem.curriculum_id = curr.id ");
             if (workingChair) {
-                    sqlSB.append(" inner join speciality spec on spec.id = curr.speciality_id ");
+                sqlSB.append(" inner join speciality spec on spec.id = curr.speciality_id ");
             }
             sqlSB.append("         LEFT JOIN semester sem ON sem.id = curr_after_sem.semester_id " +
                     "         INNER JOIN v_group gr ON gr.speciality_id = curr.speciality_id " +
@@ -569,7 +596,7 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
                     "  WHERE subj.deleted = FALSE " +
                     "    AND curr.deleted = FALSE " +
                     "    AND sem.study_year_id = gr.study_year_id");
-            if(workingChair){
+            if (workingChair) {
                 sqlSB.append(" and spec.chair_id = subj.chair_id ");
             }
         } else {
@@ -627,7 +654,7 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
                     "    AND sem.study_year_id = str.study_year_id " +
                     "    and spec.chair_id = subj.chair_id");
         }
-        if(workingChair){
+        if (workingChair) {
             sqlSB.append(" and spec.chair_id != 23 ");
         }
         List<LOAD_TO_CHAIR> loads = CommonUtils.getQuery().lookup(sqlSB.toString(), new HashMap<>(),
@@ -694,7 +721,7 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
                     SUBJECT subject = SessionFacadeFactory.getSessionFacade(
                             CommonEntityFacadeBean.class)
                             .lookup(SUBJECT.class, SUBJECT.MANAGE_DIPLOM);
-                    setLoadToChair(entranceYear,groups, loadToChair, group, subject, true);
+                    setLoadToChair(entranceYear, groups, loadToChair, group, subject, true);
                 }
             }
         }

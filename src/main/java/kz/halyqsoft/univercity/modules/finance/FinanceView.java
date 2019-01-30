@@ -3,6 +3,7 @@ package kz.halyqsoft.univercity.modules.finance;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.HierarchicalContainer;
+import com.vaadin.server.Sizeable;
 import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.*;
 import kz.halyqsoft.univercity.entity.beans.USERS;
@@ -58,16 +59,28 @@ public class FinanceView extends AbstractTaskView implements FilterPanelListener
     private static String FIRST_ROW = getUILocaleUtil().getEntityLabel(V_STUDENT_DEBTS.class);
     private static String SECOND_ROW = getUILocaleUtil().getEntityLabel(VStudentPayment.class);
     List<Entity> practiceInformations;
+    private StudentInfo studentInfo;
+
+    private Button  backButton;
+    private HorizontalLayout topHL;
+    private HorizontalLayout buttonPanel;
 
     public FinanceView(AbstractTask task) throws Exception {
         super(task);
 
         mainVL = new VerticalLayout();
         mainVL.setDefaultComponentAlignment(Alignment.MIDDLE_CENTER);
+
         mainHS = new HorizontalSplitPanel();
         mainHS.setImmediate(true);
         mainHS.setSizeFull();
         mainHS.setSplitPosition(15);
+
+        buttonPanel = CommonUtils.createButtonPanel();
+
+        topHL = new HorizontalLayout();
+        topHL.setWidth(100, Sizeable.Unit.PERCENTAGE);
+        topHL.setImmediate(true);
 
     }
 
@@ -104,6 +117,7 @@ public class FinanceView extends AbstractTaskView implements FilterPanelListener
                     doFilter(studentDebtPanel.getFilterBean());
                 } else if (valueChangeEvent.getProperty().getValue().toString().equals(SECOND_ROW)) {
                     mainVL.addComponent(paymentFilterPanel);
+                    mainVL.addComponent(topHL);
                     mainVL.addComponent(studentPaymentGW);
                     doFilter(paymentFilterPanel.getFilterBean());
                 }
@@ -130,6 +144,21 @@ public class FinanceView extends AbstractTaskView implements FilterPanelListener
         studentDebtGM.setMultiSelect(false);
         studentDebtGM.setRowNumberVisible(true);
         studentDebtGM.setRowNumberWidth(50);
+
+        backButton = new Button(CommonUtils.getUILocaleUtil().getCaption("backButton"));
+        backButton.setImmediate(true);
+        backButton.setVisible(false);
+        backButton.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                mainVL.removeComponent(studentInfo.getMainVL());
+                mainVL.addComponent(studentPaymentGW);
+                backButton.setVisible(false);
+            }
+        });
+
+        topHL.addComponent(backButton);
+        topHL.setComponentAlignment(backButton, Alignment.TOP_LEFT);
 
         studentPaymentGW = new GridWidget(VStudentPayment.class);
         studentPaymentGW.setCaption(getUILocaleUtil().getCaption("studentPaymentGW"));
@@ -543,24 +572,34 @@ public class FinanceView extends AbstractTaskView implements FilterPanelListener
                 "  trim(x3.LAST_NAME || ' ' || x3.FIRST_NAME || ' ' || coalesce(x3.MIDDLE_NAME, '')) fio, " +
                 "  x3.user_code," +
                 "  (sum(payment_sum)/(vsd.debt_sum+sum(payment_sum)))*100," +
-                "  (x2.created::date)::text " +
+                "  (x2.created::date)::text," +
+                "  data.begin_date,\n" +
+                "  data.end_date, " +
+                "  (vsd.debt_sum - x2.payment_sum)::text" +
                 " from student_payment x2 " +
                 "  inner join v_student x3 on x3.id = x2.student_id " +
                 "  inner join v_student_debts vsd on x3.user_code = vsd.user_code " +
+                "  inner join semester_data data on data.year_id = x3.entrance_year_id\n" +
                 " where x3.deleted = false " + sb.toString() +
-                " group by  x2.id , x3.LAST_NAME, x3.FIRST_NAME, x3.MIDDLE_NAME ,x3.user_code, vsd.debt_sum,x2.created";
+                " group by  x2.id , x3.LAST_NAME, x3.FIRST_NAME, x3.MIDDLE_NAME ,x3.user_code, vsd.debt_sum,x2.created,data.begin_date,\n" +
+                "        data.end_date, vsd.debt_sum ,x2.payment_sum;";
 
         String sqlStudent  = "select\n" +
                 "   x2.id,\n" +
                 "  trim(x3.LAST_NAME || ' ' || x3.FIRST_NAME || ' ' || coalesce(x3.MIDDLE_NAME, '')) fio,\n" +
                 "  x3.user_code,\n" +
                 "  (sum(payment_sum)/(vsd.debt_sum+sum(payment_sum)))*100  paymentSum," +
-                "  (x2.created::date)::text\n" +
+                "  (x2.created::date)::text," +
+                "   data.begin_date,\n" +
+                "   data.end_date,\n" +
+                "  (vsd.debt_sum - x2.payment_sum)::text" +
                 "from student_payment x2\n" +
                 "  inner join v_student x3 on x3.id = x2.student_id\n" +
                 "  inner join v_student_debts vsd on x3.user_code = vsd.user_code\n" +
+                "  inner join semester_data data on data.year_id = x3.entrance_year_id\n" +
                 "where x3.deleted = false " + sb.toString() + " and student_id = " + CommonUtils.getCurrentUser().getId() +
-                " group by  x2.id , x3.LAST_NAME,x3.FIRST_NAME,x3.MIDDLE_NAME ,x3.user_code, vsd.debt_sum,x2.created;";
+                " group by  x2.id , x3.LAST_NAME,x3.FIRST_NAME,x3.MIDDLE_NAME ,x3.user_code, vsd.debt_sum,x2.created,data.begin_date,\n" +
+                "        data.end_date, vsd.debt_sum ,x2.payment_sum;";
 
         if(CommonUtils.getCurrentUser().getTypeIndex()==2) {
             fillList(list, sqlStudent , params);
@@ -584,6 +623,9 @@ public class FinanceView extends AbstractTaskView implements FilterPanelListener
                     sp.setCode((String) oo[2]);
                     sp.setPaymentSum(((BigDecimal) oo[3]).doubleValue());
                     sp.setTime((String)oo[4]);
+                    sp.setBeginDate((Date) oo[5]);
+                    sp.setEndDate((Date) oo[6]);
+                    sp.setDebt((String) oo[7]);
                     list.add(sp);
                 }
             }
@@ -650,8 +692,19 @@ public class FinanceView extends AbstractTaskView implements FilterPanelListener
 
 
     @Override
-    public void handleEntityEvent(EntityEvent ev) {
-        super.handleEntityEvent(ev);
+    public void handleEntityEvent(EntityEvent entityEvent) {
+        if(entityEvent.getSource().equals(studentPaymentGW)){
+            if(entityEvent.getAction()==EntityEvent.SELECTED) {
+                if (studentPaymentGW != null) {
+                    mainVL.removeComponent(studentPaymentGW);
+                    studentInfo = new StudentInfo((VStudentPayment) studentPaymentGW.getSelectedEntity(),this);
+                    mainVL.addComponent(studentInfo.getMainVL());
+                    backButton.setVisible(true);
+                }
+            }
+        }
+        super.handleEntityEvent(entityEvent);
+
     }
 
 
@@ -694,5 +747,13 @@ public class FinanceView extends AbstractTaskView implements FilterPanelListener
         } else if (source.equals(studentPaymentGW)) {
             doFilter(paymentFilterPanel.getFilterBean());
         }
+    }
+
+    public GridWidget getStudentPaymentGW() {
+        return studentPaymentGW;
+    }
+
+    public void setStudentPaymentGW(GridWidget studentPaymentGW) {
+        this.studentPaymentGW = studentPaymentGW;
     }
 }

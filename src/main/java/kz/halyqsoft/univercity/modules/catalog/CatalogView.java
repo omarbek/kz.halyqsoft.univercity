@@ -144,8 +144,7 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                             classASW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
                         } else {
                             classASW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
-                        }
-                        qm.addWhere("typeName", null, null, true);
+                        }qm.addWhere("typeName", null, null, true);
                     } else if (entityClass.equals(AWARD.class)) {
                         classASW.setButtonVisible(AbstractToolbar.PREVIEW_BUTTON, false);
                         qm.addWhere("awardName", null, null, true);
@@ -188,8 +187,8 @@ public class CatalogView extends AbstractTaskView implements EntityListener {
                         classASW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
                         classASW.setButtonVisible(IconToolbar.ADD_BUTTON, false);
                         qm.addWhere("subjectName", null, null, true);
-                    }else if (entityClass.equals(TRAJECTORY.class)) {
-                         classASW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
+                    } else if (entityClass.equals(TRAJECTORY.class)) {
+                        classASW.setButtonVisible(IconToolbar.DELETE_BUTTON, false);
                         qm.addWhere("typeName", null, null, true);
                     }
                     /*else if (entityClass.equals(ACADEMIC_DEGREE.class)) {
