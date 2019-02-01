@@ -19,13 +19,18 @@
         <setting name="webFacet" value="Web" />
       </configuration>
     </facet>
+    <facet type="javaeeApplication" name="javaEEApplication">
+      <configuration>
+        <descriptors>
+          <deploymentDescriptor name="application.xml" url="file://$MODULE_DIR$/META-INF/application.xml" />
+        </descriptors>
+      </configuration>
+    </facet>
     <facet type="jpa" name="JPA">
       <configuration>
         <setting name="validation-enabled" value="true" />
         <setting name="provider-name" value="" />
         <datasource-mapping>
-          <factory-entry name="Entities" />
-          <factory-entry name="KBTU-PU" />
           <factory-entry name="UNIVER-PU" />
         </datasource-mapping>
         <deploymentDescriptor name="persistence.xml" url="file://$MODULE_DIR$/src/main/resources/META-INF/persistence.xml" />
@@ -42,15 +47,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$USER_HOME$/Downloads/chilkat-9.5.0-jdk8-x64/chilkat-9.5.0-jdk8-x64/chilkat.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
+    <orderEntry type="library" name="Maven: org.vaadin.addons:jsconsole:0.1.0" level="project" />
     <orderEntry type="library" name="Maven: com.google.cloud:google-cloud-speech:0.23.1-alpha" level="project" />
     <orderEntry type="library" name="Maven: io.netty:netty-tcnative-boringssl-static:2.0.3.Final" level="project" />
     <orderEntry type="library" name="Maven: com.google.cloud:google-cloud-core:1.5.1" level="project" />

@@ -4,7 +4,7 @@
              xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
              version="2.0">
     <persistence-unit name="UNIVER-PU" transaction-type="RESOURCE_LOCAL">
-        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+        <!--<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>-->
         <!--<provider>org.hibernate.ejb.HibernatePersistence</provider>-->
         <!--<mapping-file>META-INF/custom-orm.xml</mapping-file>-->
         <class>org.r3a.common.entity.ID</class>
@@ -48,7 +48,7 @@
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.ACADEMIC_FORMULA</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.ACADEMIC_STATUS</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.ADDRESS_TYPE</class>
-        <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.ATTESTATION_TYPE</class>
+        <!--<class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.ATTESTATION_TYPE</class>-->
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.AWARD</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.CONTRACT_TYPE</class>
         <class>kz.halyqsoft.univercity.entity.beans.univercity.catalog.CONTROL_TYPE</class>
@@ -361,8 +361,6 @@
         <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
         <properties>
             <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
-
-
             <!--LOCAL -->
             <!--<property name="javax.persistence.jdbc.url" value="jdbc:postgresql://185.146.3.193:5432/college"/>-->
             <!--<property name="javax.persistence.jdbc.user" value="postgres"/>-->
@@ -382,7 +380,6 @@
             <!--<property name="javax.persistence.jdbc.user" value="postgres"/>-->
             <!--<property name="javax.persistence.jdbc.password" value="ukpu18!"/>-->
 
-
             <!--<property name="javax.persistence.jdbc.user" value="${javax.persistence.jdbc.user}"/>-->
             <!--<property name="javax.persistence.jdbc.password" value="${javax.persistence.jdbc.password}"/>-->
             <property name="eclipselink.connection-pool.default.initial" value="1"/>
@@ -393,7 +390,7 @@
             <property name="eclipselink.ddl-generation" value="none"/>
             <!-- <property name="eclipselink.ddl-generation.output-mode" value="database"/> -->
             <!-- <property name="eclipselink.jdbc.cache-statements" value="true"/> -->
-            <!-- <property name="eclipselink.jdbc.cache-statements.size" value="100"/> -->
+            <!-- <property name="eclipselink.jdbc.cache-statements.size" va lue="100"/> -->
             <property name="eclipselink.logging.level.sql" value="FINE"/>
             <property name="eclipselink.logging.parameters" value="true"/>
             <property name="show-sql" value="false"/>

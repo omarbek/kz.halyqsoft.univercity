@@ -52,6 +52,13 @@
 	</dependencyManagement>
 
 	<dependencies>
+
+		<dependency>
+			<groupId>org.vaadin.addons</groupId>
+			<artifactId>jsconsole</artifactId>
+			<version>0.1.0</version>
+		</dependency>
+
 		<dependency>
 			<groupId>com.google.cloud</groupId>
 			<artifactId>google-cloud-speech</artifactId>
@@ -208,16 +215,16 @@
 			<version>9.4-1200-jdbc41</version>
 		</dependency>
 		<!--<dependency>-->
-			<!--<groupId>com.vaadin</groupId>-->
-			<!--<artifactId>vaadin-push</artifactId>-->
-			<!--<version>8.5.1</version>-->
+		<!--<groupId>com.vaadin</groupId>-->
+		<!--<artifactId>vaadin-push</artifactId>-->
+		<!--<version>8.5.1</version>-->
 		<!--</dependency>-->
 
 		<!--last-->
 	</dependencies>
 
 	<build>
-		<finalName>edu</finalName>
+		<finalName>ukpu</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -225,16 +232,16 @@
 				<version>3.0.0</version>
 				<configuration>
 					<!--<filters>-->
-						<!--<filter>src/main/resources/persistence/development/config.properties</filter>-->
+					<!--<filter>src/main/resources/persistence/development/config.properties</filter>-->
 					<!--</filters>-->
 					<!--<webResources>-->
-						<!--<resource>-->
-							<!--<directory>src/main/resources</directory>-->
-							<!--<filtering>true</filtering>-->
-							<!--<excludes>-->
-								<!--<exclude>VAADIN/**</exclude>-->
-							<!--</excludes>-->
-						<!--</resource>-->
+					<!--<resource>-->
+					<!--<directory>src/main/resources</directory>-->
+					<!--<filtering>true</filtering>-->
+					<!--<excludes>-->
+					<!--<exclude>VAADIN/**</exclude>-->
+					<!--</excludes>-->
+					<!--</resource>-->
 					<!--</webResources>-->
 
 					<failOnMissingWebXml>false</failOnMissingWebXml>

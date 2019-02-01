@@ -427,6 +427,7 @@ public class AutoCreationTab extends AbstractCommonView  implements FilterPanelL
         specialityComboBox.setFilteringMode(FilteringMode.CONTAINS);
         specialityComboBox.setWidth(300, Unit.PIXELS);
         QueryModel<SPECIALITY> specialityQM = new QueryModel<>(SPECIALITY.class);
+        specialityQM.addWhere("deleted" , ECriteria.EQUAL ,false);
         BeanItemContainer<SPECIALITY> specialityBIC = new BeanItemContainer<>(SPECIALITY.class,
                 SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(specialityQM));
         specialityComboBox.setContainerDataSource(specialityBIC);

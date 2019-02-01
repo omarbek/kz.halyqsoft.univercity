@@ -606,20 +606,38 @@ public class ScheduleView extends AbstractTaskView {
                 }
             }
             QueryModel<LESSON> lessonQM = new QueryModel<>(LESSON.class);
-            lessonQM.addWhereIn("scheduleDetail" , ids);
-            List<LESSON> lessonList = CommonUtils.getQuery().lookup(lessonQM);
-            List<ID> lessonIds = new ArrayList<>();
-            for(LESSON lesson : lessonList){
-                lessonIds.add(lesson.getId());
-            }
+            if(ids.size()>0){
+                lessonQM.addWhereIn("scheduleDetail" , ids);
+                lessonQM.addSelect("id");
+                List<LESSON> lessonList = CommonUtils.getQuery().lookup(lessonQM);
+                List<ID> lessonIds = new ArrayList<>();
+                for(LESSON lesson : lessonList){
+                    lessonIds.add(lesson.getId());
+                }
 
-            if(lessonIds.size()> 0){
-                QueryModel<LESSON_DETAIL> lessonDetailQM = new QueryModel<>(LESSON_DETAIL.class);
-                lessonQM.addWhereIn("lesson" , lessonIds);
-                CommonUtils.getQuery().delete(CommonUtils.getQuery().lookup(lessonDetailQM));
-            }
-            if(lessonList.size()>0){
-                CommonUtils.getQuery().delete(lessonList);
+                if(lessonIds.size()> 0){
+                    QueryModel<LESSON_DETAIL> lessonDetailQM = new QueryModel<>(LESSON_DETAIL.class);
+                    lessonDetailQM.addWhereIn("lesson" , lessonIds);
+                    lessonDetailQM.addSelect("id");
+                    List<LESSON_DETAIL> lessonDetails = CommonUtils.getQuery().lookup(lessonDetailQM);
+                    if(lessonDetails.size() > 0){
+                        String sql = "delete from lesson_detail where id in ( ";
+                        for(LESSON_DETAIL ls : lessonDetails){
+                            sql+= ls.getId().getId().longValue() +", ";
+                        }
+                        sql += lessonDetails.get(0).getId().getId().longValue();
+                        sql += ")";
+                        Map params = new HashMap<Integer, Object>();
+                        try{
+                            CommonUtils.getQuery().lookupSingle(sql ,params);
+                        }catch (Exception e){
+                            //Ignored
+                        }
+                    }
+                }
+                if(lessonList.size()>0){
+                    CommonUtils.getQuery().delete(lessonList);
+                }
             }
             SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).delete(entities);
             refresh();
