@@ -121,7 +121,7 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
         loadHL.addComponent(yearCB);
 
         Button generateButton = new Button();
-        generateButton.setCaption(getUILocaleUtil().getCaption("generate") + "sd");
+        generateButton.setCaption(getUILocaleUtil().getCaption("generate"));
         generateButton.setEnabled(false);
         generateButton.addClickListener(new Button.ClickListener() {
             @Override
@@ -206,6 +206,7 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
 
         loadGW = new GridWidget(V_LOAD_TO_CHAIR_WITH_GROUPS.class);
         loadGW.addEntityListener(this);
+
         loadGW.setButtonEnabled(AbstractToolbar.ADD_BUTTON, false);
         Button openBtn = new Button(getUILocaleUtil().getCaption("open"));
         openBtn.setIcon(FontAwesome.SIGN_IN);
@@ -221,7 +222,73 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
                 }
             }
         });
-        loadGW.getToolbarPanel().addComponent(openBtn);
+
+        Button copyButton = new Button(getUILocaleUtil().getCaption("copy"));
+        copyButton.setIcon(FontAwesome.ADJUST);
+        copyButton.addClickListener(new Button.ClickListener() {
+            @Override
+            public void buttonClick(Button.ClickEvent clickEvent) {
+                if (loadGW.getSelectedEntity() != null) {
+                    V_LOAD_TO_CHAIR_WITH_GROUPS loadToChair = (V_LOAD_TO_CHAIR_WITH_GROUPS) loadGW.getSelectedEntity();
+                    try {
+                        GROUPS groups = null;
+                        if (loadToChair.getStream() != null) {
+                            if (CommonUtils.getGroupsByStream(loadToChair.getStream()).size() != 1) {
+                                Message.showError("cannot copy");
+                                return;
+                            }
+                            groups = CommonUtils.getGroupsByStream(loadToChair.getStream()).get(0);
+                        }
+
+                        LOAD_TO_CHAIR newLoadToChair = new LOAD_TO_CHAIR();
+                        newLoadToChair.setSubject(loadToChair.getSubject());
+                        newLoadToChair.setCurriculum(loadToChair.getCurriculum());
+                        newLoadToChair.setStudyYear(loadToChair.getStudyYear());
+                        newLoadToChair.setStream(null);
+                        newLoadToChair.setGroup(groups);
+                        newLoadToChair.setSemester(loadToChair.getSemester());
+                        newLoadToChair.setCredit(loadToChair.getCredit());
+                        newLoadToChair.setCreatedYear(loadToChair.getCreatedYear());
+                        newLoadToChair.setDepartment(loadToChair.getDepartment());
+
+                        newLoadToChair.setLcCount(loadToChair.getLcCount());
+                        newLoadToChair.setPrCount(loadToChair.getPrCount());
+                        newLoadToChair.setLbCount(loadToChair.getLbCount());
+                        newLoadToChair.setWithTeacherCount(loadToChair.getWithTeacherCount());
+                        newLoadToChair.setRatingCount(loadToChair.getRatingCount());
+                        newLoadToChair.setExamCount(loadToChair.getExamCount());
+                        newLoadToChair.setControlCount(loadToChair.getControlCount());
+                        newLoadToChair.setCourseWorkCount(loadToChair.getCourseWorkCount());
+                        newLoadToChair.setDiplomaCount(loadToChair.getDiplomaCount());
+                        newLoadToChair.setPracticeCount(loadToChair.getPracticeCount());
+                        newLoadToChair.setMek(loadToChair.getMek());
+                        newLoadToChair.setProtectDiplomaCount(loadToChair.getProtectDiplomaCount());
+
+                        newLoadToChair.setStudentNumber(loadToChair.getStudentNumber());
+                        newLoadToChair.setTotalCount(loadToChair.getTotalCount());
+
+                        CommonUtils.getQuery().create(newLoadToChair);
+                    } catch (Exception e) {
+                        CommonUtils.showMessageAndWriteLog("Unable to create load to chair or index", e);
+                    }
+                    doFilter(filterPanel.getFilterBean());
+                } else {
+                    Message.showError(getUILocaleUtil().getMessage("chooseARecord"));
+                }
+            }
+        });
+        loadGW.getToolbarPanel().
+
+                setSpacing(true);
+        loadGW.getToolbarPanel().
+
+                addComponent(copyButton);
+        loadGW.getToolbarPanel().
+
+                addComponent(openBtn);
+        loadGW.getToolbarPanel().
+
+                setSizeUndefined();
 
         DBGridModel loadGM = (DBGridModel) loadGW.getWidgetModel();
         loadGM.setTitleVisible(false);
@@ -229,19 +296,42 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
         loadGM.setRefreshType(ERefreshType.MANUAL);
         loadGM.setCrudEntityClass(LOAD_TO_CHAIR.class);
 
-        subjectQM = ((FKFieldModel) loadGM.getFormModel().getFieldModel("subject")).getQueryModel();
+        subjectQM = ((FKFieldModel) loadGM.getFormModel().
+
+                getFieldModel("subject")).
+
+                getQueryModel();
         subjectQM.addWhere("deleted", false);
 
-        curriculumQM = ((FKFieldModel) loadGM.getFormModel().getFieldModel("curriculum")).getQueryModel();
+        curriculumQM = ((FKFieldModel) loadGM.getFormModel().
+
+                getFieldModel("curriculum")).
+
+                getQueryModel();
         curriculumQM.addWhere("deleted", false);
 
-        groupQM = ((FKFieldModel) loadGM.getFormModel().getFieldModel("group")).getQueryModel();
+        groupQM = ((FKFieldModel) loadGM.getFormModel().
+
+                getFieldModel("group")).
+
+                getQueryModel();
         groupQM.addWhere("deleted", false);
 
-        semesterQM = ((FKFieldModel) loadGM.getFormModel().getFieldModel("semester")).getQueryModel();
-        streamQM = ((FKFieldModel) loadGM.getFormModel().getFieldModel("stream")).getQueryModel();
+        semesterQM = ((FKFieldModel) loadGM.getFormModel().
 
-        countGW = new GridWidget(V_LOAD_TO_CHAIR_COUNT.class);
+                getFieldModel("semester")).
+
+                getQueryModel();
+
+        streamQM = ((FKFieldModel) loadGM.getFormModel().
+
+                getFieldModel("stream")).
+
+                getQueryModel();
+
+        countGW = new
+
+                GridWidget(V_LOAD_TO_CHAIR_COUNT.class);
         countGW.showToolbar(false);
 
         DBGridModel countGM = (DBGridModel) countGW.getWidgetModel();
@@ -249,7 +339,9 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
         countGM.setHeightByRows(2);
         countGM.setRefreshType(ERefreshType.MANUAL);
 
-        totalCountGW = new GridWidget(V_LOAD_TO_CHAIR_COUNT_ALL.class);
+        totalCountGW = new
+
+                GridWidget(V_LOAD_TO_CHAIR_COUNT_ALL.class);
         totalCountGW.showToolbar(false);
 
         DBGridModel totalCountGM = (DBGridModel) totalCountGW.getWidgetModel();
@@ -264,13 +356,25 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
         }
 
         getContent().addComponent(loadGW);
-        getContent().setComponentAlignment(loadGW, Alignment.MIDDLE_CENTER);
 
-        getContent().addComponent(countGW);
-        getContent().setComponentAlignment(countGW, Alignment.MIDDLE_CENTER);
+        getContent().
 
-        getContent().addComponent(totalCountGW);
+                setComponentAlignment(loadGW, Alignment.MIDDLE_CENTER);
+
+        getContent().
+
+                addComponent(countGW);
+
+        getContent().
+
+                setComponentAlignment(countGW, Alignment.MIDDLE_CENTER);
+
+        getContent().
+
+                addComponent(totalCountGW);
+
         getContent().setComponentAlignment(totalCountGW, Alignment.MIDDLE_CENTER);
+
     }
 
     private void refresh(List<V_LOAD_TO_CHAIR_WITH_GROUPS> loads, List<V_LOAD_TO_CHAIR_COUNT> loadCounts,
@@ -439,7 +543,8 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
 
     @Override
     public void handleEntityEvent(EntityEvent ev) {
-        if (ev.getAction() == EntityEvent.REMOVED || ev.getAction() == EntityEvent.MERGED || ev.getAction() == EntityEvent.CREATED) {
+        if (ev.getAction() == EntityEvent.REMOVED || ev.getAction() == EntityEvent.MERGED
+                || ev.getAction() == EntityEvent.CREATED) {
             doFilter(filterPanel.getFilterBean());
         }
     }
@@ -495,17 +600,19 @@ public class LoadToChairView extends AbstractTaskView implements FilterPanelList
                     + loadToChair.getPracticeCount() + loadToChair.getMek() + loadToChair.getProtectDiplomaCount());
             loadToChair.setCredit(loadToChair.getSubject().getCreditability().getCredit().doubleValue());
 
-            GROUPS group = loadToChair.getGroup();
-            if (group == null) {
-                QueryModel<GROUPS> groupOfStreamQM = new QueryModel<>(GROUPS.class);
-                FromItem groupStreamFI = groupOfStreamQM.addJoin(EJoin.INNER_JOIN, "id", STREAM_GROUP.class, "group");
-                groupOfStreamQM.addWhere(groupStreamFI, "stream", ECriteria.EQUAL, loadToChair.getStream().getId());
-                List<GROUPS> groups = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
-                        groupOfStreamQM);
-                group = groups.get(0);
+            if (isNew) {
+                GROUPS group = loadToChair.getGroup();
+                if (group == null) {
+                    QueryModel<GROUPS> groupOfStreamQM = new QueryModel<>(GROUPS.class);
+                    FromItem groupStreamFI = groupOfStreamQM.addJoin(EJoin.INNER_JOIN, "id", STREAM_GROUP.class, "group");
+                    groupOfStreamQM.addWhere(groupStreamFI, "stream", ECriteria.EQUAL, loadToChair.getStream().getId());
+                    List<GROUPS> groups = SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
+                            groupOfStreamQM);
+                    group = groups.get(0);
+                }
+                loadToChair.setStudentNumber(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
+                        V_GROUP.class, group.getId()).getStudentCount());
             }
-            loadToChair.setStudentNumber(SessionFacadeFactory.getSessionFacade(CommonEntityFacadeBean.class).lookup(
-                    V_GROUP.class, group.getId()).getStudentCount());
         } catch (Exception ex) {
             ex.printStackTrace();
         }

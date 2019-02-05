@@ -16,21 +16,19 @@ public class Main {
     public void run() throws IOException {
         Scanner scanner = new Scanner(new File("input.txt"));
         printWriter = new PrintWriter(new File("output.txt"));
-        int n = scanner.nextInt();
-        int[] array = new int[n];
-        for (int i = 0; i < array.length; i++) {
-            array[i] = scanner.nextInt();
+//        int n = scanner.nextInt();
+//        int[] array = new int[n];
+//        for (int i = 0; i < array.length; i++) {
+//            array[i] = scanner.nextInt();
+//        }
+        int i=scanner.nextInt();
+        int j=scanner.nextInt();
+        int k=scanner.nextInt();
+        if(i*j<k){
+            printWriter.print("NO");
+        }else{
+            printWriter.print("YES");
         }
-        int sumOfFifthCourse=0;
-        int sumOfThirdCourse=0;
-        int sumOfFirstCourse=0;
-        int currentSum;
-        for(int i=0;i<array.length;i++){
-            currentSum=sumOfFifthCourse+array[i];
-            sumOfFifthCourse+=currentSum;
-        }
-
-        printWriter.print(sumOfFifthCourse);
         printWriter.close();
     }
 }

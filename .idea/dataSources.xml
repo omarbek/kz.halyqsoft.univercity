@@ -7,14 +7,11 @@
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://ukpu-systems.kz:5432/univerdb</jdbc-url>
     </data-source>
-    <data-source source="LOCAL" name="univerdb@localhost" uuid="d86a80dc-8dba-46fd-a8ae-c90a1ae5fe3d">
+    <data-source source="LOCAL" name="univerdb@localhost" uuid="6f7932d2-ed34-437d-977d-76de9bfa19a6">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://localhost:5432/univerdb</jdbc-url>
-      <driver-properties>
-        <property name="ApplicationName" value="DataGrip" />
-      </driver-properties>
     </data-source>
   </component>
 </project>

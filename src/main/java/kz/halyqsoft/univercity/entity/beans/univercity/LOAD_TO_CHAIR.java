@@ -50,7 +50,7 @@ public class LOAD_TO_CHAIR extends AbstractEntity {
             @JoinColumn(name = "SEMESTER_ID", referencedColumnName = "ID")})
     private SEMESTER semester;
 
-    @FieldInfo(type = EFieldType.INTEGER, order = 9, inEdit = false)
+    @FieldInfo(type = EFieldType.INTEGER, order = 9)
     @Column(name = "STUDENT_NUMBER", nullable = false)
     private Integer studentNumber;
 
@@ -110,13 +110,13 @@ public class LOAD_TO_CHAIR extends AbstractEntity {
     @Column(name = "TOTAL_COUNT", nullable = false)
     private Double totalCount;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 24, inGrid = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 24, inGrid = false, inEdit = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "CREATED_YEAR_ID", referencedColumnName = "ID")})
     private ENTRANCE_YEAR createdYear;
 
-    @FieldInfo(type = EFieldType.FK_COMBO, order = 25, inGrid = false)
+    @FieldInfo(type = EFieldType.FK_COMBO, order = 25, inGrid = false, inEdit = false)
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "CHAIR_ID", referencedColumnName = "ID")})
